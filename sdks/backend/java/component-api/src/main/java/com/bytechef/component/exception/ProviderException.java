@@ -16,10 +16,6 @@
 
 package com.bytechef.component.exception;
 
-import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.commons.util.MapUtils;
-
-import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -63,21 +59,23 @@ public abstract class ProviderException extends RuntimeException {
     public static ProviderException fromException(@Nonnull Exception exception) {
         String exceptionMessage = exception.getMessage();
 
-        if (!exceptionMessage.startsWith("{") || !exceptionMessage.endsWith("}")) {
+        Matcher matcher = messagePattern.matcher(exception.getMessage());
+
+        if (!matcher.matches()) {
             throw new UnsupportedOperationException("Unable to convert " + exceptionMessage);
         }
 
-        Map<String, ?> map = JsonUtils.readMap(exception.getMessage());
-
         AuthorizationFailedException exceptionMessage1 = new AuthorizationFailedException(
-            MapUtils.getString(map,"exceptionMessage"), new ProviderErrorType());
+            matcher.group(2));
 
-        exceptionMessage1.withComponentName(MapUtils.getString(map, "componentName"));
+        exceptionMessage1.withComponentName(matcher.group(1));
 
         return exceptionMessage1;
     }
 
     private static Pattern http4nnPattern = Pattern.compile("^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$", Pattern.DOTALL);
+    private static Pattern messagePattern = Pattern.compile(
+        "\\{\"componentName\":\"(\\w+)\",\"exceptionMessage\":\"(.+)\",\"exceptionClass\":\"(.+)\"}", Pattern.DOTALL);
 
     public static boolean hasAuthorizationFailedExceptionContent(@Nonnull Exception exception) {
         ProviderException providerException = fromExceptionMessage(exception.getMessage());
@@ -96,10 +94,12 @@ public abstract class ProviderException extends RuntimeException {
             return providerException.getComponentName();
         }
 
-        if (!hasAuthorizationFailedExceptionContent(exception)) {
-            Map<String, ?> map = JsonUtils.readMap(exception.getMessage());
+        if (hasAuthorizationFailedExceptionContent(exception)) {
+            Matcher matcher = messagePattern.matcher(exception.getMessage());
 
-            return (String) map.get("componentName");
+            if (matcher.matches()) {
+                return matcher.group(1);
+            }
         }
 
         return null;
@@ -118,9 +118,8 @@ public abstract class ProviderException extends RuntimeException {
     @Nonnull
     @Override
     public String getMessage() {
-        return JsonUtils.write(Map.of("componentName", getComponentName(),
-            "exceptionMessage", super.getMessage(),
-            "exceptionClass", getClass().getName()));
+        return String.format("{\"componentName\":\"%s\",\"exceptionMessage\":\"%s\",\"exceptionClass\":\"%s\"}",
+            getComponentName(), super.getMessage(), getClass().getName());
     }
 
     private String componentName;
@@ -148,7 +147,7 @@ public abstract class ProviderException extends RuntimeException {
     }
 
     public static class BadRequestException extends ProviderException {
-        public BadRequestException(String message,) {
+        public BadRequestException(String message) {
             super(message);
         }
     }

@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.exception;
+package com.bytechef.component.exception;
 
-import com.bytechef.commons.util.JsonUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Map;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -29,19 +24,7 @@ import org.junit.jupiter.api.Test;
  */
 public class ProviderExceptionTest {
 
-    @BeforeAll
-    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT")
-    public static void beforeAll() {
-        class JsonUtilsMock extends JsonUtils {
-            static {
-                objectMapper = new ObjectMapper();
-            }
-        }
-
-        new JsonUtilsMock();
-    }
-
-    private String multilineMessage = """
+    private final String multilineMessage = """
         401 Unauthorized
         POST https://ss.gopis.com/v4/spreadsheets/132YEL8BnzkalU40J2/values/Sheet1:append?valueInputOption=RAW
         """;
@@ -61,12 +44,12 @@ public class ProviderExceptionTest {
         ProviderException providerException = ProviderException.fromExceptionMessage(multilineMessage)
             .withComponentName("byteChefComponent");
 
-        Map<String, ?> map = JsonUtils.readMap(providerException.getMessage());
+        String exceptionMessage = providerException.getMessage();
 
-        Assertions.assertEquals(map.get("exceptionMessage"), multilineMessage);
-        Assertions.assertEquals(map.get("exceptionClass"),
-            ProviderException.AuthorizationFailedException.class.getName());
-        Assertions.assertEquals(map.get("componentName"), "byteChefComponent");
+        Assertions.assertTrue(exceptionMessage.contains(multilineMessage));
+        Assertions
+            .assertTrue(exceptionMessage.contains(ProviderException.AuthorizationFailedException.class.getName()));
+        Assertions.assertTrue(exceptionMessage.contains("byteChefComponent"));
     }
 
 }
