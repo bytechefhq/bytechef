@@ -20,7 +20,6 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
-import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.ConnectionDefinition;
 import com.bytechef.platform.component.registry.facade.ConnectionDefinitionFacade;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
@@ -98,12 +97,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
                 AuthorizationCallbackResponse authorizationCallbackResponse =
                     connectionDefinitionFacade.executeAuthorizationCallback(
-                        connection.getComponentName(),
-                        new ComponentConnection(
-                            connection.getComponentName(), connection.getConnectionVersion(),
-                            oAuth2Service.checkPredefinedParameters(
-                                connection.getComponentName(), connection.getParameters()),
-                            connection.getAuthorizationName()),
+                        connection.getComponentName(), connection.getAuthorizationName(), connection.getParameters(),
                         oAuth2Service.getRedirectUri());
 
                 connection.putAllParameters(authorizationCallbackResponse.result());

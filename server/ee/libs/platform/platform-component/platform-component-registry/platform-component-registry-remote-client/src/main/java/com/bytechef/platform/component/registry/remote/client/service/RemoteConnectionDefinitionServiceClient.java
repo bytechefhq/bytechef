@@ -22,6 +22,7 @@ import com.bytechef.platform.component.registry.remote.client.AbstractWorkerClie
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -49,14 +50,16 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
 
     @Override
     public ApplyResponse executeAuthorizationApply(
-        @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
+        @NonNull String componentName, @NonNull String authorizatioName, @NonNull Map<String, ?> authorizationParms,
+        @NonNull Context context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public AuthorizationCallbackResponse executeAuthorizationCallback(
-        @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context,
+        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParms,
+        @NonNull Context context,
         @NonNull String redirectUri) {
 
         throw new UnsupportedOperationException();
@@ -70,7 +73,8 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
 
     @Override
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
+        @NonNull String componentName, @NonNull String authorizatioName, @NonNull Map<String, ?> authorizationParms,
+        @NonNull Context context) {
 
         throw new UnsupportedOperationException();
     }
@@ -136,9 +140,10 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
     }
 
     @Override
-    public RefreshTokenResponse
-        executeRefresh(
-            @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
+    public RefreshTokenResponse executeRefresh(
+        @NonNull String componentName, @NonNull String authorizationName,
+        @NonNull Map<String, ?> authorizationParms, @NonNull Context context) {
+
         throw new UnsupportedOperationException("This method is still under development");
     }
 }

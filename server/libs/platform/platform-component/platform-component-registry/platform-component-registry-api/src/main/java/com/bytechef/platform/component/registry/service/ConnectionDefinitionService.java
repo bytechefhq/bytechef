@@ -25,6 +25,7 @@ import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.ConnectionDefinition;
 import com.bytechef.platform.component.registry.domain.OAuth2AuthorizationParameters;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.lang.NonNull;
 
@@ -34,20 +35,23 @@ import org.springframework.lang.NonNull;
 public interface ConnectionDefinitionService {
 
     ApplyResponse executeAuthorizationApply(
-        @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context);
+        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParms,
+        @NonNull Context context);
 
     AuthorizationCallbackResponse executeAuthorizationCallback(
-        @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context,
-        @NonNull String redirectUri);
+        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParms,
+        @NonNull Context context, @NonNull String redirectUri);
 
     Optional<String> executeBaseUri(
         @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context);
 
     RefreshTokenResponse executeRefresh(
-        @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context);
+        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParms,
+        @NonNull Context context);
 
     OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context);
+        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParms,
+        @NonNull Context context);
 
     Authorization.AuthorizationType getAuthorizationType(
         @NonNull String componentName, int connectionVersion, @NonNull String authorizationName);

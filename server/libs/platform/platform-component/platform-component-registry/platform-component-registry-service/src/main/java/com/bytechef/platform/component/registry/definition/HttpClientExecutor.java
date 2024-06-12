@@ -318,7 +318,7 @@ public class HttpClientExecutor {
         }
 
         ApplyResponse applyResponse = connectionDefinitionService.executeAuthorizationApply(
-            componentName, componentConnection, context);
+            componentName, componentConnection.authorizationName(), componentConnection.getParameters(), context);
 
         if (applyResponse != null) {
             headers.putAll(applyResponse.getHeaders());
