@@ -46,11 +46,11 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ScriptComponentDefinition;
 import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
-import com.bytechef.platform.component.registry.constant.ConnectionDefinitionErrorType;
 import com.bytechef.platform.component.registry.definition.ParametersImpl;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.ConnectionDefinition;
 import com.bytechef.platform.component.registry.domain.OAuth2AuthorizationParameters;
+import com.bytechef.platform.component.registry.exception.ConnectionDefinitionErrorType;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.Methanol;
@@ -328,7 +328,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                     List.of(
                         Authorization.BEARER + " " +
                             MapUtils.getString(connectionParameters, Authorization.TOKEN))));
-            case CUSTOM -> (Parameters connectionParameters, Context context) -> null;
+            case CUSTOM, NONE -> (Parameters connectionParameters, Context context) -> null;
             case OAUTH2_AUTHORIZATION_CODE, OAUTH2_AUTHORIZATION_CODE_PKCE, OAUTH2_CLIENT_CREDENTIALS,
                 OAUTH2_IMPLICIT_CODE, OAUTH2_RESOURCE_OWNER_PASSWORD -> (
                     Parameters connectionParameters, Context context) -> ApplyResponse.ofHeaders(
