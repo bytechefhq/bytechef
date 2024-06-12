@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("IntegrationInstanceConfiguration_integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-12T07:17:52.854457+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-12T12:40:29.165080+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class IntegrationInstanceConfigurationIntegrationModel {
 
   private Boolean allowMultipleInstances = false;

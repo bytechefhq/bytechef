@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Resources", description = "A set of available resources.")
 @JsonTypeName("Resources")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-12T07:17:53.466209+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-12T12:42:24.418512+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class ResourcesModel {
 
   private String documentationUrl;

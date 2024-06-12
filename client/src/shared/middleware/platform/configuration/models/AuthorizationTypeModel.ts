@@ -23,6 +23,7 @@ export const AuthorizationTypeModel = {
     BearerToken: 'BEARER_TOKEN',
     Custom: 'CUSTOM',
     DigestAuth: 'DIGEST_AUTH',
+    None: 'NONE',
     Oauth2AuthorizationCode: 'OAUTH2_AUTHORIZATION_CODE',
     Oauth2AuthorizationCodePkce: 'OAUTH2_AUTHORIZATION_CODE_PKCE',
     Oauth2ClientCredentials: 'OAUTH2_CLIENT_CREDENTIALS',
