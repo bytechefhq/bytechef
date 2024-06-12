@@ -69,9 +69,14 @@ public class RemoteConnectionDefinitionFacadeController {
     public ResponseEntity<OAuth2AuthorizationParameters> getOAuth2AuthorizationParameters(
         @Valid @RequestBody ConnectionRequest connectionRequest) {
 
+        if ((connectionRequest == null) || (connectionRequest.connection == null)) {
+            return ResponseEntity.badRequest()
+                .build();
+        }
+
         return ResponseEntity.ok(
             connectionDefinitionFacade.getOAuth2AuthorizationParameters(
-                connectionRequest.componentName, connectionRequest.connection.authorizationName(),
+                connectionRequest.componentName, connectionRequest.connection.getAuthorizationName(),
                 connectionRequest.connection.getParameters()));
     }
 

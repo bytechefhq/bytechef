@@ -177,11 +177,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                                     CollectionUtils.findFirstMapOrElse(connections.values(),
                                         (componentConnection) -> MapUtils.concatDifferentTypes(
                                             componentConnection.getParameters(),
-                                            componentConnection.authorizationName() == null
-                                                ? Map.of()
-                                                : Map.of(
-                                                    Authorization.AUTHORIZATION_TYPE,
-                                                    componentConnection.authorizationName())),
+                                            Map.of(
+                                                Authorization.AUTHORIZATION_TYPE,
+                                                componentConnection.authorizationName())),
                                         Map.of())),
                                 context);
                         case MultipleConnectionsPerformFunction multipleConnectionsPerformFunction ->

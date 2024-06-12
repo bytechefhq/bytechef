@@ -21,14 +21,24 @@ import com.bytechef.platform.component.definition.ParameterConnection;
 import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
 public record ComponentConnection(
-    String componentName, int version, long connectionId, Map<String, ?> parameters, String authorizationName)
+    String componentName, int version, long connectionId, @NonNull Map<String, ?> parameters,
+    @NonNull String authorizationName)
     implements ParameterConnection {
+
+    public ComponentConnection {
+        authorizationName = authorizationName.trim();
+
+        if (authorizationName.isEmpty()) {
+            throw new IllegalArgumentException("Authorization name must not be empty or blank");
+        }
+    }
 
     @Override
     public String getComponentName() {
