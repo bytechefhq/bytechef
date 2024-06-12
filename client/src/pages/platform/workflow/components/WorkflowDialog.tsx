@@ -14,7 +14,7 @@ import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
 import {WorkflowModel} from '@/shared/middleware/platform/configuration';
 import {UseMutationResult, UseQueryResult} from '@tanstack/react-query';
-import {ReactNode, useState} from 'react';
+import {ReactNode, useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
 const SPACE = 4;
@@ -112,6 +112,13 @@ const WorkflowDialog = ({
 
         closeDialog();
     }
+
+    useEffect(() => {
+        reset({
+            description: workflow?.description || '',
+            label: workflow?.label || '',
+        });
+    }, [workflow, reset]);
 
     return (
         <Dialog
