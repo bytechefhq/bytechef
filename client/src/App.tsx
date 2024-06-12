@@ -80,11 +80,9 @@ const embeddedNavigation: {
 ];
 
 function App() {
-    const {authenticated} = useAuthenticationStore();
+    const {authenticated, getAccount, sessionHasBeenFetched, showLogin} = useAuthenticationStore();
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-    const {getAccount, showLogin} = useAuthenticationStore();
 
     const location = useLocation();
 
@@ -109,10 +107,10 @@ function App() {
     }, [showLogin, navigate]);
 
     useEffect(() => {
-        if (!authenticated) {
+        if (sessionHasBeenFetched && !authenticated) {
             navigate('/login');
         }
-    }, [authenticated, navigate]);
+    }, [authenticated, sessionHasBeenFetched, navigate]);
 
     if (!authenticated) {
         return <></>;

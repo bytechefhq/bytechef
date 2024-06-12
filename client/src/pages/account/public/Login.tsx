@@ -50,7 +50,7 @@ const Login = () => {
         }
     }, [authenticated, navigate]);
 
-    if (loading) {
+    if (loading || !sessionHasBeenFetched) {
         return <></>;
     }
 
