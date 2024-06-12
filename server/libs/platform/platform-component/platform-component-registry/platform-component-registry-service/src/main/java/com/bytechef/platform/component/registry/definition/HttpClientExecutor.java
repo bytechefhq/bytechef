@@ -59,6 +59,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import javax.net.ssl.SSLContext;
@@ -183,7 +184,7 @@ public class HttpClientExecutor {
             }
         }
 
-        if (!configuration.isDisableAuthorization()) {
+        if (!configuration.isDisableAuthorization() && (componentConnection != null)) {
             applyAuthorization(headers, queryParameters, componentName, componentConnection, context);
 
             if (Objects.equals("oauth2_authorization_code", componentConnection.getAuthorizationName())) {
@@ -247,8 +248,7 @@ public class HttpClientExecutor {
     HttpRequest createHTTPRequest(
         String urlString, RequestMethod requestMethod, Map<String, List<String>> headers,
         Map<String, List<String>> queryParameters, Body body, String componentName,
-        ComponentConnection componentConnection,
-        Context context) {
+        ComponentConnection componentConnection, Context context) {
 
         HttpRequest.Builder httpRequestBuilder = HttpRequest
             .newBuilder()
@@ -269,35 +269,31 @@ public class HttpClientExecutor {
     }
 
     Response handleResponse(HttpResponse<?> httpResponse, Configuration configuration) {
-        Response response;
         HttpHeaders httpHeaders = httpResponse.headers();
+        ResponseType responseType = configuration.getResponseType();
+        int statusCode = httpResponse.statusCode();
 
-        Map<String, List<String>> headers = httpHeaders.map();
-
-        if (configuration.getResponseType() == null) {
-            response = new ResponseImpl(headers, null, httpResponse.statusCode());
-        } else {
-            Object httpResponseBody = httpResponse.body();
-            ResponseType responseType = configuration.getResponseType();
-
-            Object body;
-
-            if (!isEmpty(httpResponseBody) && responseType == Http.ResponseType.BINARY) {
-                body = storeBinaryResponseBody(configuration, headers, (InputStream) httpResponseBody);
-            } else if (responseType == Http.ResponseType.JSON) {
-                body = isEmpty(httpResponseBody) ? null
-                    : com.bytechef.commons.util.JsonUtils.read(httpResponseBody.toString());
-            } else if (responseType == Http.ResponseType.TEXT) {
-                body = isEmpty(httpResponseBody) ? null : httpResponseBody.toString();
-            } else {
-                body = isEmpty(httpResponseBody) ? null
-                    : com.bytechef.commons.util.XmlUtils.read(httpResponseBody.toString());
-            }
-
-            response = new ResponseImpl(headers, body, httpResponse.statusCode());
+        if ((responseType == null) || !matches(responseType, httpHeaders.firstValue("content-type"))) {
+            return new ResponseImpl(httpHeaders.map(), null, statusCode);
         }
 
-        return response;
+        Object httpResponseBody = httpResponse.body();
+
+        if (isEmpty(httpResponseBody)) {
+            return new ResponseImpl(httpHeaders.map(), null, statusCode);
+        }
+
+        switch (responseType) {
+            case BINARY -> new ResponseImpl(
+                httpHeaders.map(),
+                storeBinaryResponseBody(configuration, httpHeaders.map(), (InputStream) httpResponseBody), statusCode);
+            case JSON -> new ResponseImpl(
+                httpHeaders.map(), com.bytechef.commons.util.JsonUtils.read(httpResponseBody.toString()), statusCode);
+            case XML -> new ResponseImpl(
+                httpHeaders.map(), com.bytechef.commons.util.XmlUtils.read(httpResponseBody.toString()), statusCode);
+        }
+
+        return new ResponseImpl(httpHeaders.map(), httpResponseBody.toString(), statusCode);
     }
 
     private void addFileEntry(MultipartBodyPublisher.Builder builder, String name, FileEntry fileEntry) {
@@ -415,6 +411,16 @@ public class HttpClientExecutor {
         }
 
         return false;
+    }
+
+    private boolean matches(ResponseType responseType, Optional<String> contentTypeValueOptional) {
+        String responseTypeValue = responseType.name();
+
+        if (contentTypeValueOptional.isEmpty() || !Objects.equals(responseTypeValue, contentTypeValueOptional.get())) {
+            return false;
+        }
+
+        return true;
     }
 
     private FileEntry storeBinaryResponseBody(
