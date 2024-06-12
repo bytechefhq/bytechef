@@ -51,7 +51,7 @@ public class ConnectionServiceImpl implements ConnectionService {
         Validate.notBlank(connection.getComponentName(), "'componentName' must not be empty");
         Validate.notBlank(connection.getName(), "'name' must not be empty");
         Validate.isTrue(connection.getId() == null, "'id' must be null");
-// ovdje se ne sprema token_url - kako doći do tokenUrl
+
         return connectionRepository.save(connection);
     }
 
