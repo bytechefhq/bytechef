@@ -18,3 +18,4 @@ Initial users available:
 - `./gradlew spotbugsMain spotbugsTest` - Checks `spotbugs` rules for the source code and tests
 - `./gradlew check` - Executes all above tasks
 - `./gradlew compileTestJava` - Compiles the source code and tests
+- `./gradlew spotlessApply` - Source formats the source code and tests
