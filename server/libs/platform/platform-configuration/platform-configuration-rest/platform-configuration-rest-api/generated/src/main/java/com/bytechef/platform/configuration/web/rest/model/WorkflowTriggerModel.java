@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTrigger", description = "Represents a definition of a workflow trigger.")
 @JsonTypeName("WorkflowTrigger")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-12T20:31:09.935905+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-13T06:45:36.300303+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class WorkflowTriggerModel {
 
   @Valid
@@ -36,6 +36,9 @@ public class WorkflowTriggerModel {
   private String description;
 
   private String label;
+
+  @Valid
+  private Map<String, Object> metadata = new HashMap<>();
 
   private String name;
 
@@ -124,6 +127,34 @@ public class WorkflowTriggerModel {
 
   public void setLabel(String label) {
     this.label = label;
+  }
+
+  public WorkflowTriggerModel metadata(Map<String, Object> metadata) {
+    this.metadata = metadata;
+    return this;
+  }
+
+  public WorkflowTriggerModel putMetadataItem(String key, Object metadataItem) {
+    if (this.metadata == null) {
+      this.metadata = new HashMap<>();
+    }
+    this.metadata.put(key, metadataItem);
+    return this;
+  }
+
+  /**
+   * Key-value map of metadata.
+   * @return metadata
+  */
+  
+  @Schema(name = "metadata", description = "Key-value map of metadata.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("metadata")
+  public Map<String, Object> getMetadata() {
+    return metadata;
+  }
+
+  public void setMetadata(Map<String, Object> metadata) {
+    this.metadata = metadata;
   }
 
   public WorkflowTriggerModel name(String name) {
@@ -226,6 +257,7 @@ public class WorkflowTriggerModel {
     return Objects.equals(this.connections, workflowTrigger.connections) &&
         Objects.equals(this.description, workflowTrigger.description) &&
         Objects.equals(this.label, workflowTrigger.label) &&
+        Objects.equals(this.metadata, workflowTrigger.metadata) &&
         Objects.equals(this.name, workflowTrigger.name) &&
         Objects.equals(this.parameters, workflowTrigger.parameters) &&
         Objects.equals(this.timeout, workflowTrigger.timeout) &&
@@ -234,7 +266,7 @@ public class WorkflowTriggerModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(connections, description, label, name, parameters, timeout, type);
+    return Objects.hash(connections, description, label, metadata, name, parameters, timeout, type);
   }
 
   @Override
@@ -244,6 +276,7 @@ public class WorkflowTriggerModel {
     sb.append("    connections: ").append(toIndentedString(connections)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
+    sb.append("    metadata: ").append(toIndentedString(metadata)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    parameters: ").append(toIndentedString(parameters)).append("\n");
     sb.append("    timeout: ").append(toIndentedString(timeout)).append("\n");

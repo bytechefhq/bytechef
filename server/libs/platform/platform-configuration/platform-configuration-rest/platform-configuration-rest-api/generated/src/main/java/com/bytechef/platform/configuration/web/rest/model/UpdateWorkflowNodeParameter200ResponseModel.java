@@ -22,14 +22,45 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("updateWorkflowNodeParameter_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-12T20:31:09.935905+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-13T06:45:36.300303+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class UpdateWorkflowNodeParameter200ResponseModel {
+
+  @Valid
+  private Map<String, Object> metadata = new HashMap<>();
 
   @Valid
   private Map<String, Object> parameters = new HashMap<>();
 
   @Valid
   private Map<String, Boolean> displayConditions = new HashMap<>();
+
+  public UpdateWorkflowNodeParameter200ResponseModel metadata(Map<String, Object> metadata) {
+    this.metadata = metadata;
+    return this;
+  }
+
+  public UpdateWorkflowNodeParameter200ResponseModel putMetadataItem(String key, Object metadataItem) {
+    if (this.metadata == null) {
+      this.metadata = new HashMap<>();
+    }
+    this.metadata.put(key, metadataItem);
+    return this;
+  }
+
+  /**
+   * Key-value map of metadata.
+   * @return metadata
+  */
+  
+  @Schema(name = "metadata", description = "Key-value map of metadata.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("metadata")
+  public Map<String, Object> getMetadata() {
+    return metadata;
+  }
+
+  public void setMetadata(Map<String, Object> metadata) {
+    this.metadata = metadata;
+  }
 
   public UpdateWorkflowNodeParameter200ResponseModel parameters(Map<String, Object> parameters) {
     this.parameters = parameters;
@@ -45,11 +76,11 @@ public class UpdateWorkflowNodeParameter200ResponseModel {
   }
 
   /**
-   * Get parameters
+   * Key-value map of parameters.
    * @return parameters
   */
   
-  @Schema(name = "parameters", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "parameters", description = "Key-value map of parameters.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("parameters")
   public Map<String, Object> getParameters() {
     return parameters;
@@ -73,11 +104,11 @@ public class UpdateWorkflowNodeParameter200ResponseModel {
   }
 
   /**
-   * Get displayConditions
+   * Key-value map of display condition rules.
    * @return displayConditions
   */
   
-  @Schema(name = "displayConditions", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "displayConditions", description = "Key-value map of display condition rules.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("displayConditions")
   public Map<String, Boolean> getDisplayConditions() {
     return displayConditions;
@@ -96,19 +127,21 @@ public class UpdateWorkflowNodeParameter200ResponseModel {
       return false;
     }
     UpdateWorkflowNodeParameter200ResponseModel updateWorkflowNodeParameter200Response = (UpdateWorkflowNodeParameter200ResponseModel) o;
-    return Objects.equals(this.parameters, updateWorkflowNodeParameter200Response.parameters) &&
+    return Objects.equals(this.metadata, updateWorkflowNodeParameter200Response.metadata) &&
+        Objects.equals(this.parameters, updateWorkflowNodeParameter200Response.parameters) &&
         Objects.equals(this.displayConditions, updateWorkflowNodeParameter200Response.displayConditions);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(parameters, displayConditions);
+    return Objects.hash(metadata, parameters, displayConditions);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class UpdateWorkflowNodeParameter200ResponseModel {\n");
+    sb.append("    metadata: ").append(toIndentedString(metadata)).append("\n");
     sb.append("    parameters: ").append(toIndentedString(parameters)).append("\n");
     sb.append("    displayConditions: ").append(toIndentedString(displayConditions)).append("\n");
     sb.append("}");
