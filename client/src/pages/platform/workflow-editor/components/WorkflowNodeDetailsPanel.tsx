@@ -210,6 +210,13 @@ const WorkflowNodeDetailsPanel = ({
 
         const nodeName = previousNodeNames[index];
 
+        availableDataPills.push({
+            componentIcon: componentDefinition.icon,
+            id: nodeName,
+            nodeName,
+            value: nodeName,
+        });
+
         const formattedProperties: DataPillType[] = existingProperties.map((property) => {
             if (property.properties) {
                 return getSubProperties(componentDefinition.icon!, nodeName, property.properties, property.name);
