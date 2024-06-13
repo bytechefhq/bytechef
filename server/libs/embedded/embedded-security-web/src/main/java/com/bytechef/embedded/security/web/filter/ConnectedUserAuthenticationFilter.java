@@ -16,7 +16,7 @@
 
 package com.bytechef.embedded.security.web.filter;
 
-import com.bytechef.embedded.configuration.service.ConnectedUserService;
+import com.bytechef.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.embedded.user.service.SigningKeyService;
 import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

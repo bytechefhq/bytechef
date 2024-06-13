@@ -18,9 +18,7 @@ package com.bytechef.embedded.configuration.web.rest.config;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.embedded.configuration.facade.ConnectedUserFacade;
 import com.bytechef.embedded.configuration.facade.IntegrationInstanceFacade;
-import com.bytechef.embedded.configuration.service.ConnectedUserService;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -44,12 +42,6 @@ import org.springframework.context.annotation.Configuration;
 public class IntegrationConfigurationRestTestConfiguration {
 
     private final ObjectMapper objectMapper;
-
-    @MockBean
-    private ConnectedUserFacade connectedUserFacade;
-
-    @MockBean
-    private ConnectedUserService connectedUserService;
 
     @MockBean
     private IntegrationInstanceFacade integrationInstanceFacade;

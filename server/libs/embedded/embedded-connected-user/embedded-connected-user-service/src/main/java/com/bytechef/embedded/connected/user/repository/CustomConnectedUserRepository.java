@@ -14,23 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.embedded.configuration.repository;
+package com.bytechef.embedded.connected.user.repository;
 
-import com.bytechef.embedded.configuration.domain.ConnectedUser;
-import java.util.Optional;
-import org.springframework.data.repository.ListCrudRepository;
-import org.springframework.data.repository.ListPagingAndSortingRepository;
+import com.bytechef.embedded.connected.user.domain.ConnectedUser;
+import java.time.LocalDate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 /**
  * @author Ivica Cardic
  */
 @Repository
-public interface ConnectedUserRepository
-    extends ListPagingAndSortingRepository<ConnectedUser, Long>, ListCrudRepository<ConnectedUser, Long>,
-    CustomConnectedUserRepository {
+public interface CustomConnectedUserRepository {
 
-    int DEFAULT_PAGE_SIZE = 20;
-
-    Optional<ConnectedUser> findByExternalIdAndEnvironment(String externalId, int ordinal);
+    Page<ConnectedUser> findAll(
+        String search, LocalDate createDateFrom, LocalDate createDateTo, Long integrationId, Pageable pageable);
 }

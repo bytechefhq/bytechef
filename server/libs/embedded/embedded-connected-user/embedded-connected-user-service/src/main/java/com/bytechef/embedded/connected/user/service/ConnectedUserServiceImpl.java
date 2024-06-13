@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.embedded.configuration.service;
+package com.bytechef.embedded.connected.user.service;
 
-import com.bytechef.embedded.configuration.domain.ConnectedUser;
-import com.bytechef.embedded.configuration.repository.ConnectedUserRepository;
+import com.bytechef.embedded.connected.user.domain.ConnectedUser;
+import com.bytechef.embedded.connected.user.repository.ConnectedUserRepository;
 import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;

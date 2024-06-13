@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.embedded.configuration.web.rest;
+package com.bytechef.embedded.connected.user.web.rest;
 
-import com.bytechef.embedded.configuration.facade.ConnectedUserFacade;
-import com.bytechef.embedded.configuration.service.ConnectedUserService;
-import com.bytechef.embedded.configuration.web.rest.model.ConnectedUserModel;
+import com.bytechef.embedded.connected.user.facade.ConnectedUserFacade;
+import com.bytechef.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.embedded.connected.user.web.rest.model.ConnectedUserModel;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import com.bytechef.platform.connection.web.rest.model.CredentialStatusModel;

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.embedded.configuration.repository;
+package com.bytechef.embedded.connected.user.repository;
 
-import com.bytechef.embedded.configuration.domain.ConnectedUser;
+import com.bytechef.embedded.connected.user.domain.ConnectedUser;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
 import java.util.ArrayList;

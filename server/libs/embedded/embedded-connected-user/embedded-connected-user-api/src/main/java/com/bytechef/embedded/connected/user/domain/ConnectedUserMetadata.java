@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.embedded.configuration.domain;
+package com.bytechef.embedded.connected.user.domain;
 
 import java.util.Objects;
 import org.springframework.data.relational.core.mapping.Column;

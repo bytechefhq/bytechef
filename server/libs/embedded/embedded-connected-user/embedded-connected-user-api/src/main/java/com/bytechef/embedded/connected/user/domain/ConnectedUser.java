@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.embedded.configuration.domain;
+package com.bytechef.embedded.connected.user.domain;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.constant.Environment;

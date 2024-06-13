@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.embedded.configuration.dto;
+package com.bytechef.embedded.connected.user.dto;
 
-import com.bytechef.embedded.configuration.domain.ConnectedUser;
+import com.bytechef.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;

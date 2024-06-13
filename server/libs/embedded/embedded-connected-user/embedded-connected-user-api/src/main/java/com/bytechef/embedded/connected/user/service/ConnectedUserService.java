@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.embedded.configuration.service;
+package com.bytechef.embedded.connected.user.service;
 
-import com.bytechef.embedded.configuration.domain.ConnectedUser;
+import com.bytechef.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.platform.constant.Environment;
 import java.time.LocalDate;
 import org.springframework.data.domain.Page;

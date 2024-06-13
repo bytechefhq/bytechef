@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.embedded.configuration.web.rest.mapper;
+package com.bytechef.embedded.connected.user.web.rest.mapper;
 
-import com.bytechef.embedded.configuration.dto.ConnectedUserDTO;
-import com.bytechef.embedded.configuration.web.rest.mapper.config.IntegratioConfigurationMapperSpringConfig;
-import com.bytechef.embedded.configuration.web.rest.model.ConnectedUserModel;
+import com.bytechef.embedded.connected.user.dto.ConnectedUserDTO;
+import com.bytechef.embedded.connected.user.web.rest.mapper.config.EmbeddedConnectedUserMapperSpringConfig;
+import com.bytechef.embedded.connected.user.web.rest.model.ConnectedUserModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = IntegratioConfigurationMapperSpringConfig.class)
+@Mapper(config = EmbeddedConnectedUserMapperSpringConfig.class)
 public interface ConnectedUserMapper extends Converter<ConnectedUserDTO, ConnectedUserModel> {
 
     @Override

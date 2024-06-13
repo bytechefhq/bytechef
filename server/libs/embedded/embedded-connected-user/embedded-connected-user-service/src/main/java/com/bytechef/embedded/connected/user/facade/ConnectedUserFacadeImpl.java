@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.embedded.configuration.facade;
+package com.bytechef.embedded.connected.user.facade;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.embedded.configuration.domain.ConnectedUser;
 import com.bytechef.embedded.configuration.domain.Integration;
 import com.bytechef.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfiguration;
-import com.bytechef.embedded.configuration.dto.ConnectedUserDTO;
-import com.bytechef.embedded.configuration.service.ConnectedUserService;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.embedded.configuration.service.IntegrationService;
+import com.bytechef.embedded.connected.user.domain.ConnectedUser;
+import com.bytechef.embedded.connected.user.dto.ConnectedUserDTO;
+import com.bytechef.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import com.bytechef.platform.connection.service.ConnectionService;

@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.embedded.configuration.repository;
+package com.bytechef.embedded.connected.user.web.rest.mapper.config;
 
-import com.bytechef.embedded.configuration.domain.ConnectedUser;
-import java.time.LocalDate;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Repository;
+import com.bytechef.embedded.configuration.web.rest.adapter.EmbeddedConnectedUserConversionServiceAdapter;
+import org.mapstruct.MapperConfig;
+import org.mapstruct.extensions.spring.SpringMapperConfig;
 
 /**
  * @author Ivica Cardic
  */
-@Repository
-public interface CustomConnectedUserRepository {
-
-    Page<ConnectedUser> findAll(
-        String search, LocalDate createDateFrom, LocalDate createDateTo, Long integrationId, Pageable pageable);
+@MapperConfig(componentModel = "spring", uses = {
+    EmbeddedConnectedUserConversionServiceAdapter.class
+})
+@SpringMapperConfig(
+    conversionServiceAdapterPackage = "com.bytechef.embedded.configuration.web.rest.adapter",
+    conversionServiceAdapterClassName = "EmbeddedConnectedUserConversionServiceAdapter")
+public interface EmbeddedConnectedUserMapperSpringConfig {
 }

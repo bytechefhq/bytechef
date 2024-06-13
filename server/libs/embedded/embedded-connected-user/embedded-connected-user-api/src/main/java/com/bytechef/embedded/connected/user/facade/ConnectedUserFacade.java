@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.embedded.configuration.facade;
+package com.bytechef.embedded.connected.user.facade;
 
-import com.bytechef.embedded.configuration.dto.ConnectedUserDTO;
+import com.bytechef.embedded.connected.user.dto.ConnectedUserDTO;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import java.time.LocalDate;
 import org.springframework.data.domain.Page;
