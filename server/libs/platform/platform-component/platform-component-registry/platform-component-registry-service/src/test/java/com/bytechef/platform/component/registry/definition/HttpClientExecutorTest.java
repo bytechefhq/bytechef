@@ -499,6 +499,52 @@ public class HttpClientExecutorTest {
             httpClientExecutor.handleResponse(new TestHttpResponse("text"), configurationBuilder.build()));
     }
 
+    @Test
+    public void testHandleResponse_withIncompatibleResponseType() {
+        TestHttpResponse testHttpResponse = new TestHttpResponse(
+            "IncompatibleResponseType body - text instead of JSON",
+            HttpHeaders.of(Map.of("content-type", List.of("text/html;charset=UTF-8")), (s, s2) -> true), 404);
+
+        Context.Http.Configuration.ConfigurationBuilder configurationBuilder =
+            Context.Http.Configuration.newConfiguration()
+                .responseType(Context.Http.ResponseType.JSON);
+
+        Context.Http.Response response =
+            httpClientExecutor.handleResponse(testHttpResponse, configurationBuilder.build());
+
+        Assertions.assertNull(response.getBody());
+
+        testHttpResponse = new TestHttpResponse(
+            "{\"key1\":\"value1\", \"key2\":\"value2\"}",
+            HttpHeaders.of(Map.of("content-type", List.of("application/json")), (s, s2) -> true), 404);
+
+        response = httpClientExecutor.handleResponse(testHttpResponse, configurationBuilder.build());
+
+        Assertions.assertNotNull(response.getBody());
+
+        Assertions.assertEquals(Map.of("key1", "value1", "key2", "value2"), response.getBody());
+
+        testHttpResponse = new TestHttpResponse(
+            "<root><key1>\"value1\"</key1><key2>\"value2\"</key2></root>",
+            HttpHeaders.of(Map.of("content-type", List.of("application/xml")), (s, s2) -> true), 200);
+
+        response = httpClientExecutor.handleResponse(testHttpResponse, configurationBuilder.build());
+
+        Assertions.assertNull(response.getBody());
+
+        testHttpResponse = new TestHttpResponse(
+            "<root><key1>value1</key1><key2>value2</key2></root>",
+            HttpHeaders.of(Map.of("content-type", List.of("application/xml")), (s, s2) -> true), 200);
+
+        response = httpClientExecutor.handleResponse(
+            testHttpResponse, configurationBuilder.responseType(Context.Http.ResponseType.XML)
+                .build());
+
+        Assertions.assertNotNull(response.getBody());
+
+        Assertions.assertEquals(Map.of("key1", "value1", "key2", "value2"), response.getBody());
+    }
+
     private static class TestResponseImpl implements Context.Http.Response {
 
         private final Map<String, List<String>> headers;
@@ -559,13 +605,19 @@ public class HttpClientExecutorTest {
 
         private final Object body;
         private final int statusCode;
+        private final HttpHeaders httpHeaders;
 
         private TestHttpResponse(Object body) {
             this(body, 200);
         }
 
         private TestHttpResponse(Object body, int statusCode) {
+            this(body, null, statusCode);
+        }
+
+        private TestHttpResponse(Object body, HttpHeaders httpHeaders, int statusCode) {
             this.body = body;
+            this.httpHeaders = httpHeaders;
             this.statusCode = statusCode;
         }
 
@@ -586,6 +638,10 @@ public class HttpClientExecutorTest {
 
         @Override
         public HttpHeaders headers() {
+            if (httpHeaders != null) {
+                return httpHeaders;
+            }
+
             return HttpHeaders.of(Map.of(), (n, v) -> true);
         }
 
