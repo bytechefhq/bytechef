@@ -145,14 +145,16 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             workflowNodeName, pathItems[0], result.properties, workflow, result.parameterMap, inputMap,
             result.taskParameters);
 
+        Map<String, ?> metadataMap = Map.of();
+
         if (includeInMetadata) {
-            setMetadata(workflowNodeName, path, type, definitionMap);
+            metadataMap = setMetadata(workflowNodeName, path, type, definitionMap);
         }
 
         workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
 
-        return new UpdateParameterResultDTO(displayConditionMap, result.parameterMap);
+        return new UpdateParameterResultDTO(displayConditionMap, metadataMap, result.parameterMap);
     }
 
     private void checkDependOn(String name, List<? extends Property> properties, Map<String, ?> parameterMap) {
@@ -368,7 +370,9 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     @SuppressWarnings("unchecked")
-    private void setMetadata(String workflowNodeName, String path, String type, Map<String, ?> definitionMap) {
+    private Map<String, ?> setMetadata(
+        String workflowNodeName, String path, String type, Map<String, ?> definitionMap) {
+
         Map<String, Object> metadataMap;
 
         Map<String, ?> triggerMap = getTrigger(
@@ -420,6 +424,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         } else {
             dynamicPropertyTypesMap.put(path, type);
         }
+
+        return metadataMap;
     }
 
     @SuppressWarnings("unchecked")

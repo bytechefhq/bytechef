@@ -26,6 +26,7 @@ import com.bytechef.platform.configuration.web.rest.model.UpdateWorkflowNodePara
 import com.bytechef.platform.configuration.web.rest.model.UpdateWorkflowNodeParameterRequestModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,10 +39,14 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnEndpoint
 public class WorkflowNodeParameterApiController implements WorkflowNodeParameterApi {
 
+    private final ConversionService conversionService;
     private final WorkflowNodeParameterFacade workflowNodeParameterFacade;
 
     @SuppressFBWarnings("EI")
-    public WorkflowNodeParameterApiController(WorkflowNodeParameterFacade workflowNodeParameterFacade) {
+    public WorkflowNodeParameterApiController(
+        ConversionService conversionService, WorkflowNodeParameterFacade workflowNodeParameterFacade) {
+
+        this.conversionService = conversionService;
         this.workflowNodeParameterFacade = workflowNodeParameterFacade;
     }
 
@@ -79,8 +84,6 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
             updateWorkflowNodeParameterRequestModel.getIncludeInMetadata());
 
         return ResponseEntity.ok(
-            new UpdateWorkflowNodeParameter200ResponseModel()
-                .displayConditions(updateParameterResultDTO.displayConditionMap())
-                .parameters((Map<String, Object>) updateParameterResultDTO.parameterMap()));
+            conversionService.convert(updateParameterResultDTO, UpdateWorkflowNodeParameter200ResponseModel.class));
     }
 }

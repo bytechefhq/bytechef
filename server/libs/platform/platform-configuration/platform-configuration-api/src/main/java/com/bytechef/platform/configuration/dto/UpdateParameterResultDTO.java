@@ -20,5 +20,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 
 @SuppressFBWarnings("EI")
-public record UpdateParameterResultDTO(Map<String, Boolean> displayConditionMap, Map<String, ?> parameterMap) {
+public record UpdateParameterResultDTO(
+    Map<String, Boolean> displayConditions, Map<String, ?> metadata, Map<String, ?> parameters) {
 }
