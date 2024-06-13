@@ -26,6 +26,7 @@ import resolvePath from 'object-resolve-path';
 import {ChangeEvent, KeyboardEvent, useEffect, useRef, useState} from 'react';
 import {Control, Controller, FieldValues, FormState} from 'react-hook-form';
 import ReactQuill from 'react-quill';
+import sanitizeHtml from 'sanitize-html';
 import {TYPE_ICONS} from 'shared/typeIcons';
 import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
@@ -191,13 +192,33 @@ const Property = ({
             return;
         }
 
+        const sanitizedCurrentValue = sanitizeHtml(mentionInputValue, {allowedTags: []});
+
+        if (propertyParameterValue === sanitizedCurrentValue) {
+            return;
+        }
+
         const {parameters} = currentComponent;
 
         if (!parameters) {
             return;
         }
 
-        let strippedValue: string | number = mentionInputValue.replace(/<[^>]*>?/gm, '').trim();
+        let strippedValue: string | number = sanitizeHtml(mentionInputValue, {
+            allowedTags: ['br', 'p'],
+        });
+
+        strippedValue = strippedValue.replace(/<\/p><p>/g, '\n');
+
+        if (propertyParameterValue?.includes('\n')) {
+            const equal =
+                sanitizeHtml(propertyParameterValue, {allowedTags: []}).trim() ===
+                sanitizeHtml(mentionInputValue, {allowedTags: []}).trim();
+
+            if (equal) {
+                return;
+            }
+        }
 
         const dataValueAttributes = mentionInputValue.match(/data-value="([^"]+)"/g);
 
@@ -255,6 +276,13 @@ const Property = ({
         if (currentValue === strippedValue) {
             return;
         }
+
+        strippedValue =
+            typeof strippedValue === 'string'
+                ? sanitizeHtml(strippedValue, {
+                      allowedTags: [],
+                  })
+                : strippedValue;
 
         saveProperty({
             currentComponent,
@@ -535,6 +563,16 @@ const Property = ({
             const mentionValues: Array<string> = propertyParameterValue
                 .split(/(\$\{.*?\})/g)
                 .filter((value: string) => value !== '');
+
+            if (propertyParameterValue.includes('\n')) {
+                const valueLines = propertyParameterValue.split('\n');
+
+                const paragraphedLines = valueLines.map((valueLine) => `<p>${valueLine}</p>`);
+
+                setMentionInputValue(paragraphedLines.join(''));
+
+                return;
+            }
 
             if (typeof propertyParameterValue === 'string' && propertyParameterValue.includes('${')) {
                 const mentionInputNodes = mentionValues.map((value) => {
