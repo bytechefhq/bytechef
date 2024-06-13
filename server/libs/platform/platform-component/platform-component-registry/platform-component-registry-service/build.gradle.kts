@@ -34,5 +34,6 @@ dependencies {
     testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
     testImplementation(project(":server:libs:modules:components:petstore"))
     testImplementation(project(":server:libs:modules:components:google:google-sheets"))
+    testImplementation(project(":server:libs:modules:components:http-client"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }
