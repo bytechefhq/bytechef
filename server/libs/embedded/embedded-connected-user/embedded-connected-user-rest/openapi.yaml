@@ -1,0 +1,239 @@
+---
+openapi: "3.0.1"
+info:
+  title: "The Embedded Connected User API"
+  version: "1"
+servers:
+- url: "/api/embedded"
+tags:
+- name: "connected-user"
+  description: "The Embedded Connected User API"
+paths:
+  /connected-users:
+    get:
+      description: "Get all connected users."
+      summary: "Get all connected users"
+      tags:
+        - "connected-user"
+      operationId: "getConnectedUsers"
+      parameters:
+        - name: "search"
+          description: "The name, email or external reference code of a connected user."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+        - name: "credentialStatus"
+          description: "The id of an integration instance."
+          in: "query"
+          required: false
+          schema:
+            $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml/#/components/schemas/CredentialStatus"
+        - name: "integrationId"
+          description: "The id of an integration."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "createDateFrom"
+          description: "The start range of a create date."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            format: "date"
+        - name: "createDateTo"
+          description: "The end range of a create date ."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            format: "date"
+        - name: "pageNumber"
+          description: "The number of the page to return."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int32"
+            default: 0
+      responses:
+        "200":
+          description: "The page of connected users."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Page"
+  /connected-users/{id}:
+    get:
+      description: "Get a connected user."
+      summary: "Get a connected user"
+      tags:
+        - "connected-user"
+      operationId: "getConnectedUser"
+      parameters:
+        - name: "id"
+          description: "The id of an integration instance."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "A connection object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConnectedUser"
+    delete:
+      description: "Delete a connected user."
+      summary: "Delete a connected user"
+      tags:
+        - "connected-user"
+      operationId: "deleteConnectedUser"
+      parameters:
+        - name: "id"
+          description: "The id of an integration instance configuration."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "Successful operation."
+  /connected-users/{id}/enable/{enable}:
+    patch:
+      description: "Enable/disable a connected user."
+      summary: "Enable/disable a connected user"
+      tags:
+        - "connected-user"
+      operationId: "enableConnectedUser"
+      parameters:
+        - name: "id"
+          description: "The id of a connected user."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "enable"
+          description: "Enable/disable the connected user."
+          in: "path"
+          required: true
+          schema:
+            type: "boolean"
+      responses:
+        "200":
+          description: "Successful operation."
+components:
+  schemas:
+    ConnectedUser:
+      type: "object"
+      required:
+        - "externalId"
+      properties:
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        email:
+          description: "The email address."
+          type: "string"
+        enabled:
+          description: "If a connected user is enabled or not"
+          type: "boolean"
+        externalId:
+          description: "The connected user external id."
+          type: "string"
+          readOnly: true
+        id:
+          description: "The id of a connected user."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        integrationInstances:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConnectedUserIntegrationInstance"
+        metadata:
+          type: object
+          additionalProperties: true
+          readOnly: true
+        name:
+          description: "The name of a connection."
+          type: "string"
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        __version:
+          type: "integer"
+          format: "int32"
+    ConnectedUserIntegrationInstance:
+      type: object
+      properties:
+        componentName:
+          description: "The name of a component."
+          type: "string"
+        enabled:
+          description: "If an integration's instance is enable dor not."
+          type: "boolean"
+        id:
+          description: "The id of an integration instance."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        integrationId:
+          description: "The id of an integration."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        integrationVersion:
+          description: "The version of an integration."
+          type: "integer"
+          readOnly: true
+        connectionId:
+          description: "The id of a connection."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        credentialStatus:
+          $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml/#/components/schemas/CredentialStatus"
+    Page:
+      description: "A sublist of a list of objects. It allows gain information about\
+        \ the position of it in the containing entire list."
+      type: "object"
+      properties:
+        number:
+          description: "The current page."
+          type: "integer"
+        size:
+          description: "The size of the page."
+          type: "integer"
+        numberOfElements:
+          description: "The number of elements."
+          type: "integer"
+        totalPages:
+          description: "The total number of pages."
+          type: "integer"
+        totalElements:
+          description: "The total number of elements."
+          type: "integer"
+        content:
+          description: "The list of elements."
+          type: "array"
+          items:
+            type: "object"
