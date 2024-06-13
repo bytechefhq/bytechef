@@ -24,14 +24,17 @@ public class WhatsAppConstants {
     public static final String BASE_URL = "https://graph.facebook.com/v17.0";
     public static final String BODY = "body";
     public static final String CONTACTS = "contacts";
+    public static final String GET_MESSAGE = "getMessage";
     public static final String ID = "id";
     public static final String INPUT = "input";
+    public static final String MESSAGE_RECEIVED = "messageReceived";
     public static final String MESSAGING_PRODUCT = "messaging_product";
     public static final String MESSAGES = "messages";
     public static final String PHONE_NUMBER_ID = "phoneNumberId";
     public static final String RECEIVE_USER = "to";
     public static final String RECIPIENT_TYPE = "recipient_type";
     public static final String SEND_MESSAGE = "sendMessage";
+    public static final String SENDER_NUMBER = "senderNumber";
     public static final String SYSTEM_USER_ACCESS_TOKEN = "systemUserAccessToken";
     public static final String TEXT = "text";
     public static final String TYPE = "type";

@@ -42,6 +42,9 @@ import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
 import java.util.Map;
 
+/**
+ * @author Luka Ljubić
+ */
 public class WhatsAppSendMessageAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEND_MESSAGE)
@@ -64,8 +67,7 @@ public class WhatsAppSendMessageAction {
                     object(CONTACTS)
                         .properties(
                             string(INPUT),
-                            string("wa_id")
-                        ),
+                            string("wa_id")),
                     object(MESSAGES)
                         .properties(
                             string(ID))))
