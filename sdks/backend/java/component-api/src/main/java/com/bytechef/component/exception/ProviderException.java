@@ -26,6 +26,11 @@ import javax.annotation.Nonnull;
  */
 public abstract class ProviderException extends RuntimeException {
 
+    private static final Pattern http4nnPattern = Pattern.compile(
+        "^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$", Pattern.DOTALL);
+    private static final Pattern messagePattern = Pattern.compile(
+        "\\{\"componentName\":\"(\\w+)\",\"exceptionMessage\":\"(.+)\",\"exceptionClass\":\"(.+)\"}", Pattern.DOTALL);
+
     @Nonnull
     public static ProviderException fromHttpResponseCode(int code, String message) {
         return switch (code) {
@@ -47,10 +52,9 @@ public abstract class ProviderException extends RuntimeException {
      */
     public static ProviderException fromExceptionMessage(@Nonnull String message) {
         Matcher matcher = http4nnPattern.matcher(message);
-        if (matcher.matches()) {
-            if (matcher.group(1) != null) {
-                return fromHttpResponseCode(Integer.parseInt(matcher.group(1)), message);
-            }
+
+        if (matcher.matches() && matcher.group(1) != null) {
+            return fromHttpResponseCode(Integer.parseInt(matcher.group(1)), message);
         }
 
         return null;
@@ -73,15 +77,12 @@ public abstract class ProviderException extends RuntimeException {
         return exceptionMessage1;
     }
 
-    private static Pattern http4nnPattern = Pattern.compile("^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$", Pattern.DOTALL);
-    private static Pattern messagePattern = Pattern.compile(
-        "\\{\"componentName\":\"(\\w+)\",\"exceptionMessage\":\"(.+)\",\"exceptionClass\":\"(.+)\"}", Pattern.DOTALL);
-
     public static boolean hasAuthorizationFailedExceptionContent(@Nonnull Exception exception) {
         ProviderException providerException = fromExceptionMessage(exception.getMessage());
 
-        if ((providerException == null)
-            || !Objects.equals(AuthorizationFailedException.class, providerException.getClass())) {
+        if ((providerException == null) ||
+            !Objects.equals(AuthorizationFailedException.class, providerException.getClass())) {
+
             return false;
         }
 
@@ -89,9 +90,7 @@ public abstract class ProviderException extends RuntimeException {
     }
 
     public static String getComponentName(@Nonnull Exception exception) {
-        if (exception instanceof AuthorizationFailedException) {
-            ProviderException providerException = (ProviderException) exception;
-
+        if (exception instanceof AuthorizationFailedException providerException) {
             return providerException.getComponentName();
         }
 

@@ -16,8 +16,10 @@
 
 package com.bytechef.platform.component.registry.definition;
 
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MimeTypeUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
@@ -283,17 +285,14 @@ public class HttpClientExecutor {
             return new ResponseImpl(httpHeaders.map(), null, statusCode);
         }
 
-        switch (responseType) {
+        return switch (responseType) {
             case BINARY -> new ResponseImpl(
                 httpHeaders.map(),
                 storeBinaryResponseBody(configuration, httpHeaders.map(), (InputStream) httpResponseBody), statusCode);
-            case JSON -> new ResponseImpl(
-                httpHeaders.map(), com.bytechef.commons.util.JsonUtils.read(httpResponseBody.toString()), statusCode);
-            case XML -> new ResponseImpl(
-                httpHeaders.map(), com.bytechef.commons.util.XmlUtils.read(httpResponseBody.toString()), statusCode);
-        }
-
-        return new ResponseImpl(httpHeaders.map(), httpResponseBody.toString(), statusCode);
+            case JSON -> new ResponseImpl(httpHeaders.map(), JsonUtils.read(httpResponseBody.toString()), statusCode);
+            case XML -> new ResponseImpl(httpHeaders.map(), XmlUtils.read(httpResponseBody.toString()), statusCode);
+            default -> new ResponseImpl(httpHeaders.map(), httpResponseBody.toString(), statusCode);
+        };
     }
 
     private void addFileEntry(MultipartBodyPublisher.Builder builder, String name, FileEntry fileEntry) {
@@ -444,14 +443,12 @@ public class HttpClientExecutor {
 
     private BodyPublisher getJsonBodyPublisher(Body body) {
         return MoreBodyPublishers.ofMediaType(
-            BodyPublishers.ofString(com.bytechef.commons.util.JsonUtils.write(body.getContent())),
-            MediaType.APPLICATION_JSON);
+            BodyPublishers.ofString(JsonUtils.write(body.getContent())), MediaType.APPLICATION_JSON);
     }
 
     private BodyPublisher getXmlBodyPublisher(Body body) {
         return MoreBodyPublishers.ofMediaType(
-            BodyPublishers.ofString(com.bytechef.commons.util.XmlUtils.write(body.getContent())),
-            MediaType.APPLICATION_XML);
+            BodyPublishers.ofString(XmlUtils.write(body.getContent())), MediaType.APPLICATION_XML);
     }
 
     private class ResponseImpl implements Response {

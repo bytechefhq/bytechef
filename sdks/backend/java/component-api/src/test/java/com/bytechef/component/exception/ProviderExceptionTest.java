@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
  */
 public class ProviderExceptionTest {
 
-    private final String multilineMessage = """
+    private static final String multilineMessage = """
         401 Unauthorized
         POST https://ss.gopis.com/v4/spreadsheets/132YEL8BnzkalU40J2/values/Sheet1:append?valueInputOption=RAW
         """;
