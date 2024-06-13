@@ -1,4 +1,4 @@
-package com.bytechef.embedded.configuration.web.rest.model;
+package com.bytechef.embedded.connected.user.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ConnectedUserIntegrationInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-12T12:40:28.680343+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-13T06:22:50.169912+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class ConnectedUserIntegrationInstanceModel {
 
   private String componentName;

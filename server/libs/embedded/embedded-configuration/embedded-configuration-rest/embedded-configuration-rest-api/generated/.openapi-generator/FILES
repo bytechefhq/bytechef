@@ -3,7 +3,6 @@ pom.xml
 src/main/java/com/bytechef/embedded/configuration/web/rest/ApiUtil.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/AppEventApi.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/CategoryApi.java
-src/main/java/com/bytechef/embedded/configuration/web/rest/ConnectedUserApi.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/IntegrationApi.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/IntegrationInstanceApi.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/IntegrationInstanceConfigurationApi.java
@@ -12,8 +11,6 @@ src/main/java/com/bytechef/embedded/configuration/web/rest/IntegrationTagApi.jav
 src/main/java/com/bytechef/embedded/configuration/web/rest/WorkflowApi.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/AppEventModel.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/CategoryModel.java
-src/main/java/com/bytechef/embedded/configuration/web/rest/model/ConnectedUserIntegrationInstanceModel.java
-src/main/java/com/bytechef/embedded/configuration/web/rest/model/ConnectedUserModel.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/CreateIntegrationInstanceConfigurationWorkflowJob200ResponseModel.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/EnvironmentModel.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/IntegrationBasicModel.java

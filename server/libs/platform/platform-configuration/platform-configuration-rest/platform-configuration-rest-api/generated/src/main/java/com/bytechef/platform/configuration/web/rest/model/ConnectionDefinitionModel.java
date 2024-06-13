@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectionDefinition", description = "Definition of a connection to an outside service.")
 @JsonTypeName("ConnectionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-12T12:42:24.418512+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-12T20:31:09.935905+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class ConnectionDefinitionModel {
 
   private Boolean authorizationRequired = true;
@@ -153,11 +153,11 @@ public class ConnectionDefinitionModel {
   }
 
   /**
-   * The connection name used from the connection's component.
+   * The component name used from the connection's component.
    * @return componentName
   */
   @NotNull 
-  @Schema(name = "componentName", description = "The connection name used from the connection's component.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "componentName", description = "The component name used from the connection's component.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("componentName")
   public String getComponentName() {
     return componentName;
