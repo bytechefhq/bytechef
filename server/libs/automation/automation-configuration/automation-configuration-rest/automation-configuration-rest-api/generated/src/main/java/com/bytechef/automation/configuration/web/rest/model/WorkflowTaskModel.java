@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTask", description = "Represents a definition of a workflow task.")
 @JsonTypeName("WorkflowTask")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-12T20:31:08.906868+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-13T13:55:20.232479+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class WorkflowTaskModel {
 
   @Valid
@@ -41,6 +41,9 @@ public class WorkflowTaskModel {
   private List<@Valid WorkflowTaskModel> finalize = new ArrayList<>();
 
   private String label;
+
+  @Valid
+  private Map<String, Object> metadata = new HashMap<>();
 
   private String name;
 
@@ -187,6 +190,34 @@ public class WorkflowTaskModel {
 
   public void setLabel(String label) {
     this.label = label;
+  }
+
+  public WorkflowTaskModel metadata(Map<String, Object> metadata) {
+    this.metadata = metadata;
+    return this;
+  }
+
+  public WorkflowTaskModel putMetadataItem(String key, Object metadataItem) {
+    if (this.metadata == null) {
+      this.metadata = new HashMap<>();
+    }
+    this.metadata.put(key, metadataItem);
+    return this;
+  }
+
+  /**
+   * Key-value map of metadata.
+   * @return metadata
+  */
+  
+  @Schema(name = "metadata", description = "Key-value map of metadata.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("metadata")
+  public Map<String, Object> getMetadata() {
+    return metadata;
+  }
+
+  public void setMetadata(Map<String, Object> metadata) {
+    this.metadata = metadata;
   }
 
   public WorkflowTaskModel name(String name) {
@@ -387,6 +418,7 @@ public class WorkflowTaskModel {
         Objects.equals(this.destination, workflowTask.destination) &&
         Objects.equals(this.finalize, workflowTask.finalize) &&
         Objects.equals(this.label, workflowTask.label) &&
+        Objects.equals(this.metadata, workflowTask.metadata) &&
         Objects.equals(this.name, workflowTask.name) &&
         Objects.equals(this.node, workflowTask.node) &&
         Objects.equals(this.parameters, workflowTask.parameters) &&
@@ -399,7 +431,7 @@ public class WorkflowTaskModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(connections, description, destination, finalize, label, name, node, parameters, post, pre, source, timeout, type);
+    return Objects.hash(connections, description, destination, finalize, label, metadata, name, node, parameters, post, pre, source, timeout, type);
   }
 
   @Override
@@ -411,6 +443,7 @@ public class WorkflowTaskModel {
     sb.append("    destination: ").append(toIndentedString(destination)).append("\n");
     sb.append("    finalize: ").append(toIndentedString(finalize)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
+    sb.append("    metadata: ").append(toIndentedString(metadata)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    node: ").append(toIndentedString(node)).append("\n");
     sb.append("    parameters: ").append(toIndentedString(parameters)).append("\n");
