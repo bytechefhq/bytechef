@@ -13,11 +13,8 @@ import ConnectedUserTable from '@/pages/embedded/connected-users/components/Conn
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {
-    ConnectedUserModelFromJSON,
-    type CredentialStatusModel,
-    IntegrationModel,
-} from '@/shared/middleware/embedded/configuration';
+import {IntegrationModel} from '@/shared/middleware/embedded/configuration';
+import {ConnectedUserModelFromJSON, type CredentialStatusModel} from '@/shared/middleware/embedded/connected-user';
 import {useGetConnectedUsersQuery} from '@/shared/queries/embedded/connectedUsers.queries';
 import {useGetIntegrationsQuery} from '@/shared/queries/embedded/integrations.queries';
 import {cn} from '@/shared/util/cn-utils';

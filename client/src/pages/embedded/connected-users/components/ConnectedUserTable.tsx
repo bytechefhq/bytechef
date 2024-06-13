@@ -9,7 +9,7 @@ import {
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import ConnectedUserDeleteDialog from '@/pages/embedded/connected-users/components/ConnectedUserDeleteDialog';
 import useConnectedUserSheetStore from '@/pages/embedded/connected-users/stores/useConnectedUserSheetStore';
-import {ConnectedUserModel, CredentialStatusModel} from '@/shared/middleware/embedded/configuration';
+import {ConnectedUserModel, CredentialStatusModel} from '@/shared/middleware/embedded/connected-user';
 import {useEnableConnectedUserMutation} from '@/shared/mutations/embedded/connectedUsers.mutations';
 import {ConnectedUserKeys} from '@/shared/queries/embedded/connectedUsers.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';

@@ -1,7 +1,7 @@
 import {GetWorkflowExecutionsPageRequest} from '@/shared/middleware/automation/workflow/execution';
-import {GetConnectedUsersRequest, PageModel} from '@/shared/middleware/embedded/configuration';
-import {ConnectedUserApi} from '@/shared/middleware/embedded/configuration/apis/ConnectedUserApi';
-import {ConnectedUserModel} from '@/shared/middleware/embedded/configuration/models/ConnectedUserModel';
+import {GetConnectedUsersRequest, PageModel} from '@/shared/middleware/embedded/connected-user';
+import {ConnectedUserApi} from '@/shared/middleware/embedded/connected-user/apis/ConnectedUserApi';
+import {ConnectedUserModel} from '@/shared/middleware/embedded/connected-user/models/ConnectedUserModel';
 
 /* eslint-disable sort-keys */
 import {useQuery} from '@tanstack/react-query';

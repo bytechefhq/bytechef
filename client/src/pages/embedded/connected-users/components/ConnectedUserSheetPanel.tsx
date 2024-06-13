@@ -14,7 +14,7 @@ import ConnectedUserDeleteDialog from '@/pages/embedded/connected-users/componen
 import {
     type ConnectedUserIntegrationInstanceModel,
     ConnectedUserModel,
-} from '@/shared/middleware/embedded/configuration';
+} from '@/shared/middleware/embedded/connected-user';
 import {useEnableConnectedUserMutation} from '@/shared/mutations/embedded/connectedUsers.mutations';
 import {useEnableIntegrationInstanceWorkflowMutation} from '@/shared/mutations/embedded/integrationInstanceWorkflows.mutations';
 import {useEnableIntegrationInstanceMutation} from '@/shared/mutations/embedded/integrationInstances.mutations';

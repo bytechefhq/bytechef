@@ -2,7 +2,7 @@ import {
     ConnectedUserApi,
     DeleteConnectedUserRequest,
     EnableConnectedUserRequest,
-} from '@/shared/middleware/embedded/configuration';
+} from '@/shared/middleware/embedded/connected-user';
 import {useMutation} from '@tanstack/react-query';
 
 interface DeleteConnectedUserMutationProps {
