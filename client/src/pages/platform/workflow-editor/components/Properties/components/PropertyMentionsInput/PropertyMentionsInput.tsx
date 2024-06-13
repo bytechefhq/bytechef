@@ -231,8 +231,6 @@ const PropertyMentionsInput = forwardRef(
             setFocusedInput(null);
 
             setIsFocused(false);
-
-            // setDataPillPanelOpen(false);
         };
 
         useEffect(() => {
