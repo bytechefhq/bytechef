@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.registry.facade;
+package com.bytechef.platform.component.registry.config;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
-/**
- * @author Ivica Cardic
- */
-public class ActionDefinitionFacadeTest {
+@ComponentScan(
+    basePackages = {
+        "com.bytechef.encryption", "com.bytechef.platform.component", "com.bytechef.platform.connection",
+        "com.bytechef.liquibase.config"
+    })
+@EnableAutoConfiguration
+@Configuration
+public class PlatformIntTestConfiguration {
 
-    @Disabled
-    @Test
-    public void testExecuteDynamicProperties() {
-        // TODO
-    }
 }
