@@ -32,6 +32,27 @@ import org.springframework.lang.Nullable;
  */
 public interface ActionDefinitionService {
 
+    /**
+     * Executes the routine for dynamic resolution of particular properties required for component action to properly
+     * execute {@link #executePerform(String, int, String, Map, Map, ActionContext)} method. Duration is unpredictable
+     * as it may require connecting to outer APIs/microservices/platforms. Method is only called in designTime, never in
+     * runtime. Every change of lookupDependsOnPaths parameter triggers this method to automatically update the
+     * dependent propertyName.
+     *
+     * @param componentName        the name of component
+     * @param componentVersion     the version
+     * @param actionName           action name
+     * @param propertyName         name of the property that requires dynamic resolution and is of
+     *                             type @{@link com.bytechef.component.definition.Property.DynamicPropertiesProperty}
+     * @param inputParameters      key-value collection of parameters required by business logic
+     * @param lookupDependsOnPaths list of dependent property names
+     * @param connection           connection used to connect to outer source
+     * @param context              additional technical data required by some actions
+     * @return list of dynamically resolved properties
+     * @throws {@link com.bytechef.platform.component.exception.ComponentExecutionException} - if procession breaks
+     *                within ByteChef system or {@link com.bytechef.component.exception.ProviderException} - if external
+     *                system is unavailable or call to it results in errors
+     */
     List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         @NonNull Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths,
@@ -47,6 +68,22 @@ public interface ActionDefinitionService {
         @NonNull Map<String, ?> inputParameters, @NonNull Map<String, ComponentConnection> connections,
         @NonNull ActionContext context);
 
+    /**
+     * Executes the action of particular component version. Duration is unpredictable as work done by action may require
+     * connecting to outer APIs/microservices/platforms.
+     *
+     * @param componentName    the name of component
+     * @param componentVersion the version
+     * @param actionName       action name
+     * @param inputParameters  key-value collection of parameters required by business logic
+     * @param connections      collection of connections used to connect to outer sources
+     * @param context          additional technical data required by some actions
+     * @return result of execution or throws exceptions
+     * @throws {@link com.bytechef.platform.component.exception.ComponentExecutionException} - if procession breaks
+     *                within ByteChef system or {@link com.bytechef.component.exception.ProviderException} - if external
+     *                system is unavailable or call to it results in errors
+     *
+     */
     Object executePerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, @NonNull Map<String, ComponentConnection> connections,
