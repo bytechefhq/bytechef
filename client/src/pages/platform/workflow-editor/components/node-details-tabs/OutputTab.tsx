@@ -112,18 +112,21 @@ const OutputTab = ({currentNode, outputDefined = false, outputSchema, sampleOutp
 
                             <DropdownMenuContent align="end" className="w-60 cursor-pointer">
                                 {outputDefined && (
-                                    <DropdownMenuItem onClick={handlePredefinedOutputSchemaClick}>
+                                    <DropdownMenuItem
+                                        className="cursor-pointer"
+                                        onClick={handlePredefinedOutputSchemaClick}
+                                    >
                                         Use Predefined Output Schema
                                     </DropdownMenuItem>
                                 )}
 
                                 {!currentNode.trigger && (
-                                    <DropdownMenuItem onClick={handleTestComponentClick}>
+                                    <DropdownMenuItem className="cursor-pointer" onClick={handleTestComponentClick}>
                                         Test Component
                                     </DropdownMenuItem>
                                 )}
 
-                                <DropdownMenuItem onClick={() => setShowUploadDialog(true)}>
+                                <DropdownMenuItem className="cursor-pointer" onClick={() => setShowUploadDialog(true)}>
                                     Upload Sample Output Data
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
