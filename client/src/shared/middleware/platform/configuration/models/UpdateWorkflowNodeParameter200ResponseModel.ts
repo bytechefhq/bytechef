@@ -20,13 +20,19 @@ import { mapValues } from '../runtime';
  */
 export interface UpdateWorkflowNodeParameter200ResponseModel {
     /**
-     * 
+     * Key-value map of metadata.
+     * @type {{ [key: string]: any; }}
+     * @memberof UpdateWorkflowNodeParameter200ResponseModel
+     */
+    metadata?: { [key: string]: any; };
+    /**
+     * Key-value map of parameters.
      * @type {{ [key: string]: any; }}
      * @memberof UpdateWorkflowNodeParameter200ResponseModel
      */
     parameters?: { [key: string]: any; };
     /**
-     * 
+     * Key-value map of display condition rules.
      * @type {{ [key: string]: boolean; }}
      * @memberof UpdateWorkflowNodeParameter200ResponseModel
      */
@@ -50,6 +56,7 @@ export function UpdateWorkflowNodeParameter200ResponseModelFromJSONTyped(json: a
     }
     return {
         
+        'metadata': json['metadata'] == null ? undefined : json['metadata'],
         'parameters': json['parameters'] == null ? undefined : json['parameters'],
         'displayConditions': json['displayConditions'] == null ? undefined : json['displayConditions'],
     };
@@ -61,6 +68,7 @@ export function UpdateWorkflowNodeParameter200ResponseModelToJSON(value?: Update
     }
     return {
         
+        'metadata': value['metadata'],
         'parameters': value['parameters'],
         'displayConditions': value['displayConditions'],
     };
