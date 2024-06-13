@@ -45,6 +45,12 @@ export interface WorkflowTriggerModel {
      */
     label?: string;
     /**
+     * Key-value map of metadata.
+     * @type {{ [key: string]: any; }}
+     * @memberof WorkflowTriggerModel
+     */
+    metadata?: { [key: string]: any; };
+    /**
      * The identifier name of the task. Task names are used for assigning the output of one task so it can be later used by subsequent tasks.
      * @type {string}
      * @memberof WorkflowTriggerModel
@@ -92,6 +98,7 @@ export function WorkflowTriggerModelFromJSONTyped(json: any, ignoreDiscriminator
         'connections': json['connections'] == null ? undefined : ((json['connections'] as Array<any>).map(WorkflowConnectionModelFromJSON)),
         'description': json['description'] == null ? undefined : json['description'],
         'label': json['label'] == null ? undefined : json['label'],
+        'metadata': json['metadata'] == null ? undefined : json['metadata'],
         'name': json['name'],
         'parameters': json['parameters'] == null ? undefined : json['parameters'],
         'timeout': json['timeout'] == null ? undefined : json['timeout'],
@@ -107,6 +114,7 @@ export function WorkflowTriggerModelToJSON(value?: Omit<WorkflowTriggerModel, 'c
         
         'description': value['description'],
         'label': value['label'],
+        'metadata': value['metadata'],
         'name': value['name'],
         'parameters': value['parameters'],
         'timeout': value['timeout'],

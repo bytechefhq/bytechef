@@ -63,6 +63,12 @@ export interface WorkflowTaskModel {
      */
     label?: string;
     /**
+     * Key-value map of metadata.
+     * @type {{ [key: string]: any; }}
+     * @memberof WorkflowTaskModel
+     */
+    metadata?: { [key: string]: any; };
+    /**
      * The identifier name of the task. Task names are used for assigning the output of one task so it can be later used by subsequent tasks.
      * @type {string}
      * @memberof WorkflowTaskModel
@@ -136,6 +142,7 @@ export function WorkflowTaskModelFromJSONTyped(json: any, ignoreDiscriminator: b
         'destination': json['destination'] == null ? undefined : DataStreamComponentModelFromJSON(json['destination']),
         'finalize': json['finalize'] == null ? undefined : ((json['finalize'] as Array<any>).map(WorkflowTaskModelFromJSON)),
         'label': json['label'] == null ? undefined : json['label'],
+        'metadata': json['metadata'] == null ? undefined : json['metadata'],
         'name': json['name'],
         'node': json['node'] == null ? undefined : json['node'],
         'parameters': json['parameters'] == null ? undefined : json['parameters'],
@@ -157,6 +164,7 @@ export function WorkflowTaskModelToJSON(value?: Omit<WorkflowTaskModel, 'connect
         'destination': DataStreamComponentModelToJSON(value['destination']),
         'finalize': value['finalize'] == null ? undefined : ((value['finalize'] as Array<any>).map(WorkflowTaskModelToJSON)),
         'label': value['label'],
+        'metadata': value['metadata'],
         'name': value['name'],
         'node': value['node'],
         'parameters': value['parameters'],
