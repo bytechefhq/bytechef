@@ -276,6 +276,9 @@ public class HttpClientExecutor {
         int statusCode = httpResponse.statusCode();
 
         if ((responseType == null) || !matches(responseType, httpHeaders.firstValue("content-type"))) {
+            logger.warn("Unexpected response body content-type type: {} can not be converted to {}",
+                httpHeaders.firstValue("content-type"), responseType);
+
             return new ResponseImpl(httpHeaders.map(), null, statusCode);
         }
 
@@ -413,9 +416,9 @@ public class HttpClientExecutor {
     }
 
     private boolean matches(ResponseType responseType, Optional<String> contentTypeValueOptional) {
-        String responseTypeValue = responseType.name();
+        if (contentTypeValueOptional.isEmpty() ||
+            !StringUtils.containsIgnoreCase(contentTypeValueOptional.get(), responseType.name())) {
 
-        if (contentTypeValueOptional.isEmpty() || !Objects.equals(responseTypeValue, contentTypeValueOptional.get())) {
             return false;
         }
 
