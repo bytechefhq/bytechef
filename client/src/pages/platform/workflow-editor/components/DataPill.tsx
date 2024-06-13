@@ -74,6 +74,7 @@ const DataPill = ({
                     'inline-flex cursor-pointer items-center space-x-2 rounded-full border bg-gray-100 px-2 py-0.5 text-sm hover:bg-gray-50',
                     !mentionInput && 'cursor-not-allowed'
                 )}
+                draggable
                 onClick={() => addDataPillToInput(workflowNodeName)}
             >
                 <span className="mr-2" title={property?.type}>
