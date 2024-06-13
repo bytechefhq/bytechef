@@ -818,10 +818,16 @@ paths:
               schema:
                 type: "object"
                 properties:
+                  metadata:
+                    description: "Key-value map of metadata."
+                    type: "object"
+                    additionalProperties: true
                   parameters:
+                    description: "Key-value map of parameters."
                     type: "object"
                     additionalProperties: true
                   displayConditions:
+                    description: "Key-value map of display condition rules."
                     type: "object"
                     additionalProperties:
                       type: "boolean"
@@ -2261,6 +2267,10 @@ components:
         label:
           description: "The human-readable description of the task."
           type: "string"
+        metadata:
+          description: "Key-value map of metadata."
+          type: "object"
+          additionalProperties: true
         name:
           description: "The identifier name of the task. Task names are used for assigning\
             \ the output of one task so it can be later used by subsequent tasks."
@@ -2314,6 +2324,10 @@ components:
         label:
           description: "The human-readable description of the task."
           type: "string"
+        metadata:
+          description: "Key-value map of metadata."
+          type: "object"
+          additionalProperties: true
         name:
           description: "The identifier name of the task. Task names are used for assigning\
             \ the output of one task so it can be later used by subsequent tasks."
