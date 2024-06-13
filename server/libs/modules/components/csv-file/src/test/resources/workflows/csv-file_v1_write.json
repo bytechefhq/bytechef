@@ -8,7 +8,7 @@
   } ],
   "outputs": [ {
     "name": "writeCsvFile",
-    "value": "${writeCsvFile.fileEntry}"
+    "value": "${writeCsvFile}"
   } ],
   "tasks": [ {
     "name": "writeCsvFile",

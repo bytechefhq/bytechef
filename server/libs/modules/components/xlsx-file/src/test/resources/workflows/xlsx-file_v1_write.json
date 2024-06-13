@@ -8,7 +8,7 @@
   } ],
   "outputs": [ {
     "name": "writeXlsxFile",
-    "value": "${writeXlsxFile.fileEntry}"
+    "value": "${writeXlsxFile}"
   } ],
   "tasks": [ {
     "name": "writeXlsxFile",

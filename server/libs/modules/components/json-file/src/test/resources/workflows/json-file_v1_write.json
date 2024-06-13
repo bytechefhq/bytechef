@@ -8,7 +8,7 @@
   } ],
   "outputs": [ {
     "name": "writeJSONFile",
-    "value": "${writeJSONFile.fileEntry}"
+    "value": "${writeJSONFile}"
   } ],
   "tasks": [ {
     "name": "writeJSONFile",
