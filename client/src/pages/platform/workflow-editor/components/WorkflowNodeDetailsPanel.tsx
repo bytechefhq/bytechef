@@ -262,6 +262,7 @@ const WorkflowNodeDetailsPanel = ({
             () => {
                 setCurrentComponent({
                     ...currentComponent,
+                    metadata: {},
                     operationName,
                     parameters: {},
                 });

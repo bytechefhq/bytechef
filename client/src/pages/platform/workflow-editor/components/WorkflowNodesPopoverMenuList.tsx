@@ -102,6 +102,7 @@ const WorkflowNodesPopoverMenuList = memo(
                                     ),
                                     id: getFormattedName(clickedItem.name!, nodes),
                                     label: clickedItem?.title,
+                                    metadata: undefined,
                                     name: getFormattedName(clickedItem.name!, nodes),
                                     operationName: clickedComponentDefinition.triggers?.[0].name,
                                     parameters: undefined,

@@ -178,6 +178,7 @@ const Property = ({
 
         saveProperty({
             currentComponent,
+            includeInMetadata: property.custom,
             path,
             setCurrentComponent,
             type,
@@ -286,6 +287,7 @@ const Property = ({
 
         saveProperty({
             currentComponent,
+            includeInMetadata: property.custom,
             path,
             setCurrentComponent,
             type,
@@ -302,6 +304,7 @@ const Property = ({
 
         saveProperty({
             currentComponent,
+            includeInMetadata: property.custom,
             path,
             setCurrentComponent,
             type,
@@ -443,6 +446,7 @@ const Property = ({
 
         saveProperty({
             currentComponent,
+            includeInMetadata: property.custom,
             path,
             setCurrentComponent,
             type,
