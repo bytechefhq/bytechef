@@ -45,6 +45,11 @@ export type ComponentType = {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         [key: string]: boolean;
     };
+    metadata?: {
+        ui?: {
+            dynamicPropertyTypes?: {[key: string]: string};
+        };
+    };
     notes?: string;
     operationName: string;
     parameters?: {

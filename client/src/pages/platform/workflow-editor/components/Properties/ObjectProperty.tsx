@@ -1,12 +1,12 @@
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
-import {ControlTypeModel} from '@/shared/middleware/platform/configuration';
+import {ControlTypeModel, PropertyTypeModel} from '@/shared/middleware/platform/configuration';
 import {PropertyType, SubPropertyType} from '@/shared/types';
+import isObject from 'isobject';
 import resolvePath from 'object-resolve-path';
 import {Fragment, useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-import getParameterType from '../../utils/getParameterType';
 import Property from './Property';
 import DeletePropertyButton from './components/DeletePropertyButton';
 import SubPropertyPopover from './components/SubPropertyPopover';
@@ -118,24 +118,40 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
                 (property) => property.name === parameterKey
             );
 
+            let parameterItemType = currentComponent.metadata?.ui?.dynamicPropertyTypes?.[`${path}.${parameterKey}`];
+
+            const parameterKeyValue = parameterObject[parameterKey!];
+
+            if (Array.isArray(parameterKeyValue) && !parameterItemType) {
+                parameterItemType = 'ARRAY';
+            }
+
+            if (isObject(parameterKeyValue) && !parameterItemType) {
+                parameterItemType = 'OBJECT';
+            }
+
             if (matchingProperty) {
+                const matchingPropertyType = matchingProperty.type || parameterItemType;
+
                 return {
                     ...matchingProperty,
-                    defaultValue: parameterObject[parameterKey!],
+                    controlType: VALUE_PROPERTY_CONTROL_TYPES[
+                        matchingPropertyType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
+                    ] as ControlTypeModel,
+                    defaultValue: parameterKeyValue,
+                    type: matchingPropertyType,
                 };
             } else {
-                const parameterItemType = getParameterType(parameterObject[parameterKey!]);
-
                 return {
                     controlType: VALUE_PROPERTY_CONTROL_TYPES[
                         parameterItemType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
                     ] as ControlTypeModel,
                     custom: true,
-                    defaultValue: parameterObject[parameterKey!],
+                    defaultValue: parameterKeyValue,
                     expressionEnabled: true,
                     label: parameterKey,
                     name: parameterKey,
-                    type: parameterItemType,
+                    type: parameterItemType as PropertyTypeModel,
                 };
             }
         });
@@ -149,9 +165,10 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
 
     // set subProperties in cases where the ObjectProperty has predefined properties
     useEffect(() => {
-        if (properties?.length) {
+        if (properties?.length && !currentComponent?.parameters) {
             setSubProperties(properties as Array<PropertyType>);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [properties]);
 
     return (

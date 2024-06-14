@@ -5,10 +5,10 @@ import {ControlTypeModel, ObjectPropertyModel, PropertyTypeModel} from '@/shared
 import {ArrayPropertyType, PropertyType} from '@/shared/types';
 import {getRandomId} from '@/shared/util/random-utils';
 import {PlusIcon} from '@radix-ui/react-icons';
+import isObject from 'isobject';
 import resolvePath from 'object-resolve-path';
 import {Fragment, useEffect, useState} from 'react';
 
-import getParameterType from '../../utils/getParameterType';
 import ArrayPropertyItem from './components/ArrayPropertyItem';
 import SubPropertyPopover from './components/SubPropertyPopover';
 
@@ -45,6 +45,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
             key: getRandomId(),
             label: `Item ${arrayItems.length.toString()}`,
             name: `${name}__${arrayItems.length.toString()}`,
+            path: `${path}[${arrayItems.length.toString()}]`,
             type: matchingItem?.type || newPropertyType || 'STRING',
         };
 
@@ -126,7 +127,17 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
             }
         } else if (Array.isArray(parameterValue)) {
             const parameterArrayItems = parameterValue.map((parameterItemValue: ArrayPropertyType, index: number) => {
-                const parameterItemType = getParameterType(parameterItemValue);
+                const subPropertyPath = `${path}[${index}]`;
+
+                let parameterItemType = currentComponent.metadata?.ui?.dynamicPropertyTypes?.[subPropertyPath];
+
+                if (isObject(parameterItemValue) && !parameterItemType) {
+                    parameterItemType = 'OBJECT';
+                }
+
+                if (Array.isArray(parameterItemValue) && !parameterItemType) {
+                    parameterItemType = 'ARRAY';
+                }
 
                 const newSubProperty = {
                     arrayName: name,
@@ -138,29 +149,28 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                     expressionEnabled: true,
                     label: `Item ${index}`,
                     name: index.toString(),
-                    type: parameterItemType,
+                    path: subPropertyPath,
+                    type: parameterItemType as PropertyTypeModel,
                 };
 
                 if (parameterItemType === 'OBJECT') {
                     const customSubProperties = Object.keys(parameterItemValue).map((key) => {
                         const subPropertyParameterValue = parameterItemValue[key as keyof ArrayPropertyType];
 
-                        const subPropertyParameterItemType = getParameterType(subPropertyParameterValue);
-
-                        const subPropertyType =
-                            subPropertyParameterItemType ||
-                            (typeof subPropertyParameterValue === 'boolean' ? 'BOOLEAN' : 'STRING');
+                        const subPropertyParameterItemType =
+                            currentComponent.metadata?.ui?.dynamicPropertyTypes?.[`${path}[${index}].${key}`];
 
                         return {
                             controlType: VALUE_PROPERTY_CONTROL_TYPES[
-                                subPropertyType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
+                                subPropertyParameterItemType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
                             ] as ControlTypeModel,
                             custom: true,
                             defaultValue: subPropertyParameterValue,
                             expressionEnabled: true,
                             label: key,
                             name: key,
-                            type: subPropertyType as PropertyTypeModel,
+                            path: `${subPropertyPath}.${key}`,
+                            type: subPropertyParameterItemType as PropertyTypeModel,
                         };
                     });
 
