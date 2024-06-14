@@ -54,6 +54,7 @@ export default function saveProperty({
                 setCurrentComponent({
                     ...currentComponent,
                     displayConditions: response.displayConditions,
+                    metadata: response.metadata,
                     parameters: response.parameters,
                 });
             },

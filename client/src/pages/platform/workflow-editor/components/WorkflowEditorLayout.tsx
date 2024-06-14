@@ -89,14 +89,16 @@ const WorkflowEditorLayout = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentNodeName, workflowNodeOutputs]);
 
+    // set currentComponent when currentNodeName changes
     useEffect(() => {
-        const workflowComponents = [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])]?.map((operation) => {
-            const {description, label, name, parameters, type} = operation;
+        const workflowComponents = [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])]?.map((workflowNode) => {
+            const {description, label, metadata, name, parameters, type} = workflowNode;
 
             const [componentName, operationName] = type.split('/v1/');
 
             return {
                 componentName,
+                metadata,
                 notes: description,
                 operationName,
                 parameters,
