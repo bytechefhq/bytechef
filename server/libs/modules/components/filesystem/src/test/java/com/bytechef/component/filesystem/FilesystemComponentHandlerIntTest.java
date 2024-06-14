@@ -66,7 +66,7 @@ public class FilesystemComponentHandlerIntTest {
         FileEntry fileEntry = fileStorageService.storeFileContent(
             FileEntryConstants.FILES_DIR, "sample.txt", Files.contentOf(getFile(), StandardCharsets.UTF_8));
 
-        assertThat(((Map<?, ?>) outputs.get("readLocalFile")))
+        assertThat((Map<?, ?>) outputs.get("readLocalFile"))
             .hasFieldOrPropertyWithValue("extension", "txt")
             .hasFieldOrPropertyWithValue("mimeType", "text/plain")
             .hasFieldOrPropertyWithValue("name", "sample.txt")
