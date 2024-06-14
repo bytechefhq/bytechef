@@ -500,7 +500,7 @@ public class HttpClientExecutorTest {
     }
 
     @Test
-    public void testHandleResponse_withIncompatibleResponseType() {
+    public void testHandleResponseWithIncompatibleResponseType() {
         TestHttpResponse testHttpResponse = new TestHttpResponse(
             "IncompatibleResponseType body - text instead of JSON",
             HttpHeaders.of(Map.of("content-type", List.of("text/html;charset=UTF-8")), (s, s2) -> true), 404);
