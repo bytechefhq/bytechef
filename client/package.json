@@ -139,6 +139,7 @@
         "eslint-plugin-sort-destructure-keys": "^2.0.0",
         "eslint-plugin-tailwindcss": "^3.17.3",
         "identity-obj-proxy": "^3.0.0",
+        "isobject": "^4.0.0",
         "jsdom": "^24.1.0",
         "msw": "^2.3.1",
         "object-resolve-path": "^1.1.1",
