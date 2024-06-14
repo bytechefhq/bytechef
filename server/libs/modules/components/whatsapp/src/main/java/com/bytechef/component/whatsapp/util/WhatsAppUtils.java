@@ -22,7 +22,7 @@ import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.BASE_UR
 import com.bytechef.component.definition.Context;
 import java.util.Map;
 
-public class WhatsAppUtil {
+public class WhatsAppUtils {
 
     public static String getWhatsappServer(String accessToken, Context context) {
         Map<?, ?> response = context.http(http -> http.get(BASE_URL + "/metadata")
@@ -39,6 +39,6 @@ public class WhatsAppUtil {
         return (String) response.get("dc");
     }
 
-    private WhatsAppUtil() {
+    private WhatsAppUtils() {
     }
 }

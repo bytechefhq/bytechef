@@ -32,17 +32,18 @@ import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.SENDER_
 
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
-import com.bytechef.component.whatsapp.util.WhatsAppUtil;
+import com.bytechef.component.whatsapp.util.WhatsAppUtils;
 import java.util.List;
 import java.util.Map;
 
 /**
  * @author Luka Ljubić
  */
-public class WhatsAppNewIncomingWhatsAppMessageTrigger {
+public class WhatsAppNewIncomingMessageTrigger {
 
     public static final ComponentDSL.ModifiableTriggerDefinition TRIGGER_DEFINITION =
         ComponentDSL.trigger(MESSAGE_RECEIVED)
@@ -84,14 +85,16 @@ public class WhatsAppNewIncomingWhatsAppMessageTrigger {
                                                 object("text")
                                                     .properties(
                                                         string("body")))))))
-            .dynamicWebhookDisable(WhatsAppNewIncomingWhatsAppMessageTrigger::dynamicWebhookDisable)
-            .dynamicWebhookEnable(WhatsAppNewIncomingWhatsAppMessageTrigger::dynamicWebhookEnable)
-            .dynamicWebhookRequest(WhatsAppNewIncomingWhatsAppMessageTrigger::dynamicWebhookRequest);
+            .dynamicWebhookDisable(WhatsAppNewIncomingMessageTrigger::dynamicWebhookDisable)
+            .dynamicWebhookEnable(WhatsAppNewIncomingMessageTrigger::dynamicWebhookEnable)
+            .dynamicWebhookRequest(WhatsAppNewIncomingMessageTrigger::dynamicWebhookRequest);
 
-    private static Object dynamicWebhookRequest(
+    private WhatsAppNewIncomingMessageTrigger() {
+    }
+
+    protected static Object dynamicWebhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders httpHeaders,
-        HttpParameters httpParameters, WebhookBody body,
-        WebhookMethod webhookMethod,
+        HttpParameters httpParameters, WebhookBody body, WebhookMethod webhookMethod,
         DynamicWebhookEnableOutput dynamicWebhookEnableOutput, TriggerContext context) {
 
         if (body == null) {
@@ -101,26 +104,22 @@ public class WhatsAppNewIncomingWhatsAppMessageTrigger {
         return body.getContent();
     }
 
-    private static DynamicWebhookEnableOutput dynamicWebhookEnable(
+    protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl, String workflowExecutionId,
         TriggerContext context) {
-        String server = WhatsAppUtil.getWhatsappServer(
-            connectionParameters.getRequiredString(ACCESS_TOKEN), context);
 
+        String server = WhatsAppUtils.getWhatsappServer(connectionParameters.getRequiredString(ACCESS_TOKEN), context);
         String url = BASE_URL + "/webhooks";
 
         Map<?, ?> response = context
-            .http(http -> http.post(
-                url.formatted(
-                    server, inputParameters.getRequiredString(RECEIVE_USER))))
+            .http(http -> http.post(url.formatted(server, inputParameters.getRequiredString(RECEIVE_USER))))
             .body(
-                Context.Http.Body.of(
+                Http.Body.of(
                     Map.of(
                         "url", webhookUrl,
                         "events", Map.of(GET_MESSAGE, true),
-                        "sources", Map.of(
-                            "api", true))))
-            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+                        "sources", Map.of("api", true))))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new Context.TypeReference<>() {});
 
@@ -135,17 +134,16 @@ public class WhatsAppNewIncomingWhatsAppMessageTrigger {
         return new DynamicWebhookEnableOutput(Map.of("id", response.get("id")), null);
     }
 
-    private static void dynamicWebhookDisable(
+    public static void dynamicWebhookDisable(
         Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters, String s,
         TriggerContext context) {
-        String server = WhatsAppUtil.getWhatsappServer(connectionParameters.getRequiredString(ACCESS_TOKEN), context);
 
-        context.http(http -> http.delete(
-            "https://%s.api.mailchimp.com/3.0/lists/%s/webhooks/%s".formatted(
-                server, inputParameters.getRequiredString(SENDER_NUMBER), outputParameters.get("id"))))
+        String server = WhatsAppUtils.getWhatsappServer(connectionParameters.getRequiredString(ACCESS_TOKEN), context);
+
+        context.http(http -> http
+            .delete(
+                "https://%s.api.mailchimp.com/3.0/lists/%s/webhooks/%s".formatted(
+                    server, inputParameters.getRequiredString(SENDER_NUMBER), outputParameters.get("id"))))
             .execute();
-    }
-
-    private WhatsAppNewIncomingWhatsAppMessageTrigger() {
     }
 }
