@@ -76,8 +76,8 @@ public class WhatsAppSendMessageAction {
     private WhatsAppSendMessageAction() {
     }
 
-    public static Object
-        perform(Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+    public static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         return actionContext
             .http(http -> http.post(BASE_URL + "/" + connectionParameters.getString(PHONE_NUMBER_ID) + "/messages"))

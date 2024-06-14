@@ -24,7 +24,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.whatsapp.action.WhatsAppSendMessageAction;
-import com.bytechef.component.whatsapp.trigger.WhatsAppNewIncomingWhatsAppMessageTrigger;
+import com.bytechef.component.whatsapp.trigger.WhatsAppNewIncomingMessageTrigger;
 import com.google.auto.service.AutoService;
 
 /**
@@ -41,7 +41,7 @@ public class WhatsAppComponentHandler implements ComponentHandler {
         .connection(CONNECTION_DEFINITION)
         .categories(ComponentCategory.COMMUNICATION)
         .actions(WhatsAppSendMessageAction.ACTION_DEFINITION)
-        .triggers(WhatsAppNewIncomingWhatsAppMessageTrigger.TRIGGER_DEFINITION)
+        .triggers(WhatsAppNewIncomingMessageTrigger.TRIGGER_DEFINITION)
         .icon("path:assets/whatsapp.svg");
 
     @Override
