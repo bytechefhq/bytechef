@@ -143,8 +143,8 @@ public class WhatsAppNewIncomingMessageTrigger {
         String server = WhatsAppUtils.getWhatsappServer(connectionParameters.getRequiredString(ACCESS_TOKEN), context);
 
         context.http(http -> http
-            .delete(url.formatted(
-                    server, inputParameters.getRequiredString(SENDER_NUMBER), outputParameters.get("id"))))
+            .delete(
+                url.formatted(server, inputParameters.getRequiredString(SENDER_NUMBER), outputParameters.get("id"))))
             .execute();
     }
 }
