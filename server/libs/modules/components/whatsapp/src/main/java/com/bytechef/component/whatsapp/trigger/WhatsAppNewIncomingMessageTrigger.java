@@ -138,11 +138,12 @@ public class WhatsAppNewIncomingMessageTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters, String s,
         TriggerContext context) {
 
+        String url = BASE_URL + "/webhooks";
+
         String server = WhatsAppUtils.getWhatsappServer(connectionParameters.getRequiredString(ACCESS_TOKEN), context);
 
         context.http(http -> http
-            .delete(
-                "https://%s.api.mailchimp.com/3.0/lists/%s/webhooks/%s".formatted(
+            .delete(url.formatted(
                     server, inputParameters.getRequiredString(SENDER_NUMBER), outputParameters.get("id"))))
             .execute();
     }
