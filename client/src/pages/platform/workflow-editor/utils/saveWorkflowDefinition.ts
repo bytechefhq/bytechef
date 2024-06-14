@@ -22,6 +22,11 @@ type NodeDataType = {
     description?: string;
     icon?: JSX.Element | string;
     label?: string;
+    metadata?: {
+        ui?: {
+            dynamicPropertyTypes?: {[key: string]: string};
+        };
+    };
     name: string;
     operationName?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -72,7 +77,7 @@ export default async function saveWorkflowDefinition(
         return;
     }
 
-    const {componentName, description, label, name, parameters} = nodeData;
+    const {componentName, description, label, metadata, name, parameters} = nodeData;
 
     let {operationName} = nodeData;
 
@@ -94,6 +99,7 @@ export default async function saveWorkflowDefinition(
     const newTask: WorkflowTaskModel = {
         description,
         label,
+        metadata,
         name,
         parameters,
         type: `${componentName}/v1/${operationName}`,
