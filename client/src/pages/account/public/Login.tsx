@@ -7,6 +7,7 @@ import {Input} from '@/components/ui/input';
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {zodResolver} from '@hookform/resolvers/zod';
+import {useQueryClient} from '@tanstack/react-query';
 import React, {useEffect} from 'react';
 import {useForm} from 'react-hook-form';
 import {Link, Navigate, useLocation, useNavigate} from 'react-router-dom';
@@ -25,6 +26,8 @@ const Login = () => {
 
     const navigate = useNavigate();
 
+    const queryClient = useQueryClient();
+
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
             email: '',
@@ -42,7 +45,11 @@ const Login = () => {
         if (!sessionHasBeenFetched) {
             getAccount();
         }
-    }, [sessionHasBeenFetched, getAccount]);
+
+        if (sessionHasBeenFetched) {
+            queryClient.resetQueries();
+        }
+    }, [sessionHasBeenFetched, queryClient, getAccount]);
 
     useEffect(() => {
         if (authenticated) {
