@@ -232,6 +232,9 @@ const Integration = () => {
     useEffect(() => {
         setWorkflowNodeDetailsPanelOpen(false);
 
+        useWorkflowDataStore.getState().reset();
+        useWorkflowNodeDetailsPanelStore.getState().reset();
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [integrationWorkflowId]);
 
