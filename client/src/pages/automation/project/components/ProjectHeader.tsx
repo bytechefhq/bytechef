@@ -1,8 +1,8 @@
-import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectHeaderDeleteProjectAlertDialog from '@/pages/automation/project/components/ProjectHeaderDeleteProjectAlertDialog';
 import ProjectHeaderDeleteWorkflowAlertDialog from '@/pages/automation/project/components/ProjectHeaderDeleteWorkflowAlertDialog';
+import ProjectHeaderDropdownMenu from '@/pages/automation/project/components/ProjectHeaderDropDownMenu';
 import ProjectHeaderOutputButton from '@/pages/automation/project/components/ProjectHeaderOutputButton';
 import ProjectHeaderProjectDropDownMenu from '@/pages/automation/project/components/ProjectHeaderProjectDropDownMenu';
 import ProjectHeaderRunButton from '@/pages/automation/project/components/ProjectHeaderRunButton';
@@ -15,7 +15,7 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
-import {ProjectModel, ProjectStatusModel, WorkflowModel} from '@/shared/middleware/automation/configuration';
+import {ProjectModel, WorkflowModel} from '@/shared/middleware/automation/configuration';
 import {WorkflowTestApi} from '@/shared/middleware/platform/workflow/test';
 import {useDeleteProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {
@@ -180,20 +180,7 @@ const ProjectHeader = ({
 
     return (
         <header className="flex items-center border-b py-2 pl-3 pr-2.5">
-            <div className="flex flex-1 items-center space-x-2">
-                <h1>{project?.name}</h1>
-
-                {project && (
-                    <Badge
-                        className="flex space-x-1"
-                        variant={project.status === ProjectStatusModel.Published ? 'success' : 'outline'}
-                    >
-                        <span>V{project.projectVersion}</span>
-
-                        <span>{project.status === ProjectStatusModel.Published ? `Published` : 'Draft'}</span>
-                    </Badge>
-                )}
-            </div>
+            <div className="flex flex-1">{project && <ProjectHeaderDropdownMenu project={project} />}</div>
 
             <div className="flex items-center space-x-6">
                 <div className="flex space-x-1">

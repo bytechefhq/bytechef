@@ -2,8 +2,8 @@ import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import IntegrationHeaderDeleteIntegrationAlertDialog from '@/pages/embedded/integration/components/IntegrationHeaderDeleteIntegrationAlertDialog';
 import IntegrationHeaderDeleteWorkflowAlertDialog from '@/pages/embedded/integration/components/IntegrationHeaderDeleteWorkflowAlertDialog';
+import IntegrationHeaderDropDownMenu from '@/pages/embedded/integration/components/IntegrationHeaderDropDownMenu';
 import IntegrationHeaderIntegrationDropDownMenu from '@/pages/embedded/integration/components/IntegrationHeaderIntegrationDropDownMenu';
-import IntegrationHeaderIntegrationVersionBadge from '@/pages/embedded/integration/components/IntegrationHeaderIntegrationVersionBadge';
 import IntegrationHeaderOutputButton from '@/pages/embedded/integration/components/IntegrationHeaderOutputButton';
 import IntegrationHeaderRunButton from '@/pages/embedded/integration/components/IntegrationHeaderRunButton';
 import IntegrationHeaderStopButton from '@/pages/embedded/integration/components/IntegrationHeaderStopButton';
@@ -160,20 +160,14 @@ const IntegrationHeader = ({
                 .catch(() => {
                     setWorkflowIsRunning(false);
                     setWorkflowTestExecution(undefined);
-
-                    // queryClient.invalidateQueries({
-                    //     queryKey: WorkflowKeys.integrationWorkflows(integrationId),
-                    // });
                 });
         }
     };
 
     return (
         <header className="flex items-center border-b py-2 pl-3 pr-2.5">
-            <div className="flex flex-1 items-center">
-                <h1>{integration?.componentName}</h1>
-
-                {integration && <IntegrationHeaderIntegrationVersionBadge integration={integration} />}
+            <div className="flex flex-1">
+                {integration && <IntegrationHeaderDropDownMenu integration={integration} />}
             </div>
 
             <div className="flex items-center space-x-6">
