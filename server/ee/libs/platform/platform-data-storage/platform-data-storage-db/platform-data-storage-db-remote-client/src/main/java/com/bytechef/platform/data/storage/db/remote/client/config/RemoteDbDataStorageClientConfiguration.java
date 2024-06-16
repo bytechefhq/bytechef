@@ -7,12 +7,12 @@
 
 package com.bytechef.platform.data.storage.db.remote.client.config;
 
-import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.data.storage.db.remote.client.service.RemoteDbDataStorageServiceClient;
 import com.bytechef.platform.data.storage.db.service.DbDataStorageService;
 import com.bytechef.platform.data.storage.service.DataStorageService;
+import com.bytechef.remote.client.LoadBalancedRestClient;
 import java.util.Map;
 import java.util.Optional;
 import org.slf4j.Logger;

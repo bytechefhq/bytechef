@@ -7,10 +7,10 @@
 
 package com.bytechef.embedded.configuration.remote.client.service;
 
-import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.platform.constant.Environment;
+import com.bytechef.remote.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.stereotype.Component;

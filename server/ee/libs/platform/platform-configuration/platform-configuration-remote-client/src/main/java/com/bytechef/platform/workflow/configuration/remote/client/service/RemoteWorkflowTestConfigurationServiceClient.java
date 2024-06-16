@@ -7,10 +7,10 @@
 
 package com.bytechef.platform.workflow.configuration.remote.client.service;
 
-import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.remote.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;

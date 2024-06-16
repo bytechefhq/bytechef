@@ -9,7 +9,7 @@ package com.bytechef.atlas.execution.remote.client.service;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.commons.rest.client.LoadBalancedRestClient;
+import com.bytechef.remote.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.ParameterizedTypeReference;

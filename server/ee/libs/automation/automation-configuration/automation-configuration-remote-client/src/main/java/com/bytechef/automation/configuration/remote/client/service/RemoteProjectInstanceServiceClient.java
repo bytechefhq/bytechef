@@ -9,8 +9,8 @@ package com.bytechef.automation.configuration.remote.client.service;
 
 import com.bytechef.automation.configuration.domain.ProjectInstance;
 import com.bytechef.automation.configuration.service.ProjectInstanceService;
-import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import com.bytechef.platform.constant.Environment;
+import com.bytechef.remote.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.stereotype.Component;

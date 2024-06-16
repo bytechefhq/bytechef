@@ -7,9 +7,9 @@
 
 package com.bytechef.platform.workflow.execution.remote.client.service;
 
-import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
+import com.bytechef.remote.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Optional;
 import org.springframework.stereotype.Component;

@@ -8,10 +8,10 @@
 package com.bytechef.platform.workflow.execution.remote.client.service;
 
 import com.bytechef.atlas.execution.domain.Job.Status;
-import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.workflow.execution.domain.InstanceJob;
 import com.bytechef.platform.workflow.execution.service.InstanceJobService;
+import com.bytechef.remote.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.List;

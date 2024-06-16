@@ -7,10 +7,10 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.registry.remote.client.service;
 
-import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import com.bytechef.platform.workflow.task.dispatcher.registry.domain.Output;
 import com.bytechef.platform.workflow.task.dispatcher.registry.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
+import com.bytechef.remote.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;

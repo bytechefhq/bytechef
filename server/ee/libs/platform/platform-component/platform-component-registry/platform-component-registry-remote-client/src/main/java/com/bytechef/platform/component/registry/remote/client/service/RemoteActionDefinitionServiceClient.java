@@ -7,7 +7,6 @@
 
 package com.bytechef.platform.component.registry.remote.client.service;
 
-import com.bytechef.commons.rest.client.DefaultRestClient;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.platform.component.registry.domain.ActionDefinition;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
@@ -16,6 +15,7 @@ import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.platform.component.registry.service.ActionDefinitionService;
+import com.bytechef.remote.client.DefaultRestClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;

@@ -7,19 +7,19 @@
 
 package com.bytechef.platform.component.registry.remote.client.service;
 
-import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
-import com.bytechef.commons.rest.client.DefaultRestClient;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.Authorization.RefreshTokenResponse;
 import com.bytechef.component.definition.Context;
+import com.bytechef.discovery.util.WorkerDiscoveryUtils;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.ConnectionDefinition;
 import com.bytechef.platform.component.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
+import com.bytechef.remote.client.DefaultRestClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;

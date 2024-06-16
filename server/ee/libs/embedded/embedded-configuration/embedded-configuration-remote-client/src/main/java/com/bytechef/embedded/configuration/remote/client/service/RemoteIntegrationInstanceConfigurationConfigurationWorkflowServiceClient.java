@@ -7,10 +7,10 @@
 
 package com.bytechef.embedded.configuration.remote.client.service;
 
-import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflowConnection;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
+import com.bytechef.remote.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;

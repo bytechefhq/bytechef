@@ -9,8 +9,8 @@ package com.bytechef.atlas.execution.remote.client.service;
 
 import com.bytechef.atlas.execution.domain.Context.Classname;
 import com.bytechef.atlas.execution.service.ContextService;
-import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.remote.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.core.ParameterizedTypeReference;

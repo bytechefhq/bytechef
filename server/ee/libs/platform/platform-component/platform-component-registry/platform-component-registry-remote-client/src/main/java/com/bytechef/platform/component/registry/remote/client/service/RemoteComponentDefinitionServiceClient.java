@@ -7,13 +7,13 @@
 
 package com.bytechef.platform.component.registry.remote.client.service;
 
-import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
-import com.bytechef.commons.rest.client.DefaultRestClient;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.discovery.util.WorkerDiscoveryUtils;
 import com.bytechef.platform.component.definition.DataStreamComponentDefinition.ComponentType;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
 import com.bytechef.platform.component.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
+import com.bytechef.remote.client.DefaultRestClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;

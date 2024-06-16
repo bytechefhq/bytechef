@@ -10,7 +10,7 @@ package com.bytechef.automation.configuration.remote.client.service;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflowConnection;
 import com.bytechef.automation.configuration.service.ProjectInstanceWorkflowService;
-import com.bytechef.commons.rest.client.LoadBalancedRestClient;
+import com.bytechef.remote.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
