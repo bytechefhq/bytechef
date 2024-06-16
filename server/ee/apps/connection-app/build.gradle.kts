@@ -17,6 +17,7 @@ dependencies {
     implementation(project(":server:libs:automation:automation-connection:automation-connection-rest"))
     implementation(project(":server:libs:automation:automation-connection:automation-connection-service"))
     implementation(project(":server:libs:automation:automation-swagger"))
+    implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:config:async-config"))
     implementation(project(":server:libs:config:environment-config"))
     implementation(project(":server:libs:config:jackson-config"))

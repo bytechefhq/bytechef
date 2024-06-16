@@ -68,6 +68,7 @@ include("server:libs:automation:automation-workflow:automation-workflow-executio
 include("server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-rest")
 include("server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-service")
 
+include("server:libs:config:app-config")
 include("server:libs:config:async-config")
 include("server:libs:config:automation-demo-config")
 include("server:libs:config:cache-config")

@@ -12,6 +12,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.cloud:spring-cloud-starter-loadbalancer")
     implementation("org.springframework.retry:spring-retry")
+    implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:config:async-config"))
     implementation(project(":server:libs:config:environment-config"))
     implementation(project(":server:libs:config:jackson-config"))

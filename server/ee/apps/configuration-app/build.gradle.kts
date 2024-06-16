@@ -24,6 +24,7 @@ dependencies {
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-rest:automation-configuration-rest-impl"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
     implementation(project(":server:libs:automation:automation-swagger"))
+    implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:config:async-config"))
     implementation(project(":server:libs:config:automation-demo-config"))
     implementation(project(":server:libs:config:cache-config"))

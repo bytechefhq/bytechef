@@ -13,6 +13,7 @@ dependencies {
     implementation("org.springframework.retry:spring-retry")
     implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-service"))
     implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-config"))
+    implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:config:async-config"))
     implementation(project(":server:libs:config:environment-config"))
     implementation(project(":server:libs:config:jackson-config"))

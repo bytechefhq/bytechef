@@ -8,6 +8,7 @@ spring:
           searchLocations: classpath:/config/apps
   profiles:
     active: dev,native
+
 bytechef:
   discovery-service:
     provider: redis

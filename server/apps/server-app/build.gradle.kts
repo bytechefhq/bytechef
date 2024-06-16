@@ -35,6 +35,7 @@ dependencies {
     implementation(project(":server:libs:automation:automation-workflow:automation-workflow-coordinator"))
     implementation(project(":server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-rest"))
     implementation(project(":server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-service"))
+    implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:config:async-config"))
     implementation(project(":server:libs:config:automation-demo-config"))
     implementation(project(":server:libs:config:cache-config"))
