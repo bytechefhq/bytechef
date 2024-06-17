@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class ProjectConnectionTagApiControllerTest {
+public class ConnectionTagApiControllerTest {
 
     @Disabled
     @Test

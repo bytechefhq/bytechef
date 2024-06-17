@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.connection.web.rest;
+package com.bytechef.embedded.connection.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -53,8 +53,8 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
  * @author Ivica Cardic
  */
 @Disabled
-@WebMvcTest(value = ProjectConnectionApiController.class)
-public class ProjectConnectionApiControllerIntTest {
+@WebMvcTest(value = ConnectionApiController.class)
+public class ConnectionApiControllerIntTest {
 
     @MockBean
     private ConnectionFacade connectionFacade;
@@ -119,7 +119,7 @@ public class ProjectConnectionApiControllerIntTest {
 
     @Test
     public void testGetConnectionTags() {
-        when(connectionFacade.getConnectionTags(AppType.AUTOMATION))
+        when(connectionFacade.getConnectionTags(AppType.EMBEDDED))
             .thenReturn(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")));
 
         try {
@@ -147,7 +147,7 @@ public class ProjectConnectionApiControllerIntTest {
     public void testGetConnections() {
         ConnectionDTO connectionDTO = getConnection();
 
-        when(connectionFacade.getConnections(null, null, null, AppType.AUTOMATION))
+        when(connectionFacade.getConnections((String) null, null, null, AppType.EMBEDDED))
             .thenReturn(List.of(connectionDTO));
 
         this.webTestClient
@@ -162,7 +162,7 @@ public class ProjectConnectionApiControllerIntTest {
                 .parameters(null))
             .hasSize(1);
 
-        when(connectionFacade.getConnections("component1", null, null, AppType.AUTOMATION))
+        when(connectionFacade.getConnections("component1", null, null, AppType.EMBEDDED))
             .thenReturn(List.of(connectionDTO));
 
         this.webTestClient
@@ -175,8 +175,7 @@ public class ProjectConnectionApiControllerIntTest {
             .expectBodyList(ConnectionModel.class)
             .hasSize(1);
 
-        when(connectionFacade.getConnections(null, 1, null, AppType.AUTOMATION))
-            .thenReturn(List.of(connectionDTO));
+        when(connectionFacade.getConnections(null, 1, null, AppType.EMBEDDED)).thenReturn(List.of(connectionDTO));
 
         this.webTestClient
             .get()
@@ -188,7 +187,7 @@ public class ProjectConnectionApiControllerIntTest {
             .expectBodyList(ConnectionModel.class)
             .hasSize(1);
 
-        when(connectionFacade.getConnections("component1", 1, null, AppType.AUTOMATION))
+        when(connectionFacade.getConnections("component1", 1, null, AppType.EMBEDDED))
             .thenReturn(List.of(connectionDTO));
 
         this.webTestClient
@@ -207,8 +206,7 @@ public class ProjectConnectionApiControllerIntTest {
             .name("name")
             .parameters(Map.of("key1", "value1"));
 
-        when(connectionFacade.create(any(), AppType.AUTOMATION))
-            .thenReturn(getConnection());
+        when(connectionFacade.create(any(), AppType.EMBEDDED)).thenReturn(getConnection());
 
         try {
             assert connectionDTO.id() != null;
@@ -236,7 +234,7 @@ public class ProjectConnectionApiControllerIntTest {
 
         ArgumentCaptor<ConnectionDTO> connectionArgumentCaptor = ArgumentCaptor.forClass(ConnectionDTO.class);
 
-        verify(connectionFacade).create(connectionArgumentCaptor.capture(), AppType.AUTOMATION);
+        verify(connectionFacade).create(connectionArgumentCaptor.capture(), AppType.EMBEDDED);
 
         assertThat(connectionArgumentCaptor.getValue())
             .hasFieldOrPropertyWithValue("componentName", "componentName")
@@ -318,7 +316,7 @@ public class ProjectConnectionApiControllerIntTest {
             .build();
     }
 
-    @ComponentScan(basePackages = "com.bytechef.automation.connection.web.rest")
+    @ComponentScan(basePackages = "com.bytechef.embedded.connection.web.rest")
     @Configuration
     public static class ConnectionRestTestConfiguration {
     }

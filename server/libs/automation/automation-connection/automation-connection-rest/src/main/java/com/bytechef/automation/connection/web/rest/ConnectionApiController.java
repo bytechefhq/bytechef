@@ -36,17 +36,17 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @author Ivica Cardic
  */
-@RestController
+@RestController("com.bytechef.automation.connection.web.rest.ConnectionApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
 @ConditionalOnEndpoint
-public class ProjectConnectionApiController implements ConnectionApi {
+public class ConnectionApiController implements ConnectionApi {
 
     private final ConnectionFacade connectionFacade;
     private final ConversionService conversionService;
     private final WorkspaceConnectionFacade workspaceConnectionFacade;
 
     @SuppressFBWarnings("EI")
-    public ProjectConnectionApiController(
+    public ConnectionApiController(
         ConnectionFacade connectionFacade, ConversionService conversionService,
         WorkspaceConnectionFacade workspaceConnectionFacade) {
 
