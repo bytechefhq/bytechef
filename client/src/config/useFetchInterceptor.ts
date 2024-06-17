@@ -31,7 +31,7 @@ export default function useFetchInterceptor() {
             if (response.status === 403 || response.status === 401) {
                 clearAuthentication();
                 clearCurrentWorkspaceId();
-                console.log(response.url);
+
                 if (!response.url.endsWith('/api/account')) {
                     navigate('/login');
                 }
