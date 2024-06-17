@@ -35,11 +35,11 @@ import org.springframework.lang.NonNull;
 public interface ConnectionDefinitionService {
 
     ApplyResponse executeAuthorizationApply(
-        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParms,
+        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParams,
         @NonNull Context context);
 
     AuthorizationCallbackResponse executeAuthorizationCallback(
-        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParms,
+        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParams,
         @NonNull Context context, @NonNull String redirectUri);
 
     Optional<String> executeBaseUri(

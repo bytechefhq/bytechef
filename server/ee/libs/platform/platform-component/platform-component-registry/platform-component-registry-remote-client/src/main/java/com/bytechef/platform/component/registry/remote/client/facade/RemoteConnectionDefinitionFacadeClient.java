@@ -37,24 +37,24 @@ public class RemoteConnectionDefinitionFacadeClient extends AbstractWorkerClient
 
     @Override
     public Authorization.AuthorizationCallbackResponse executeAuthorizationCallback(
-        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParms,
+        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParams,
         @NonNull String redirectUri) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, CONNECTION_DEFINITION_FACADE + "/execute-authorization-callback"),
-            new AuthorizationCallbackRequest(componentName, authorizationName, authorizationParms, redirectUri),
+            new AuthorizationCallbackRequest(componentName, authorizationName, authorizationParams, redirectUri),
             Authorization.AuthorizationCallbackResponse.class);
     }
 
     @Override
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParms) {
+        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParams) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, CONNECTION_DEFINITION_FACADE + "/get-oauth2-authorization-parameters"),
-            new ConnectionRequest(componentName, authorizationName, authorizationParms),
+            new ConnectionRequest(componentName, authorizationName, authorizationParams),
             OAuth2AuthorizationParameters.class);
     }
 

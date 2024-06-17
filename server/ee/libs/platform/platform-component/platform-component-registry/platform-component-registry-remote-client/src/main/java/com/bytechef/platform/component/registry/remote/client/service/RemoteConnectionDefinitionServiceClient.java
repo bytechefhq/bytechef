@@ -50,7 +50,7 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
 
     @Override
     public ApplyResponse executeAuthorizationApply(
-        @NonNull String componentName, @NonNull String authorizatioName, @NonNull Map<String, ?> authorizationParms,
+        @NonNull String componentName, @NonNull String authorizatioName, @NonNull Map<String, ?> authorizationParams,
         @NonNull Context context) {
 
         throw new UnsupportedOperationException();
@@ -58,7 +58,7 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
 
     @Override
     public AuthorizationCallbackResponse executeAuthorizationCallback(
-        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParms,
+        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParams,
         @NonNull Context context,
         @NonNull String redirectUri) {
 

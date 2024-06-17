@@ -84,7 +84,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public ApplyResponse executeAuthorizationApply(
-        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParms,
+        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParams,
         @NonNull Context context) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
@@ -94,7 +94,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             authorization.getApply(), getDefaultApply(authorization.getType()));
 
         try {
-            return applyFunction.apply(new ParametersImpl(authorizationParms), context);
+            return applyFunction.apply(new ParametersImpl(authorizationParams), context);
         } catch (Exception e) {
             throw new ComponentExecutionException(e, ConnectionDefinitionErrorType.EXECUTE_AUTHORIZATION_APPLY);
         }
@@ -102,7 +102,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public AuthorizationCallbackResponse executeAuthorizationCallback(
-        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParms,
+        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParams,
         @NonNull Context context, @NonNull String redirectUri) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
@@ -143,7 +143,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
         try {
             return authorizationCallbackFunction.apply(
-                new ParametersImpl(authorizationParms), MapUtils.getString(authorizationParms, CODE),
+                new ParametersImpl(authorizationParams), MapUtils.getString(authorizationParams, CODE),
                 redirectUri, verifier, context);
         } catch (Exception e) {
             throw new ComponentExecutionException(e, ConnectionDefinitionErrorType.EXECUTE_AUTHORIZATION_CALLBACK);
@@ -229,7 +229,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParms,
+        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParams,
         @NonNull Context context) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
@@ -246,7 +246,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             authorization.getScopes(),
             (connectionParameters, context1) -> getDefaultScopes(connectionParameters));
 
-        ParametersImpl connectionParameters = new ParametersImpl(authorizationParms);
+        ParametersImpl connectionParameters = new ParametersImpl(authorizationParams);
 
         try {
             return new OAuth2AuthorizationParameters(

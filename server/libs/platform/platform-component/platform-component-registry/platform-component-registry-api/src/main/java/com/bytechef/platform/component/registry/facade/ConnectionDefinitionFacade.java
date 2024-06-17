@@ -27,9 +27,9 @@ import org.springframework.lang.NonNull;
 public interface ConnectionDefinitionFacade {
 
     AuthorizationCallbackResponse executeAuthorizationCallback(
-        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParms,
+        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParams,
         @NonNull String redirectUri);
 
     OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParms);
+        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParams);
 }
