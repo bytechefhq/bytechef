@@ -29,7 +29,7 @@ const ConnectionParameters = ({
             <div className="text-sm font-medium">Connection Parameters</div>
 
             <div className="flex flex-col gap-3 text-sm">
-                <div className="flex gap-1">
+                <div className="flex w-full flex-col gap-1">
                     {connectionDefinition.properties &&
                         connection.connectionParameters &&
                         Object.keys(connection.connectionParameters).length > 0 &&
@@ -48,7 +48,7 @@ const ConnectionParameters = ({
                     connection.authorizationParameters &&
                     Object.keys(connection.authorizationParameters).length > 0 &&
                     authorizations.map((authorization) => (
-                        <div className="flex w-full gap-1" key={authorization.name}>
+                        <div className="flex w-full flex-col gap-1" key={authorization.name}>
                             <div className="flex">
                                 <div className="w-4/12 font-medium text-muted-foreground">Authorization:</div>
 
