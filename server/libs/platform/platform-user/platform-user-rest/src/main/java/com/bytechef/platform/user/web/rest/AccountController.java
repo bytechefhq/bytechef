@@ -29,6 +29,7 @@ import com.bytechef.platform.user.exception.LoginAlreadyUsedException;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.MailService;
 import com.bytechef.platform.user.service.PersistentTokenService;
+import com.bytechef.platform.user.service.TempEmailService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.user.web.rest.exception.AccountErrorType;
 import com.bytechef.platform.user.web.rest.exception.AccountResourceException;
@@ -73,17 +74,19 @@ public class AccountController {
     private final PersistentTokenService persistentTokenService;
     private final TenantService tenantService;
     private final UserService userService;
+    private final TempEmailService tempEmailService;
 
     @SuppressFBWarnings("EI")
     public AccountController(
         AuthorityService authorityService, MailService mailService, PersistentTokenService persistentTokenService,
-        TenantService tenantService, UserService userService) {
+        TenantService tenantService, UserService userService, TempEmailService tempEmailService) {
 
         this.authorityService = authorityService;
         this.persistentTokenService = persistentTokenService;
         this.tenantService = tenantService;
         this.userService = userService;
         this.mailService = mailService;
+        this.tempEmailService = tempEmailService;
     }
 
     /**
@@ -97,6 +100,10 @@ public class AccountController {
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public void registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
+        if (tempEmailService.isEmailTemp(managedUserVM.getEmail())) {
+            throw new EmailAlreadyUsedException();
+        }
+
         if (tenantService.isMultiTenantEnabled()) {
             if (tenantService.tenantIdsByUserLoginExist(managedUserVM.getLogin())) {
                 throw new LoginAlreadyUsedException();
