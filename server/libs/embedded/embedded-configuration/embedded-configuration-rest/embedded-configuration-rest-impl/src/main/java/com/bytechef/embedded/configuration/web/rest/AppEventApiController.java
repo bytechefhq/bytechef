@@ -20,6 +20,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.embedded.configuration.domain.AppEvent;
 import com.bytechef.embedded.configuration.service.AppEventService;
 import com.bytechef.embedded.configuration.web.rest.model.AppEventModel;
+import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}")
+@ConditionalOnEndpoint
 public class AppEventApiController implements AppEventApi {
 
     private final AppEventService appEventService;

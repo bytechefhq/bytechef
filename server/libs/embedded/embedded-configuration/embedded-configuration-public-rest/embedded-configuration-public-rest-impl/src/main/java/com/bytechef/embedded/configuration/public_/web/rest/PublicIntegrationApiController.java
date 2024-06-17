@@ -19,6 +19,7 @@ package com.bytechef.embedded.configuration.public_.web.rest;
 import com.bytechef.embedded.configuration.facade.IntegrationFacade;
 import com.bytechef.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.embedded.configuration.public_.web.rest.model.IntegrationModel;
+import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}")
+@ConditionalOnEndpoint
 public class PublicIntegrationApiController implements IntegrationApi {
 
     private final ConversionService conversionService;

@@ -25,6 +25,7 @@ import com.bytechef.embedded.configuration.web.rest.model.IntegrationStatusModel
 import com.bytechef.embedded.configuration.web.rest.model.IntegrationVersionModel;
 import com.bytechef.embedded.configuration.web.rest.model.PublishIntegrationRequestModel;
 import com.bytechef.embedded.configuration.web.rest.model.WorkflowModel;
+import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
@@ -38,6 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}")
+@ConditionalOnEndpoint
 public class IntegrationApiController implements IntegrationApi {
 
     private final ConversionService conversionService;

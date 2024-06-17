@@ -18,6 +18,7 @@ package com.bytechef.embedded.configuration.web.rest;
 
 import com.bytechef.embedded.configuration.facade.IntegrationFacade;
 import com.bytechef.embedded.configuration.web.rest.model.CategoryModel;
+import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController("com.bytechef.embedded.configuration.web.rest.CategoryApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}")
+@ConditionalOnEndpoint
 public class CategoryApiController implements CategoryApi {
 
     private final IntegrationFacade integrationFacade;
