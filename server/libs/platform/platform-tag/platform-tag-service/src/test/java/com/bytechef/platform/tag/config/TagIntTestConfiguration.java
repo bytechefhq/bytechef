@@ -16,16 +16,19 @@
 
 package com.bytechef.platform.tag.config;
 
+import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 @ComponentScan(basePackages = {
-    "com.bytechef.liquibase.config", "com.bytechef.platform.tag"
+    "com.bytechef.platform.tag"
 })
 @EnableAutoConfiguration
+@Import(LiquibaseConfiguration.class)
 @Configuration
 public class TagIntTestConfiguration {
 

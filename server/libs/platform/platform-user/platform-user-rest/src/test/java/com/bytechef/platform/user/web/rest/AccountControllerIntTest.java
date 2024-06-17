@@ -28,7 +28,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.bytechef.platform.security.constant.AuthorityConstants;
-import com.bytechef.platform.tenant.service.TenantService;
 import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.PersistentToken;
@@ -53,11 +52,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -73,7 +70,7 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = UserIntTestConfiguration.class)
+@SpringBootTest(classes = UserIntTestConfiguration.class, properties = "bytechef.tenant.mode=single")
 @AutoConfigureMockMvc
 class AccountControllerIntTest {
 
@@ -98,19 +95,10 @@ class AccountControllerIntTest {
     private MockMvc restAccountMockMvc;
 
     @Autowired
-    private TenantService tenantService;
-
-    @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private UserService userService;
-
-    @BeforeEach
-    void beforeEach() {
-        Mockito.when(tenantService.isMultipleTenantsAllowed())
-            .thenReturn(true);
-    }
 
     @Test
     @WithUnauthenticatedMockUser

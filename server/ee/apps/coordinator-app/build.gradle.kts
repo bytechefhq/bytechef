@@ -37,7 +37,9 @@ dependencies {
 
     implementation(project(":server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-remote-client"))
+    implementation(project(":server:ee:libs:config:tenant-multi-message-event-config"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
+    implementation(project(":server:ee:libs:core:commons:commons-rest-controller"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-registry:platform-component-registry-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-remote-client"))

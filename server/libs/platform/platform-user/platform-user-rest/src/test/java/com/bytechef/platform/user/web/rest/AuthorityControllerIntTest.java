@@ -47,7 +47,7 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = UserIntTestConfiguration.class)
+@SpringBootTest(classes = UserIntTestConfiguration.class, properties = "bytechef.tenant.mode=single")
 @AutoConfigureMockMvc
 @WithMockUser(authorities = {
     "ROLE_ADMIN"

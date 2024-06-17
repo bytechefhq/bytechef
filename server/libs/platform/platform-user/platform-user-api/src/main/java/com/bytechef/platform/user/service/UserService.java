@@ -51,6 +51,8 @@ public interface UserService {
 
     User getUser(long id);
 
+    void saveUser(User user);
+
     User registerUser(AdminUserDTO userDTO, String password);
 
     void removeNotActivatedUsers();

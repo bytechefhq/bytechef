@@ -22,15 +22,14 @@ import com.bytechef.message.Prioritizable;
 import com.bytechef.message.Retryable;
 import com.bytechef.message.event.MessageEvent;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
 import org.apache.commons.lang3.Validate;
 
 /**
  * @author Ivica CardFic
  */
-public class TaskExecutionEvent implements Prioritizable, Retryable, MessageEvent<TaskWorkerMessageRoute> {
+public class TaskExecutionEvent extends AbstractEvent
+    implements Prioritizable, Retryable, MessageEvent<TaskWorkerMessageRoute> {
 
-    private LocalDateTime createdDate;
     private TaskWorkerMessageRoute route;
     private TaskExecution taskExecution;
 
@@ -46,13 +45,8 @@ public class TaskExecutionEvent implements Prioritizable, Retryable, MessageEven
     public TaskExecutionEvent(TaskWorkerMessageRoute route, TaskExecution taskExecution) {
         Validate.notNull(taskExecution, "'taskExecution' must not be null");
 
-        this.createdDate = LocalDateTime.now();
         this.route = route;
         this.taskExecution = taskExecution;
-    }
-
-    public LocalDateTime getCreatedDate() {
-        return createdDate;
     }
 
     @Override
@@ -90,11 +84,6 @@ public class TaskExecutionEvent implements Prioritizable, Retryable, MessageEven
         return route;
     }
 
-    @Override
-    public LocalDateTime getCreateDate() {
-        return createdDate;
-    }
-
     @SuppressFBWarnings("EI")
     public TaskExecution getTaskExecution() {
         return taskExecution;
@@ -105,7 +94,7 @@ public class TaskExecutionEvent implements Prioritizable, Retryable, MessageEven
         return "TaskExecutionEvent{" +
             "taskExecution=" + taskExecution +
             ", route=" + route +
-            ", createdDate=" + createdDate +
+            ", createDate=" + createDate +
             "} ";
     }
 }

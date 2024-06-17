@@ -16,13 +16,23 @@
 
 package com.bytechef.async.config;
 
-import java.lang.reflect.Method;
+import com.bytechef.tenant.TenantContext;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
+import org.springframework.aop.interceptor.SimpleAsyncUncaughtExceptionHandler;
+import org.springframework.boot.autoconfigure.task.TaskExecutionProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.util.concurrent.ListenableFuture;
 
 /**
  * @author Ivica Cardic
@@ -30,12 +40,100 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Configuration
 @EnableAsync
 @EnableScheduling
-public class AsyncConfiguration implements AsyncUncaughtExceptionHandler {
+public class AsyncConfiguration implements AsyncConfigurer {
 
-    private static final Logger logger = LoggerFactory.getLogger(AsyncConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(AsyncConfiguration.class);
+
+    private final TaskExecutionProperties taskExecutionProperties;
+
+    @SuppressFBWarnings("EI")
+    public AsyncConfiguration(TaskExecutionProperties taskExecutionProperties) {
+        this.taskExecutionProperties = taskExecutionProperties;
+    }
 
     @Override
-    public void handleUncaughtException(Throwable ex, Method method, Object... params) {
-        logger.error(ex.getMessage(), ex);
+    @Bean(name = "taskExecutor")
+    public Executor getAsyncExecutor() {
+        log.debug("Creating Async Task Executor");
+
+        ThreadPoolTaskExecutor executor = new TenantThreadPoolTaskExecutor();
+
+        TaskExecutionProperties.Pool pool = taskExecutionProperties.getPool();
+
+        executor.setCorePoolSize(pool.getCoreSize());
+        executor.setMaxPoolSize(pool.getMaxSize());
+        executor.setQueueCapacity(pool.getQueueCapacity());
+        executor.setThreadNamePrefix(taskExecutionProperties.getThreadNamePrefix());
+
+        return executor;
+    }
+
+    @Override
+    public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
+        return new SimpleAsyncUncaughtExceptionHandler();
+    }
+
+    private static class TenantThreadPoolTaskExecutor extends ThreadPoolTaskExecutor {
+        @Override
+        public void execute(Runnable task) {
+            super.execute(getTenantRunnable(task));
+        }
+
+        @Override
+        public void execute(Runnable task, long startTimeout) {
+            super.execute(getTenantRunnable(task), startTimeout);
+        }
+
+        @Override
+        public Future<?> submit(Runnable task) {
+            return super.submit(getTenantRunnable(task));
+        }
+
+        @Override
+        public <T> Future<T> submit(Callable<T> task) {
+            return super.submit(getTenantCallable(task));
+        }
+
+        @Override
+        public ListenableFuture<?> submitListenable(Runnable task) {
+            return super.submitListenable(getTenantRunnable(task));
+        }
+
+        @Override
+        public <T> ListenableFuture<T> submitListenable(Callable<T> task) {
+            return super.submitListenable(getTenantCallable(task));
+        }
+
+        private Runnable getTenantRunnable(Runnable task) {
+            String tenantId = TenantContext.getCurrentTenantId();
+
+            return () -> {
+                String currentTenantId = TenantContext.getCurrentTenantId();
+
+                try {
+                    TenantContext.setCurrentTenantId(tenantId);
+
+                    task.run();
+                } finally {
+                    TenantContext.setCurrentTenantId(currentTenantId);
+                }
+            };
+        }
+
+        private <V> Callable<V> getTenantCallable(Callable<V> task) {
+            String tenantId = TenantContext.getCurrentTenantId();
+
+            return () -> {
+                String currentTenantId = TenantContext.getCurrentTenantId();
+
+                try {
+                    TenantContext.setCurrentTenantId(tenantId);
+
+                    return task.call();
+                } finally {
+                    TenantContext.setCurrentTenantId(currentTenantId);
+                }
+            };
+        }
     }
 }

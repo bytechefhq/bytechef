@@ -142,6 +142,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void saveUser(User user) {
+        userRepository.save(user);
+    }
+
+    @Override
     public User registerUser(AdminUserDTO userDTO, String password) {
         if (!EMAIL_VALIDATOR.isValid(userDTO.getEmail())) {
             throw new InvalidEmailException(userDTO.getEmail());

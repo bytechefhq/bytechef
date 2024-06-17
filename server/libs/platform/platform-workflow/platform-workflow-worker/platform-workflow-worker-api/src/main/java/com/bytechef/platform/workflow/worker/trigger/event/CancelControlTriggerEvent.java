@@ -19,31 +19,26 @@ package com.bytechef.platform.workflow.worker.trigger.event;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.configuration.domain.CancelControlTrigger;
 import com.bytechef.platform.workflow.worker.trigger.message.route.TriggerWorkerMessageRoute;
-import java.time.LocalDateTime;
+import org.apache.commons.lang3.Validate;
 
 /**
  * @author Ivica Cardic
  */
-public class CancelControlTriggerEvent implements MessageEvent<TriggerWorkerMessageRoute> {
+public class CancelControlTriggerEvent extends AbstractEvent implements MessageEvent<TriggerWorkerMessageRoute> {
 
-    private LocalDateTime createdDate;
     private CancelControlTrigger controlTrigger;
 
     private CancelControlTriggerEvent() {
     }
 
     public CancelControlTriggerEvent(CancelControlTrigger controlTrigger) {
-        this.createdDate = LocalDateTime.now();
+        Validate.notNull(controlTrigger, "'controlTrigger' must not be null");
+
         this.controlTrigger = controlTrigger;
     }
 
     public CancelControlTrigger getControlTrigger() {
         return controlTrigger;
-    }
-
-    @Override
-    public LocalDateTime getCreateDate() {
-        return createdDate;
     }
 
     @Override
@@ -55,6 +50,7 @@ public class CancelControlTriggerEvent implements MessageEvent<TriggerWorkerMess
     public String toString() {
         return "CancelControlTriggerEvent{" +
             "controlTrigger=" + controlTrigger +
+            ", createDate=" + createDate +
             "} ";
     }
 }

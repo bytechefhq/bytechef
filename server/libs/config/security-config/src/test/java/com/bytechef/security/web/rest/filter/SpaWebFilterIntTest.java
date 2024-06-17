@@ -26,18 +26,30 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.test.web.servlet.MockMvc;
 
+/**
+ * @author Ivica Cardic
+ */
 @AutoConfigureMockMvc
-@EnableAutoConfiguration
+@EnableAutoConfiguration(exclude = DataSourceAutoConfiguration.class)
 @WithMockUser
 @SpringBootTest(classes = SecurityConfiguration.class)
 public class SpaWebFilterIntTest {
+
+    @MockBean
+    private AuthenticationFailureHandler authenticationFailureHandler;
+
+    @MockBean
+    private AuthenticationSuccessHandler authenticationSuccessHandler;
 
     @Autowired
     private MockMvc mockMvc;

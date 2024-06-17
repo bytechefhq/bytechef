@@ -1,6 +1,5 @@
 dependencies {
     implementation("org.apache.commons:commons-lang3")
-    implementation("commons-validator:commons-validator:1.8.0")
     implementation("org.springframework:spring-context")
     implementation("org.springframework.data:spring-data-jdbc")
     implementation("org.springframework.security:spring-security-core")

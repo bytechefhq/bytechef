@@ -19,8 +19,18 @@ package com.bytechef.atlas.coordinator.config;
 import com.bytechef.atlas.coordinator.TaskCoordinator;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.coordinator.config.TaskCoordinatorProperties.TaskCoordinatorSubscriptions;
+import com.bytechef.atlas.coordinator.event.ApplicationEvent;
+import com.bytechef.atlas.coordinator.event.ErrorEvent;
+import com.bytechef.atlas.coordinator.event.ResumeJobEvent;
+import com.bytechef.atlas.coordinator.event.StartJobEvent;
+import com.bytechef.atlas.coordinator.event.StopJobEvent;
+import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
+import com.bytechef.message.event.MessageEvent;
+import com.bytechef.message.event.MessageEventPostReceiveProcessor;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -31,34 +41,90 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnCoordinator
 public class TaskCoordinatorMessageBrokerConfigurerConfiguration {
 
+    private final List<MessageEventPostReceiveProcessor> messageEventPostReceiveProcessors;
+
+    @SuppressFBWarnings("EI")
+    public TaskCoordinatorMessageBrokerConfigurerConfiguration(
+        List<MessageEventPostReceiveProcessor> messageEventPostReceiveProcessors) {
+
+        this.messageEventPostReceiveProcessors = messageEventPostReceiveProcessors;
+    }
+
     @Bean
     MessageBrokerConfigurer<?> taskCoordinatorMessageBrokerConfigurer(
         TaskCoordinator taskCoordinator, TaskCoordinatorProperties taskCoordinatorProperties) {
+
+        TaskCoordinatorDelegate taskCoordinatorDelegate = new TaskCoordinatorDelegate(
+            messageEventPostReceiveProcessors, taskCoordinator);
 
         return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
             TaskCoordinatorSubscriptions subscriptions = taskCoordinatorProperties.getSubscriptions();
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar, TaskCoordinatorMessageRoute.APPLICATION_EVENTS,
-                subscriptions.getApplicationEvents(), taskCoordinator, "onApplicationEvent");
+                subscriptions.getApplicationEvents(), taskCoordinatorDelegate, "onApplicationEvent");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar, TaskCoordinatorMessageRoute.ERROR_EVENTS,
-                subscriptions.getTaskExecutionErrorEvents(), taskCoordinator, "onErrorEvent");
+                subscriptions.getTaskExecutionErrorEvents(), taskCoordinatorDelegate, "onErrorEvent");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar, TaskCoordinatorMessageRoute.JOB_RESUME_EVENTS,
-                subscriptions.getResumeJobEvents(),
-                taskCoordinator, "onResumeJobEvent");
+                subscriptions.getResumeJobEvents(), taskCoordinatorDelegate, "onResumeJobEvent");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar, TaskCoordinatorMessageRoute.JOB_START_EVENTS,
-                subscriptions.getStartJobEvents(),
-                taskCoordinator, "onStartJobEvent");
+                subscriptions.getStartJobEvents(), taskCoordinatorDelegate, "onStartJobEvent");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar, TaskCoordinatorMessageRoute.JOB_STOP_EVENTS,
-                subscriptions.getStopJobEvents(),
-                taskCoordinator, "onStopJobEvent");
+                subscriptions.getStopJobEvents(), taskCoordinatorDelegate, "onStopJobEvent");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar, TaskCoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
-                subscriptions.getTaskExecutionCompleteEvents(), taskCoordinator, "onTaskExecutionCompleteEvent");
+                subscriptions.getTaskExecutionCompleteEvents(), taskCoordinatorDelegate,
+                "onTaskExecutionCompleteEvent");
         };
+    }
+
+    private record TaskCoordinatorDelegate(
+        List<MessageEventPostReceiveProcessor> messageEventPostReceiveProcessors, TaskCoordinator taskCoordinator) {
+
+        public void onApplicationEvent(ApplicationEvent applicationEvent) {
+            process(applicationEvent);
+
+            taskCoordinator.onApplicationEvent(applicationEvent);
+        }
+
+        public void onErrorEvent(ErrorEvent errorEvent) {
+            process(errorEvent);
+
+            taskCoordinator.onErrorEvent(errorEvent);
+        }
+
+        public void onResumeJobEvent(ResumeJobEvent resumeJobEvent) {
+            process(resumeJobEvent);
+
+            taskCoordinator.onResumeJobEvent(resumeJobEvent);
+        }
+
+        public void onStartJobEvent(StartJobEvent startJobEvent) {
+            process(startJobEvent);
+
+            taskCoordinator.onStartJobEvent(startJobEvent);
+        }
+
+        public void onStopJobEvent(StopJobEvent stopJobEvent) {
+            process(stopJobEvent);
+
+            taskCoordinator.onStopJobEvent(stopJobEvent);
+        }
+
+        public void onTaskExecutionCompleteEvent(TaskExecutionCompleteEvent taskExecutionCompleteEvent) {
+            process(taskExecutionCompleteEvent);
+
+            taskCoordinator.onTaskExecutionCompleteEvent(taskExecutionCompleteEvent);
+        }
+
+        private void process(MessageEvent<?> messageEvent) {
+            for (MessageEventPostReceiveProcessor messageEventPostReceiveProcessor : messageEventPostReceiveProcessors) {
+                messageEventPostReceiveProcessor.process(messageEvent);
+            }
+        }
     }
 }

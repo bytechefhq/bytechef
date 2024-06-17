@@ -24,6 +24,7 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.JobServiceImpl;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -63,10 +64,10 @@ public class JobFacadeIntTest {
 
     @ComponentScan(
         basePackages = {
-            "com.bytechef.atlas.execution.facade", "com.bytechef.atlas.execution.repository.jdbc",
-            "com.bytechef.liquibase.config"
+            "com.bytechef.atlas.execution.facade", "com.bytechef.atlas.execution.repository.jdbc"
         })
     @EnableAutoConfiguration
+    @Import(LiquibaseConfiguration.class)
     @Configuration
     public static class WorkflowExecutionIntTestConfiguration {
 

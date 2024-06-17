@@ -16,17 +16,20 @@
 
 package com.bytechef.platform.component.registry.jdbc.operation.config;
 
+import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 /**
  * @author Ivica Cardic
  */
 @ComponentScan({
-    "com.bytechef.liquibase.config", "com.bytechef.platform.component.registry.jdbc"
+    "com.bytechef.platform.component.registry.jdbc"
 })
 @EnableAutoConfiguration
+@Import(LiquibaseConfiguration.class)
 @Configuration
 public class JdbcOperationIntTestConfiguration {
 }

@@ -79,6 +79,11 @@ public class RemoteUserServiceClient implements UserService {
     }
 
     @Override
+    public void saveUser(User user) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public User registerUser(AdminUserDTO userDTO, String password) {
         throw new UnsupportedOperationException();
     }

@@ -1,4 +1,5 @@
 dependencies {
+    api("org.springframework.data:spring-data-commons")
     api(project(":server:libs:platform:platform-api"))
 
     implementation("jakarta.validation:jakarta.validation-api")

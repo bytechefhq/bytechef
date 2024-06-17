@@ -18,8 +18,13 @@ package com.bytechef.platform.workflow.worker.config;
 
 import com.bytechef.atlas.worker.annotation.ConditionalOnWorker;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
+import com.bytechef.message.event.MessageEvent;
+import com.bytechef.message.event.MessageEventPostReceiveProcessor;
 import com.bytechef.platform.workflow.worker.TriggerWorker;
+import com.bytechef.platform.workflow.worker.trigger.event.TriggerExecutionEvent;
 import com.bytechef.platform.workflow.worker.trigger.message.route.TriggerWorkerMessageRoute;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -30,16 +35,50 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnWorker
 public class TriggerWorkerMessageBrokerConfigurerConfiguration {
 
+    private final List<MessageEventPostReceiveProcessor> messageEventPostReceiveProcessors;
+
+    @SuppressFBWarnings("EI")
+    public TriggerWorkerMessageBrokerConfigurerConfiguration(
+        List<MessageEventPostReceiveProcessor> messageEventPostReceiveProcessors) {
+
+        this.messageEventPostReceiveProcessors = messageEventPostReceiveProcessors;
+    }
+
     @Bean
     MessageBrokerConfigurer<?> triggerWorkerMessageBrokerConfigurer(TriggerWorker triggerWorker) {
+        TaskWorkerDelegate taskWorkerDelegate =
+            new TaskWorkerDelegate(messageEventPostReceiveProcessors, triggerWorker);
+
         return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, TriggerWorkerMessageRoute.CONTROL_EVENTS, 1, triggerWorker,
+                listenerEndpointRegistrar, TriggerWorkerMessageRoute.CONTROL_EVENTS, 1, taskWorkerDelegate,
                 "onCancelControlTriggerEvent");
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, TriggerWorkerMessageRoute.TRIGGER_EXECUTION_EVENTS, 1, triggerWorker,
+                listenerEndpointRegistrar, TriggerWorkerMessageRoute.TRIGGER_EXECUTION_EVENTS, 1, taskWorkerDelegate,
                 "onTriggerExecutionEvent");
         };
+    }
+
+    private record TaskWorkerDelegate(
+        List<MessageEventPostReceiveProcessor> messageEventPostReceiveProcessors, TriggerWorker triggerWorker) {
+
+        public void onCancelControlTriggerEvent(MessageEvent<?> messageEvent) {
+            process(messageEvent);
+
+            triggerWorker.onCancelControlTriggerEvent(messageEvent);
+        }
+
+        public void onTriggerExecutionEvent(TriggerExecutionEvent triggerExecutionEvent) {
+            process(triggerExecutionEvent);
+
+            triggerWorker.onTriggerExecutionEvent(triggerExecutionEvent);
+        }
+
+        private void process(MessageEvent<?> messageEvent) {
+            for (MessageEventPostReceiveProcessor messageEventPostReceiveProcessor : messageEventPostReceiveProcessors) {
+                messageEventPostReceiveProcessor.process(messageEvent);
+            }
+        }
     }
 }

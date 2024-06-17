@@ -50,6 +50,7 @@ import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
+import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -70,7 +71,6 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -129,10 +129,9 @@ public class TaskCoordinatorIntTest {
         return jobSyncExecutor.execute(new JobParameters(workflowId, Collections.singletonMap("yourName", "me")));
     }
 
-    @ComponentScan("com.bytechef.liquibase.config")
     @EnableAutoConfiguration
     @Import({
-        PostgreSQLContainerConfiguration.class
+        LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class
     })
     @Configuration
     public static class CoordinatorIntTestConfiguration {

@@ -78,7 +78,7 @@ public class TaskWorkerMessageRoute implements MessageRoute {
 
     @Override
     public String toString() {
-        return "WorkerMessageRoute{" +
+        return "TaskWorkerMessageRoute{" +
             "exchange=" + exchange +
             ", routeName='" + routeName + '\'' +
             '}';

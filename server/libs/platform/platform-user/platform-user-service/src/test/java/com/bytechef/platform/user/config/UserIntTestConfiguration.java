@@ -17,6 +17,7 @@
 package com.bytechef.platform.user.config;
 
 import com.bytechef.jdbc.config.AuditingJdbcConfiguration;
+import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.cache.annotation.EnableCaching;
@@ -29,13 +30,11 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-@ComponentScan(basePackages = {
-    "com.bytechef.platform.user", "com.bytechef.liquibase.config"
-})
+@ComponentScan(basePackages = "com.bytechef.platform.user")
 @EnableAutoConfiguration
 @EnableCaching
 @Import({
-    AuditingJdbcConfiguration.class, PostgreSQLContainerConfiguration.class
+    AuditingJdbcConfiguration.class, LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class
 })
 @Configuration
 public class UserIntTestConfiguration {

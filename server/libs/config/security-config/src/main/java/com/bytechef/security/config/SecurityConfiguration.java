@@ -21,10 +21,11 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 
 import com.bytechef.platform.security.config.SecurityProperties;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.web.filter.FilterAfterContributor;
 import com.bytechef.platform.security.web.filter.FilterBeforeContributor;
 import com.bytechef.platform.security.web.matcher.RequestMatcherContributor;
-import com.bytechef.security.web.rest.filter.CookieCsrfFilter;
-import com.bytechef.security.web.rest.filter.SpaWebFilter;
+import com.bytechef.security.web.filter.CookieCsrfFilter;
+import com.bytechef.security.web.filter.SpaWebFilter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -41,6 +42,8 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
@@ -64,19 +67,27 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 @EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfiguration {
 
+    private final AuthenticationFailureHandler authenticationFailureHandler;
+    private final AuthenticationSuccessHandler authenticationSuccessHandler;
     private final RememberMeServices rememberMeServices;
     private final SecurityProperties securityProperties;
+    private final List<FilterAfterContributor> filterAfterContributors;
     private final List<FilterBeforeContributor> filterBeforeContributors;
     private final List<RequestMatcherContributor> requestMatcherContributors;
 
     @SuppressFBWarnings("EI")
     public SecurityConfiguration(
-        RememberMeServices rememberMeServices, SecurityProperties securityProperties,
+        AuthenticationFailureHandler authenticationFailureHandler,
+        AuthenticationSuccessHandler authenticationSuccessHandler, RememberMeServices rememberMeServices,
+        SecurityProperties securityProperties, List<FilterAfterContributor> filterAfterContributors,
         List<FilterBeforeContributor> filterBeforeContributors,
         List<RequestMatcherContributor> requestMatcherContributors) {
 
+        this.authenticationFailureHandler = authenticationFailureHandler;
+        this.authenticationSuccessHandler = authenticationSuccessHandler;
         this.rememberMeServices = rememberMeServices;
         this.securityProperties = securityProperties;
+        this.filterAfterContributors = filterAfterContributors;
         this.filterBeforeContributors = filterBeforeContributors;
         this.requestMatcherContributors = requestMatcherContributors;
     }
@@ -100,17 +111,22 @@ public class SecurityConfiguration {
         }
 
         http.addFilterAfter(new SpaWebFilter(), BasicAuthenticationFilter.class)
-            .addFilterAfter(new CookieCsrfFilter(), BasicAuthenticationFilter.class)
-            .headers(
-                headers -> headers
-                    .contentSecurityPolicy(csp -> csp.policyDirectives(securityProperties.getContentSecurityPolicy()))
-                    .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
-                    .referrerPolicy(
-                        referrer -> referrer
-                            .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
-                    .permissionsPolicy(
-                        permissions -> permissions.policy(
-                            "camera=(), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), sync-xhr=()")))
+            .addFilterAfter(new CookieCsrfFilter(), BasicAuthenticationFilter.class);
+
+        for (FilterAfterContributor filterAfterContributor : filterAfterContributors) {
+            http.addFilterAfter(filterAfterContributor.getFilter(), filterAfterContributor.getAfterFilter());
+        }
+
+        http.headers(
+            headers -> headers
+                .contentSecurityPolicy(csp -> csp.policyDirectives(securityProperties.getContentSecurityPolicy()))
+                .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
+                .referrerPolicy(
+                    referrer -> referrer
+                        .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
+                .permissionsPolicy(
+                    permissions -> permissions.policy(
+                        "camera=(), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), sync-xhr=()")))
             .authorizeHttpRequests(
                 authz -> requestMatchers(authz, mvc)
                     .requestMatchers(mvc.pattern("/*.ico"), mvc.pattern("/*.png"), mvc.pattern("/*.svg"))
@@ -170,9 +186,8 @@ public class SecurityConfiguration {
                 formLogin -> formLogin
                     .loginPage("/")
                     .loginProcessingUrl("/api/authentication")
-                    .successHandler((request, response, authentication) -> response.setStatus(HttpStatus.OK.value()))
-                    .failureHandler(
-                        (request, response, exception) -> response.setStatus(HttpStatus.UNAUTHORIZED.value()))
+                    .successHandler(authenticationSuccessHandler)
+                    .failureHandler(authenticationFailureHandler)
                     .permitAll())
             .logout(
                 logout -> logout.logoutUrl("/api/logout")

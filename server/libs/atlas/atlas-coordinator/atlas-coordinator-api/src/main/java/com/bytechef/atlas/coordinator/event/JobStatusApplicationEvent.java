@@ -52,7 +52,7 @@ public class JobStatusApplicationEvent extends AbstractEvent implements Applicat
 
     @Override
     public String toString() {
-        return "JobStatusEvent{" +
+        return "JobStatusApplicationEvent{" +
             "jobId=" + jobId +
             ", status=" + status +
             ", createdDate=" + createDate +

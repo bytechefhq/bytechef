@@ -29,6 +29,7 @@ import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
+import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.platform.component.registry.oas.handler.loader.OpenApiComponentHandlerLoader;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
@@ -48,14 +49,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 @ComponentScan(
     basePackages = {
-        "com.bytechef.encryption", "com.bytechef.platform.component", "com.bytechef.platform.connection",
-        "com.bytechef.liquibase.config"
+        "com.bytechef.encryption", "com.bytechef.platform.component", "com.bytechef.platform.connection"
     })
 @EnableAutoConfiguration
+@Import(LiquibaseConfiguration.class)
 @Configuration
 public class ComponentRegistryConfiguration {
 

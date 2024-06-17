@@ -30,6 +30,7 @@ import com.bytechef.component.definition.Resources;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
+import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -41,15 +42,17 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
  * @author Ivica Cardic
  */
 @ComponentScan(basePackages = {
-    "com.bytechef.encryption", "com.bytechef.liquibase.config", "com.bytechef.platform.connection"
+    "com.bytechef.encryption", "com.bytechef.platform.connection"
 })
 @EnableAutoConfiguration
+@Import(LiquibaseConfiguration.class)
 @Configuration
 public class ConnectionIntTestConfiguration {
 

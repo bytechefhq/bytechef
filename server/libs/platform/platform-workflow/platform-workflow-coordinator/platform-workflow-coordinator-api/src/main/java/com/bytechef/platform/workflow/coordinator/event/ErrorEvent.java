@@ -17,6 +17,8 @@
 package com.bytechef.platform.workflow.coordinator.event;
 
 import com.bytechef.error.Errorable;
+import com.bytechef.message.event.MessageEvent;
+import com.bytechef.platform.workflow.coordinator.message.route.TriggerCoordinatorMessageRoute;
 
-public interface ErrorEvent extends Errorable {
+public interface ErrorEvent extends Errorable, MessageEvent<TriggerCoordinatorMessageRoute> {
 }

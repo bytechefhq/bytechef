@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.config;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
@@ -44,6 +45,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
@@ -52,11 +54,11 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 @ComponentScan(
     basePackages = {
         "com.bytechef.atlas.configuration.repository.jdbc", "com.bytechef.platform.category",
-        "com.bytechef.automation.configuration", "com.bytechef.platform.connection", "com.bytechef.liquibase.config",
-        "com.bytechef.platform.tag"
+        "com.bytechef.automation.configuration", "com.bytechef.platform.connection", "com.bytechef.platform.tag"
     })
 @EnableAutoConfiguration
 @EnableCaching
+@Import(LiquibaseConfiguration.class)
 @Configuration
 @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
 public class ProjectIntTestConfiguration {

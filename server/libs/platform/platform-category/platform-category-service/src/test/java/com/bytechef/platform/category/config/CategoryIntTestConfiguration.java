@@ -16,18 +16,21 @@
 
 package com.bytechef.platform.category.config;
 
+import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
  * @author Ivica Cardic
  */
 @ComponentScan(basePackages = {
-    "com.bytechef.liquibase.config", "com.bytechef.platform.category"
+    "com.bytechef.platform.category"
 })
+@Import(LiquibaseConfiguration.class)
 @EnableAutoConfiguration
 @Configuration
 public class CategoryIntTestConfiguration {

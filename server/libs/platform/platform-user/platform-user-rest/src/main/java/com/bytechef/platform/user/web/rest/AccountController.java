@@ -18,7 +18,6 @@ package com.bytechef.platform.user.web.rest;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.security.util.SecurityUtils;
-import com.bytechef.platform.tenant.service.TenantService;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.PersistentToken;
 import com.bytechef.platform.user.domain.User;
@@ -26,6 +25,7 @@ import com.bytechef.platform.user.dto.AdminUserDTO;
 import com.bytechef.platform.user.dto.PasswordChangeDTO;
 import com.bytechef.platform.user.exception.EmailAlreadyUsedException;
 import com.bytechef.platform.user.exception.InvalidPasswordException;
+import com.bytechef.platform.user.exception.LoginAlreadyUsedException;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.MailService;
 import com.bytechef.platform.user.service.PersistentTokenService;
@@ -34,6 +34,8 @@ import com.bytechef.platform.user.web.rest.exception.AccountErrorType;
 import com.bytechef.platform.user.web.rest.exception.AccountResourceException;
 import com.bytechef.platform.user.web.rest.vm.KeyAndPasswordVM;
 import com.bytechef.platform.user.web.rest.vm.ManagedUserVM;
+import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -95,9 +97,19 @@ public class AccountController {
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public void registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
-        if (!tenantService.isMultipleTenantsAllowed()) {
-            throw new AccountResourceException(
-                "Organization already exists", AccountErrorType.ORGANIZATION_ALREADY_EXISTS);
+        if (tenantService.isMultiTenantEnabled()) {
+            if (tenantService.tenantIdsByUserLoginExist(managedUserVM.getLogin())) {
+                throw new LoginAlreadyUsedException();
+            }
+
+            if (tenantService.tenantIdsByUserEmailExist(managedUserVM.getEmail())) {
+                throw new EmailAlreadyUsedException();
+            }
+        } else {
+            if (userService.countActiveUsers() > 0) {
+                throw new AccountResourceException(
+                    "Organization already exists", AccountErrorType.ORGANIZATION_ALREADY_EXISTS);
+            }
         }
 
         if (isPasswordLengthInvalid(managedUserVM.getPassword())) {
@@ -117,12 +129,23 @@ public class AccountController {
      */
     @GetMapping("/activate")
     public void activateAccount(@RequestParam(value = "key") String key) {
-        Optional<User> user = userService.activateRegistration(key);
+        Optional<User> userOptional = userService.activateRegistration(key);
 
-        if (user.isEmpty()) {
+        if (userOptional.isEmpty()) {
             throw new AccountResourceException(
                 "No user was found for this activation key", AccountErrorType.USER_NOT_FOUND);
         }
+
+        if (tenantService.isMultiTenantEnabled()) {
+            String tenantId = tenantService.createTenant();
+
+            User user = userOptional.get();
+
+            user.setId(null);
+
+            TenantContext.runWithTenantId(tenantId, () -> userService.saveUser(user));
+        }
+
     }
 
     /**
@@ -167,13 +190,28 @@ public class AccountController {
         String userLogin = SecurityUtils.getCurrentUserLogin()
             .orElseThrow(() -> new AccountResourceException(
                 "Current user login not found", AccountErrorType.USER_NOT_FOUND));
-        Optional<User> existingUser = userService.fetchUserByEmail(userDTO.getEmail());
 
-        if (existingUser.isPresent() && (!isEqualsIgnoreCase(existingUser, userLogin))) {
+        Optional<User> existingUser;
+
+        if (tenantService.isMultiTenantEnabled()) {
+            existingUser = TenantContext.callWithTenantId(
+                TenantContext.getCurrentTenantId(), () -> userService.fetchUserByEmail(userDTO.getEmail()));
+        } else {
+            existingUser = userService.fetchUserByEmail(userDTO.getEmail());
+        }
+
+        if (existingUser.isPresent() && !isEqualsIgnoreCase(existingUser, userLogin)) {
             throw new EmailAlreadyUsedException();
         }
 
-        Optional<User> user = userService.fetchUserByLogin(userLogin);
+        Optional<User> user;
+
+        if (tenantService.isMultiTenantEnabled()) {
+            user = TenantContext.callWithTenantId(
+                TenantContext.getCurrentTenantId(), () -> userService.fetchUserByLogin(userLogin));
+        } else {
+            user = userService.fetchUserByLogin(userLogin);
+        }
 
         if (user.isEmpty()) {
             throw new AccountResourceException("User could not be found", AccountErrorType.USER_NOT_FOUND);
@@ -195,6 +233,7 @@ public class AccountController {
         if (isPasswordLengthInvalid(passwordChangeDto.getNewPassword())) {
             throw new InvalidPasswordException();
         }
+
         userService.changePassword(passwordChangeDto.getCurrentPassword(), passwordChangeDto.getNewPassword());
     }
 
@@ -253,7 +292,17 @@ public class AccountController {
      */
     @PostMapping(path = "/account/reset-password/init")
     public void requestPasswordReset(@RequestBody String email) {
-        Optional<User> user = userService.requestPasswordReset(email);
+        Optional<User> user;
+
+        if (tenantService.isMultiTenantEnabled()) {
+            user = tenantService.getTenantIdsByUserEmail(email)
+                .stream()
+                .findFirst()
+                .flatMap(tenantId -> TenantContext.callWithTenantId(
+                    tenantId, () -> userService.requestPasswordReset(email)));
+        } else {
+            user = userService.requestPasswordReset(email);
+        }
 
         if (user.isPresent()) {
             mailService.sendPasswordResetMail(user.orElseThrow());
@@ -277,8 +326,17 @@ public class AccountController {
             throw new InvalidPasswordException();
         }
 
-        Optional<User> user = userService.completePasswordReset(
-            keyAndPassword.getNewPassword(), keyAndPassword.getKey());
+        Optional<User> user;
+
+        if (tenantService.isMultiTenantEnabled()) {
+            String tenantId = tenantService.getTenantIdByUserResetKey(keyAndPassword.getKey());
+
+            user = TenantContext.callWithTenantId(
+                tenantId,
+                () -> userService.completePasswordReset(keyAndPassword.getNewPassword(), keyAndPassword.getKey()));
+        } else {
+            user = userService.completePasswordReset(keyAndPassword.getNewPassword(), keyAndPassword.getKey());
+        }
 
         if (user.isEmpty()) {
             throw new AccountResourceException("No user was found for this reset key", AccountErrorType.USER_NOT_FOUND);

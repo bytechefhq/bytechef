@@ -18,7 +18,9 @@ package com.bytechef.message.event.listener;
 
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.event.MessageEvent;
+import com.bytechef.message.event.MessageEventPreSendProcessor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
@@ -34,10 +36,13 @@ public class MessageEventListener {
     private static final Logger logger = LoggerFactory.getLogger(MessageEventListener.class);
 
     private final MessageBroker messageBroker;
+    private final List<MessageEventPreSendProcessor> messageEventPreSendProcessors;
 
     @SuppressFBWarnings("EI")
-    public MessageEventListener(MessageBroker messageBroker) {
+    public MessageEventListener(MessageBroker messageBroker,
+        List<MessageEventPreSendProcessor> messageEventPreSendProcessors) {
         this.messageBroker = messageBroker;
+        this.messageEventPreSendProcessors = messageEventPreSendProcessors;
     }
 
     @EventListener
@@ -45,6 +50,10 @@ public class MessageEventListener {
     public void onMessageEvent(MessageEvent<?> messageEvent) {
         if (logger.isDebugEnabled()) {
             logger.debug("onMessageEvent: " + messageEvent);
+        }
+
+        for (MessageEventPreSendProcessor messageEventPreSendProcessor : messageEventPreSendProcessors) {
+            messageEvent = messageEventPreSendProcessor.process(messageEvent);
         }
 
         messageBroker.send(messageEvent.getRoute(), messageEvent);

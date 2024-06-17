@@ -26,6 +26,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -83,11 +84,12 @@ public class JdbcWorkflowRepositoryIntTest {
 
     @ComponentScan(
         basePackages = {
-            "com.bytechef.atlas.configuration.repository.jdbc", "com.bytechef.liquibase.config",
+            "com.bytechef.atlas.configuration.repository.jdbc",
         })
     @EnableAutoConfiguration
     @EnableCaching
     @Configuration
+    @Import(LiquibaseConfiguration.class)
     @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     public static class WorkflowConfigurationRepositoryIntTestConfiguration {
 

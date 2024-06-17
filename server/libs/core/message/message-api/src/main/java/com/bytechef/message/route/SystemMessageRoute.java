@@ -46,7 +46,7 @@ public enum SystemMessageRoute implements MessageRoute {
 
     @Override
     public String toString() {
-        return "TriggerMessageRoute{" +
+        return "SystemMessageRoute{" +
             "exchange=" + exchange +
             ", routeName='" + routeName + '\'' +
             "} ";

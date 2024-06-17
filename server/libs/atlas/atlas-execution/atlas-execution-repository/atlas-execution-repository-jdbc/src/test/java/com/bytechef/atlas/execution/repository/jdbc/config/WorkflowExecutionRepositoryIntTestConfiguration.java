@@ -30,6 +30,7 @@ import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
+import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,6 +44,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
@@ -50,10 +52,10 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
  */
 @ComponentScan(
     basePackages = {
-        "com.bytechef.atlas.configuration.converter", "com.bytechef.atlas.execution.repository.jdbc",
-        "com.bytechef.liquibase.config",
+        "com.bytechef.atlas.configuration.converter", "com.bytechef.atlas.execution.repository.jdbc"
     })
 @EnableAutoConfiguration
+@Import(LiquibaseConfiguration.class)
 @Configuration
 @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
 public class WorkflowExecutionRepositoryIntTestConfiguration {

@@ -16,7 +16,9 @@
 
 package com.bytechef.atlas.coordinator.event;
 
+import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 import com.bytechef.error.Errorable;
+import com.bytechef.message.event.MessageEvent;
 
-public interface ErrorEvent extends Errorable {
+public interface ErrorEvent extends Errorable, MessageEvent<TaskCoordinatorMessageRoute> {
 }

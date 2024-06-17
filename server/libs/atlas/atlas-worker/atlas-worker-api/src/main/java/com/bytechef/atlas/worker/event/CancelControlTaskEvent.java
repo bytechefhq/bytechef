@@ -20,32 +20,24 @@ import com.bytechef.atlas.configuration.domain.CancelControlTask;
 import com.bytechef.atlas.worker.message.route.TaskWorkerMessageRoute;
 import com.bytechef.message.event.MessageEvent;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
 
 /**
  * @author Ivica Cardic
  */
-public class CancelControlTaskEvent implements MessageEvent<TaskWorkerMessageRoute> {
+public class CancelControlTaskEvent extends AbstractEvent implements MessageEvent<TaskWorkerMessageRoute> {
 
-    private LocalDateTime createdDate;
     private CancelControlTask controlTask;
 
     private CancelControlTaskEvent() {
     }
 
     public CancelControlTaskEvent(CancelControlTask controlTask) {
-        this.createdDate = LocalDateTime.now();
         this.controlTask = controlTask;
     }
 
     @SuppressFBWarnings("EI")
     public CancelControlTask getControlTask() {
         return controlTask;
-    }
-
-    @Override
-    public LocalDateTime getCreateDate() {
-        return createdDate;
     }
 
     @Override

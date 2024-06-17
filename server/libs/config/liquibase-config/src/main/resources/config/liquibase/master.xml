@@ -5,27 +5,27 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <!-- core -->
-    <includeAll path="classpath:config/liquibase/changelog/core/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or connection" />
+    <includeAll path="classpath:config/liquibase/changelog/core/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or connection or multitenant" />
 
     <!-- user -->
-    <includeAll path="classpath:config/liquibase/changelog/platform/user/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or user" />
-    <includeAll path="classpath:config/liquibase/changelog/embedded/user/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or user" />
-    <includeAll path="classpath:config/liquibase/changelog/embedded/connected_user/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or user" />
+    <includeAll path="classpath:config/liquibase/changelog/platform/user/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or user or multitenant" />
+    <includeAll path="classpath:config/liquibase/changelog/embedded/user/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or user or multitenant" />
+    <includeAll path="classpath:config/liquibase/changelog/embedded/connected_user/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or user or multitenant" />
 
     <!-- connection -->
-    <includeAll path="classpath:config/liquibase/changelog/platform/connection/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or connection" />
-    <includeAll path="classpath:config/liquibase/changelog/automation/connection/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or connection" />
+    <includeAll path="classpath:config/liquibase/changelog/platform/connection/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or connection or multitenant" />
+    <includeAll path="classpath:config/liquibase/changelog/automation/connection/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or connection or multitenant" />
 
     <!-- configuration -->
-    <includeAll path="classpath:config/liquibase/changelog/atlas/configuration/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration" />
-    <includeAll path="classpath:config/liquibase/changelog/platform/configuration/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration" />
-    <includeAll path="classpath:config/liquibase/changelog/automation/configuration/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration" />
-    <includeAll path="classpath:config/liquibase/changelog/embedded/configuration/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration" />
+    <includeAll path="classpath:config/liquibase/changelog/atlas/configuration/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
+    <includeAll path="classpath:config/liquibase/changelog/platform/configuration/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
+    <includeAll path="classpath:config/liquibase/changelog/automation/configuration/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
+    <includeAll path="classpath:config/liquibase/changelog/embedded/configuration/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
 
     <!-- execution -->
-    <includeAll path="classpath:config/liquibase/changelog/atlas/execution/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or execution" />
-    <includeAll path="classpath:config/liquibase/changelog/platform/execution/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or execution" />
-    <includeAll path="classpath:config/liquibase/changelog/data_entry/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or execution" />
+    <includeAll path="classpath:config/liquibase/changelog/atlas/execution/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or execution or multitenant" />
+    <includeAll path="classpath:config/liquibase/changelog/platform/execution/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or execution or multitenant" />
+    <includeAll path="classpath:config/liquibase/changelog/data_entry/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or execution or multitenant" />
 
     <!-- quartz -->
     <includeAll path="classpath:config/liquibase/changelog/quartz/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or scheduler" />

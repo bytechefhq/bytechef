@@ -49,7 +49,7 @@ public enum TriggerWorkerMessageRoute implements MessageRoute {
 
     @Override
     public String toString() {
-        return "TriggerMessageRoute{" +
+        return "TriggerWorkerMessageRoute{" +
             "exchange=" + exchange +
             ", routeName='" + routeName + '\'' +
             "} ";

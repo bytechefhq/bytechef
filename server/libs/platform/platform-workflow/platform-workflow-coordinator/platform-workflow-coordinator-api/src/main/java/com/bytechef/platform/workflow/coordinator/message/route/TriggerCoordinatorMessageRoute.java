@@ -53,7 +53,7 @@ public enum TriggerCoordinatorMessageRoute implements MessageRoute {
 
     @Override
     public String toString() {
-        return "TriggerMessageRoute{" +
+        return "TriggerCoordinatorMessageRoute{" +
             "exchange=" + exchange +
             ", routeName='" + routeName + '\'' +
             "} ";

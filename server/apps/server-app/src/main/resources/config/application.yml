@@ -107,6 +107,10 @@ spring:
         core-size: 2
         max-size: 50
         queue-capacity: 10000
+    scheduling:
+      thread-name-prefix: server-app-scheduling-
+      pool:
+        size: 2
   threads:
     virtual:
 #      enabled: true
@@ -157,6 +161,7 @@ bytechef:
     content-security-policy: "default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:"
     remember-me:
       key:
+  # Tenant support mode (single | multi) default: single
   tenant:
     mode: single
   webhook-url: http://127.0.0.1:9555/webhooks/{id}

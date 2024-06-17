@@ -21,15 +21,14 @@ import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.worker.trigger.message.route.TriggerWorkerMessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
 import org.apache.commons.lang3.Validate;
 
 /**
  * @author Ivica Cardic
  */
-public class TriggerExecutionEvent implements Prioritizable, MessageEvent<TriggerWorkerMessageRoute> {
+public class TriggerExecutionEvent extends AbstractEvent
+    implements Prioritizable, MessageEvent<TriggerWorkerMessageRoute> {
 
-    private LocalDateTime createdDate;
     private TriggerExecution triggerExecution;
 
     private TriggerExecutionEvent() {
@@ -41,7 +40,6 @@ public class TriggerExecutionEvent implements Prioritizable, MessageEvent<Trigge
 
         Validate.notNull(triggerExecution, "'triggerExecution' must not be null");
 
-        this.createdDate = LocalDateTime.now();
         this.triggerExecution = triggerExecution;
     }
 
@@ -55,11 +53,6 @@ public class TriggerExecutionEvent implements Prioritizable, MessageEvent<Trigge
         return triggerExecution.getPriority();
     }
 
-    @Override
-    public LocalDateTime getCreateDate() {
-        return createdDate;
-    }
-
     public TriggerWorkerMessageRoute getRoute() {
         return TriggerWorkerMessageRoute.TRIGGER_EXECUTION_EVENTS;
     }
@@ -68,7 +61,7 @@ public class TriggerExecutionEvent implements Prioritizable, MessageEvent<Trigge
     public String toString() {
         return "TriggerExecutionEvent{" +
             "triggerExecution=" + triggerExecution +
-            ", createdDate=" + createdDate +
+            ", createDate=" + createDate +
             "} ";
     }
 }

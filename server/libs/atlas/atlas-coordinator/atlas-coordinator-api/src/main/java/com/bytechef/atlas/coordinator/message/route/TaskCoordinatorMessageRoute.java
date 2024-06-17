@@ -58,7 +58,7 @@ public class TaskCoordinatorMessageRoute implements MessageRoute {
 
     @Override
     public String toString() {
-        return "TaskMessageRoute{" +
+        return "TaskCoordinatorMessageRoute{" +
             "exchange=" + exchange +
             ", routeName='" + routeName + '\'' +
             '}';

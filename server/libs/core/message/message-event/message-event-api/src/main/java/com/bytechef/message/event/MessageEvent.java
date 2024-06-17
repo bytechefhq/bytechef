@@ -24,7 +24,11 @@ import java.time.LocalDateTime;
  */
 public interface MessageEvent<T extends MessageRoute> {
 
-    T getRoute();
+    Object getMetadata(String name);
 
     LocalDateTime getCreateDate();
+
+    T getRoute();
+
+    void putMetadata(String name, Object value);
 }

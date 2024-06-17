@@ -33,8 +33,10 @@ dependencies {
     implementation(project(":server:libs:platform:platform-component:platform-component-registry:platform-component-registry-service"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-impl"))
 
+    implementation(project(":server:ee:libs:config:tenant-multi-message-event-config"))
     implementation(project(":server:ee:libs:core:discovery:discovery-metadata-api"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
+    implementation(project(":server:ee:libs:core:commons:commons-rest-controller"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-registry:platform-component-registry-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-registry:platform-component-registry-remote-rest"))
     implementation(project(":server:ee:libs:platform:platform-connection:platform-connection-remote-client"))

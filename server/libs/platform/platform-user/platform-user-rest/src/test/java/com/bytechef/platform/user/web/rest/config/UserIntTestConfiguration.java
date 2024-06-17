@@ -17,7 +17,7 @@
 package com.bytechef.platform.user.web.rest.config;
 
 import com.bytechef.jdbc.config.AuditingJdbcConfiguration;
-import com.bytechef.platform.tenant.service.TenantService;
+import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.security.config.SecurityConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -29,23 +29,33 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.RememberMeServices;
 
 /**
  * @author Ivica Cardic
  */
 @ComponentScan(basePackages = {
-    "com.bytechef.liquibase.config", "com.bytechef.platform.user", "com.bytechef.platform.web.rest",
+    "com.bytechef.platform.user", "com.bytechef.platform.web.rest", "com.bytechef.tenant"
 })
 @EnableAutoConfiguration
 @EnableCaching
 @Import({
-    AuditingJdbcConfiguration.class, PostgreSQLContainerConfiguration.class, SecurityConfiguration.class
+    AuditingJdbcConfiguration.class, LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class,
+    SecurityConfiguration.class
 })
 @Configuration
 public class UserIntTestConfiguration {
 
     @MockBean
-    private TenantService tenantService;
+    private AuthenticationFailureHandler authenticationFailureHandler;
+
+    @MockBean
+    private AuthenticationSuccessHandler authenticationSuccessHandler;
+
+    @MockBean
+    private RememberMeServices rememberMeServices;
 
     @Bean
     JavaMailSender javaMailSender() {

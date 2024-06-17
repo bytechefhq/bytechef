@@ -16,16 +16,18 @@
 
 package com.bytechef.platform.component.registry.config;
 
+import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 @ComponentScan(
     basePackages = {
-        "com.bytechef.encryption", "com.bytechef.platform.component", "com.bytechef.platform.connection",
-        "com.bytechef.liquibase.config"
+        "com.bytechef.encryption", "com.bytechef.platform.component", "com.bytechef.platform.connection"
     })
 @EnableAutoConfiguration
+@Import(LiquibaseConfiguration.class)
 @Configuration
 public class PlatformIntTestConfiguration {
 
