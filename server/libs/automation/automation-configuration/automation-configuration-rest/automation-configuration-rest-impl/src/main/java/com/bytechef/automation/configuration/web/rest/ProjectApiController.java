@@ -56,7 +56,6 @@ public class ProjectApiController implements ProjectApi {
 
     @Override
     public ResponseEntity<ProjectModel> createProject(ProjectModel projectModel) {
-
         return ResponseEntity.ok(
             conversionService.convert(
                 projectFacade.createProject(
