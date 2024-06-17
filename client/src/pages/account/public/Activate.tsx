@@ -1,3 +1,4 @@
+import LoadingIcon from '@/components/LoadingIcon';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {useActivateStore} from '@/pages/account/public/stores/useActivateStore';
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
@@ -22,8 +23,16 @@ const failureAlert = (
     </div>
 );
 
+const loadingAlert = (
+    <div className="flex items-center text-lg">
+        <LoadingIcon />
+
+        <span>Your account is activating..... But it won&apos;t take forever.</span>
+    </div>
+);
+
 export const Activate = () => {
-    const {activate, activationFailure, activationSuccess} = useActivateStore();
+    const {activate, activationFailure, activationSuccess, loading} = useActivateStore();
 
     const [searchParams] = useSearchParams();
 
@@ -46,6 +55,8 @@ export const Activate = () => {
                     {activationSuccess ? successAlert : undefined}
 
                     {activationFailure ? failureAlert : undefined}
+
+                    {loading ? loadingAlert : undefined}
                 </CardContent>
             </Card>
         </PublicLayoutContainer>

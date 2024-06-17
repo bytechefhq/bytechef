@@ -37,6 +37,8 @@ export const useActivateStore = create<ActivateI>()(
 
                 set((state) => ({
                     ...state,
+                    activationSuccess: false,
+                    activationFailure: false,
                     loading: true,
                 }));
 
