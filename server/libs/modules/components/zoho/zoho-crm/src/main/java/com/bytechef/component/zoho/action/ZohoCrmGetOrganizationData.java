@@ -30,6 +30,9 @@ import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
 
+/**
+ * @author Luka Ljubić
+ */
 public class ZohoCrmGetOrganizationData {
 
     public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action(GET_ORG_DATA)
@@ -53,10 +56,10 @@ public class ZohoCrmGetOrganizationData {
     private ZohoCrmGetOrganizationData() {
     }
 
-    private static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+    protected static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return context
-            .http(http -> http.get(connectionParameters.getRequiredString(REGION) + BASE_URL + "/org"))
+        return context.http(http -> http.get(connectionParameters.getRequiredString(REGION) + BASE_URL + "/org"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

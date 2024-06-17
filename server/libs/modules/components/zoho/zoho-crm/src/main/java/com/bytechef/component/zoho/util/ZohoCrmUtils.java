@@ -28,7 +28,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Luka Ljubić
+ */
 public class ZohoCrmUtils {
+
+    private ZohoCrmUtils() {
+    }
 
     public static List<Option<String>> getRoleOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
@@ -40,15 +46,7 @@ public class ZohoCrmUtils {
             .execute()
             .getBody(new Context.TypeReference<>() {});
 
-        List<Option<String>> options = new ArrayList<>();
-
-        for (Object item : body) {
-            if (item instanceof Map<?, ?> map) {
-                options.add(option((String) map.get("name"), (String) map.get("name")));
-            }
-        }
-
-        return options;
+        return getOptions(body);
     }
 
     public static List<Option<String>> getProfileOptions(
@@ -61,6 +59,10 @@ public class ZohoCrmUtils {
             .execute()
             .getBody(new Context.TypeReference<>() {});
 
+        return getOptions(body);
+    }
+
+    private static List<Option<String>> getOptions(List<Map<String, Object>> body) {
         List<Option<String>> options = new ArrayList<>();
 
         for (Object item : body) {
@@ -70,8 +72,5 @@ public class ZohoCrmUtils {
         }
 
         return options;
-    }
-
-    private ZohoCrmUtils() {
     }
 }

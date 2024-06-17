@@ -33,6 +33,9 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+/**
+ * @author Luka Ljubić
+ */
 class ZohoCrmUtilTest {
 
     private final ActionContext mockedContext = mock(ActionContext.class);
@@ -42,7 +45,6 @@ class ZohoCrmUtilTest {
 
     @BeforeEach
     public void beforeEach() {
-
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.headers(any()))
@@ -57,8 +59,10 @@ class ZohoCrmUtilTest {
     void testGetRoleOptions() {
         List<Map<String, Object>> body = new ArrayList<>();
         Map<String, Object> items = new LinkedHashMap<>();
+
         items.put("name", "taskName");
         items.put("id", "123");
+
         body.add(items);
 
         when(mockedResponse.getBody(any(Context.TypeReference.class)))
@@ -68,7 +72,8 @@ class ZohoCrmUtilTest {
 
         expectedOptions.add(option("taskName", "taskName"));
 
-        assertEquals(expectedOptions,
+        assertEquals(
+            expectedOptions,
             ZohoCrmUtils.getRoleOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
@@ -87,7 +92,8 @@ class ZohoCrmUtilTest {
 
         expectedOptions.add(option("taskName", "taskName"));
 
-        assertEquals(expectedOptions,
+        assertEquals(
+            expectedOptions,
             ZohoCrmUtils.getProfileOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 }

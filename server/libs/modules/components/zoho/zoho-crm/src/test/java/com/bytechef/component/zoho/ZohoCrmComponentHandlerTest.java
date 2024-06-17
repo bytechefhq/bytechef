@@ -19,10 +19,13 @@ package com.bytechef.component.zoho;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
+/**
+ * @author Luka Ljubić
+ */
 public class ZohoCrmComponentHandlerTest {
+
     @Test
     void testGetComponentDefinition() {
-
         JsonFileAssert.assertEquals("definition/zoho_crm.json", new ZohoCrmComponentHandler().getDefinition());
     }
 }

@@ -28,6 +28,9 @@ import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentDSL;
 import java.util.List;
 
+/**
+ * @author Luka Ljubić
+ */
 public class ZohoCrmConnection {
 
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()

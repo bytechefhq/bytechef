@@ -29,6 +29,9 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
+/**
+ * @author Luka Ljubić
+ */
 class ZohoCrmGetAllUsersActionTest {
 
     private final ActionContext mockedContext = mock(ActionContext.class);

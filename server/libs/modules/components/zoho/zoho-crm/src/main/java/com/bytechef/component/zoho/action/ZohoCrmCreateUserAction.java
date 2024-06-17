@@ -38,6 +38,9 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.zoho.util.ZohoCrmUtils;
 
+/**
+ * @author Luka Ljubić
+ */
 public class ZohoCrmCreateUserAction {
 
     public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_USER)
@@ -82,9 +85,8 @@ public class ZohoCrmCreateUserAction {
     private ZohoCrmCreateUserAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters conectionParameters, ActionContext context) {
-        return context
-            .http(http -> http.post(conectionParameters.getRequiredString(REGION) + BASE_URL + "/users"))
+    protected static Object perform(Parameters inputParameters, Parameters conectionParameters, ActionContext context) {
+        return context.http(http -> http.post(conectionParameters.getRequiredString(REGION) + BASE_URL + "/users"))
             .body(
                 Body.of(
                     USER_ROLE, inputParameters.getRequiredString(USER_ROLE),

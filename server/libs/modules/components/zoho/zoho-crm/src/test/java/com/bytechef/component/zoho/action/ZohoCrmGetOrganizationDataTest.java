@@ -27,6 +27,9 @@ import com.bytechef.component.definition.Parameters;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
+/**
+ * @author Luka Ljubić
+ */
 public class ZohoCrmGetOrganizationDataTest {
 
     private final ActionContext mockedContext = mock(ActionContext.class);

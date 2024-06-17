@@ -32,6 +32,9 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 
+/**
+ * @author Luka Ljubić
+ */
 public class ZohoCrmGetAllUsersAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(GET_ALL_USERS)
@@ -84,9 +87,8 @@ public class ZohoCrmGetAllUsersAction {
     private ZohoCrmGetAllUsersAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters conectionParameters, ActionContext context) {
-        return context
-            .http(http -> http.get(conectionParameters.getRequiredString(REGION) + BASE_URL + "/users"))
+    protected static Object perform(Parameters inputParameters, Parameters conectionParameters, ActionContext context) {
+        return context.http(http -> http.get(conectionParameters.getRequiredString(REGION) + BASE_URL + "/users"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new Context.TypeReference<>() {});
