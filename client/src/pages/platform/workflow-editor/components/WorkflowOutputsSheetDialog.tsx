@@ -6,7 +6,6 @@ import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/wo
 import {WorkflowInputModel, WorkflowModel} from '@/shared/middleware/platform/configuration';
 import {WorkflowDefinitionType} from '@/shared/types';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {Cross2Icon} from '@radix-ui/react-icons';
 import {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
@@ -109,10 +108,6 @@ const WorkflowOutputsSheetDialog = ({
                     <div className="space-y-2">
                         <div className="flex items-center justify-between">
                             <DialogTitle>{`${outputIndex === -1 ? 'Create' : 'Edit'} Workflow Output`}</DialogTitle>
-
-                            <DialogClose asChild>
-                                <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />
-                            </DialogClose>
                         </div>
 
                         <p className="text-sm text-muted-foreground">{`${outputIndex === -1 ? 'Create' : 'Edit'} new workflow output expression.`}</p>

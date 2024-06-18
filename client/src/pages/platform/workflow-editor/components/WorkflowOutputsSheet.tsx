@@ -20,7 +20,7 @@ const WorkflowOutputsSheet = ({onClose, workflow}: WorkflowOutputsSheetProps) =>
                 <div className="flex items-center justify-between">
                     <SheetTitle className="flex">Workflow Outputs</SheetTitle>
 
-                    <div className="flex items-center gap-2">
+                    <div className="mx-8 flex items-center">
                         {workflow.outputs && workflow.outputs?.length > 0 && (
                             <WorkflowOutputsSheetDialog
                                 triggerNode={<Button size="sm">New Output</Button>}
