@@ -9,6 +9,10 @@ springdoc:
     enabled: false
 ---
 
+info:
+  application:
+    edition: ${bytechef.edition}
+
 management:
   endpoints:
     web:
