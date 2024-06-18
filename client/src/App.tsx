@@ -3,6 +3,7 @@ import useFetchInterceptor from '@/config/useFetchInterceptor';
 import {DesktopSidebar} from '@/shared/layout/DesktopSidebar';
 import {MobileSidebar} from '@/shared/layout/MobileSidebar';
 import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {
     ActivityIcon,
@@ -80,9 +81,10 @@ const embeddedNavigation: {
 ];
 
 function App() {
-    const {authenticated, getAccount, sessionHasBeenFetched, showLogin} = useAuthenticationStore();
-
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    const {getApplicationInfo} = useApplicationInfoStore();
+    const {authenticated, getAccount, sessionHasBeenFetched, showLogin} = useAuthenticationStore();
 
     const location = useLocation();
 
@@ -99,6 +101,10 @@ function App() {
     useEffect(() => {
         getAccount();
     }, [getAccount]);
+
+    useEffect(() => {
+        getApplicationInfo();
+    }, [getApplicationInfo]);
 
     useEffect(() => {
         if (showLogin) {

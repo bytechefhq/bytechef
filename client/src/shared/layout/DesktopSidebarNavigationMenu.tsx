@@ -9,12 +9,12 @@ import {
 } from '@/components/ui/navigation-menu';
 import {AppType, useAppTypeStore} from '@/pages/home/stores/useAppTypeStore';
 import {cn} from '@/shared/util/cn-utils';
-import {ComponentPropsWithoutRef, ElementRef, ReactNode, forwardRef} from 'react';
+import React, {ComponentPropsWithoutRef, ElementRef, forwardRef} from 'react';
 import {Link} from 'react-router-dom';
 
 import reactLogo from '../../assets/logo.svg';
 
-const DesktopSidebarNavigationMenu = ({children}: {children: ReactNode}) => {
+const DesktopSidebarNavigationMenu = () => {
     const {setCurrentType} = useAppTypeStore();
 
     const handleClick = (appType: AppType) => {
@@ -30,7 +30,7 @@ const DesktopSidebarNavigationMenu = ({children}: {children: ReactNode}) => {
                         onPointerLeave={(event) => event.preventDefault()}
                         onPointerMove={(event) => event.preventDefault()}
                     >
-                        {children}
+                        <img alt="ByteChef" className="h-8 w-auto" src={reactLogo} />
                     </NavigationMenuTrigger>
 
                     <NavigationMenuContent>

@@ -18,6 +18,7 @@ import {
 } from '@/ee/shared/mutations/automation/workspaces.mutations';
 import {WorkspaceModel} from '@/shared/middleware/automation/configuration';
 import {WorkspaceKeys} from '@/shared/queries/automation/workspaces.queries';
+import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
 import {ReactNode, useState} from 'react';
@@ -38,6 +39,8 @@ interface WorkspaceDialogProps {
 const WorkspaceDialog = ({onClose, triggerNode, workspace}: WorkspaceDialogProps) => {
     const [isOpen, setIsOpen] = useState(!triggerNode);
 
+    const {account} = useAuthenticationStore();
+
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
             description: workspace?.description || '',
@@ -54,6 +57,12 @@ const WorkspaceDialog = ({onClose, triggerNode, workspace}: WorkspaceDialogProps
         queryClient.invalidateQueries({
             queryKey: WorkspaceKeys.workspaces,
         });
+
+        if (account) {
+            queryClient.refetchQueries({
+                queryKey: WorkspaceKeys.userWorkspaces(account.id!),
+            });
+        }
 
         closeDialog();
     };

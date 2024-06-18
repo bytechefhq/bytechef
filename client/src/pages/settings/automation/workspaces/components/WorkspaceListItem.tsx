@@ -21,6 +21,7 @@ import {useDeleteWorkspaceMutation} from '@/ee/shared/mutations/automation/works
 import WorkspaceDialog from '@/pages/settings/automation/workspaces/components/WorkspaceDialog';
 import {WorkspaceModel} from '@/shared/middleware/automation/configuration';
 import {WorkspaceKeys} from '@/shared/queries/automation/workspaces.queries';
+import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';
 import {useState} from 'react';
@@ -33,6 +34,8 @@ const WorkspaceListItem = ({workspace}: WorkspaceListItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
+    const {account} = useAuthenticationStore();
+
     const queryClient = useQueryClient();
 
     const deleteWorkspaceMutation = useDeleteWorkspaceMutation({
@@ -40,6 +43,12 @@ const WorkspaceListItem = ({workspace}: WorkspaceListItemProps) => {
             queryClient.invalidateQueries({
                 queryKey: WorkspaceKeys.workspaces,
             });
+
+            if (account) {
+                queryClient.refetchQueries({
+                    queryKey: WorkspaceKeys.userWorkspaces(account.id!),
+                });
+            }
         },
     });
 
