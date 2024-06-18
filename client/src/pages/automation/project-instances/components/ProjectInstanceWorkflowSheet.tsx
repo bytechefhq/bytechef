@@ -129,7 +129,7 @@ const ProjectInstanceWorkflowSheet = () => {
                 </h1>
 
                 {componentDefinitionsFetched ? (
-                    <div className="flex h-full flex-1 flex-col rounded-xl bg-muted shadow-inner">
+                    <div className="flex h-full flex-1 flex-col rounded-xl bg-muted">
                         <ReactFlow
                             defaultEdges={defaultEdgesWithWorkflowEdges}
                             defaultNodes={defaultNodesWithWorkflowNodes || defaultNodes}
