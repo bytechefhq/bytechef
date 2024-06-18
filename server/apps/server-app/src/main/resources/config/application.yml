@@ -135,6 +135,7 @@ bytechef:
     provider: simple
   data-storage:
     provider: db
+  edition: ee
   encryption:
     provider: filesystem
   file-storage:

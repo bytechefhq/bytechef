@@ -38,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @ConditionalOnProperty(value = "bytechef.tenant.mode", havingValue = "multi")
+@ConditionalOnEEVersion
 public class MultiTenantService implements TenantService, ResourceLoaderAware {
 
     private final TenantRepository tenantRepository;

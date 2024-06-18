@@ -194,6 +194,7 @@ dependencies {
     implementation(project(":server:libs:modules:task-dispatchers:subflow"))
 
     implementation(project(":server:ee:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-git"))
+    implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-rest"))
     implementation(project(":server:ee:libs:config:tenant-multi-data-config"))
     implementation(project(":server:ee:libs:config:tenant-multi-message-event-config"))
     implementation(project(":server:ee:libs:config:tenant-multi-security-config"))

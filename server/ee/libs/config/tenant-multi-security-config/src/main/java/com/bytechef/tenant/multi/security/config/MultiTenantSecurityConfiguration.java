@@ -23,6 +23,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConditionalOnProperty(value = "bytechef.tenant.mode", havingValue = "multi")
+@ConditionalOnEEVersion
 public class MultiTenantSecurityConfiguration {
 
     @Bean

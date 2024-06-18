@@ -44,6 +44,7 @@ import org.springframework.stereotype.Component;
  */
 @Component("userDetailsService")
 @ConditionalOnProperty(value = "bytechef.tenant.mode", havingValue = "single")
+@ConditionalOnCEVersion
 public class SingleTenantUserDetailsService implements UserDetailsService, ApplicationContextAware {
 
     private static final Logger log = LoggerFactory.getLogger(SingleTenantUserDetailsService.class);

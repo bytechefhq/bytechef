@@ -3,7 +3,7 @@ dependencies {
     api(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
     api(project(":server:libs:core:error-api"))
     api(project(":server:libs:core:file-storage:file-storage-api"))
-    api(project(":server:libs:core:message:message-broker:message-broker-api"))
+    api(project(":server:libs:core:message:message-api"))
 
     implementation("org.apache.commons:commons-lang3")
     implementation("com.fasterxml.jackson.core:jackson-annotations")

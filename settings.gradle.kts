@@ -82,6 +82,7 @@ include("server:libs:config:rest-config")
 include("server:libs:config:static-resources-config")
 include("server:libs:config:security-config")
 
+include("server:libs:core:annotation-api")
 include("server:libs:core:commons:commons-data")
 include("server:libs:core:commons:commons-util")
 include("server:libs:core:error-api")
@@ -303,6 +304,7 @@ include("server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client")
 
 include("server:ee:libs:automation:automation-configuration:automation-configuration-remote-client")
 include("server:ee:libs:automation:automation-configuration:automation-configuration-remote-rest")
+include("server:ee:libs:automation:automation-configuration:automation-configuration-rest")
 
 include("server:ee:libs:config:tenant-multi-data-config")
 include("server:ee:libs:config:tenant-multi-message-event-config")

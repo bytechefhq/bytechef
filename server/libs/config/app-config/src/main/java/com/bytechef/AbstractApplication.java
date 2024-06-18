@@ -53,7 +53,7 @@ public abstract class AbstractApplication {
             .filter(StringUtils::isNotBlank)
             .orElse("/");
 
-        String[] environments = environment.getActiveProfiles();
+        String[] activeProfiles = environment.getActiveProfiles();
 
         logger.info(
             CRLFLogConverter.CRLF_SAFE_MARKER,
@@ -62,7 +62,8 @@ public abstract class AbstractApplication {
                 \tApplication '{}' is running! Access URLs:
                 \tLocal: \t\t{}://127.0.0.1:{}{}
                 \tExternal: \t{}://{}:{}{}
-                \tProfile(s): \t{}
+                \tEdition: \t{}
+                \tProfile(s): {}
                 \tSwaggerUI: \t{}
                 ----------------------------------------------------------""",
             environment.getProperty("spring.application.name"),
@@ -73,8 +74,8 @@ public abstract class AbstractApplication {
             getHostAddress(),
             serverPort,
             contextPath,
-            environments,
-            getSwaggerUiUrl(Arrays.asList(environments), protocol, serverPort, contextPath));
+            StringUtils.upperCase(environment.getProperty("bytechef.edition")),
+            getSwaggerUiUrl(Arrays.asList(activeProfiles), protocol, serverPort, contextPath));
     }
 
     private static String getHostAddress() {
@@ -91,9 +92,9 @@ public abstract class AbstractApplication {
     }
 
     private static String getSwaggerUiUrl(
-        List<String> environments, String protocol, String serverPort, String contextPath) {
+        List<String> activeProfiles, String protocol, String serverPort, String contextPath) {
 
-        return environments.contains("api-docs")
+        return activeProfiles.contains("api-docs")
             ? "%s://127.0.0.1:%s%s".formatted(protocol, serverPort, contextPath + "swagger-ui.html")
             : "-";
     }

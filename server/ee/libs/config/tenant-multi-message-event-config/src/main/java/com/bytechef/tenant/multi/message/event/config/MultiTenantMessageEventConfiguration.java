@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConditionalOnProperty(value = "bytechef.tenant.mode", havingValue = "multi")
+@ConditionalOnEEVersion
 public class MultiTenantMessageEventConfiguration {
 
     private static final String TENANT_ID = "TENANT_ID";

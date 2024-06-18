@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnProperty(value = "bytechef.tenant.mode", havingValue = "single")
+@ConditionalOnCEVersion
 public class SingleTenantAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     @Override

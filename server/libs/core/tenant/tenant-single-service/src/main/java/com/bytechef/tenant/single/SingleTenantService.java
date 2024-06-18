@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @ConditionalOnProperty(value = "bytechef.tenant.mode", havingValue = "single")
+@ConditionalOnCEVersion
 public class SingleTenantService implements TenantService {
 
     @SuppressFBWarnings("EI")
