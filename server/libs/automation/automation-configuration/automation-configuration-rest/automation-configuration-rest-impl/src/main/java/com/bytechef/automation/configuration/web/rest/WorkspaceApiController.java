@@ -16,10 +16,9 @@
 
 package com.bytechef.automation.configuration.web.rest;
 
-import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
-import com.bytechef.automation.configuration.service.WorkspaceService;
 import com.bytechef.automation.configuration.web.rest.model.WorkspaceModel;
+import com.bytechef.edition.annotation.ConditionalOnCEVersion;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -33,36 +32,17 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
+@ConditionalOnCEVersion
 @ConditionalOnEndpoint
 public class WorkspaceApiController implements WorkspaceApi {
 
     private final ConversionService conversionService;
     private final WorkspaceFacade workspaceFacade;
-    private final WorkspaceService workspaceService;
 
     @SuppressFBWarnings("EI")
-    public WorkspaceApiController(
-        ConversionService conversionService, WorkspaceFacade workspaceFacade, WorkspaceService workspaceService) {
-
+    public WorkspaceApiController(ConversionService conversionService, WorkspaceFacade workspaceFacade) {
         this.conversionService = conversionService;
         this.workspaceFacade = workspaceFacade;
-        this.workspaceService = workspaceService;
-    }
-
-    @Override
-    public ResponseEntity<WorkspaceModel> createWorkspace(WorkspaceModel workspaceModel) {
-        return ResponseEntity.ok(
-            conversionService.convert(
-                workspaceService.create(conversionService.convert(workspaceModel, Workspace.class)),
-                WorkspaceModel.class));
-    }
-
-    @Override
-    public ResponseEntity<Void> deleteWorkspace(Long id) {
-        workspaceService.delete(id);
-
-        return ResponseEntity.noContent()
-            .build();
     }
 
     @Override
@@ -72,27 +52,5 @@ public class WorkspaceApiController implements WorkspaceApi {
                 .stream()
                 .map(workspace -> conversionService.convert(workspace, WorkspaceModel.class))
                 .toList());
-    }
-
-    @Override
-    public ResponseEntity<WorkspaceModel> getWorkspace(Long id) {
-        return ResponseEntity.ok(conversionService.convert(workspaceService.getWorkspace(id), WorkspaceModel.class));
-    }
-
-    @Override
-    public ResponseEntity<List<WorkspaceModel>> getWorkspaces() {
-        return ResponseEntity.ok(
-            workspaceService.getWorkspaces()
-                .stream()
-                .map(workspace -> conversionService.convert(workspace, WorkspaceModel.class))
-                .toList());
-    }
-
-    @Override
-    public ResponseEntity<WorkspaceModel> updateWorkspace(Long id, WorkspaceModel workspaceModel) {
-        return ResponseEntity.ok(
-            conversionService.convert(
-                workspaceService.update(conversionService.convert(workspaceModel.id(id), Workspace.class)),
-                WorkspaceModel.class));
     }
 }
