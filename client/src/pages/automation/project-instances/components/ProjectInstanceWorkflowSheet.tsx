@@ -123,7 +123,7 @@ const ProjectInstanceWorkflowSheet = () => {
 
     return (
         <Sheet onOpenChange={() => setProjectInstanceWorkflowSheetOpen(!projectInstanceWorkflowSheetOpen)} open>
-            <SheetContent className="flex w-2/3 flex-col sm:max-w-screen-xl">
+            <SheetContent className="flex w-2/3 flex-col p-4 sm:max-w-screen-xl">
                 <h1 className="text-lg font-semibold">
                     {workflow?.label} <span className="text-base font-normal text-gray-500">(read-only)</span>
                 </h1>
