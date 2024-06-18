@@ -1,0 +1,7 @@
+.content {
+    @apply pointer-events-none;
+}
+
+.handle {
+    @apply invisible;
+}
