@@ -14,6 +14,7 @@ import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/P
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {ControlTypeModel} from '@/shared/middleware/platform/configuration';
 import {DataPillType} from '@/shared/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {twMerge} from 'tailwind-merge';
@@ -40,20 +41,19 @@ const MentionInputListItem = (item: DataPillType) => {
 };
 
 interface PropertyMentionsInputProps {
-    controlType?: string;
-    defaultValue?: string;
+    controlType: ControlTypeModel;
+    defaultValue: string;
     description?: string;
-    fieldsetClassName?: string;
     handleInputTypeSwitchButtonClick: () => void;
     inputTypeSwitchButtonClassName?: string;
     label?: string;
-    leadingIcon?: ReactNode;
+    leadingIcon: ReactNode;
     onChange: (value: string) => void;
-    onKeyPress?: (event: KeyboardEvent) => void;
-    placeholder?: string;
+    onKeyPress: (event: KeyboardEvent) => void;
+    placeholder: string;
     required?: boolean;
     singleMention?: boolean;
-    showInputTypeSwitchButton: boolean;
+    showInputTypeSwitchButton?: boolean;
     value: string;
 }
 
@@ -70,9 +70,9 @@ const PropertyMentionsInput = forwardRef(
             onChange,
             onKeyPress,
             placeholder,
-            required,
-            showInputTypeSwitchButton,
-            singleMention,
+            required = false,
+            showInputTypeSwitchButton = false,
+            singleMention = false,
             value,
         }: PropertyMentionsInputProps,
         ref: Ref<ReactQuill>

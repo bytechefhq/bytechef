@@ -130,7 +130,7 @@ const Property = ({
         placeholder = '',
         properties,
         propertiesDataSource,
-        required,
+        required = false,
         type,
     } = property;
 
@@ -772,7 +772,7 @@ const Property = ({
                     type !== 'DYNAMIC_PROPERTIES' &&
                     controlType !== 'CODE_EDITOR' && (
                         <PropertyMentionsInput
-                            controlType={controlType}
+                            controlType={controlType || 'TEXT'}
                             defaultValue={defaultValue}
                             description={description}
                             handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
