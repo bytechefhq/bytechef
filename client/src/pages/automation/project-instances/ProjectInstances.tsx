@@ -184,7 +184,7 @@ const ProjectInstances = () => {
                 loading={projectsIsLoading || projectInstancesIsLoading || tagsIsLoading}
             >
                 {projectInstances && projectInstances?.length > 0 ? (
-                    <div className="w-full px-2 2xl:mx-auto 2xl:w-4/5">
+                    <div className="w-full p-2 2xl:mx-auto 2xl:w-4/5">
                         {Array.from(projectInstanceMap.keys())?.map(
                             (projectId) =>
                                 projects &&

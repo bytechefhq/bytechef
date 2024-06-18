@@ -17,43 +17,39 @@ const ProjectInstanceList = ({
     const projectInstanceMap = useProjectInstancesEnabledStore(({projectInstanceMap}) => projectInstanceMap);
 
     return (
-        <>
-            {projectInstances.length > 0 && (
-                <div className="w-full">
-                    {projectInstances.map((projectInstance) => {
-                        const projectTagIds = projectInstance.tags?.map((tag) => tag.id);
+        <div className="w-full">
+            {projectInstances.map((projectInstance) => {
+                const projectTagIds = projectInstance.tags?.map((tag) => tag.id);
 
-                        if (!project || !project.id) {
-                            return;
-                        }
+                if (!project || !project.id) {
+                    return <></>;
+                }
 
-                        return (
-                            <Collapsible className="group" key={projectInstance.id}>
-                                <ProjectInstanceListItem
-                                    key={projectInstance.id}
-                                    projectInstance={projectInstance}
-                                    remainingTags={tags?.filter((tag) => !projectTagIds?.includes(tag.id))}
-                                />
+                return (
+                    <Collapsible className="group" key={projectInstance.id}>
+                        <ProjectInstanceListItem
+                            key={projectInstance.id}
+                            projectInstance={projectInstance}
+                            remainingTags={tags?.filter((tag) => !projectTagIds?.includes(tag.id))}
+                        />
 
-                                <CollapsibleContent>
-                                    <ProjectInstanceWorkflowList
-                                        projectId={project.id}
-                                        projectInstanceEnabled={
-                                            projectInstanceMap.has(projectInstance.id!)
-                                                ? projectInstanceMap.get(projectInstance.id!)!
-                                                : projectInstance.enabled!
-                                        }
-                                        projectInstanceId={projectInstance.id!}
-                                        projectInstanceWorkflows={projectInstance.projectInstanceWorkflows}
-                                        projectVersion={projectInstance.projectVersion!}
-                                    />
-                                </CollapsibleContent>
-                            </Collapsible>
-                        );
-                    })}
-                </div>
-            )}
-        </>
+                        <CollapsibleContent>
+                            <ProjectInstanceWorkflowList
+                                projectId={project.id}
+                                projectInstanceEnabled={
+                                    projectInstanceMap.has(projectInstance.id!)
+                                        ? projectInstanceMap.get(projectInstance.id!)!
+                                        : projectInstance.enabled!
+                                }
+                                projectInstanceId={projectInstance.id!}
+                                projectInstanceWorkflows={projectInstance.projectInstanceWorkflows}
+                                projectVersion={projectInstance.projectVersion!}
+                            />
+                        </CollapsibleContent>
+                    </Collapsible>
+                );
+            })}
+        </div>
     );
 };
 

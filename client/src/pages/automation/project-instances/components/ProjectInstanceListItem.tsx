@@ -75,6 +75,7 @@ const ProjectInstanceListItem = ({projectInstance, remainingTags}: ProjectInstan
             {
                 onSuccess: () => {
                     setProjectInstanceEnabled(projectInstance.id!, !projectInstance.enabled);
+
                     projectInstance!.enabled = !projectInstance.enabled;
                 },
             }
@@ -83,99 +84,89 @@ const ProjectInstanceListItem = ({projectInstance, remainingTags}: ProjectInstan
 
     return (
         <>
-            <div className="flex w-full items-center justify-between rounded-md px-2 hover:bg-gray-50">
-                <div className="flex flex-1 items-center border-b border-muted py-5 group-data-[state='open']:border-none">
-                    <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                            <div className="flex w-full items-center gap-2">
-                                {projectInstance.description ? (
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                            <span className="text-base font-semibold">{projectInstance.name}</span>
-                                        </TooltipTrigger>
+            <div className="flex w-full rounded-md">
+                <div className="flex-1 space-y-4 px-4 py-2">
+                    <div className="flex w-full items-center space-x-4">
+                        {projectInstance.description ? (
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <h2 className="text-2xl font-semibold leading-3">{projectInstance.name}</h2>
+                                </TooltipTrigger>
 
-                                        <TooltipContent>{projectInstance.description}</TooltipContent>
-                                    </Tooltip>
-                                ) : (
-                                    <span className="text-base font-semibold">{projectInstance.name}</span>
-                                )}
+                                <TooltipContent>{projectInstance.description}</TooltipContent>
+                            </Tooltip>
+                        ) : (
+                            <h2 className="text-2xl font-semibold leading-3">{projectInstance.name}</h2>
+                        )}
 
-                                <Badge variant="secondary">V{projectInstance.projectVersion}</Badge>
+                        <Badge variant="secondary">v{projectInstance.projectVersion}</Badge>
 
-                                <span className="text-xs uppercase text-gray-700">{projectInstance?.environment}</span>
-                            </div>
-                        </div>
-
-                        <div className="mt-2 sm:flex sm:items-center sm:justify-between">
-                            <div className="flex items-center">
-                                <CollapsibleTrigger className="group mr-4 flex text-xs font-semibold text-gray-700">
-                                    <span className="mr-1">
-                                        {projectInstance.projectInstanceWorkflows?.length === 1
-                                            ? `1 workflow`
-                                            : `${projectInstance.projectInstanceWorkflows?.length} workflows`}
-                                    </span>
-
-                                    <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
-                                </CollapsibleTrigger>
-
-                                <div onClick={(event) => event.preventDefault()}>
-                                    {projectInstance.tags && (
-                                        <TagList
-                                            getRequest={(id, tags) => ({
-                                                id: id!,
-                                                updateTagsRequestModel: {
-                                                    tags: tags || [],
-                                                },
-                                            })}
-                                            id={projectInstance.id!}
-                                            remainingTags={remainingTags}
-                                            tags={projectInstance.tags}
-                                            updateTagsMutation={updateProjectInstanceTagsMutation}
-                                        />
-                                    )}
-                                </div>
-                            </div>
-                        </div>
+                        <span className="text-sm font-bold text-gray-500">{projectInstance?.environment}</span>
                     </div>
 
-                    <div className="flex items-center justify-end gap-x-6">
-                        <div className="flex flex-col items-end gap-y-4">
-                            <Badge variant={projectInstance.enabled ? 'success' : 'secondary'}>
-                                {projectInstance.enabled ? 'Enabled' : 'Disabled'}
-                            </Badge>
+                    <div className="mt-2 sm:flex sm:items-center sm:justify-between">
+                        <CollapsibleTrigger className="group flex items-center space-x-2">
+                            <span>
+                                {projectInstance.projectInstanceWorkflows?.length === 1
+                                    ? `1 workflow`
+                                    : `${projectInstance.projectInstanceWorkflows?.length} workflows`}
+                            </span>
 
+                            <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
+                        </CollapsibleTrigger>
+
+                        <div onClick={(event) => event.preventDefault()}>
+                            {projectInstance.tags && (
+                                <TagList
+                                    getRequest={(id, tags) => ({
+                                        id: id!,
+                                        updateTagsRequestModel: {
+                                            tags: tags || [],
+                                        },
+                                    })}
+                                    id={projectInstance.id!}
+                                    remainingTags={remainingTags}
+                                    tags={projectInstance.tags}
+                                    updateTagsMutation={updateProjectInstanceTagsMutation}
+                                />
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-x-6">
+                    <div className="flex flex-col items-end gap-y-4">
+                        <Badge variant={projectInstance.enabled ? 'success' : 'secondary'}>
+                            {projectInstance.enabled ? 'Enabled' : 'Disabled'}
+                        </Badge>
+
+                        {projectInstance.lastExecutionDate && (
                             <Tooltip>
                                 <TooltipTrigger className="flex items-center text-sm text-gray-500">
-                                    {projectInstance.lastExecutionDate ? (
-                                        <span>
-                                            {`Executed at ${projectInstance.lastExecutionDate?.toLocaleDateString()} ${projectInstance.lastExecutionDate?.toLocaleTimeString()}`}
-                                        </span>
-                                    ) : (
-                                        '-'
-                                    )}
+                                    <span>
+                                        {`Executed at ${projectInstance.lastExecutionDate?.toLocaleDateString()} ${projectInstance.lastExecutionDate?.toLocaleTimeString()}`}
+                                    </span>
                                 </TooltipTrigger>
 
                                 <TooltipContent>Last Execution Date</TooltipContent>
                             </Tooltip>
-                        </div>
-
-                        <Switch checked={projectInstance.enabled} onCheckedChange={handleOnCheckedChange} />
-
-                        <div className="w-5"></div>
-
-                        <ProjectInstanceListItemDropdownMenu
-                            onDeleteClick={() => setShowDeleteDialog(true)}
-                            onEditClick={() => setShowEditDialog(true)}
-                            onEnableClick={() =>
-                                enableProjectInstanceMutation.mutate({
-                                    enable: !projectInstance.enabled,
-                                    id: projectInstance.id!,
-                                })
-                            }
-                            onUpdateProjectVersionClick={() => setShowUpdateProjectVersionDialog(true)}
-                            projectInstanceEnabled={projectInstance.enabled!}
-                        />
+                        )}
                     </div>
+
+                    <Switch checked={projectInstance.enabled} onCheckedChange={handleOnCheckedChange} />
+
+                    <ProjectInstanceListItemDropdownMenu
+                        onDeleteClick={() => setShowDeleteDialog(true)}
+                        onEditClick={() => setShowEditDialog(true)}
+                        onEnableClick={() =>
+                            enableProjectInstanceMutation.mutate({
+                                enable: !projectInstance.enabled,
+                                id: projectInstance.id!,
+                            })
+                        }
+                        onUpdateProjectVersionClick={() => setShowUpdateProjectVersionDialog(true)}
+                        projectInstanceEnabled={projectInstance.enabled!}
+                    />
                 </div>
             </div>
 
