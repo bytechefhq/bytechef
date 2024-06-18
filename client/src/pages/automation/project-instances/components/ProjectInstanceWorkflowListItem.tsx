@@ -13,6 +13,7 @@ import {
 import {ComponentDefinitionBasicModel} from '@/shared/middleware/platform/configuration';
 import {useEnableProjectInstanceWorkflowMutation} from '@/shared/mutations/automation/projectInstanceWorkflows.mutations';
 import {ProjectInstanceKeys} from '@/shared/queries/automation/projectInstances.queries';
+import {Component1Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {ClipboardIcon, PlayIcon} from 'lucide-react';
@@ -79,48 +80,47 @@ const ProjectInstanceWorkflowListItem = ({
         );
     };
 
-    const handleWorkflowLabelClick = () => {
+    const handleWorkflowClick = () => {
         setWorkflowId(workflow.id!);
+
         setProjectInstanceWorkflowSheetOpen(true);
     };
 
-    const handleWorkflowRun = () => {
+    const handleRunWorkflowClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event?.stopPropagation();
+
         projectInstanceApi
             .createProjectInstanceWorkflowJob({
                 id: projectInstanceId,
                 workflowId: workflow.id!,
             })
-            .then(() => {
+            .then(() =>
                 toast({
                     description: 'Workflow request sent.',
-                });
-            });
+                })
+            );
     };
 
     return (
-        <>
-            <div className="flex flex-1 items-center">
-                <div
-                    className={twMerge(
-                        'w-96 text-sm font-semibold',
-                        !projectInstanceWorkflow.enabled && 'text-muted-foreground'
-                    )}
-                >
-                    <button onClick={handleWorkflowLabelClick}>{workflow.label}</button>
-                </div>
+        <li className="flex cursor-pointer rounded-md px-2 py-1 hover:bg-gray-50" onClick={handleWorkflowClick}>
+            <div className="flex flex-1 items-center justify-between px-2">
+                <span className={twMerge('font-semibold', !projectInstanceWorkflow.enabled && 'text-muted-foreground')}>
+                    {workflow.label}
+                </span>
 
-                <div className="ml-6 flex">
+                <div className="ml-6 flex space-x-1">
                     {filteredComponentNames?.map((name) => {
                         const componentDefinition = workflowComponentDefinitions[name];
                         const taskDispatcherDefinition = workflowTaskDispatcherDefinitions[name];
 
                         return (
-                            <div className="mr-0.5 flex items-center justify-center rounded-full border p-1" key={name}>
+                            <div className="flex items-center justify-center rounded-full border-2 p-1" key={name}>
                                 <Tooltip>
                                     <TooltipTrigger>
                                         <InlineSVG
-                                            className="size-5 flex-none"
+                                            className="size-5"
                                             key={name}
+                                            loader={<Component1Icon className="size-5 flex-none text-gray-900" />}
                                             src={
                                                 componentDefinition?.icon
                                                     ? componentDefinition?.icon
@@ -176,7 +176,7 @@ const ProjectInstanceWorkflowListItem = ({
                         {(workflow.triggers?.length == 0 || workflow.triggers?.[0]?.name === 'manual') && (
                             <Button
                                 disabled={!projectInstanceEnabled || !projectInstanceWorkflow.enabled}
-                                onClick={() => handleWorkflowRun()}
+                                onClick={handleRunWorkflowClick}
                                 size="icon"
                                 variant="ghost"
                             >
@@ -229,7 +229,7 @@ const ProjectInstanceWorkflowListItem = ({
                     workflow={workflow}
                 />
             )}
-        </>
+        </li>
     );
 };
 
