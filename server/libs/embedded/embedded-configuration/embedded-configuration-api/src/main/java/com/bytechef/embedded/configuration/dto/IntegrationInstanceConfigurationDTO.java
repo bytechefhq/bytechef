@@ -65,6 +65,7 @@ public record IntegrationInstanceConfigurationDTO(
         integrationInstance.setId(id);
         integrationInstance.setIntegrationId(integrationId);
         integrationInstance.setIntegrationVersion(integrationVersion);
+        integrationInstance.setName(name);
         integrationInstance.setTags(tags);
         integrationInstance.setVersion(version);
 
