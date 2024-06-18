@@ -30,6 +30,8 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.exception.ProviderException;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -110,9 +112,18 @@ public class CopperOptionUtils {
             default -> context.http(http -> http.post(BASE_URL + "/opportunities/search"));
         };
 
-        List<Map<String, Object>> body = executor.configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        List<Map<String, Object>> body = null;
+        Http.Response response = executor.configuration(Http.responseType(Http.ResponseType.JSON)).execute();
+
+        try {
+            body = response.getBody(new TypeReference<>() {});
+        } catch (Exception e){
+            Map<String, Object> badRequestBody = (Map<String, Object>) response.getBody();
+            String message = (String) badRequestBody.get("message");
+            Integer code = (Integer) badRequestBody.get("status");
+
+            throw ProviderException.fromHttpResponseCode(code, message);
+        }
 
         return createOptions(body);
     }
