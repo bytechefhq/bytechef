@@ -26,6 +26,12 @@ export default ({mode}) => {
         server: {
             host: '127.0.0.1',
             proxy: {
+                '/actuator': {
+                    changeOrigin: true,
+                    secure: false,
+                    target: 'http://localhost:9555',
+                    // rewrite: (path) => path.replace(/^\/api/, ""),
+                },
                 '/api': {
                     changeOrigin: true,
                     secure: false,

@@ -1,11 +1,11 @@
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
+import {useGetWorkspacesQuery} from '@/ee/shared/queries/automation/workspaces.queries';
 import WorkspaceDialog from '@/pages/settings/automation/workspaces/components/WorkspaceDialog';
 import WorkspaceList from '@/pages/settings/automation/workspaces/components/WorkspaceList';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {useGetWorkspacesQuery} from '@/shared/queries/automation/workspaces.queries';
 import {ZapIcon} from 'lucide-react';
 
 const Workspaces = () => {

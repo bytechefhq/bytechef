@@ -17,9 +17,9 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {useDeleteWorkspaceMutation} from '@/ee/shared/mutations/automation/workspaces.mutations';
 import WorkspaceDialog from '@/pages/settings/automation/workspaces/components/WorkspaceDialog';
 import {WorkspaceModel} from '@/shared/middleware/automation/configuration';
-import {useDeleteWorkspaceMutation} from '@/shared/mutations/automation/workspaces.mutations';
 import {WorkspaceKeys} from '@/shared/queries/automation/workspaces.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';

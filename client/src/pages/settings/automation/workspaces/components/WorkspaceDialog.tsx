@@ -12,11 +12,11 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
-import {WorkspaceModel} from '@/shared/middleware/automation/configuration';
 import {
     useCreateWorkspaceMutation,
     useUpdateWorkspaceMutation,
-} from '@/shared/mutations/automation/workspaces.mutations';
+} from '@/ee/shared/mutations/automation/workspaces.mutations';
+import {WorkspaceModel} from '@/shared/middleware/automation/configuration';
 import {WorkspaceKeys} from '@/shared/queries/automation/workspaces.queries';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';

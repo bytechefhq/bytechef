@@ -1,6 +1,8 @@
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {useEffect} from 'react';
 import {Outlet, useLocation} from 'react-router-dom';
 
 interface SettingsProps {
@@ -12,7 +14,13 @@ interface SettingsProps {
 }
 
 const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
+    const {getApplicationInfo} = useApplicationInfoStore();
+
     const location = useLocation();
+
+    useEffect(() => {
+        getApplicationInfo();
+    }, [getApplicationInfo]);
 
     return (
         <LayoutContainer

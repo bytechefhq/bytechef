@@ -1,4 +1,4 @@
-import {WorkspaceApi, WorkspaceModel} from '@/shared/middleware/automation/configuration';
+import {WorkspaceApi, WorkspaceModel} from '@/ee/shared/middleware/automation/configuration';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateWorkspaceMutationProps {

@@ -28,6 +28,7 @@ import ApiKeys from '@/pages/settings/embedded/api-keys/ApiKeys';
 import SigningKeys from '@/pages/settings/embedded/signing-keys/SigningKeys';
 import PrivateRoute from '@/shared/auth/PrivateRoute';
 import {AUTHORITIES} from '@/shared/constants';
+import EEVersion from '@/shared/edition/EEVersion';
 import ErrorPage from '@/shared/error/ErrorPage';
 import PageNotFound from '@/shared/error/PageNotFound';
 import Settings from '@/shared/layout/Settings';
@@ -181,7 +182,9 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
-                                            <Workspaces />
+                                            <EEVersion>
+                                                <Workspaces />
+                                            </EEVersion>
                                         </PrivateRoute>
                                     ),
                                     path: 'workspaces',
