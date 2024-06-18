@@ -1,0 +1,136 @@
+---
+openapi: "3.0.1"
+info:
+  title: "The Automation Configuration API"
+  version: "1"
+servers:
+- url: "/api/automation"
+tags:
+- name: "workspace"
+  description: "The Automation Workspace API"
+paths:
+  /users/{id}/workspaces:
+    get:
+      description: "Get all user workspaces."
+      summary: "Get all user workspaces"
+      tags:
+        - "workspace"
+      operationId: "getUserWorkspaces"
+      parameters:
+        - name: "id"
+          description: "The id of a user."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The list of user workspaces."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "../../../../../libs/automation/automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/Workspace"
+  /workspaces:
+    get:
+      description: "Get workspaces."
+      summary: "Get workspaces"
+      tags:
+        - "workspace"
+      operationId: "getWorkspaces"
+      responses:
+        "200":
+          description: "A list of workspaces."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "../../../../../libs/automation/automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/Workspace"
+    post:
+      description: "Create a workspace event."
+      summary: "Create a new workspace"
+      tags:
+        - "workspace"
+      operationId: "createWorkspace"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "../../../../../libs/automation/automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/Workspace"
+        required: true
+      responses:
+        "200":
+          description: "The workspace object."
+          content:
+            application/json:
+              schema:
+                $ref: "../../../../../libs/automation/automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/Workspace"
+  /workspaces/{id}:
+    delete:
+      description: "Delete a workspace."
+      summary: "Delete a workspace"
+      tags:
+        - "workspace"
+      operationId: "deleteWorkspace"
+      parameters:
+        - name: "id"
+          description: "The id of a workspace."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "Successful operation."
+    get:
+      description: "Get a workspace by id."
+      summary: "Get a workspace by id"
+      tags:
+        - "workspace"
+      operationId: "getWorkspace"
+      parameters:
+        - name: "id"
+          description: "The id of a workspace."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The workspace object."
+          content:
+            application/json:
+              schema:
+                $ref: "../../../../../libs/automation/automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/Workspace"
+    put:
+      description: "Update an existing workspace."
+      summary: "Update an existing workspace"
+      tags:
+        - "workspace"
+      operationId: "updateWorkspace"
+      parameters:
+        - name: "id"
+          description: "The id of a workspace."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "../../../../../libs/automation/automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/Workspace"
+        required: true
+      responses:
+        "200":
+          description: "The updated workspace object."
+          content:
+            application/json:
+              schema:
+                $ref: "../../../../../libs/automation/automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/Workspace"
