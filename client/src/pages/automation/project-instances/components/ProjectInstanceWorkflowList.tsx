@@ -16,7 +16,7 @@ const ProjectInstanceWorkflowList = ({
     projectId: number;
     projectInstanceId: number;
     projectInstanceEnabled: boolean;
-    projectInstanceWorkflows?: Array<ProjectInstanceWorkflowModel>;
+    projectInstanceWorkflows: Array<ProjectInstanceWorkflowModel>;
     projectVersion: number;
 }) => {
     const {data: componentDefinitions, isLoading: isComponentDefinitionsLoading} = useGetComponentDefinitionsQuery({
@@ -40,27 +40,31 @@ const ProjectInstanceWorkflowList = ({
         [key: string]: ComponentDefinitionBasicModel | undefined;
     } = {};
 
-    return isComponentDefinitionsLoading || isTaskDispatcherDefinitionsLoading || isProjectWorkflowsLoading ? (
-        <div className="space-y-3 py-2">
-            <Skeleton className="h-5 w-40" />
+    if (isComponentDefinitionsLoading || isTaskDispatcherDefinitionsLoading || isProjectWorkflowsLoading) {
+        return (
+            <div className="space-y-3 py-2">
+                <Skeleton className="h-5 w-40" />
 
-            {[1, 2].map((value) => (
-                <div className="flex items-center space-x-4" key={value}>
-                    <Skeleton className="h-4 w-80" />
+                {[1, 2].map((value) => (
+                    <div className="flex items-center space-x-4" key={value}>
+                        <Skeleton className="h-4 w-80" />
 
-                    <div className="flex w-60 items-center space-x-1">
-                        <Skeleton className="h-6 w-7 rounded-full" />
+                        <div className="flex w-60 items-center space-x-1">
+                            <Skeleton className="h-6 w-7 rounded-full" />
 
-                        <Skeleton className="size-7 rounded-full" />
+                            <Skeleton className="size-7 rounded-full" />
 
-                        <Skeleton className="size-7 rounded-full" />
+                            <Skeleton className="size-7 rounded-full" />
+                        </div>
+
+                        <Skeleton className="h-4 flex-1" />
                     </div>
+                ))}
+            </div>
+        );
+    }
 
-                    <Skeleton className="h-4 flex-1" />
-                </div>
-            ))}
-        </div>
-    ) : (
+    return (
         <div className="border-b border-b-gray-100 py-3 pl-4">
             <h3 className="mb-2 flex justify-start px-2 font-semibold uppercase text-gray-400">Workflows</h3>
 
@@ -92,9 +96,13 @@ const ProjectInstanceWorkflowList = ({
                                 (item, index) => componentNames?.indexOf(item) === index
                             );
 
-                            const projectInstanceWorkflow = projectInstanceWorkflows?.find(
+                            const projectInstanceWorkflow = projectInstanceWorkflows.find(
                                 (projectInstanceWorkflow) => projectInstanceWorkflow.workflowId === workflow?.id
                             );
+
+                            if (!projectInstanceWorkflow) {
+                                return <></>;
+                            }
 
                             return (
                                 <ProjectInstanceWorkflowListItem

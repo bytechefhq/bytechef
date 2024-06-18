@@ -16,6 +16,7 @@ import {useSearchParams} from 'react-router-dom';
 
 import ProjectInstanceDialog from './components/ProjectInstanceDialog';
 import ProjectInstanceList from './components/ProjectInstanceList';
+import useProjectInstanceWorkflowSheetStore from './stores/useProjectInstanceWorkflowSheetStore';
 
 export enum Type {
     Project,
@@ -78,6 +79,8 @@ const ProjectInstances = () => {
     }
 
     const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetProjectInstanceTagsQuery();
+
+    const {projectInstanceWorkflowSheetOpen} = useProjectInstanceWorkflowSheetStore();
 
     let pageTitle: string | undefined;
 
@@ -198,7 +201,7 @@ const ProjectInstances = () => {
                                 )
                         )}
 
-                        <ProjectInstanceWorkflowSheet />
+                        {projectInstanceWorkflowSheetOpen && <ProjectInstanceWorkflowSheet />}
                     </div>
                 ) : (
                     <EmptyList
