@@ -33,19 +33,21 @@ const ProjectInstanceList = ({
                             remainingTags={tags?.filter((tag) => !projectTagIds?.includes(tag.id))}
                         />
 
-                        <CollapsibleContent>
-                            <ProjectInstanceWorkflowList
-                                projectId={project.id}
-                                projectInstanceEnabled={
-                                    projectInstanceMap.has(projectInstance.id!)
-                                        ? projectInstanceMap.get(projectInstance.id!)!
-                                        : projectInstance.enabled!
-                                }
-                                projectInstanceId={projectInstance.id!}
-                                projectInstanceWorkflows={projectInstance.projectInstanceWorkflows}
-                                projectVersion={projectInstance.projectVersion!}
-                            />
-                        </CollapsibleContent>
+                        {!!projectInstance.projectInstanceWorkflows?.length && (
+                            <CollapsibleContent>
+                                <ProjectInstanceWorkflowList
+                                    projectId={project.id}
+                                    projectInstanceEnabled={
+                                        projectInstanceMap.has(projectInstance.id!)
+                                            ? projectInstanceMap.get(projectInstance.id!)!
+                                            : projectInstance.enabled!
+                                    }
+                                    projectInstanceId={projectInstance.id!}
+                                    projectInstanceWorkflows={projectInstance.projectInstanceWorkflows}
+                                    projectVersion={projectInstance.projectVersion!}
+                                />
+                            </CollapsibleContent>
+                        )}
                     </Collapsible>
                 );
             })}
