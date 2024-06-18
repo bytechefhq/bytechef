@@ -90,11 +90,11 @@ const SubPropertyPopover = ({
                             value={newPropertyType}
                         />
                     ) : (
-                        <div className="flex w-full flex-col">
-                            <span className="mb-1 text-sm font-medium text-gray-700">Type</span>
+                        <div className="flex w-full items-center gap-2 text-sm">
+                            <span className="font-medium">Type</span>
 
                             {availablePropertyTypes[0] && (
-                                <span className="inline-flex w-full rounded-md bg-white py-2 text-sm">
+                                <span className="inline-flex w-full rounded-md bg-white">
                                     {availablePropertyTypes[0].value}
                                 </span>
                             )}
