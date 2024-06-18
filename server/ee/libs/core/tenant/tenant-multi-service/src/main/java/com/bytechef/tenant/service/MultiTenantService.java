@@ -16,7 +16,9 @@
 
 package com.bytechef.tenant.service;
 
+import com.bytechef.edition.annotation.ConditionalOnEEVersion;
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
 import com.bytechef.tenant.domain.Tenant;
 import com.bytechef.tenant.repository.TenantRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -26,7 +28,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import liquibase.integration.spring.MultiTenantSpringLiquibase;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.ResourceLoader;
@@ -37,8 +38,8 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Ivica Cardic
  */
 @Service
-@ConditionalOnProperty(value = "bytechef.tenant.mode", havingValue = "multi")
 @ConditionalOnEEVersion
+@ConditionalOnMultiTenant
 public class MultiTenantService implements TenantService, ResourceLoaderAware {
 
     private final TenantRepository tenantRepository;

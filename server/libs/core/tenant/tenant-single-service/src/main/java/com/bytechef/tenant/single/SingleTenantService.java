@@ -16,10 +16,9 @@
 
 package com.bytechef.tenant.single;
 
+import com.bytechef.tenant.annotation.ConditionalOnSingleTenant;
 import com.bytechef.tenant.service.TenantService;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 /**
@@ -27,13 +26,8 @@ import org.springframework.stereotype.Service;
  */
 
 @Service
-@ConditionalOnProperty(value = "bytechef.tenant.mode", havingValue = "single")
-@ConditionalOnCEVersion
+@ConditionalOnSingleTenant
 public class SingleTenantService implements TenantService {
-
-    @SuppressFBWarnings("EI")
-    public SingleTenantService() {
-    }
 
     @Override
     public String createTenant() {

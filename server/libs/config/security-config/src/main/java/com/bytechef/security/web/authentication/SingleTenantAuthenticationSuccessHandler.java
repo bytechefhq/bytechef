@@ -16,9 +16,9 @@
 
 package com.bytechef.security.web.authentication;
 
+import com.bytechef.tenant.annotation.ConditionalOnSingleTenant;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -28,8 +28,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-@ConditionalOnProperty(value = "bytechef.tenant.mode", havingValue = "single")
-@ConditionalOnCEVersion
+@ConditionalOnSingleTenant
 public class SingleTenantAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     @Override

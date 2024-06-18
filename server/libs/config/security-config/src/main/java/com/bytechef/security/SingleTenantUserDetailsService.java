@@ -21,6 +21,7 @@ import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.exception.UserNotActivatedException;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
+import com.bytechef.tenant.annotation.ConditionalOnSingleTenant;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -28,7 +29,6 @@ import org.apache.commons.validator.routines.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -43,8 +43,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component("userDetailsService")
-@ConditionalOnProperty(value = "bytechef.tenant.mode", havingValue = "single")
-@ConditionalOnCEVersion
+@ConditionalOnSingleTenant
 public class SingleTenantUserDetailsService implements UserDetailsService, ApplicationContextAware {
 
     private static final Logger log = LoggerFactory.getLogger(SingleTenantUserDetailsService.class);

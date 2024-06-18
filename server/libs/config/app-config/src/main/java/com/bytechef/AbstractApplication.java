@@ -63,6 +63,7 @@ public abstract class AbstractApplication {
                 \tLocal: \t\t{}://127.0.0.1:{}{}
                 \tExternal: \t{}://{}:{}{}
                 \tEdition: \t{}
+                \tTenant mode: {}
                 \tProfile(s): {}
                 \tSwaggerUI: \t{}
                 ----------------------------------------------------------""",
@@ -75,6 +76,8 @@ public abstract class AbstractApplication {
             serverPort,
             contextPath,
             StringUtils.upperCase(environment.getProperty("bytechef.edition")),
+            environment.getProperty("bytechef.tenant.mode"),
+            activeProfiles,
             getSwaggerUiUrl(Arrays.asList(activeProfiles), protocol, serverPort, contextPath));
     }
 

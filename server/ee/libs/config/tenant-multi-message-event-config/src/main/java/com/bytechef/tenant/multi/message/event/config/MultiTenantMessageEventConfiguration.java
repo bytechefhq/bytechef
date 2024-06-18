@@ -7,10 +7,11 @@
 
 package com.bytechef.tenant.multi.message.event.config;
 
+import com.bytechef.edition.annotation.ConditionalOnEEVersion;
 import com.bytechef.message.event.MessageEventPostReceiveProcessor;
 import com.bytechef.message.event.MessageEventPreSendProcessor;
 import com.bytechef.tenant.TenantContext;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -20,8 +21,8 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnProperty(value = "bytechef.tenant.mode", havingValue = "multi")
 @ConditionalOnEEVersion
+@ConditionalOnMultiTenant
 public class MultiTenantMessageEventConfiguration {
 
     private static final String TENANT_ID = "TENANT_ID";
