@@ -18,6 +18,7 @@ package com.bytechef.platform.data.storage.db.config;
 
 import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.data.storage.annotation.ConditionalOnDataStorageProviderDb;
 import com.bytechef.platform.data.storage.db.repository.DataStorageRepository;
 import com.bytechef.platform.data.storage.db.service.DbDataStorageService;
 import com.bytechef.platform.data.storage.db.service.DbDataStorageServiceImpl;
@@ -26,7 +27,6 @@ import java.util.Map;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -34,7 +34,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnProperty(prefix = "bytechef", name = "data-storage.provider", havingValue = "db")
+@ConditionalOnDataStorageProviderDb
 public class DbDataStorageConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(DbDataStorageConfiguration.class);

@@ -24,7 +24,7 @@ import org.springframework.core.ParameterizedTypeReference;
 public class RemoteDbDataStorageServiceClient implements DbDataStorageService {
 
     private static final String EXECUTION_APP = "execution-app";
-    private static final String DATA_STORAGE_SERVICE = "/remote/db-ddata-storage-service";
+    private static final String DATA_STORAGE_SERVICE = "/remote/db-data-storage-service";
 
     private final LoadBalancedRestClient loadBalancedRestClient;
 
