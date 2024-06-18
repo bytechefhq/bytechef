@@ -40,8 +40,7 @@ public abstract class AbstractResponseEntityExceptionHandler extends ResponseEnt
         logger.error(exception.getMessage(), exception);
 
         return createProblemDetail(
-            exception.getCause() == null ? exception : (Exception) exception.getCause(),
-            status, exception.getEntityClass(), exception.getErrorKey(),
+            exception, status, exception.getEntityClass(), exception.getErrorKey(),
             exception.getErrorMessageCode(), exception.getErrorMessageArguments(), properties, request);
     }
 
