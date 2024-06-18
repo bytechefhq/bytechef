@@ -102,9 +102,14 @@ const ProjectInstanceWorkflowListItem = ({
     };
 
     return (
-        <li className="flex cursor-pointer rounded-md px-2 py-1 hover:bg-gray-50" onClick={handleWorkflowClick}>
-            <div className="flex flex-1 items-center justify-between px-2">
-                <span className={twMerge('font-semibold', !projectInstanceWorkflow.enabled && 'text-muted-foreground')}>
+        <li className="flex items-center justify-between rounded-md px-2 py-1 hover:bg-gray-50">
+            <div className="flex flex-1 cursor-pointer items-center" onClick={handleWorkflowClick}>
+                <span
+                    className={twMerge(
+                        'w-96 text-sm font-semibold',
+                        !projectInstanceWorkflow.enabled && 'text-muted-foreground'
+                    )}
+                >
                     {workflow.label}
                 </span>
 
