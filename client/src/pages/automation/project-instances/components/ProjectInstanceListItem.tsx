@@ -161,8 +161,6 @@ const ProjectInstanceListItem = ({projectInstance, remainingTags}: ProjectInstan
 
                         <Switch checked={projectInstance.enabled} onCheckedChange={handleOnCheckedChange} />
 
-                        <div className="w-5"></div>
-
                         <ProjectInstanceListItemDropdownMenu
                             onDeleteClick={() => setShowDeleteDialog(true)}
                             onEditClick={() => setShowEditDialog(true)}
