@@ -138,7 +138,7 @@ const ProjectInstanceWorkflowListItem = ({
             </div>
 
             <div className="flex items-center justify-end gap-x-6">
-                {projectInstanceWorkflow?.lastExecutionDate ? (
+                {projectInstanceWorkflow?.lastExecutionDate && (
                     <Tooltip>
                         <TooltipTrigger className="flex items-center text-sm text-gray-500">
                             <span>
@@ -148,8 +148,6 @@ const ProjectInstanceWorkflowListItem = ({
 
                         <TooltipContent>Last Execution Date</TooltipContent>
                     </Tooltip>
-                ) : (
-                    '-'
                 )}
 
                 {projectInstanceWorkflow && (
