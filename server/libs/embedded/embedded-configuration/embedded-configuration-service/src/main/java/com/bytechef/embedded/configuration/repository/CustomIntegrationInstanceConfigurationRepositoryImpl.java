@@ -17,6 +17,7 @@
 package com.bytechef.embedded.configuration.repository;
 
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -86,7 +87,21 @@ public class CustomIntegrationInstanceConfigurationRepositoryImpl
 
         List<IntegrationInstanceConfiguration> integrationInstanceConfigurations = jdbcClient.sql(query)
             .params(arguments)
-            .query(IntegrationInstanceConfiguration.class)
+            .query(
+                (rs, rowNum) -> {
+                    IntegrationInstanceConfiguration integrationInstanceConfiguration =
+                        new IntegrationInstanceConfiguration();
+
+                    integrationInstanceConfiguration.setDescription(rs.getString("description"));
+                    integrationInstanceConfiguration.setEnabled(rs.getBoolean("enabled"));
+                    integrationInstanceConfiguration.setEnvironment(Environment.values()[rs.getInt("environment")]);
+                    integrationInstanceConfiguration.setId(rs.getLong("id"));
+                    integrationInstanceConfiguration.setIntegrationId(rs.getLong("integration_id"));
+                    integrationInstanceConfiguration.setIntegrationVersion(rs.getInt("integration_version"));
+                    integrationInstanceConfiguration.setVersion(rs.getInt("version"));
+
+                    return integrationInstanceConfiguration;
+                })
             .list();
 
         for (IntegrationInstanceConfiguration integrationInstanceConfiguration : integrationInstanceConfigurations) {
