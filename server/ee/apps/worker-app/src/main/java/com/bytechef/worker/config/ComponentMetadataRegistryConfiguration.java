@@ -8,7 +8,7 @@
 package com.bytechef.worker.config;
 
 import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.discovery.metadata.ServiceMetadataRegistry;
+import com.bytechef.ee.discovery.metadata.ServiceMetadataRegistry;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
 import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
