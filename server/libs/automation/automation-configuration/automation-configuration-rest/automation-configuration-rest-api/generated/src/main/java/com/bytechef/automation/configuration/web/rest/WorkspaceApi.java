@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-13T13:55:20.232479+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-18T07:28:07.351254+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 @Validated
 @Tag(name = "workspace", description = "The Automation Workspace API")
 public interface WorkspaceApi {
@@ -40,77 +40,6 @@ public interface WorkspaceApi {
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
-
-    /**
-     * POST /workspaces : Create a new workspace
-     * Create a workspace event.
-     *
-     * @param workspaceModel  (required)
-     * @return The workspace object. (status code 200)
-     */
-    @Operation(
-        operationId = "createWorkspace",
-        summary = "Create a new workspace",
-        description = "Create a workspace event.",
-        tags = { "workspace" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "The workspace object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = WorkspaceModel.class))
-            })
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/workspaces",
-        produces = { "application/json" },
-        consumes = { "application/json" }
-    )
-    
-    default ResponseEntity<WorkspaceModel> createWorkspace(
-        @Parameter(name = "WorkspaceModel", description = "", required = true) @Valid @RequestBody WorkspaceModel workspaceModel
-    ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : 0 }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    /**
-     * DELETE /workspaces/{id} : Delete a workspace
-     * Delete a workspace.
-     *
-     * @param id The id of a workspace. (required)
-     * @return Successful operation. (status code 200)
-     */
-    @Operation(
-        operationId = "deleteWorkspace",
-        summary = "Delete a workspace",
-        description = "Delete a workspace.",
-        tags = { "workspace" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.")
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.DELETE,
-        value = "/workspaces/{id}"
-    )
-    
-    default ResponseEntity<Void> deleteWorkspace(
-        @Parameter(name = "id", description = "The id of a workspace.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
-    ) {
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
 
     /**
      * GET /users/{id}/workspaces : Get all user workspaces
@@ -143,131 +72,6 @@ public interface WorkspaceApi {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "[ { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : 0 }, { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : 0 } ]";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    /**
-     * GET /workspaces/{id} : Get a workspace by id
-     * Get a workspace by id.
-     *
-     * @param id The id of a workspace. (required)
-     * @return The workspace object. (status code 200)
-     */
-    @Operation(
-        operationId = "getWorkspace",
-        summary = "Get a workspace by id",
-        description = "Get a workspace by id.",
-        tags = { "workspace" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "The workspace object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = WorkspaceModel.class))
-            })
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.GET,
-        value = "/workspaces/{id}",
-        produces = { "application/json" }
-    )
-    
-    default ResponseEntity<WorkspaceModel> getWorkspace(
-        @Parameter(name = "id", description = "The id of a workspace.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
-    ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : 0 }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    /**
-     * GET /workspaces : Get workspaces
-     * Get workspaces.
-     *
-     * @return A list of workspaces. (status code 200)
-     */
-    @Operation(
-        operationId = "getWorkspaces",
-        summary = "Get workspaces",
-        description = "Get workspaces.",
-        tags = { "workspace" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "A list of workspaces.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = WorkspaceModel.class)))
-            })
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.GET,
-        value = "/workspaces",
-        produces = { "application/json" }
-    )
-    
-    default ResponseEntity<List<WorkspaceModel>> getWorkspaces(
-        
-    ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : 0 }, { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : 0 } ]";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    /**
-     * PUT /workspaces/{id}/projects : Update an existing workspace
-     * Update an existing workspace.
-     *
-     * @param id The id of a workspace. (required)
-     * @param workspaceModel  (required)
-     * @return The updated workspace object. (status code 200)
-     */
-    @Operation(
-        operationId = "updateWorkspace",
-        summary = "Update an existing workspace",
-        description = "Update an existing workspace.",
-        tags = { "workspace" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "The updated workspace object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = WorkspaceModel.class))
-            })
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.PUT,
-        value = "/workspaces/{id}/projects",
-        produces = { "application/json" },
-        consumes = { "application/json" }
-    )
-    
-    default ResponseEntity<WorkspaceModel> updateWorkspace(
-        @Parameter(name = "id", description = "The id of a workspace.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "WorkspaceModel", description = "", required = true) @Valid @RequestBody WorkspaceModel workspaceModel
-    ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : 0 }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

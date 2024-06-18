@@ -30,7 +30,7 @@ val generateOpenAPITypeScriptFetch by tasks.registering(org.openapitools.generat
     generatorName.set("typescript-fetch")
     inputSpec.set("$projectDir/openapi.yaml")
     modelNameSuffix.set("Model")
-    outputDir.set("$rootDir/client/src/shared/middleware/ee/automation/configuration")
+    outputDir.set("$rootDir/client/src/ee/shared/middleware/automation/configuration")
     typeMappings.set(
         mapOf(
             "DateTime" to "Date"
