@@ -16,13 +16,16 @@ describe('PropertyInput', async () => {
                 type="email"
             />
         );
+
         expect(screen.getByText('Email Address')).toBeInTheDocument();
+
         expect(
             screen.getByRole('textbox', {
                 name: /email address/i,
             })
         ).toBeInTheDocument();
     });
+
     it('should change input value', async () => {
         render(
             <PropertyInput
@@ -46,6 +49,7 @@ describe('PropertyInput', async () => {
 
         expect(input).toHaveValue('foo@bar.com');
     });
+
     it('should render the input with error', () => {
         render(
             <PropertyInput
@@ -57,13 +61,16 @@ describe('PropertyInput', async () => {
                 type="email"
             />
         );
+
         expect(
             screen.getByRole('textbox', {
                 name: /email address/i,
             })
         ).toBeInTheDocument();
+
         expect(screen.getByRole('alert')).toHaveTextContent('This field is required');
     });
+
     it('should render the asterisk if input is required', () => {
         render(
             <PropertyInput
@@ -76,7 +83,9 @@ describe('PropertyInput', async () => {
                 type="email"
             />
         );
+
         expect(screen.getByText('Email Address')).toBeInTheDocument();
+
         expect(screen.getByText('*')).toBeInTheDocument();
     });
 });
