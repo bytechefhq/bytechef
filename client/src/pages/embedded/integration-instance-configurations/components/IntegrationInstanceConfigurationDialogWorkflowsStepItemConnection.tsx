@@ -10,8 +10,8 @@ import {
     useGetConnectionsQuery,
 } from '@/shared/queries/embedded/connections.queries';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
+import {PlusIcon} from '@radix-ui/react-icons';
 import * as Portal from '@radix-ui/react-portal';
-import {PlusIcon} from 'lucide-react';
 import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 

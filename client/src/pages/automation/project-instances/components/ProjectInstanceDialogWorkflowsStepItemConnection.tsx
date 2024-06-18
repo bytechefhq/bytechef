@@ -11,8 +11,8 @@ import {
     useGetWorkspaceConnectionsQuery,
 } from '@/shared/queries/automation/connections.queries';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
+import {PlusIcon} from '@radix-ui/react-icons';
 import * as Portal from '@radix-ui/react-portal';
-import {PlusIcon} from 'lucide-react';
 import {useState} from 'react';
 import {Control} from 'react-hook-form';
 import InlineSVG from 'react-inlinesvg';

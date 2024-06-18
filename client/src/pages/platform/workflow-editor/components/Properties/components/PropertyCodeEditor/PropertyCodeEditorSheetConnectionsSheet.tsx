@@ -28,10 +28,10 @@ import {
 } from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {WorkflowDefinitionType, WorkflowTaskType} from '@/shared/types';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {Cross2Icon} from '@radix-ui/react-icons';
+import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
 import {useQueryClient} from '@tanstack/react-query';
-import {LinkIcon, PlusIcon} from 'lucide-react';
+import {LinkIcon} from 'lucide-react';
 import {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';

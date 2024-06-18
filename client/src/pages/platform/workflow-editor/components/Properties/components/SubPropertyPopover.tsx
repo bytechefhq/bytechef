@@ -1,8 +1,9 @@
 import {Button} from '@/components/ui/button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
+import {PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
-import {PlusIcon, XIcon} from 'lucide-react';
+import {XIcon} from 'lucide-react';
 
 import PropertyInput from './PropertyInput/PropertyInput';
 import PropertySelect from './PropertySelect';
