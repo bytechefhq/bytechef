@@ -83,19 +83,14 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
                             );
 
                             return (
-                                <li
-                                    className="flex items-center justify-between rounded-md px-2 py-1 hover:bg-gray-50"
+                                <ProjectWorkflowListItem
+                                    filteredComponentNames={filteredComponentNames}
                                     key={workflow.id}
-                                >
-                                    <ProjectWorkflowListItem
-                                        filteredComponentNames={filteredComponentNames}
-                                        key={workflow.id}
-                                        project={project}
-                                        workflow={workflow}
-                                        workflowComponentDefinitions={workflowComponentDefinitions}
-                                        workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
-                                    />
-                                </li>
+                                    project={project}
+                                    workflow={workflow}
+                                    workflowComponentDefinitions={workflowComponentDefinitions}
+                                    workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                                />
                             );
                         })}
             </ul>

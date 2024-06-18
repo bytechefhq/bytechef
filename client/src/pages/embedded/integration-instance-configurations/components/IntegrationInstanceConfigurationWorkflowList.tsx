@@ -98,28 +98,21 @@ const IntegrationInstanceConfigurationWorkflowList = ({
                                         integrationInstanceConfigurationWorkflow.workflowId === workflow?.id
                                 );
 
+                            if (!integrationInstanceConfigurationWorkflow) {
+                                return <></>;
+                            }
+
                             return (
-                                <li
-                                    className="flex items-center justify-between rounded-md px-2 py-1 hover:bg-gray-50"
+                                <IntegrationInstanceConfigurationWorkflowListItem
+                                    filteredComponentNames={filteredComponentNames}
+                                    integrationInstanceConfigurationEnabled={integrationInstanceConfigurationEnabled}
+                                    integrationInstanceConfigurationId={integrationInstanceConfigurationId}
+                                    integrationInstanceConfigurationWorkflow={integrationInstanceConfigurationWorkflow}
                                     key={workflow.id}
-                                >
-                                    {integrationInstanceConfigurationWorkflow && (
-                                        <IntegrationInstanceConfigurationWorkflowListItem
-                                            filteredComponentNames={filteredComponentNames}
-                                            integrationInstanceConfigurationEnabled={
-                                                integrationInstanceConfigurationEnabled
-                                            }
-                                            integrationInstanceConfigurationId={integrationInstanceConfigurationId}
-                                            integrationInstanceConfigurationWorkflow={
-                                                integrationInstanceConfigurationWorkflow
-                                            }
-                                            key={workflow.id}
-                                            workflow={workflow}
-                                            workflowComponentDefinitions={workflowComponentDefinitions}
-                                            workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
-                                        />
-                                    )}
-                                </li>
+                                    workflow={workflow}
+                                    workflowComponentDefinitions={workflowComponentDefinitions}
+                                    workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                                />
                             );
                         })}
             </ul>

@@ -78,7 +78,7 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
     };
 
     return (
-        <>
+        <li className="flex items-center justify-between rounded-md px-2 py-1 hover:bg-gray-50" key={workflow.id}>
             <div
                 className={twMerge(
                     'w-96 text-sm font-semibold',
@@ -259,7 +259,7 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
                     workflow={workflow}
                 />
             )}
-        </>
+        </li>
     );
 };
 

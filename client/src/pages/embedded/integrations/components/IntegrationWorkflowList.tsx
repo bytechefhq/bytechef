@@ -104,19 +104,14 @@ const IntegrationWorkflowList = ({integration}: {integration: IntegrationModel})
                                 );
 
                                 return (
-                                    <li
-                                        className="flex items-center justify-between rounded-md px-2 py-1 hover:bg-gray-50"
+                                    <IntegrationWorkflowListItem
+                                        filteredComponentNames={filteredComponentNames}
+                                        integration={integration}
                                         key={workflow.id}
-                                    >
-                                        <IntegrationWorkflowListItem
-                                            filteredComponentNames={filteredComponentNames}
-                                            integration={integration}
-                                            key={workflow.id}
-                                            workflow={workflow}
-                                            workflowComponentDefinitions={workflowComponentDefinitions}
-                                            workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
-                                        />
-                                    </li>
+                                        workflow={workflow}
+                                        workflowComponentDefinitions={workflowComponentDefinitions}
+                                        workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                                    />
                                 );
                             })}
                     </ul>
