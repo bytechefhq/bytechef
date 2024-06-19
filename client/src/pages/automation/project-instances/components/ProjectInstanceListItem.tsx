@@ -159,9 +159,11 @@ const ProjectInstanceListItem = ({projectInstance, remainingTags}: ProjectInstan
                             </Tooltip>
                         </div>
 
-                        <Switch checked={projectInstance.enabled} onCheckedChange={handleOnCheckedChange} />
-
-                        <div className="w-5"></div>
+                        <Switch
+                            checked={projectInstance.enabled}
+                            className="mr-11"
+                            onCheckedChange={handleOnCheckedChange}
+                        />
 
                         <ProjectInstanceListItemDropdownMenu
                             onDeleteClick={() => setShowDeleteDialog(true)}
