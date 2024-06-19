@@ -34,36 +34,39 @@ import com.bytechef.component.definition.Parameters;
 /**
  * @author Ivica Cardic
  */
-public class DataMapperMapObjectsToListAction {
+public class DataMapperMapObjectsToArrayAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL.action("mapObjectsToList")
-        .title("Map objects to list")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL.action("mapObjectsToArray")
+        .title("Map objects to array")
         .description("Transform an object or array of objects into an array of key-value pairs.")
         .properties(
             integer(TYPE)
                 .label("Type")
-                .description("The value type.")
+                .description("Type of the input. Cam be an object or an array of objects.")
                 .options(
                     option("Object", 1),
                     option("Array", 2)),
             object(INPUT)
                 .label("Input")
-                .description("The object containing one or more properties.")
+                .description("An input object containing one or more properties.")
                 .displayCondition("type == 1")
                 .required(true),
             array(INPUT)
                 .label("Input")
-                .description("The array containing one or more properties.")
-                .displayCondition("type == 1")
+                .description("An input array containing one or more objects.")
+                .displayCondition("type == 2")
+                .items(object())
                 .required(true),
             string(FIELD_KEY)
                 .label("Field key")
-                .description("The key name to which keys should be mapped."),
+                .description(
+                    "Property key of each newly created object in the array. Its property value will be a property key from the input."),
             string(VALUE_KEY)
                 .label("Value key")
-                .description("The key name to which values should be mapped."))
+                .description(
+                    "Property key of each newly created object in the array. Its property value will be a property value from the input."))
         .output()
-        .perform(DataMapperMapObjectsToListAction::perform);
+        .perform(DataMapperMapObjectsToArrayAction::perform);
 
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {

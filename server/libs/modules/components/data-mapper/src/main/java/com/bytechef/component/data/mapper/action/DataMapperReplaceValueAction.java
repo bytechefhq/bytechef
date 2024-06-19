@@ -42,15 +42,15 @@ import com.bytechef.component.definition.Parameters;
 /**
  * @author Ivica Cardic
  */
-public class DataMapperMapOneValueAction {
+public class DataMapperReplaceValueAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL.action("mapOneValue")
-        .title("Map one value")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL.action("replaceValue")
+        .title("Replace value")
         .description(
-            "The action maps a given value by matching it with the defined mappings, and it returns the outcome of the mapping. In case there is no mapping specified for the value, it returns the default value, and if there is no default defined, it returns null.")
+            "Replaces a given value with the specified value defined in mappings. In case there is no mapping specified for the value, it returns the default value, and if there is no default defined, it returns null.")
         .properties(
             integer(TYPE)
-                .label("Value Type")
+                .label("Value type")
                 .description("The value type.")
                 .options(
                     option("Array", 1),
@@ -65,195 +65,121 @@ public class DataMapperMapOneValueAction {
                     option("Time", 10)),
             array(VALUE)
                 .label("Value")
-                .description("The value you want to map.")
+                .description("The value you want to replace.")
                 .displayCondition("type == 1")
                 .required(true),
             bool(VALUE)
                 .label("Value")
-                .description("The value you want to map.")
+                .description("The value you want to replace.")
                 .displayCondition("type == 2")
                 .required(true),
             date(VALUE)
                 .label("Value")
-                .description("The value you want to map.")
+                .description("The value you want to replace.")
                 .displayCondition("type == 3")
                 .required(true),
             dateTime(VALUE)
                 .label("Value")
-                .description("The value you want to map.")
+                .description("The value you want to replace.")
                 .displayCondition("type == 4")
                 .required(true),
             integer(VALUE)
                 .label("Value")
-                .description("The value you want to map.")
+                .description("The value you want to replace.")
                 .displayCondition("type == 5")
                 .required(true),
             nullable(VALUE)
                 .label("Value")
-                .description("The value you want to map.")
+                .description("The value you want to replace.")
                 .displayCondition("type == 6")
                 .required(true),
             number(VALUE)
                 .label("Value")
-                .description("The value you want to map.")
+                .description("The value you want to replace.")
                 .displayCondition("type == 7")
                 .required(true),
             object(VALUE)
                 .label("Value")
-                .description("The value you want to map.")
+                .description("The value you want to replace.")
                 .displayCondition("type == 8")
                 .additionalProperties(
                     array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
                 .required(true),
             string(VALUE)
                 .label("Value")
-                .description("The value you want to map.")
+                .description("The value you want to replace.")
                 .displayCondition("type == 9")
                 .required(true),
             time(VALUE)
                 .label("Value")
-                .description("The value you want to map.")
+                .description("The value you want to replace.")
                 .displayCondition("type == 10")
                 .required(true),
             array(DEFAULT_VALUE)
                 .label("Default value")
-                .description("If there is no existing mapping, assign this value a default mapping.")
+                .description("If there is no existing mapping, assign this value as default.")
                 .displayCondition("type == 1")
                 .required(true),
             bool(DEFAULT_VALUE)
                 .label("Default value")
-                .description("If there is no existing mapping, assign this value a default mapping.")
+                .description("If there is no existing mapping, assign this value as default.")
                 .displayCondition("type == 2")
                 .required(true),
             date(DEFAULT_VALUE)
                 .label("Default value")
-                .description("If there is no existing mapping, assign this value a default mapping.")
+                .description("If there is no existing mapping, assign this value as default.")
                 .displayCondition("type == 3")
                 .required(true),
             dateTime(DEFAULT_VALUE)
                 .label("Default value")
-                .description("If there is no existing mapping, assign this value a default mapping.")
+                .description("If there is no existing mapping, assign this value as default.")
                 .displayCondition("type == 4")
                 .required(true),
             integer(DEFAULT_VALUE)
                 .label("Default value")
-                .description("If there is no existing mapping, assign this value a default mapping.")
+                .description("If there is no existing mapping, assign this value as default.")
                 .displayCondition("type == 5")
                 .required(true),
             nullable(DEFAULT_VALUE)
                 .label("Default value")
-                .description("If there is no existing mapping, assign this value a default mapping.")
+                .description("If there is no existing mapping, assign this value as default.")
                 .displayCondition("type == 6")
                 .required(true),
             number(DEFAULT_VALUE)
                 .label("Default value")
-                .description("If there is no existing mapping, assign this value a default mapping.")
+                .description("If there is no existing mapping, assign this value as default.")
                 .displayCondition("type == 7")
                 .required(true),
             object(DEFAULT_VALUE)
                 .label("Default value")
-                .description("If there is no existing mapping, assign this value a default mapping.")
+                .description("If there is no existing mapping, assign this value as default.")
                 .displayCondition("type == 8")
                 .required(true),
             string(DEFAULT_VALUE)
                 .label("Default value")
-                .description("If there is no existing mapping, assign this value a default mapping.")
+                .description("If there is no existing mapping, assign this value as default.")
                 .displayCondition("type == 9")
                 .required(true),
             time(DEFAULT_VALUE)
                 .label("Default value")
-                .description("If there is no existing mapping, assign this value a default mapping.")
+                .description("If there is no existing mapping, assign this value as default.")
                 .displayCondition("type == 10")
                 .required(true),
             array(MAPPINGS)
                 .label("Mappings")
                 .description(
-                    "The collection of \"mappings\" associated with a certain value. When the specified value matches the \"From\" value, the connector will provide the corresponding \"To\" value.")
+                    "An array of objects that contains properties 'from' and 'to'.")
                 .items(
                     object().properties(
-                        array(FROM)
-                            .label("From")
-                            .displayCondition("type == 1")
-                            .required(true),
-                        bool(FROM)
-                            .label("From")
-                            .displayCondition("type == 2")
-                            .required(true),
-                        date(FROM)
-                            .label("From")
-                            .displayCondition("type == 3")
-                            .required(true),
-                        dateTime(FROM)
-                            .label("From")
-                            .displayCondition("type == 4")
-                            .required(true),
-                        integer(FROM)
-                            .label("From")
-                            .displayCondition("type == 5")
-                            .required(true),
-                        nullable(FROM)
-                            .label("From")
-                            .displayCondition("type == 6")
-                            .required(true),
-                        number(FROM)
-                            .label("From")
-                            .displayCondition("type == 7")
-                            .required(true),
                         object(FROM)
-                            .label("From")
-                            .displayCondition("type == 8")
-                            .required(true),
-                        string(FROM)
-                            .label("From")
-                            .displayCondition("type == 9")
-                            .required(true),
-                        time(FROM)
-                            .label("From")
-                            .displayCondition("type == 10")
-                            .required(true),
-                        array(TO)
-                            .label("To")
-                            .displayCondition("type == 1")
-                            .required(true),
-                        bool(TO)
-                            .label("To")
-                            .displayCondition("type == 2")
-                            .required(true),
-                        date(TO)
-                            .label("To")
-                            .displayCondition("type == 3")
-                            .required(true),
-                        dateTime(TO)
-                            .label("To")
-                            .displayCondition("type == 4")
-                            .required(true),
-                        integer(TO)
-                            .label("To")
-                            .displayCondition("type == 5")
-                            .required(true),
-                        nullable(TO)
-                            .label("To")
-                            .displayCondition("type == 6")
-                            .required(true),
-                        number(TO)
-                            .label("To")
-                            .displayCondition("type == 7")
+                            .label("Defines the property value you want to change.")
                             .required(true),
                         object(TO)
-                            .label("To")
-                            .displayCondition("type == 8")
-                            .required(true),
-                        string(TO)
-                            .label("To")
-                            .displayCondition("type == 9")
-                            .required(true),
-                        time(TO)
-                            .label("To")
-                            .displayCondition("type == 10")
+                            .label("Defines what you want to change the property value to")
                             .required(true)))
                 .required(true))
         .output()
-        .perform(DataMapperMapOneValueAction::perform);
+        .perform(DataMapperReplaceValueAction::perform);
 
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
