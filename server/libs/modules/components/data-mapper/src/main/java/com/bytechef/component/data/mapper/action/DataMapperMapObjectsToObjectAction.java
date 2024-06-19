@@ -22,7 +22,7 @@ import static com.bytechef.component.data.mapper.constant.DataMapperConstants.IN
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INCLUDE_UNMAPPED;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INPUT;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.MAPPINGS;
-import static com.bytechef.component.data.mapper.constant.DataMapperConstants.REQUIRED_FIELDS;
+import static com.bytechef.component.data.mapper.constant.DataMapperConstants.REQUIRED_FIELD;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.TO;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.TYPE;
 import static com.bytechef.component.definition.ComponentDSL.array;
@@ -40,58 +40,63 @@ import com.bytechef.component.definition.Parameters;
 /**
  * @author Ivica Cardic
  */
-public class DataMapperMapObjectsAction {
+public class DataMapperMapObjectsToObjectAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL.action("mapObjects")
-        .title("Map objects")
-        .description("Transform the fields of an object and assign them new keys.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL.action("mapObjectsToObject")
+        .title("Map objects to object")
+        .description("Creates a new object with the chosen input properties. You can also rename the property keys.")
         .properties(
             integer(TYPE)
                 .label("Type")
-                .description("The value type.")
+                .description("The input type.")
                 .options(
                     option("Object", 1),
                     option("Array", 2)),
             object(INPUT)
                 .label("Input")
-                .description("The object containing one or more properties.")
+                .description("An object containing one or more properties.")
                 .displayCondition("type == 1")
                 .required(true),
             array(INPUT)
                 .label("Input")
-                .description("The array containing one or more properties.")
+                .description("An array containing one or more objects.")
                 .displayCondition("type == 2")
+                .items(object())
                 .required(true),
             array(MAPPINGS)
                 .label("Mapping")
                 .description(
-                    "The collection of of \"mappings\"  where the \"From\" key as the key and the value as the key that needs mapping. For nested keys, it supports dot notation, where the new mapped path can be used for nested mapping.")
+                    "An array of objects that contains properties 'from', 'to' and 'requiredField'. For nested keys, it supports dot notation, where the new mapped path can be used for nested mapping.")
                 .items(
                     object()
                         .properties(
                             string(FROM)
-                                .label("From"),
+                                .label("From")
+                                .description(
+                                    "Name of the input property key that you want to put in the newly created object."),
                             string(TO)
-                                .label("To")))
+                                .label("To")
+                                .description("Name of the property key in the newly created object."),
+                            bool(REQUIRED_FIELD)
+                                .label("Required field")
+                                .description("Does the property require a value?")
+                                .defaultValue(false)))
                 .required(true),
             bool(INCLUDE_UNMAPPED)
                 .label("Include Unmapped")
-                .description("Should fields from the original object that do not have mappings be included?")
-                .defaultValue(true),
+                .description(
+                    "Should fields from the original object that do not have mappings be included in the new object?")
+                .defaultValue(false),
             bool(INCLUDE_NULLS)
                 .label("Include Nulls")
-                .description("Should fields that have null values be included?")
+                .description("Should fields that have null values be included in the new object?")
                 .defaultValue(true),
             bool(INCLUDE_EMPTY_STRINGS)
                 .label("Include empty strings")
-                .description("Should fields with empty string values be included?")
-                .defaultValue(true),
-            array(REQUIRED_FIELDS)
-                .label("Required fields")
-                .description("A list of fields that are required on the mapped object.")
-                .items(string()))
+                .description("Should fields with empty string values be included in the new object?")
+                .defaultValue(true))
         .output()
-        .perform(DataMapperMapObjectsAction::perform);
+        .perform(DataMapperMapObjectsToObjectAction::perform);
 
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {

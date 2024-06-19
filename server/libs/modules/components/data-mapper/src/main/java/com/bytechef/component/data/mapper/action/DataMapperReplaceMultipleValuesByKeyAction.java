@@ -19,10 +19,10 @@ package com.bytechef.component.data.mapper.action;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.FROM;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INPUT;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.MAPPINGS;
+import static com.bytechef.component.data.mapper.constant.DataMapperConstants.OUTPUT;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.TO;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL;
@@ -32,31 +32,38 @@ import com.bytechef.component.definition.Parameters;
 /**
  * @author Ivica Cardic
  */
-public class DataMapperMapKeysAction {
+public class DataMapperReplaceMultipleValuesByKeyAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL.action("mapKeys")
-        .title("Map Keys")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL.action("replaceMultipleValuesByKey")
+        .title("Replace multiple values by key")
         .description(
-            "The action maps values of a given object to fresh keys and returns a new object containing those newly mapped keys.")
+            "Replaces all values specified by the keys in the input object with the values specified by keys in the output object.")
         .properties(
             object(INPUT)
                 .label("Input")
-                .description("Object containing one or more properties.")
+                .description("An object containing one or more properties.")
+                .required(true),
+            object(OUTPUT)
+                .label("Output")
+                .description("An object containing one or more properties.")
                 .required(true),
             array(MAPPINGS)
                 .label("Mappings")
                 .description(
-                    "The collection of of \"mappings\" where \"From\" refers to a particular key from the Input, while \"To\" represents the name of a new key that is assigned the corresponding value of the \"From\" key.")
+                    "Object that contains properties 'from' and 'to'.")
                 .items(
                     object()
                         .properties(
-                            string(FROM)
-                                .label("From"),
-                            string(TO)
-                                .label("To")))
+                            object(FROM)
+                                .label("From")
+                                .description("Defines the input property key of the value you want to change."),
+                            object(TO)
+                                .label("To")
+                                .description(
+                                    "Defines the output property key of the value you want to change the input value to.")))
                 .required(true))
         .output()
-        .perform(DataMapperMapKeysAction::perform);
+        .perform(DataMapperReplaceMultipleValuesByKeyAction::perform);
 
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {

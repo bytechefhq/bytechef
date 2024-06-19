@@ -19,7 +19,7 @@ package com.bytechef.component.data.mapper.action;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.FIELD_KEY;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.FIELD_VALUE;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INPUT;
-import static com.bytechef.component.definition.ComponentDSL.array;
+import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ActionContext;
@@ -30,31 +30,32 @@ import com.bytechef.component.definition.Parameters;
 /**
  * @author Ivica Cardic
  */
-public class DataMapperMapListToObjectAction {
+public class DataMapperMergeAndPivotByKeyAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL.action("mapListToObject")
-        .title("Map list to object")
-        .description("Map an array of key value objects to a single object.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL
+        .action("mergeAndPivotPropertiesByKey")
+        .title("Merge and pivot properties by key")
+        .description(
+            "Creates a new object that has the specified field key as kay and an object as value. The object in the value has all properties defined in the input field that have the specified field key. Each one of those input values becomes a property key with the specified field value as property value.")
         .properties(
-            array(INPUT)
+            object(INPUT)
                 .label("Input")
-                .description("An array of key value objects.")
+                .description("The input object that contains property keys and values.")
                 .required(true),
             string(FIELD_KEY)
                 .label("Field Key")
-                .description("The value's key will serve as the key in the newly created object.")
+                .description("The key of the newly created object.")
                 .required(true),
             string(FIELD_VALUE)
-                .label("Field Key")
-                .description("The value of the key will become the value in the new object.")
+                .label("Field Value")
+                .description("The value of each property in the newly created objects value.")
                 .required(true))
         .output()
-        .perform(DataMapperMapListToObjectAction::perform);
+        .perform(DataMapperMergeAndPivotByKeyAction::perform);
 
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        // TODO
         return null;
     }
 }
