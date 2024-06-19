@@ -246,7 +246,7 @@ export const Connections = () => {
                                 useGetConnectionTagsQuery={useGetConnectionTagsQuery}
                             />
                         }
-                        icon={<Link2Icon className="size-12 text-gray-400" />}
+                        icon={<Link2Icon className="size-24 text-gray-300" />}
                         message="You do not have any Connections created yet."
                         title="No Connections"
                     />

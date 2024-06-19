@@ -248,7 +248,7 @@ const Project = () => {
     return (
         <>
             <LayoutContainer
-                className="bg-muted dark:bg-background"
+                className="border-l bg-muted dark:bg-background"
                 leftSidebarOpen={false}
                 rightSidebarBody={
                     componentDefinitions &&

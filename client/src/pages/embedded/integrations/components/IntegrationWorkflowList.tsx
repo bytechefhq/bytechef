@@ -127,7 +127,7 @@ const IntegrationWorkflowList = ({integration}: {integration: IntegrationModel})
                                 useGetWorkflowQuery={useGetWorkflowQuery}
                             />
                         }
-                        icon={<WorkflowIcon className="size-12 text-gray-400" />}
+                        icon={<WorkflowIcon className="size-24 text-gray-300" />}
                         message="Get started by creating a new workflow."
                         title="No Workflows"
                     />

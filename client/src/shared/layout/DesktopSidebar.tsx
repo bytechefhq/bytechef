@@ -20,7 +20,7 @@ export function DesktopSidebar({
     }[];
 }) {
     return (
-        <aside className={twMerge('hidden border-r bg-muted lg:flex lg:shrink-0', className)}>
+        <aside className={twMerge('hidden bg-muted lg:flex lg:shrink-0', className)}>
             <div className="flex w-[56px]">
                 <div className="flex min-h-0 flex-1 flex-col">
                     <div className="flex-1">

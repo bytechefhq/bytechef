@@ -186,7 +186,7 @@ const Projects = () => {
                                 triggerNode={<Button>Create Project</Button>}
                             />
                         }
-                        icon={<FolderIcon className="size-12 text-gray-400" />}
+                        icon={<FolderIcon className="size-24 text-gray-300" />}
                         message="Get started by creating a new project."
                         title="No Projects"
                     />

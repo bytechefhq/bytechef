@@ -427,7 +427,7 @@ export const WorkflowExecutions = () => {
                     <WorkflowExecutionsTable data={workflowExecutions} />
                 ) : (
                     <EmptyList
-                        icon={<ActivityIcon className="size-12 text-gray-400" />}
+                        icon={<ActivityIcon className="size-24 text-gray-300" />}
                         message={emptyListMessage}
                         title="No Executed Workflows"
                     />
