@@ -3,7 +3,7 @@ import {useGetWorkflowExecutionQuery} from '@/shared/queries/automation/workflow
 
 import useWorkflowExecutionSheetStore from '../stores/useWorkflowExecutionSheetStore';
 import WorkflowExecutionAccordion from './WorkflowExecutionAccordion';
-import WorkflowExecutionSheetPanel from './WorkflowExecutionSheetPanel';
+import WorkflowExecutionWorkflowPanel from './WorkflowExecutionWorkflowPanel';
 
 const WorkflowExecutionSheet = () => {
     const {setWorkflowExecutionDetailsSheetOpen, workflowExecutionDetailsSheetOpen, workflowExecutionId} =
@@ -33,7 +33,7 @@ const WorkflowExecutionSheet = () => {
                     )}
                 </div>
 
-                {workflowExecution && <WorkflowExecutionSheetPanel workflowExecution={workflowExecution} />}
+                {workflowExecution && <WorkflowExecutionWorkflowPanel workflowExecution={workflowExecution} />}
             </SheetContent>
         </Sheet>
     );
