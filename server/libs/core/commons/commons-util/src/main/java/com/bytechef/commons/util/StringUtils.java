@@ -16,15 +16,13 @@
 
 package com.bytechef.commons.util;
 
-import org.apache.commons.lang3.StringUtils;
-
 /**
  * @author Ivica Cardic
  */
-public class SecurityUtils {
+public class StringUtils {
 
     public static String obfuscate(String string, int maxLength, int visibleLength) {
-        if (!StringUtils.isEmpty(string)) {
+        if (!org.apache.commons.lang3.StringUtils.isEmpty(string)) {
             if (string.length() > maxLength) {
                 string = string.substring(0, maxLength);
             }

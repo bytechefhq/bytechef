@@ -19,7 +19,7 @@ package com.bytechef.automation.user.web.rest;
 import com.bytechef.automation.user.web.rest.model.ApiKeyModel;
 import com.bytechef.automation.user.web.rest.model.CreateApiKey200ResponseModel;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.SecurityUtils;
+import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.user.domain.ApiKey;
@@ -96,6 +96,6 @@ public class ApiKeyApiController implements ApiKeyApi {
     }
 
     private static String obfuscate(String secretKey) {
-        return SecurityUtils.obfuscate(secretKey, 28, 4);
+        return StringUtils.obfuscate(secretKey, 28, 4);
     }
 }
