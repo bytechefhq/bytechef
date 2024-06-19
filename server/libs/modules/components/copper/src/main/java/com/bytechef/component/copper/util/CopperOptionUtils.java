@@ -58,12 +58,22 @@ public class CopperOptionUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 
-        Map<String, ArrayList<Map<String, Object>>> body =
-            context
-                .http(http -> http.get(BASE_URL + "/activity_types"))
-                .configuration(Http.responseType(Http.ResponseType.JSON))
-                .execute()
-                .getBody(new TypeReference<>() {});
+        Map<String, ArrayList<Map<String, Object>>> body = null;
+
+        Http.Response response = context
+            .http(http -> http.get(BASE_URL + "/activity_types"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute();
+
+        try {
+            body = response.getBody(new TypeReference<>() {});
+        } catch (Exception e){
+            Map<String, Object> badRequestBody = (Map<String, Object>) response.getBody();
+            String message = (String) badRequestBody.get("message");
+            Integer code = (Integer) badRequestBody.get("status");
+
+            throw ProviderException.fromHttpResponseCode(code, message);
+        }
 
         List<Option<String>> options = new ArrayList<>();
 
