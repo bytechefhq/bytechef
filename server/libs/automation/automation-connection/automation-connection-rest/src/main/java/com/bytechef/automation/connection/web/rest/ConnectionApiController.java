@@ -18,7 +18,7 @@ package com.bytechef.automation.connection.web.rest;
 
 import com.bytechef.automation.connection.facade.WorkspaceConnectionFacade;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.commons.util.SecurityUtils;
+import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
@@ -122,7 +122,7 @@ public class ConnectionApiController implements ConnectionApi {
             MapUtils.toMap(
                 connectionModel.getAuthorizationParameters(),
                 Map.Entry::getKey,
-                entry -> SecurityUtils.obfuscate(toString(entry.getValue()), 28, 8)));
+                entry -> StringUtils.obfuscate(toString(entry.getValue()), 28, 8)));
 
         return Validate.notNull(connectionModel, "connectionModel")
             .parameters(null);
