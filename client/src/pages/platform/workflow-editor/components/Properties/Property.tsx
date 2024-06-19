@@ -435,13 +435,19 @@ const Property = ({
 
         setPropertyParameterValue(value);
 
+        let actualValue: string | boolean | null = type === 'BOOLEAN' ? value === 'true' : value;
+
+        if (value === 'null') {
+            actualValue = null;
+        }
+
         saveProperty({
             currentComponent,
             path,
             setCurrentComponent,
             type,
             updateWorkflowNodeParameterMutation,
-            value: type === 'BOOLEAN' ? value === 'true' : value,
+            value: actualValue,
             workflowId: workflow.id,
         });
     };
