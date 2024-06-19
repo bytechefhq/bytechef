@@ -34,8 +34,6 @@ public interface ComponentDefinition {
     Optional<List<? extends ActionDefinition>> getActions();
 
     /**
-     * TODO
-     *
      * @return
      */
     Optional<List<ComponentCategory>> getCategories();
