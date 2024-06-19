@@ -803,7 +803,7 @@ paths:
           in: "query"
           required: false
           schema:
-            $ref: '#/components/schemas/Environment'
+            $ref: "#/components/schemas/Environment"
         - name: "projectId"
           description: "The project ids used for filtering project instances."
           in: "query"

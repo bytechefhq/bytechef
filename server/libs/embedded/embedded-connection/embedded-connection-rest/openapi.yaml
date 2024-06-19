@@ -31,6 +31,12 @@ paths:
         required: false
         schema:
           type: "integer"
+      - name: "environment"
+        description: "The environment."
+        in: "query"
+        required: false
+        schema:
+          $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/ConnectionEnvironment"
       - name: "tagId"
         description: "The tag id of used for filtering connections."
         in: "query"

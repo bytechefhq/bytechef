@@ -17,6 +17,12 @@ paths:
       - "workflow-execution"
       operationId: "getWorkflowExecutionsPage"
       parameters:
+      - name: "environment"
+        description: "The environment."
+        in: "query"
+        required: false
+        schema:
+          $ref: "#/components/schemas/Environment"
       - name: "jobStatus"
         description: "The status of an executed job"
         in: "query"
@@ -102,6 +108,12 @@ paths:
                 $ref: "#/components/schemas/WorkflowExecution"
 components:
   schemas:
+    Environment:
+      description: "The environment of a project."
+      type: "string"
+      enum:
+        - "TEST"
+        - "PRODUCTION"
     Page:
       description: "A sublist of a list of objects. It allows gain information about\
         \ the position of it in the containing entire list."

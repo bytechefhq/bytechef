@@ -40,11 +40,8 @@ components:
       description: "The environment of an integration."
       type: "string"
       enum:
-        - "test"
-        - "production"
-      x-enum-varnames:
-        - "test"
-        - "production"
+        - "TEST"
+        - "PRODUCTION"
     Integration:
       description: "A group of workflows that make one logical integration."
       type: "object"
