@@ -1,3 +1,5 @@
+import defaultEdges from '@/shared/defaultEdges';
+import defaultNodes from '@/shared/defaultNodes';
 import {
     ActionDefinitionBasicModel,
     ComponentDefinitionBasicModel,
@@ -13,12 +15,10 @@ import ReactFlow, {Controls, Edge, MiniMap, Node, useReactFlow, useStore} from '
 
 import PlaceholderEdge from '../edges/PlaceholderEdge';
 import WorkflowEdge from '../edges/WorkflowEdge';
-import defaultEdges from '../edges/defaultEdges';
 import useHandleDrop from '../hooks/useHandleDrop';
 import useLayout from '../hooks/useLayout';
 import PlaceholderNode from '../nodes/PlaceholderNode';
 import WorkflowNode from '../nodes/WorkflowNode';
-import defaultNodes from '../nodes/defaultNodes';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 

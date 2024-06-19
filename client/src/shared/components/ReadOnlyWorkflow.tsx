@@ -1,4 +1,4 @@
-import defaultNodes from '@/pages/platform/workflow-editor/nodes/defaultNodes';
+import defaultNodes from '@/shared/defaultNodes';
 import {ComponentIcon} from 'lucide-react';
 import {useMemo} from 'react';
 import InlineSVG from 'react-inlinesvg';
