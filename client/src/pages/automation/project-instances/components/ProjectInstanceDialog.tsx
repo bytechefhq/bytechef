@@ -130,7 +130,7 @@ const ProjectInstanceDialog = ({
         },
     ];
 
-    function closeDialog() {
+    const closeDialog = () => {
         setIsOpen(false);
 
         setTimeout(() => {
@@ -147,9 +147,13 @@ const ProjectInstanceDialog = ({
 
             resetWorkflowsEnabledStore();
         }, 300);
-    }
+    };
 
-    function saveProjectInstance(formData: ProjectInstanceModel) {
+    const handleNextClick = () => {
+        setActiveStepIndex(activeStepIndex + 1);
+    };
+
+    const handleSaveClick = (formData: ProjectInstanceModel) => {
         if (!formData) {
             return;
         }
@@ -178,11 +182,7 @@ const ProjectInstanceDialog = ({
                 }),
             });
         }
-    }
-
-    function handleNextClick() {
-        setActiveStepIndex(activeStepIndex + 1);
-    }
+    };
 
     useEffect(() => {
         if (workflows) {
@@ -312,7 +312,7 @@ const ProjectInstanceDialog = ({
                                     </Button>
                                 )}
 
-                                <Button onClick={handleSubmit(saveProjectInstance)}>Save</Button>
+                                <Button onClick={handleSubmit(handleSaveClick)}>Save</Button>
                             </>
                         )}
                     </DialogFooter>

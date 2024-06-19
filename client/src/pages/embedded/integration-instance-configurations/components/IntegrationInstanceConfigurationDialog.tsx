@@ -120,7 +120,7 @@ const IntegrationInstanceConfigurationDialog = ({
         },
     ];
 
-    function closeDialog() {
+    const closeDialog = () => {
         setIsOpen(false);
 
         setTimeout(() => {
@@ -137,9 +137,13 @@ const IntegrationInstanceConfigurationDialog = ({
 
             resetWorkflowsEnabledStore();
         }, 300);
-    }
+    };
 
-    function saveIntegrationInstanceConfiguration(formData: IntegrationInstanceConfigurationModel) {
+    const handleNextClick = () => {
+        setActiveStepIndex(activeStepIndex + 1);
+    };
+
+    const handleSaveClick = (formData: IntegrationInstanceConfigurationModel) => {
         if (!formData) {
             return;
         }
@@ -180,11 +184,7 @@ const IntegrationInstanceConfigurationDialog = ({
                 ),
             });
         }
-    }
-
-    function handleNextClick() {
-        setActiveStepIndex(activeStepIndex + 1);
-    }
+    };
 
     return (
         <Dialog
@@ -262,7 +262,7 @@ const IntegrationInstanceConfigurationDialog = ({
                                     </Button>
                                 )}
 
-                                <Button onClick={handleSubmit(saveIntegrationInstanceConfiguration)}>Save</Button>
+                                <Button onClick={handleSubmit(handleSaveClick)}>Save</Button>
                             </>
                         )}
                     </DialogFooter>
