@@ -1,0 +1,37 @@
+name: Improvement
+description: Create a ByteChef improvement request
+title: "[improve]: "
+labels: [improve]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to write to us! We consider your opinion as valuable guideline for the future.
+  - type: textarea
+    attributes:
+      label: Improvement target
+      description: Provide target (program code, readme file, sample, configuration, usability, productivity) and possible improvement suggestion.
+      placeholder: |
+        User interface view could provide Reset action on Workflow menu
+        Java code in class com.bytechef.service.SeriviceClass is hard to understand
+        If one can configure protocol it could speed up kubernetes integration
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Improvement description
+      description: Improvement details and explanation of benefits. If possible provide link to online docs or article that justify the improvement request.
+      placeholder: |
+        Here is good article with couple additional links with examples of good user experience:
+        ```...```
+        Additional links <Z>
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Observed Version
+      description: "The observed version of ByteChef where improvement was considered"
+      placeholder: "2.3.1"
+    validations:
+      required: true
