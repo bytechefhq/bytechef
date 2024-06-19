@@ -20,10 +20,11 @@ import static com.bytechef.component.data.mapper.constant.DataMapperConstants.FR
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INPUT;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.MAPPINGS;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.TO;
-import static com.bytechef.component.data.mapper.constant.DataMapperConstants.VALUE;
+import static com.bytechef.component.data.mapper.constant.DataMapperConstants.TYPE;
 import static com.bytechef.component.definition.ComponentDSL.array;
+import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDSL.option;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL;
@@ -33,36 +34,46 @@ import com.bytechef.component.definition.Parameters;
 /**
  * @author Ivica Cardic
  */
-public class DataMapperMapMultipleValuesBetweenObjectsAction {
+public class DataMapperReplaceAllSpecifiedValuesAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL
-        .action("mapMultipleValuesBetweenObjects")
-        .title("Map multiple values between objects\n")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL.action("replaceAllSpecifiedValues")
+        .title("Replace all specified values")
         .description(
-            "Transform object properties by assigning new values and generate a new object with updated properties.")
+            "Goes through all object parameters and replaces all specified input parameter values.")
         .properties(
+            integer(TYPE)
+                .label("Type")
+                .description("The input type.")
+                .options(
+                    option("Object", 1),
+                    option("Array", 2)),
             object(INPUT)
                 .label("Input")
-                .description("Object containing one or more properties.")
-                .required(true),
-            object(VALUE)
-                .label("Value")
-                .description("Object containing one or more properties.")
+                .description("An object containing one or more properties.")
+                .displayCondition("type == 1"),
+            array(INPUT)
+                .label("Input")
+                .description("An array containing one or more objects.")
+                .displayCondition("type == 2")
+                .items(object())
                 .required(true),
             array(MAPPINGS)
                 .label("Mappings")
                 .description(
-                    "The collection of of \"mappings\" where \"From\" corresponds to an existing key in the Input, while the key \"To\" is utilized to determine the value to which the \"From\" key should be set, by referring to its key in the Values.")
+                    "Object that contains properties 'from' and 'to'.")
                 .items(
-                    object()
-                        .properties(
-                            string(FROM)
-                                .label("From"),
-                            string(TO)
-                                .label("To")))
+                    object().properties(
+                        object(FROM)
+                            .label("From")
+                            .description("Defines the property value you want to change.")
+                            .required(true),
+                        object(TO)
+                            .label("From")
+                            .description("Defines what you want to change the property value to")
+                            .required(true)))
                 .required(true))
         .output()
-        .perform(DataMapperMapMultipleValuesBetweenObjectsAction::perform);
+        .perform(DataMapperReplaceAllSpecifiedValuesAction::perform);
 
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
