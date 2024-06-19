@@ -167,7 +167,7 @@ bytechef:
     email:
       temp-domains-url: #https://gist.githubusercontent.com/SimonHoiberg/f5a23b1fa3762330c8af1e9090918b63/raw/53963d0dbdd93c594fbc067cee95966156ee066b/temp-email-list.txt
     remember-me:
-      key:
+      key: remember_me
   # Tenant support mode (single | multi - ee only) default: single
   tenant:
     mode: single

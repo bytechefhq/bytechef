@@ -121,6 +121,8 @@ bytechef:
     #        clientSecret: 123456789
     redirect-uri: ${bytechef.public-url}/callback
   public-url: http://127.0.0.1:5173
+    remember-me:
+      key: remember_me
   tenant:
     mode: single
   webhook-url: http://127.0.0.1:7888/webhooks/{id}
