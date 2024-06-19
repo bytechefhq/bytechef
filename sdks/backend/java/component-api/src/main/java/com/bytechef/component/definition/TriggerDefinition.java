@@ -169,8 +169,6 @@ public interface TriggerDefinition {
     TriggerType getType();
 
     /**
-     * TODO
-     *
      * @return
      */
     Optional<Boolean> getWebhookRawBody();
@@ -188,15 +186,11 @@ public interface TriggerDefinition {
     Optional<TriggerWorkflowNodeDescriptionFunction> getWorkflowNodeDescriptionFunction();
 
     /**
-     * TODO
-     *
      * @return
      */
     Optional<Boolean> getWorkflowSyncExecution();
 
     /**
-     * TODO
-     *
      * @return
      */
     Optional<Boolean> getWorkflowSyncValidation();

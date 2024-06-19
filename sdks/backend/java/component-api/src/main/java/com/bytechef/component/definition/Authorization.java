@@ -136,8 +136,6 @@ public interface Authorization {
     Optional<List<? extends Property>> getProperties();
 
     /**
-     * TODO
-     *
      * @return
      */
     Optional<RefreshFunction> getRefresh();
