@@ -1,0 +1,63 @@
+name: Regression report
+description: Report a bug which causes a feature that worked correctly to stop working after a certain event
+title: "[regression]: "
+labels: [regression]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report the problem.
+  - type: textarea
+    attributes:
+      label: Feature, functionality or component that stop working
+      description: Name of component, element in UI, functionality or process that stop working correctly
+      placeholder: |
+        After recent <X>, <Y> doesn't work as expected. Usual and expected way it worked or behaved:
+        ```...```
+        Recent changes modified/disabled/corrupted implementation and this happens:
+        ```...```
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Steps To Reproduce
+      description: Describe steps to reproduce this behaviour, include console / network logs & videos. Good reproduction description speeds up triage and motivate developers to start working on issue.
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+    validations:
+      required: false
+  - type: input
+    id: operableMarker
+    attributes:
+      label: Last Known Working Marker
+      description: "ByteChef version/git-commit-hash/tag/branch without regression"
+      placeholder: "1.10.1"
+    validations:
+      required: true
+  - type: input
+    id: inoperableMarker
+    attributes:
+      label: Marker at which regression starts
+      description: "ByteChef version/git-commit-hash/tag/branch where regression was spotted."
+      placeholder: "416a0098d00ee79f95b58622b2ebe5b4b93a4147"
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: OS
+      description: "The ByteChef host OS and version"
+      placeholder: "e.g. macOS 11, Windows 7/10, Ubuntu 18.04, GCP n2., AWS EC2"
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser
+      description: "The browser used to access user interface. Fill out this if regression harms the user interface"
+      placeholder: "browser, desktop or mobile, os, e.g. firefox 78, desktop, macOS 11"
+    validations:
+      required: false
