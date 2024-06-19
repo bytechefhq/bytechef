@@ -224,8 +224,26 @@ const PropertyComboBox = ({
                             <CommandEmpty>No item found.</CommandEmpty>
 
                             <CommandGroup>
+                                <CommandItem
+                                    className="cursor-pointer hover:bg-muted"
+                                    key="resetOption"
+                                    onSelect={() => {
+                                        setOpen(false);
+
+                                        if (onValueChange) {
+                                            onValueChange('');
+                                        }
+                                    }}
+                                    value=""
+                                >
+                                    <span>Select...</span>
+
+                                    {value === '' && <CheckIcon className="ml-auto size-4" />}
+                                </CommandItem>
+
                                 {(options as Array<ComboBoxItemType>)?.map((option) => (
                                     <CommandItem
+                                        className="cursor-pointer hover:bg-muted"
                                         key={option.value}
                                         onSelect={() => {
                                             setOpen(false);
@@ -242,11 +260,9 @@ const PropertyComboBox = ({
 
                                         {option.description ? (
                                             <div className="flex flex-col gap-1">
-                                                <div>{option.label}</div>
+                                                <span>{option.label}</span>
 
-                                                <div className="text-xs text-muted-foreground">
-                                                    {option.description}
-                                                </div>
+                                                <p className="text-xs text-muted-foreground">{option.description}</p>
                                             </div>
                                         ) : (
                                             <span>{option.label}</span>
