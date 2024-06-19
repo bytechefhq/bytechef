@@ -20,7 +20,7 @@ const formSchema = z.object({
 });
 
 const Login = () => {
-    const {authenticated, getAccount, loading, login, loginError, sessionHasBeenFetched} = useAuthenticationStore();
+    const {authenticated, getAccount, login, loginError, sessionHasBeenFetched} = useAuthenticationStore();
 
     const pageLocation = useLocation();
 
@@ -56,10 +56,6 @@ const Login = () => {
             navigate('/');
         }
     }, [authenticated, navigate]);
-
-    if (loading || !sessionHasBeenFetched) {
-        return <></>;
-    }
 
     const {from} = pageLocation.state || {from: {pathname: '/', search: pageLocation.search}};
 
