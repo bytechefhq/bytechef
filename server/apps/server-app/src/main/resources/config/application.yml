@@ -139,7 +139,9 @@ bytechef:
     provider: simple
   data-storage:
     provider: db
+  # Edition (ce - Community Edition | ee - Enterprise Edition) default: ee
   edition: ee
+  # Encryption key provider (filesystem - the key generated on filesystem) default: filesystem
   encryption:
     provider: filesystem
   file-storage:
