@@ -3,4 +3,4 @@ appVersion: 1.19.0
 description: The ByteChef helm chart for QUBINETS Kubernetes cluster
 name: bytechef
 type: application
-version: 0.1.5
+version: 0.1.6

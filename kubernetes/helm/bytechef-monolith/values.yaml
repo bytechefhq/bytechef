@@ -15,6 +15,7 @@ env:
     SERVER_PORT: 9555
     SPRING_PROFILES_ACTIVE: "dev,docker"
     BYTECHEF_RESOURCES_WEB: "file:///opt/bytechef/client/"
+    BYTECHEF_SECURITY_REMEMBER-ME_KEY: "KEYTOBEREPLACED"
   secret: {}
 
 
