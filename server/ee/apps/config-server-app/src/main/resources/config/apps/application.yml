@@ -99,6 +99,9 @@ spring:
 #####
 
 bytechef:
+  cache:
+    # Cache provider (redis | simple) default: simple
+    provider: redis
   data-storage:
     provider: db
   discovery-service:
@@ -111,6 +114,9 @@ bytechef:
     provider: filesystem
     filesystem:
       basedir: ${user.home}/bytechef/data/file-storage
+  mail:
+    base-url: ${bytechef.public-url}
+    from: noreply@bytechef.io
   message-broker:
     # Messaging provider between Coordinator and Workers (amqp | jms | kafka | redis) default: redis
     provider: redis
@@ -121,8 +127,15 @@ bytechef:
     #        clientSecret: 123456789
     redirect-uri: ${bytechef.public-url}/callback
   public-url: http://127.0.0.1:5173
+  resources:
+    web: file:///opt/bytechef/client
+  security:
+    content-security-policy: "default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:"
+    email:
+      temp-domains-url: #https://gist.githubusercontent.com/SimonHoiberg/f5a23b1fa3762330c8af1e9090918b63/raw/53963d0dbdd93c594fbc067cee95966156ee066b/temp-email-list.txt
     remember-me:
       key: remember_me
+  # Tenant support mode (single | multi - ee only) default: single
   tenant:
     mode: single
   webhook-url: http://127.0.0.1:7888/webhooks/{id}
