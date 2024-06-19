@@ -17,10 +17,12 @@
 package com.bytechef.embedded.workflow.execution.web.rest;
 
 import com.bytechef.atlas.execution.domain.Job.Status;
+import com.bytechef.embedded.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.embedded.workflow.execution.facade.WorkflowExecutionFacade;
 import com.bytechef.embedded.workflow.execution.web.rest.model.WorkflowExecutionBasicModel;
 import com.bytechef.embedded.workflow.execution.web.rest.model.WorkflowExecutionModel;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
+import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import org.springframework.core.convert.ConversionService;
@@ -57,12 +59,14 @@ public class WorkflowExecutionApiController implements WorkflowExecutionApi {
 
     @Override
     public ResponseEntity<Page> getWorkflowExecutionsPage(
-        String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId,
+        EnvironmentModel environment, String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate,
+        Long projectId,
         Long integrationInstanceConfigurationId, String workflowId, Integer pageNumber) {
 
         return ResponseEntity.ok(
             workflowExecutionFacade
                 .getWorkflowExecutions(
+                    environment == null ? null : Environment.valueOf(environment.name()),
                     jobStatus == null ? null : Status.valueOf(jobStatus), jobStartDate, jobEndDate, projectId,
                     integrationInstanceConfigurationId, workflowId, pageNumber)
                 .map(workflowExecutionDTO -> conversionService.convert(

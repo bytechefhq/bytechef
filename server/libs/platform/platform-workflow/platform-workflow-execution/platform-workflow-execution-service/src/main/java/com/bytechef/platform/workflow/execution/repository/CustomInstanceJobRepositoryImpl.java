@@ -42,18 +42,18 @@ public class CustomInstanceJobRepositoryImpl implements CustomInstanceJobReposit
 
     @Override
     public Page<Long> findAllJobIds(
-        Integer status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, int type,
+        Integer status, LocalDateTime startDate, LocalDateTime endDate, List<Long> instanceIds, int type,
         @NonNull List<String> workflowIds, Pageable pageable) {
 
         Page<Long> page;
-        Query query = buildQuery(status, startDate, endDate, instanceId, type, workflowIds, pageable, true);
+        Query query = buildQuery(status, startDate, endDate, instanceIds, type, workflowIds, pageable, true);
 
         Long total = jdbcTemplate.queryForObject(query.query, Long.class, query.arguments);
 
         if (total == null || total == 0) {
             page = Page.empty();
         } else {
-            query = buildQuery(status, startDate, endDate, instanceId, type, workflowIds, pageable, false);
+            query = buildQuery(status, startDate, endDate, instanceIds, type, workflowIds, pageable, false);
 
             List<Long> jobs = jdbcTemplate.query(query.query, (rs, rowNum) -> rs.getLong("job_id"), query.arguments);
 
@@ -64,7 +64,7 @@ public class CustomInstanceJobRepositoryImpl implements CustomInstanceJobReposit
     }
 
     private Query buildQuery(
-        Integer status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, int type,
+        Integer status, LocalDateTime startDate, LocalDateTime endDate, List<Long> instanceIds, int type,
         List<String> workflowIds, Pageable pageable, boolean countQuery) {
 
         String query;
@@ -99,10 +99,9 @@ public class CustomInstanceJobRepositoryImpl implements CustomInstanceJobReposit
             arguments.add(endDate);
         }
 
-        if (instanceId != null) {
-            query += "AND instance_id = ? ";
-
-            arguments.add(instanceId);
+        if (instanceIds != null && !instanceIds.isEmpty()) {
+            query += "AND instance_id IN(%s) ".formatted(
+                String.join(",", CollectionUtils.map(instanceIds, String::valueOf)));
         }
 
         if (!CollectionUtils.isEmpty(workflowIds)) {

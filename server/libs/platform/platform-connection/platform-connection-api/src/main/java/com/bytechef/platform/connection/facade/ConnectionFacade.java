@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.connection.facade;
 
+import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.tag.domain.Tag;
@@ -32,7 +33,9 @@ public interface ConnectionFacade {
 
     ConnectionDTO getConnection(Long id);
 
-    List<ConnectionDTO> getConnections(String componentName, Integer connectionVersion, Long tagId, AppType type);
+    List<ConnectionDTO> getConnections(
+        String componentName, Integer connectionVersion, ConnectionEnvironment connectionEnvironment,
+        Long tagId, AppType type);
 
     List<Tag> getConnectionTags(AppType type);
 

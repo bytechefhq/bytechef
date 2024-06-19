@@ -93,14 +93,14 @@ public class ConnectionServiceIntTest {
         connection = connectionRepository.save(connection);
 
         assertThat(connectionService.getConnection(Validate.notNull(connection.getId(), "id"))).isEqualTo(connection);
-        assertThat(connectionService.getConnections(null, null, tag.getId(), AppType.AUTOMATION)).hasSize(1);
+        assertThat(connectionService.getConnections(null, null, null, tag.getId(), AppType.AUTOMATION)).hasSize(1);
     }
 
     @Test
     public void getGetConnections() {
         connectionRepository.save(getConnection());
 
-        assertThat(connectionService.getConnections(null, null, null, AppType.AUTOMATION)).hasSize(1);
+        assertThat(connectionService.getConnections(null, null, null, null, AppType.AUTOMATION)).hasSize(1);
     }
 
     @Test

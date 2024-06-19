@@ -30,6 +30,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.embedded.configuration.domain.Integration;
 import com.bytechef.embedded.configuration.domain.IntegrationInstance;
+import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
 import com.bytechef.embedded.configuration.dto.WorkflowDTO;
 import com.bytechef.embedded.configuration.facade.IntegrationFacade;
@@ -42,6 +43,7 @@ import com.bytechef.embedded.workflow.execution.dto.WorkflowExecution;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
 import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
 import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
@@ -142,8 +144,8 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
     @Override
     @Transactional(readOnly = true)
     public Page<WorkflowExecution> getWorkflowExecutions(
-        Status jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long integrationId,
-        Long integrationInstanceConfigurationId, String workflowId, int pageNumber) {
+        Environment environment, Status jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate,
+        Long integrationId, Long integrationInstanceConfigurationId, String workflowId, int pageNumber) {
 
         List<String> workflowIds = new ArrayList<>();
 
@@ -161,9 +163,22 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
         if (workflowIds.isEmpty()) {
             return Page.empty();
         } else {
+            List<Long> integrationInstanceConfigurationIds = new ArrayList<>();
+
+            if (integrationInstanceConfigurationId != null) {
+                integrationInstanceConfigurationIds.add(integrationInstanceConfigurationId);
+            } else if (environment != null) {
+                integrationInstanceConfigurationIds.addAll(
+                    integrationInstanceConfigurationService
+                        .getIntegrationInstanceConfigurations(environment, null, null)
+                        .stream()
+                        .map(IntegrationInstanceConfiguration::getId)
+                        .toList());
+            }
+
             Page<Job> jobIdsPage = instanceJobService
                 .getJobIds(
-                    jobStatus, jobStartDate, jobEndDate, integrationInstanceConfigurationId, AppType.EMBEDDED,
+                    jobStatus, jobStartDate, jobEndDate, integrationInstanceConfigurationIds, AppType.EMBEDDED,
                     workflowIds, pageNumber)
                 .map(jobService::getJob);
 

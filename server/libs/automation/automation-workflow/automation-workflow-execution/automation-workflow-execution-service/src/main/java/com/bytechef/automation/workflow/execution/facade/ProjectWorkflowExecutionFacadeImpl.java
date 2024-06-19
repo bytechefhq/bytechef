@@ -27,6 +27,7 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectInstance;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.automation.configuration.dto.WorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
@@ -40,6 +41,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
 import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
 import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
@@ -135,8 +137,8 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
     @Override
     @Transactional(readOnly = true)
     public Page<WorkflowExecution> getWorkflowExecutions(
-        Status jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
-        String workflowId, int pageNumber) {
+        Environment environment, Status jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId,
+        Long projectInstanceId, String workflowId, int pageNumber) {
 
         List<String> workflowIds = new ArrayList<>();
 
@@ -154,9 +156,21 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
         if (workflowIds.isEmpty()) {
             workflowExecutionPage = Page.empty();
         } else {
+            List<Long> projectInstanceIds = new ArrayList<>();
+
+            if (projectInstanceId != null) {
+                projectInstanceIds.add(projectInstanceId);
+            } else if (environment != null) {
+                projectInstanceIds.addAll(
+                    projectInstanceService.getProjectInstances(null, environment, null, null)
+                        .stream()
+                        .map(ProjectInstance::getId)
+                        .toList());
+            }
+
             Page<Job> jobsPage = instanceJobService
                 .getJobIds(
-                    jobStatus, jobStartDate, jobEndDate, projectInstanceId, AppType.AUTOMATION, workflowIds,
+                    jobStatus, jobStartDate, jobEndDate, projectInstanceIds, AppType.AUTOMATION, workflowIds,
                     pageNumber)
                 .map(jobService::getJob);
 

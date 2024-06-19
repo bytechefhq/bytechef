@@ -28,6 +28,6 @@ import org.springframework.lang.NonNull;
 public interface CustomInstanceJobRepository {
 
     Page<Long> findAllJobIds(
-        Integer status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, int type,
+        Integer status, LocalDateTime startDate, LocalDateTime endDate, List<Long> instanceIds, int type,
         @NonNull List<String> workflowIds, Pageable pageable);
 }

@@ -19,6 +19,7 @@ package com.bytechef.automation.connection.facade;
 import com.bytechef.automation.connection.domain.WorkspaceConnection;
 import com.bytechef.automation.connection.service.WorkspaceConnectionService;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.AppType;
@@ -63,13 +64,15 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
 
     @Override
     public List<ConnectionDTO> getConnections(
-        long workspaceId, String componentName, Integer connectionVersion, Long tagId) {
+        long workspaceId, String componentName, Integer connectionVersion, ConnectionEnvironment connectionEnvironment,
+        Long tagId) {
 
         List<Long> connectionIds = CollectionUtils.map(
             workspaceConnectionService.getWorkspaceConnections(workspaceId), WorkspaceConnection::getConnectionId);
 
         return CollectionUtils.filter(
-            connectionFacade.getConnections(componentName, connectionVersion, tagId, AppType.AUTOMATION),
+            connectionFacade.getConnections(
+                componentName, connectionVersion, connectionEnvironment, tagId, AppType.AUTOMATION),
             connectionDTO -> connectionIds.contains(connectionDTO.id()));
     }
 }
