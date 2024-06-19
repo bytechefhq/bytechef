@@ -297,7 +297,7 @@ const IntegrationInstanceConfigurations = () => {
                                 triggerNode={<Button>Create Instance Configuration</Button>}
                             />
                         }
-                        icon={<Settings2Icon className="size-12 text-gray-400" />}
+                        icon={<Settings2Icon className="size-24 text-gray-300" />}
                         message="Get started by creating a new integration instance configuration."
                         title="No Integration Configuration Instances"
                     />

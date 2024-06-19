@@ -101,7 +101,7 @@ const EmbeddedIPaaSIntegrations = () => {
                             triggerNode={<Button>Create Integration</Button>}
                         />
                     }
-                    icon={<SquareIcon className="size-12 text-gray-400" />}
+                    icon={<SquareIcon className="size-24 text-gray-300" />}
                     message="Get started by creating a new integrations."
                     title="No Integrations"
                 />

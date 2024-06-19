@@ -12,7 +12,7 @@ const EEVersion = ({children}: {children: ReactNode}) => {
     return (
         <div className="flex size-full items-center justify-center">
             <div className="flex flex-col items-center space-y-2">
-                <Building2Icon className="size-10" />
+                <Building2Icon className="size-24 text-gray-300" />
 
                 <p className="text-lg font-medium">This is EE only feature.</p>
 

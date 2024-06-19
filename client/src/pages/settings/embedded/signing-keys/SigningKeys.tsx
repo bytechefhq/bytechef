@@ -43,7 +43,7 @@ const SigningKeys = () => {
                 ) : (
                     <EmptyList
                         button={<Button onClick={() => setShowEditDialog(true)}>New Signing Key</Button>}
-                        icon={<ClipboardSignatureIcon className="size-12 text-gray-400" />}
+                        icon={<ClipboardSignatureIcon className="size-24 text-gray-300" />}
                         message="Get started by creating a new Signing key."
                         title="No Signing Keys"
                     />
