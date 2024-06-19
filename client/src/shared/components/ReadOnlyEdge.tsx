@@ -1,8 +1,8 @@
 import {EdgeProps, getBezierPath} from 'reactflow';
 
-import styles from './WorkflowEdgeReadOnly.module.css';
+import styles from '../styles/WorkflowEdge.module.css';
 
-export default function WorkflowEdgeReadOnly({
+export default function ReadOnlyEdge({
     id,
     markerEnd,
     sourcePosition,
