@@ -69,9 +69,11 @@ export const useAuthenticationStore = create<AuthenticationI>()(
             showLogin: false,
 
             clearAuthentication: () => {
-                set(() => ({
-                    ...initialState,
+                set((state) => ({
+                    ...state,
+                    loading: false,
                     showLogin: true,
+                    authenticated: false,
                 }));
             },
 
