@@ -101,6 +101,8 @@ const PropertySelect = ({
                     sideOffset={5}
                 >
                     <SelectGroup>
+                        <SelectItem value="null">Select...</SelectItem>
+
                         {options.map((option) =>
                             option.description ? (
                                 <Item
