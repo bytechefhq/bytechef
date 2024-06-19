@@ -42,6 +42,6 @@ public interface InstanceJobService {
     List<Long> getJobIds(long instanceId, AppType type);
 
     Page<Long> getJobIds(
-        Status status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, AppType type,
-        List<String> workflowIds, int pageNumber);
+        Status status, LocalDateTime startDate, LocalDateTime endDate, List<Long> instanceIds,
+        AppType type, List<String> workflowIds, int pageNumber);
 }

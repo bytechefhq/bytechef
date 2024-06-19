@@ -82,13 +82,13 @@ public class InstanceJobServiceImpl implements InstanceJobService {
 
     @Override
     public Page<Long> getJobIds(
-        Status status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, AppType type,
+        Status status, LocalDateTime startDate, LocalDateTime endDate, List<Long> instanceIds, AppType type,
         List<String> workflowIds, int pageNumber) {
 
         PageRequest pageRequest = PageRequest.of(pageNumber, InstanceJobRepository.DEFAULT_PAGE_SIZE);
 
         return instanceJobRepository.findAllJobIds(
-            status == null ? null : status.ordinal(), startDate, endDate, instanceId, type.ordinal(), workflowIds,
+            status == null ? null : status.ordinal(), startDate, endDate, instanceIds, type.ordinal(), workflowIds,
             pageRequest);
     }
 }

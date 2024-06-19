@@ -17,6 +17,7 @@
 package com.bytechef.platform.connection.service;
 
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.constant.AppType;
 import java.util.List;
 
@@ -35,7 +36,9 @@ public interface ConnectionService {
 
     List<Connection> getConnections(String componentName, int version, AppType type);
 
-    List<Connection> getConnections(String componentName, Integer connectionVersion, Long tagId, AppType type);
+    List<Connection> getConnections(
+        String componentName, Integer connectionVersion, ConnectionEnvironment connectionEnvironment, Long tagId,
+        AppType type);
 
     Connection update(long id, List<Long> tagIds);
 

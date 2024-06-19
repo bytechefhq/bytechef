@@ -9,6 +9,7 @@ package com.bytechef.ee.platform.connection.remote.client.service;
 
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.AppType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -68,7 +69,8 @@ public class RemoteConnectionServiceClient implements ConnectionService {
 
     @Override
     public List<Connection> getConnections(
-        String componentName, Integer connectionVersion, Long tagId, AppType type) {
+        String componentName, Integer connectionVersion, ConnectionEnvironment connectionEnvironment, Long tagId,
+        AppType type) {
 
         throw new UnsupportedOperationException();
     }

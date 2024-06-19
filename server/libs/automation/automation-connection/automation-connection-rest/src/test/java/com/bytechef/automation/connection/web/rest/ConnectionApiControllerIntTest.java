@@ -147,7 +147,7 @@ public class ConnectionApiControllerIntTest {
     public void testGetConnections() {
         ConnectionDTO connectionDTO = getConnection();
 
-        when(connectionFacade.getConnections(null, null, null, AppType.AUTOMATION))
+        when(connectionFacade.getConnections(null, null, null, null, AppType.AUTOMATION))
             .thenReturn(List.of(connectionDTO));
 
         this.webTestClient
@@ -162,7 +162,7 @@ public class ConnectionApiControllerIntTest {
                 .parameters(null))
             .hasSize(1);
 
-        when(connectionFacade.getConnections("component1", null, null, AppType.AUTOMATION))
+        when(connectionFacade.getConnections("component1", null, null, null, AppType.AUTOMATION))
             .thenReturn(List.of(connectionDTO));
 
         this.webTestClient
@@ -175,7 +175,7 @@ public class ConnectionApiControllerIntTest {
             .expectBodyList(ConnectionModel.class)
             .hasSize(1);
 
-        when(connectionFacade.getConnections(null, 1, null, AppType.AUTOMATION))
+        when(connectionFacade.getConnections(null, 1, null, null, AppType.AUTOMATION))
             .thenReturn(List.of(connectionDTO));
 
         this.webTestClient
@@ -188,7 +188,7 @@ public class ConnectionApiControllerIntTest {
             .expectBodyList(ConnectionModel.class)
             .hasSize(1);
 
-        when(connectionFacade.getConnections("component1", 1, null, AppType.AUTOMATION))
+        when(connectionFacade.getConnections("component1", 1, null, null, AppType.AUTOMATION))
             .thenReturn(List.of(connectionDTO));
 
         this.webTestClient

@@ -19,6 +19,7 @@ package com.bytechef.platform.connection.service;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.constant.AppType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -83,33 +84,40 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     @Transactional(readOnly = true)
     public List<Connection> getConnections(
-        String componentName, Integer connectionVersion, Long tagId, AppType type) {
+        String componentName, Integer connectionVersion, ConnectionEnvironment connectionEnvironment, Long tagId,
+        AppType type) {
 
-        List<Connection> connectionIterable;
+        List<Connection> connections;
 
         if (StringUtils.isBlank(componentName) && tagId == null) {
-            connectionIterable = connectionRepository.findAllByTypeOrderByName(type.ordinal());
+            connections = connectionRepository.findAllByTypeOrderByName(type.ordinal());
         } else if (StringUtils.isNotBlank(componentName) && tagId == null) {
             if (connectionVersion == null) {
-                connectionIterable = connectionRepository.findAllByComponentNameAndTypeOrderByName(
+                connections = connectionRepository.findAllByComponentNameAndTypeOrderByName(
                     componentName, type.ordinal());
             } else {
-                connectionIterable = connectionRepository.findAllByComponentNameAndConnectionVersionAndTypeOrderByName(
+                connections = connectionRepository.findAllByComponentNameAndConnectionVersionAndTypeOrderByName(
                     componentName, connectionVersion, type.ordinal());
             }
         } else if (StringUtils.isBlank(componentName)) {
-            connectionIterable = connectionRepository.findAllByTagIdAndTypeOrderByName(tagId, type.ordinal());
+            connections = connectionRepository.findAllByTagIdAndTypeOrderByName(tagId, type.ordinal());
         } else {
             if (connectionVersion == null) {
-                connectionIterable = connectionRepository.findAllByComponentNameAndTagIdAndTypeOrderByName(
+                connections = connectionRepository.findAllByComponentNameAndTagIdAndTypeOrderByName(
                     componentName, tagId, type.ordinal());
             } else {
-                connectionIterable = connectionRepository.findAllByCNCVTITOrderByName(
+                connections = connectionRepository.findAllByCNCVTITOrderByName(
                     componentName, connectionVersion, tagId, type.ordinal());
             }
         }
 
-        return CollectionUtils.toList(connectionIterable);
+        if (connectionEnvironment != null) {
+            connections = connections.stream()
+                .filter(connection -> connection.getEnvironment() == connectionEnvironment)
+                .toList();
+        }
+
+        return CollectionUtils.toList(connections);
     }
 
     @Override

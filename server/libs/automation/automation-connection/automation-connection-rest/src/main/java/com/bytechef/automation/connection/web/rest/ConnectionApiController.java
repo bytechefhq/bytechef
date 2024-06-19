@@ -20,8 +20,10 @@ import com.bytechef.automation.connection.facade.WorkspaceConnectionFacade;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.SecurityUtils;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
+import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
+import com.bytechef.platform.connection.web.rest.model.ConnectionEnvironmentModel;
 import com.bytechef.platform.connection.web.rest.model.ConnectionModel;
 import com.bytechef.platform.constant.AppType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -77,10 +79,14 @@ public class ConnectionApiController implements ConnectionApi {
 
     @Override
     public ResponseEntity<List<ConnectionModel>> getConnections(
-        String componentName, Integer connectionVersion, Long tagId) {
+        String componentName, Integer connectionVersion, ConnectionEnvironmentModel connectionEnvironment, Long tagId) {
 
         return ResponseEntity.ok(
-            connectionFacade.getConnections(componentName, connectionVersion, tagId, AppType.AUTOMATION)
+            connectionFacade
+                .getConnections(
+                    componentName, connectionVersion,
+                    connectionEnvironment == null ? null : ConnectionEnvironment.valueOf(connectionEnvironment.name()),
+                    tagId, AppType.AUTOMATION)
                 .stream()
                 .map(this::toConnectionModel)
                 .toList());
@@ -88,10 +94,15 @@ public class ConnectionApiController implements ConnectionApi {
 
     @Override
     public ResponseEntity<List<ConnectionModel>> getWorkspaceConnections(
-        Long id, String componentName, Integer connectionVersion, Long tagId) {
+        Long id, String componentName, Integer connectionVersion, ConnectionEnvironmentModel connectionEnvironment,
+        Long tagId) {
 
         return ResponseEntity.ok(
-            workspaceConnectionFacade.getConnections(id, componentName, connectionVersion, tagId)
+            workspaceConnectionFacade
+                .getConnections(
+                    id, componentName, connectionVersion,
+                    connectionEnvironment == null ? null : ConnectionEnvironment.valueOf(connectionEnvironment.name()),
+                    tagId)
                 .stream()
                 .map(this::toConnectionModel)
                 .toList());

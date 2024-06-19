@@ -81,7 +81,7 @@ public class RemoteInstanceJobServiceClient implements InstanceJobService {
 
     @Override
     public Page<Long> getJobIds(
-        Status status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, AppType type,
+        Status status, LocalDateTime startDate, LocalDateTime endDate, List<Long> instanceIds, AppType type,
         List<String> workflowIds, int pageNumber) {
 
         throw new UnsupportedOperationException();

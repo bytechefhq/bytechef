@@ -18,6 +18,7 @@ package com.bytechef.embedded.workflow.execution.facade;
 
 import com.bytechef.atlas.execution.domain.Job.Status;
 import com.bytechef.embedded.workflow.execution.dto.WorkflowExecution;
+import com.bytechef.platform.constant.Environment;
 import java.time.LocalDateTime;
 import org.springframework.data.domain.Page;
 
@@ -29,6 +30,6 @@ public interface WorkflowExecutionFacade {
     WorkflowExecution getWorkflowExecution(long id);
 
     Page<WorkflowExecution> getWorkflowExecutions(
-        Status jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId,
+        Environment environment, Status jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId,
         Long integrationInstanceConfigurationId, String workflowId, int pageNumber);
 }
