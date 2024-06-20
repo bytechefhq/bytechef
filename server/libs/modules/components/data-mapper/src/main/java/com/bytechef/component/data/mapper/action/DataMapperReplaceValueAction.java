@@ -34,10 +34,17 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.time;
 
+import com.bytechef.commons.util.ConvertUtils;
+import com.bytechef.commons.util.ExceptionUtils;
+import com.bytechef.component.data.mapper.util.DataMapperUtils;
+import com.bytechef.component.data.mapper.util.mapping.Mapping;
+import com.bytechef.component.data.mapper.util.mapping.ObjectMapping;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+
+import java.util.List;
 
 /**
  * @author Ivica Cardic
@@ -52,6 +59,7 @@ public class DataMapperReplaceValueAction {
             integer(TYPE)
                 .label("Value type")
                 .description("The value type.")
+                .required(true)
                 .options(
                     option("Array", 1),
                     option("Boolean", 2),
@@ -171,11 +179,105 @@ public class DataMapperReplaceValueAction {
                     "An array of objects that contains properties 'from' and 'to'.")
                 .items(
                     object().properties(
+                        array(FROM)
+                            .label("Value")
+                            .description("Defines the property value you want to change.")
+                            .displayCondition("type == 1")
+                            .required(true),
+                        bool(FROM)
+                            .label("Value")
+                            .description("Defines the property value you want to change.")
+                            .displayCondition("type == 2")
+                            .required(true),
+                        date(FROM)
+                            .label("Value")
+                            .description("Defines the property value you want to change.")
+                            .displayCondition("type == 3")
+                            .required(true),
+                        dateTime(FROM)
+                            .label("Value")
+                            .description("Defines the property value you want to change.")
+                            .displayCondition("type == 4")
+                            .required(true),
+                        integer(FROM)
+                            .label("Value")
+                            .description("Defines the property value you want to change.")
+                            .displayCondition("type == 5")
+                            .required(true),
+                        nullable(FROM)
+                            .label("Value")
+                            .description("Defines the property value you want to change.")
+                            .displayCondition("type == 6")
+                            .required(true),
+                        number(FROM)
+                            .label("Value")
+                            .description("Defines the property value you want to change.")
+                            .displayCondition("type == 7")
+                            .required(true),
                         object(FROM)
-                            .label("Defines the property value you want to change.")
+                            .label("Value")
+                            .description("Defines the property value you want to change.")
+                            .displayCondition("type == 8")
+                            .required(true),
+                        string(FROM)
+                            .label("Value")
+                            .description("Defines the property value you want to change.")
+                            .displayCondition("type == 9")
+                            .required(true),
+                        time(FROM)
+                            .label("Value")
+                            .description("Defines the property value you want to change.")
+                            .displayCondition("type == 10")
+                            .required(true),
+                        array(TO)
+                            .label("Value")
+                            .description("Defines what you want to change the property value to.")
+                            .displayCondition("type == 1")
+                            .required(true),
+                        bool(TO)
+                            .label("Value")
+                            .description("Defines what you want to change the property value to.")
+                            .displayCondition("type == 2")
+                            .required(true),
+                        date(TO)
+                            .label("Value")
+                            .description("Defines what you want to change the property value to.")
+                            .displayCondition("type == 3")
+                            .required(true),
+                        dateTime(TO)
+                            .label("Value")
+                            .description("Defines what you want to change the property value to.")
+                            .displayCondition("type == 4")
+                            .required(true),
+                        integer(TO)
+                            .label("Value")
+                            .description("Defines what you want to change the property value to.")
+                            .displayCondition("type == 5")
+                            .required(true),
+                        nullable(TO)
+                            .label("Value")
+                            .description("Defines what you want to change the property value to.")
+                            .displayCondition("type == 6")
+                            .required(true),
+                        number(TO)
+                            .label("Value")
+                            .description("Defines what you want to change the property value to.")
+                            .displayCondition("type == 7")
                             .required(true),
                         object(TO)
-                            .label("Defines what you want to change the property value to")
+                            .label("Value")
+                            .description("Defines what you want to change the property value to.")
+                            .displayCondition("type == 8")
+                            .required(true),
+                        string(TO)
+                            .label("Value")
+                            .description("Defines what you want to change the property value to.")
+                            .displayCondition("type == 9")
+                            .required(true),
+                        time(TO)
+                            .label("Value")
+                            .description("Defines what you want to change the property value to.")
+                            .displayCondition("type == 10")
                             .required(true)))
                 .required(true))
         .output()
@@ -183,8 +285,16 @@ public class DataMapperReplaceValueAction {
 
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Class<?> type = DataMapperUtils.getType(inputParameters);
 
-        // TODO
-        return null;
+        List<ObjectMapping> mappingList = inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of());
+
+        for (Mapping<Object, Object> mapping : mappingList) {
+            if(ConvertUtils.canConvert(mapping.getFrom(), type)) {
+                if(ConvertUtils.convertValue(mapping.getFrom(), type).equals(inputParameters.get(VALUE, type))) return ConvertUtils.convertValue(mapping.getTo(), type);
+            }
+        }
+
+        return inputParameters.get(DEFAULT_VALUE, type);
     }
 }
