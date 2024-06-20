@@ -2,6 +2,7 @@ README.md
 pom.xml
 src/main/java/com/bytechef/embedded/workflow/execution/web/rest/ApiUtil.java
 src/main/java/com/bytechef/embedded/workflow/execution/web/rest/WorkflowExecutionApi.java
+src/main/java/com/bytechef/embedded/workflow/execution/web/rest/model/Environment1Model.java
 src/main/java/com/bytechef/embedded/workflow/execution/web/rest/model/IntegrationInstanceConfigurationIntegrationModel.java
 src/main/java/com/bytechef/embedded/workflow/execution/web/rest/model/IntegrationStatusModel.java
 src/main/java/com/bytechef/embedded/workflow/execution/web/rest/model/WebhookRetryModel.java

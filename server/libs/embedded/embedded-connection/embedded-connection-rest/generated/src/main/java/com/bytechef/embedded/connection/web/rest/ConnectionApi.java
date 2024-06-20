@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-12T20:31:08.386227+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-19T18:41:34.631069+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 @Validated
 @Tag(name = "connection", description = "The Embedded Connection API")
 public interface ConnectionApi {
@@ -158,6 +158,7 @@ public interface ConnectionApi {
      *
      * @param componentName The component name used for filtering connections. (optional)
      * @param connectionVersion The connection version. (optional)
+     * @param environment The environment. (optional)
      * @param tagId The tag id of used for filtering connections. (optional)
      * @return A list of connections. (status code 200)
      */
@@ -181,6 +182,7 @@ public interface ConnectionApi {
     default ResponseEntity<List<com.bytechef.platform.connection.web.rest.model.ConnectionModel>> getConnections(
         @Parameter(name = "componentName", description = "The component name used for filtering connections.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "componentName", required = false) String componentName,
         @Parameter(name = "connectionVersion", description = "The connection version.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "connectionVersion", required = false) Integer connectionVersion,
+        @Parameter(name = "environment", description = "The environment.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "environment", required = false) com.bytechef.platform.connection.web.rest.model.ConnectionEnvironmentModel environment,
         @Parameter(name = "tagId", description = "The tag id of used for filtering connections.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagId", required = false) Long tagId
     ) {
         getRequest().ifPresent(request -> {

@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-12T20:31:08.062012+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-19T23:08:56.283950+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 @Validated
 @Tag(name = "connection", description = "The Automation Connection API")
 public interface ConnectionApi {
@@ -160,6 +160,7 @@ public interface ConnectionApi {
      *
      * @param componentName The component name used for filtering connections. (optional)
      * @param connectionVersion The connection version. (optional)
+     * @param environment The environment. (optional)
      * @param tagId The tag id of used for filtering connections. (optional)
      * @return The list of connections. (status code 200)
      */
@@ -183,6 +184,7 @@ public interface ConnectionApi {
     default ResponseEntity<List<com.bytechef.platform.connection.web.rest.model.ConnectionModel>> getConnections(
         @Parameter(name = "componentName", description = "The component name used for filtering connections.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "componentName", required = false) String componentName,
         @Parameter(name = "connectionVersion", description = "The connection version.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "connectionVersion", required = false) Integer connectionVersion,
+        @Parameter(name = "environment", description = "The environment.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "environment", required = false) com.bytechef.platform.connection.web.rest.model.ConnectionEnvironmentModel environment,
         @Parameter(name = "tagId", description = "The tag id of used for filtering connections.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagId", required = false) Long tagId
     ) {
         getRequest().ifPresent(request -> {
@@ -206,6 +208,7 @@ public interface ConnectionApi {
      * @param id The id of a workspace. (required)
      * @param componentName The component name used for filtering connections. (optional)
      * @param connectionVersion The connection version. (optional)
+     * @param environment The environment. (optional)
      * @param tagId The tag id of used for filtering connections. (optional)
      * @return The list of connections. (status code 200)
      */
@@ -230,6 +233,7 @@ public interface ConnectionApi {
         @Parameter(name = "id", description = "The id of a workspace.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "componentName", description = "The component name used for filtering connections.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "componentName", required = false) String componentName,
         @Parameter(name = "connectionVersion", description = "The connection version.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "connectionVersion", required = false) Integer connectionVersion,
+        @Parameter(name = "environment", description = "The environment.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "environment", required = false) com.bytechef.platform.connection.web.rest.model.ConnectionEnvironmentModel environment,
         @Parameter(name = "tagId", description = "The tag id of used for filtering connections.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagId", required = false) Long tagId
     ) {
         getRequest().ifPresent(request -> {
