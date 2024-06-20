@@ -3,4 +3,3 @@ pom.xml
 src/main/java/com/bytechef/automation/connection/web/rest/ApiUtil.java
 src/main/java/com/bytechef/automation/connection/web/rest/ConnectionApi.java
 src/main/java/com/bytechef/automation/connection/web/rest/ConnectionTagApi.java
-src/main/java/com/bytechef/automation/connection/web/rest/model/ConnectionEnvironmentModel.java
