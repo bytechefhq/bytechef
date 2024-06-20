@@ -72,12 +72,11 @@ public class VTigerCreateProductAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
         Map<String, String> paramMap = paramMapFill(inputParameters);
 
         return context
-            .http(http -> http.post(connectionParameters.getRequiredString(INSTANCE_URL) +
-                "/restapi/v1/vtiger/default/create"))
+            .http(http -> http.post(
+                connectionParameters.getRequiredString(INSTANCE_URL) + "/restapi/v1/vtiger/default/create"))
             .body(
                 Body.of(
                     "elementType", "Products",
