@@ -14,7 +14,7 @@ const InputTypeSwitchButton = ({
     mentionInput: boolean;
 }) => (
     <Button
-        className={twMerge('z-50 size-auto p-0.5', className)}
+        className={twMerge('size-auto p-0.5', className)}
         onClick={handleClick}
         size="icon"
         title="Switch input type"
