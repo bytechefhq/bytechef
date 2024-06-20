@@ -70,6 +70,7 @@ const WorkflowNodeDetailsPanel = ({
     workflowNodeOutputs: WorkflowNodeOutputModel[];
 }) => {
     const [activeTab, setActiveTab] = useState('description');
+    const [availableDataPills, setAvailableDataPills] = useState<Array<DataPillType>>();
     const [currentOperationName, setCurrentOperationName] = useState('');
     const [currentOperationProperties, setCurrentOperationProperties] = useState<Array<PropertyType>>([]);
     const [workflowDefinition, setWorkflowDefinition] = useState<WorkflowDefinitionType>({});
@@ -193,50 +194,6 @@ const WorkflowNodeDetailsPanel = ({
             return !!property.name;
         });
 
-    const availableDataPills: Array<DataPillType> = [];
-
-    previousComponentProperties?.forEach((componentProperty, index) => {
-        if (!componentProperty || !componentProperty.properties?.length) {
-            return;
-        }
-
-        if (!workflow.triggers?.length) {
-            index += 1;
-        }
-
-        const {componentDefinition} = componentProperty;
-
-        const existingProperties = getExistingProperties(componentProperty.properties);
-
-        const nodeName = previousNodeNames[index];
-
-        availableDataPills.push({
-            componentIcon: componentDefinition.icon,
-            id: nodeName,
-            nodeName,
-            value: nodeName,
-        });
-
-        const formattedProperties: DataPillType[] = existingProperties.map((property) => {
-            if (property.properties) {
-                return getSubProperties(componentDefinition.icon!, nodeName, property.properties, property.name);
-            } else if (property.items) {
-                return getSubProperties(componentDefinition.icon!, nodeName, property.items, property.name);
-            }
-
-            return {
-                componentIcon: componentDefinition.icon,
-                id: property.name,
-                nodeName,
-                value: `${nodeName}.${property.name}`,
-            };
-        });
-
-        if (existingProperties.length && formattedProperties.length) {
-            availableDataPills.push(...formattedProperties);
-        }
-    });
-
     const nodeTabs = TABS.filter(({name}) => {
         if (name === 'connection') {
             return workflowConnections.length > 0;
@@ -347,13 +304,63 @@ const WorkflowNodeDetailsPanel = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [componentActions, currentNode?.name]);
 
+    // Set availableDataPills depending on previousComponentProperties
+    useEffect(() => {
+        if (!previousComponentProperties) {
+            return;
+        }
+
+        const dataPills: Array<DataPillType> = [];
+
+        previousComponentProperties.forEach((componentProperty, index) => {
+            if (!componentProperty || !componentProperty.properties?.length) {
+                return;
+            }
+
+            const {componentDefinition} = componentProperty;
+
+            const existingProperties = getExistingProperties(componentProperty.properties);
+
+            const nodeName = workflow.triggers?.length ? previousNodeNames[index] : previousNodeNames[index + 1];
+
+            dataPills.push({
+                componentIcon: componentDefinition.icon,
+                id: nodeName,
+                nodeName,
+                value: nodeName,
+            });
+
+            const formattedProperties: DataPillType[] = existingProperties.map((property) => {
+                if (property.properties) {
+                    return getSubProperties(componentDefinition.icon!, nodeName, property.properties, property.name);
+                } else if (property.items) {
+                    return getSubProperties(componentDefinition.icon!, nodeName, property.items, property.name);
+                }
+
+                return {
+                    componentIcon: componentDefinition.icon,
+                    id: property.name,
+                    nodeName,
+                    value: `${nodeName}.${property.name}`,
+                };
+            });
+
+            if (existingProperties.length && formattedProperties.length) {
+                dataPills.push(...formattedProperties);
+            }
+        });
+
+        setAvailableDataPills(dataPills.flat(Infinity));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [previousComponentProperties, previousNodeNames, workflow.triggers]);
+
     // Set dataPills depending on availableDataPills
     useEffect(() => {
-        if (availableDataPills) {
+        if (availableDataPills?.length) {
             setDataPills(availableDataPills.flat(Infinity));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [availableDataPills.length]);
+    }, [availableDataPills?.length]);
 
     // Tab switching logic
     useEffect(() => {
