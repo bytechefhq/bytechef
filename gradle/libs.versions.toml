@@ -15,7 +15,7 @@ pmd = "7.1.0"
 spotbugs = "4.8.5"
 spotbugs-gradle-plugin = "6.0.14"
 spotless-plugin-gradle = "6.25.0"
-spring-boot = "3.3.0"
+spring-boot = "3.3.1"
 spring-shell = "3.3.0"
 
 [libraries]
