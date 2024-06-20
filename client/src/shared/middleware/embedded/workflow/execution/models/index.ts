@@ -2,6 +2,7 @@
 /* eslint-disable */
 export * from './ComponentDefinitionBasicModel';
 export * from './DataStreamComponentModel';
+export * from './Environment1Model';
 export * from './EnvironmentModel';
 export * from './ExecutionErrorModel';
 export * from './IntegrationBasicModel';
