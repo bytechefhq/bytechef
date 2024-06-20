@@ -94,8 +94,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         try {
             return actionDefinitionService.executeOptions(
                 componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
-                searchText,
-                componentConnection, actionContext);
+                searchText, componentConnection, actionContext);
         } catch (Exception exception) {
             executionException = exception;
 
@@ -187,8 +186,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
             executionException = exception;
 
             componentConnections = getTokenRefreshedComponentConnection(
-                componentName, connectionIds, exception, componentConnections,
-                actionContext);
+                componentName, connectionIds, exception, componentConnections, actionContext);
 
             if (!componentConnections.isEmpty()) {
                 return actionDefinitionService.executePerform(
