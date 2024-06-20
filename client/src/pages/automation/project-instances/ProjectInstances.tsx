@@ -6,12 +6,12 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import {ProjectInstanceModel} from '@/shared/middleware/automation/configuration';
+import {EnvironmentModel, ProjectInstanceModel} from '@/shared/middleware/automation/configuration';
 import {useGetProjectInstanceTagsQuery} from '@/shared/queries/automation/projectInstanceTags.queries';
 import {useGetWorkspaceProjectInstancesQuery} from '@/shared/queries/automation/projectInstances.queries';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {Layers3Icon, TagIcon} from 'lucide-react';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
 import ProjectInstanceDialog from './components/ProjectInstanceDialog';
@@ -24,20 +24,12 @@ export enum Type {
 }
 
 const ProjectInstances = () => {
-    const {currentWorkspaceId} = useWorkspaceStore();
-
     const [searchParams] = useSearchParams();
 
-    const defaultCurrentState = {
-        id: searchParams.get('projectId')
-            ? parseInt(searchParams.get('projectId')!)
-            : searchParams.get('tagId')
-              ? parseInt(searchParams.get('tagId')!)
-              : undefined,
-        type: searchParams.get('tagId') ? Type.Tag : Type.Project,
-    };
+    const [environment, setEnvironment] = useState<number | undefined>(getEnvironment());
+    const [filterData, setFilterData] = useState<{id?: number; type: Type}>(getFilterData());
 
-    const [filterData, setFilterData] = useState<{id?: number; type: Type}>(defaultCurrentState);
+    const {currentWorkspaceId} = useWorkspaceStore();
 
     const {
         data: projects,
@@ -53,6 +45,8 @@ const ProjectInstances = () => {
         error: projectInstancesError,
         isLoading: projectInstancesIsLoading,
     } = useGetWorkspaceProjectInstancesQuery({
+        environment:
+            environment === 1 ? EnvironmentModel.Test : environment === 2 ? EnvironmentModel.Production : undefined,
         id: currentWorkspaceId!,
         projectId: searchParams.get('projectId') ? parseInt(searchParams.get('projectId')!) : undefined,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
@@ -90,6 +84,28 @@ const ProjectInstances = () => {
         pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
     }
 
+    function getEnvironment() {
+        return searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : undefined;
+    }
+
+    function getFilterData() {
+        return searchParams.get('projectId') || searchParams.get('tagId')
+            ? {
+                  id: searchParams.get('projectId')
+                      ? parseInt(searchParams.get('projectId')!)
+                      : parseInt(searchParams.get('tagId')!),
+                  type: searchParams.get('tagId') ? Type.Tag : Type.Project,
+              }
+            : {type: Type.Project};
+    }
+
+    useEffect(() => {
+        setEnvironment(getEnvironment());
+        setFilterData(getFilterData());
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [searchParams]);
+    console.log(filterData);
     return (
         <LayoutContainer
             header={
@@ -112,6 +128,32 @@ const ProjectInstances = () => {
                     <LeftSidebarNav
                         body={
                             <>
+                                {[
+                                    {label: 'All Environments', value: undefined},
+                                    {label: 'Test', value: 1},
+                                    {label: 'Production', value: 2},
+                                ]?.map((item) => (
+                                    <LeftSidebarNavItem
+                                        item={{
+                                            current: environment === item.value,
+                                            id: item.value,
+                                            name: item.label,
+                                            onItemClick: (id?: number | string) => {
+                                                setEnvironment(id as number);
+                                            },
+                                        }}
+                                        key={item.value}
+                                        toLink={`?environment=${item.value ?? ''}${filterData.id ? `&${filterData.type === Type.Project ? 'projectId' : 'tagId'}=${filterData.id}` : ''}`}
+                                    />
+                                ))}
+                            </>
+                        }
+                        title="Environments"
+                    />
+
+                    <LeftSidebarNav
+                        body={
+                            <>
                                 <LeftSidebarNavItem
                                     item={{
                                         current: !filterData?.id && filterData.type === Type.Project,
@@ -123,6 +165,7 @@ const ProjectInstances = () => {
                                             });
                                         },
                                     }}
+                                    toLink={`?environment=${environment ?? ''}`}
                                 />
 
                                 {projects &&
@@ -140,7 +183,7 @@ const ProjectInstances = () => {
                                                 },
                                             }}
                                             key={item.name}
-                                            toLink={`?projectId=${item.id}`}
+                                            toLink={`?projectId=${item.id}&environment=${environment ?? ''}`}
                                         />
                                     ))}
                             </>
@@ -168,7 +211,7 @@ const ProjectInstances = () => {
                                                     },
                                                 }}
                                                 key={item.id}
-                                                toLink={`?tagId=${item.id}`}
+                                                toLink={`?tagId=${item.id}&environment=${environment ?? ''}`}
                                             />
                                         ))
                                     ) : (
