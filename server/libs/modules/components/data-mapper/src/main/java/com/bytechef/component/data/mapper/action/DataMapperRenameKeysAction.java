@@ -67,7 +67,7 @@ public class DataMapperRenameKeysAction {
         .output()
         .perform(DataMapperRenameKeysAction::perform);
 
-    protected static Object perform(
+    protected static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         Map<String, Object> input = inputParameters.getMap(INPUT, Object.class, Map.of());
         List<StringMapping> mappingList = inputParameters.getList(MAPPINGS, StringMapping.class, List.of());

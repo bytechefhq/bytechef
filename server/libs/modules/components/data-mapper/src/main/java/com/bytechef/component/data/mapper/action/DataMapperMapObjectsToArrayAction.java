@@ -18,6 +18,7 @@ package com.bytechef.component.data.mapper.action;
 
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.FIELD_KEY;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INPUT;
+import static com.bytechef.component.data.mapper.constant.DataMapperConstants.MAPPINGS;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.TYPE;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.VALUE_KEY;
 import static com.bytechef.component.definition.ComponentDSL.array;
@@ -26,10 +27,19 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
+import com.bytechef.commons.util.MapUtils;
+import com.bytechef.component.data.mapper.util.mapping.ObjectMapping;
+import com.bytechef.component.data.mapper.util.mapping.StringMapping;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -60,18 +70,43 @@ public class DataMapperMapObjectsToArrayAction {
             string(FIELD_KEY)
                 .label("Field key")
                 .description(
-                    "Property key of each newly created object in the array. Its property value will be a property key from the input."),
+                    "Property key of each newly created object in the array. Its property value will be a property key from the input.")
+                .required(true),
             string(VALUE_KEY)
                 .label("Value key")
                 .description(
-                    "Property key of each newly created object in the array. Its property value will be a property value from the input."))
+                    "Property key of each newly created object in the array. Its property value will be a property value from the input.")
+                .required(true))
         .output()
         .perform(DataMapperMapObjectsToArrayAction::perform);
 
-    protected static Object perform(
+    protected static List<Map<String, Object>> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        List<Map<String, Object>> output = new ArrayList<>();
 
-        // TODO
-        return null;
+        if(inputParameters.getInteger(TYPE).equals(1)){
+            Map<String, Object> input = inputParameters.getMap(INPUT, Object.class, Map.of());
+
+            for(Map.Entry<String, Object> entry : input.entrySet()){
+                Map<String, Object> objectHashMap = new HashMap<>();
+                objectHashMap.put(inputParameters.getRequiredString(FIELD_KEY), entry.getKey());
+                objectHashMap.put(inputParameters.getRequiredString(VALUE_KEY), entry.getValue());
+                output.add(objectHashMap);
+            }
+        }
+        else {
+            List<Object> input = inputParameters.getList(INPUT, Object.class, List.of());
+
+            for(Object object : input) {
+                for (Map.Entry<String, Object> entry : ((Map<String, Object>)object).entrySet()) {
+                    Map<String, Object> objectHashMap = new HashMap<>();
+                    objectHashMap.put(inputParameters.getRequiredString(FIELD_KEY), entry.getKey());
+                    objectHashMap.put(inputParameters.getRequiredString(VALUE_KEY), entry.getValue());
+                    output.add(objectHashMap);
+                }
+            }
+        }
+
+        return output;
     }
 }
