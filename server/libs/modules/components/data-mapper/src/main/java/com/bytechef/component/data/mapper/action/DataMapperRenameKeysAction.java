@@ -24,11 +24,11 @@ import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
-import com.bytechef.component.data.mapper.util.Mapping;
+import com.bytechef.component.data.mapper.util.mapping.Mapping;
+import com.bytechef.component.data.mapper.util.mapping.StringMapping;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import java.util.HashMap;
 import java.util.List;
@@ -70,7 +70,7 @@ public class DataMapperRenameKeysAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         Map<String, Object> input = inputParameters.getMap(INPUT, Object.class, Map.of());
-        List<Mapping> mappingList = inputParameters.getList(MAPPINGS, Mapping.class, List.of());
+        List<StringMapping> mappingList = inputParameters.getList(MAPPINGS, StringMapping.class, List.of());
         Map<String, String> mappings = mappingList.stream().collect(Collectors.toMap(Mapping::getFrom, Mapping::getTo));
 
         Map<String, Object> output = new HashMap<>();
