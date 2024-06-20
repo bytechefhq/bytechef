@@ -66,8 +66,8 @@ public class VTigerGetMeAction {
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return context
-            .http(http -> http.get(connectionParameters.getRequiredString(INSTANCE_URL)
-                + "/restapi/v1/vtiger/default/me"))
+            .http(http -> http.get(
+                connectionParameters.getRequiredString(INSTANCE_URL) + "/restapi/v1/vtiger/default/me"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

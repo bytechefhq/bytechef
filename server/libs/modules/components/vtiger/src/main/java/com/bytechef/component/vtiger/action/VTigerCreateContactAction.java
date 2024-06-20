@@ -70,7 +70,6 @@ public class VTigerCreateContactAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
         Map<String, String> paramMap = new LinkedHashMap<>();
 
         paramMap.put(FIRSTNAME, inputParameters.getRequiredString(FIRSTNAME));
@@ -78,8 +77,8 @@ public class VTigerCreateContactAction {
         paramMap.put(EMAIL, inputParameters.getRequiredString(EMAIL));
 
         return context
-            .http(http -> http.post(connectionParameters.getRequiredString(INSTANCE_URL) +
-                "/restapi/v1/vtiger/default/create"))
+            .http(http -> http.post(
+                connectionParameters.getRequiredString(INSTANCE_URL) + "/restapi/v1/vtiger/default/create"))
             .body(
                 Body.of(
                     "elementType", "Contacts",
