@@ -24,7 +24,7 @@ public class StringUtils {
     public static String obfuscate(String string, int maxLength, int visibleLength) {
         if (!org.apache.commons.lang3.StringUtils.isEmpty(string)) {
             if (string.length() > maxLength) {
-                string = string.substring(0, maxLength);
+                string = string.substring(string.length() - maxLength);
             }
 
             string =
