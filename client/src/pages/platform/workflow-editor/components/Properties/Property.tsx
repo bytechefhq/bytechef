@@ -530,8 +530,6 @@ const Property = ({
                 return;
             }
 
-            console.log(name, path);
-
             const paramValue = resolvePath(parameters, path);
 
             if (paramValue !== undefined || paramValue !== null) {
