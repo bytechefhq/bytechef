@@ -13,12 +13,12 @@
  */
 
 import { mapValues } from '../runtime';
-import type { EnvironmentModel } from './EnvironmentModel';
+import type { Environment1Model } from './Environment1Model';
 import {
-    EnvironmentModelFromJSON,
-    EnvironmentModelFromJSONTyped,
-    EnvironmentModelToJSON,
-} from './EnvironmentModel';
+    Environment1ModelFromJSON,
+    Environment1ModelFromJSONTyped,
+    Environment1ModelToJSON,
+} from './Environment1Model';
 import type { IntegrationInstanceConfigurationIntegrationModel } from './IntegrationInstanceConfigurationIntegrationModel';
 import {
     IntegrationInstanceConfigurationIntegrationModelFromJSON,
@@ -70,10 +70,10 @@ export interface IntegrationInstanceConfigurationModel {
     enabled?: boolean;
     /**
      * 
-     * @type {EnvironmentModel}
+     * @type {Environment1Model}
      * @memberof IntegrationInstanceConfigurationModel
      */
-    environment?: EnvironmentModel;
+    environment?: Environment1Model;
     /**
      * The id of an integration instance configuration.
      * @type {number}
@@ -164,7 +164,7 @@ export function IntegrationInstanceConfigurationModelFromJSONTyped(json: any, ig
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'description': json['description'] == null ? undefined : json['description'],
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
-        'environment': json['environment'] == null ? undefined : EnvironmentModelFromJSON(json['environment']),
+        'environment': json['environment'] == null ? undefined : Environment1ModelFromJSON(json['environment']),
         'id': json['id'] == null ? undefined : json['id'],
         'integration': json['integration'] == null ? undefined : IntegrationInstanceConfigurationIntegrationModelFromJSON(json['integration']),
         'integrationId': json['integrationId'] == null ? undefined : json['integrationId'],
@@ -187,7 +187,7 @@ export function IntegrationInstanceConfigurationModelToJSON(value?: Omit<Integra
         
         'description': value['description'],
         'enabled': value['enabled'],
-        'environment': EnvironmentModelToJSON(value['environment']),
+        'environment': Environment1ModelToJSON(value['environment']),
         'integration': IntegrationInstanceConfigurationIntegrationModelToJSON(value['integration']),
         'integrationId': value['integrationId'],
         'integrationInstanceConfigurationWorkflows': value['integrationInstanceConfigurationWorkflows'] == null ? undefined : ((value['integrationInstanceConfigurationWorkflows'] as Array<any>).map(IntegrationInstanceConfigurationWorkflowModelToJSON)),

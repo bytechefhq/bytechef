@@ -13,12 +13,12 @@
  */
 
 import { mapValues } from '../runtime';
-import type { EnvironmentModel } from './EnvironmentModel';
+import type { Environment1Model } from './Environment1Model';
 import {
-    EnvironmentModelFromJSON,
-    EnvironmentModelFromJSONTyped,
-    EnvironmentModelToJSON,
-} from './EnvironmentModel';
+    Environment1ModelFromJSON,
+    Environment1ModelFromJSONTyped,
+    Environment1ModelToJSON,
+} from './Environment1Model';
 
 /**
  * Contains configurations and connections required for the execution of integration workflows.
@@ -52,10 +52,10 @@ export interface IntegrationInstanceConfigurationBasicModel {
     enabled?: boolean;
     /**
      * 
-     * @type {EnvironmentModel}
+     * @type {Environment1Model}
      * @memberof IntegrationInstanceConfigurationBasicModel
      */
-    environment?: EnvironmentModel;
+    environment?: Environment1Model;
     /**
      * The id of an integration instance configuration.
      * @type {number}
@@ -115,7 +115,7 @@ export function IntegrationInstanceConfigurationBasicModelFromJSONTyped(json: an
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'description': json['description'] == null ? undefined : json['description'],
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
-        'environment': json['environment'] == null ? undefined : EnvironmentModelFromJSON(json['environment']),
+        'environment': json['environment'] == null ? undefined : Environment1ModelFromJSON(json['environment']),
         'id': json['id'] == null ? undefined : json['id'],
         'integrationId': json['integrationId'] == null ? undefined : json['integrationId'],
         'integrationVersion': json['integrationVersion'] == null ? undefined : json['integrationVersion'],
@@ -133,7 +133,7 @@ export function IntegrationInstanceConfigurationBasicModelToJSON(value?: Omit<In
         
         'description': value['description'],
         'enabled': value['enabled'],
-        'environment': EnvironmentModelToJSON(value['environment']),
+        'environment': Environment1ModelToJSON(value['environment']),
         'integrationId': value['integrationId'],
         'integrationVersion': value['integrationVersion'],
     };

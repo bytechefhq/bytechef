@@ -1,9 +1,9 @@
-.openapi-generator-ignore
 apis/WorkflowExecutionApi.ts
 apis/index.ts
 index.ts
 models/ComponentDefinitionBasicModel.ts
 models/DataStreamComponentModel.ts
+models/Environment1Model.ts
 models/EnvironmentModel.ts
 models/ExecutionErrorModel.ts
 models/IntegrationBasicModel.ts

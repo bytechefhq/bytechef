@@ -15,10 +15,13 @@
 
 import * as runtime from '../runtime';
 import type {
+  EnvironmentModel,
   PageModel,
   WorkflowExecutionModel,
 } from '../models/index';
 import {
+    EnvironmentModelFromJSON,
+    EnvironmentModelToJSON,
     PageModelFromJSON,
     PageModelToJSON,
     WorkflowExecutionModelFromJSON,
@@ -30,6 +33,7 @@ export interface GetWorkflowExecutionRequest {
 }
 
 export interface GetWorkflowExecutionsPageRequest {
+    environment?: EnvironmentModel;
     jobStatus?: GetWorkflowExecutionsPageJobStatusEnum;
     jobStartDate?: Date;
     jobEndDate?: Date;
@@ -85,6 +89,10 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
      */
     async getWorkflowExecutionsPageRaw(requestParameters: GetWorkflowExecutionsPageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PageModel>> {
         const queryParameters: any = {};
+
+        if (requestParameters['environment'] != null) {
+            queryParameters['environment'] = requestParameters['environment'];
+        }
 
         if (requestParameters['jobStatus'] != null) {
             queryParameters['jobStatus'] = requestParameters['jobStatus'];
