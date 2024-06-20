@@ -60,8 +60,18 @@ public class SingleTenantService implements TenantService {
     }
 
     @Override
+    public List<String> getTenantIds() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public boolean isMultiTenantEnabled() {
         return false;
+    }
+
+    @Override
+    public void loadChangelog(List<String> tenantIds, String contexts) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

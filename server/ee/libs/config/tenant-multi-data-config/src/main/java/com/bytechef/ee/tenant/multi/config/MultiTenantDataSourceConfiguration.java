@@ -8,8 +8,10 @@
 package com.bytechef.ee.tenant.multi.config;
 
 import com.bytechef.edition.annotation.ConditionalOnEEVersion;
+import com.bytechef.ee.tenant.multi.liquibase.MultiTenantLiquibaseChangelogLoader;
 import com.bytechef.ee.tenant.multi.sql.MultiTenantDataSource;
 import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
+import com.bytechef.tenant.service.TenantService;
 import com.zaxxer.hikari.HikariDataSource;
 import javax.sql.DataSource;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
@@ -39,4 +41,8 @@ public class MultiTenantDataSourceConfiguration {
         return new MultiTenantDataSource(dataSource);
     }
 
+    @Bean
+    MultiTenantLiquibaseChangelogLoader multiTenantLiquibaseCheck(TenantService tenantService) {
+        return new MultiTenantLiquibaseChangelogLoader(tenantService);
+    }
 }

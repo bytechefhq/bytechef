@@ -35,7 +35,11 @@ public interface TenantService {
 
     String getTenantIdByUserResetKey(String key);
 
+    List<String> getTenantIds();
+
     boolean isMultiTenantEnabled();
+
+    void loadChangelog(List<String> tenantIds, String contexts);
 
     boolean tenantIdsByUserEmailExist(String email);
 

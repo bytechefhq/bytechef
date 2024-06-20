@@ -18,10 +18,10 @@ package com.bytechef.ee.tenant.service;
 
 import com.bytechef.edition.annotation.ConditionalOnEEVersion;
 import com.bytechef.ee.tenant.repository.TenantRepository;
-import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
 import com.bytechef.tenant.domain.Tenant;
 import com.bytechef.tenant.service.TenantService;
+import com.bytechef.tenant.util.TenantUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.text.DecimalFormat;
 import java.util.Collections;
@@ -110,6 +110,7 @@ public class MultiTenantService implements TenantService, ResourceLoaderAware {
         return tenantRepository.findTenantIdByUserResetKey(key);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<String> getTenantIds() {
         return tenantRepository.findTenantIds();
@@ -130,23 +131,7 @@ public class MultiTenantService implements TenantService, ResourceLoaderAware {
     }
 
     @Override
-    public void setResourceLoader(ResourceLoader resourceLoader) {
-        this.resourceLoader = resourceLoader;
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public boolean tenantIdsByUserEmailExist(String email) {
-        return !getTenantIdsByUserEmail(email).isEmpty();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public boolean tenantIdsByUserLoginExist(String email) {
-        return !getTenantIdsByUserLogin(email).isEmpty();
-    }
-
-    private void loadChangelog(List<String> tenantIds, String contexts) {
+    public void loadChangelog(List<String> tenantIds, String contexts) {
         MultiTenantSpringLiquibase multiTenantSpringLiquibase = new MultiTenantSpringLiquibase();
 
         multiTenantSpringLiquibase.setDataSource(dataSource);
@@ -176,5 +161,22 @@ public class MultiTenantService implements TenantService, ResourceLoaderAware {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void setResourceLoader(ResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean tenantIdsByUserEmailExist(String email) {
+        return !getTenantIdsByUserEmail(email).isEmpty();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean tenantIdsByUserLoginExist(String email) {
+        return !getTenantIdsByUserLogin(email).isEmpty();
     }
 }
