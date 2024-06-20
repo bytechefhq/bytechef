@@ -33,6 +33,8 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
 
     const {additionalProperties, label, name, properties} = property;
 
+    const isContainerObject = name === '__item';
+
     let availablePropertyTypes = additionalProperties?.length
         ? additionalProperties?.reduce((types: Array<{label: string; value: string}>, property) => {
               if (property.type) {
@@ -61,7 +63,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
         path = name;
     }
 
-    if (name === '__item' && path) {
+    if (isContainerObject && path) {
         path = path.replace('.__item', '');
     }
 
@@ -154,12 +156,18 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
 
     return (
         <Fragment key={name}>
-            <ul className={twMerge('space-y-4', label && name !== '__item' && 'ml-2 border-l', arrayName && 'pl-2')}>
+            <ul
+                className={twMerge(
+                    'space-y-4',
+                    label && !isContainerObject && 'ml-2 border-l',
+                    arrayName && !isContainerObject && 'pl-2'
+                )}
+            >
                 {(subProperties as unknown as Array<SubPropertyType>)?.map((subProperty, index) => (
                     <div
                         className={twMerge(
                             'relative flex w-full',
-                            subProperty.controlType === 'OBJECT_BUILDER' && 'pl-2'
+                            subProperty.controlType === 'OBJECT_BUILDER' && !isContainerObject && 'pl-2'
                         )}
                         key={`${property.name}_${subProperty.name}_${index}`}
                     >
@@ -169,7 +177,8 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
                             customClassName={twMerge(
                                 'w-full last-of-type:pb-0',
                                 label && 'mb-0',
-                                name === '__item' ? 'pb-0' : !arrayName && 'pl-2'
+                                isContainerObject && 'pb-0',
+                                !arrayName && !isContainerObject && 'pl-2'
                             )}
                             inputTypeSwitchButtonClassName={subProperty.custom ? 'mr-6' : ''}
                             key={`${property.name}_${subProperty.name}_${index}`}
