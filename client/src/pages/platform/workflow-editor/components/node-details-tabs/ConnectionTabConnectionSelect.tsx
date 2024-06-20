@@ -83,10 +83,10 @@ const ConnectionTabConnectionSelect = ({
         setConnectionId(connectionId);
 
         queryClient.removeQueries({
-            queryKey: [WorkflowNodeDynamicPropertyKeys.workflowNodeDynamicProperties, workflowId],
+            queryKey: [...WorkflowNodeDynamicPropertyKeys.workflowNodeDynamicProperties, workflowId],
         });
         queryClient.removeQueries({
-            queryKey: [WorkflowNodeOptionKeys.workflowNodeOptions, workflowId],
+            queryKey: [...WorkflowNodeOptionKeys.workflowNodeOptions, workflowId],
         });
     };
 
