@@ -1,9 +1,9 @@
 import {Sheet, SheetContent} from '@/components/ui/sheet';
+import WorkflowExecutionWorkflowPanel from '@/pages/automation/workflow-executions/components/WorkflowExecutionWorkflowPanel';
 import {useGetWorkflowExecutionQuery} from '@/shared/queries/embedded/integrationWorkflowExecutions.queries';
 
 import useWorkflowExecutionSheetStore from '../stores/useWorkflowExecutionSheetStore';
 import WorkflowExecutionAccordion from './WorkflowExecutionAccordion';
-import WorkflowExecutionSheetPanel from './WorkflowExecutionSheetPanel';
 
 const WorkflowExecutionSheet = () => {
     const {setWorkflowExecutionSheetOpen, workflowExecutionId, workflowExecutionSheetOpen} =
@@ -33,7 +33,7 @@ const WorkflowExecutionSheet = () => {
                     )}
                 </div>
 
-                {workflowExecution && <WorkflowExecutionSheetPanel workflowExecution={workflowExecution} />}
+                {workflowExecution && <WorkflowExecutionWorkflowPanel workflowExecution={workflowExecution} />}
             </SheetContent>
         </Sheet>
     );

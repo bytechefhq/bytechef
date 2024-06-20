@@ -105,7 +105,7 @@ const ProjectInstances = () => {
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchParams]);
-    console.log(filterData);
+
     return (
         <LayoutContainer
             header={

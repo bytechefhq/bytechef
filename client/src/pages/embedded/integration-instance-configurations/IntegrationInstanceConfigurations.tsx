@@ -4,6 +4,7 @@ import {Button} from '@/components/ui/button';
 import IntegrationInstanceConfigurationDialog from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationDialog';
 import IntegrationInstanceConfigurationList from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationList';
 import IntegrationInstanceConfigurationWorkflowSheet from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationWorkflowSheet';
+import useIntegrationInstanceConfigurationWorkflowSheetStore from '@/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationWorkflowSheetStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
@@ -83,6 +84,8 @@ const IntegrationInstanceConfigurations = () => {
     }
 
     const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetIntegrationInstanceConfigurationTagsQuery();
+
+    const {integrationInstanceConfigurationWorkflowSheetOpen} = useIntegrationInstanceConfigurationWorkflowSheetStore();
 
     let pageTitle: string | undefined;
 
@@ -283,7 +286,9 @@ const IntegrationInstanceConfigurations = () => {
                                 )
                         )}
 
-                        <IntegrationInstanceConfigurationWorkflowSheet />
+                        {integrationInstanceConfigurationWorkflowSheetOpen && (
+                            <IntegrationInstanceConfigurationWorkflowSheet />
+                        )}
                     </div>
                 ) : (
                     <EmptyList
