@@ -352,7 +352,7 @@ const WorkflowNodeDetailsPanel = ({
 
         setAvailableDataPills(dataPills.flat(Infinity));
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [previousComponentProperties, previousNodeNames, workflow.triggers]);
+    }, [previousComponentProperties.length]);
 
     // Set dataPills depending on availableDataPills
     useEffect(() => {
