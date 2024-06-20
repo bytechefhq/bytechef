@@ -83,7 +83,7 @@ class AccountControllerIntTest {
     private MailService mailService;
 
     @Autowired
-    private ObjectMapper om;
+    private ObjectMapper objectMapper;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -178,7 +178,7 @@ class AccountControllerIntTest {
         restAccountMockMvc
             .perform(
                 post("/api/register").contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(validUser))
+                    .content(objectMapper.writeValueAsBytes(validUser))
                     .with(csrf()))
             .andExpect(status().isCreated());
 
@@ -203,7 +203,7 @@ class AccountControllerIntTest {
         restAccountMockMvc
             .perform(
                 post("/api/register").contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(invalidUser))
+                    .content(objectMapper.writeValueAsBytes(invalidUser))
                     .with(csrf()))
             .andExpect(status().isBadRequest());
 
@@ -227,7 +227,7 @@ class AccountControllerIntTest {
         restAccountMockMvc
             .perform(
                 post("/api/register").contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(invalidUser))
+                    .content(objectMapper.writeValueAsBytes(invalidUser))
                     .with(csrf()))
             .andExpect(status().isBadRequest());
 
@@ -289,7 +289,7 @@ class AccountControllerIntTest {
         restAccountMockMvc
             .perform(
                 post("/api/register").contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(firstUser))
+                    .content(objectMapper.writeValueAsBytes(firstUser))
                     .with(csrf()))
             .andExpect(status().isCreated());
 
@@ -297,7 +297,7 @@ class AccountControllerIntTest {
         restAccountMockMvc
             .perform(
                 post("/api/register").contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(secondUser))
+                    .content(objectMapper.writeValueAsBytes(secondUser))
                     .with(csrf()))
             .andExpect(status().isCreated());
 
@@ -314,7 +314,7 @@ class AccountControllerIntTest {
         restAccountMockMvc
             .perform(
                 post("/api/register").contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(secondUser))
+                    .content(objectMapper.writeValueAsBytes(secondUser))
                     .with(csrf()))
             .andExpect(status().is4xxClientError());
     }
@@ -338,7 +338,7 @@ class AccountControllerIntTest {
         restAccountMockMvc
             .perform(
                 post("/api/register").contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(firstUser))
+                    .content(objectMapper.writeValueAsBytes(firstUser))
                     .with(csrf()))
             .andExpect(status().isCreated());
 
@@ -361,7 +361,7 @@ class AccountControllerIntTest {
         restAccountMockMvc
             .perform(
                 post("/api/register").contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(secondUser))
+                    .content(objectMapper.writeValueAsBytes(secondUser))
                     .with(csrf()))
             .andExpect(status().isCreated());
 
@@ -391,7 +391,7 @@ class AccountControllerIntTest {
             .perform(
                 post("/api/register")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(userWithUpperCaseEmail))
+                    .content(objectMapper.writeValueAsBytes(userWithUpperCaseEmail))
                     .with(csrf()))
             .andExpect(status().isCreated());
 
@@ -412,14 +412,29 @@ class AccountControllerIntTest {
         restAccountMockMvc
             .perform(
                 post("/api/register").contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(secondUser))
+                    .content(objectMapper.writeValueAsBytes(secondUser))
                     .with(csrf()))
             .andExpect(status().is4xxClientError());
     }
 
     @Test
     @Transactional
-    void testRegisterAdminIsIgnored() throws Exception {
+    void testRegisterDuplicateAdmin() throws Exception {
+        User existingUser = new User();
+
+        existingUser.setLogin("test-register-valid");
+        existingUser.setPassword("password");
+        existingUser.setFirstName("Alice");
+        existingUser.setLastName("Test");
+        existingUser.setEmail("test-register-valid@example.com");
+        existingUser.setActivated(true);
+        existingUser.setImageUrl("http://placehold.it/50x50");
+        existingUser.setLangKey(UserConstants.DEFAULT_LANGUAGE);
+
+        assertThat(userRepository.findByLogin("test-register-valid")).isEmpty();
+
+        userRepository.save(existingUser);
+
         ManagedUserVM validUser = new ManagedUserVM();
 
         validUser.setLogin("badguy");
@@ -430,29 +445,20 @@ class AccountControllerIntTest {
         validUser.setActivated(true);
         validUser.setImageUrl("http://placehold.it/50x50");
         validUser.setLangKey(UserConstants.DEFAULT_LANGUAGE);
-        validUser.setAuthorities(Collections.singleton(AuthorityConstants.ADMIN));
 
         restAccountMockMvc
             .perform(
                 post("/api/register").contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(validUser))
+                    .content(objectMapper.writeValueAsBytes(validUser))
                     .with(csrf()))
-            .andExpect(status().isCreated());
-
-        Optional<User> userDup = userRepository.findByLogin("badguy");
-
-        assertThat(userDup).isPresent();
-//        assertThat(userDup.orElseThrow()
-//            .getAuthorities())
-//                .hasSize(1)
-//                .containsExactly(authorityRepository.findByName(AuthoritiesConstants.USER)
-//                    .orElseThrow());
+            .andExpect(status().isBadRequest());
     }
 
     @Test
     @Transactional
     void testActivateAccount() throws Exception {
         final String activationKey = "some activation key";
+
         User user = new User();
 
         user.setLogin("activate-account");
@@ -506,7 +512,7 @@ class AccountControllerIntTest {
         restAccountMockMvc
             .perform(
                 post("/api/account").contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(userDTO))
+                    .content(objectMapper.writeValueAsBytes(userDTO))
                     .with(csrf()))
             .andExpect(status().isOk());
 
@@ -520,7 +526,7 @@ class AccountControllerIntTest {
         assertThat(updatedUser.getPassword()).isEqualTo(user.getPassword());
         assertThat(updatedUser.getImageUrl()).isEqualTo(userDTO.getImageUrl());
         assertThat(updatedUser.isActivated()).isTrue();
-//        assertThat(updatedUser.getAuthorities()).isEmpty();
+        assertThat(updatedUser.getAuthorityIds()).isEmpty();
     }
 
     @Test
@@ -550,7 +556,7 @@ class AccountControllerIntTest {
         restAccountMockMvc
             .perform(
                 post("/api/account").contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(userDTO))
+                    .content(objectMapper.writeValueAsBytes(userDTO))
                     .with(csrf()))
             .andExpect(status().isBadRequest());
 
@@ -593,12 +599,13 @@ class AccountControllerIntTest {
         restAccountMockMvc
             .perform(
                 post("/api/account").contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(userDTO))
+                    .content(objectMapper.writeValueAsBytes(userDTO))
                     .with(csrf()))
             .andExpect(status().isBadRequest());
 
         User updatedUser = userRepository.findByLogin("save-existing-email")
             .orElse(null);
+
         assertThat(updatedUser.getEmail()).isEqualTo("save-existing-email@example.com");
     }
 
@@ -629,7 +636,7 @@ class AccountControllerIntTest {
         restAccountMockMvc
             .perform(
                 post("/api/account").contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(userDTO))
+                    .content(objectMapper.writeValueAsBytes(userDTO))
                     .with(csrf()))
             .andExpect(status().isOk());
 
@@ -657,7 +664,8 @@ class AccountControllerIntTest {
             .perform(
                 post("/api/account/change-password")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(new PasswordChangeDTO("1" + currentPassword, "new password")))
+                    .content(
+                        objectMapper.writeValueAsBytes(new PasswordChangeDTO("1" + currentPassword, "new password")))
                     .with(csrf()))
             .andExpect(status().isBadRequest());
 
@@ -686,7 +694,7 @@ class AccountControllerIntTest {
             .perform(
                 post("/api/account/change-password")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(new PasswordChangeDTO(currentPassword, "new password")))
+                    .content(objectMapper.writeValueAsBytes(new PasswordChangeDTO(currentPassword, "new password")))
                     .with(csrf()))
             .andExpect(status().isOk());
 
@@ -716,7 +724,7 @@ class AccountControllerIntTest {
             .perform(
                 post("/api/account/change-password")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(new PasswordChangeDTO(currentPassword, newPassword)))
+                    .content(objectMapper.writeValueAsBytes(new PasswordChangeDTO(currentPassword, newPassword)))
                     .with(csrf()))
             .andExpect(status().isBadRequest());
 
@@ -746,7 +754,7 @@ class AccountControllerIntTest {
             .perform(
                 post("/api/account/change-password")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(new PasswordChangeDTO(currentPassword, newPassword)))
+                    .content(objectMapper.writeValueAsBytes(new PasswordChangeDTO(currentPassword, newPassword)))
                     .with(csrf()))
             .andExpect(status().isBadRequest());
 
@@ -774,7 +782,7 @@ class AccountControllerIntTest {
             .perform(
                 post("/api/account/change-password")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(new PasswordChangeDTO(currentPassword, "")))
+                    .content(objectMapper.writeValueAsBytes(new PasswordChangeDTO(currentPassword, "")))
                     .with(csrf()))
             .andExpect(status().isBadRequest());
 
@@ -867,8 +875,9 @@ class AccountControllerIntTest {
         userRepository.save(user);
 
         restAccountMockMvc
-            .perform(post("/api/account/reset-password/init").content("password-reset@example.com")
-                .with(csrf()))
+            .perform(
+                post("/api/account/reset-password/init").content("password-reset@example.com")
+                    .with(csrf()))
             .andExpect(status().isOk());
     }
 
@@ -922,7 +931,7 @@ class AccountControllerIntTest {
             .perform(
                 post("/api/account/reset-password/finish")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(keyAndPassword))
+                    .content(objectMapper.writeValueAsBytes(keyAndPassword))
                     .with(csrf()))
             .andExpect(status().isOk());
 
@@ -954,7 +963,7 @@ class AccountControllerIntTest {
             .perform(
                 post("/api/account/reset-password/finish")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(keyAndPassword))
+                    .content(objectMapper.writeValueAsBytes(keyAndPassword))
                     .with(csrf()))
             .andExpect(status().isBadRequest());
 
@@ -976,7 +985,7 @@ class AccountControllerIntTest {
             .perform(
                 post("/api/account/reset-password/finish")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(keyAndPassword))
+                    .content(objectMapper.writeValueAsBytes(keyAndPassword))
                     .with(csrf()))
             .andExpect(status().isInternalServerError());
     }
