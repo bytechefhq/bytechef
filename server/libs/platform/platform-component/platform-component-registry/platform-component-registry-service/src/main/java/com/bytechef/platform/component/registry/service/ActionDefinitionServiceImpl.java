@@ -115,10 +115,12 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 .stream()
                 .map(Option::new)
                 .toList();
-        } catch (ProviderException e) {
-            throw new ComponentExecutionException(e.getMessage(), inputParameters, ActionDefinitionErrorType.EXECUTE_OPTIONS);
         } catch (Exception e) {
-            throw new ComponentExecutionException("Unexpected error", e, inputParameters, ActionDefinitionErrorType.EXECUTE_OPTIONS);
+            if (e instanceof ProviderException) {
+                throw (ProviderException) e;
+            }
+
+            throw new ComponentExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_OPTIONS);
         }
     }
 
