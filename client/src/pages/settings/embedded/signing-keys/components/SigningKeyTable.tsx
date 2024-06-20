@@ -73,7 +73,7 @@ const SigningKeyTable = ({signingKeys}: SigningKeyTableProps) => {
     const columns = useMemo(
         () => [
             columnHelper.accessor('environment', {
-                cell: (info) => info.getValue() ?? '',
+                cell: (info) => info.getValue(),
                 header: 'Environment',
             }),
             columnHelper.accessor('createdDate', {

@@ -4,9 +4,11 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import TablePagination from '@/components/TablePagination';
 import {Label} from '@/components/ui/label';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
+import {EnvironmentModel} from '@/shared/middleware/automation/configuration';
 import {IntegrationModel} from '@/shared/middleware/embedded/configuration';
 import {
     GetWorkflowExecutionsPageJobStatusEnum,
@@ -63,6 +65,9 @@ export const WorkflowExecutions = () => {
     const [filterEndDate, setFilterEndDate] = useState<Date | undefined>(
         searchParams.get('endDate') ? new Date(+searchParams.get('endDate')!) : undefined
     );
+    const [filterEnvironment, setFilterEnvironment] = useState<string | undefined>(
+        searchParams.get('environment') ? searchParams.get('environment')! : undefined
+    );
     const [filterIntegrationId, setFilterIntegrationId] = useState<number | undefined>(
         searchParams.get('integrationId') ? +searchParams.get('integrationId')! : undefined
     );
@@ -100,6 +105,12 @@ export const WorkflowExecutions = () => {
         error: workflowExecutionsError,
         isLoading: workflowExecutionsIsLoading,
     } = useGetWorkflowExecutionsQuery({
+        environment:
+            filterEnvironment === '1'
+                ? EnvironmentModel.Test
+                : filterEnvironment === '2'
+                  ? EnvironmentModel.Production
+                  : undefined,
         integrationId: filterIntegrationId,
         integrationInstanceConfigurationId: filterIntegrationInstanceConfigurationId,
         jobEndDate: filterEndDate,
@@ -132,6 +143,7 @@ export const WorkflowExecutions = () => {
     );
 
     function filter(
+        environment?: string,
         status?: GetWorkflowExecutionsPageJobStatusEnum,
         startDate?: Date,
         endDate?: Date,
@@ -141,7 +153,7 @@ export const WorkflowExecutions = () => {
         pageNumber?: number
     ) {
         navigate(
-            `/embedded/executions?status=${status ? status : ''}&startDate=${startDate ? startDate.getTime() : ''}&endDate=${endDate ? endDate.getTime() : ''}&integrationId=${integrationId ? integrationId : ''}&integrationInstanceConfigurationId=${integrationInstanceConfigurationId ? integrationInstanceConfigurationId : ''}&workflowId=${workflowId ? workflowId : ''}&pageNumber=${pageNumber ? pageNumber : ''}`
+            `/embedded/executions?environment=${environment ?? ''}&status=${status ? status : ''}&startDate=${startDate ? startDate.getTime() : ''}&endDate=${endDate ? endDate.getTime() : ''}&integrationId=${integrationId ? integrationId : ''}&integrationInstanceConfigurationId=${integrationInstanceConfigurationId ? integrationInstanceConfigurationId : ''}&workflowId=${workflowId ? workflowId : ''}&pageNumber=${pageNumber ? pageNumber : ''}`
         );
     }
 
@@ -149,9 +161,25 @@ export const WorkflowExecutions = () => {
         setFilterEndDate(date);
 
         filter(
+            filterEnvironment,
             filterStatus,
             filterStartDate,
             date,
+            filterIntegrationId,
+            filterIntegrationInstanceConfigurationId,
+            filterWorkflowId,
+            filterPageNumber
+        );
+    };
+
+    const handleEnvironmentChange = (environment: string) => {
+        setFilterEnvironment(environment);
+
+        filter(
+            environment,
+            filterStatus,
+            filterStartDate,
+            filterEndDate,
             filterIntegrationId,
             filterIntegrationInstanceConfigurationId,
             filterWorkflowId,
@@ -169,6 +197,7 @@ export const WorkflowExecutions = () => {
         setFilterIntegrationId(integrationId);
 
         filter(
+            filterEnvironment,
             filterStatus,
             filterStartDate,
             filterEndDate,
@@ -189,6 +218,7 @@ export const WorkflowExecutions = () => {
         setFilterIntegrationInstanceConfigurationId(integrationInstanceConfigurationId);
 
         filter(
+            filterEnvironment,
             filterStatus,
             filterStartDate,
             filterEndDate,
@@ -203,6 +233,7 @@ export const WorkflowExecutions = () => {
         setFilterPageNumber(pageNumber);
 
         filter(
+            filterEnvironment,
             filterStatus,
             filterStartDate,
             filterEndDate,
@@ -217,6 +248,7 @@ export const WorkflowExecutions = () => {
         setFilterStartDate(date);
 
         filter(
+            filterEnvironment,
             filterStatus,
             date,
             filterEndDate,
@@ -237,6 +269,7 @@ export const WorkflowExecutions = () => {
         setFilterStatus(status);
 
         filter(
+            filterEnvironment,
             status,
             filterStartDate,
             filterEndDate,
@@ -255,7 +288,9 @@ export const WorkflowExecutions = () => {
         }
 
         setFilterWorkflowId(workflowId);
+
         filter(
+            filterEnvironment,
             filterStatus,
             filterStartDate,
             filterEndDate,
@@ -290,6 +325,22 @@ export const WorkflowExecutions = () => {
             }
             leftSidebarBody={
                 <div className="space-y-4 px-4">
+                    <div className="flex flex-col space-y-2">
+                        <Label>Environment</Label>
+
+                        <Select onValueChange={handleEnvironmentChange} value={filterEnvironment}>
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select environment" />
+                            </SelectTrigger>
+
+                            <SelectContent>
+                                <SelectItem value="1">Test</SelectItem>
+
+                                <SelectItem value="2">Production</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
                     <div className="flex flex-col space-y-2">
                         <Label>Status</Label>
 

@@ -5,6 +5,7 @@ import ConnectionDialog from '@/pages/platform/connection/components/ConnectionD
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
+import {ConnectionEnvironmentModel} from '@/shared/middleware/embedded/connection';
 import {useCreateConnectionMutation} from '@/shared/mutations/embedded/connections.mutations';
 import {
     ConnectionKeys,
@@ -13,7 +14,7 @@ import {
 } from '@/shared/queries/embedded/connections.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {Link2Icon, TagIcon} from 'lucide-react';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
 import ConnectionList from './components/ConnectionList';
@@ -26,19 +27,11 @@ export enum Type {
 export const Connections = () => {
     const [searchParams] = useSearchParams();
 
-    const defaultCurrentState = {
-        id: searchParams.get('componentName')
-            ? searchParams.get('componentName')!
-            : searchParams.get('tagId')
-              ? parseInt(searchParams.get('tagId')!)
-              : undefined,
-        type: searchParams.get('tagId') ? Type.Tag : Type.Component,
-    };
-
+    const [environment, setEnvironment] = useState<number | undefined>(getEnvironment());
     const [filterData, setFilterData] = useState<{
         id?: number | string;
         type: Type;
-    }>(defaultCurrentState);
+    }>(getFilterData());
 
     const {
         data: allConnections,
@@ -59,6 +52,14 @@ export const Connections = () => {
         isLoading: connectionsIsLoading,
     } = useGetConnectionsQuery({
         componentName: searchParams.get('componentName') ? searchParams.get('componentName')! : undefined,
+        environment:
+            environment === 1
+                ? ConnectionEnvironmentModel.Development
+                : environment === 2
+                  ? ConnectionEnvironmentModel.Test
+                  : environment === 3
+                    ? ConnectionEnvironmentModel.Production
+                    : undefined,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
 
@@ -71,6 +72,28 @@ export const Connections = () => {
     } else {
         pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
     }
+
+    function getEnvironment() {
+        return searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : undefined;
+    }
+
+    function getFilterData() {
+        return searchParams.get('componentName') || searchParams.get('tagId')
+            ? {
+                  id: searchParams.get('componentName')
+                      ? searchParams.get('componentName')!
+                      : parseInt(searchParams.get('tagId')!),
+                  type: searchParams.get('tagId') ? Type.Tag : Type.Component,
+              }
+            : {type: Type.Component};
+    }
+
+    useEffect(() => {
+        setEnvironment(getEnvironment());
+        setFilterData(getFilterData());
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [searchParams]);
 
     return (
         <LayoutContainer
@@ -102,6 +125,33 @@ export const Connections = () => {
                     <LeftSidebarNav
                         body={
                             <>
+                                {[
+                                    {label: 'All Environments', value: undefined},
+                                    {label: 'Development', value: 1},
+                                    {label: 'Test', value: 2},
+                                    {label: 'Production', value: 3},
+                                ]?.map((item) => (
+                                    <LeftSidebarNavItem
+                                        item={{
+                                            current: environment === item.value,
+                                            id: item.value,
+                                            name: item.label,
+                                            onItemClick: (id?: number | string) => {
+                                                setEnvironment(id as number);
+                                            },
+                                        }}
+                                        key={item.value}
+                                        toLink={`?environment=${item.value ?? ''}${filterData.id ? `&${filterData.type === Type.Component ? 'componentName' : 'tagId'}=${filterData.id}` : ''}`}
+                                    />
+                                ))}
+                            </>
+                        }
+                        title="Environments"
+                    />
+
+                    <LeftSidebarNav
+                        body={
+                            <>
                                 <LeftSidebarNavItem
                                     item={{
                                         current: !filterData?.id && filterData.type === Type.Component,
@@ -130,7 +180,7 @@ export const Connections = () => {
                                                     }),
                                             }}
                                             key={item.name}
-                                            toLink={`?componentName=${item.name}`}
+                                            toLink={`?componentName=${item.name}&environment=${environment ?? ''}`}
                                         />
                                     ))}
                             </>
@@ -160,7 +210,7 @@ export const Connections = () => {
                                                     },
                                                 }}
                                                 key={item.id}
-                                                toLink={`?tagId=${item.id}`}
+                                                toLink={`?tagId=${item.id}&environment=${environment ?? ''}`}
                                             />
                                         ))
                                     ))}

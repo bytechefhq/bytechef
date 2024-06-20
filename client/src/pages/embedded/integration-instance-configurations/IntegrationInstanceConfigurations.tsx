@@ -7,13 +7,13 @@ import IntegrationInstanceConfigurationWorkflowSheet from '@/pages/embedded/inte
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import {IntegrationInstanceConfigurationModel} from '@/shared/middleware/embedded/configuration';
+import {EnvironmentModel, IntegrationInstanceConfigurationModel} from '@/shared/middleware/embedded/configuration';
 import {useGetIntegrationInstanceConfigurationTagsQuery} from '@/shared/queries/embedded/integrationInstanceConfigurationTags.queries';
 import {useGetIntegrationInstanceConfigurationsQuery} from '@/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useGetIntegrationsQuery} from '@/shared/queries/embedded/integrations.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {Settings2Icon, TagIcon} from 'lucide-react';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
 export enum Type {
@@ -24,16 +24,8 @@ export enum Type {
 const IntegrationInstanceConfigurations = () => {
     const [searchParams] = useSearchParams();
 
-    const defaultCurrentState = {
-        id: searchParams.get('integrationId')
-            ? parseInt(searchParams.get('integrationId')!)
-            : searchParams.get('tagId')
-              ? parseInt(searchParams.get('tagId')!)
-              : undefined,
-        type: searchParams.get('tagId') ? Type.Tag : Type.Integration,
-    };
-
-    const [filterData, setFilterData] = useState<{id?: number; type: Type}>(defaultCurrentState);
+    const [environment, setEnvironment] = useState<number | undefined>(getEnvironment());
+    const [filterData, setFilterData] = useState<{id?: number; type: Type}>(getFilterData());
 
     const {
         data: componentDefinitions,
@@ -56,6 +48,8 @@ const IntegrationInstanceConfigurations = () => {
         error: integrationInstanceConfigurationsError,
         isLoading: integrationInstanceConfigurationsLoading,
     } = useGetIntegrationInstanceConfigurationsQuery({
+        environment:
+            environment === 1 ? EnvironmentModel.Test : environment === 2 ? EnvironmentModel.Production : undefined,
         integrationId: searchParams.get('integrationId') ? parseInt(searchParams.get('integrationId')!) : undefined,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
@@ -98,6 +92,28 @@ const IntegrationInstanceConfigurations = () => {
         pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
     }
 
+    function getEnvironment() {
+        return searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : undefined;
+    }
+
+    function getFilterData() {
+        return searchParams.get('integrationId') || searchParams.get('tagId')
+            ? {
+                  id: searchParams.get('integrationId')
+                      ? parseInt(searchParams.get('integrationId')!)
+                      : parseInt(searchParams.get('tagId')!),
+                  type: searchParams.get('tagId') ? Type.Tag : Type.Integration,
+              }
+            : {type: Type.Integration};
+    }
+
+    useEffect(() => {
+        setEnvironment(searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : undefined);
+        setFilterData(getFilterData());
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [searchParams]);
+
     return (
         <LayoutContainer
             header={
@@ -124,6 +140,32 @@ const IntegrationInstanceConfigurations = () => {
             }
             leftSidebarBody={
                 <>
+                    <LeftSidebarNav
+                        body={
+                            <>
+                                {[
+                                    {label: 'All Environments', value: undefined},
+                                    {label: 'Test', value: 1},
+                                    {label: 'Production', value: 2},
+                                ]?.map((item) => (
+                                    <LeftSidebarNavItem
+                                        item={{
+                                            current: environment === item.value,
+                                            id: item.value,
+                                            name: item.label,
+                                            onItemClick: (id?: number | string) => {
+                                                setEnvironment(id as number);
+                                            },
+                                        }}
+                                        key={item.value}
+                                        toLink={`?environment=${item.value ?? ''}${filterData.id ? `&${filterData.type === Type.Integration ? 'integrationId' : 'tagId'}=${filterData.id}` : ''}`}
+                                    />
+                                ))}
+                            </>
+                        }
+                        title="Environments"
+                    />
+
                     <LeftSidebarNav
                         body={
                             <>
@@ -161,7 +203,7 @@ const IntegrationInstanceConfigurations = () => {
                                                 },
                                             }}
                                             key={item.componentName}
-                                            toLink={`?integrationId=${item.id}`}
+                                            toLink={`?integrationId=${item.id}&environment=${environment ?? ''}`}
                                         />
                                     ))}
                             </>
@@ -189,7 +231,7 @@ const IntegrationInstanceConfigurations = () => {
                                                     },
                                                 }}
                                                 key={item.id}
-                                                toLink={`?tagId=${item.id}`}
+                                                toLink={`?tagId=${item.id}&environment=${environment ?? ''}`}
                                             />
                                         ))
                                     ) : (

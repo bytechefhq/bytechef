@@ -4,11 +4,12 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import TablePagination from '@/components/TablePagination';
 import {Label} from '@/components/ui/label';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {ProjectModel} from '@/shared/middleware/automation/configuration';
+import {EnvironmentModel, ProjectModel} from '@/shared/middleware/automation/configuration';
 import {
     GetWorkflowExecutionsPageJobStatusEnum,
     WorkflowExecutionModelFromJSON,
@@ -64,6 +65,9 @@ export const WorkflowExecutions = () => {
     const [filterEndDate, setFilterEndDate] = useState<Date | undefined>(
         searchParams.get('endDate') ? new Date(+searchParams.get('endDate')!) : undefined
     );
+    const [filterEnvironment, setFilterEnvironment] = useState<string | undefined>(
+        searchParams.get('environment') ? searchParams.get('environment')! : undefined
+    );
     const [filterPageNumber, setFilterPageNumber] = useState<number | undefined>(
         searchParams.get('pageNumber') ? +searchParams.get('pageNumber')! : undefined
     );
@@ -99,6 +103,12 @@ export const WorkflowExecutions = () => {
         error: workflowExecutionsError,
         isLoading: workflowExecutionsIsLoading,
     } = useGetWorkflowExecutionsQuery({
+        environment:
+            filterEnvironment === '1'
+                ? EnvironmentModel.Test
+                : filterEnvironment === '2'
+                  ? EnvironmentModel.Production
+                  : undefined,
         jobEndDate: filterEndDate,
         jobStartDate: filterStartDate,
         jobStatus: filterStatus,
@@ -131,6 +141,7 @@ export const WorkflowExecutions = () => {
     );
 
     function filter(
+        environment?: string,
         status?: GetWorkflowExecutionsPageJobStatusEnum,
         startDate?: Date,
         endDate?: Date,
@@ -140,7 +151,7 @@ export const WorkflowExecutions = () => {
         pageNumber?: number
     ) {
         navigate(
-            `/automation/executions?status=${status ? status : ''}&startDate=${startDate ? startDate.getTime() : ''}&endDate=${endDate ? endDate.getTime() : ''}&projectId=${projectId ? projectId : ''}&projectInstanceId=${projectInstanceId ? projectInstanceId : ''}&workflowId=${workflowId ? workflowId : ''}&pageNumber=${pageNumber ? pageNumber : ''}`
+            `/automation/executions?environment=${environment ?? ''}&status=${status ? status : ''}&startDate=${startDate ? startDate.getTime() : ''}&endDate=${endDate ? endDate.getTime() : ''}&projectId=${projectId ? projectId : ''}&projectInstanceId=${projectInstanceId ? projectInstanceId : ''}&workflowId=${workflowId ? workflowId : ''}&pageNumber=${pageNumber ? pageNumber : ''}`
         );
     }
 
@@ -148,9 +159,25 @@ export const WorkflowExecutions = () => {
         setFilterEndDate(date);
 
         filter(
+            filterEnvironment,
             filterStatus,
             filterStartDate,
             date,
+            filterProjectId,
+            filterProjectInstanceId,
+            filterWorkflowId,
+            filterPageNumber
+        );
+    };
+
+    const handleEnvironmentChange = (environment: string) => {
+        setFilterEnvironment(environment);
+
+        filter(
+            environment,
+            filterStatus,
+            filterStartDate,
+            filterEndDate,
             filterProjectId,
             filterProjectInstanceId,
             filterWorkflowId,
@@ -162,6 +189,7 @@ export const WorkflowExecutions = () => {
         setFilterPageNumber(pageNumber);
 
         filter(
+            filterEnvironment,
             filterStatus,
             filterStartDate,
             filterEndDate,
@@ -182,6 +210,7 @@ export const WorkflowExecutions = () => {
         setFilterProjectId(projectId);
 
         filter(
+            filterEnvironment,
             filterStatus,
             filterStartDate,
             filterEndDate,
@@ -202,6 +231,7 @@ export const WorkflowExecutions = () => {
         setFilterProjectInstanceId(projectInstanceId);
 
         filter(
+            filterEnvironment,
             filterStatus,
             filterStartDate,
             filterEndDate,
@@ -222,6 +252,7 @@ export const WorkflowExecutions = () => {
         setFilterStatus(status);
 
         filter(
+            filterEnvironment,
             status,
             filterStartDate,
             filterEndDate,
@@ -236,6 +267,7 @@ export const WorkflowExecutions = () => {
         setFilterStartDate(date);
 
         filter(
+            filterEnvironment,
             filterStatus,
             date,
             filterEndDate,
@@ -256,6 +288,7 @@ export const WorkflowExecutions = () => {
         setFilterWorkflowId(workflowId);
 
         filter(
+            filterEnvironment,
             filterStatus,
             filterStartDate,
             filterEndDate,
@@ -290,6 +323,22 @@ export const WorkflowExecutions = () => {
             }
             leftSidebarBody={
                 <div className="space-y-4 px-4">
+                    <div className="flex flex-col space-y-2">
+                        <Label>Environment</Label>
+
+                        <Select onValueChange={handleEnvironmentChange} value={filterEnvironment}>
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select environment" />
+                            </SelectTrigger>
+
+                            <SelectContent>
+                                <SelectItem value="1">Test</SelectItem>
+
+                                <SelectItem value="2">Production</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
                     <div className="flex flex-col space-y-2">
                         <Label>Status</Label>
 
