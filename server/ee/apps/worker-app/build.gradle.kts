@@ -95,6 +95,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:nifty"))
     implementation(project(":server:libs:modules:components:object-helper"))
     implementation(project(":server:libs:modules:components:ods-file"))
+    implementation(project(":server:libs:modules:components:one-simple-api"))
     implementation(project(":server:libs:modules:components:openai"))
     implementation(project(":server:libs:modules:components:petstore"))
     implementation(project(":server:libs:modules:components:pipedrive"))
