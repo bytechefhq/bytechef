@@ -15,12 +15,14 @@ dependencies {
     implementation(project(":server:libs:platform:platform-security:platform-security-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
 
+    testImplementation("com.zaxxer:HikariCP")
     testImplementation("org.springframework:spring-tx")
     testImplementation("org.springframework.boot:spring-boot-starter-mail")
     testImplementation("org.springframework.boot:spring-boot-starter-validation")
     testImplementation("org.springframework.boot:spring-boot-starter-web")
     testImplementation("org.springframework.data:spring-data-jdbc")
     testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("org.testcontainers:postgresql")
     testImplementation(project(":server:libs:platform:platform-rest:platform-rest-impl"))
     testImplementation(project(":server:libs:platform:platform-user:platform-user-service"))
     testImplementation(project(":server:libs:config:jdbc-config"))
@@ -29,4 +31,8 @@ dependencies {
     testImplementation(project(":server:libs:config:security-config"))
     testImplementation(project(":server:libs:core:tenant:tenant-single-service"))
     testImplementation(project(":server:libs:test:test-int-support"))
+
+    testImplementation(project(":server:ee:libs:core:tenant:tenant-multi-service"))
+    testImplementation(project(":server:ee:libs:config:tenant-multi-data-config"))
+    testImplementation(project(":server:ee:libs:config:tenant-multi-security-config"))
 }

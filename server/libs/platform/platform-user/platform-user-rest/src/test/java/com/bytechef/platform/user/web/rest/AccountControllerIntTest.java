@@ -348,6 +348,7 @@ class AccountControllerIntTest {
 
         // Duplicate email, different login
         ManagedUserVM secondUser = new ManagedUserVM();
+
         secondUser.setLogin("test-register-duplicate-email-2");
         secondUser.setPassword(firstUser.getPassword());
         secondUser.setFirstName(firstUser.getFirstName());
