@@ -157,16 +157,16 @@ const Property = ({
         path = name;
     }
 
-    if (path) {
-        path = path.replace(/\s/g, '_');
-    }
-
     if (control) {
         path = `parameters.${name}`;
     }
 
     if (path === objectName) {
         path = `${path}.${name}`;
+    }
+
+    if (path) {
+        path = path.replaceAll(/\s/g, '__nbsp__').replaceAll(/-/g, '__dash__');
     }
 
     const saveInputValue = useDebouncedCallback(() => {
@@ -529,6 +529,8 @@ const Property = ({
 
                 return;
             }
+
+            console.log(name, path);
 
             const paramValue = resolvePath(parameters, path);
 
