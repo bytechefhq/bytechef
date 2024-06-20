@@ -77,4 +77,12 @@ public class Authority {
     public int hashCode() {
         return getClass().hashCode();
     }
+
+    @Override
+    public String toString() {
+        return "Authority{" +
+            "id=" + id +
+            ", name='" + name + '\'' +
+            '}';
+    }
 }
