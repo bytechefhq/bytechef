@@ -61,7 +61,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.twilio.util.TwilioUtils;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
@@ -87,11 +87,67 @@ public class TwilioSendSMSAction {
                 .description("The SID of the Account creating the Message resource.")
                 .required(false),
             string(TO)
-                .label("to")
+                .label("To")
                 .description(
                     "The recipient's phone number in E.164 format (for SMS/MMS) or channel address, e.g. " +
                         "whatsapp:+15552229999.")
-                .controlType(Property.ControlType.PHONE)
+                .controlType(ControlType.PHONE)
+                .required(true),
+            integer(SOURCE)
+                .label("Source")
+                .options(
+                    option("From", 1),
+                    option("Messaging Service SID", 2))
+                .required(true),
+            string(FROM)
+                .label("From")
+                .description(
+                    "The sender's Twilio phone number (in E.164 format), alphanumeric sender ID, Wireless SIM, short " +
+                        "code, or channel address (e.g., whatsapp:+15554449999). The value of the from parameter " +
+                        "must be a sender that is hosted within Twilio and belongs to the Account creating the " +
+                        "Message. If you are using messaging_service_sid, this parameter can be empty (Twilio " +
+                        "assigns a from value from the Messaging Service's Sender Pool) or you can provide a " +
+                        "specific sender from your Sender Pool.")
+                .displayCondition("%s == %s".formatted(SOURCE, 1))
+                .controlType(ControlType.PHONE)
+                .required(true),
+            string(MESSAGING_SERVICE_SID)
+                .label("Messaging Service SID")
+                .description(
+                    "The SID of the Messaging Service you want to associate with the Message. When this parameter is " +
+                        "provided and the from parameter is omitted, Twilio selects the optimal sender from the " +
+                        "Messaging Service's Sender Pool. You may also provide a from parameter if you want to use a " +
+                        "specific Sender from the Sender Pool.")
+                .displayCondition("%s == %s".formatted(SOURCE, 2))
+                .required(true),
+            integer(CONTENT)
+                .label("Content")
+                .options(
+                    option("Body", 1),
+                    option("Media URL", 2))
+                .required(true),
+            string(BODY)
+                .label("Body")
+                .description(
+                    "The text content of the outgoing message. Can be up to 1,600 characters in length. SMS only: If " +
+                        "the body contains more than 160 GSM-7 characters (or 70 UCS-2 characters), the message is " +
+                        "segmented and charged accordingly. For long body text, consider using the send_as_mms " +
+                        "parameter.")
+                .maxLength(1600)
+                .displayCondition("%s == %s".formatted(CONTENT, 1))
+                .required(true),
+            array(MEDIA_URL)
+                .label("Media URL")
+                .description(
+                    "The URL of media to include in the Message content. jpeg, jpg, gif, and png file types are " +
+                        "fully supported by Twilio and content is formatted for delivery on destination devices. The " +
+                        "media size limit is 5 MB for supported file types (jpeg, jpg, png, gif) and 500 KB for " +
+                        "other types of accepted media. To send more than one image in the message, provide multiple " +
+                        "media_url parameters in the POST request. You can include up to ten media_url parameters " +
+                        "per message. International and carrier limits apply.")
+                .items(
+                    string()
+                        .controlType(ControlType.URL))
                 .required(true),
             string(STATUS_CALLBACK)
                 .label("Status callback")
@@ -100,7 +156,7 @@ public class TwilioSendSMSAction {
                         "contain a valid hostname and underscores are not allowed. If you include this parameter " +
                         "with the messaging_service_sid, Twilio uses this URL instead of the Status Callback URL of " +
                         "the Messaging Service.")
-                .controlType(Property.ControlType.URL)
+                .controlType(ControlType.URL)
                 .required(false),
             string(APPLICATION_SID)
                 .label("Application SID")
@@ -220,62 +276,6 @@ public class TwilioSendSMSAction {
                     option("enable", "enable"),
                     option("disable", "disable"))
                 .required(false),
-            string(SOURCE)
-                .label("Source")
-                .options(
-                    option("From", FROM),
-                    option("Messaging Service SID", MESSAGING_SERVICE_SID))
-                .required(true),
-            string(FROM)
-                .label("From")
-                .description(
-                    "The sender's Twilio phone number (in E.164 format), alphanumeric sender ID, Wireless SIM, short " +
-                        "code, or channel address (e.g., whatsapp:+15554449999). The value of the from parameter " +
-                        "must be a sender that is hosted within Twilio and belongs to the Account creating the " +
-                        "Message. If you are using messaging_service_sid, this parameter can be empty (Twilio " +
-                        "assigns a from value from the Messaging Service's Sender Pool) or you can provide a " +
-                        "specific sender from your Sender Pool.")
-                .displayCondition("%s == '%s'".formatted(SOURCE, FROM))
-                .controlType(Property.ControlType.PHONE)
-                .required(true),
-            string(MESSAGING_SERVICE_SID)
-                .label("Messaging Service SID")
-                .description(
-                    "The SID of the Messaging Service you want to associate with the Message. When this parameter is " +
-                        "provided and the from parameter is omitted, Twilio selects the optimal sender from the " +
-                        "Messaging Service's Sender Pool. You may also provide a from parameter if you want to use a " +
-                        "specific Sender from the Sender Pool.")
-                .displayCondition("%s == '%s'".formatted(SOURCE, MESSAGING_SERVICE_SID))
-                .required(true),
-            string(CONTENT)
-                .label("Content")
-                .options(
-                    option("Body", BODY),
-                    option("Media URL", MEDIA_URL))
-                .required(true),
-            string(BODY)
-                .label("Body")
-                .description(
-                    "The text content of the outgoing message. Can be up to 1,600 characters in length. SMS only: If " +
-                        "the body contains more than 160 GSM-7 characters (or 70 UCS-2 characters), the message is " +
-                        "segmented and charged accordingly. For long body text, consider using the send_as_mms " +
-                        "parameter.")
-                .maxLength(1600)
-                .displayCondition("%s == '%s'".formatted(CONTENT, BODY))
-                .required(true),
-            array(MEDIA_URL)
-                .label("Media URL")
-                .description(
-                    "The URL of media to include in the Message content. jpeg, jpg, gif, and png file types are " +
-                        "fully supported by Twilio and content is formatted for delivery on destination devices. The " +
-                        "media size limit is 5 MB for supported file types (jpeg, jpg, png, gif) and 500 KB for " +
-                        "other types of accepted media. To send more than one image in the message, provide multiple " +
-                        "media_url parameters in the POST request. You can include up to ten media_url parameters " +
-                        "per message. International and carrier limits apply.")
-                .items(
-                    string()
-                        .controlType(Property.ControlType.URL))
-                .required(true),
             string(CONTENT_SID)
                 .label("Content SID")
                 .description(
@@ -284,7 +284,7 @@ public class TwilioSendSMSAction {
                         "Template is not used. Find the SID in the Console on the Content Editor page. For Content " +
                         "API users, the SID is found in Twilio's response when creating the Template or by fetching " +
                         "your Templates.")
-                .displayCondition("%s == '%s'".formatted(CONTENT, MEDIA_URL))
+                .displayCondition("%s == %s".formatted(CONTENT, 2))
                 .required(false))
         .outputSchema(
             object()
@@ -355,7 +355,7 @@ public class TwilioSendSMSAction {
         if (isFirstCase(from, body, pathAccountSid)) {
             MessageCreator messageCreator = Message.creator(new PhoneNumber(to), messagingServiceSID, mediaURL);
 
-            return getMessage(inputParameters, messageCreator);
+            return sendMessage(inputParameters, messageCreator);
         }
 
         // second case: pathAccountSid, to, messagingServiceSid, mediaUrl
@@ -364,7 +364,7 @@ public class TwilioSendSMSAction {
             MessageCreator messageCreator = Message.creator(
                 pathAccountSid, new PhoneNumber(to), messagingServiceSID, mediaURL);
 
-            return getMessage(inputParameters, messageCreator);
+            return sendMessage(inputParameters, messageCreator);
         }
 
         // third case: to, messagingServiceSid, body
@@ -372,7 +372,7 @@ public class TwilioSendSMSAction {
         if (isThirdCase(from, body, pathAccountSid)) {
             MessageCreator messageCreator = Message.creator(new PhoneNumber(to), messagingServiceSID, body);
 
-            return getMessage(inputParameters, messageCreator);
+            return sendMessage(inputParameters, messageCreator);
         }
 
         // fourth case: pathAccountSid, to, messagingServiceSid, body
@@ -381,7 +381,7 @@ public class TwilioSendSMSAction {
             MessageCreator messageCreator = Message.creator(
                 pathAccountSid, new PhoneNumber(to), messagingServiceSID, body);
 
-            return getMessage(inputParameters, messageCreator);
+            return sendMessage(inputParameters, messageCreator);
         }
 
         // fifth case: to, from, mediaUrl
@@ -389,7 +389,7 @@ public class TwilioSendSMSAction {
         if (isFifthCase(from, body, pathAccountSid)) {
             MessageCreator messageCreator = Message.creator(new PhoneNumber(to), new PhoneNumber(from), mediaURL);
 
-            return getMessage(inputParameters, messageCreator);
+            return sendMessage(inputParameters, messageCreator);
         }
 
         // sixth case: pathAccountSid, to, from, mediaUrl
@@ -398,7 +398,7 @@ public class TwilioSendSMSAction {
             MessageCreator messageCreator = Message.creator(
                 pathAccountSid, new PhoneNumber(to), new PhoneNumber(from), mediaURL);
 
-            return getMessage(inputParameters, messageCreator);
+            return sendMessage(inputParameters, messageCreator);
         }
 
         // seventh case: to, from, body
@@ -406,7 +406,7 @@ public class TwilioSendSMSAction {
         if (isSeventhCase(from, body, pathAccountSid)) {
             MessageCreator messageCreator = Message.creator(new PhoneNumber(to), new PhoneNumber(from), body);
 
-            return getMessage(inputParameters, messageCreator);
+            return sendMessage(inputParameters, messageCreator);
         }
 
         // eighth case: pathAccountSid, to, from, body
@@ -414,11 +414,11 @@ public class TwilioSendSMSAction {
         MessageCreator messageCreator = Message.creator(
             pathAccountSid, new PhoneNumber(to), new PhoneNumber(from), body);
 
-        return getMessage(inputParameters, messageCreator);
+        return sendMessage(inputParameters, messageCreator);
 
     }
 
-    private static Message getMessage(Parameters inputParameters, MessageCreator messageCreator) {
+    private static Message sendMessage(Parameters inputParameters, MessageCreator messageCreator) {
         if (inputParameters.getString(ZONE_ID) != null) {
             messageCreator.setSendAt(ZonedDateTime.of(
                 inputParameters.getLocalDateTime(DATE_TIME),
