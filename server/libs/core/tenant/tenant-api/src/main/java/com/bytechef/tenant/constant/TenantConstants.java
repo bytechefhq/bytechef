@@ -22,4 +22,5 @@ package com.bytechef.tenant.constant;
 public class TenantConstants {
 
     public static final String CURRENT_TENANT_ID = "CURRENT_TENANT_ID";
+    public static final String TENANT_PREFIX = "bytechef";
 }

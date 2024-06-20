@@ -32,7 +32,11 @@ public class MultiTenantFilter extends OncePerRequestFilter {
 
         String currentTenantId = (String) session.getAttribute(TenantConstants.CURRENT_TENANT_ID);
 
-        TenantContext.setCurrentTenantId(currentTenantId);
+        if (currentTenantId == null) {
+            TenantContext.resetCurrentTenantId();
+        } else {
+            TenantContext.setCurrentTenantId(currentTenantId);
+        }
 
         filterChain.doFilter(request, response);
     }

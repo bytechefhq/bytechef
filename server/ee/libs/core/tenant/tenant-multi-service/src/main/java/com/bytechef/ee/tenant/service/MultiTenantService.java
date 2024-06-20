@@ -76,6 +76,7 @@ public class MultiTenantService implements TenantService, ResourceLoaderAware {
         tenantRepository.createTenant(tenantId);
     }
 
+    @Override
     public void deleteTenant(String tenantId) {
         tenantRepository.deleteTenant(tenantId);
     }
@@ -154,7 +155,7 @@ public class MultiTenantService implements TenantService, ResourceLoaderAware {
         List<String> schemas =
             tenantIds
                 .stream()
-                .map(TenantContext::getDatabaseSchema)
+                .map(TenantUtils::getDatabaseSchema)
                 .collect(Collectors.toList());
 
         multiTenantSpringLiquibase.setSchemas(schemas);

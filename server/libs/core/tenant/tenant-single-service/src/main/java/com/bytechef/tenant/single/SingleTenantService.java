@@ -35,6 +35,11 @@ public class SingleTenantService implements TenantService {
     }
 
     @Override
+    public void deleteTenant(String tenantId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public String getTenantIdByUserActivationKey(String key) {
         throw new UnsupportedOperationException();
     }

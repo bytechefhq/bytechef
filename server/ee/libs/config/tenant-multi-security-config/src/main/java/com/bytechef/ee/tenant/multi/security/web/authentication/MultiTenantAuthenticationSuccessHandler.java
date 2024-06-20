@@ -9,6 +9,7 @@ package com.bytechef.ee.tenant.multi.security.web.authentication;
 
 import com.bytechef.tenant.constant.TenantConstants;
 import com.bytechef.tenant.service.TenantService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -27,6 +28,7 @@ public class MultiTenantAuthenticationSuccessHandler implements AuthenticationSu
 
     private final TenantService tenantService;
 
+    @SuppressFBWarnings("EI")
     public MultiTenantAuthenticationSuccessHandler(TenantService tenantService) {
         this.tenantService = tenantService;
     }

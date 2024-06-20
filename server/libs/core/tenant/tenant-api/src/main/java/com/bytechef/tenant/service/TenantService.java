@@ -25,6 +25,8 @@ public interface TenantService {
 
     String createTenant();
 
+    void deleteTenant(String tenantId);
+
     String getTenantIdByUserActivationKey(String key);
 
     List<String> getTenantIdsByUserEmail(String email);

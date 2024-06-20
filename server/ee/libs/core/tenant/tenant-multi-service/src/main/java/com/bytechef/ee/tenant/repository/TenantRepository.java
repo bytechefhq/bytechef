@@ -16,8 +16,9 @@
 
 package com.bytechef.ee.tenant.repository;
 
-import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.constant.TenantConstants;
 import com.bytechef.tenant.domain.Tenant;
+import com.bytechef.tenant.util.TenantUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -47,7 +48,7 @@ public class TenantRepository {
     public String findTenantIdByOrganizationName(String organizationName) {
         List<String[]> tenantIds = findTenantIdsByColumnNames(
             tenantId -> "SELECT '%s' FROM %s.organization c WHERE UPPER(u.name) = UPPER('%s')".formatted(
-                tenantId, TenantContext.getDatabaseSchema(tenantId), organizationName),
+                tenantId, TenantUtils.getDatabaseSchema(tenantId), organizationName),
             1);
 
         if (tenantIds.size() > 1) {
@@ -69,16 +70,16 @@ public class TenantRepository {
             ResultSet resultSet =
                 statement.executeQuery(
                     "SELECT schema_name FROM information_schema.schemata WHERE schema_name LIKE '%s'".formatted(
-                        TenantContext.TENANT_PREFIX + '%'));
+                        TenantConstants.TENANT_PREFIX + '%'));
 
             while (resultSet.next()) {
                 String schemaName = resultSet.getString(1);
 
-                if (schemaName.equals(TenantContext.TENANT_PREFIX)) {
+                if (schemaName.equals(TenantConstants.TENANT_PREFIX)) {
                     continue;
                 }
 
-                tenants.add(TenantContext.getTenantId(schemaName));
+                tenants.add(TenantUtils.getTenantId(schemaName));
             }
         } catch (SQLException sqle) {
             throw new RuntimeException(sqle.getMessage(), sqle);
@@ -90,7 +91,7 @@ public class TenantRepository {
     public List<String> findTenantIdsByUserEmail(String email) {
         List<String[]> tenantIds = findTenantIdsByColumnNames(
             tenantId -> "SELECT '%s' FROM %s.user u WHERE UPPER(u.email) = UPPER('%s')".formatted(
-                tenantId, TenantContext.getDatabaseSchema(tenantId), email),
+                tenantId, TenantUtils.getDatabaseSchema(tenantId), email),
             1);
 
         return tenantIds.stream()
@@ -101,7 +102,7 @@ public class TenantRepository {
     public List<String> findTenantIdsByUserLogin(String login) {
         List<String[]> tenantIds = findTenantIdsByColumnNames(
             tenantId -> "SELECT '%s' FROM %s.user u WHERE UPPER(u.login) = UPPER('%s')".formatted(
-                tenantId, TenantContext.getDatabaseSchema(tenantId), login),
+                tenantId, TenantUtils.getDatabaseSchema(tenantId), login),
             1);
 
         return tenantIds.stream()
@@ -112,7 +113,7 @@ public class TenantRepository {
     public List<Tenant> findTenants() {
         List<String[]> rows =
             findTenantIdsByColumnNames(tenantId -> "SELECT '%s', c.id, c.name FROM %s.company c".formatted(
-                tenantId, TenantContext.getDatabaseSchema(tenantId)), 3);
+                tenantId, TenantUtils.getDatabaseSchema(tenantId)), 3);
 
         return rows.stream()
             .map(row -> {
@@ -128,7 +129,7 @@ public class TenantRepository {
     }
 
     public void createTenant(String tenantId) {
-        String schema = TenantContext.getDatabaseSchema(tenantId);
+        String schema = TenantUtils.getDatabaseSchema(tenantId);
 
         try (Connection connection = dataSource.getConnection(); Statement statement = connection.createStatement()) {
             statement.execute("CREATE SCHEMA %s".formatted(schema));
@@ -142,12 +143,12 @@ public class TenantRepository {
             ResultSet resultSet =
                 statement.executeQuery(
                     "SELECT MAX(schema_name) FROM information_schema.schemata WHERE schema_name LIKE '%s'".formatted(
-                        TenantContext.TENANT_PREFIX + '%'));
+                        TenantConstants.TENANT_PREFIX + '%'));
 
             if (resultSet.next()) {
                 String schemaName = resultSet.getString(1);
 
-                return TenantContext.getTenantId(schemaName);
+                return TenantUtils.getTenantId(schemaName);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -157,10 +158,10 @@ public class TenantRepository {
     }
 
     public void deleteTenant(String tenantId) {
-        String schema = TenantContext.getDatabaseSchema(tenantId);
+        String schema = TenantUtils.getDatabaseSchema(tenantId);
 
         try (Connection connection = dataSource.getConnection(); Statement statement = connection.createStatement()) {
-            statement.execute("DROP DATABASE %s".formatted(schema));
+            statement.execute("DROP SCHEMA %s CASCADE".formatted(schema));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -169,7 +170,7 @@ public class TenantRepository {
     public String findTenantIdByUserActivationKey(String activationKey) {
         List<String[]> tenantIds = findTenantIdsByColumnNames(
             tenantId -> "SELECT '%s' FROM %s.user u WHERE UPPER(u.activation_key) = UPPER('%s')".formatted(
-                tenantId, TenantContext.getDatabaseSchema(tenantId), activationKey),
+                tenantId, TenantUtils.getDatabaseSchema(tenantId), activationKey),
             1);
 
         if (tenantIds.size() > 1) {
@@ -187,7 +188,7 @@ public class TenantRepository {
     public String findTenantIdByUserResetKey(String resetKey) {
         List<String[]> tenantIds = findTenantIdsByColumnNames(
             tenantId -> "SELECT '%s' FROM %s.user u WHERE UPPER(u.reset_key) = UPPER('%s')".formatted(
-                tenantId, TenantContext.getDatabaseSchema(tenantId), resetKey),
+                tenantId, TenantUtils.getDatabaseSchema(tenantId), resetKey),
             1);
 
         if (tenantIds.size() > 1) {

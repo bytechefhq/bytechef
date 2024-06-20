@@ -37,6 +37,7 @@ import com.bytechef.platform.user.web.rest.vm.KeyAndPasswordVM;
 import com.bytechef.platform.user.web.rest.vm.ManagedUserVM;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.service.TenantService;
+import com.bytechef.tenant.util.TenantUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -150,7 +151,7 @@ public class AccountController {
 
             user.setId(null);
 
-            TenantContext.runWithTenantId(tenantId, () -> userService.saveUser(user));
+            TenantUtils.runWithTenantId(tenantId, () -> userService.saveUser(user));
         }
 
     }
@@ -201,7 +202,7 @@ public class AccountController {
         Optional<User> existingUser;
 
         if (tenantService.isMultiTenantEnabled()) {
-            existingUser = TenantContext.callWithTenantId(
+            existingUser = TenantUtils.callWithTenantId(
                 TenantContext.getCurrentTenantId(), () -> userService.fetchUserByEmail(userDTO.getEmail()));
         } else {
             existingUser = userService.fetchUserByEmail(userDTO.getEmail());
@@ -214,7 +215,7 @@ public class AccountController {
         Optional<User> user;
 
         if (tenantService.isMultiTenantEnabled()) {
-            user = TenantContext.callWithTenantId(
+            user = TenantUtils.callWithTenantId(
                 TenantContext.getCurrentTenantId(), () -> userService.fetchUserByLogin(userLogin));
         } else {
             user = userService.fetchUserByLogin(userLogin);
@@ -305,7 +306,7 @@ public class AccountController {
             user = tenantService.getTenantIdsByUserEmail(email)
                 .stream()
                 .findFirst()
-                .flatMap(tenantId -> TenantContext.callWithTenantId(
+                .flatMap(tenantId -> TenantUtils.callWithTenantId(
                     tenantId, () -> userService.requestPasswordReset(email)));
         } else {
             user = userService.requestPasswordReset(email);
@@ -338,7 +339,7 @@ public class AccountController {
         if (tenantService.isMultiTenantEnabled()) {
             String tenantId = tenantService.getTenantIdByUserResetKey(keyAndPassword.getKey());
 
-            user = TenantContext.callWithTenantId(
+            user = TenantUtils.callWithTenantId(
                 tenantId,
                 () -> userService.completePasswordReset(keyAndPassword.getNewPassword(), keyAndPassword.getKey()));
         } else {
