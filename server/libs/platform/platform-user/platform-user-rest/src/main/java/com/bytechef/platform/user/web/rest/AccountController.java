@@ -153,7 +153,6 @@ public class AccountController {
 
             TenantUtils.runWithTenantId(tenantId, () -> userService.saveUser(user));
         }
-
     }
 
     /**
@@ -199,27 +198,23 @@ public class AccountController {
             .orElseThrow(() -> new AccountResourceException(
                 "Current user login not found", AccountErrorType.USER_NOT_FOUND));
 
-        Optional<User> existingUser;
-
-        if (tenantService.isMultiTenantEnabled()) {
-            existingUser = TenantUtils.callWithTenantId(
-                TenantContext.getCurrentTenantId(), () -> userService.fetchUserByEmail(userDTO.getEmail()));
-        } else {
-            existingUser = userService.fetchUserByEmail(userDTO.getEmail());
-        }
+        Optional<User> existingUser = userService.fetchUserByEmail(userDTO.getEmail());
 
         if (existingUser.isPresent() && !isEqualsIgnoreCase(existingUser, userLogin)) {
             throw new EmailAlreadyUsedException();
         }
 
+        if (tenantService.isMultiTenantEnabled()) {
+            List<String> tenantIds = tenantService.getTenantIdsByUserEmail(userDTO.getEmail());
+
+            if (!tenantIds.contains(TenantContext.getCurrentTenantId())) {
+                throw new EmailAlreadyUsedException();
+            }
+        }
+
         Optional<User> user;
 
-        if (tenantService.isMultiTenantEnabled()) {
-            user = TenantUtils.callWithTenantId(
-                TenantContext.getCurrentTenantId(), () -> userService.fetchUserByLogin(userLogin));
-        } else {
-            user = userService.fetchUserByLogin(userLogin);
-        }
+        user = userService.fetchUserByLogin(userLogin);
 
         if (user.isEmpty()) {
             throw new AccountResourceException("User could not be found", AccountErrorType.USER_NOT_FOUND);
@@ -338,6 +333,11 @@ public class AccountController {
 
         if (tenantService.isMultiTenantEnabled()) {
             String tenantId = tenantService.getTenantIdByUserResetKey(keyAndPassword.getKey());
+
+            if (tenantId == null) {
+                throw new AccountResourceException(
+                    "No user was found for this reset key", AccountErrorType.USER_NOT_FOUND);
+            }
 
             user = TenantUtils.callWithTenantId(
                 tenantId,
