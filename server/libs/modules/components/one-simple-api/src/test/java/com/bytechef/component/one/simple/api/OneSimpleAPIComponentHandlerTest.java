@@ -26,8 +26,7 @@ class OneSimpleAPIComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-
-        JsonFileAssert.assertEquals("definition/one-simple-api_v1.json",
-            new OneSimpleAPIComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals(
+            "definition/one-simple-api_v1.json", new OneSimpleAPIComponentHandler().getDefinition());
     }
 }

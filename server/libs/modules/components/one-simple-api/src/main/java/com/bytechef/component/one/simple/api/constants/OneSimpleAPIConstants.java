@@ -16,6 +16,9 @@
 
 package com.bytechef.component.one.simple.api.constants;
 
+/**
+ * @author Luka Ljubic
+ */
 public class OneSimpleAPIConstants {
 
     public static final String ACCESS_TOKEN = "token";
@@ -33,5 +36,4 @@ public class OneSimpleAPIConstants {
 
     private OneSimpleAPIConstants() {
     }
-
 }
