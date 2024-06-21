@@ -73,9 +73,7 @@ public class OneSimpleAPIWebPageInformationAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        return context
-            .http(http -> http.get(BASE_URL + "/page_info"))
+        return context.http(http -> http.get(BASE_URL + "/page_info"))
             .body(
                 Context.Http.Body.of(
                     ACCESS_TOKEN, connectionParameters.getRequiredString(ACCESS_TOKEN),

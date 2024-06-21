@@ -37,7 +37,7 @@ public class OneSimpleAPIConnection {
                 .properties(
                     string(ACCESS_TOKEN)
                         .label("Access Token")
-                        .description("Access Token that is given to you when you create a API Token in onesimpleapi")
+                        .description("Access Token that is given to you when you create a API Token in OneSimpleApi")
                         .required(true))
                 .scopes((connection, context) -> List.of(
                     "shortener",

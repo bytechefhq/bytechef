@@ -56,9 +56,7 @@ public class OneSimpleAPIUrlShortenerAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        return context
-            .http(http -> http.get(BASE_URL + "/shortener/new"))
+        return context.http(http -> http.get(BASE_URL + "/shortener/new"))
             .body(
                 Body.of(
                     ACCESS_TOKEN, connectionParameters.getRequiredString(ACCESS_TOKEN),

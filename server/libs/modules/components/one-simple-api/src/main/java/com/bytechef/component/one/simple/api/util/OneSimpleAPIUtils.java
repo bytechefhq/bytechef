@@ -30,9 +30,12 @@ import java.util.Map;
  */
 public class OneSimpleAPIUtils {
 
+    private OneSimpleAPIUtils() {
+    }
+
     public static List<Option<String>> getCurrencyOptions(
-        Parameters parameters, Parameters parameters1, Map<String, String> stringStringMap, String s,
-        ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, ActionContext context) {
 
         List<Option<String>> options = new ArrayList<>();
 
@@ -52,8 +55,5 @@ public class OneSimpleAPIUtils {
         options.add(option("United States Dollar", "USD"));
 
         return options;
-    }
-
-    private OneSimpleAPIUtils() {
     }
 }

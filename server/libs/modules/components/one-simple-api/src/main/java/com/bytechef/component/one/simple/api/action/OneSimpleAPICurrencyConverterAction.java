@@ -74,9 +74,7 @@ public class OneSimpleAPICurrencyConverterAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        return context
-            .http(http -> http.get(BASE_URL + "/exchange_rate"))
+        return context.http(http -> http.get(BASE_URL + "/exchange_rate"))
             .body(
                 Body.of(
                     ACCESS_TOKEN, connectionParameters.getRequiredString(ACCESS_TOKEN),
