@@ -137,6 +137,10 @@ bytechef:
   cache:
     # Cache provider (redis | simple) default: simple
     provider: simple
+  component:
+    registry:
+      # The list of component names to exclude from runtime
+      exclude:
   data-storage:
     provider: db
   # Edition (ce - Community Edition | ee - Enterprise Edition) default: ee

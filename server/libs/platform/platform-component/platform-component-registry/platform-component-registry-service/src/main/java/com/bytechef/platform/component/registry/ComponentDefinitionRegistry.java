@@ -32,6 +32,7 @@ import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.platform.component.factory.ComponentHandlerListFactory;
+import com.bytechef.platform.component.registry.config.ComponentRegistryProperties;
 import com.bytechef.platform.registry.util.PropertyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
@@ -69,7 +70,7 @@ public class ComponentDefinitionRegistry {
     private final List<ComponentDefinition> componentDefinitions;
 
     public ComponentDefinitionRegistry(
-        List<ComponentHandler> componentHandlers,
+        ComponentRegistryProperties componentRegistryProperties, List<ComponentHandler> componentHandlers,
         @Autowired(required = false) ComponentHandlerListFactory componentHandlerListFactory) {
 
         List<ComponentHandler> mergedComponentHandlers = CollectionUtils.concat(
@@ -83,6 +84,13 @@ public class ComponentDefinitionRegistry {
         List<ComponentDefinition> componentDefinitions = CollectionUtils.concat(
             CollectionUtils.map(mergedComponentHandlers, ComponentHandler::getDefinition),
             MANUAL_COMPONENT_DEFINITION, MISSING_COMPONENT_DEFINITION);
+
+        if (!CollectionUtils.isEmpty(componentRegistryProperties.getExclude())) {
+            componentDefinitions = componentDefinitions.stream()
+                .filter(componentDefinition -> !CollectionUtils.contains(
+                    componentRegistryProperties.getExclude(), componentDefinition.getName()))
+                .toList();
+        }
 
         this.componentDefinitions = CollectionUtils.sort(componentDefinitions, this::compare);
 
