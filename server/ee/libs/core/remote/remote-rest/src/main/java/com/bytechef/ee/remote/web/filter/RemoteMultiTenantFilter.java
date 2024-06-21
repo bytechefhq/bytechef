@@ -23,7 +23,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * @author Ivica Cardic
  */
 @Component
-public class MultiTenantFilter extends OncePerRequestFilter {
+public class RemoteMultiTenantFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
