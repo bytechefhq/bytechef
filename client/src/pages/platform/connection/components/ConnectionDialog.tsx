@@ -383,9 +383,9 @@ const ConnectionDialog = ({
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
             {!componentDefinitionsLoading && (
-                <DialogContent onInteractOutside={(event) => event.preventDefault()}>
+                <DialogContent className="gap-0 px-0 py-6" onInteractOutside={(event) => event.preventDefault()}>
                     <Form {...form}>
-                        <DialogHeader>
+                        <DialogHeader className="px-6">
                             <DialogTitle>{`${connection?.id ? 'Edit' : 'Create'} Connection`}</DialogTitle>
 
                             {!connection?.id && (
@@ -398,7 +398,7 @@ const ConnectionDialog = ({
                         {errors?.length > 0 && <Errors errors={errors} />}
 
                         {(wizardStep === 'configuration_step' || oAuth2AuthorizationParametersLoading) && (
-                            <div className="grid max-h-[600px] gap-4 overflow-y-auto">
+                            <div className="flex flex-col space-y-4 overflow-y-auto p-6">
                                 {!connection?.id && (
                                     <FormField
                                         control={control}
@@ -631,8 +631,8 @@ const ConnectionDialog = ({
                                                 <FormControl>
                                                     <CreatableSelect
                                                         field={field}
-                                                        fieldsetClassName="mb-0"
-                                                        isMulti={true}
+                                                        isMulti
+                                                        menuPlacement="top"
                                                         onCreateOption={(inputValue: string) => {
                                                             setValue('tags', [
                                                                 ...getValues().tags!,
@@ -643,13 +643,11 @@ const ConnectionDialog = ({
                                                                 },
                                                             ]);
                                                         }}
-                                                        options={remainingTags!.map((tag: TagModel) => {
-                                                            return {
-                                                                label: tag.name,
-                                                                value: tag.name.toLowerCase().replace(/\W/g, ''),
-                                                                ...tag,
-                                                            };
-                                                        })}
+                                                        options={remainingTags!.map((tag: TagModel) => ({
+                                                            label: tag.name,
+                                                            value: tag.name.toLowerCase().replace(/\W/g, ''),
+                                                            ...tag,
+                                                        }))}
                                                     />
                                                 </FormControl>
 
@@ -691,7 +689,7 @@ const ConnectionDialog = ({
                             </div>
                         )}
 
-                        <DialogFooter>
+                        <DialogFooter className="px-6">
                             {wizardStep === 'oauth_step' && (
                                 <Button
                                     onClick={() => {
