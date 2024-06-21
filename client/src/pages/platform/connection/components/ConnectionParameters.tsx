@@ -8,66 +8,76 @@ const ConnectionParameters = ({
     connection: ConnectionModel;
     connectionDefinition: ConnectionDefinitionModel;
 }) => {
-    const authorizations = connectionDefinition.authorizations?.filter(
+    const {authorizations, properties: connectionProperties} = connectionDefinition;
+    const {authorizationParameters, connectionParameters} = connection;
+
+    const existingAuthorizations = authorizations?.filter(
         (authorization) =>
             authorization.properties &&
-            authorization.properties.filter((property) => !!connection.authorizationParameters![property.name!])
-                .length > 0
+            authorization.properties.filter((property) => !!authorizationParameters![property.name!]).length > 0
     );
 
     if (
-        connection.connectionParameters &&
-        Object.values(connection.connectionParameters).every((x) => x === null || x === '') &&
-        connection.authorizationParameters &&
-        Object.values(connection.authorizationParameters).every((x) => x === null || x === '')
+        connectionParameters &&
+        Object.values(connectionParameters).every((parameter) => parameter === null || parameter === '') &&
+        authorizationParameters &&
+        Object.values(authorizationParameters).every((parameter) => parameter === null || parameter === '')
     ) {
         return <></>;
     }
 
+    const hasConnectionParameters =
+        connectionProperties && connectionParameters && !!Object.keys(connectionParameters).length;
+
+    const hasAuthorizationParameters =
+        existingAuthorizations && authorizationParameters && !!Object.keys(authorizationParameters).length;
+
     return (
-        <div className="flex flex-col gap-1">
-            <div className="text-sm font-medium">Connection Parameters</div>
+        <div className="space-y-4">
+            <h2 className="text-center font-semibold uppercase text-gray-500">
+                {hasConnectionParameters ? 'Connection' : 'Authorization'} Parameters
+            </h2>
 
-            <div className="flex flex-col gap-3 text-sm">
-                <div className="flex w-full flex-col gap-1">
-                    {connectionDefinition.properties &&
-                        connection.connectionParameters &&
-                        Object.keys(connection.connectionParameters).length > 0 &&
-                        connectionDefinition.properties
-                            .filter((property) => !!connection.connectionParameters![property.name!])
+            <div className="flex flex-col text-sm">
+                {hasConnectionParameters && (
+                    <ul className="flex w-full flex-col">
+                        {connectionProperties!
+                            .filter((property) => !!connectionParameters![property.name!])
                             .map((property) => (
-                                <div className="flex w-full" key={property.name}>
-                                    <div className="w-4/12 text-muted-foreground">{property.name}:</div>
+                                <li className="flex w-full" key={property.name}>
+                                    <span className="text-muted-foreground">{property.name}:</span>
 
-                                    <div className="col-span-2">{connection.connectionParameters![property.name!]}</div>
-                                </div>
+                                    <span>{connectionParameters![property.name!]}</span>
+                                </li>
                             ))}
-                </div>
+                    </ul>
+                )}
 
-                {authorizations &&
-                    connection.authorizationParameters &&
-                    Object.keys(connection.authorizationParameters).length > 0 &&
-                    authorizations.map((authorization) => (
-                        <div className="flex w-full flex-col gap-1" key={authorization.name}>
-                            <div className="flex">
-                                <div className="w-4/12 font-medium text-muted-foreground">Authorization:</div>
+                {hasAuthorizationParameters &&
+                    existingAuthorizations.map((authorization) => (
+                        <ul className="flex w-full flex-col space-y-1" key={authorization.name}>
+                            <li className="flex justify-between">
+                                <span className="font-medium text-muted-foreground">Authorization:</span>
 
-                                <div className="col-span-2">{authorization.title}</div>
-                            </div>
+                                <span className="">{authorization.title}</span>
+                            </li>
 
-                            {authorization.properties &&
-                                authorization.properties
-                                    .filter((property) => !!connection.authorizationParameters![property.name!])
-                                    .map((property) => (
-                                        <div className="flex w-full" key={property.name}>
-                                            <div className="w-4/12 text-muted-foreground">{property.name}:</div>
+                            {authorization.properties && (
+                                <>
+                                    {authorization.properties
+                                        .filter((property) => !!authorizationParameters![property.name!])
+                                        .map((property) => (
+                                            <li className="flex w-full justify-between" key={property.name}>
+                                                <span className="text-muted-foreground">{property.name}:</span>
 
-                                            <div className="col-span-2">
-                                                {connection.authorizationParameters![property.name!]}
-                                            </div>
-                                        </div>
-                                    ))}
-                        </div>
+                                                <pre className="self-end text-xs">
+                                                    {authorizationParameters![property.name!]}
+                                                </pre>
+                                            </li>
+                                        ))}
+                                </>
+                            )}
+                        </ul>
                     ))}
             </div>
         </div>
