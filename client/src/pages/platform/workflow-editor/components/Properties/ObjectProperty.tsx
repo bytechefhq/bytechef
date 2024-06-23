@@ -181,13 +181,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
                 )}
             >
                 {(subProperties as unknown as Array<SubPropertyType>)?.map((subProperty, index) => (
-                    <div
-                        className={twMerge(
-                            'relative flex w-full',
-                            subProperty.controlType === 'OBJECT_BUILDER' && !isContainerObject && 'pl-2'
-                        )}
-                        key={`${property.name}_${subProperty.name}_${index}`}
-                    >
+                    <div className="relative flex w-full" key={`${property.name}_${subProperty.name}_${index}`}>
                         <Property
                             arrayIndex={arrayIndex}
                             arrayName={arrayName}
@@ -197,7 +191,14 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
                                 isContainerObject && 'pb-0',
                                 !arrayName && !isContainerObject && 'pl-2'
                             )}
-                            inputTypeSwitchButtonClassName={subProperty.custom ? 'mr-6' : ''}
+                            deletePropertyButton={
+                                subProperty.custom && name && subProperty.name && currentComponent ? (
+                                    <DeletePropertyButton
+                                        onClick={() => handleDeleteClick(subProperty)}
+                                        propertyName={subProperty.name}
+                                    />
+                                ) : undefined
+                            }
                             key={`${property.name}_${subProperty.name}_${index}`}
                             objectName={arrayName ? '' : name}
                             operationName={operationName}
@@ -207,16 +208,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
                                 ...subProperty,
                                 name: subProperty.name,
                             }}
-                            showDeletePropertyButton
                         />
-
-                        {subProperty.custom && name && subProperty.name && currentComponent && (
-                            <DeletePropertyButton
-                                className="absolute right-0"
-                                onClick={() => handleDeleteClick(subProperty)}
-                                propertyName={subProperty.name}
-                            />
-                        )}
                     </div>
                 ))}
             </ul>

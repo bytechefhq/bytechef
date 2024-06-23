@@ -16,9 +16,9 @@ export type SelectOptionType = {
 
 interface PropertySelectProps {
     defaultValue?: string;
+    deletePropertyButton?: ReactNode;
     description?: string;
     handleInputTypeSwitchButtonClick?: () => void;
-    inputTypeSwitchButtonClassName?: string;
     label?: string;
     leadingIcon?: ReactNode;
     name?: string;
@@ -32,9 +32,9 @@ interface PropertySelectProps {
 
 const PropertySelect = ({
     defaultValue,
+    deletePropertyButton,
     description,
     handleInputTypeSwitchButtonClick,
-    inputTypeSwitchButtonClassName,
     label,
     leadingIcon,
     name,
@@ -47,30 +47,32 @@ const PropertySelect = ({
 }: PropertySelectProps) => (
     <fieldset className="w-full space-y-1">
         {label && (
-            <div className="flex items-center">
-                <Label className={twMerge(description && 'mr-1', 'leading-normal')} htmlFor={name}>
-                    <span>{label}</span>
+            <div className="flex w-full items-center justify-between">
+                <div className="flex items-center">
+                    <Label className={twMerge(description && 'mr-1', 'leading-normal')} htmlFor={name}>
+                        <span>{label}</span>
 
-                    {required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
-                </Label>
+                        {required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
+                    </Label>
 
-                {description && (
-                    <Tooltip>
-                        <TooltipTrigger>
-                            <QuestionMarkCircledIcon />
-                        </TooltipTrigger>
+                    {description && (
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <QuestionMarkCircledIcon />
+                            </TooltipTrigger>
 
-                        <TooltipContent>{description}</TooltipContent>
-                    </Tooltip>
-                )}
+                            <TooltipContent>{description}</TooltipContent>
+                        </Tooltip>
+                    )}
+                </div>
 
-                {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
-                    <InputTypeSwitchButton
-                        className={twMerge('ml-auto', inputTypeSwitchButtonClassName)}
-                        handleClick={handleInputTypeSwitchButtonClick}
-                        mentionInput={false}
-                    />
-                )}
+                <div className="flex items-center">
+                    {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
+                        <InputTypeSwitchButton handleClick={handleInputTypeSwitchButtonClick} mentionInput={false} />
+                    )}
+
+                    {deletePropertyButton}
+                </div>
             </div>
         )}
 

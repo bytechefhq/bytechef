@@ -26,6 +26,7 @@ type ComboBoxItemType = {
 
 interface PropertyComboBoxProps {
     arrayIndex?: number;
+    deletePropertyButton?: ReactNode;
     description?: string;
     handleInputTypeSwitchButtonClick?: () => void;
     label?: string;
@@ -48,6 +49,7 @@ interface PropertyComboBoxProps {
 
 const PropertyComboBox = ({
     arrayIndex,
+    deletePropertyButton,
     description,
     handleInputTypeSwitchButtonClick,
     label,
@@ -120,30 +122,35 @@ const PropertyComboBox = ({
     return (
         <fieldset className="w-full space-y-1">
             {label && (
-                <div className="flex items-center">
-                    <Label className={twMerge(description && 'mr-1', 'leading-normal')} htmlFor={name}>
-                        {label}
+                <div className="flex w-full items-center justify-between">
+                    <div className="flex items-center">
+                        <Label className={twMerge(description && 'mr-1', 'leading-normal')} htmlFor={name}>
+                            {label}
 
-                        {required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
-                    </Label>
+                            {required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
+                        </Label>
 
-                    {description && (
-                        <Tooltip>
-                            <TooltipTrigger>
-                                <QuestionMarkCircledIcon />
-                            </TooltipTrigger>
+                        {description && (
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <QuestionMarkCircledIcon />
+                                </TooltipTrigger>
 
-                            <TooltipContent>{description}</TooltipContent>
-                        </Tooltip>
-                    )}
+                                <TooltipContent>{description}</TooltipContent>
+                            </Tooltip>
+                        )}
+                    </div>
 
-                    {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
-                        <InputTypeSwitchButton
-                            className="ml-auto"
-                            handleClick={handleInputTypeSwitchButtonClick}
-                            mentionInput={false}
-                        />
-                    )}
+                    <div className="flex items-center">
+                        {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
+                            <InputTypeSwitchButton
+                                handleClick={handleInputTypeSwitchButtonClick}
+                                mentionInput={false}
+                            />
+                        )}
+
+                        {deletePropertyButton}
+                    </div>
                 </div>
             )}
 
