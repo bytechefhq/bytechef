@@ -43,9 +43,9 @@ const MentionInputListItem = (item: DataPillType) => {
 interface PropertyMentionsInputProps {
     controlType: ControlTypeModel;
     defaultValue: string;
+    deletePropertyButton?: ReactNode;
     description?: string;
     handleInputTypeSwitchButtonClick: () => void;
-    inputTypeSwitchButtonClassName?: string;
     label?: string;
     leadingIcon: ReactNode;
     onChange: (value: string) => void;
@@ -62,9 +62,9 @@ const PropertyMentionsInput = forwardRef(
         {
             controlType,
             defaultValue,
+            deletePropertyButton,
             description,
             handleInputTypeSwitchButtonClick,
-            inputTypeSwitchButtonClassName,
             label,
             leadingIcon,
             onChange,
@@ -283,13 +283,13 @@ const PropertyMentionsInput = forwardRef(
                             </div>
                         )}
 
-                        {showInputTypeSwitchButton && (
-                            <InputTypeSwitchButton
-                                className={inputTypeSwitchButtonClassName}
-                                handleClick={handleInputTypeSwitchButtonClick}
-                                mentionInput
-                            />
-                        )}
+                        <div className="flex items-center">
+                            {showInputTypeSwitchButton && (
+                                <InputTypeSwitchButton handleClick={handleInputTypeSwitchButtonClick} mentionInput />
+                            )}
+
+                            {deletePropertyButton}
+                        </div>
                     </div>
                 )}
 

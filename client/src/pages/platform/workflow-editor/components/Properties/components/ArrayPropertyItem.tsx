@@ -31,26 +31,25 @@ const ArrayPropertyItem = ({
     };
 
     return (
-        <div className="ml-2 flex w-full items-center" key={`${arrayName}_${arrayItem.name}`}>
+        <div className="flex" key={`${arrayName}_${arrayItem.name}`}>
             <Property
                 arrayIndex={index}
                 arrayName={arrayName}
                 customClassName="pl-2 w-full"
-                inputTypeSwitchButtonClassName="ml-auto"
+                deletePropertyButton={
+                    arrayItem.custom && arrayName && arrayItem.name && currentComponent ? (
+                        <DeletePropertyButton
+                            key={`${arrayItem.key}_deleteSubPropertyButton`}
+                            onClick={handleOnDeleteClick}
+                            propertyName={path}
+                        />
+                    ) : undefined
+                }
                 key={`${arrayName}_${arrayItem.name}_${arrayItem.key}_property`}
                 parameterValue={arrayItem.defaultValue}
                 path={path}
                 property={arrayItem as ArrayPropertyType}
             />
-
-            {arrayItem.custom && arrayName && arrayItem.name && currentComponent && (
-                <DeletePropertyButton
-                    className="ml-2 mr-4"
-                    key={`${arrayItem.key}_deleteSubPropertyButton`}
-                    onClick={handleOnDeleteClick}
-                    propertyName={path}
-                />
-            )}
         </div>
     );
 };

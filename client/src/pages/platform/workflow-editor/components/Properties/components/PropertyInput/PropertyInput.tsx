@@ -7,12 +7,12 @@ import {ChangeEvent, InputHTMLAttributes, ReactNode, forwardRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 interface PropertyInputProps extends InputHTMLAttributes<HTMLInputElement> {
+    deletePropertyButton?: ReactNode;
     description?: string;
     error?: boolean;
     errorMessage?: string;
     fieldsetClassName?: string;
     handleInputTypeSwitchButtonClick?: () => void;
-    inputTypeSwitchButtonClassName?: string;
     label?: string;
     leadingIcon?: ReactNode;
     name: string;
@@ -26,6 +26,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
     (
         {
             className,
+            deletePropertyButton,
             description,
             disabled,
             error,
@@ -33,7 +34,6 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
             fieldsetClassName,
             handleInputTypeSwitchButtonClick,
             id,
-            inputTypeSwitchButtonClassName,
             label,
             leadingIcon,
             name,
@@ -70,13 +70,13 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                     </div>
                 )}
 
-                {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
-                    <InputTypeSwitchButton
-                        className={inputTypeSwitchButtonClassName}
-                        handleClick={handleInputTypeSwitchButtonClick}
-                        mentionInput={false}
-                    />
-                )}
+                <div className="flex items-center">
+                    {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
+                        <InputTypeSwitchButton handleClick={handleInputTypeSwitchButtonClick} mentionInput={false} />
+                    )}
+
+                    {deletePropertyButton}
+                </div>
             </div>
 
             <div className={twMerge([label && type !== 'hidden' && 'mt-1', leadingIcon && 'relative'])} title={title}>
