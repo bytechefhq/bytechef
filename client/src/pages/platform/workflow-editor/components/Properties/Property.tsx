@@ -23,7 +23,7 @@ import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {usePrevious} from '@uidotdev/usehooks';
 import resolvePath from 'object-resolve-path';
-import {ChangeEvent, KeyboardEvent, useEffect, useRef, useState} from 'react';
+import {ChangeEvent, KeyboardEvent, ReactNode, useEffect, useRef, useState} from 'react';
 import {Control, Controller, FieldValues, FormState} from 'react-hook-form';
 import ReactQuill from 'react-quill';
 import sanitizeHtml from 'sanitize-html';
@@ -55,14 +55,13 @@ interface PropertyProps {
     control?: Control<any, any>;
     customClassName?: string;
     formState?: FormState<FieldValues>;
-    inputTypeSwitchButtonClassName?: string;
+    deletePropertyButton?: ReactNode;
     objectName?: string;
     operationName?: string;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     parameterValue?: any;
     path?: string;
     property: PropertyType;
-    showDeletePropertyButton?: boolean;
 }
 
 const Property = ({
@@ -70,14 +69,13 @@ const Property = ({
     arrayName,
     control,
     customClassName,
+    deletePropertyButton,
     formState,
-    inputTypeSwitchButtonClassName,
     objectName,
     operationName,
     parameterValue,
     path,
     property,
-    showDeletePropertyButton = false,
 }: PropertyProps) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [hasError, setHasError] = useState(false);
@@ -784,9 +782,9 @@ const Property = ({
                         <PropertyMentionsInput
                             controlType={controlType || 'TEXT'}
                             defaultValue={defaultValue}
+                            deletePropertyButton={deletePropertyButton}
                             description={description}
                             handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
-                            inputTypeSwitchButtonClassName={inputTypeSwitchButtonClassName}
                             key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                             label={label || name}
                             leadingIcon={typeIcon}
@@ -840,17 +838,16 @@ const Property = ({
                                             )}
                                         </div>
 
-                                        {showInputTypeSwitchButton && (
-                                            <InputTypeSwitchButton
-                                                className={
-                                                    showDeletePropertyButton
-                                                        ? inputTypeSwitchButtonClassName
-                                                        : undefined
-                                                }
-                                                handleClick={handleInputTypeSwitchButtonClick}
-                                                mentionInput={mentionInput}
-                                            />
-                                        )}
+                                        <div className="flex items-center">
+                                            {showInputTypeSwitchButton && (
+                                                <InputTypeSwitchButton
+                                                    handleClick={handleInputTypeSwitchButtonClick}
+                                                    mentionInput={mentionInput}
+                                                />
+                                            )}
+
+                                            {deletePropertyButton}
+                                        </div>
                                     </div>
                                 )}
                             </div>
@@ -969,12 +966,12 @@ const Property = ({
 
                         {!control && (isValidControlType || isNumericalInput) && path && (
                             <PropertyInput
+                                deletePropertyButton={deletePropertyButton}
                                 description={description}
                                 error={hasError}
                                 errorMessage={errorMessage}
                                 fieldsetClassName={objectName && arrayName && 'ml-2'}
                                 handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
-                                inputTypeSwitchButtonClassName={inputTypeSwitchButtonClassName}
                                 key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                                 label={label || name}
                                 leadingIcon={typeIcon}
@@ -1000,6 +997,7 @@ const Property = ({
 
                         {!control && (isValidControlType || isNumericalInput) && !!options?.length && (
                             <PropertySelect
+                                deletePropertyButton={deletePropertyButton}
                                 description={description}
                                 key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                                 label={label || name}
@@ -1014,6 +1012,7 @@ const Property = ({
                         {!control && controlType === 'SELECT' && type !== 'BOOLEAN' && (
                             <PropertyComboBox
                                 arrayIndex={arrayIndex}
+                                deletePropertyButton={deletePropertyButton}
                                 description={description}
                                 handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
                                 key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
@@ -1039,9 +1038,9 @@ const Property = ({
                         {!control && controlType === 'SELECT' && type === 'BOOLEAN' && (
                             <PropertySelect
                                 defaultValue={defaultValue?.toString()}
+                                deletePropertyButton={deletePropertyButton}
                                 description={description}
                                 handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
-                                inputTypeSwitchButtonClassName={inputTypeSwitchButtonClassName}
                                 key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                                 label={label || name}
                                 leadingIcon={typeIcon}
