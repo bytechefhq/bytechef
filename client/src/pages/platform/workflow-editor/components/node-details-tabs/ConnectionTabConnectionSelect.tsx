@@ -16,6 +16,7 @@ import {
     WorkflowConnectionModel,
     WorkflowTestConfigurationConnectionModel,
 } from '@/shared/middleware/platform/configuration';
+import {ConnectionModel} from '@/shared/middleware/platform/connection/models';
 import {useSaveWorkflowTestConfigurationConnectionMutation} from '@/shared/mutations/platform/workflowTestConfigurations.mutations';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
@@ -40,6 +41,7 @@ const ConnectionTabConnectionSelect = ({
     workflowTestConfigurationConnection?: WorkflowTestConfigurationConnectionModel;
 }) => {
     const [connectionId, setConnectionId] = useState<number | undefined>();
+    const [currentConnection, setCurrentConnection] = useState<ConnectionModel>();
 
     const {currentNode, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
 
@@ -106,10 +108,10 @@ const ConnectionTabConnectionSelect = ({
             setCurrentNode({...currentNode, connectionId});
         }
 
+        setCurrentConnection(connections?.find((connection) => connection.id === connectionId));
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [connectionId]);
-
-    const connection = connections?.find((connection) => connection.id === connectionId);
 
     return (
         <div className="flex flex-col gap-6">
@@ -123,7 +125,7 @@ const ConnectionTabConnectionSelect = ({
                 )}
 
                 {workflowConnectionsCount > 1 && (
-                    <SelectLabel className="text-muted-foreground text-sm">{workflowConnection.key}</SelectLabel>
+                    <SelectLabel className="text-sm text-muted-foreground">{workflowConnection.key}</SelectLabel>
                 )}
 
                 <Select
