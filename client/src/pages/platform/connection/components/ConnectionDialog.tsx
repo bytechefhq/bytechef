@@ -152,12 +152,16 @@ const ConnectionDialog = ({
             queryClient.invalidateQueries({
                 queryKey: ComponentDefinitionKeys.componentDefinitions,
             });
+
             queryClient.invalidateQueries({
                 queryKey: connectionsQueryKey,
             });
+
             queryClient.invalidateQueries({
                 queryKey: connectionTagsQueryKey,
             });
+
+            console.log('connection created');
 
             closeDialog();
         },
@@ -643,7 +647,7 @@ const ConnectionDialog = ({
                         </div>
 
                         {connection?.id && connectionDefinition && (
-                            <div className="py-4">
+                            <div className="px-6 pb-6">
                                 <ConnectionParameters
                                     connection={connection}
                                     connectionDefinition={connectionDefinition}

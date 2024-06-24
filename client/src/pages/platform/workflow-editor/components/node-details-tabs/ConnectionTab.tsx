@@ -1,6 +1,5 @@
 import {Button} from '@/components/ui/button';
 import {useConnectionQuery} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
-import ConnectionTabConnectionLabel from '@/pages/platform/workflow-editor/components/node-details-tabs/ConnectionTabConnectionLabel';
 import ConnectionTabConnectionSelect from '@/pages/platform/workflow-editor/components/node-details-tabs/ConnectionTabConnectionSelect';
 import {
     ComponentDefinitionModel,
