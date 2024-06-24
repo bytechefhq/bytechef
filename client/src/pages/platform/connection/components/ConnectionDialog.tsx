@@ -1,4 +1,4 @@
-import ComboBox, {ComboBoxItemType} from '@/components/ComboBox';
+import {ComboBoxItemType} from '@/components/ComboBox';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {Button} from '@/components/ui/button';
 import {Checkbox} from '@/components/ui/checkbox';
@@ -45,6 +45,7 @@ import {ClipboardIcon} from 'lucide-react';
 import {ReactNode, useEffect, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
+import ComponentSelectionInput from './ComponentSelectionInput';
 import OAuth2Button from './OAuth2Button';
 
 interface ConnectionDialogProps {
@@ -397,288 +398,249 @@ const ConnectionDialog = ({
 
                         {errors?.length > 0 && <Errors errors={errors} />}
 
-                        {(wizardStep === 'configuration_step' || oAuth2AuthorizationParametersLoading) && (
-                            <div className="flex flex-col space-y-4 overflow-y-auto p-6">
-                                {!connection?.id && (
-                                    <FormField
-                                        control={control}
-                                        name="componentName"
-                                        render={({field}) => {
-                                            if (!componentDefinition && componentDefinitions) {
-                                                return (
-                                                    <FormItem>
-                                                        <FormLabel>Component</FormLabel>
-
-                                                        <FormControl>
-                                                            <ComboBox
-                                                                items={componentDefinitions.map(
-                                                                    (componentDefinition) => ({
-                                                                        componentDefinition,
-                                                                        icon: componentDefinition.icon,
-                                                                        label: componentDefinition.title!,
-                                                                        value: componentDefinition.name,
-                                                                    })
-                                                                )}
-                                                                name="component"
-                                                                onBlur={field.onBlur}
-                                                                onChange={(item) =>
-                                                                    handleComponentDefinitionChange(
-                                                                        item?.componentDefinition as ComponentDefinitionBasicModel
-                                                                    )
-                                                                }
-                                                                value={field.value}
-                                                            />
-                                                        </FormControl>
-
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                );
-                                            } else if (connectionDefinitions && connectionDefinitions?.length > 1) {
-                                                return (
-                                                    <FormItem>
-                                                        <FormLabel>Component</FormLabel>
-
-                                                        <FormControl>
-                                                            <ComboBox
-                                                                items={connectionDefinitions.map(
-                                                                    (connectionDefinition) =>
-                                                                        ({
-                                                                            componentDefinition:
-                                                                                selectedComponentDefinition,
-                                                                            icon: selectedComponentDefinition?.icon
-                                                                                ? selectedComponentDefinition?.icon
-                                                                                : undefined,
-                                                                            label: connectionDefinition.componentTitle
-                                                                                ? connectionDefinition.componentTitle
-                                                                                : undefined,
-                                                                            value: connectionDefinition.componentName,
-                                                                        }) as ComboBoxItemType
-                                                                )}
-                                                                onBlur={field.onBlur}
-                                                                onChange={(item) =>
-                                                                    handleComponentDefinitionChange(
-                                                                        item?.componentDefinition as ComponentDefinitionBasicModel
-                                                                    )
-                                                                }
-                                                                value={field.value}
-                                                            />
-                                                        </FormControl>
-
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                );
-                                            } else {
-                                                return (
-                                                    <FormItem>
-                                                        <FormLabel>Component</FormLabel>
-
-                                                        <FormControl>
-                                                            <Input disabled value={componentDefinition?.title} />
-                                                        </FormControl>
-
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                );
-                                            }
-                                        }}
-                                        rules={{required: true}}
-                                    />
-                                )}
-
-                                <FormField
-                                    control={form.control}
-                                    name="name"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>Name</FormLabel>
-
-                                            <FormControl>
-                                                <Input placeholder="My Connection" {...field} />
-                                            </FormControl>
-
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                    rules={{required: true}}
-                                />
-
-                                {!connection?.id && (
-                                    <FormField
-                                        control={control}
-                                        name="environment"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Environment</FormLabel>
-
-                                                <FormControl>
-                                                    <Select
-                                                        defaultValue={field.value}
-                                                        onValueChange={(value) => field.onChange(value)}
-                                                    >
-                                                        <SelectTrigger className="w-full">
-                                                            <SelectValue placeholder="Select environment" />
-                                                        </SelectTrigger>
-
-                                                        <SelectContent>
-                                                            <SelectItem value="DEVELOPMENT">Development</SelectItem>
-
-                                                            <SelectItem value="TEST">Test</SelectItem>
-
-                                                            <SelectItem value="PRODUCTION">Production</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                </FormControl>
-
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                        rules={{required: true}}
-                                        shouldUnregister={false}
-                                    />
-                                )}
-
-                                {!connection?.id && showConnectionProperties && !!connectionDefinition.properties && (
-                                    <Properties
-                                        control={control}
-                                        formState={formState}
-                                        properties={connectionDefinition?.properties}
-                                    />
-                                )}
-
-                                {!connection?.id && showAuthorizations && (
-                                    <FormField
-                                        control={control}
-                                        name="authorizationName"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Authorization</FormLabel>
-
-                                                <Select
-                                                    onValueChange={(value) => {
-                                                        setAuthorizationName(value);
-                                                        setUsePredefinedOAuthApp(false);
-                                                        setValue('authorizationName', value);
-                                                    }}
-                                                    {...field}
-                                                >
-                                                    <SelectTrigger className="mt-1">
-                                                        <FormControl>
-                                                            <SelectValue placeholder="Select..." />
-                                                        </FormControl>
-                                                    </SelectTrigger>
-
-                                                    <SelectContent>
-                                                        {authorizationOptions.map((authorizationOption) => (
-                                                            <SelectItem
-                                                                key={authorizationOption.value!}
-                                                                value={authorizationOption.value!}
-                                                            >
-                                                                {authorizationOption.label!}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                )}
-
-                                {showRedirectUriInput && oAuth2Properties?.redirectUri && (
-                                    <div>
-                                        <Label>Redirect URI</Label>
-
-                                        <RedirectUriInput redirectUri={oAuth2Properties.redirectUri} />
-                                    </div>
-                                )}
-
-                                {!connection?.id &&
-                                    showAuthorizationProperties &&
-                                    !!authorizations?.length &&
-                                    authorizations[0]?.properties && (
-                                        <Properties
+                        <div className="flex flex-col space-y-4 overflow-y-auto p-6">
+                            {(wizardStep === 'configuration_step' || oAuth2AuthorizationParametersLoading) && (
+                                <>
+                                    {!connection?.id && (
+                                        <FormField
                                             control={control}
-                                            formState={formState}
-                                            properties={authorizations[0]?.properties}
+                                            name="componentName"
+                                            render={({field}) => {
+                                                let items: Array<ComboBoxItemType> | undefined;
+
+                                                if (!componentDefinition && componentDefinitions) {
+                                                    items = componentDefinitions.map((componentDefinitionItem) => ({
+                                                        ...componentDefinitionItem,
+                                                        componentDefinition: componentDefinitionItem,
+                                                        icon: componentDefinitionItem.icon,
+                                                        label: componentDefinitionItem.title,
+                                                        value: componentDefinitionItem.name,
+                                                    }));
+                                                } else if (connectionDefinitions?.length) {
+                                                    items = connectionDefinitions.map((connectionDefinitionItem) => ({
+                                                        ...connectionDefinitionItem,
+                                                        componentDefinition: selectedComponentDefinition,
+                                                        icon: selectedComponentDefinition?.icon,
+                                                        label: connectionDefinitionItem.componentTitle,
+                                                        value: connectionDefinitionItem.componentName,
+                                                    }));
+                                                }
+
+                                                return (
+                                                    <ComponentSelectionInput
+                                                        componentDefinition={componentDefinition}
+                                                        field={field}
+                                                        handleComponentDefinitionChange={
+                                                            handleComponentDefinitionChange
+                                                        }
+                                                        items={items}
+                                                        selectedComponentDefinition={selectedComponentDefinition}
+                                                    />
+                                                );
+                                            }}
+                                            rules={{required: true}}
                                         />
                                     )}
 
-                                {showOAuth2AppPredefined && (
-                                    <div>
-                                        <a
-                                            className="text-sm text-blue-600"
-                                            href="#"
-                                            onClick={() => setUsePredefinedOAuthApp(!usePredefinedOAuthApp)}
-                                        >
-                                            {usePredefinedOAuthApp && <span>I want to use my own app credentials</span>}
-
-                                            {!usePredefinedOAuthApp && (
-                                                <span>I want to use predefined app credentials</span>
-                                            )}
-                                        </a>
-                                    </div>
-                                )}
-
-                                {!tagsLoading && (
                                     <FormField
-                                        control={control}
-                                        name="tags"
+                                        control={form.control}
+                                        name="name"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>Tags</FormLabel>
+                                                <FormLabel>Name</FormLabel>
 
                                                 <FormControl>
-                                                    <CreatableSelect
-                                                        field={field}
-                                                        isMulti
-                                                        menuPlacement="top"
-                                                        onCreateOption={(inputValue: string) => {
-                                                            setValue('tags', [
-                                                                ...getValues().tags!,
-                                                                {
-                                                                    label: inputValue,
-                                                                    name: inputValue,
-                                                                    value: inputValue,
-                                                                },
-                                                            ]);
-                                                        }}
-                                                        options={remainingTags!.map((tag: TagModel) => ({
-                                                            label: tag.name,
-                                                            value: tag.name.toLowerCase().replace(/\W/g, ''),
-                                                            ...tag,
-                                                        }))}
-                                                    />
+                                                    <Input placeholder="My Connection" {...field} />
                                                 </FormControl>
 
                                                 <FormMessage />
                                             </FormItem>
                                         )}
+                                        rules={{required: true}}
                                     />
-                                )}
-                            </div>
-                        )}
 
-                        {!oAuth2AuthorizationParametersLoading && wizardStep === 'oauth_step' && (
-                            <div>
-                                <Alert className="border-blue-50 bg-blue-50 text-blue-700">
-                                    <RocketIcon className="size-4" />
+                                    {!connection?.id && (
+                                        <FormField
+                                            control={control}
+                                            name="environment"
+                                            render={({field}) => (
+                                                <FormItem>
+                                                    <FormLabel>Environment</FormLabel>
 
-                                    <AlertTitle>Heads up!</AlertTitle>
+                                                    <FormControl>
+                                                        <Select
+                                                            defaultValue={field.value}
+                                                            onValueChange={(value) => field.onChange(value)}
+                                                        >
+                                                            <SelectTrigger className="w-full">
+                                                                <SelectValue placeholder="Select environment" />
+                                                            </SelectTrigger>
 
-                                    <AlertDescription>
-                                        Excellent! You can connect and create the
-                                        <span className="mx-0.5 font-semibold">
-                                            {selectedComponentDefinition?.title}
-                                        </span>
-                                        connection under name
-                                        <span className="mx-0.5 font-semibold">{`'${getValues()?.name}'`}</span>.
-                                    </AlertDescription>
-                                </Alert>
+                                                            <SelectContent>
+                                                                <SelectItem value="DEVELOPMENT">Development</SelectItem>
 
-                                {scopes && scopes.length > 0 && <Scopes scopes={scopes} />}
-                            </div>
-                        )}
+                                                                <SelectItem value="TEST">Test</SelectItem>
+
+                                                                <SelectItem value="PRODUCTION">Production</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </FormControl>
+
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                            rules={{required: true}}
+                                            shouldUnregister={false}
+                                        />
+                                    )}
+
+                                    {!connection?.id &&
+                                        showConnectionProperties &&
+                                        !!connectionDefinition.properties && (
+                                            <Properties
+                                                control={control}
+                                                formState={formState}
+                                                properties={connectionDefinition?.properties}
+                                            />
+                                        )}
+
+                                    {!connection?.id && showAuthorizations && (
+                                        <FormField
+                                            control={control}
+                                            name="authorizationName"
+                                            render={({field}) => (
+                                                <FormItem>
+                                                    <FormLabel>Authorization</FormLabel>
+
+                                                    <Select
+                                                        onValueChange={(value) => {
+                                                            setAuthorizationName(value);
+                                                            setUsePredefinedOAuthApp(false);
+                                                            setValue('authorizationName', value);
+                                                        }}
+                                                        {...field}
+                                                    >
+                                                        <SelectTrigger className="mt-1">
+                                                            <FormControl>
+                                                                <SelectValue placeholder="Select..." />
+                                                            </FormControl>
+                                                        </SelectTrigger>
+
+                                                        <SelectContent>
+                                                            {authorizationOptions.map((authorizationOption) => (
+                                                                <SelectItem
+                                                                    key={authorizationOption.value!}
+                                                                    value={authorizationOption.value!}
+                                                                >
+                                                                    {authorizationOption.label!}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    )}
+
+                                    {showRedirectUriInput && oAuth2Properties?.redirectUri && (
+                                        <div>
+                                            <Label>Redirect URI</Label>
+
+                                            <RedirectUriInput redirectUri={oAuth2Properties.redirectUri} />
+                                        </div>
+                                    )}
+
+                                    {!connection?.id &&
+                                        showAuthorizationProperties &&
+                                        !!authorizations?.length &&
+                                        authorizations[0]?.properties && (
+                                            <Properties
+                                                control={control}
+                                                formState={formState}
+                                                properties={authorizations[0]?.properties}
+                                            />
+                                        )}
+
+                                    {showOAuth2AppPredefined && (
+                                        <div>
+                                            <a
+                                                className="text-sm text-blue-600"
+                                                href="#"
+                                                onClick={() => setUsePredefinedOAuthApp(!usePredefinedOAuthApp)}
+                                            >
+                                                {usePredefinedOAuthApp && (
+                                                    <span>I want to use my own app credentials</span>
+                                                )}
+
+                                                {!usePredefinedOAuthApp && (
+                                                    <span>I want to use predefined app credentials</span>
+                                                )}
+                                            </a>
+                                        </div>
+                                    )}
+
+                                    {!tagsLoading && (
+                                        <FormField
+                                            control={control}
+                                            name="tags"
+                                            render={({field}) => (
+                                                <FormItem>
+                                                    <FormLabel>Tags</FormLabel>
+
+                                                    <FormControl>
+                                                        <CreatableSelect
+                                                            field={field}
+                                                            isMulti
+                                                            menuPlacement="top"
+                                                            onCreateOption={(inputValue: string) => {
+                                                                setValue('tags', [
+                                                                    ...getValues().tags!,
+                                                                    {
+                                                                        label: inputValue,
+                                                                        name: inputValue,
+                                                                        value: inputValue,
+                                                                    },
+                                                                ]);
+                                                            }}
+                                                            options={remainingTags!.map((tag: TagModel) => ({
+                                                                label: tag.name,
+                                                                value: tag.name.toLowerCase().replace(/\W/g, ''),
+                                                                ...tag,
+                                                            }))}
+                                                        />
+                                                    </FormControl>
+
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    )}
+                                </>
+                            )}
+
+                            {!oAuth2AuthorizationParametersLoading && wizardStep === 'oauth_step' && (
+                                <>
+                                    <Alert className="border-blue-50 bg-blue-50 text-blue-700">
+                                        <RocketIcon className="size-4" />
+
+                                        <AlertTitle>Heads up!</AlertTitle>
+
+                                        <AlertDescription>
+                                            Excellent! You can connect and create the
+                                            <span className="mx-0.5 font-semibold">
+                                                {selectedComponentDefinition?.title}
+                                            </span>
+                                            connection under name
+                                            <span className="mx-0.5 font-semibold">{`'${getValues()?.name}'`}</span>.
+                                        </AlertDescription>
+                                    </Alert>
+
+                                    {scopes && scopes.length > 0 && <Scopes scopes={scopes} />}
+                                </>
+                            )}
+                        </div>
 
                         {connection?.id && connectionDefinition && (
                             <div className="py-4">
