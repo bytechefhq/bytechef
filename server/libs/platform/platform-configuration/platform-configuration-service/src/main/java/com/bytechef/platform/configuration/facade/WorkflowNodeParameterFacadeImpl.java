@@ -85,7 +85,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         String[] pathItems = path.split("\\.");
 
         setMetadata(workflowNodeName, path, null, definitionMap);
-        setParameter(pathItems, null, result.parameterMap);
+        setParameter(pathItems, null, true, result.parameterMap);
 
         workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
@@ -130,7 +130,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         String[] pathItems = path.split("\\.");
 
-        setParameter(pathItems, value, result.parameterMap);
+        setParameter(pathItems, value, false, result.parameterMap);
 
         Map<String, Boolean> displayConditionMap;
 
@@ -429,7 +429,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     @SuppressWarnings("unchecked")
-    private void setParameter(String[] pathItems, Object value, Map<String, ?> parameterMap) {
+    private void setParameter(String[] pathItems, Object value, boolean removeValue, Map<String, ?> parameterMap) {
         Map<String, Object> map = (Map<String, Object>) parameterMap;
 
         for (int i = 0; i < pathItems.length; i++) {
@@ -472,7 +472,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
                     if (j == arrayIndexes.size() - 1) {
                         if (i == pathItems.length - 1) {
-                            if (value == null) {
+                            if (removeValue) {
                                 list.remove(arrayIndex);
                             } else {
                                 list.set(arrayIndex, value);
@@ -506,7 +506,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                         map = subParameterMap;
                     }
                 } else {
-                    if (value == null) {
+                    if (removeValue) {
                         map.remove(pathItem);
                     } else {
                         map.put(pathItem, value);
