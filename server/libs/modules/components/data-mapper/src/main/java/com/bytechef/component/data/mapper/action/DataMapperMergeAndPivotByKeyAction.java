@@ -61,7 +61,7 @@ public class DataMapperMergeAndPivotByKeyAction {
         .output()
         .perform(DataMapperMergeAndPivotByKeyAction::perform);
 
-    protected static Map<String, Object> perform(
+    protected static Map<String, Map<Object, Object>> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         List<Object> input = inputParameters.getList(INPUT, Object.class, List.of());
         String key = inputParameters.getRequiredString(FIELD_KEY);
@@ -74,7 +74,7 @@ public class DataMapperMergeAndPivotByKeyAction {
             }
         }
 
-        Map<String, Object> output = new HashMap<>();
+        Map<String, Map<Object, Object>> output = new HashMap<>();
         output.put(key, objectHashMap);
         return output;
     }
