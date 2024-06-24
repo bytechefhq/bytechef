@@ -58,18 +58,17 @@ public class FreshdeskComponentHandler extends AbstractFreshdeskComponentHandler
 
         return modifiableConnectionDefinition
             .authorizations(
-                authorization(
-                    AuthorizationType.BASIC_AUTH.toLowerCase(), AuthorizationType.BASIC_AUTH)
-                        .title("Basic Auth")
-                        .properties(
-                            string(DOMAIN)
-                                .label("Domain")
-                                .description(
-                                    "Your helpdesk domain name, e.g. https://{your_domain}.freshdesk.com/api/v2")
-                                .required(true),
-                            string(USERNAME)
-                                .label("API key")
-                                .required(true)))
+                authorization(AuthorizationType.BASIC_AUTH)
+                    .title("Basic Auth")
+                    .properties(
+                        string(DOMAIN)
+                            .label("Domain")
+                            .description(
+                                "Your helpdesk domain name, e.g. https://{your_domain}.freshdesk.com/api/v2")
+                            .required(true),
+                        string(USERNAME)
+                            .label("API key")
+                            .required(true)))
             .baseUri((connectionParameters, context) -> "https://" + connectionParameters.getRequiredString(DOMAIN)
                 + ".freshdesk.com/api/v2");
     }

@@ -33,16 +33,15 @@ import com.bytechef.component.definition.ComponentDSL;
 public class FreshdeskConnection {
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://{domain}.freshdesk.com/api/v2")
-        .authorizations(authorization(
-            AuthorizationType.BASIC_AUTH.toLowerCase(), AuthorizationType.BASIC_AUTH)
-                .title("Basic Auth")
-                .properties(
-                    string(USERNAME)
-                        .label("Username")
-                        .required(true),
-                    string(PASSWORD)
-                        .label("Password")
-                        .required(true)));
+        .authorizations(authorization(AuthorizationType.BASIC_AUTH)
+            .title("Basic Auth")
+            .properties(
+                string(USERNAME)
+                    .label("Username")
+                    .required(true),
+                string(PASSWORD)
+                    .label("Password")
+                    .required(true)));
 
     private FreshdeskConnection() {
     }

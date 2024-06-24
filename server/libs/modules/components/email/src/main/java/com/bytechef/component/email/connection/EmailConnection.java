@@ -47,16 +47,13 @@ public class EmailConnection {
                 .description("If selected the connection will use TLS when connecting to server."))
         .authorizationRequired(false)
         .authorizations(
-            authorization(
-                AuthorizationType.BASIC_AUTH.name()
-                    .toLowerCase(),
-                AuthorizationType.BASIC_AUTH)
-                    .title("Basic Auth")
-                    .properties(
-                        string(USERNAME)
-                            .label("Username")
-                            .required(true),
-                        string(PASSWORD)
-                            .label("Password")
-                            .required(true)));
+            authorization(AuthorizationType.BASIC_AUTH)
+                .title("Basic Auth")
+                .properties(
+                    string(USERNAME)
+                        .label("Username")
+                        .required(true),
+                    string(PASSWORD)
+                        .label("Password")
+                        .required(true)));
 }

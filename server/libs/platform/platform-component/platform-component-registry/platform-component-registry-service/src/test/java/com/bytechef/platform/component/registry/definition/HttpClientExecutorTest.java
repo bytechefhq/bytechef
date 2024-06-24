@@ -227,7 +227,7 @@ public class HttpClientExecutorTest {
 //            .thenReturn(
 //                Optional.of(
 //                    new MockConnection(
-//                        ComponentDSL.authorization(AuthorizationType.API_KEY.name(), AuthorizationType.API_KEY))
+//                        ComponentDSL.authorization(AuthorizationType.API_KEY))
 //                            .parameters(
 //                                Map.of(
 //                                    AuthorizationConstants.KEY, AuthorizationConstants.API_TOKEN,
@@ -247,7 +247,7 @@ public class HttpClientExecutorTest {
 //            .thenReturn(
 //                Optional.of(
 //                    new MockConnection(
-//                        ComponentDSL.authorization(AuthorizationType.API_KEY.name(), AuthorizationType.API_KEY))
+//                        ComponentDSL.authorization(AuthorizationType.API_KEY))
 //                            .parameters(
 //                                Map.of(
 //                                    AuthorizationConstants.KEY, AuthorizationConstants.API_TOKEN,
@@ -268,9 +268,7 @@ public class HttpClientExecutorTest {
 //            .thenReturn(
 //                Optional.of(
 //                    new MockConnection(
-//                        ComponentDSL.authorization(
-//                            Authorization.AuthorizationType.BASIC_AUTH.name(),
-//                            Authorization.AuthorizationType.BASIC_AUTH))
+//                        ComponentDSL.authorization(Authorization.AuthorizationType.BASIC_AUTH))
 //                                .parameters(
 //                                    Map.of(AuthorizationConstants.USERNAME, "username", AuthorizationConstants.PASSWORD,
 //                                        "password"))));

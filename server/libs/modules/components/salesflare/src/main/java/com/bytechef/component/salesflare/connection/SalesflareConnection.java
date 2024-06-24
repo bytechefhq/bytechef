@@ -32,13 +32,12 @@ import com.bytechef.component.definition.ComponentDSL;
 public class SalesflareConnection {
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://api.salesflare.com")
-        .authorizations(authorization(
-            AuthorizationType.BEARER_TOKEN.toLowerCase(), AuthorizationType.BEARER_TOKEN)
-                .title("Bearer Token")
-                .properties(
-                    string(TOKEN)
-                        .label("Token")
-                        .required(true)));
+        .authorizations(authorization(AuthorizationType.BEARER_TOKEN)
+            .title("Bearer Token")
+            .properties(
+                string(TOKEN)
+                    .label("Token")
+                    .required(true)));
 
     private SalesflareConnection() {
     }

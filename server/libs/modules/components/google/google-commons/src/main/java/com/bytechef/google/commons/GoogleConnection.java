@@ -35,7 +35,6 @@ public class GoogleConnection {
     public static ModifiableConnectionDefinition createConnection(Authorization.ScopesFunction scopes) {
         return connection()
             .authorizations(authorization(
-                AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(),
                 AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                     .title("OAuth2 Authorization Code")
                     .properties(

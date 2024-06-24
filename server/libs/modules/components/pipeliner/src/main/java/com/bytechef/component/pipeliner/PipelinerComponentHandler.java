@@ -59,32 +59,31 @@ public class PipelinerComponentHandler extends AbstractPipelinerComponentHandler
 
         modifiableConnectionDefinition
             .authorizations(
-                authorization(
-                    AuthorizationType.BASIC_AUTH.toLowerCase(), AuthorizationType.BASIC_AUTH)
-                        .title("Basic Auth")
-                        .properties(
-                            string(SPACE_ID)
-                                .label("Space Id")
-                                .description("Your Space ID")
-                                .required(true),
-                            string(SERVER_URL)
-                                .label("Server URL")
-                                .options(
-                                    option("https://us-east.api.pipelinersales.com/api/v100/rest/spaces/",
-                                        "https://us-east.api.pipelinersales.com/api/v100/rest/spaces/"),
-                                    option("https://eu-central.api.pipelinersales.com/api/v100/rest/spaces/",
-                                        "https://eu-central.api.pipelinersales.com/api/v100/rest/spaces/"),
-                                    option("https://ca-central.api.pipelinersales.com/api/v100/rest/spaces/",
-                                        "https://ca-central.api.pipelinersales.com/api/v100/rest/spaces/"),
-                                    option("https://ap-southeast.api.pipelinersales.com/api/v100/rest/spaces/",
-                                        "https://ap-southeast.api.pipelinersales.com/api/v100/rest/spaces/"))
-                                .required(true),
-                            string(USERNAME)
-                                .label("Username")
-                                .required(true),
-                            string(PASSWORD)
-                                .label("Password")
-                                .required(true)))
+                authorization(AuthorizationType.BASIC_AUTH)
+                    .title("Basic Auth")
+                    .properties(
+                        string(SPACE_ID)
+                            .label("Space Id")
+                            .description("Your Space ID")
+                            .required(true),
+                        string(SERVER_URL)
+                            .label("Server URL")
+                            .options(
+                                option("https://us-east.api.pipelinersales.com/api/v100/rest/spaces/",
+                                    "https://us-east.api.pipelinersales.com/api/v100/rest/spaces/"),
+                                option("https://eu-central.api.pipelinersales.com/api/v100/rest/spaces/",
+                                    "https://eu-central.api.pipelinersales.com/api/v100/rest/spaces/"),
+                                option("https://ca-central.api.pipelinersales.com/api/v100/rest/spaces/",
+                                    "https://ca-central.api.pipelinersales.com/api/v100/rest/spaces/"),
+                                option("https://ap-southeast.api.pipelinersales.com/api/v100/rest/spaces/",
+                                    "https://ap-southeast.api.pipelinersales.com/api/v100/rest/spaces/"))
+                            .required(true),
+                        string(USERNAME)
+                            .label("Username")
+                            .required(true),
+                        string(PASSWORD)
+                            .label("Password")
+                            .required(true)))
             .baseUri((connectionParameters, context) -> connectionParameters.getRequiredString(SERVER_URL) +
                 connectionParameters.getRequiredString(SPACE_ID));
 

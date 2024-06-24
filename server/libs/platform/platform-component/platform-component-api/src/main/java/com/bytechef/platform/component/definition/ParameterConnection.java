@@ -41,13 +41,13 @@ public interface ParameterConnection {
     String getAuthorizationName();
 
     default boolean isAuthorizationOauth2AuthorizationCode() {
-        return Objects.equals(AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(), getAuthorizationName()) ||
-            Objects.equals(AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE.toLowerCase(), getAuthorizationName());
+        return Objects.equals(AuthorizationType.OAUTH2_AUTHORIZATION_CODE.getName(), getAuthorizationName()) ||
+            Objects.equals(AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE.getName(), getAuthorizationName());
     }
 
     default boolean canCredentialsBeRefreshed() {
-        return Objects.equals(getAuthorizationName(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase()) ||
-            Objects.equals(getAuthorizationName(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE.toLowerCase()) ||
-            Objects.equals(CUSTOM.toLowerCase(), getAuthorizationName());
+        return Objects.equals(getAuthorizationName(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE.getName()) ||
+            Objects.equals(getAuthorizationName(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE.getName()) ||
+            Objects.equals(CUSTOM.getName(), getAuthorizationName());
     }
 }

@@ -35,16 +35,15 @@ public class PipelinerConnection {
         .baseUri((
             connectionParameters,
             context) -> "https://eu-central.api.pipelinersales.com/api/v100/rest/spaces/{space_id}")
-        .authorizations(authorization(
-            AuthorizationType.BASIC_AUTH.toLowerCase(), AuthorizationType.BASIC_AUTH)
-                .title("Basic Auth")
-                .properties(
-                    string(USERNAME)
-                        .label("Username")
-                        .required(true),
-                    string(PASSWORD)
-                        .label("Password")
-                        .required(true)));
+        .authorizations(authorization(AuthorizationType.BASIC_AUTH)
+            .title("Basic Auth")
+            .properties(
+                string(USERNAME)
+                    .label("Username")
+                    .required(true),
+                string(PASSWORD)
+                    .label("Password")
+                    .required(true)));
 
     private PipelinerConnection() {
     }

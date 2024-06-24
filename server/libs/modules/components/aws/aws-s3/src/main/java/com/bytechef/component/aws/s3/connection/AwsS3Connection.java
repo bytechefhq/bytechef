@@ -30,7 +30,7 @@ public class AwsS3Connection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .authorizations(
-            authorization(Authorization.AuthorizationType.CUSTOM.toLowerCase(), Authorization.AuthorizationType.CUSTOM)
+            authorization(Authorization.AuthorizationType.CUSTOM)
                 .properties(
                     string(AwsS3Constants.ACCESS_KEY_ID)
                         .label("Access Key ID")

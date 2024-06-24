@@ -37,37 +37,33 @@ import java.util.List;
 public class PipedriveConnection {
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://api.pipedrive.com/v1")
-        .authorizations(authorization(
-            AuthorizationType.API_KEY.toLowerCase(), AuthorizationType.API_KEY)
-                .title("API Key")
+        .authorizations(authorization(AuthorizationType.API_KEY)
+            .title("API Key")
+            .properties(
+
+                string(VALUE)
+                    .label("Value")
+                    .required(true),
+                string(ADD_TO)
+                    .label("Add to")
+                    .required(true)
+                    .defaultValue(ApiTokenLocation.QUERY_PARAMETERS.name())
+                    .hidden(true)
+
+            ), authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+                .title("OAuth2 Authorization Code")
                 .properties(
-
-                    string(VALUE)
-                        .label("Value")
+                    string(CLIENT_ID)
+                        .label("Client Id")
                         .required(true),
-                    string(ADD_TO)
-                        .label("Add to")
-                        .required(true)
-                        .defaultValue(ApiTokenLocation.QUERY_PARAMETERS.name())
-                        .hidden(true)
-
-                ), authorization(
-                    AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(),
-                    AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-                        .title("OAuth2 Authorization Code")
-                        .properties(
-                            string(CLIENT_ID)
-                                .label("Client Id")
-                                .required(true),
-                            string(CLIENT_SECRET)
-                                .label("Client Secret")
-                                .required(true))
-                        .authorizationUrl(
-                            (connectionParameters, context) -> "https://oauth.pipedrive.com/oauth/authorize")
-                        .scopes((connection, context) -> List.of("deals:full", "contacts:full", "search:read",
-                            "leads:read", "leads:full", "contacts:read", "deals:read"))
-                        .tokenUrl((connectionParameters, context) -> "https://oauth.pipedrive.com/oauth/token")
-                        .refreshUrl((connectionParameters, context) -> "https://oauth.pipedrive.com/oauth/token"));
+                    string(CLIENT_SECRET)
+                        .label("Client Secret")
+                        .required(true))
+                .authorizationUrl((connectionParameters, context) -> "https://oauth.pipedrive.com/oauth/authorize")
+                .scopes((connection, context) -> List.of("deals:full", "contacts:full", "search:read", "leads:read",
+                    "leads:full", "contacts:read", "deals:read"))
+                .tokenUrl((connectionParameters, context) -> "https://oauth.pipedrive.com/oauth/token")
+                .refreshUrl((connectionParameters, context) -> "https://oauth.pipedrive.com/oauth/token"));
 
     private PipedriveConnection() {
     }

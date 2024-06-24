@@ -34,20 +34,19 @@ import java.util.List;
 public class AsanaConnection {
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://app.asana.com/api/1.0")
-        .authorizations(authorization(
-            AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-                .title("OAuth2 Authorization Code")
-                .properties(
-                    string(CLIENT_ID)
-                        .label("Client Id")
-                        .required(true),
-                    string(CLIENT_SECRET)
-                        .label("Client Secret")
-                        .required(true))
-                .authorizationUrl((connectionParameters, context) -> "https://app.asana.com/-/oauth_authorize")
-                .scopes((connection, context) -> List.of("default", "openid", "email", "profile"))
-                .tokenUrl((connectionParameters, context) -> "https://app.asana.com/-/oauth_token")
-                .refreshUrl((connectionParameters, context) -> "https://app.asana.com/-/oauth_token"));
+        .authorizations(authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+            .title("OAuth2 Authorization Code")
+            .properties(
+                string(CLIENT_ID)
+                    .label("Client Id")
+                    .required(true),
+                string(CLIENT_SECRET)
+                    .label("Client Secret")
+                    .required(true))
+            .authorizationUrl((connectionParameters, context) -> "https://app.asana.com/-/oauth_authorize")
+            .scopes((connection, context) -> List.of("default", "openid", "email", "profile"))
+            .tokenUrl((connectionParameters, context) -> "https://app.asana.com/-/oauth_token")
+            .refreshUrl((connectionParameters, context) -> "https://app.asana.com/-/oauth_token"));
 
     private AsanaConnection() {
     }

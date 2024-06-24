@@ -34,11 +34,10 @@ public final class ResendConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://api.resend.com")
-        .authorizations(authorization(
-            BEARER_TOKEN.toLowerCase(), BEARER_TOKEN)
-                .title("Bearer Token")
-                .properties(
-                    string(TOKEN)
-                        .label("Token")
-                        .required(true)));
+        .authorizations(authorization(BEARER_TOKEN)
+            .title("Bearer Token")
+            .properties(
+                string(TOKEN)
+                    .label("Token")
+                    .required(true)));
 }

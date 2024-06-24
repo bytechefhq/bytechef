@@ -23,6 +23,7 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.vtiger.constant.VTigerConstants.INSTANCE_URL;
 
 import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 
 /**
@@ -31,10 +32,8 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefini
 public class VTigerConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .authorizations(authorization(
-            Authorization.AuthorizationType.BASIC_AUTH.name()
-                .toLowerCase(),
-            Authorization.AuthorizationType.BASIC_AUTH)
+        .authorizations(
+            authorization(AuthorizationType.BASIC_AUTH)
                 .title("Basic Auth")
                 .properties(
                     string(Authorization.USERNAME)

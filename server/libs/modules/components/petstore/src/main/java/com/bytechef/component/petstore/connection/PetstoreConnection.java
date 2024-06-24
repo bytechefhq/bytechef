@@ -36,32 +36,30 @@ import java.util.List;
 public class PetstoreConnection {
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://petstore3.swagger.io/api/v3")
-        .authorizations(authorization(
-            AuthorizationType.OAUTH2_IMPLICIT_CODE.toLowerCase(), AuthorizationType.OAUTH2_IMPLICIT_CODE)
-                .title("OAuth2 Implicit")
+        .authorizations(authorization(AuthorizationType.OAUTH2_IMPLICIT_CODE)
+            .title("OAuth2 Implicit")
+            .properties(
+                string(CLIENT_ID)
+                    .label("Client Id")
+                    .required(true),
+                string(CLIENT_SECRET)
+                    .label("Client Secret")
+                    .required(true))
+            .authorizationUrl((connectionParameters, context) -> "https://petstore3.swagger.io/oauth/authorize")
+            .scopes((connectionParameters, context) -> List.of("write:pets", "read:pets")),
+            authorization(AuthorizationType.API_KEY)
+                .title("API Key")
                 .properties(
-                    string(CLIENT_ID)
-                        .label("Client Id")
-                        .required(true),
-                    string(CLIENT_SECRET)
-                        .label("Client Secret")
-                        .required(true))
-                .authorizationUrl((connectionParameters, context) -> "https://petstore3.swagger.io/oauth/authorize")
-                .scopes((connectionParameters, context) -> List.of("write:pets", "read:pets")),
-            authorization(
-                AuthorizationType.API_KEY.toLowerCase(), AuthorizationType.API_KEY)
-                    .title("API Key")
-                    .properties(
-                        string(KEY)
-                            .label("Key")
-                            .required(true)
-                            .defaultValue("api_key")
-                            .hidden(true),
-                        string(VALUE)
-                            .label("Value")
-                            .required(true)
+                    string(KEY)
+                        .label("Key")
+                        .required(true)
+                        .defaultValue("api_key")
+                        .hidden(true),
+                    string(VALUE)
+                        .label("Value")
+                        .required(true)
 
-                    ));
+                ));
 
     private PetstoreConnection() {
     }

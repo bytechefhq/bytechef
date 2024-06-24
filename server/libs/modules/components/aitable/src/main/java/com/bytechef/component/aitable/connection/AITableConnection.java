@@ -33,7 +33,7 @@ public class AITableConnection {
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> BASE_URL)
         .authorizations(
-            authorization(AuthorizationType.BEARER_TOKEN.toLowerCase(), AuthorizationType.BEARER_TOKEN)
+            authorization(AuthorizationType.BEARER_TOKEN)
                 .title("Bearer Token")
                 .properties(
                     string(TOKEN)

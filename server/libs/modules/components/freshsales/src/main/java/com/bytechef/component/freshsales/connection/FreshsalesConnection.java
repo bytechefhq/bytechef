@@ -36,20 +36,19 @@ public class FreshsalesConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .authorizations(
-            authorization(
-                AuthorizationType.API_KEY.toLowerCase(), AuthorizationType.API_KEY)
-                    .title("API Key")
-                    .properties(
-                        string(USERNAME)
-                            .label("Bundle alias")
-                            .description("Your Freshsales bundle alias (e.g. https://<alias>.myfreshworks.com)")
-                            .required(true),
-                        string(KEY)
-                            .label("API Key")
-                            .description("The API Key supplied by Freshsales")
-                            .required(true))
-                    .apply((connectionParameters, context) -> ofHeaders(
-                        Map.of(AUTHORIZATION, List.of("Token token=" + connectionParameters.getRequiredString(KEY))))));
+            authorization(AuthorizationType.API_KEY)
+                .title("API Key")
+                .properties(
+                    string(USERNAME)
+                        .label("Bundle alias")
+                        .description("Your Freshsales bundle alias (e.g. https://<alias>.myfreshworks.com)")
+                        .required(true),
+                    string(KEY)
+                        .label("API Key")
+                        .description("The API Key supplied by Freshsales")
+                        .required(true))
+                .apply((connectionParameters, context) -> ofHeaders(
+                    Map.of(AUTHORIZATION, List.of("Token token=" + connectionParameters.getRequiredString(KEY))))));
 
     private FreshsalesConnection() {
     }

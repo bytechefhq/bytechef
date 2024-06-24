@@ -34,19 +34,18 @@ import java.util.List;
 public class HubspotConnection {
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://api.hubapi.com/")
-        .authorizations(authorization(
-            AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-                .title("OAuth2 Authorization Code")
-                .properties(
-                    string(CLIENT_ID)
-                        .label("Client Id")
-                        .required(true),
-                    string(CLIENT_SECRET)
-                        .label("Client Secret")
-                        .required(true))
-                .authorizationUrl((connectionParameters, context) -> "https://app.hubspot.com/oauth/authorize")
-                .scopes((connection, context) -> List.of("crm.objects.contacts.write", "crm.objects.contacts.read"))
-                .tokenUrl((connectionParameters, context) -> "https://api.hubapi.com/oauth/v1/token"));
+        .authorizations(authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+            .title("OAuth2 Authorization Code")
+            .properties(
+                string(CLIENT_ID)
+                    .label("Client Id")
+                    .required(true),
+                string(CLIENT_SECRET)
+                    .label("Client Secret")
+                    .required(true))
+            .authorizationUrl((connectionParameters, context) -> "https://app.hubspot.com/oauth/authorize")
+            .scopes((connection, context) -> List.of("crm.objects.contacts.write", "crm.objects.contacts.read"))
+            .tokenUrl((connectionParameters, context) -> "https://api.hubapi.com/oauth/v1/token"));
 
     private HubspotConnection() {
     }

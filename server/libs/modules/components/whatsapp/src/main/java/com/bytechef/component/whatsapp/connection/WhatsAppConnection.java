@@ -37,7 +37,7 @@ public class WhatsAppConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .authorizations(
-            authorization(AuthorizationType.CUSTOM.toLowerCase(), AuthorizationType.CUSTOM)
+            authorization(AuthorizationType.CUSTOM)
                 .title("WhatsApp Custom Authorization")
                 .properties(
                     string(SYSTEM_USER_ACCESS_TOKEN)

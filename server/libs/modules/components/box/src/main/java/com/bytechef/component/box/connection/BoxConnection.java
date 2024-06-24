@@ -33,8 +33,8 @@ public class BoxConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://api.box.com/2.0")
-        .authorizations(authorization(
-            AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+        .authorizations(
+            authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                 .title("OAuth2 Authorization Code")
                 .properties(
                     string(CLIENT_ID)

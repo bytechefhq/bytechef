@@ -33,16 +33,15 @@ import com.bytechef.component.definition.ComponentDSL;
 public class TeamworkConnection {
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://{yourSiteName}.teamwork.com/projects/api/v3")
-        .authorizations(authorization(
-            AuthorizationType.BASIC_AUTH.toLowerCase(), AuthorizationType.BASIC_AUTH)
-                .title("Basic Auth")
-                .properties(
-                    string(USERNAME)
-                        .label("Username")
-                        .required(true),
-                    string(PASSWORD)
-                        .label("Password")
-                        .required(true)));
+        .authorizations(authorization(AuthorizationType.BASIC_AUTH)
+            .title("Basic Auth")
+            .properties(
+                string(USERNAME)
+                    .label("Username")
+                    .required(true),
+                string(PASSWORD)
+                    .label("Password")
+                    .required(true)));
 
     private TeamworkConnection() {
     }

@@ -55,7 +55,7 @@ public class TeamworkComponentHandler extends AbstractTeamworkComponentHandler {
 
         return modifiableConnectionDefinition
             .authorizations(
-                authorization(AuthorizationType.BASIC_AUTH.toLowerCase(), AuthorizationType.BASIC_AUTH)
+                authorization(AuthorizationType.BASIC_AUTH)
                     .title("Basic Auth")
                     .properties(
                         string(SITE_NAME)

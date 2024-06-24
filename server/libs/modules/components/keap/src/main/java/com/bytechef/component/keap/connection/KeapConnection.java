@@ -32,19 +32,18 @@ import com.bytechef.component.definition.ComponentDSL;
  */
 public class KeapConnection {
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .authorizations(authorization(
-            AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-                .title("OAuth2 Authorization Code")
-                .properties(
-                    string(CLIENT_ID)
-                        .label("Client Id")
-                        .required(true),
-                    string(CLIENT_SECRET)
-                        .label("Client Secret")
-                        .required(true))
-                .authorizationUrl(
-                    (connectionParameters, context) -> "https://accounts.infusionsoft.com/app/oauth/authorize")
-                .tokenUrl((connectionParameters, context) -> "https://api.infusionsoft.com/token"));
+        .authorizations(authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+            .title("OAuth2 Authorization Code")
+            .properties(
+                string(CLIENT_ID)
+                    .label("Client Id")
+                    .required(true),
+                string(CLIENT_SECRET)
+                    .label("Client Secret")
+                    .required(true))
+            .authorizationUrl(
+                (connectionParameters, context) -> "https://accounts.infusionsoft.com/app/oauth/authorize")
+            .tokenUrl((connectionParameters, context) -> "https://api.infusionsoft.com/token"));
 
     private KeapConnection() {
     }

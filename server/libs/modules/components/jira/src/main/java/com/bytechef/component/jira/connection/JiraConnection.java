@@ -34,7 +34,7 @@ public class JiraConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .authorizations(
-            authorization(AuthorizationType.BASIC_AUTH.toLowerCase(), AuthorizationType.BASIC_AUTH)
+            authorization(AuthorizationType.BASIC_AUTH)
                 .title("Basic Auth")
                 .properties(
                     string(YOUR_DOMAIN)

@@ -30,8 +30,8 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefini
 public class CapsuleCRMConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .authorizations(authorization(
-            BEARER_TOKEN.toLowerCase(), BEARER_TOKEN)
+        .authorizations(
+            authorization(BEARER_TOKEN)
                 .title("Bearer Token")
                 .properties(
                     string(TOKEN)

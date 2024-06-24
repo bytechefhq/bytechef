@@ -95,15 +95,14 @@ public class DiscordComponentHandler extends AbstractDiscordComponentHandler {
 
         return modifiableConnectionDefinition
             .authorizations(
-                authorization(
-                    AuthorizationType.BEARER_TOKEN.toLowerCase(), AuthorizationType.BEARER_TOKEN)
-                        .title("Bearer Token")
-                        .properties(
-                            string(TOKEN)
-                                .label("Bot token")
-                                .required(true))
-                        .apply((connectionParameters, context) -> ofHeaders(
-                            Map.of(AUTHORIZATION, List.of("Bot " + connectionParameters.getRequiredString(TOKEN))))))
+                authorization(AuthorizationType.BEARER_TOKEN)
+                    .title("Bearer Token")
+                    .properties(
+                        string(TOKEN)
+                            .label("Bot token")
+                            .required(true))
+                    .apply((connectionParameters, context) -> ofHeaders(
+                        Map.of(AUTHORIZATION, List.of("Bot " + connectionParameters.getRequiredString(TOKEN))))))
             .baseUri((connectionParameters, context) -> BASE_URL);
     }
 

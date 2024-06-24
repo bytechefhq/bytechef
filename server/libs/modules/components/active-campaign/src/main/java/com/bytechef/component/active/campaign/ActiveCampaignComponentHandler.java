@@ -60,22 +60,21 @@ public class ActiveCampaignComponentHandler extends AbstractActiveCampaignCompon
 
         return modifiableConnectionDefinition
             .authorizations(
-                authorization(
-                    AuthorizationType.API_KEY.toLowerCase(), AuthorizationType.API_KEY)
-                        .title("API Key")
-                        .properties(
-                            string(USERNAME)
-                                .label("Account name")
-                                .description("Your account name, e.g. https://{youraccountname}.api-us1.com")
-                                .required(true),
-                            string(KEY)
-                                .label("Key")
-                                .required(true)
-                                .defaultValue("Api-Token")
-                                .hidden(true),
-                            string(VALUE)
-                                .label("API Key")
-                                .required(true)))
+                authorization(AuthorizationType.API_KEY)
+                    .title("API Key")
+                    .properties(
+                        string(USERNAME)
+                            .label("Account name")
+                            .description("Your account name, e.g. https://{youraccountname}.api-us1.com")
+                            .required(true),
+                        string(KEY)
+                            .label("Key")
+                            .required(true)
+                            .defaultValue("Api-Token")
+                            .hidden(true),
+                        string(VALUE)
+                            .label("API Key")
+                            .required(true)))
             .baseUri(
                 (connectionParameters, context) -> "https://" + connectionParameters.getRequiredString(USERNAME) +
                     ".api-us1.com/api/3");

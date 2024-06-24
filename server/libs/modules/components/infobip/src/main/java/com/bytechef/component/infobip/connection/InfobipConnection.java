@@ -33,8 +33,8 @@ public class InfobipConnection {
     }
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .authorizations(authorization(
-            AuthorizationType.API_KEY.toLowerCase(), AuthorizationType.API_KEY)
+        .authorizations(
+            authorization(AuthorizationType.API_KEY)
                 .title("API Key")
                 .properties(
                     string(VALUE)

@@ -32,18 +32,17 @@ import com.bytechef.component.definition.ComponentDSL;
  */
 public class MailchimpConnection {
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .authorizations(authorization(
-            AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-                .title("OAuth2 Authorization Code")
-                .properties(
-                    string(CLIENT_ID)
-                        .label("Client Id")
-                        .required(true),
-                    string(CLIENT_SECRET)
-                        .label("Client Secret")
-                        .required(true))
-                .authorizationUrl((connectionParameters, context) -> "https://login.mailchimp.com/oauth2/authorize")
-                .tokenUrl((connectionParameters, context) -> "https://login.mailchimp.com/oauth2/token"));
+        .authorizations(authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+            .title("OAuth2 Authorization Code")
+            .properties(
+                string(CLIENT_ID)
+                    .label("Client Id")
+                    .required(true),
+                string(CLIENT_SECRET)
+                    .label("Client Secret")
+                    .required(true))
+            .authorizationUrl((connectionParameters, context) -> "https://login.mailchimp.com/oauth2/authorize")
+            .tokenUrl((connectionParameters, context) -> "https://login.mailchimp.com/oauth2/token"));
 
     private MailchimpConnection() {
     }

@@ -37,25 +37,24 @@ public class AcceloConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .authorizations(
-            authorization(
-                AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-                    .title("OAuth2 Authorization Code")
-                    .properties(
-                        string(DEPLOYMENT)
-                            .label("Deployment")
-                            .description(
-                                "Actual deployment identifier or name to target a specific deployment within the " +
-                                    "Accelo platform.")
-                            .required(true),
-                        string(CLIENT_ID)
-                            .label("Client Id")
-                            .required(true),
-                        string(CLIENT_SECRET)
-                            .label("Client Secret")
-                            .required(true))
-                    .authorizationUrl((connection, context) -> "https://" + connection.getRequiredString(DEPLOYMENT) +
-                        ".api.accelo.com/oauth2/v0/authorize")
-                    .scopes((connection, context) -> List.of("write(all)"))
-                    .tokenUrl((connection, context) -> "https://" + connection.getRequiredString(DEPLOYMENT) +
-                        ".api.accelo.com/oauth2/v0/token"));
+            authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+                .title("OAuth2 Authorization Code")
+                .properties(
+                    string(DEPLOYMENT)
+                        .label("Deployment")
+                        .description(
+                            "Actual deployment identifier or name to target a specific deployment within the " +
+                                "Accelo platform.")
+                        .required(true),
+                    string(CLIENT_ID)
+                        .label("Client Id")
+                        .required(true),
+                    string(CLIENT_SECRET)
+                        .label("Client Secret")
+                        .required(true))
+                .authorizationUrl((connection, context) -> "https://" + connection.getRequiredString(DEPLOYMENT) +
+                    ".api.accelo.com/oauth2/v0/authorize")
+                .scopes((connection, context) -> List.of("write(all)"))
+                .tokenUrl((connection, context) -> "https://" + connection.getRequiredString(DEPLOYMENT) +
+                    ".api.accelo.com/oauth2/v0/token"));
 }

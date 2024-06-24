@@ -35,21 +35,20 @@ public class CopperConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .authorizations(
-            authorization(
-                AuthorizationType.API_KEY.toLowerCase(), AuthorizationType.API_KEY)
-                    .title("API Key")
-                    .properties(
-                        string(USERNAME)
-                            .label("Email address")
-                            .required(true),
-                        string(KEY)
-                            .label("Key")
-                            .required(true))
-                    .apply((connectionParameters, context) -> ofHeaders(
-                        Map.of(
-                            "X-PW-AccessToken", List.of(connectionParameters.getRequiredString(KEY)),
-                            "X-PW-Application", List.of("developer_api"),
-                            "X-PW-UserEmail", List.of(connectionParameters.getRequiredString(USERNAME))))));
+            authorization(AuthorizationType.API_KEY)
+                .title("API Key")
+                .properties(
+                    string(USERNAME)
+                        .label("Email address")
+                        .required(true),
+                    string(KEY)
+                        .label("Key")
+                        .required(true))
+                .apply((connectionParameters, context) -> ofHeaders(
+                    Map.of(
+                        "X-PW-AccessToken", List.of(connectionParameters.getRequiredString(KEY)),
+                        "X-PW-Application", List.of("developer_api"),
+                        "X-PW-UserEmail", List.of(connectionParameters.getRequiredString(USERNAME))))));
 
     private CopperConnection() {
     }

@@ -43,7 +43,7 @@ public class XeroConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .authorizations(
-            authorization(OAUTH2_AUTHORIZATION_CODE.toLowerCase(), OAUTH2_AUTHORIZATION_CODE)
+            authorization(OAUTH2_AUTHORIZATION_CODE)
                 .title("OAuth2 Authorization Code")
                 .properties(
                     string(CLIENT_ID)

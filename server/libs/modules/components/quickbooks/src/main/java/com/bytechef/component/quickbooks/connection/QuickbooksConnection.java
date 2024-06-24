@@ -37,8 +37,8 @@ public class QuickbooksConnection {
     }
 
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .authorizations(authorization(
-            AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+        .authorizations(
+            authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                 .title("OAuth2 Authorization Code")
                 .properties(
                     string(CLIENT_ID)

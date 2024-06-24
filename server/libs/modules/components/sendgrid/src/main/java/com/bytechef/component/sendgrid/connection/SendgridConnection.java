@@ -31,13 +31,12 @@ public class SendgridConnection {
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://api.sendgrid.com/v3/resource")
         .authorizations(
-            authorization(
-                BEARER_TOKEN.toLowerCase(), BEARER_TOKEN)
-                    .title("Bearer Token")
-                    .properties(
-                        string(TOKEN)
-                            .label("Token")
-                            .required(true)));
+            authorization(BEARER_TOKEN)
+                .title("Bearer Token")
+                .properties(
+                    string(TOKEN)
+                        .label("Token")
+                        .required(true)));
 
     private SendgridConnection() {
     }

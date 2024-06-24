@@ -31,8 +31,8 @@ public final class OpenAIConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://api.openai.com/v1")
-        .authorizations(authorization(
-            BEARER_TOKEN.toLowerCase(), BEARER_TOKEN)
+        .authorizations(
+            authorization(BEARER_TOKEN)
                 .title("Bearer Token")
                 .properties(
                     string(TOKEN)

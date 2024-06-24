@@ -32,13 +32,12 @@ import com.bytechef.component.definition.ComponentDSL;
 public class DiscordConnection {
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://discord.com/api/v10")
-        .authorizations(authorization(
-            AuthorizationType.BEARER_TOKEN.toLowerCase(), AuthorizationType.BEARER_TOKEN)
-                .title("Bearer Token")
-                .properties(
-                    string(TOKEN)
-                        .label("Token")
-                        .required(true)));
+        .authorizations(authorization(AuthorizationType.BEARER_TOKEN)
+            .title("Bearer Token")
+            .properties(
+                string(TOKEN)
+                    .label("Token")
+                    .required(true)));
 
     private DiscordConnection() {
     }

@@ -32,13 +32,12 @@ import com.bytechef.component.definition.ComponentDSL;
 public class AirtableConnection {
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://api.airtable.com/v0")
-        .authorizations(authorization(
-            AuthorizationType.BEARER_TOKEN.toLowerCase(), AuthorizationType.BEARER_TOKEN)
-                .title("Bearer Token")
-                .properties(
-                    string(TOKEN)
-                        .label("Token")
-                        .required(true)));
+        .authorizations(authorization(AuthorizationType.BEARER_TOKEN)
+            .title("Bearer Token")
+            .properties(
+                string(TOKEN)
+                    .label("Token")
+                    .required(true)));
 
     private AirtableConnection() {
     }

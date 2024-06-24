@@ -35,9 +35,8 @@ public class ZohoCrmConnection {
 
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://accounts.zoho.eu/oauth/v2/auth")
-        .authorizations(authorization(
-            Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(),
-            Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+        .authorizations(
+            authorization(Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                 .title("OAuth2 Authorization Code")
                 .properties(
                     string(CLIENT_ID)

@@ -49,19 +49,18 @@ public class InsightlyComponentHandler extends AbstractInsightlyComponentHandler
 
         return modifiableConnectionDefinition
             .authorizations(
-                authorization(
-                    AuthorizationType.BASIC_AUTH.toLowerCase(), AuthorizationType.BASIC_AUTH)
-                        .title("Basic Auth")
-                        .properties(
-                            string(POD)
-                                .label("Pod")
-                                .description(
-                                    "Your instances pod can be found under your API URL, e.g. " +
-                                        "https://api.{pod}.insightly.com/v3.1")
-                                .required(true),
-                            string(USERNAME)
-                                .label("API Key")
-                                .required(true)))
+                authorization(AuthorizationType.BASIC_AUTH)
+                    .title("Basic Auth")
+                    .properties(
+                        string(POD)
+                            .label("Pod")
+                            .description(
+                                "Your instances pod can be found under your API URL, e.g. " +
+                                    "https://api.{pod}.insightly.com/v3.1")
+                            .required(true),
+                        string(USERNAME)
+                            .label("API Key")
+                            .required(true)))
             .baseUri(
                 (connectionParameters, context) -> "https://api." + connectionParameters.getRequiredString(POD) +
                     ".insightly.com/v3.1");

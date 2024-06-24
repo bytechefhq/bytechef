@@ -33,20 +33,19 @@ import com.bytechef.component.definition.ComponentDSL;
 public class ActiveCampaignConnection {
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://{youraccountname}.api-us1.com/api/3")
-        .authorizations(authorization(
-            AuthorizationType.API_KEY.toLowerCase(), AuthorizationType.API_KEY)
-                .title("API Key")
-                .properties(
-                    string(KEY)
-                        .label("Key")
-                        .required(true)
-                        .defaultValue("Api-Token")
-                        .hidden(true),
-                    string(VALUE)
-                        .label("Value")
-                        .required(true)
+        .authorizations(authorization(AuthorizationType.API_KEY)
+            .title("API Key")
+            .properties(
+                string(KEY)
+                    .label("Key")
+                    .required(true)
+                    .defaultValue("Api-Token")
+                    .hidden(true),
+                string(VALUE)
+                    .label("Value")
+                    .required(true)
 
-                ));
+            ));
 
     private ActiveCampaignConnection() {
     }

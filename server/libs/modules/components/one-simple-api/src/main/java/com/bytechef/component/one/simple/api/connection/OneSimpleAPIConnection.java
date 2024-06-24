@@ -32,7 +32,7 @@ public class OneSimpleAPIConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .authorizations(
-            authorization(CUSTOM.toLowerCase(), CUSTOM)
+            authorization(CUSTOM)
                 .title("One Simple API Connection")
                 .properties(
                     string(ACCESS_TOKEN)

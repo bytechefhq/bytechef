@@ -63,7 +63,7 @@ public class ShopifyComponentHandler extends AbstractShopifyComponentHandler {
 
         return modifiableConnectionDefinition
             .authorizations(
-                authorization(AuthorizationType.API_KEY.toLowerCase(), AuthorizationType.API_KEY)
+                authorization(AuthorizationType.API_KEY)
                     .title("API Key")
                     .properties(
                         string(SHOP_NAME)

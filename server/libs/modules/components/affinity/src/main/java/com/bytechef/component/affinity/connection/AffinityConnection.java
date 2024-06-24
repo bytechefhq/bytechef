@@ -33,13 +33,12 @@ public class AffinityConnection {
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> BASE_URL)
         .authorizations(
-            authorization(
-                BEARER_TOKEN.toLowerCase(), BEARER_TOKEN)
-                    .title("Bearer Token")
-                    .properties(
-                        string(TOKEN)
-                            .label("Token")
-                            .required(true)));
+            authorization(BEARER_TOKEN)
+                .title("Bearer Token")
+                .properties(
+                    string(TOKEN)
+                        .label("Token")
+                        .required(true)));
 
     private AffinityConnection() {
     }

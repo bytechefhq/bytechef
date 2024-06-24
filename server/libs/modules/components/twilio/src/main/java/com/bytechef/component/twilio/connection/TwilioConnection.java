@@ -34,10 +34,8 @@ public class TwilioConnection {
     }
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .authorizations(authorization(
-            AuthorizationType.BASIC_AUTH.name()
-                .toLowerCase(),
-            AuthorizationType.BASIC_AUTH)
+        .authorizations(
+            authorization(AuthorizationType.BASIC_AUTH)
                 .title("Basic Auth")
                 .properties(
                     string(USERNAME)
