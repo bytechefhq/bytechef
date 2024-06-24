@@ -33,7 +33,7 @@ const ConnectionParameters = ({
         existingAuthorizations && authorizationParameters && !!Object.keys(authorizationParameters).length;
 
     return (
-        <div className="space-y-4">
+        <div className="mt-4 space-y-4">
             <h2 className="text-center font-semibold uppercase text-gray-500">
                 {hasConnectionParameters ? 'Connection' : 'Authorization'} Parameters
             </h2>
