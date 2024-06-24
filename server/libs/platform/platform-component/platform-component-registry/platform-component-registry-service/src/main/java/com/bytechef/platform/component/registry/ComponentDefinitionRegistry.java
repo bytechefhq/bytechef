@@ -122,7 +122,15 @@ public class ComponentDefinitionRegistry {
     public Authorization getAuthorization(String componentName, int connectionVersion, String authorizationName) {
         ConnectionDefinition connectionDefinition = getConnectionDefinition(componentName, connectionVersion);
 
-        return connectionDefinition.getAuthorization(authorizationName);
+        return OptionalUtils.orElse(connectionDefinition.getAuthorizations(), List.of())
+            .stream()
+            .filter(authorization -> {
+                Authorization.AuthorizationType type = authorization.getType();
+
+                return Objects.equals(type.getName(), authorizationName);
+            })
+            .findFirst()
+            .orElseThrow(IllegalArgumentException::new);
     }
 
     public ComponentDefinition getComponentDefinition(String name, Integer version) {

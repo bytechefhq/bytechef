@@ -16,6 +16,7 @@
 
 package com.bytechef.component.definition;
 
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.OptionsDataSource.OptionsFunction;
 import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.component.definition.PropertiesDataSource.TriggerPropertiesFunction;
@@ -52,9 +53,8 @@ public final class ComponentDSL {
         return new ModifiableArrayProperty(name);
     }
 
-    public static ModifiableAuthorization
-        authorization(String name, Authorization.AuthorizationType authorizationType) {
-        return new ModifiableAuthorization(name, authorizationType);
+    public static ModifiableAuthorization authorization(AuthorizationType authorizationType) {
+        return new ModifiableAuthorization(authorizationType);
     }
 
     public static ModifiableBooleanProperty bool() {
@@ -733,9 +733,10 @@ public final class ComponentDSL {
         private TokenUrlFunction tokenUrlFunction;
         private final AuthorizationType type;
 
-        private ModifiableAuthorization(String name, AuthorizationType type) {
-            this.name = Objects.requireNonNull(name);
+        private ModifiableAuthorization(AuthorizationType type) {
             this.type = Objects.requireNonNull(type);
+
+            this.name = type.getName();
         }
 
         public ModifiableAuthorization acquire(AcquireFunction acquire) {
@@ -1441,11 +1442,6 @@ public final class ComponentDSL {
         }
 
         @Override
-        public boolean containsAuthorizations() {
-            return authorizations != null && !authorizations.isEmpty();
-        }
-
-        @Override
         public boolean equals(Object o) {
             if (this == o) {
                 return true;
@@ -1465,16 +1461,6 @@ public final class ComponentDSL {
         public int hashCode() {
             return Objects.hash(
                 authorizationRequired, authorizations, baseUriFunction, properties, testConsumer, version);
-        }
-
-        @Override
-        public ModifiableAuthorization getAuthorization(String authorizationName) {
-            Objects.requireNonNull(authorizations, "Authorization %s does not exist".formatted(authorizationName));
-
-            return authorizations.stream()
-                .filter(authorization -> Objects.equals(authorization.getName(), authorizationName))
-                .findFirst()
-                .orElseThrow(IllegalArgumentException::new);
         }
 
         @Override

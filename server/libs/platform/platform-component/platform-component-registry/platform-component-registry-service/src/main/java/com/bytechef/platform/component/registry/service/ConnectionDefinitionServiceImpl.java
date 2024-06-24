@@ -333,24 +333,19 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 if (ApiTokenLocation.valueOf(addTo.toUpperCase()) == ApiTokenLocation.HEADER) {
                     return ApplyResponse.ofHeaders(
                         Map.of(
-                            MapUtils.getString(
-                                connectionParameters, Authorization.KEY, Authorization.API_TOKEN),
-                            List.of(
-                                MapUtils.getString(connectionParameters, Authorization.VALUE, ""))));
+                            MapUtils.getString(connectionParameters, Authorization.KEY, Authorization.API_TOKEN),
+                            List.of(MapUtils.getString(connectionParameters, Authorization.VALUE, ""))));
                 } else {
                     return ApplyResponse.ofQueryParameters(
                         Map.of(
-                            MapUtils.getString(
-                                connectionParameters, Authorization.KEY, Authorization.API_TOKEN),
-                            List.of(
-                                MapUtils.getString(connectionParameters, Authorization.VALUE, ""))));
+                            MapUtils.getString(connectionParameters, Authorization.KEY, Authorization.API_TOKEN),
+                            List.of(MapUtils.getString(connectionParameters, Authorization.VALUE, ""))));
                 }
             };
             case BASIC_AUTH, DIGEST_AUTH -> (Parameters connectionParameters, Context context) -> {
                 String valueToEncode =
                     MapUtils.getString(connectionParameters, Authorization.USERNAME) +
-                        ":" +
-                        MapUtils.getString(connectionParameters, Authorization.PASSWORD);
+                        ":" + MapUtils.getString(connectionParameters, Authorization.PASSWORD);
 
                 return ApplyResponse.ofHeaders(
                     Map.of(
@@ -363,8 +358,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 Map.of(
                     Authorization.AUTHORIZATION,
                     List.of(
-                        Authorization.BEARER + " " +
-                            MapUtils.getString(connectionParameters, Authorization.TOKEN))));
+                        Authorization.BEARER + " " + MapUtils.getString(connectionParameters, Authorization.TOKEN))));
             case CUSTOM, NONE -> (Parameters connectionParameters, Context context) -> null;
             case OAUTH2_AUTHORIZATION_CODE, OAUTH2_AUTHORIZATION_CODE_PKCE, OAUTH2_CLIENT_CREDENTIALS,
                 OAUTH2_IMPLICIT_CODE, OAUTH2_RESOURCE_OWNER_PASSWORD -> (
@@ -376,8 +370,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                                     connectionParameters, Authorization.HEADER_PREFIX,
                                     Authorization.BEARER) +
                                     " " +
-                                    MapUtils.getRequiredString(
-                                        connectionParameters, Authorization.ACCESS_TOKEN))));
+                                    MapUtils.getRequiredString(connectionParameters, Authorization.ACCESS_TOKEN))));
         };
     }
 

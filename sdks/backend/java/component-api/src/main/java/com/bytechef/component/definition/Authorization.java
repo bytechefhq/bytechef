@@ -27,37 +27,170 @@ import java.util.Optional;
  */
 public interface Authorization {
 
+    /**
+     *
+     */
     String ACCESS_TOKEN = "access_token";
+
+    /**
+     *
+     */
     String ADD_TO = "addTo";
+
+    /**
+     *
+     */
     String API_TOKEN = "api_token";
+
+    /**
+     *
+     */
     String AUTHORIZATION = "Authorization";
+
+    /**
+     *
+     */
     String AUTHORIZATION_TYPE = "authorizationName";
+
+    /**
+     *
+     */
     String AUTHORIZATION_URL = "authorizationUrl";
+
+    /**
+     *
+     */
     String EXPIRES_IN = "expires_in";
+
+    /**
+     *
+     */
     String BEARER = "Bearer";
+
+    /**
+     *
+     */
     String CLIENT_ID = "clientId";
+
+    /**
+     *
+     */
     String CLIENT_SECRET = "clientSecret";
+
+    /**
+     *
+     */
     String CODE = "code";
+
+    /**
+     *
+     */
     String HEADER_PREFIX = "headerPrefix";
+
+    /**
+     *
+     */
     String KEY = "key";
+
+    /**
+     *
+     */
     String PASSWORD = "password";
+
+    /**
+     *
+     */
     String REFRESH_TOKEN = "refresh_token";
+
+    /**
+     *
+     */
     String REFRESH_URL = "refreshUrl";
+
+    /**
+     *
+     */
     String SCOPES = "scopes";
+
+    /**
+     *
+     */
     String TOKEN = "token";
+
+    /**
+     *
+     */
     String TOKEN_URL = "tokenUrl";
+
+    /**
+     *
+     */
     String USERNAME = "username";
+
+    /**
+     *
+     */
     String VALUE = "value";
 
     /**
      *
      */
     enum AuthorizationType {
-        API_KEY, BASIC_AUTH, BEARER_TOKEN, CUSTOM, DIGEST_AUTH, NONE, OAUTH2_AUTHORIZATION_CODE,
-        OAUTH2_AUTHORIZATION_CODE_PKCE, OAUTH2_CLIENT_CREDENTIALS, OAUTH2_IMPLICIT_CODE,
+        /**
+         *
+         */
+        API_KEY,
+
+        /**
+         *
+         */
+        BASIC_AUTH,
+
+        /**
+         *
+         */
+        BEARER_TOKEN, CUSTOM,
+
+        /**
+         *
+         */
+        DIGEST_AUTH,
+
+        /**
+         *
+         */
+        NONE,
+
+        /**
+         *
+         */
+        OAUTH2_AUTHORIZATION_CODE,
+
+        /**
+         *
+         */
+        OAUTH2_AUTHORIZATION_CODE_PKCE,
+
+        /**
+         *
+         */
+        OAUTH2_CLIENT_CREDENTIALS,
+
+        /**
+         *
+         */
+        OAUTH2_IMPLICIT_CODE,
+
+        /**
+         *
+         */
         OAUTH2_RESOURCE_OWNER_PASSWORD;
 
-        public String toLowerCase() {
+        /**
+         *
+         * @return
+         */
+        public String getName() {
             return name().toLowerCase();
         }
     }
@@ -66,7 +199,15 @@ public interface Authorization {
      *
      */
     enum ApiTokenLocation {
+
+        /**
+         *
+         */
         HEADER,
+
+        /**
+         *
+         */
         QUERY_PARAMETERS,
     }
 
@@ -293,7 +434,7 @@ public interface Authorization {
     }
 
     /**
-     * adds oauth refresh token value to provided connectionParameters
+     * Adds oauth refresh token value to provided connectionParameters
      */
     @FunctionalInterface
     interface RefreshTokenFunction {
@@ -312,6 +453,14 @@ public interface Authorization {
     @FunctionalInterface
     interface PkceFunction {
 
+        /**
+         * @param verifier
+         * @param challenge
+         * @param challengeMethod
+         * @param context
+         * @return
+         * @throws Exception
+         */
         Pkce apply(String verifier, String challenge, String challengeMethod, Context context)
             throws Exception;
     }
@@ -415,10 +564,18 @@ public interface Authorization {
             return applyResponse;
         }
 
+        /**
+         *
+         * @return
+         */
         public Map<String, List<String>> getHeaders() {
             return headers;
         }
 
+        /**
+         *
+         * @return
+         */
         public Map<String, List<String>> getQueryParameters() {
             return queryParameters;
         }
@@ -430,12 +587,25 @@ public interface Authorization {
     @SuppressFBWarnings("EI")
     record AuthorizationCallbackResponse(Map<String, ?> result) {
 
+        /**
+         *
+         * @param accessToken
+         * @param refreshToken
+         * @param expiresIn
+         * @param additionalParameters
+         */
         public AuthorizationCallbackResponse(
             String accessToken, String refreshToken, Long expiresIn, Map<String, Object> additionalParameters) {
 
             this(toMap(accessToken, refreshToken, expiresIn, additionalParameters));
         }
 
+        /**
+         *
+         * @param accessToken
+         * @param refreshToken
+         * @param expiresIn
+         */
         public AuthorizationCallbackResponse(String accessToken, String refreshToken, Long expiresIn) {
             this(accessToken, refreshToken, expiresIn, Map.of());
         }
@@ -455,9 +625,20 @@ public interface Authorization {
         }
     }
 
+    /**
+     *
+     * @param accessToken
+     * @param expiresIn
+     */
     record RefreshTokenResponse(String accessToken, String refreshToken, Long expiresIn) {
     }
 
+    /**
+     *
+     * @param verifier
+     * @param challenge
+     * @param challengeMethod
+     */
     record Pkce(String verifier, String challenge, String challengeMethod) {
     }
 }

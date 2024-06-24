@@ -329,15 +329,6 @@ public class ConnectionFacadeIntTest {
     }
 
     private static class MockConnectionDefinition implements com.bytechef.component.definition.ConnectionDefinition {
-        @Override
-        public boolean containsAuthorizations() {
-            return false;
-        }
-
-        @Override
-        public Authorization getAuthorization(String authorizationName) {
-            return null;
-        }
 
         @Override
         public Optional<Boolean> getAuthorizationRequired() {

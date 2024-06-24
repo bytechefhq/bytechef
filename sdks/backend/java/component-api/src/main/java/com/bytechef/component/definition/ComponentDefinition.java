@@ -119,7 +119,6 @@ public interface ComponentDefinition {
     Optional<List<? extends TriggerDefinition>> getTriggers();
 
     /**
-     * TODO
      *
      * @return
      */

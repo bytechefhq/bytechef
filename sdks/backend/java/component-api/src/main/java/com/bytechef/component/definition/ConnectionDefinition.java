@@ -26,21 +26,15 @@ import java.util.Optional;
  */
 public interface ConnectionDefinition {
 
+    /**
+     *
+     */
     String BASE_URI = "baseUri";
 
     /**
      *
      * @return
      */
-    boolean containsAuthorizations();
-
-    /**
-     *
-     * @param authorizationName
-     * @return
-     */
-    Authorization getAuthorization(String authorizationName);
-
     Optional<Boolean> getAuthorizationRequired();
 
     /**
@@ -69,7 +63,6 @@ public interface ConnectionDefinition {
     Optional<TestConsumer> getTest();
 
     /**
-     * TODO
      *
      * @return
      */

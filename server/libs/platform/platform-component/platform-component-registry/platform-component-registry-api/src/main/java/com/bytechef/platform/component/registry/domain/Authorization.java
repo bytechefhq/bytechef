@@ -44,12 +44,16 @@ public class Authorization {
     public Authorization(com.bytechef.component.definition.Authorization authorization) {
         this.description = OptionalUtils.orElse(authorization.getDescription(), null);
         this.detectOn = OptionalUtils.orElse(authorization.getDetectOn(), List.of());
-        this.name = authorization.getName();
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(authorization.getProperties(), List.of()),
             valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty));
-        this.title = OptionalUtils.orElse(authorization.getTitle(), authorization.getName());
+
         this.type = authorization.getType();
+
+        this.name = type.getName();
+
+        this.title = OptionalUtils.orElse(authorization.getTitle(), name);
+
         this.refreshOn = OptionalUtils.orElse(authorization.getRefreshOn(), List.of(401));
     }
 
