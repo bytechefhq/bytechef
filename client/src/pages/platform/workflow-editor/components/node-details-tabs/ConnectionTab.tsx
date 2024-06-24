@@ -46,13 +46,9 @@ const ConnectionTab = ({
 
                     return (
                         <fieldset className="space-y-2" key={workflowConnection.key}>
-                            <ConnectionTabConnectionLabel
-                                workflowConnection={workflowConnection}
-                                workflowConnectionsCount={workflowConnections.length}
-                            />
-
                             <ConnectionTabConnectionSelect
                                 workflowConnection={workflowConnection}
+                                workflowConnectionsCount={workflowConnections.length}
                                 workflowId={workflowId}
                                 workflowNodeName={workflowNodeName}
                                 workflowTestConfigurationConnection={workflowTestConfigurationConnection}
