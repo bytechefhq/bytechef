@@ -31,8 +31,10 @@ import java.util.Objects;
 public class Authorization {
 
     private String description;
+    private List<String> detectOn;
     private String name;
     private List<? extends Property> properties;
+    private List<Object> refreshOn;
     private String title;
     private AuthorizationType type;
 
@@ -41,12 +43,14 @@ public class Authorization {
 
     public Authorization(com.bytechef.component.definition.Authorization authorization) {
         this.description = OptionalUtils.orElse(authorization.getDescription(), null);
+        this.detectOn = OptionalUtils.orElse(authorization.getDetectOn(), List.of());
         this.name = authorization.getName();
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(authorization.getProperties(), List.of()),
             valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty));
         this.title = OptionalUtils.orElse(authorization.getTitle(), authorization.getName());
         this.type = authorization.getType();
+        this.refreshOn = OptionalUtils.orElse(authorization.getRefreshOn(), List.of(401));
     }
 
     @Nullable
@@ -71,13 +75,18 @@ public class Authorization {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o)
+    public boolean equals(Object object) {
+        if (this == object) {
             return true;
-        if (!(o instanceof Authorization that))
+        }
+
+        if (!(object instanceof Authorization that)) {
             return false;
-        return Objects.equals(description, that.description) && Objects.equals(name, that.name)
-            && Objects.equals(properties, that.properties) && Objects.equals(title, that.title) && type == that.type;
+        }
+
+        return Objects.equals(description, that.description) && Objects.equals(detectOn, that.detectOn) &&
+            Objects.equals(name, that.name) && Objects.equals(properties, that.properties) &&
+            Objects.equals(refreshOn, that.refreshOn) && Objects.equals(title, that.title) && type == that.type;
     }
 
     @Override
@@ -85,14 +94,24 @@ public class Authorization {
         return Objects.hash(description, name, properties, title, type);
     }
 
+    public List<String> getDetectOn() {
+        return detectOn;
+    }
+
+    public List<Object> getRefreshOn() {
+        return refreshOn;
+    }
+
     @Override
     public String toString() {
         return "Authorization{" +
-            "description='" + description + '\'' +
-            ", name='" + name + '\'' +
-            ", properties=" + properties +
-            ", title='" + title + '\'' +
+            "name='" + name + '\'' +
             ", type=" + type +
+            ", title='" + title + '\'' +
+            ", description='" + description + '\'' +
+            ", properties=" + properties +
+            ", refreshOn=" + refreshOn +
+            ", detectOn=" + detectOn +
             '}';
     }
 }

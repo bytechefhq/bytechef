@@ -112,7 +112,7 @@ public interface Authorization {
      *
      * @return
      */
-    Optional<List<Object>> getDetectOn();
+    Optional<List<String>> getDetectOn();
 
     /**
      *
@@ -430,7 +430,7 @@ public interface Authorization {
         }
     }
 
-    record RefreshTokenResponse(String accessToken, Long expiresIn) {
+    record RefreshTokenResponse(String accessToken, String refreshToken, Long expiresIn) {
     }
 
     record Pkce(String verifier, String challenge, String challengeMethod) {
