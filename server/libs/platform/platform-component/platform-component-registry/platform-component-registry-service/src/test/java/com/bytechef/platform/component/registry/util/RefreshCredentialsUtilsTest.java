@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.exception;
+package com.bytechef.platform.component.registry.util;
 
+import com.bytechef.component.exception.ProviderException;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Igor Beslic
  */
-public class ProviderExceptionTest {
+public class RefreshCredentialsUtilsTest {
 
     private static final String multilineMessage = """
         401 Unauthorized
@@ -31,25 +33,12 @@ public class ProviderExceptionTest {
 
     @Test
     public void testGetByExceptionMessage() {
-        Assertions.assertNotNull(ProviderException.fromExceptionMessage("401"));
-        Assertions.assertNotNull(ProviderException.fromExceptionMessage("401 Unauthorized"));
-
-        ProviderException providerException = ProviderException.fromExceptionMessage(multilineMessage);
-
-        Assertions.assertNotNull(providerException);
+        Assertions.assertTrue(RefreshCredentialsUtils.matches(List.of(401), new ProviderException(401)));
+        Assertions.assertTrue(
+            RefreshCredentialsUtils.matches(
+                List.of("^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$"), new Exception("401 Unauthorized")));
+        Assertions.assertTrue(
+            RefreshCredentialsUtils.matches(
+                List.of("^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$"), new Exception(multilineMessage)));
     }
-
-    @Test
-    public void testGetMessage() {
-        ProviderException providerException = ProviderException.fromExceptionMessage(multilineMessage)
-            .withComponentName("byteChefComponent");
-
-        String exceptionMessage = providerException.getMessage();
-
-        Assertions.assertTrue(exceptionMessage.contains(multilineMessage));
-        Assertions
-            .assertTrue(exceptionMessage.contains(ProviderException.AuthorizationFailedException.class.getName()));
-        Assertions.assertTrue(exceptionMessage.contains("byteChefComponent"));
-    }
-
 }
