@@ -24,6 +24,7 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
+import com.google.api.client.googleapis.auth.oauth2.GoogleOAuthConstants;
 import java.util.List;
 
 /**
@@ -46,7 +47,9 @@ public class GoogleMailConnection {
                     string(CLIENT_SECRET)
                         .label("Client Secret")
                         .required(true))
-                .authorizationUrl((connection, context) -> "https://accounts.google.com/o/oauth2/auth")
+                .authorizationUrl((connection, context) -> " https://accounts.google.com/o/oauth2/v2/auth")
+                .refreshUrl((connectionParameters, context) -> GoogleOAuthConstants.TOKEN_SERVER_URL)
+                .refreshOn("^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$")
                 .scopes((connection, context) -> List.of("https://www.googleapis.com/auth/gmail.send",
                     "https://www.googleapis.com/auth/gmail.readonly"))
                 .tokenUrl((connection, context) -> "https://oauth2.googleapis.com/token"));
