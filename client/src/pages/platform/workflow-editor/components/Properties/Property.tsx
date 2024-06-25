@@ -476,17 +476,7 @@ const Property = ({
             }
         }
 
-        if (controlType === 'SELECT') {
-            if (
-                propertyParameterValue &&
-                typeof propertyParameterValue === 'string' &&
-                propertyParameterValue.includes('${')
-            ) {
-                setMentionInput(true);
-            }
-        }
-
-        if (controlType === 'OBJECT_BUILDER') {
+        if (controlType === 'SELECT' || controlType === 'OBJECT_BUILDER') {
             if (
                 propertyParameterValue &&
                 typeof propertyParameterValue === 'string' &&
