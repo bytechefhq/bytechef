@@ -49,6 +49,7 @@ public class GoogleSheetsConnection {
                         .required(true))
                 .authorizationUrl((connection, context) -> " https://accounts.google.com/o/oauth2/v2/auth")
                 .refreshUrl((connectionParameters, context) -> GoogleOAuthConstants.TOKEN_SERVER_URL)
+                .refreshOn("^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$")
                 .scopes((connection, context) -> List.of(
                     "https://www.googleapis.com/auth/spreadsheets",
                     "https://www.googleapis.com/auth/drive.readonly"))
