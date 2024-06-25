@@ -31,6 +31,8 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
 
 import java.util.HashMap;
 import java.util.List;
@@ -63,28 +65,27 @@ public class DataMapperReplaceMultipleValuesByKeyAction {
                     object()
                         .properties(
                             string(FROM)
-                                .label("From")
-                                .description("Defines the input property key of the value you want to change."),
+                                .label("From Path")
+                                .description("Defines the input path of property key of the value you want to change. Dot notation."),
                             string(TO)
-                                .label("To")
+                                .label("To Path")
                                 .description(
-                                    "Defines the output property key of the value you want to change the input value to.")))
+                                    "Defines the output path of property key of the value you want to change the input value to. Dot notation.")))
                 .required(true))
         .output()
         .perform(DataMapperReplaceMultipleValuesByKeyAction::perform);
 
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        Map<String, Object> input = new HashMap<>(inputParameters.getMap(INPUT, Object.class, Map.of()));
-        Map<String, Object> output = inputParameters.getMap(OUTPUT, Object.class, Map.of());
         List<StringMapping> mappingList = inputParameters.getList(MAPPINGS, StringMapping.class, List.of());
         Map<String, String> mappings = mappingList.stream().collect(Collectors.toMap(Mapping::getFrom, Mapping::getTo));
 
+        DocumentContext input = JsonPath.parse(inputParameters.get(INPUT));
+        DocumentContext output = JsonPath.parse(inputParameters.get(OUTPUT));
         for (Map.Entry<String, String> entry : mappings.entrySet()) {
-            if (input.containsKey(entry.getKey()) && output.containsKey(entry.getValue()))
-                input.put(entry.getKey(), output.get(entry.getValue()));
+            input.set(entry.getKey(), output.read(entry.getValue()));
         }
 
-        return input;
+        return input.read("$");
     }
 }
