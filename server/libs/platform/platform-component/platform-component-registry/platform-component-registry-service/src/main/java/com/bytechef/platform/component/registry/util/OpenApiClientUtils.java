@@ -30,6 +30,7 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Output;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.Property.ValueProperty;
+import com.bytechef.component.exception.ProviderException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -70,7 +71,7 @@ public class OpenApiClientUtils {
         if (response.getStatusCode() < 200 || response.getStatusCode() > 299) {
             Object body = response.getBody();
 
-            throw new IllegalArgumentException(body == null ? null : body.toString());
+            throw new ProviderException(response.getStatusCode(), body == null ? null : body.toString());
         }
 
         return response;

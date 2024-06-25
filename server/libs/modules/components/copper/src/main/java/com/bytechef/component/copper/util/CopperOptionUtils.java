@@ -72,7 +72,7 @@ public class CopperOptionUtils {
             String message = (String) badRequestBody.get("message");
             Integer code = (Integer) badRequestBody.get("status");
 
-            throw ProviderException.fromHttpResponseCode(code, message);
+            throw new ProviderException(code, message);
         }
 
         List<Option<String>> options = new ArrayList<>();
@@ -134,7 +134,7 @@ public class CopperOptionUtils {
             String message = (String) badRequestBody.get("message");
             Integer code = (Integer) badRequestBody.get("status");
 
-            throw ProviderException.fromHttpResponseCode(code, message);
+            throw new ProviderException(code, message);
         }
 
         return createOptions(body);

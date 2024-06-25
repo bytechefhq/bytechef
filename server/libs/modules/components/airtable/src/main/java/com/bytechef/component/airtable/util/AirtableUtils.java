@@ -35,7 +35,7 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.component.definition.Property;
-import com.bytechef.component.exception.ProviderException.BadRequestException;
+import com.bytechef.component.exception.ProviderException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +60,7 @@ public class AirtableUtils {
             logger -> logger.debug("Response for url='https://api.airtable.com/v0/meta/bases': " + body));
 
         if (body.containsKey("error")) {
-            throw new BadRequestException((String) ((Map<?, ?>) body.get("error")).get("message"));
+            throw new ProviderException.BadRequestException((String) ((Map<?, ?>) body.get("error")).get("message"));
         }
 
         return getOptions((Map<String, List<Map<?, ?>>>) body, "bases");
@@ -80,7 +80,8 @@ public class AirtableUtils {
             Map<?, ?> body = response.getBody(Map.class);
 
             if (body.containsKey("error")) {
-                throw new BadRequestException((String) ((Map<?, ?>) body.get("error")).get("message"));
+                throw new ProviderException.BadRequestException(
+                    (String) ((Map<?, ?>) body.get("error")).get("message"));
             }
 
             Map<String, List<AirtableTable>> tablesMap = response.getBody(new Context.TypeReference<>() {});
@@ -94,7 +95,7 @@ public class AirtableUtils {
                 .filter(curTable -> Objects.equals(
                     curTable.id(), inputParameters.getRequiredString(TABLE_ID)))
                 .findFirst()
-                .orElseThrow(() -> new BadRequestException("Request Airtable table does not exist"));
+                .orElseThrow(() -> new ProviderException.BadRequestException("Requested table does not exist"));
 
             for (AirtableField field : table.fields()) {
                 if (SKIP_FIELDS.contains(field.type())) {
@@ -152,7 +153,7 @@ public class AirtableUtils {
             .getBody(new Context.TypeReference<>() {}));
 
         if (body.containsKey("error")) {
-            throw new BadRequestException((String) ((Map<?, ?>) body.get("error")).get("message"));
+            throw new ProviderException.BadRequestException((String) ((Map<?, ?>) body.get("error")).get("message"));
         }
 
         context.logger(logger -> logger.debug("Response for url='%s': %s".formatted(url, body)));
