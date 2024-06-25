@@ -21,9 +21,7 @@ interface ObjectPropertyProps {
 }
 
 const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, path, property}: ObjectPropertyProps) => {
-    const [subProperties, setSubProperties] = useState<Array<PropertyType>>(
-        (property.properties as Array<PropertyType>) || []
-    );
+    const [subProperties, setSubProperties] = useState<Array<PropertyType>>();
     const [newPropertyName, setNewPropertyName] = useState('');
     const [newPropertyType, setNewPropertyType] = useState<keyof typeof VALUE_PROPERTY_CONTROL_TYPES>(
         (property.additionalProperties?.[0]?.type as keyof typeof VALUE_PROPERTY_CONTROL_TYPES) || 'STRING'
@@ -90,7 +88,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
             return;
         }
 
-        setSubProperties((subProperties) => subProperties.filter((property) => property.name !== subProperty.name));
+        setSubProperties((subProperties) => subProperties?.filter((property) => property.name !== subProperty.name));
 
         if (onDeleteClick) {
             onDeleteClick(`${path}.${subProperty.name}`);
@@ -169,7 +167,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
 
     // set subProperties in cases where the ObjectProperty has predefined properties
     useEffect(() => {
-        if (properties?.length && !currentComponent?.parameters) {
+        if (properties?.length) {
             setSubProperties(properties as Array<PropertyType>);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -185,35 +183,33 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
                 )}
             >
                 {(subProperties as unknown as Array<SubPropertyType>)?.map((subProperty, index) => (
-                    <div className="relative flex w-full" key={`${property.name}_${subProperty.name}_${index}`}>
-                        <Property
-                            arrayIndex={arrayIndex}
-                            arrayName={arrayName}
-                            customClassName={twMerge(
-                                'w-full last-of-type:pb-0',
-                                label && 'mb-0',
-                                isContainerObject && 'pb-0',
-                                !arrayName && !isContainerObject && 'pl-2'
-                            )}
-                            deletePropertyButton={
-                                subProperty.custom && name && subProperty.name && currentComponent ? (
-                                    <DeletePropertyButton
-                                        onClick={() => handleDeleteClick(subProperty)}
-                                        propertyName={subProperty.name}
-                                    />
-                                ) : undefined
-                            }
-                            key={`${property.name}_${subProperty.name}_${index}`}
-                            objectName={arrayName ? '' : name}
-                            operationName={operationName}
-                            parameterValue={subProperty.defaultValue}
-                            path={`${path}.${subProperty.name}`}
-                            property={{
-                                ...subProperty,
-                                name: subProperty.name,
-                            }}
-                        />
-                    </div>
+                    <Property
+                        arrayIndex={arrayIndex}
+                        arrayName={arrayName}
+                        customClassName={twMerge(
+                            'w-full last-of-type:pb-0',
+                            label && 'mb-0',
+                            isContainerObject && 'pb-0',
+                            !arrayName && !isContainerObject && 'pl-2'
+                        )}
+                        deletePropertyButton={
+                            subProperty.custom && name && subProperty.name && currentComponent ? (
+                                <DeletePropertyButton
+                                    onClick={() => handleDeleteClick(subProperty)}
+                                    propertyName={subProperty.name}
+                                />
+                            ) : undefined
+                        }
+                        key={`${property.name}_${subProperty.name}_${index}`}
+                        objectName={arrayName ? '' : name}
+                        operationName={operationName}
+                        parameterValue={subProperty.defaultValue}
+                        path={`${path}.${subProperty.name}`}
+                        property={{
+                            ...subProperty,
+                            name: subProperty.name,
+                        }}
+                    />
                 ))}
             </ul>
 
