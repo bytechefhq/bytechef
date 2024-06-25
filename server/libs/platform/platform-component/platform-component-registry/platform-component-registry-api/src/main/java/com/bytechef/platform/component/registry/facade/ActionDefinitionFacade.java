@@ -51,7 +51,7 @@ public interface ActionDefinitionFacade {
 
     Object executePerformForPolyglot(
         String componentName, int componentVersion, String actionName, @NonNull Map<String, ?> inputParameters,
-        Map<String, ComponentConnection> componentConnections, ActionContext actionContext);
+        ComponentConnection componentConnection, ActionContext actionContext);
 
     String executeWorkflowNodeDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,

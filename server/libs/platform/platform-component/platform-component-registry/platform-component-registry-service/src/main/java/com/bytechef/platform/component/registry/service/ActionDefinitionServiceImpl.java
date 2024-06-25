@@ -84,6 +84,10 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 .map(valueProperty -> (Property) Property.toProperty(valueProperty))
                 .toList();
         } catch (Exception e) {
+            if (e instanceof ProviderException) {
+                throw (ProviderException) e;
+            }
+
             throw new ComponentExecutionException(
                 e, inputParameters, ActionDefinitionErrorType.EXECUTE_DYNAMIC_PROPERTIES);
         }
@@ -184,6 +188,10 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 (property, sampleOutput) -> new Output(
                     Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput));
         } catch (Exception e) {
+            if (e instanceof ProviderException) {
+                throw (ProviderException) e;
+            }
+
             throw new ComponentExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
         }
     }

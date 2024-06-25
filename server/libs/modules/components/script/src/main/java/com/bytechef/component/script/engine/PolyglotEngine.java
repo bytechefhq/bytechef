@@ -37,7 +37,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Engine;
@@ -227,21 +226,20 @@ public class PolyglotEngine {
         public ProxyExecutable getMember(String actionName) {
             return arguments -> {
                 Map<String, ?> inputParameters = arguments.length == 0
-                    ? Map.of()
-                    : (Map<String, ?>) copyToJavaValue(arguments[0]);
+                    ? Map.of() : (Map<String, ?>) copyToJavaValue(arguments[0]);
 
-                Map<String, ComponentConnection> connections;
+                ComponentConnection componentConnection = null;
 
-                if (parameterConnections.isEmpty()) {
-                    connections = Map.of();
-                } else {
+                if (!parameterConnections.isEmpty()) {
+                    Map.Entry<String, ComponentConnection> entry;
+
                     if (arguments.length < 2) {
-                        connections = getFirstComponentConnectionEntry()
-                            .map(Map::ofEntries)
-                            .orElse(Map.of());
+                        entry = getFirstComponentConnectionEntry();
                     } else {
-                        connections = Map.ofEntries(getComponentConnectionEntry(arguments[1].asString()));
+                        entry = getComponentConnectionEntry(arguments[1].asString());
                     }
+
+                    componentConnection = entry.getValue();
                 }
 
                 ActionDefinitionFacade actionDefinitionFacade = applicationContext.getBean(
@@ -249,7 +247,7 @@ public class PolyglotEngine {
 
                 Object result = actionDefinitionFacade.executePerformForPolyglot(
                     componentDefinition.getName(), componentDefinition.getVersion(), actionName,
-                    (Map) copyFromPolyglotContext(inputParameters), connections, actionContext);
+                    (Map) copyFromPolyglotContext(inputParameters), componentConnection, actionContext);
 
                 if (result == null) {
                     return null;
@@ -287,7 +285,7 @@ public class PolyglotEngine {
                 .orElseThrow(IllegalArgumentException::new);
         }
 
-        private Optional<Map.Entry<String, ComponentConnection>> getFirstComponentConnectionEntry() {
+        private Map.Entry<String, ComponentConnection> getFirstComponentConnectionEntry() {
             return parameterConnections
                 .entrySet()
                 .stream()
@@ -297,7 +295,8 @@ public class PolyglotEngine {
                     return Objects.equals(parameterConnection.getComponentName(), componentDefinition.getName());
                 })
                 .findFirst()
-                .map(entry -> Map.entry(entry.getKey(), toComponentConnection(entry.getValue())));
+                .map(entry -> Map.entry(entry.getKey(), toComponentConnection(entry.getValue())))
+                .orElseThrow(IllegalStateException::new);
         }
 
         private ComponentConnection toComponentConnection(ParameterConnection parameterConnection) {
