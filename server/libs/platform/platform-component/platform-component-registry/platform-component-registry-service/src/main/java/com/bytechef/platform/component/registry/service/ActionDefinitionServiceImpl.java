@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.component.registry.service;
 
-import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionContext;
@@ -50,6 +49,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -94,6 +94,52 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
+    public Output executeMultipleConnectionsOutput(
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, ?> inputParameters, @NonNull Map<String, ComponentConnection> connections,
+        @NonNull ActionContext context) {
+
+        MultipleConnectionsOutputFunction multipleConnectionsOutputFunction =
+            (MultipleConnectionsOutputFunction) getOutputFunction(componentName, componentVersion, actionName);
+
+        try {
+            com.bytechef.component.definition.Output output = multipleConnectionsOutputFunction.apply(
+                new ParametersImpl(inputParameters), connections, context);
+
+            if (output == null) {
+                return null;
+            }
+
+            return SchemaUtils.toOutput(
+                output,
+                (property, sampleOutput) -> new Output(
+                    Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput));
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
+        }
+    }
+
+    @Override
+    public Object executeMultipleConnectionsPerform(
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, ?> inputParameters, @NonNull Map<String, ComponentConnection> connections,
+        @NonNull ActionContext context) {
+
+        com.bytechef.component.definition.ActionDefinition actionDefinition =
+            componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
+
+        MultipleConnectionsPerformFunction multipleConnectionsPerformFunction =
+            (MultipleConnectionsPerformFunction) OptionalUtils.get(actionDefinition.getPerform());
+
+        try {
+            return multipleConnectionsPerformFunction.apply(
+                new ParametersImpl(inputParameters), connections, context);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
+        }
+    }
+
+    @Override
     public List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         @NonNull Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths, String searchText,
@@ -125,26 +171,17 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public Output executeOutput(
+    public Output executeSingleConnectionOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, @NonNull Map<String, ComponentConnection> connections,
-        @NonNull ActionContext context) {
+        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
 
-        OutputFunction outputFunction = getOutputFunction(componentName, componentVersion, actionName);
+        SingleConnectionOutputFunction singleConnectionOutputFunction =
+            (SingleConnectionOutputFunction) getOutputFunction(componentName, componentVersion, actionName);
 
         try {
-            com.bytechef.component.definition.Output output = switch (outputFunction) {
-                case SingleConnectionOutputFunction singleConnectionOutputFunction ->
-                    singleConnectionOutputFunction.apply(
-                        new ParametersImpl(inputParameters),
-                        new ParametersImpl(
-                            CollectionUtils.findFirstMapOrElse(
-                                connections.values(), ComponentConnection::parameters, Map.of())),
-                        context);
-                case MultipleConnectionsOutputFunction multipleConnectionsOutputFunction ->
-                    multipleConnectionsOutputFunction.apply(new ParametersImpl(inputParameters), connections, context);
-                default -> throw new IllegalStateException();
-            };
+            com.bytechef.component.definition.Output output = singleConnectionOutputFunction.apply(
+                new ParametersImpl(inputParameters),
+                new ParametersImpl(getConnectionParameters(connection)), context);
 
             if (output == null) {
                 return null;
@@ -160,51 +197,28 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public Object executePerform(
+    public Object executeSingleConnectionPerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, @NonNull Map<String, ComponentConnection> connections,
+        @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
         @NonNull ActionContext context) {
 
         com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
 
-        return actionDefinition.getPerform()
-            .map(performFunction -> {
-                try {
-                    return switch (performFunction) {
-                        case SingleConnectionPerformFunction singleConnectionPerformFunction ->
-                            singleConnectionPerformFunction.apply(
-                                new ParametersImpl(inputParameters),
-                                new ParametersImpl(
-                                    CollectionUtils.findFirstMapOrElse(connections.values(),
-                                        (componentConnection) -> MapUtils.concatDifferentTypes(
-                                            componentConnection.getParameters(),
-                                            Map.of(
-                                                Authorization.AUTHORIZATION_TYPE,
-                                                componentConnection.authorizationName())),
-                                        Map.of())),
-                                context);
-                        case MultipleConnectionsPerformFunction multipleConnectionsPerformFunction ->
-                            multipleConnectionsPerformFunction.apply(
-                                new ParametersImpl(inputParameters), connections, context);
-                        default -> throw new IllegalStateException();
-                    };
-                } catch (Exception e) {
-                    if (e instanceof ProviderException) {
-                        throw (ProviderException) e;
-                    }
+        SingleConnectionPerformFunction singleConnectionPerformFunction =
+            (SingleConnectionPerformFunction) OptionalUtils.get(actionDefinition.getPerform());
 
-                    ProviderException providerException = ProviderException.fromExceptionMessage(e.getMessage());
+        try {
+            return singleConnectionPerformFunction.apply(
+                new ParametersImpl(inputParameters), new ParametersImpl(getConnectionParameters(connection)), context);
+        } catch (Exception e) {
+            if (e instanceof ProviderException) {
+                throw (ProviderException) e;
+            }
 
-                    if (providerException != null) {
-                        throw providerException.withComponentName(componentName);
-                    }
-
-                    throw new ComponentExecutionException(
-                        e, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
-                }
-            })
-            .orElse(null);
+            throw new ComponentExecutionException(
+                e, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
+        }
     }
 
     @Override
@@ -244,6 +258,16 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             .stream()
             .map(actionDefinition -> new ActionDefinition(actionDefinition, componentName, componentVersion))
             .toList();
+    }
+
+    @Override
+    public boolean isSingleConnectionPerform(
+        @NonNull String componentName, int componentVersion, @NonNull String actionName) {
+
+        com.bytechef.component.definition.ActionDefinition actionDefinition =
+            componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
+
+        return OptionalUtils.get(actionDefinition.getPerform()) instanceof SingleConnectionPerformFunction;
     }
 
     private ActionOptionsFunction<?> getComponentOptionsFunction(
@@ -302,9 +326,18 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             .orElse(componentDefinition.getName());
     }
 
-    private OutputFunction getOutputFunction(
-        String componentName, int componentVersion, String actionName) {
+    private static ParametersImpl getConnectionParameters(ComponentConnection componentConnection) {
+        if (componentConnection == null) {
+            return new ParametersImpl(Map.of());
+        }
 
+        return new ParametersImpl(
+            MapUtils.concatDifferentTypes(
+                componentConnection.getParameters(),
+                Map.of(Authorization.AUTHORIZATION_TYPE, componentConnection.authorizationName())));
+    }
+
+    private OutputFunction getOutputFunction(String componentName, int componentVersion, String actionName) {
         com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
 
