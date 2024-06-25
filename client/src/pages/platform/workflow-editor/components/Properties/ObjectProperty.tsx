@@ -133,11 +133,15 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
             if (matchingProperty) {
                 const matchingPropertyType = matchingProperty.type || parameterItemType;
 
+                const matchingPropertyControlType =
+                    matchingProperty.controlType ||
+                    (VALUE_PROPERTY_CONTROL_TYPES[
+                        matchingPropertyType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
+                    ] as ControlTypeModel);
+
                 return {
                     ...matchingProperty,
-                    controlType: VALUE_PROPERTY_CONTROL_TYPES[
-                        matchingPropertyType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
-                    ] as ControlTypeModel,
+                    controlType: matchingPropertyControlType,
                     defaultValue: parameterKeyValue,
                     type: matchingPropertyType,
                 };
