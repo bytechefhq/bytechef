@@ -38,7 +38,6 @@ dependencies {
     implementation(project(":server:ee:libs:core:discovery:discovery-metadata-api"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
     implementation(project(":server:ee:libs:core:remote:remote-rest"))
-    implementation(project(":server:ee:libs:platform:platform-component:platform-component-registry:platform-component-registry-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-registry:platform-component-registry-remote-rest"))
     implementation(project(":server:ee:libs:platform:platform-connection:platform-connection-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-data-storage:platform-data-storage-db:platform-data-storage-db-remote-client"))

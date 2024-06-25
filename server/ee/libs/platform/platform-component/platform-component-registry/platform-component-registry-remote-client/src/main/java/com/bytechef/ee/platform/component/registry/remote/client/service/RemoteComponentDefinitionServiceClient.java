@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
@@ -31,7 +30,6 @@ import org.springframework.util.LinkedMultiValueMap;
  * @author Ivica Cardic
  */
 @Component
-@ConditionalOnMissingClass(value = "com.bytechef.worker.WorkerApplication")
 public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
     implements ComponentDefinitionService {
 

@@ -19,7 +19,6 @@ import com.bytechef.platform.constant.AppType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.lang.NonNull;
@@ -31,7 +30,6 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-@ConditionalOnMissingClass(value = "com.bytechef.worker.WorkerApplication")
 public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     implements ActionDefinitionFacade {
 
