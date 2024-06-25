@@ -20,6 +20,7 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.constant.AppType;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -44,5 +45,5 @@ public interface ConnectionService {
 
     Connection update(Connection connection);
 
-    Connection updateConnectionParameter(long connectionId, String key, Object value);
+    Connection updateConnectionParameters(long connectionId, Map<String, ?> parameters);
 }

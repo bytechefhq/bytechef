@@ -144,16 +144,16 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
 
     @Override
-    public Connection updateConnectionParameter(long connectionId, String key, Object value) {
-        Validate.notBlank(key, "'parameter name' must not be empty");
+    public Connection updateConnectionParameters(long connectionId, Map<String, ?> parameters) {
+        Validate.notNull(parameters, "'parameters' must not be null");
 
         Connection connection = getConnection(connectionId);
 
-        Map<String, Object> parameters = new HashMap<>(connection.getParameters());
+        Map<String, Object> curParameters = new HashMap<>(connection.getParameters());
 
-        parameters.put(key, value);
+        curParameters.putAll(parameters);
 
-        connection.setParameters(parameters);
+        connection.setParameters(curParameters);
 
         return connectionRepository.save(connection);
     }
