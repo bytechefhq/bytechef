@@ -720,7 +720,7 @@ public final class ComponentDSL {
         private ClientIdFunction clientIdFunction;
         private ClientSecretFunction clientSecretFunction;
         private RefreshTokenFunction refreshTokenFunction;
-        private List<Object> detectOn;
+        private List<String> detectOn;
         private String description;
         private final String name;
         private List<? extends Property> properties;
@@ -774,7 +774,7 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableAuthorization detectOn(Object... detectOn) {
+        public ModifiableAuthorization detectOn(String... detectOn) {
             if (detectOn != null) {
                 this.detectOn = List.of(detectOn);
             }
@@ -886,7 +886,7 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<List<Object>> getDetectOn() {
+        public Optional<List<String>> getDetectOn() {
             return Optional.ofNullable(detectOn);
         }
 
