@@ -58,25 +58,23 @@ const PropertyDynamicProperties = ({
         );
     }
 
-    return subProperties ? (
-        <ul className="space-y-4" key={(lookupDependsOnValues ?? []).join('')}>
-            {subProperties.map((property, index) => {
-                const propertyDefaultValue = property.name ? parameterValue?.[property.name] : '';
+    if (!subProperties) {
+        return <></>;
+    }
 
-                return (
-                    <Property
-                        key={`${property.name}_${index}_${(lookupDependsOnValues ?? []).join('')}`}
-                        objectName={name}
-                        operationName={currentOperationName}
-                        parameterValue={propertyDefaultValue}
-                        path={path}
-                        property={property}
-                    />
-                );
-            })}
+    return (
+        <ul className="space-y-4" key={`${(lookupDependsOnValues ?? []).join('')}_DynamicProperty`}>
+            {subProperties.map((property, index) => (
+                <Property
+                    key={`${property.name}_${index}_${(lookupDependsOnValues ?? []).join('')}_property`}
+                    objectName={name}
+                    operationName={currentOperationName}
+                    parameterValue={property.name ? parameterValue?.[property.name] : ''}
+                    path={path}
+                    property={property}
+                />
+            ))}
         </ul>
-    ) : (
-        <></>
     );
 };
 
