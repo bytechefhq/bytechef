@@ -16,26 +16,35 @@
 
 package com.bytechef.platform.component.registry.facade;
 
+import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
+import static com.bytechef.component.definition.Authorization.EXPIRES_IN;
+import static com.bytechef.component.definition.Authorization.REFRESH_TOKEN;
+import static com.bytechef.component.definition.Authorization.RefreshTokenResponse;
+
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.exception.ProviderException;
+import com.bytechef.platform.component.exception.ComponentExecutionException;
+import com.bytechef.platform.component.registry.definition.ActionContextImpl;
 import com.bytechef.platform.component.registry.definition.factory.ContextFactory;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
+import com.bytechef.platform.component.registry.exception.ActionDefinitionErrorType;
 import com.bytechef.platform.component.registry.service.ActionDefinitionService;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
+import com.bytechef.platform.component.registry.util.RefreshCredentialsUtils;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.exception.ErrorType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -71,11 +80,15 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
-        return actionDefinitionService.executeDynamicProperties(
-            componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
-            componentConnection,
-            contextFactory.createActionContext(
-                componentName, componentVersion, actionName, null, null, null, componentConnection));
+        ActionContext actionContext = contextFactory.createActionContext(
+            componentName, componentVersion, actionName, null, null, null, componentConnection);
+
+        return executeSingleConnectionFunction(
+            componentName, componentVersion, componentConnection, actionContext,
+            ActionDefinitionErrorType.EXECUTE_DYNAMIC_PROPERTIES,
+            (curComponentConnection, curActionContext) -> actionDefinitionService.executeDynamicProperties(
+                componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
+                curComponentConnection, curActionContext));
     }
 
     @Override
@@ -89,27 +102,12 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         ActionContext actionContext = contextFactory.createActionContext(
             componentName, componentVersion, actionName, null, null, null, componentConnection);
 
-        Exception executionException;
-
-        try {
-            return actionDefinitionService.executeOptions(
+        return executeSingleConnectionFunction(
+            componentName, componentVersion, componentConnection, actionContext,
+            ActionDefinitionErrorType.EXECUTE_OPTIONS,
+            (componentConnection1, actionContext1) -> actionDefinitionService.executeOptions(
                 componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
-                searchText, componentConnection, actionContext);
-        } catch (Exception exception) {
-            executionException = exception;
-
-            Map<String, ComponentConnection> tokenRefreshedComponentConnections = getTokenRefreshedComponentConnection(
-                componentName, Map.of("tmpName", connectionId), exception, Map.of("tmpName", componentConnection),
-                actionContext);
-
-            if (!tokenRefreshedComponentConnections.isEmpty()) {
-                return actionDefinitionService.executeOptions(
-                    componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
-                    searchText, componentConnection, actionContext);
-            }
-        }
-
-        throw new UnsupportedOperationException("Unable to recover from execution error", executionException);
+                searchText, componentConnection1, actionContext1));
     }
 
     @Override
@@ -117,48 +115,37 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, @NonNull Map<String, Long> connectionIds) {
 
-        Map<String, ComponentConnection> componentConnections = getComponentConnections(connectionIds);
+        ExecuteFunctionData executeFunctionData = getExecuteFunctionData(
+            componentName, componentVersion, actionName, connectionIds);
 
-        Set<Map.Entry<String, ComponentConnection>> entries = componentConnections.entrySet();
+        ActionContext actionContext = contextFactory.createActionContext(
+            componentName, componentVersion, actionName, null, null, null, executeFunctionData.componentConnection());
 
-        return actionDefinitionService.executeOutput(
-            componentName, componentVersion, actionName, inputParameters, componentConnections,
-            contextFactory.createActionContext(
-                componentName, componentVersion, actionName, null, null, null,
-                entries.size() == 1 ? CollectionUtils.getFirstMap(entries, Map.Entry::getValue) : null));
+        if (executeFunctionData.singleConnectionPerform()) {
+            return executeSingleConnectionFunction(
+                componentName, componentVersion, executeFunctionData.componentConnection(), actionContext,
+                ActionDefinitionErrorType.EXECUTE_OUTPUT,
+                (componentConnection1, actionContext1) -> actionDefinitionService.executeSingleConnectionOutput(
+                    componentName, componentVersion, actionName, inputParameters, componentConnection1,
+                    actionContext1));
+        } else {
+            return actionDefinitionService.executeMultipleConnectionsOutput(
+                componentName, componentVersion, actionName, inputParameters,
+                executeFunctionData.componentConnections(), actionContext);
+        }
     }
 
     @Override
     public Object executePerformForPolyglot(
         String componentName, int componentVersion, String actionName, @NonNull Map<String, ?> inputParameters,
-        Map<String, ComponentConnection> componentConnections,
-        ActionContext actionContext) {
+        ComponentConnection componentConnection, ActionContext actionContext) {
 
-        Exception executionException;
-
-        try {
-            return actionDefinitionService.executePerform(
-                componentName, componentVersion, actionName, inputParameters, componentConnections, actionContext);
-        } catch (Exception exception) {
-            executionException = exception;
-
-            ComponentConnection componentConnection = componentConnections.values()
-                .stream()
-                .findFirst()
-                .get();
-
-            componentConnections = getTokenRefreshedComponentConnection(
-                componentName, Map.of(componentConnection.componentName(), componentConnection.getConnectionId()),
-                exception, Map.of(componentConnection.componentName(), componentConnection),
-                actionContext);
-
-            if (!componentConnections.isEmpty()) {
-                return actionDefinitionService.executePerform(
-                    componentName, componentVersion, actionName, inputParameters, componentConnections, actionContext);
-            }
-        }
-
-        throw new UnsupportedOperationException("Unable to recover from execution error", executionException);
+        return executeSingleConnectionFunction(
+            componentName, componentVersion, componentConnection, actionContext,
+            ActionDefinitionErrorType.EXECUTE_PERFORM,
+            (componentConnection1, actionContext1) -> actionDefinitionService.executeSingleConnectionPerform(
+                componentName, componentVersion, actionName, inputParameters, componentConnection1,
+                actionContext1));
     }
 
     @Override
@@ -167,76 +154,25 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         Long instanceId, Long instanceWorkflowId, Long jobId, @NonNull Map<String, ?> inputParameters,
         @NonNull Map<String, Long> connectionIds) {
 
-        Map<String, ComponentConnection> componentConnections = getComponentConnections(connectionIds);
-
-        Set<Map.Entry<String, ComponentConnection>> entries = componentConnections.entrySet();
+        ExecuteFunctionData executeFunctionData = getExecuteFunctionData(
+            componentName, componentVersion, actionName, connectionIds);
 
         ActionContext actionContext = contextFactory.createActionContext(
             componentName, componentVersion, actionName, type, instanceWorkflowId, jobId,
-            entries.size() == 1
-                ? CollectionUtils.getFirstMap(entries, Map.Entry::getValue)
-                : null);
+            executeFunctionData.componentConnection);
 
-        Exception executionException;
-
-        try {
-            return actionDefinitionService.executePerform(
-                componentName, componentVersion, actionName, inputParameters, componentConnections, actionContext);
-        } catch (Exception exception) {
-            executionException = exception;
-
-            componentConnections = getTokenRefreshedComponentConnection(
-                componentName, connectionIds, exception, componentConnections, actionContext);
-
-            if (!componentConnections.isEmpty()) {
-                return actionDefinitionService.executePerform(
-                    componentName, componentVersion, actionName, inputParameters, componentConnections, actionContext);
-            }
+        if (executeFunctionData.singleConnectionPerform) {
+            return executeSingleConnectionFunction(
+                componentName, componentVersion, executeFunctionData.componentConnection, actionContext,
+                ActionDefinitionErrorType.EXECUTE_PERFORM,
+                (componentConnection1, actionContext1) -> actionDefinitionService.executeSingleConnectionPerform(
+                    componentName, componentVersion, actionName, inputParameters, componentConnection1,
+                    actionContext1));
+        } else {
+            return actionDefinitionService.executeMultipleConnectionsPerform(
+                componentName, componentVersion, actionName, inputParameters, executeFunctionData.componentConnections,
+                actionContext);
         }
-
-        throw new UnsupportedOperationException("Unable to recover from execution error", executionException);
-
-    }
-
-    private Map<String, ComponentConnection> getTokenRefreshedComponentConnection(
-        String componentName, Map<String, Long> connectionIds, Exception exception,
-        Map<String, ComponentConnection> componentConnections, ActionContext actionContext) {
-
-        if (!ProviderException.hasAuthorizationFailedExceptionContent(exception)) {
-            throw new UnsupportedOperationException(
-                "Unable to recover failed request with token refresh procedure", exception);
-        }
-
-        HashMap<String, ComponentConnection> refreshedConnections = new HashMap<>();
-
-        componentConnections.forEach((connectionName, componentConnection) -> {
-
-            if (!componentConnection.isAuthorizationNameOauth2AuthorizationCode()) {
-                return;
-            }
-
-            String realComponentName = componentName;
-
-            if (!Objects.equals(ProviderException.getComponentName(exception), componentName)) {
-                realComponentName = ProviderException.getComponentName(exception);
-            }
-
-            Authorization.RefreshTokenResponse refreshTokenResponse =
-                connectionDefinitionService.executeRefresh(realComponentName, componentConnection.authorizationName(),
-                    componentConnection.getParameters(), actionContext);
-
-            Long connectionId = connectionIds.get(realComponentName);
-            Connection connection = connectionService.updateConnectionParameter(
-                connectionId, "access_token",
-                Objects.requireNonNull(refreshTokenResponse.accessToken()));
-
-            refreshedConnections.put(connectionName, new ComponentConnection(
-                realComponentName, connection.getVersion(), connectionId, connection.getParameters(),
-                connection.getAuthorizationName()));
-
-        });
-
-        return refreshedConnections;
     }
 
     @Override
@@ -247,6 +183,54 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         return actionDefinitionService.executeWorkflowNodeDescription(
             componentName, componentVersion, actionName, inputParameters,
             contextFactory.createActionContext(componentName, componentVersion, actionName, null, null, null, null));
+    }
+
+    private <V> V executeSingleConnectionFunction(
+        String componentName, int componentVersion, ComponentConnection componentConnection,
+        ActionContext actionContext, ErrorType errorType, BiFunction<ComponentConnection, ActionContext, V> function) {
+
+        try {
+            return function.apply(componentConnection, actionContext);
+        } catch (Exception exception) {
+            List<Object> refreshOn = connectionDefinitionService.getAuthorizationRefreshOn(
+                componentName, componentConnection.version(), componentConnection.authorizationName());
+
+            if (componentConnection.canCredentialsBeRefreshed() &&
+                RefreshCredentialsUtils.matches(refreshOn, exception)) {
+
+                componentConnection = getRefreshedCredentialsComponentConnection(componentConnection, actionContext);
+
+                ActionContextImpl actionContextImpl = (ActionContextImpl) actionContext;
+
+                actionContext = contextFactory.createActionContext(
+                    componentName, componentVersion, actionContextImpl.getActionName(), actionContextImpl.getAppType(),
+                    actionContextImpl.getInstanceWorkflowId(), actionContextImpl.getJobId(), componentConnection);
+
+                return function.apply(componentConnection, actionContext);
+            }
+
+            if (exception instanceof ProviderException) {
+                throw new ComponentExecutionException(exception, errorType);
+            }
+
+            throw exception;
+        }
+    }
+
+    private ExecuteFunctionData getExecuteFunctionData(
+        String componentName, int componentVersion, String actionName, Map<String, Long> connectionIds) {
+
+        Map<String, ComponentConnection> componentConnections = getComponentConnections(connectionIds);
+
+        Set<Map.Entry<String, ComponentConnection>> entries = componentConnections.entrySet();
+
+        boolean singleConnectionPerform = actionDefinitionService.isSingleConnectionPerform(
+            componentName, componentVersion, actionName);
+
+        ComponentConnection componentConnection = singleConnectionPerform && !entries.isEmpty()
+            ? CollectionUtils.getFirstMap(entries, Map.Entry::getValue) : null;
+
+        return new ExecuteFunctionData(componentConnections, componentConnection, singleConnectionPerform);
     }
 
     private ComponentConnection getComponentConnection(Long connectionId) {
@@ -263,19 +247,65 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         return componentConnection;
     }
 
-    private Map<String, ComponentConnection> getComponentConnections(Map<String, Long> connectionIds) {
-        return connectionIds
-            .entrySet()
-            .stream()
-            .collect(
-                Collectors.toMap(
-                    Map.Entry::getKey,
-                    entry -> {
-                        Connection connection = connectionService.getConnection(entry.getValue());
+    private ComponentConnection getComponentConnection(Map.Entry<String, Long> entry) {
+        Connection connection = connectionService.getConnection(entry.getValue());
 
-                        return new ComponentConnection(
-                            connection.getComponentName(), connection.getConnectionVersion(), entry.getValue(),
-                            connection.getParameters(), connection.getAuthorizationName());
-                    }));
+        return new ComponentConnection(
+            connection.getComponentName(), connection.getConnectionVersion(), entry.getValue(),
+            connection.getParameters(), connection.getAuthorizationName());
+    }
+
+    private Map<String, ComponentConnection> getComponentConnections(Map<String, Long> connectionIds) {
+        return connectionIds.entrySet()
+            .stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, this::getComponentConnection));
+    }
+
+    private ComponentConnection getRefreshedCredentialsComponentConnection(
+        ComponentConnection componentConnection, ActionContext actionContext) {
+
+        Connection connection;
+        Map<String, ?> parameters;
+
+            if (componentConnection.isAuthorizationOauth2AuthorizationCode()) {
+                RefreshTokenResponse refreshTokenResponse =
+                    connectionDefinitionService.executeRefresh(
+                        componentConnection.componentName(), componentConnection.version(),
+                        componentConnection.authorizationName(), componentConnection.getParameters(), actionContext);
+
+                parameters = new HashMap<>() {
+                    {
+                        put(ACCESS_TOKEN, refreshTokenResponse.accessToken());
+
+                        if (refreshTokenResponse.refreshToken() != null) {
+                            put(REFRESH_TOKEN, refreshTokenResponse.refreshToken());
+                        }
+
+                        if (refreshTokenResponse.expiresIn() != null) {
+                            put(EXPIRES_IN, refreshTokenResponse.expiresIn());
+                        }
+                    }
+                };
+            } else {
+                parameters = connectionDefinitionService.executeAcquire(
+                    componentConnection.componentName(), componentConnection.version(),
+                    componentConnection.authorizationName(), componentConnection.getParameters(), actionContext);
+            }
+
+                connection = connectionService.updateConnectionParameters(
+                    componentConnection.connectionId(), parameters);
+            }
+
+            connection = connectionService.updateConnectionParameters(componentConnection.connectionId(), parameters);
+        }
+
+        return new ComponentConnection(
+            componentConnection.componentName(), connection.getConnectionVersion(), componentConnection.connectionId(),
+            connection.getParameters(), connection.getAuthorizationName());
+    }
+
+    private record ExecuteFunctionData(
+        Map<String, ComponentConnection> componentConnections, ComponentConnection componentConnection,
+        boolean singleConnectionPerform) {
     }
 }
