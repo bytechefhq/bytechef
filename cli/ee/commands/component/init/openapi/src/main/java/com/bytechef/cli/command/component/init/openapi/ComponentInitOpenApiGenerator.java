@@ -667,8 +667,7 @@ public class ComponentInitOpenApiGenerator {
 
         builder.add(
             """
-                authorization(
-                    AuthorizationType.API_KEY.toLowerCase(), AuthorizationType.API_KEY)
+                authorization(AuthorizationType.API_KEY)
                     .title($S)
                     .properties(
                         $L
@@ -692,8 +691,7 @@ public class ComponentInitOpenApiGenerator {
 
         builder.add(
             """
-                authorization(
-                    AuthorizationType.BASIC_AUTH.toLowerCase(), AuthorizationType.BASIC_AUTH)
+                authorization(AuthorizationType.BASIC_AUTH)
                     .title($S)
                     .properties(
                         string(USERNAME)
@@ -718,8 +716,7 @@ public class ComponentInitOpenApiGenerator {
 
         builder.add(
             """
-                authorization(
-                    AuthorizationType.BEARER_TOKEN.toLowerCase(), AuthorizationType.BEARER_TOKEN)
+                authorization(AuthorizationType.BEARER_TOKEN)
                     .title($S)
                     .properties(
                         string(TOKEN)
@@ -740,8 +737,7 @@ public class ComponentInitOpenApiGenerator {
 
         builder.add(
             """
-                authorization(
-                    AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+                authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                     .title($S)
                     .properties(
                         string(CLIENT_ID)
@@ -779,8 +775,7 @@ public class ComponentInitOpenApiGenerator {
 
         builder.add(
             """
-                authorization(
-                    AuthorizationType.OAUTH2_CLIENT_CREDENTIALS.toLowerCase(), AuthorizationType.OAUTH2_CLIENT_CREDENTIALS)
+                authorization(AuthorizationType.OAUTH2_CLIENT_CREDENTIALS)
                     .title($S)
                     .properties(
                         string(CLIENT_ID)
@@ -814,8 +809,7 @@ public class ComponentInitOpenApiGenerator {
 
         builder.add(
             """
-                authorization(
-                    AuthorizationType.OAUTH2_IMPLICIT_CODE.toLowerCase(), AuthorizationType.OAUTH2_IMPLICIT_CODE)
+                authorization(AuthorizationType.OAUTH2_IMPLICIT_CODE)
                     .title($S)
                     .properties(
                         string(CLIENT_ID)
@@ -849,8 +843,7 @@ public class ComponentInitOpenApiGenerator {
 
         builder.add(
             """
-                authorization(
-                    AuthorizationType.OAUTH2_RESOURCE_OWNER_PASSWORD.toLowerCase(), AuthorizationType.OAUTH2_RESOURCE_OWNER_PASSWORD)
+                authorization(AuthorizationType.OAUTH2_RESOURCE_OWNER_PASSWORD)
                     .title($S)
                     .properties(
                         string(CLIENT_ID)
