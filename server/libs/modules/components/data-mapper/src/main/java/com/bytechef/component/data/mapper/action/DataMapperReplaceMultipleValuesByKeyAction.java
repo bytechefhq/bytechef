@@ -23,11 +23,19 @@ import static com.bytechef.component.data.mapper.constant.DataMapperConstants.OU
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.TO;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.string;
 
+import com.bytechef.component.data.mapper.util.mapping.Mapping;
+import com.bytechef.component.data.mapper.util.mapping.StringMapping;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic
@@ -54,10 +62,10 @@ public class DataMapperReplaceMultipleValuesByKeyAction {
                 .items(
                     object()
                         .properties(
-                            object(FROM)
+                            string(FROM)
                                 .label("From")
                                 .description("Defines the input property key of the value you want to change."),
-                            object(TO)
+                            string(TO)
                                 .label("To")
                                 .description(
                                     "Defines the output property key of the value you want to change the input value to.")))
@@ -67,8 +75,16 @@ public class DataMapperReplaceMultipleValuesByKeyAction {
 
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Map<String, Object> input = new HashMap<>(inputParameters.getMap(INPUT, Object.class, Map.of()));
+        Map<String, Object> output = inputParameters.getMap(OUTPUT, Object.class, Map.of());
+        List<StringMapping> mappingList = inputParameters.getList(MAPPINGS, StringMapping.class, List.of());
+        Map<String, String> mappings = mappingList.stream().collect(Collectors.toMap(Mapping::getFrom, Mapping::getTo));
 
-        // TODO
-        return null;
+        for (Map.Entry<String, String> entry : mappings.entrySet()) {
+            if (input.containsKey(entry.getKey()) && output.containsKey(entry.getValue()))
+                input.put(entry.getKey(), output.get(entry.getValue()));
+        }
+
+        return input;
     }
 }
