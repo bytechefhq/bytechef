@@ -16,6 +16,9 @@
 
 package com.bytechef.platform.component.definition;
 
+import static com.bytechef.component.definition.Authorization.AuthorizationType.CUSTOM;
+
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import java.util.Map;
 import java.util.Objects;
 
@@ -37,7 +40,14 @@ public interface ParameterConnection {
 
     String getAuthorizationName();
 
-    default boolean isAuthorizationNameOauth2AuthorizationCode() {
-        return Objects.equals("oauth2_authorization_code", getAuthorizationName());
+    default boolean isAuthorizationOauth2AuthorizationCode() {
+        return Objects.equals(AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(), getAuthorizationName()) ||
+            Objects.equals(AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE.toLowerCase(), getAuthorizationName());
+    }
+
+    default boolean canCredentialsBeRefreshed() {
+        return Objects.equals(getAuthorizationName(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase()) ||
+            Objects.equals(getAuthorizationName(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE.toLowerCase()) ||
+            Objects.equals(CUSTOM.toLowerCase(), getAuthorizationName());
     }
 }
