@@ -757,340 +757,335 @@ const Property = ({
     return (
         <li
             className={twMerge(
+                'w-full',
                 hidden && 'mb-0',
                 controlType === 'OBJECT_BUILDER' && 'flex-col',
                 controlType === 'ARRAY_BUILDER' && 'flex-col',
                 customClassName
             )}
         >
-            <div className="w-full">
-                {mentionInput &&
-                    currentComponent &&
-                    currentComponentDefinition &&
-                    type !== 'DYNAMIC_PROPERTIES' &&
-                    controlType !== 'CODE_EDITOR' && (
-                        <PropertyMentionsInput
-                            controlType={controlType || 'TEXT'}
-                            defaultValue={defaultValue}
-                            deletePropertyButton={deletePropertyButton}
-                            description={description}
-                            handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
-                            key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
-                            label={label || name}
-                            leadingIcon={typeIcon}
-                            onChange={handleMentionsInputChange}
-                            onKeyPress={(event: KeyboardEvent) => {
-                                if (type !== 'STRING') {
-                                    event.key !== '{' && event.preventDefault();
-                                }
-                            }}
-                            placeholder={placeholder}
-                            ref={editorRef}
-                            required={required}
-                            showInputTypeSwitchButton={showInputTypeSwitchButton}
-                            singleMention={type !== 'STRING'}
-                            value={mentionInputValue}
+            {mentionInput &&
+                currentComponent &&
+                currentComponentDefinition &&
+                type !== 'DYNAMIC_PROPERTIES' &&
+                controlType !== 'CODE_EDITOR' && (
+                    <PropertyMentionsInput
+                        controlType={controlType || 'TEXT'}
+                        defaultValue={defaultValue}
+                        deletePropertyButton={deletePropertyButton}
+                        description={description}
+                        handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                        key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
+                        label={label || name}
+                        leadingIcon={typeIcon}
+                        onChange={handleMentionsInputChange}
+                        onKeyPress={(event: KeyboardEvent) => {
+                            if (type !== 'STRING') {
+                                event.key !== '{' && event.preventDefault();
+                            }
+                        }}
+                        placeholder={placeholder}
+                        ref={editorRef}
+                        required={required}
+                        showInputTypeSwitchButton={showInputTypeSwitchButton}
+                        singleMention={type !== 'STRING'}
+                        value={mentionInputValue}
+                    />
+                )}
+
+            {!mentionInput && (
+                <>
+                    {((controlType === 'OBJECT_BUILDER' && name !== '__item') || controlType === 'ARRAY_BUILDER') && (
+                        <div className="flex items-center pb-1">
+                            {typeIcon && (
+                                <span className={twMerge(label ? 'pr-2' : 'pr-1')} title={type}>
+                                    {typeIcon}
+                                </span>
+                            )}
+
+                            {(label || description || showInputTypeSwitchButton) && (
+                                <div className="flex w-full items-center justify-between">
+                                    <div className="flex items-center">
+                                        {label && <Label className="leading-normal">{label}</Label>}
+
+                                        {!label && arrayIndex !== undefined && (
+                                            <Label className="leading-normal">Item</Label>
+                                        )}
+
+                                        {description && (
+                                            <Tooltip>
+                                                <TooltipTrigger>
+                                                    <QuestionMarkCircledIcon className="ml-1" />
+                                                </TooltipTrigger>
+
+                                                <TooltipPortal>
+                                                    <TooltipContent className="max-w-md">{description}</TooltipContent>
+                                                </TooltipPortal>
+                                            </Tooltip>
+                                        )}
+                                    </div>
+
+                                    <div className="flex items-center">
+                                        {showInputTypeSwitchButton && (
+                                            <InputTypeSwitchButton
+                                                handleClick={handleInputTypeSwitchButtonClick}
+                                                mentionInput={mentionInput}
+                                            />
+                                        )}
+
+                                        {deletePropertyButton}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {(controlType === 'ARRAY_BUILDER' || controlType === 'MULTI_SELECT') && path && (
+                        <ArrayProperty
+                            onDeleteClick={handleDeleteCustomPropertyClick}
+                            path={path}
+                            property={property}
                         />
                     )}
 
-                {!mentionInput && (
-                    <>
-                        {((controlType === 'OBJECT_BUILDER' && name !== '__item') ||
-                            controlType === 'ARRAY_BUILDER') && (
-                            <div className="flex items-center pb-1">
-                                {typeIcon && (
-                                    <span className={twMerge(label ? 'pr-2' : 'pr-1')} title={type}>
-                                        {typeIcon}
-                                    </span>
-                                )}
+                    {controlType === 'OBJECT_BUILDER' && (
+                        <ObjectProperty
+                            arrayIndex={arrayIndex}
+                            arrayName={arrayName}
+                            onDeleteClick={handleDeleteCustomPropertyClick}
+                            operationName={operationName}
+                            path={path}
+                            property={property}
+                        />
+                    )}
 
-                                {(label || description || showInputTypeSwitchButton) && (
-                                    <div className="flex w-full items-center justify-between">
-                                        <div className="flex items-center">
-                                            {label && <Label className="leading-normal">{label}</Label>}
+                    {type === 'FILE_ENTRY' && <ObjectProperty operationName={operationName} property={property} />}
 
-                                            {!label && arrayIndex !== undefined && (
-                                                <Label className="leading-normal">Item</Label>
-                                            )}
-
-                                            {description && (
-                                                <Tooltip>
-                                                    <TooltipTrigger>
-                                                        <QuestionMarkCircledIcon className="ml-1" />
-                                                    </TooltipTrigger>
-
-                                                    <TooltipPortal>
-                                                        <TooltipContent className="max-w-md">
-                                                            {description}
-                                                        </TooltipContent>
-                                                    </TooltipPortal>
-                                                </Tooltip>
-                                            )}
-                                        </div>
-
-                                        <div className="flex items-center">
-                                            {showInputTypeSwitchButton && (
-                                                <InputTypeSwitchButton
-                                                    handleClick={handleInputTypeSwitchButtonClick}
-                                                    mentionInput={mentionInput}
-                                                />
-                                            )}
-
-                                            {deletePropertyButton}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
-                        {(controlType === 'ARRAY_BUILDER' || controlType === 'MULTI_SELECT') && path && (
-                            <ArrayProperty
-                                onDeleteClick={handleDeleteCustomPropertyClick}
-                                path={path}
-                                property={property}
-                            />
-                        )}
-
-                        {controlType === 'OBJECT_BUILDER' && (
-                            <ObjectProperty
-                                arrayIndex={arrayIndex}
-                                arrayName={arrayName}
-                                onDeleteClick={handleDeleteCustomPropertyClick}
-                                operationName={operationName}
-                                path={path}
-                                property={property}
-                            />
-                        )}
-
-                        {type === 'FILE_ENTRY' && <ObjectProperty operationName={operationName} property={property} />}
-
-                        {control && (isValidControlType || isNumericalInput) && path && (
-                            <>
-                                <Controller
-                                    control={control}
-                                    defaultValue={defaultValue}
-                                    key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
-                                    name={path}
-                                    render={({field}) => (
-                                        <PropertyInput
-                                            description={description}
-                                            error={hasError}
-                                            label={label || name}
-                                            leadingIcon={typeIcon}
-                                            placeholder={placeholder}
-                                            required={required}
-                                            type={hidden ? 'hidden' : getInputHTMLType(controlType)}
-                                            {...field}
-                                        />
-                                    )}
-                                />
-                            </>
-                        )}
-
-                        {control && controlType === 'SELECT' && type !== 'BOOLEAN' && path && (
-                            <Controller
-                                control={control}
-                                defaultValue={defaultValue}
-                                key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
-                                name={path}
-                                render={({field: {name, onChange}}) => (
-                                    <PropertySelect
-                                        description={description}
-                                        label={label || name}
-                                        leadingIcon={typeIcon}
-                                        name={name}
-                                        onValueChange={(value) => {
-                                            onChange(value);
-                                            setSelectValue(value);
-                                        }}
-                                        options={options as Array<SelectOptionType>}
-                                        value={selectValue}
-                                    />
-                                )}
-                            />
-                        )}
-
-                        {control && controlType === 'SELECT' && type === 'BOOLEAN' && path && (
-                            <Controller
-                                control={control}
-                                defaultValue={defaultValue}
-                                key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
-                                name={path}
-                                render={({field: {name, onChange}}) => (
-                                    <PropertySelect
-                                        description={description}
-                                        label={label || name}
-                                        leadingIcon={typeIcon}
-                                        name={name}
-                                        onValueChange={(value) => {
-                                            onChange(value);
-                                            setSelectValue(value);
-                                        }}
-                                        options={[
-                                            {label: 'True', value: 'true'},
-                                            {label: 'False', value: 'false'},
-                                        ]}
-                                    />
-                                )}
-                            />
-                        )}
-
-                        {control && controlType === 'TEXT_AREA' && path && (
+                    {control && (isValidControlType || isNumericalInput) && path && (
+                        <>
                             <Controller
                                 control={control}
                                 defaultValue={defaultValue}
                                 key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                                 name={path}
                                 render={({field}) => (
-                                    <PropertyTextArea
+                                    <PropertyInput
                                         description={description}
                                         error={hasError}
                                         label={label || name}
                                         leadingIcon={typeIcon}
+                                        placeholder={placeholder}
                                         required={required}
+                                        type={hidden ? 'hidden' : getInputHTMLType(controlType)}
                                         {...field}
                                     />
                                 )}
                             />
-                        )}
+                        </>
+                    )}
 
-                        {!control && (isValidControlType || isNumericalInput) && path && (
-                            <PropertyInput
-                                deletePropertyButton={deletePropertyButton}
-                                description={description}
-                                error={hasError}
-                                errorMessage={errorMessage}
-                                fieldsetClassName={objectName && arrayName && 'ml-2'}
-                                handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
-                                key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
-                                label={label || name}
-                                leadingIcon={typeIcon}
-                                max={maxValue}
-                                maxLength={maxLength}
-                                min={minValue}
-                                minLength={minLength}
-                                name={path}
-                                onChange={handleInputChange}
-                                placeholder={
-                                    isNumericalInput && minValue && maxValue
-                                        ? `From ${minValue} to ${maxValue}`
-                                        : placeholder || 'Type number'
-                                }
-                                ref={inputRef}
-                                required={required}
-                                showInputTypeSwitchButton={showInputTypeSwitchButton}
-                                title={type}
-                                type={hidden ? 'hidden' : getInputHTMLType(controlType)}
-                                value={isNumericalInput ? numericValue : inputValue}
-                            />
-                        )}
+                    {control && controlType === 'SELECT' && type !== 'BOOLEAN' && path && (
+                        <Controller
+                            control={control}
+                            defaultValue={defaultValue}
+                            key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
+                            name={path}
+                            render={({field: {name, onChange}}) => (
+                                <PropertySelect
+                                    description={description}
+                                    label={label || name}
+                                    leadingIcon={typeIcon}
+                                    name={name}
+                                    onValueChange={(value) => {
+                                        onChange(value);
+                                        setSelectValue(value);
+                                    }}
+                                    options={options as Array<SelectOptionType>}
+                                    value={selectValue}
+                                />
+                            )}
+                        />
+                    )}
 
-                        {!control && (isValidControlType || isNumericalInput) && !!options?.length && (
-                            <PropertySelect
-                                deletePropertyButton={deletePropertyButton}
-                                description={description}
-                                key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
-                                label={label || name}
-                                leadingIcon={typeIcon}
-                                name={name}
-                                onValueChange={(value) => handleSelectChange(value, name!)}
-                                options={options as Array<SelectOptionType>}
-                                value={selectValue}
-                            />
-                        )}
+                    {control && controlType === 'SELECT' && type === 'BOOLEAN' && path && (
+                        <Controller
+                            control={control}
+                            defaultValue={defaultValue}
+                            key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
+                            name={path}
+                            render={({field: {name, onChange}}) => (
+                                <PropertySelect
+                                    description={description}
+                                    label={label || name}
+                                    leadingIcon={typeIcon}
+                                    name={name}
+                                    onValueChange={(value) => {
+                                        onChange(value);
+                                        setSelectValue(value);
+                                    }}
+                                    options={[
+                                        {label: 'True', value: 'true'},
+                                        {label: 'False', value: 'false'},
+                                    ]}
+                                />
+                            )}
+                        />
+                    )}
 
-                        {!control && controlType === 'SELECT' && type !== 'BOOLEAN' && (
-                            <PropertyComboBox
-                                arrayIndex={arrayIndex}
-                                deletePropertyButton={deletePropertyButton}
-                                description={description}
-                                handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
-                                key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
-                                label={label || name}
-                                leadingIcon={typeIcon}
-                                lookupDependsOnPaths={optionsDataSource?.optionsLookupDependsOn?.map(
-                                    (optionLookupDependency) =>
-                                        optionLookupDependency.replace('[index]', `[${arrayIndex}]`)
-                                )}
-                                lookupDependsOnValues={lookupDependsOnValues}
-                                name={name}
-                                onValueChange={(value: string) => handleSelectChange(value, name!)}
-                                options={(formattedOptions as Array<OptionModel>) || undefined || []}
-                                path={path}
-                                required={required}
-                                showInputTypeSwitchButton={showInputTypeSwitchButton}
-                                value={selectValue}
-                                workflowId={workflow.id!}
-                                workflowNodeName={currentNode?.name ?? ''}
-                            />
-                        )}
+                    {control && controlType === 'TEXT_AREA' && path && (
+                        <Controller
+                            control={control}
+                            defaultValue={defaultValue}
+                            key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
+                            name={path}
+                            render={({field}) => (
+                                <PropertyTextArea
+                                    description={description}
+                                    error={hasError}
+                                    label={label || name}
+                                    leadingIcon={typeIcon}
+                                    required={required}
+                                    {...field}
+                                />
+                            )}
+                        />
+                    )}
 
-                        {!control && controlType === 'SELECT' && type === 'BOOLEAN' && (
-                            <PropertySelect
-                                defaultValue={defaultValue?.toString()}
-                                deletePropertyButton={deletePropertyButton}
-                                description={description}
-                                handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
-                                key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
-                                label={label || name}
-                                leadingIcon={typeIcon}
-                                name={name}
-                                onValueChange={(value: string) => handleSelectChange(value, name!)}
-                                options={[
-                                    {label: 'True', value: 'true'},
-                                    {label: 'False', value: 'false'},
-                                ]}
-                                showInputTypeSwitchButton={showInputTypeSwitchButton}
-                                value={selectValue}
-                            />
-                        )}
+                    {!control && (isValidControlType || isNumericalInput) && path && (
+                        <PropertyInput
+                            deletePropertyButton={deletePropertyButton}
+                            description={description}
+                            error={hasError}
+                            errorMessage={errorMessage}
+                            fieldsetClassName={objectName && arrayName && 'ml-2'}
+                            handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                            key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
+                            label={label || name}
+                            leadingIcon={typeIcon}
+                            max={maxValue}
+                            maxLength={maxLength}
+                            min={minValue}
+                            minLength={minLength}
+                            name={path}
+                            onChange={handleInputChange}
+                            placeholder={
+                                isNumericalInput && minValue && maxValue
+                                    ? `From ${minValue} to ${maxValue}`
+                                    : placeholder || 'Type number'
+                            }
+                            ref={inputRef}
+                            required={required}
+                            showInputTypeSwitchButton={showInputTypeSwitchButton}
+                            title={type}
+                            type={hidden ? 'hidden' : getInputHTMLType(controlType)}
+                            value={isNumericalInput ? numericValue : inputValue}
+                        />
+                    )}
 
-                        {!control && controlType === 'TEXT_AREA' && (
-                            <PropertyTextArea
-                                description={description}
-                                error={hasError}
-                                key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
-                                label={label || name}
-                                leadingIcon={typeIcon}
-                                name={name!}
-                                onChange={handleInputChange}
-                                required={required}
-                                value={inputValue}
-                            />
-                        )}
+                    {!control && (isValidControlType || isNumericalInput) && !!options?.length && (
+                        <PropertySelect
+                            deletePropertyButton={deletePropertyButton}
+                            description={description}
+                            key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
+                            label={label || name}
+                            leadingIcon={typeIcon}
+                            name={name}
+                            onValueChange={(value) => handleSelectChange(value, name!)}
+                            options={options as Array<SelectOptionType>}
+                            value={selectValue}
+                        />
+                    )}
 
-                        {type === 'NULL' && <span>NULL</span>}
-                    </>
-                )}
+                    {!control && controlType === 'SELECT' && type !== 'BOOLEAN' && (
+                        <PropertyComboBox
+                            arrayIndex={arrayIndex}
+                            deletePropertyButton={deletePropertyButton}
+                            description={description}
+                            handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                            key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
+                            label={label || name}
+                            leadingIcon={typeIcon}
+                            lookupDependsOnPaths={optionsDataSource?.optionsLookupDependsOn?.map(
+                                (optionLookupDependency) => optionLookupDependency.replace('[index]', `[${arrayIndex}]`)
+                            )}
+                            lookupDependsOnValues={lookupDependsOnValues}
+                            name={name}
+                            onValueChange={(value: string) => handleSelectChange(value, name!)}
+                            options={(formattedOptions as Array<OptionModel>) || undefined || []}
+                            path={path}
+                            required={required}
+                            showInputTypeSwitchButton={showInputTypeSwitchButton}
+                            value={selectValue}
+                            workflowId={workflow.id!}
+                            workflowNodeName={currentNode?.name ?? ''}
+                        />
+                    )}
 
-                {type === 'DYNAMIC_PROPERTIES' && currentComponentDefinition && currentComponent && (
-                    <PropertyDynamicProperties
-                        currentNodeConnectionId={currentNode?.connectionId}
-                        currentOperationName={operationName}
-                        lookupDependsOnValues={lookupDependsOnValues}
-                        name={name}
-                        parameterValue={propertyParameterValue}
-                        path={path}
-                    />
-                )}
+                    {!control && controlType === 'SELECT' && type === 'BOOLEAN' && (
+                        <PropertySelect
+                            defaultValue={defaultValue?.toString()}
+                            deletePropertyButton={deletePropertyButton}
+                            description={description}
+                            handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                            key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
+                            label={label || name}
+                            leadingIcon={typeIcon}
+                            name={name}
+                            onValueChange={(value: string) => handleSelectChange(value, name!)}
+                            options={[
+                                {label: 'True', value: 'true'},
+                                {label: 'False', value: 'false'},
+                            ]}
+                            showInputTypeSwitchButton={showInputTypeSwitchButton}
+                            value={selectValue}
+                        />
+                    )}
 
-                {controlType === 'CODE_EDITOR' && (
-                    <PropertyCodeEditor
-                        defaultValue={defaultValue}
-                        description={description}
-                        key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
-                        label={label || name}
-                        language={languageId!}
-                        leadingIcon={typeIcon}
-                        name={name!}
-                        onChange={handleCodeEditorChange}
-                        required={required}
-                        value={propertyParameterValue}
-                        workflow={workflow}
-                        workflowNodeName={currentNode?.name ?? ''}
-                    />
-                )}
-            </div>
+                    {!control && controlType === 'TEXT_AREA' && (
+                        <PropertyTextArea
+                            description={description}
+                            error={hasError}
+                            key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
+                            label={label || name}
+                            leadingIcon={typeIcon}
+                            name={name!}
+                            onChange={handleInputChange}
+                            required={required}
+                            value={inputValue}
+                        />
+                    )}
+
+                    {type === 'NULL' && <span>NULL</span>}
+                </>
+            )}
+
+            {type === 'DYNAMIC_PROPERTIES' && currentComponentDefinition && currentComponent && (
+                <PropertyDynamicProperties
+                    currentNodeConnectionId={currentNode?.connectionId}
+                    currentOperationName={operationName}
+                    lookupDependsOnValues={lookupDependsOnValues}
+                    name={name}
+                    parameterValue={propertyParameterValue}
+                    path={path}
+                />
+            )}
+
+            {controlType === 'CODE_EDITOR' && (
+                <PropertyCodeEditor
+                    defaultValue={defaultValue}
+                    description={description}
+                    key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
+                    label={label || name}
+                    language={languageId!}
+                    leadingIcon={typeIcon}
+                    name={name!}
+                    onChange={handleCodeEditorChange}
+                    required={required}
+                    value={propertyParameterValue}
+                    workflow={workflow}
+                    workflowNodeName={currentNode?.name ?? ''}
+                />
+            )}
         </li>
     );
 };
