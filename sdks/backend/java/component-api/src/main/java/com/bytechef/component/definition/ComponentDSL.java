@@ -2118,7 +2118,7 @@ public final class ComponentDSL {
 
         @Override
         public ControlType getControlType() {
-            return null;
+            return ControlType.NULL;
         }
     }
 
