@@ -16,22 +16,23 @@
 
 package com.bytechef.component.data.mapper.util.mapping;
 
-public class RequiredStringMapping extends Mapping<String, String> {
-    private boolean required;
+public class RequiredStringMapping extends StringMapping {
+    private boolean requiredField;
 
     public RequiredStringMapping() {
+        super();
     }
 
-    public RequiredStringMapping(String from, String to, boolean required) {
-        super(from, to);
-        this.required = required;
+    public RequiredStringMapping(String from, String to, boolean requiredField) {
+        super(to, from);
+        this.requiredField = requiredField;
     }
 
-    public boolean isRequired() {
-        return required;
+    public boolean isRequiredField() {
+        return requiredField;
     }
 
-    public void setRequired(boolean required) {
-        this.required = required;
+    public void setRequiredField(boolean requiredField) {
+        this.requiredField = requiredField;
     }
 }
