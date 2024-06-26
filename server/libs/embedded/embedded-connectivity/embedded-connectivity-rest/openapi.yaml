@@ -644,7 +644,6 @@ paths:
 #      description: "A type of property."
 #      type: "string"
 #      enum:
-#        - "ANY"
 #        - "ARRAY"
 #        - "BOOLEAN"
 #        - "DATE"
