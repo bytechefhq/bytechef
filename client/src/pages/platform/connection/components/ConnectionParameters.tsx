@@ -34,7 +34,7 @@ const ConnectionParameters = ({
 
     return (
         <div className="mt-4 space-y-4">
-            <h2 className="text-center font-semibold uppercase text-gray-500">
+            <h2 className="heading-tertiary text-center">
                 {hasConnectionParameters ? 'Connection' : 'Authorization'} Parameters
             </h2>
 
