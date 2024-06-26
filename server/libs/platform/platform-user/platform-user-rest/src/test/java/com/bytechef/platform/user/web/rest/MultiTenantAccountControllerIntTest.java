@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.sql.DataSource;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,6 +96,11 @@ class MultiTenantAccountControllerIntTest {
 
     @Autowired
     private UserService userService;
+
+    @AfterAll
+    public static void afterAll() {
+        TenantContext.resetCurrentTenantId();
+    }
 
     @BeforeEach
     public void beforeEach() {
