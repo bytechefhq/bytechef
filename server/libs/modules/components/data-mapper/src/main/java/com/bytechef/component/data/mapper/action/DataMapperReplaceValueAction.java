@@ -71,7 +71,8 @@ public class DataMapperReplaceValueAction {
                     option("Number", 7),
                     option("Object", 8),
                     option("String", 9),
-                    option("Time", 10)),
+                    option("Time", 10))
+                .required(true),
             array(VALUE)
                 .label("Value")
                 .description("The value you want to replace.")
@@ -178,109 +179,138 @@ public class DataMapperReplaceValueAction {
                 .label("Mappings")
                 .description(
                     "An array of objects that contains properties 'from' and 'to'.")
+                .displayCondition("type == 1")
                 .items(
                     object().properties(
                         array(FROM)
                             .label("Value from")
                             .description("Defines the property value you want to change.")
-                            .displayCondition("type == 1")
-                            .required(true),
-                        bool(FROM)
-                            .label("Value from")
-                            .description("Defines the property value you want to change.")
-                            .displayCondition("type == 2")
-                            .required(true),
-                        date(FROM)
-                            .label("Value from")
-                            .description("Defines the property value you want to change.")
-                            .displayCondition("type == 3")
-                            .required(true),
-                        dateTime(FROM)
-                            .label("Value from")
-                            .description("Defines the property value you want to change.")
-                            .displayCondition("type == 4")
-                            .required(true),
-                        integer(FROM)
-                            .label("Value from")
-                            .description("Defines the property value you want to change.")
-                            .displayCondition("type == 5")
-                            .required(true),
-                        nullable(FROM)
-                            .label("Value from")
-                            .description("Defines the property value you want to change.")
-                            .displayCondition("type == 6")
-                            .required(true),
-                        number(FROM)
-                            .label("Value from")
-                            .description("Defines the property value you want to change.")
-                            .displayCondition("type == 7")
-                            .required(true),
-                        object(FROM)
-                            .label("Value from")
-                            .description("Defines the property value you want to change.")
-                            .displayCondition("type == 8")
-                            .required(true),
-                        string(FROM)
-                            .label("Value from")
-                            .description("Defines the property value you want to change.")
-                            .displayCondition("type == 9")
-                            .required(true),
-                        time(FROM)
-                            .label("Value from")
-                            .description("Defines the property value you want to change.")
-                            .displayCondition("type == 10")
                             .required(true),
                         array(TO)
                             .label("Value to")
                             .description("Defines what you want to change the property value to.")
-                            .displayCondition("type == 1")
+                            .required(true))),
+            array(MAPPINGS)
+                .label("Mappings")
+                .description(
+                    "An array of objects that contains properties 'from' and 'to'.")
+                .displayCondition("type == 2")
+                .items(
+                    object().properties(
+                        bool(FROM)
+                            .label("Value from")
+                            .description("Defines the property value you want to change.")
                             .required(true),
                         bool(TO)
                             .label("Value to")
                             .description("Defines what you want to change the property value to.")
-                            .displayCondition("type == 2")
+                            .required(true))),
+            array(MAPPINGS)
+                .label("Mappings")
+                .description(
+                    "An array of objects that contains properties 'from' and 'to'.")
+                .displayCondition("type == 3")
+                .items(
+                    object().properties(
+                        date(FROM)
+                            .label("Value from")
+                            .description("Defines the property value you want to change.")
                             .required(true),
+
                         date(TO)
                             .label("Value to")
                             .description("Defines what you want to change the property value to.")
-                            .displayCondition("type == 3")
+                            .required(true))),
+            array(MAPPINGS)
+                .label("Mappings")
+                .description(
+                    "An array of objects that contains properties 'from' and 'to'.")
+                .displayCondition("type == 4")
+                .items(
+                    object().properties(
+                        dateTime(FROM)
+                            .label("Value from")
+                            .description("Defines the property value you want to change.")
                             .required(true),
                         dateTime(TO)
                             .label("Value to")
                             .description("Defines what you want to change the property value to.")
-                            .displayCondition("type == 4")
+                            .required(true))),
+            array(MAPPINGS)
+                .label("Mappings")
+                .description(
+                    "An array of objects that contains properties 'from' and 'to'.")
+                .displayCondition("type == 5")
+                .items(
+                    object().properties(
+                        integer(FROM)
+                            .label("Value from")
+                            .description("Defines the property value you want to change.")
                             .required(true),
                         integer(TO)
                             .label("Value to")
                             .description("Defines what you want to change the property value to.")
-                            .displayCondition("type == 5")
-                            .required(true),
-                        nullable(TO)
-                            .label("Value to")
-                            .description("Defines what you want to change the property value to.")
-                            .displayCondition("type == 6")
+                            .required(true))),
+            array(MAPPINGS)
+                .label("Mappings")
+                .description(
+                    "An array of objects that contains properties 'from' and 'to'.")
+                .displayCondition("type == 7")
+                .items(
+                    object().properties(
+                        number(FROM)
+                            .label("Value from")
+                            .description("Defines the property value you want to change.")
                             .required(true),
                         number(TO)
                             .label("Value to")
                             .description("Defines what you want to change the property value to.")
-                            .displayCondition("type == 7")
+                            .required(true))),
+            array(MAPPINGS)
+                .label("Mappings")
+                .description(
+                    "An array of objects that contains properties 'from' and 'to'.")
+                .displayCondition("type == 8")
+                .items(
+                    object().properties(
+                        object(FROM)
+                            .label("Value from")
+                            .description("Defines the property value you want to change.")
                             .required(true),
                         object(TO)
                             .label("Value to")
                             .description("Defines what you want to change the property value to.")
-                            .displayCondition("type == 8")
+                            .required(true))),
+            array(MAPPINGS)
+                .label("Mappings")
+                .description(
+                    "An array of objects that contains properties 'from' and 'to'.")
+                .displayCondition("type == 9")
+                .items(
+                    object().properties(
+                        string(FROM)
+                            .label("Value from")
+                            .description("Defines the property value you want to change.")
                             .required(true),
                         string(TO)
                             .label("Value to")
                             .description("Defines what you want to change the property value to.")
-                            .displayCondition("type == 9")
+                            .required(true))),
+            array(MAPPINGS)
+                .label("Mappings")
+                .description(
+                    "An array of objects that contains properties 'from' and 'to'.")
+                .displayCondition("type == 10")
+                .items(
+                    object().properties(
+                        time(FROM)
+                            .label("Value from")
+                            .description("Defines the property value you want to change.")
                             .required(true),
                         time(TO)
                             .label("Value to")
                             .description("Defines what you want to change the property value to.")
-                            .displayCondition("type == 10")
-                            .required(true)))
-                .required(true))
+                            .required(true))))
         .output()
         .perform(DataMapperReplaceValueAction::perform);
 
