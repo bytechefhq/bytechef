@@ -37,32 +37,35 @@ public class RemoteConnectionDefinitionFacadeClient extends AbstractWorkerClient
 
     @Override
     public Authorization.AuthorizationCallbackResponse executeAuthorizationCallback(
-        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParams,
-        @NonNull String redirectUri) {
+        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
+        @NonNull Map<String, ?> authorizationParams, @NonNull String redirectUri) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, CONNECTION_DEFINITION_FACADE + "/execute-authorization-callback"),
-            new AuthorizationCallbackRequest(componentName, authorizationName, authorizationParams, redirectUri),
+            new AuthorizationCallbackRequest(
+                componentName, connectionVersion, authorizationName, authorizationParams, redirectUri),
             Authorization.AuthorizationCallbackResponse.class);
     }
 
     @Override
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParams) {
+        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
+        @NonNull Map<String, ?> authorizationParams) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, CONNECTION_DEFINITION_FACADE + "/get-oauth2-authorization-parameters"),
-            new ConnectionRequest(componentName, authorizationName, authorizationParams),
+            new ConnectionRequest(componentName, connectionVersion, authorizationName, authorizationParams),
             OAuth2AuthorizationParameters.class);
     }
 
     private record AuthorizationCallbackRequest(
-        String componentName, String authorizationName, Map<String, ?> authorizationParams, String redirectUri) {
+        String componentName, int connectionVersion, String authorizationName, Map<String, ?> authorizationParams,
+        String redirectUri) {
     }
 
-    private record ConnectionRequest(String componentName, String authorizationName,
-        Map<String, ?> authorizationParams) {
+    private record ConnectionRequest(
+        String componentName, int connectionVersion, String authorizationName, Map<String, ?> authorizationParams) {
     }
 }

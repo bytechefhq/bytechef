@@ -97,6 +97,14 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     @Override
+    public Object executePerformForPolyglot(
+        String componentName, int componentVersion, String actionName, @NonNull Map<String, ?> inputParameters,
+        ComponentConnection componentConnection, ActionContext actionContext) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public String executeWorkflowNodeDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters) {
@@ -107,13 +115,6 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
             new NodeDescriptionRequest(
                 componentVersion, componentName, actionName, inputParameters),
             String.class);
-    }
-
-    @Override
-    public Object executePerformForPolyglot(
-        String componentName, int componentVersion, String actionName, @NonNull Map<String, ?> inputParameters,
-        Map<String, ComponentConnection> componentConnections, ActionContext actionContext) {
-        throw new UnsupportedOperationException();
     }
 
     private record NodeDescriptionRequest(

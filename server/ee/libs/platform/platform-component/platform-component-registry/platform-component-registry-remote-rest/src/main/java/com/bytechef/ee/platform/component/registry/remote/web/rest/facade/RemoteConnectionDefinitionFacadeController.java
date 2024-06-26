@@ -8,13 +8,12 @@
 package com.bytechef.ee.platform.component.registry.remote.web.rest.facade;
 
 import com.bytechef.component.definition.Authorization;
-import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.registry.facade.ConnectionDefinitionFacade;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -53,8 +52,9 @@ public class RemoteConnectionDefinitionFacadeController {
 
         return ResponseEntity.ok(
             connectionDefinitionFacade.executeAuthorizationCallback(
-                authorizationCallbackRequest.componentName, authorizationCallbackRequest.connection.authorizationName(),
-                authorizationCallbackRequest.connection.getParameters(), authorizationCallbackRequest.redirectUri()));
+                authorizationCallbackRequest.componentName, authorizationCallbackRequest.connectionVersion,
+                authorizationCallbackRequest.authorizationName(), authorizationCallbackRequest.authorizationParams(),
+                authorizationCallbackRequest.redirectUri()));
     }
 
     @RequestMapping(
@@ -69,23 +69,26 @@ public class RemoteConnectionDefinitionFacadeController {
     public ResponseEntity<OAuth2AuthorizationParameters> getOAuth2AuthorizationParameters(
         @Valid @RequestBody ConnectionRequest connectionRequest) {
 
-        if ((connectionRequest == null) || (connectionRequest.connection == null)) {
+        if (connectionRequest == null) {
             return ResponseEntity.badRequest()
                 .build();
         }
 
         return ResponseEntity.ok(
             connectionDefinitionFacade.getOAuth2AuthorizationParameters(
-                connectionRequest.componentName, connectionRequest.connection.getAuthorizationName(),
-                connectionRequest.connection.getParameters()));
+                connectionRequest.componentName, connectionRequest.connectionVersion,
+                connectionRequest.authorizationName(), connectionRequest.authorizationParams()));
     }
 
     @SuppressFBWarnings("EI")
     public record AuthorizationCallbackRequest(
-        @NotNull String componentName, ComponentConnection connection, @NotNull String redirectUri) {
+        String componentName, int connectionVersion, String authorizationName, Map<String, ?> authorizationParams,
+        String redirectUri) {
     }
 
     @SuppressFBWarnings("EI")
-    public record ConnectionRequest(@NotNull String componentName, @Nullable ComponentConnection connection) {
+    public record ConnectionRequest(
+        @NotNull String componentName, int connectionVersion, @NotNull String authorizationName,
+        @NotNull Map<String, ?> authorizationParams) {
     }
 }

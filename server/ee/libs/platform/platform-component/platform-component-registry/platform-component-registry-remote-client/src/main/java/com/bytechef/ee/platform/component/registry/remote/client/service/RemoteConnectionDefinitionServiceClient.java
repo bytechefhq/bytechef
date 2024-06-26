@@ -49,18 +49,26 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
     }
 
     @Override
-    public ApplyResponse executeAuthorizationApply(
-        @NonNull String componentName, @NonNull String authorizatioName, @NonNull Map<String, ?> authorizationParams,
+    public Map<String, ?> executeAcquire(
+        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
+        @NonNull Map<String, ?> connectionParameters,
         @NonNull Context context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
+    public ApplyResponse executeAuthorizationApply(
+        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
+        @NonNull Map<String, ?> connectionParameters, @NonNull Context context) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public AuthorizationCallbackResponse executeAuthorizationCallback(
-        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParams,
-        @NonNull Context context,
-        @NonNull String redirectUri) {
+        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
+        @NonNull Map<String, ?> connectionParameters, @NonNull Context context, @NonNull String redirectUri) {
 
         throw new UnsupportedOperationException();
     }
@@ -68,13 +76,36 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
     @Override
     public Optional<String> executeBaseUri(
         @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public RefreshTokenResponse executeRefresh(
+        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
+        @NonNull Map<String, ?> connectionParameters, @NonNull Context context) {
+
         throw new UnsupportedOperationException();
     }
 
     @Override
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        @NonNull String componentName, @NonNull String authorizatioName, @NonNull Map<String, ?> authorizationParms,
-        @NonNull Context context) {
+        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
+        @NonNull Map<String, ?> connectionParameters, @NonNull Context context) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<String> getAuthorizationDetectOn(
+        @NonNull String componentName, int componentVersion, @NonNull String authorizationName) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Object> getAuthorizationRefreshOn(
+        @NonNull String componentName, int componentVersion, @NonNull String authorizationName) {
 
         throw new UnsupportedOperationException();
     }
@@ -137,13 +168,5 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
             .join();
 
         return CollectionUtils.map(completableFutures, CompletableFuture::join);
-    }
-
-    @Override
-    public RefreshTokenResponse executeRefresh(
-        @NonNull String componentName, @NonNull String authorizationName,
-        @NonNull Map<String, ?> authorizationParms, @NonNull Context context) {
-
-        throw new UnsupportedOperationException("This method is still under development");
     }
 }

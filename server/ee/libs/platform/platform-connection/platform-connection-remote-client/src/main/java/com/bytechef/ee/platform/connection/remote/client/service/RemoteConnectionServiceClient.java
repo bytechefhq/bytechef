@@ -14,6 +14,7 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.AppType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
@@ -86,7 +87,8 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     }
 
     @Override
-    public Connection updateConnectionParameter(long connectionId, String key, Object value) {
+    @Override
+    public Connection updateConnectionParameters(long connectionId, Map<String, ?> parameters) {
         throw new UnsupportedOperationException();
     }
 }
