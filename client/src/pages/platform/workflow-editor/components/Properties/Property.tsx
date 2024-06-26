@@ -164,7 +164,11 @@ const Property = ({
     }
 
     if (path) {
-        path = path.replaceAll(/\s/g, '__nbsp__').replaceAll(/-/g, '__dash__');
+        path = path.replace(/[^a-zA-Z0-9_.]/g, (char) => {
+            const charCode = char.charCodeAt(0);
+
+            return charCode ? `0x${charCode.toString()}` : '0x00';
+        });
     }
 
     const saveInputValue = useDebouncedCallback(() => {
