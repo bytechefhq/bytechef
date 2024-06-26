@@ -16,15 +16,8 @@
 
 package com.bytechef.component.google.drive.connection;
 
-import static com.bytechef.component.definition.Authorization.AuthorizationType;
-import static com.bytechef.component.definition.Authorization.CLIENT_ID;
-import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
-import static com.bytechef.component.definition.ComponentDSL.authorization;
-import static com.bytechef.component.definition.ComponentDSL.connection;
-import static com.bytechef.component.definition.ComponentDSL.string;
-
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
-import com.google.api.client.googleapis.auth.oauth2.GoogleOAuthConstants;
+import com.bytechef.google.commons.GoogleConnection;
 import java.util.List;
 
 /**
@@ -33,23 +26,9 @@ import java.util.List;
  */
 public class GoogleDriveConnection {
 
-    public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .authorizations(authorization(
-            AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-                .title("OAuth2 Authorization Code")
-                .properties(
-                    string(CLIENT_ID)
-                        .label("Client Id")
-                        .required(true),
-                    string(CLIENT_SECRET)
-                        .label("Client Secret")
-                        .required(true))
-                .authorizationUrl((connection, context) -> " https://accounts.google.com/o/oauth2/v2/auth")
-                .refreshUrl((connectionParameters, context) -> GoogleOAuthConstants.TOKEN_SERVER_URL)
-                .refreshOn("^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$")
-                .scopes((connection, context) -> List.of("https://www.googleapis.com/auth/drive"))
-                .tokenUrl((connection, context) -> "https://oauth2.googleapis.com/token"));
-
     private GoogleDriveConnection() {
     }
+
+    public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
+        (connection, context) -> List.of("https://www.googleapis.com/auth/drive"));
 }
