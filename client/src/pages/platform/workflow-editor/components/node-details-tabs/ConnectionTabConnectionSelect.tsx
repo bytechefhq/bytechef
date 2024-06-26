@@ -1,13 +1,6 @@
 import {Button} from '@/components/ui/button';
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
+import {Label} from '@/components/ui/label';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
 import ConnectionParameters from '@/pages/platform/connection/components/ConnectionParameters';
 import {useConnectionQuery} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
@@ -115,17 +108,17 @@ const ConnectionTabConnectionSelect = ({
 
     return (
         <div className="flex flex-col gap-6">
-            <SelectGroup>
+            <div>
                 {componentDefinition && (
-                    <SelectLabel className="font-normal">
+                    <Label className="font-normal">
                         {componentDefinition.title}
 
                         {workflowConnection.required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
-                    </SelectLabel>
+                    </Label>
                 )}
 
                 {workflowConnectionsCount > 1 && (
-                    <SelectLabel className="text-sm text-muted-foreground">{workflowConnection.key}</SelectLabel>
+                    <Label className="text-sm text-muted-foreground">{workflowConnection.key}</Label>
                 )}
 
                 <Select
@@ -169,11 +162,11 @@ const ConnectionTabConnectionSelect = ({
                             ))}
                     </SelectContent>
                 </Select>
+            </div>
 
-                {currentConnection && connectionDefinition && (
-                    <ConnectionParameters connection={currentConnection} connectionDefinition={connectionDefinition} />
-                )}
-            </SelectGroup>
+            {currentConnection && connectionDefinition && (
+                <ConnectionParameters connection={currentConnection} connectionDefinition={connectionDefinition} />
+            )}
         </div>
     );
 };
