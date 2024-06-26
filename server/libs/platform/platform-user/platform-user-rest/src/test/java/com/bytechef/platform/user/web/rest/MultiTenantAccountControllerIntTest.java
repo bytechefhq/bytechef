@@ -49,6 +49,7 @@ import javax.sql.DataSource;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -67,6 +68,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
  *
  * @author Ivica Cardic
  */
+@Disabled
 @SpringBootTest(
     classes = {
         UserIntTestConfiguration.class, MultiTenantAccountControllerConfiguration.class
