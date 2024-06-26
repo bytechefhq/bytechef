@@ -51,7 +51,7 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
     ) : (
         <div className="border-b border-b-gray-100 py-3 pl-4">
             <div className="mb-1 flex items-center justify-between">
-                <h3 className="flex justify-start pl-2 text-sm font-semibold uppercase text-gray-500">Workflows</h3>
+                <h3 className="heading-tertiary flex justify-start pl-2 text-sm">Workflows</h3>
             </div>
 
             <ul>

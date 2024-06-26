@@ -5,6 +5,8 @@ import {worker} from './mocks/server';
 
 import './styles/index.css';
 
+import './styles/components.css';
+
 import {ThemeProvider} from '@/shared/providers/theme-provider';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools';

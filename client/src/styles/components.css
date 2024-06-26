@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .heading-tertiary {
+        @apply font-semibold uppercase text-gray-500;
+    }
+}
