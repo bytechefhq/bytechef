@@ -16,22 +16,23 @@
 
 package com.bytechef.component.data.mapper.util.mapping;
 
-public class ObjectTypeMapping extends Mapping<Object, Object> {
-    private int type;
+public class ObjectTypeMapping extends ObjectMapping {
+    private int valueType;
 
     public ObjectTypeMapping() {
+        super();
     }
 
-    public ObjectTypeMapping(String from, String to, int type) {
+    public ObjectTypeMapping(String from, String to, int valueType) {
         super(from, to);
-        this.type = type;
+        this.valueType = valueType;
     }
 
-    public int isRequired() {
-        return type;
+    public int getValueType() {
+        return valueType;
     }
 
-    public void setRequired(int type) {
-        this.type = type;
+    public void setValueType(int valueType) {
+        this.valueType = valueType;
     }
 }

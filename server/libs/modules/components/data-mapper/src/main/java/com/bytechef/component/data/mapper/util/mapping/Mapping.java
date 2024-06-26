@@ -20,10 +20,10 @@ public abstract class Mapping<F, T> {
     private F from;
     private T to;
 
-    public Mapping() {
+    protected Mapping() {
     }
 
-    public Mapping(F from, T to) {
+    protected Mapping(F from, T to) {
         this.from = from;
         this.to = to;
     }

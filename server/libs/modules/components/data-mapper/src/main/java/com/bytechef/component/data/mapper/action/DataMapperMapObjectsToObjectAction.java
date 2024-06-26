@@ -33,7 +33,6 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
-import com.bytechef.component.data.mapper.util.mapping.Mapping;
 import com.bytechef.component.data.mapper.util.mapping.RequiredStringMapping;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL;
@@ -116,7 +115,8 @@ public class DataMapperMapObjectsToObjectAction {
         List<RequiredStringMapping> mappingList =
             inputParameters.getList(MAPPINGS, RequiredStringMapping.class, List.of());
         Map<String, Pair<String, Boolean>> mappings = mappingList.stream()
-            .collect(Collectors.toMap(Mapping::getFrom, value -> Pair.create(value.getTo(), value.isRequired())));
+            .collect(Collectors.toMap(RequiredStringMapping::getFrom,
+                value -> Pair.create(value.getTo(), value.isRequiredField())));
 
         if (inputParameters.getInteger(TYPE)
             .equals(1)) {

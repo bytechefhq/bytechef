@@ -17,5 +17,11 @@
 package com.bytechef.component.data.mapper.util.mapping;
 
 public class ObjectMapping extends Mapping<Object, Object> {
+    public ObjectMapping() {
+        super();
+    }
 
+    public ObjectMapping(String to, String from) {
+        super(to, from);
+    }
 }
