@@ -98,7 +98,8 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
                 AuthorizationCallbackResponse authorizationCallbackResponse =
                     connectionDefinitionFacade.executeAuthorizationCallback(
-                        connection.getComponentName(), connection.getAuthorizationName(),
+                        connection.getComponentName(), connection.getConnectionVersion(),
+                        connection.getAuthorizationName(),
                         oAuth2Service.checkPredefinedParameters(
                             connection.getComponentName(), connection.getParameters()),
                         oAuth2Service.getRedirectUri());
