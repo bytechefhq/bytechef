@@ -18,7 +18,6 @@
  * @export
  */
 export const PropertyTypeModel = {
-    Any: 'ANY',
     Array: 'ARRAY',
     Boolean: 'BOOLEAN',
     Date: 'DATE',
