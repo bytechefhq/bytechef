@@ -33,6 +33,7 @@ import com.bytechef.component.exception.ProviderException;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
+import com.bytechef.platform.component.registry.util.RefreshCredentialsUtils;
 import com.bytechef.platform.workflow.execution.constants.FileEntryConstants;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -189,8 +190,8 @@ public class HttpClientExecutor {
         if (!configuration.isDisableAuthorization() && (componentConnection != null)) {
             applyAuthorization(headers, queryParameters, componentName, componentConnection, context);
 
-            if (Objects.equals("oauth2_authorization_code", componentConnection.getAuthorizationName())) {
                 builder.interceptor(getInterceptor());
+            if (componentConnection.canCredentialsBeRefreshed()) {
             }
         }
 
@@ -225,7 +226,8 @@ public class HttpClientExecutor {
             @Override
             public <T> HttpResponse<T> intercept(HttpRequest httpRequest, Chain<T> chain)
                 throws IOException, InterruptedException {
-                logger.trace("Intercepting OAuth Authorized request to analyze response");
+
+                logger.trace("Intercepting Authorized request to analyze response");
 
                 HttpResponse<T> httpResponse = chain.forward(httpRequest);
 
@@ -233,9 +235,9 @@ public class HttpClientExecutor {
                     return httpResponse;
                 }
 
-                logger.debug("Rise exception");
+                Object body = httpResponse.body();
 
-                throw ProviderException.fromHttpResponseCode(httpResponse.statusCode(), "Token expired");
+                throw new ProviderException(httpResponse.statusCode(), body.toString());
             }
 
             @Override
