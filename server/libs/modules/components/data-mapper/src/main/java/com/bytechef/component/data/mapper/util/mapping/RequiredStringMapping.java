@@ -24,7 +24,7 @@ public class RequiredStringMapping extends StringMapping {
     }
 
     public RequiredStringMapping(String from, String to, boolean requiredField) {
-        super(to, from);
+        super(from, to);
         this.requiredField = requiredField;
     }
 
