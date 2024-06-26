@@ -806,7 +806,13 @@ const Property = ({
                             {(label || description || showInputTypeSwitchButton) && (
                                 <div className="flex w-full items-center justify-between">
                                     <div className="flex items-center">
-                                        {label && <Label className="leading-normal">{label}</Label>}
+                                        {label && (
+                                            <Label className="leading-normal">
+                                                {label}
+
+                                                {required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
+                                            </Label>
+                                        )}
 
                                         {!label && arrayIndex !== undefined && (
                                             <Label className="leading-normal">Item</Label>
