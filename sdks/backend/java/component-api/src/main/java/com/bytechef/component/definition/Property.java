@@ -45,6 +45,7 @@ public interface Property extends BaseProperty {
         INTEGER,
         MULTI_SELECT,
         NUMBER,
+        NULL,
         OBJECT_BUILDER,
         PASSWORD,
         PHONE,
