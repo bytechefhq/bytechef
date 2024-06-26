@@ -51,7 +51,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"batch":null,"defaultOutputFunction":false,"deprecated":null,"description":"description","help":null,"metadata":null,"name":"name","outputFunction":null,"properties":null,"title":"title","workflowNodeDescriptionFunction":null,"output":null,"perform":{}}
+                {"batch":null,"dynamicOutput":false,"deprecated":null,"description":"description","help":null,"metadata":null,"name":"name","outputResponse":null,"properties":null,"title":"title","workflowNodeDescription":null,"output":null,"perform":{},"processErrorResponse":null}
                 """,
             action);
     }
