@@ -31,7 +31,7 @@ const ConnectionTab = ({
     const {ConnectionKeys, useCreateConnectionMutation, useGetConnectionTagsQuery} = useConnectionQuery();
 
     return (
-        <div className="flex h-full flex-col gap-4 overflow-auto p-4">
+        <div className="flex h-full flex-col gap-6 overflow-auto p-4">
             {workflowConnections?.length ? (
                 workflowConnections.map((workflowConnection) => {
                     const workflowTestConfigurationConnection =
@@ -74,7 +74,7 @@ const ConnectionTab = ({
             )}
 
             {showConnectionNote && (
-                <div className="mt-4 flex flex-col rounded-md bg-amber-100 p-4 text-gray-800">
+                <div className="flex flex-col rounded-md bg-amber-100 p-4 text-gray-800">
                     <div className="flex items-center pb-2">
                         <span className="font-medium">Note</span>
 
