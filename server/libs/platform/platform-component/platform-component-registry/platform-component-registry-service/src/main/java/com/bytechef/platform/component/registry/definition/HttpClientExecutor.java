@@ -190,8 +190,10 @@ public class HttpClientExecutor {
         if (!configuration.isDisableAuthorization() && (componentConnection != null)) {
             applyAuthorization(headers, queryParameters, componentName, componentConnection, context);
 
-                builder.interceptor(getInterceptor());
             if (componentConnection.canCredentialsBeRefreshed()) {
+                builder.interceptor(
+                    getInterceptor(
+                        componentName, componentConnection.version(), componentConnection.authorizationName()));
             }
         }
 
@@ -221,7 +223,7 @@ public class HttpClientExecutor {
         return builder.build();
     }
 
-    private Methanol.Interceptor getInterceptor() {
+    private Methanol.Interceptor getInterceptor(String componentName, int connectionVersion, String authorizationName) {
         return new Methanol.Interceptor() {
             @Override
             public <T> HttpResponse<T> intercept(HttpRequest httpRequest, Chain<T> chain)
@@ -232,6 +234,17 @@ public class HttpClientExecutor {
                 HttpResponse<T> httpResponse = chain.forward(httpRequest);
 
                 if ((httpResponse.statusCode() > 199) && (httpResponse.statusCode() < 300)) {
+                    List<String> detectOn = connectionDefinitionService.getAuthorizationDetectOn(
+                        componentName, connectionVersion, authorizationName);
+
+                    if (!detectOn.isEmpty()) {
+                        Object body = httpResponse.body();
+
+                        if (RefreshCredentialsUtils.matches(body.toString(), detectOn)) {
+                            throw new ProviderException(body.toString());
+                        }
+                    }
+
                     return httpResponse;
                 }
 
