@@ -82,13 +82,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new Activity",
     "help": null,
     "metadata": null,
     "name": "createActivity",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The Activity Type of this Activity.",
@@ -195,7 +193,9 @@
     "title": "Create activity",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "output": {
+    "perform": { },
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -379,16 +379,14 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new Company",
     "help": null,
     "metadata": null,
     "name": "createCompany",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The name of the Company.",
@@ -966,7 +964,9 @@
     "title": "Create company",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "output": {
+    "perform": { },
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -1514,16 +1514,14 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new Person",
     "help": null,
     "metadata": null,
     "name": "createPerson",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The first and last name of the Person.",
@@ -2217,7 +2215,9 @@
     "title": "Create person",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "output": {
+    "perform": { },
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -2866,7 +2866,7 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "dynamicOutput": true
   } ],
   "triggers": null
 }

@@ -6,7 +6,8 @@
     "help": null,
     "metadata": null,
     "name": "javascript",
-    "output": null,
+    "outputResponse": null,
+    "dynamicOutput": true,
     "properties": [ {
       "advancedOption": null,
       "description": "Initialize parameter values used in the custom code.",
@@ -242,10 +243,9 @@
     } ],
     "title": "JavaScript",
     "perform": { },
-    "defaultOutputFunction": true,
-    "workflowNodeDescription": null,
+    "output": null,
     "processErrorResponse": null,
-    "outputFunction": null
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "deprecated": null,
@@ -253,7 +253,8 @@
     "help": null,
     "metadata": null,
     "name": "python",
-    "output": null,
+    "outputResponse": null,
+    "dynamicOutput": true,
     "properties": [ {
       "advancedOption": null,
       "description": "Initialize parameter values used in the custom code.",
@@ -489,10 +490,9 @@
     } ],
     "title": "Python",
     "perform": { },
-    "defaultOutputFunction": true,
-    "workflowNodeDescription": null,
+    "output": null,
     "processErrorResponse": null,
-    "outputFunction": null
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "deprecated": null,
@@ -500,7 +500,8 @@
     "help": null,
     "metadata": null,
     "name": "ruby",
-    "output": null,
+    "outputResponse": null,
+    "dynamicOutput": true,
     "properties": [ {
       "advancedOption": null,
       "description": "Initialize parameter values used in the custom code.",
@@ -736,10 +737,9 @@
     } ],
     "title": "Ruby",
     "perform": { },
-    "defaultOutputFunction": true,
-    "workflowNodeDescription": null,
+    "output": null,
     "processErrorResponse": null,
-    "outputFunction": null
+    "workflowNodeDescription": null
   } ],
   "categories": [ "HELPERS", "DEVELOPER_TOOLS" ],
   "connection": null,

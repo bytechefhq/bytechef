@@ -15,13 +15,11 @@
   "connection": null,
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Converts the XML string to object/array.",
     "help": null,
     "metadata": null,
     "name": "parse",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The XML string to convert to the data.",
@@ -44,7 +42,11 @@
       "optionsDataSource": null
     } ],
     "title": "Convert from XML string",
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "output": null,
+    "perform": { },
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -68,18 +70,14 @@
       },
       "sampleOutput": null
     },
-    "perform": { },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Writes the object/array to a XML string.",
     "help": null,
     "metadata": null,
     "name": "stringify",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The value type.",
@@ -150,7 +148,11 @@
       "optionsDataSource": null
     } ],
     "title": "Convert to XML string",
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "output": null,
+    "perform": { },
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -174,9 +176,7 @@
       },
       "sampleOutput": null
     },
-    "perform": { },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true
   } ],
   "triggers": null
 }

@@ -82,13 +82,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Posts a message to a public channel, private channel, or existing direct message conversation.",
     "help": null,
     "metadata": null,
     "name": "sendMessage",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The id of a channel where the message will be sent.",
@@ -472,7 +470,7 @@
     "title": "Send message",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -963,16 +961,16 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "dynamicOutput": true,
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Sends a direct message to another user in a workspace. If it hasn't already, a direct message conversation will be created.",
     "help": null,
     "metadata": null,
     "name": "sendDirectMessage",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The id of a user to send the direct message to.",
@@ -1356,7 +1354,7 @@
     "title": "Send direct message",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -1847,7 +1845,9 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "dynamicOutput": true,
+    "perform": { },
+    "output": null
   } ],
   "triggers": null
 }

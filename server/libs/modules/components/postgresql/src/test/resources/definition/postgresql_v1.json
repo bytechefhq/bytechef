@@ -121,13 +121,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Execute an SQL query.",
     "help": null,
     "metadata": null,
     "name": "query",
-    "outputFunction": { },
     "properties": [ {
       "advancedOption": null,
       "description": "The raw SQL query to execute. You can use :property1 and :property2 in conjunction with parameters.",
@@ -253,19 +251,19 @@
       "optionsDataSource": null
     } ],
     "title": "Query",
-    "perform": { },
-    "output": null,
     "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "workflowNodeDescription": null,
+    "output": { },
+    "perform": { },
+    "outputResponse": null,
+    "dynamicOutput": false
   }, {
     "batch": null,
-    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Insert rows in database.",
     "help": null,
     "metadata": null,
     "name": "insert",
-    "outputFunction": { },
     "properties": [ {
       "advancedOption": null,
       "description": "Name of the schema the table belongs to.",
@@ -582,19 +580,19 @@
       "optionsDataSource": null
     } ],
     "title": "Insert",
-    "perform": { },
-    "output": null,
     "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "workflowNodeDescription": null,
+    "output": { },
+    "perform": { },
+    "outputResponse": null,
+    "dynamicOutput": false
   }, {
     "batch": null,
-    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Update rows in database.",
     "help": null,
     "metadata": null,
     "name": "update",
-    "outputFunction": { },
     "properties": [ {
       "advancedOption": null,
       "description": "Name of the schema the table belongs to.",
@@ -931,19 +929,19 @@
       "optionsDataSource": null
     } ],
     "title": "Update",
-    "perform": { },
-    "output": null,
     "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "workflowNodeDescription": null,
+    "output": { },
+    "perform": { },
+    "outputResponse": null,
+    "dynamicOutput": false
   }, {
     "batch": null,
-    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Delete rows from database.",
     "help": null,
     "metadata": null,
     "name": "delete",
-    "outputFunction": { },
     "properties": [ {
       "advancedOption": null,
       "description": "Name of the schema the table belongs to.",
@@ -1239,19 +1237,19 @@
       "optionsDataSource": null
     } ],
     "title": "Delete",
-    "perform": { },
-    "output": null,
     "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "workflowNodeDescription": null,
+    "output": { },
+    "perform": { },
+    "outputResponse": null,
+    "dynamicOutput": false
   }, {
     "batch": null,
-    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Execute an SQL DML or DML statement.",
     "help": null,
     "metadata": null,
     "name": "execute",
-    "outputFunction": { },
     "properties": [ {
       "advancedOption": null,
       "description": "The raw DML or DDL statement to execute. You can use :property1 and :property2 in conjunction with parameters.",
@@ -1610,10 +1608,12 @@
       "optionsDataSource": null
     } ],
     "title": "Execute",
-    "perform": { },
-    "output": null,
     "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "workflowNodeDescription": null,
+    "output": { },
+    "perform": { },
+    "outputResponse": null,
+    "dynamicOutput": false
   } ],
   "triggers": null
 }

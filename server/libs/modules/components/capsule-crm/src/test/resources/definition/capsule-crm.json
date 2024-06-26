@@ -42,7 +42,6 @@
       "title": "Bearer Token",
       "type": "BEARER_TOKEN",
       "acquire": null,
-      "authorizationCallback": null,
       "authorizationUrl": null,
       "clientSecret": null,
       "refreshToken": null,
@@ -52,7 +51,8 @@
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null
+      "tokenUrl": null,
+      "authorizationCallback": null
     } ],
     "properties": null,
     "version": 1,
@@ -62,13 +62,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new Person or Organization",
     "help": null,
     "metadata": null,
     "name": "createContact",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Represents if this party is a person or an organisation.",
@@ -553,9 +551,7 @@
       "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Create Contact",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -771,16 +767,18 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "dynamicOutput": true,
+    "perform": { },
+    "output": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new Task",
     "help": null,
     "metadata": null,
     "name": "createTask",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "A short description of the task.",
@@ -900,9 +898,7 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Create Task",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -1062,7 +1058,11 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "dynamicOutput": true,
+    "perform": { },
+    "output": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   } ],
   "triggers": null
 }

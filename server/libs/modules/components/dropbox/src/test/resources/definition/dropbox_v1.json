@@ -63,16 +63,16 @@
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
       "authorizationCallback": null,
+      "authorizationUrl": { },
+      "clientSecret": null,
+      "refreshToken": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": { },
-      "authorizationUrl": { },
-      "clientSecret": null,
-      "refreshToken": null
+      "tokenUrl": { }
     } ],
     "properties": null,
     "version": 1,
@@ -82,13 +82,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Copy a file or folder to a different location in the user's Dropbox. If the source path is a folder all its contents will be copied.",
     "help": null,
     "metadata": null,
     "name": "copy",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Name of the file with the extension. Don't fill in if you want a folder.",
@@ -153,8 +151,7 @@
     "title": "Copy",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "perform": { },
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -290,23 +287,24 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "dynamicOutput": true,
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Create a folder at a given path.",
     "help": null,
     "metadata": null,
     "name": "createFolder",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The path of the new folder. Root is /.",
@@ -331,8 +329,7 @@
     "title": "Create new folder",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "perform": { },
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -635,46 +632,47 @@
                       "options": null,
                       "optionsDataSource": null
                     } ],
-                    "controlType": "OBJECT_BUILDER",
-                    "optionsDataSource": null
+                    "optionsDataSource": null,
+                    "controlType": "OBJECT_BUILDER"
                   } ],
                   "maxItems": null,
                   "minItems": null,
                   "multipleValues": null,
                   "options": null,
-                  "controlType": "ARRAY_BUILDER",
-                  "optionsDataSource": null
+                  "optionsDataSource": null,
+                  "controlType": "ARRAY_BUILDER"
                 } ],
-                "controlType": "OBJECT_BUILDER",
-                "optionsDataSource": null
+                "optionsDataSource": null,
+                "controlType": "OBJECT_BUILDER"
               } ],
               "maxItems": null,
               "minItems": null,
               "multipleValues": null,
               "options": null,
-              "controlType": "ARRAY_BUILDER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "ARRAY_BUILDER"
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "dynamicOutput": true,
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Create a new .paper file on which you can write at a given path",
     "help": null,
     "metadata": null,
     "name": "createTextFile",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The path of the new paper file. Starts with / as root.",
@@ -719,8 +717,7 @@
     "title": "Create a new paper file",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "perform": { },
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -815,23 +812,24 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "dynamicOutput": true,
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Delete the file or folder at a given path. If the path is a folder, all its contents will be deleted too.",
     "help": null,
     "metadata": null,
     "name": "delete",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Path of the file or folder. Root is /.",
@@ -876,8 +874,7 @@
     "title": "Delete",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "perform": { },
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -1013,23 +1010,24 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "dynamicOutput": true,
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Get a temporary link to stream content of a file. This link will expire in four hours and afterwards you will get 410 Gone. This URL should not be used to display content directly in the browser. The Content-Type of the link is determined automatically by the file's mime type.",
     "help": null,
     "metadata": null,
     "name": "getFileLink",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The path to the file you want a temporary link to.  Root is /.",
@@ -1074,8 +1072,7 @@
     "title": "Get file link",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "perform": { },
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -1145,8 +1142,8 @@
             "label": "Client modified",
             "placeholder": null,
             "options": null,
-            "controlType": "DATE",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "DATE"
           }, {
             "advancedOption": null,
             "description": null,
@@ -1162,8 +1159,8 @@
             "label": "Server modified",
             "placeholder": null,
             "options": null,
-            "controlType": "DATE",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "DATE"
           }, {
             "advancedOption": null,
             "description": null,
@@ -1201,8 +1198,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "INTEGER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -1241,8 +1238,8 @@
               "options": null,
               "optionsDataSource": null
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -1301,8 +1298,8 @@
               "options": null,
               "optionsDataSource": null
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -1403,11 +1400,11 @@
               "minItems": null,
               "multipleValues": null,
               "options": null,
-              "controlType": "ARRAY_BUILDER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "ARRAY_BUILDER"
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -1531,25 +1528,25 @@
                     "options": null,
                     "optionsDataSource": null
                   } ],
-                  "controlType": "OBJECT_BUILDER",
-                  "optionsDataSource": null
+                  "optionsDataSource": null,
+                  "controlType": "OBJECT_BUILDER"
                 } ],
                 "maxItems": null,
                 "minItems": null,
                 "multipleValues": null,
                 "options": null,
-                "controlType": "ARRAY_BUILDER",
-                "optionsDataSource": null
+                "optionsDataSource": null,
+                "controlType": "ARRAY_BUILDER"
               } ],
-              "controlType": "OBJECT_BUILDER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "OBJECT_BUILDER"
             } ],
             "maxItems": null,
             "minItems": null,
             "multipleValues": null,
             "options": null,
-            "controlType": "ARRAY_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "ARRAY_BUILDER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -1690,14 +1687,14 @@
               "label": "Created",
               "placeholder": null,
               "options": null,
-              "controlType": "DATE",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "DATE"
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1719,20 +1716,21 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "dynamicOutput": true,
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Lists content of a folder.",
     "help": null,
     "metadata": null,
     "name": "listFolder",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Path of the filename. Inputting nothing searches root.",
@@ -1757,8 +1755,7 @@
     "title": "List folder",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "perform": { },
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -1925,18 +1922,18 @@
                 "options": null,
                 "optionsDataSource": null
               } ],
-              "controlType": "OBJECT_BUILDER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "OBJECT_BUILDER"
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1982,20 +1979,21 @@
           } ],
           "controlType": "SELECT"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "dynamicOutput": true,
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Move a file or folder to a different location in the user's Dropbox. If the source path is a folder all its contents will be moved. Note that we do not currently support case-only renaming.",
     "help": null,
     "metadata": null,
     "name": "move",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Name of the file with the extension. Don't fill in if you want a folder.",
@@ -2060,8 +2058,7 @@
     "title": "Move",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "perform": { },
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -2197,23 +2194,24 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "dynamicOutput": true,
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Searches for files and folders. Can only be used to retrieve a maximum of 10,000 matches. Recent changes may not immediately be reflected in search results due to a short delay in indexing. Duplicate results may be returned across pages. Some results may not be returned.",
     "help": null,
     "metadata": null,
     "name": "search",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The string to search for. May match across multiple fields based on the request arguments.Must have length of at most 1000 and not be null.",
@@ -2238,8 +2236,7 @@
     "title": "Search",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "perform": { },
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -2364,25 +2361,25 @@
                   } ],
                   "controlType": "SELECT"
                 } ],
-                "controlType": "OBJECT_BUILDER",
-                "optionsDataSource": null
+                "optionsDataSource": null,
+                "controlType": "OBJECT_BUILDER"
               } ],
               "maxItems": null,
               "minItems": null,
               "multipleValues": null,
               "options": null,
-              "controlType": "ARRAY_BUILDER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "ARRAY_BUILDER"
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2428,20 +2425,21 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "dynamicOutput": true,
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Create a new file up to a size of 150MB with the contents provided in the request.",
     "help": null,
     "metadata": null,
     "name": "uploadFile",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The object property which contains a reference to the file to be written.",
@@ -2582,8 +2580,7 @@
     "title": "Upload file",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "perform": { },
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -2636,8 +2633,8 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "controlType": "DATE",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2653,8 +2650,8 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "controlType": "DATE",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2692,8 +2689,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2732,8 +2729,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2792,8 +2789,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2894,11 +2891,11 @@
             "minItems": null,
             "multipleValues": null,
             "options": null,
-            "controlType": "ARRAY_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "ARRAY_BUILDER"
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -3022,25 +3019,25 @@
                   "options": null,
                   "optionsDataSource": null
                 } ],
-                "controlType": "OBJECT_BUILDER",
-                "optionsDataSource": null
+                "optionsDataSource": null,
+                "controlType": "OBJECT_BUILDER"
               } ],
               "maxItems": null,
               "minItems": null,
               "multipleValues": null,
               "options": null,
-              "controlType": "ARRAY_BUILDER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "ARRAY_BUILDER"
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -3181,17 +3178,20 @@
             "label": null,
             "placeholder": null,
             "options": null,
-            "controlType": "DATE",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "DATE"
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "dynamicOutput": true,
+    "output": null,
+    "perform": { }
   } ],
   "triggers": null
 }

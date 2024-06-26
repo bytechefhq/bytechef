@@ -102,13 +102,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new issue.",
     "help": null,
     "metadata": null,
     "name": "createIssue",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The name of the project to create the issue in.",
@@ -266,7 +264,9 @@
       "optionsDataSource": null
     } ],
     "title": "Create issue",
-    "output": {
+    "perform": { },
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -330,18 +330,16 @@
       },
       "sampleOutput": null
     },
-    "perform": { },
+    "dynamicOutput": true,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Get issue details in selected project.",
     "help": null,
     "metadata": null,
     "name": "getIssue",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Project where the issue is located.",
@@ -390,7 +388,9 @@
       }
     } ],
     "title": "Get issue",
-    "output": {
+    "perform": { },
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -896,18 +896,16 @@
       },
       "sampleOutput": null
     },
-    "perform": { },
+    "dynamicOutput": true,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Search for issues using JQL",
     "help": null,
     "metadata": null,
     "name": "searchForIssuesUsingJql",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The JQL that defines the search. If no JQL expression is provided, all issues are returned",
@@ -949,7 +947,9 @@
       "optionsDataSource": null
     } ],
     "title": "Search issues",
-    "output": {
+    "perform": { },
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -1476,7 +1476,7 @@
       },
       "sampleOutput": null
     },
-    "perform": { },
+    "dynamicOutput": true,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   } ],

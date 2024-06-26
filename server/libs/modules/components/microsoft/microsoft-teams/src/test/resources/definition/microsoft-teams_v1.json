@@ -82,6 +82,9 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
+      "authorizationUrl": { },
+      "clientSecret": null,
+      "refreshToken": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -89,9 +92,6 @@
       "refreshUrl": null,
       "scopes": { },
       "tokenUrl": { },
-      "authorizationUrl": { },
-      "clientSecret": null,
-      "refreshToken": null,
       "authorizationCallback": null
     } ],
     "properties": null,
@@ -102,13 +102,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new channel within a team.",
     "help": null,
     "metadata": null,
     "name": "createChannel",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Team where the channel will be created.",
@@ -174,8 +172,7 @@
       "optionsDataSource": null
     } ],
     "title": "Create channel",
-    "perform": { },
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -254,22 +251,23 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
+    "perform": { },
+    "output": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Sends a message to a channel.",
     "help": null,
     "metadata": null,
     "name": "sendChannelMessage",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Team where the channel is located.",
@@ -366,8 +364,7 @@
       "optionsDataSource": null
     } ],
     "title": "Send channel message",
-    "perform": { },
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -463,8 +460,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -523,25 +520,26 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
+    "perform": { },
+    "output": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Sends a message in an existing chat.",
     "help": null,
     "metadata": null,
     "name": "sendChatMessage",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -615,8 +613,7 @@
       "optionsDataSource": null
     } ],
     "title": "Send chat message",
-    "perform": { },
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -732,14 +729,17 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
+    "perform": { },
+    "output": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   } ],

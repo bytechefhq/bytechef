@@ -42,6 +42,7 @@
       "title": "Bearer Token",
       "type": "BEARER_TOKEN",
       "acquire": null,
+      "authorizationCallback": null,
       "authorizationUrl": null,
       "clientSecret": null,
       "refreshToken": null,
@@ -51,8 +52,7 @@
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null,
-      "authorizationCallback": null
+      "tokenUrl": null
     } ],
     "properties": null,
     "version": 1,
@@ -62,13 +62,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Find records in datasheet",
     "help": null,
     "metadata": null,
     "name": "findRecords",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -224,8 +222,9 @@
       "controlType": "INTEGER"
     } ],
     "title": "Find records",
-    "perform": { },
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -605,17 +604,16 @@
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true,
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Update record in datasheet",
     "help": null,
     "metadata": null,
     "name": "updateRecord",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -702,8 +700,9 @@
       }
     } ],
     "title": "Update record",
-    "perform": { },
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -1083,17 +1082,16 @@
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true,
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new record in datasheet.",
     "help": null,
     "metadata": null,
     "name": "createRecord",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -1157,8 +1155,9 @@
       }
     } ],
     "title": "Create record",
-    "perform": { },
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -1538,8 +1537,9 @@
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true,
+    "perform": { },
+    "output": null
   } ],
   "triggers": null
 }

@@ -82,6 +82,7 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
+      "authorizationCallback": null,
       "authorizationUrl": { },
       "clientSecret": null,
       "refreshToken": null,
@@ -91,8 +92,7 @@
       "refresh": null,
       "refreshUrl": null,
       "scopes": { },
-      "tokenUrl": { },
-      "authorizationCallback": null
+      "tokenUrl": { }
     } ],
     "properties": null,
     "version": 1,
@@ -102,13 +102,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Download a file from your Microsoft OneDrive",
     "help": null,
     "metadata": null,
     "name": "downloadFile",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Folder from which you want to download the file.",
@@ -157,7 +155,9 @@
       }
     } ],
     "title": "Download file",
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -257,18 +257,16 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
     "perform": { },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "output": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "List files in a OneDrive folder",
     "help": null,
     "metadata": null,
     "name": "listFiles",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Folder from which you want to list files. If no folder is specified, the root folder will be used.",
@@ -294,7 +292,9 @@
       }
     } ],
     "title": "List Files",
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -379,18 +379,16 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
     "perform": { },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "output": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "List folders in a OneDrive folder",
     "help": null,
     "metadata": null,
     "name": "listFolders",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Folder from which you want to list folders. If no folder is specified, the root folder will be used.",
@@ -416,7 +414,9 @@
       }
     } ],
     "title": "List Folders",
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -501,18 +501,16 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
     "perform": { },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "output": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Upload a file to your Microsoft OneDrive",
     "help": null,
     "metadata": null,
     "name": "uploadFile",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Folder where the file should be uploaded; if no folder is selected, the file will be uploaded in the root folder.",
@@ -634,7 +632,9 @@
       "controlType": "FILE_ENTRY"
     } ],
     "title": "Upload file",
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -698,9 +698,9 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
     "perform": { },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "output": null
   } ],
   "triggers": null
 }

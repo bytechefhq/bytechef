@@ -106,7 +106,6 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -116,7 +115,8 @@
       "tokenUrl": { },
       "authorizationUrl": { },
       "clientSecret": null,
-      "refreshToken": null
+      "refreshToken": null,
+      "authorizationCallback": null
     } ],
     "properties": null,
     "version": 1,
@@ -126,13 +126,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Get all users in your Zoho CRM team",
     "help": null,
     "metadata": null,
     "name": "getAllUsers",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Chose a category for your users response",
@@ -195,9 +193,9 @@
       "optionsDataSource": null
     } ],
     "title": "Get All Users",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
-    "output": {
+    "perform": { },
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -601,16 +599,16 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "dynamicOutput": true,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Create a user for your CRM team",
     "help": null,
     "metadata": null,
     "name": "createUser",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Input user first name",
@@ -719,9 +717,9 @@
       }
     } ],
     "title": "Create a user",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
-    "output": {
+    "perform": { },
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -865,21 +863,21 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "dynamicOutput": true,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Get info about your organization",
     "help": null,
     "metadata": null,
     "name": "getOrganizationData",
-    "outputFunction": null,
     "properties": null,
     "title": "Get Organization data",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
-    "output": {
+    "perform": { },
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -1083,7 +1081,9 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "dynamicOutput": true,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   } ],
   "triggers": null
 }

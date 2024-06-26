@@ -15,18 +15,16 @@
   "connection": null,
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Description",
     "help": null,
     "metadata": null,
     "name": "dummy",
-    "outputFunction": null,
     "properties": [ ],
     "title": "Title",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -50,6 +48,8 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
+    "output": null,
     "perform": { }
   } ],
   "triggers": null

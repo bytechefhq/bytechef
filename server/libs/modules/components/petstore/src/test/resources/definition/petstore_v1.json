@@ -142,7 +142,6 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Add a new pet to the store",
     "help": null,
@@ -153,7 +152,6 @@
       "bodyContentType": "JSON"
     },
     "name": "addPet",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -429,8 +427,7 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Add a new pet to the store",
-    "perform": null,
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -707,11 +704,13 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
+    "output": null,
+    "perform": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Update an existing pet by Id",
     "help": null,
@@ -722,7 +721,6 @@
       "bodyContentType": "JSON"
     },
     "name": "updatePet",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -998,8 +996,7 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Update an existing pet",
-    "perform": null,
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -1276,11 +1273,13 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
+    "output": null,
+    "perform": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Multiple status values can be provided with comma separated strings",
     "help": null,
@@ -1289,7 +1288,6 @@
       "path": "/pet/findByStatus"
     },
     "name": "findPetsByStatus",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Status values that need to be considered for filter",
@@ -1326,8 +1324,7 @@
       "optionsDataSource": null
     } ],
     "title": "Finds Pets by status",
-    "perform": null,
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -1625,11 +1622,13 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
+    "output": null,
+    "perform": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
     "help": null,
@@ -1638,7 +1637,6 @@
       "path": "/pet/findByTags"
     },
     "name": "findPetsByTags",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Tags to filter by",
@@ -1684,8 +1682,7 @@
       "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Finds Pets by tags",
-    "perform": null,
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -1983,11 +1980,13 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
+    "output": null,
+    "perform": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "delete a pet",
     "help": null,
@@ -1996,7 +1995,6 @@
       "path": "/pet/{petId}"
     },
     "name": "deletePet",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "",
@@ -2042,13 +2040,14 @@
       "controlType": "INTEGER"
     } ],
     "title": "Deletes a pet",
-    "perform": null,
+    "outputResponse": null,
+    "dynamicOutput": false,
     "output": null,
+    "perform": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Returns a single pet",
     "help": null,
@@ -2057,7 +2056,6 @@
       "path": "/pet/{petId}"
     },
     "name": "getPetById",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "ID of pet to return",
@@ -2081,8 +2079,7 @@
       "controlType": "INTEGER"
     } ],
     "title": "Find pet by ID",
-    "perform": null,
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -2359,11 +2356,13 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
+    "output": null,
+    "perform": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "",
     "help": null,
@@ -2372,7 +2371,6 @@
       "path": "/pet/{petId}"
     },
     "name": "updatePetWithForm",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "ID of pet that needs to be updated",
@@ -2440,13 +2438,14 @@
       "optionsDataSource": null
     } ],
     "title": "Updates a pet in the store with form data",
-    "perform": null,
+    "outputResponse": null,
+    "dynamicOutput": false,
     "output": null,
+    "perform": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "",
     "help": null,
@@ -2457,7 +2456,6 @@
       "bodyContentType": "BINARY"
     },
     "name": "uploadFile",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "ID of pet to update",
@@ -2601,8 +2599,7 @@
       "controlType": "FILE_ENTRY"
     } ],
     "title": "uploads an image",
-    "perform": null,
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -2687,11 +2684,13 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
+    "output": null,
+    "perform": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Returns a map of status codes to quantities",
     "help": null,
@@ -2700,11 +2699,9 @@
       "path": "/store/inventory"
     },
     "name": "getInventory",
-    "outputFunction": null,
     "properties": [ ],
     "title": "Returns pet inventories by status",
-    "perform": null,
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -2749,11 +2746,13 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
+    "output": null,
+    "perform": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Place a new order in the store",
     "help": null,
@@ -2764,7 +2763,6 @@
       "bodyContentType": "JSON"
     },
     "name": "placeOrder",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -2919,8 +2917,7 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Place an order for a pet",
-    "perform": null,
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -3076,11 +3073,13 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
+    "output": null,
+    "perform": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors",
     "help": null,
@@ -3089,7 +3088,6 @@
       "path": "/store/order/{orderId}"
     },
     "name": "deleteOrder",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "ID of the order that needs to be deleted",
@@ -3113,13 +3111,14 @@
       "controlType": "INTEGER"
     } ],
     "title": "Delete purchase order by ID",
-    "perform": null,
+    "outputResponse": null,
+    "dynamicOutput": false,
     "output": null,
+    "perform": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.",
     "help": null,
@@ -3128,7 +3127,6 @@
       "path": "/store/order/{orderId}"
     },
     "name": "getOrderById",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "ID of order that needs to be fetched",
@@ -3152,8 +3150,7 @@
       "controlType": "INTEGER"
     } ],
     "title": "Find purchase order by ID",
-    "perform": null,
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -3309,11 +3306,13 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
+    "output": null,
+    "perform": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "This can only be done by the logged in user.",
     "help": null,
@@ -3324,7 +3323,6 @@
       "bodyContentType": "JSON"
     },
     "name": "createUser",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -3507,8 +3505,7 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Create user",
-    "perform": null,
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -3692,11 +3689,13 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
+    "output": null,
+    "perform": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates list of users with given input array",
     "help": null,
@@ -3707,7 +3706,6 @@
       "bodyContentType": "JSON"
     },
     "name": "createUsersWithListInput",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -3911,8 +3909,7 @@
       "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Creates list of users with given input array",
-    "perform": null,
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -4117,11 +4114,13 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
+    "output": null,
+    "perform": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "This can only be done by the logged in user.",
     "help": null,
@@ -4130,7 +4129,6 @@
       "path": "/user/{username}"
     },
     "name": "deleteUser",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The name that needs to be deleted",
@@ -4155,13 +4153,14 @@
       "optionsDataSource": null
     } ],
     "title": "Delete user",
-    "perform": null,
+    "outputResponse": null,
+    "dynamicOutput": false,
     "output": null,
+    "perform": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "",
     "help": null,
@@ -4170,7 +4169,6 @@
       "path": "/user/{username}"
     },
     "name": "getUserByName",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The name that needs to be fetched. Use user1 for testing. ",
@@ -4195,8 +4193,7 @@
       "optionsDataSource": null
     } ],
     "title": "Get user by user name",
-    "perform": null,
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -4380,11 +4377,13 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
+    "output": null,
+    "perform": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "This can only be done by the logged in user.",
     "help": null,
@@ -4395,7 +4394,6 @@
       "bodyContentType": "JSON"
     },
     "name": "updateUser",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "name that need to be deleted",
@@ -4600,8 +4598,7 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Update user",
-    "perform": null,
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -4785,6 +4782,9 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
+    "output": null,
+    "perform": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   } ],

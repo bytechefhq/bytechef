@@ -42,7 +42,6 @@
       "title": "Bearer Token",
       "type": "BEARER_TOKEN",
       "acquire": null,
-      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -52,7 +51,8 @@
       "tokenUrl": null,
       "authorizationUrl": null,
       "clientSecret": null,
-      "refreshToken": null
+      "refreshToken": null,
+      "authorizationCallback": null
     } ],
     "properties": null,
     "version": 1,
@@ -62,7 +62,6 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Adds a record into an Airtable table.",
     "help": null,
@@ -73,7 +72,6 @@
       "bodyContentType": "JSON"
     },
     "name": "createRecord",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The base id.",
@@ -143,9 +141,9 @@
       }
     } ],
     "title": "Creates a record",
-    "processErrorResponse": { },
-    "workflowNodeDescription": null,
-    "output": {
+    "perform": null,
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -400,16 +398,16 @@
       },
       "sampleOutput": null
     },
-    "perform": null
+    "dynamicOutput": true,
+    "processErrorResponse": { },
+    "workflowNodeDescription": null
   } ],
   "triggers": [ {
     "batch": null,
-    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Trigger off when a new entry is added to the table that you have selected.",
     "help": null,
     "name": "newRecord",
-    "outputFunction": { },
     "properties": [ {
       "advancedOption": null,
       "description": "The base id.",
@@ -483,16 +481,18 @@
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
-    "staticWebhookRequest": null,
-    "dynamicWebhookRequest": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "output": null,
     "deduplicate": null,
     "poll": { },
+    "output": { },
     "listenerDisable": null,
     "listenerEnable": null,
-    "webhookValidate": null
+    "webhookValidate": null,
+    "outputResponse": null,
+    "dynamicOutput": false,
+    "dynamicWebhookDisable": null,
+    "dynamicWebhookEnable": null,
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": null,
+    "staticWebhookRequest": null
   } ]
 }

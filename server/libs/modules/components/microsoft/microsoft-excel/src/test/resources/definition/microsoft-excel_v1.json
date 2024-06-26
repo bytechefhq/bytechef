@@ -82,6 +82,7 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -91,8 +92,7 @@
       "tokenUrl": { },
       "authorizationUrl": { },
       "clientSecret": null,
-      "refreshToken": null,
-      "authorizationCallback": null
+      "refreshToken": null
     } ],
     "properties": null,
     "version": 1,
@@ -102,13 +102,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Append a row of values to an existing worksheet",
     "help": null,
     "metadata": null,
     "name": "appendRow",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -196,8 +194,11 @@
       }
     } ],
     "title": "Append row",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "output": null,
     "perform": { },
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -287,17 +288,14 @@
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Clear a worksheet of all values.",
     "help": null,
     "metadata": null,
     "name": "clearWorksheet",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -370,19 +368,19 @@
       "controlType": "SELECT"
     } ],
     "title": "Clear worksheet",
-    "perform": { },
-    "output": null,
     "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "workflowNodeDescription": null,
+    "output": null,
+    "perform": { },
+    "outputResponse": null,
+    "dynamicOutput": false
   }, {
     "batch": null,
-    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Delete row on an existing sheet",
     "help": null,
     "metadata": null,
     "name": "deleteRow",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -450,19 +448,19 @@
       "optionsDataSource": null
     } ],
     "title": "Delete row",
-    "perform": { },
-    "output": null,
     "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "workflowNodeDescription": null,
+    "output": null,
+    "perform": { },
+    "outputResponse": null,
+    "dynamicOutput": false
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Get row values from the worksheet by the row number",
     "help": null,
     "metadata": null,
     "name": "findRowByNum",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -554,8 +552,11 @@
       "optionsDataSource": null
     } ],
     "title": "Find row by number",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "output": null,
     "perform": { },
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -645,17 +646,14 @@
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Update a row in a worksheet",
     "help": null,
     "metadata": null,
     "name": "updateRow",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -762,8 +760,11 @@
       }
     } ],
     "title": "Update row",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "output": null,
     "perform": { },
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -853,8 +854,7 @@
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true
   } ],
   "triggers": null
 }

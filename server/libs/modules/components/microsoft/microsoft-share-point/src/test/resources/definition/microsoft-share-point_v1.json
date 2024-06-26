@@ -102,13 +102,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new folder at path you specify.",
     "help": null,
     "metadata": null,
     "name": "createFolder",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -177,9 +175,11 @@
       "optionsDataSource": null
     } ],
     "title": "Create folder",
-    "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "output": {
+    "processErrorResponse": null,
+    "output": null,
+    "perform": { },
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -243,16 +243,14 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new list",
     "help": null,
     "metadata": null,
     "name": "createList",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -318,9 +316,11 @@
       "optionsDataSource": null
     } ],
     "title": "Create list",
-    "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "output": {
+    "processErrorResponse": null,
+    "output": null,
+    "perform": { },
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -404,16 +404,14 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new item in a list.",
     "help": null,
     "metadata": null,
     "name": "createListItem",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -477,9 +475,11 @@
       }
     } ],
     "title": "Create list item",
-    "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "output": {
+    "processErrorResponse": null,
+    "output": null,
+    "perform": { },
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -523,16 +523,14 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Upload file to Microsoft SharePoint folder.",
     "help": null,
     "metadata": null,
     "name": "uploadFile",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -677,9 +675,11 @@
       "controlType": "FILE_ENTRY"
     } ],
     "title": "Upload file",
-    "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "output": {
+    "processErrorResponse": null,
+    "output": null,
+    "perform": { },
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -723,7 +723,7 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "dynamicOutput": true
   } ],
   "triggers": null
 }

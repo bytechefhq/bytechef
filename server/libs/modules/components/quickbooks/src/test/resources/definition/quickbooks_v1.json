@@ -62,17 +62,17 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "authorizationCallback": null,
-      "authorizationUrl": { },
-      "clientSecret": null,
-      "refreshToken": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": { },
-      "tokenUrl": { }
+      "tokenUrl": { },
+      "authorizationUrl": { },
+      "clientSecret": null,
+      "refreshToken": null,
+      "authorizationCallback": null
     } ],
     "properties": null,
     "version": 1,
@@ -82,13 +82,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Has conditionally required parameters.",
     "help": null,
     "metadata": null,
     "name": "createCustomer",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The name of the person or organization as displayed. Must be unique across all Customer, Vendor, and Employee objects. Cannot be removed with sparse update. If not supplied, the system generates DisplayName by concatenating customer name components supplied in the request from the following list: Title, GivenName, MiddleName, FamilyName, and Suffix.",
@@ -211,10 +209,9 @@
       "optionsDataSource": null
     } ],
     "title": "Create customer",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
     "perform": { },
-    "output": {
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -390,8 +387,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -530,8 +527,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -626,8 +623,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -645,8 +642,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -707,11 +704,11 @@
             "minValue": null,
             "numberPrecision": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "NUMBER"
+            "controlType": "NUMBER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -732,8 +729,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "NUMBER"
+          "controlType": "NUMBER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -775,20 +772,21 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "dynamicOutput": true,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new item.",
     "help": null,
     "metadata": null,
     "name": "createItem",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Name of the item. This value must be unique. Required for create.",
@@ -922,8 +920,8 @@
       "label": "Inventory start date",
       "placeholder": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "DATE"
+      "controlType": "DATE",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Expense account id",
@@ -949,10 +947,9 @@
       }
     } ],
     "title": "Create item",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
     "perform": { },
-    "output": {
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -1050,23 +1047,24 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "NUMBER"
+          "controlType": "NUMBER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "dynamicOutput": true,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Downloads the pdf file of a customer.",
     "help": null,
     "metadata": null,
     "name": "downloadCustomerPdf",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The id of a customer to download the pdf for.",
@@ -1092,10 +1090,9 @@
       }
     } ],
     "title": "Download customer pdf",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
     "perform": { },
-    "output": {
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -1194,7 +1191,10 @@
         "controlType": "FILE_ENTRY"
       },
       "sampleOutput": null
-    }
+    },
+    "dynamicOutput": true,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   } ],
   "triggers": null
 }

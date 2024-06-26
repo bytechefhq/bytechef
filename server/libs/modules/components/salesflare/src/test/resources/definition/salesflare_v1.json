@@ -42,17 +42,17 @@
       "title": "Bearer Token",
       "type": "BEARER_TOKEN",
       "acquire": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
-      "refreshToken": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null
+      "tokenUrl": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "refreshToken": null,
+      "authorizationCallback": null
     } ],
     "properties": null,
     "version": 1,
@@ -62,7 +62,6 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Creates new account",
     "help": null,
@@ -73,7 +72,6 @@
       "bodyContentType": "JSON"
     },
     "name": "createAccount",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -232,20 +230,21 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Create account",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
+    "perform": null,
     "output": null,
-    "perform": null
+    "outputResponse": null,
+    "dynamicOutput": false,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates new contacts",
     "help": null,
@@ -256,7 +255,6 @@
       "bodyContentType": "JSON"
     },
     "name": "createContacts",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -469,23 +467,23 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Create contacts",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
-    "output": {
+    "perform": null,
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -553,28 +551,29 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
-    "perform": null
+    "dynamicOutput": true,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates new tasks",
     "help": null,
@@ -585,7 +584,6 @@
       "bodyContentType": "JSON"
     },
     "name": "createTasks",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -654,23 +652,23 @@
           "label": "Reminder Date",
           "placeholder": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE"
+          "controlType": "DATE",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Create tasks",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
-    "output": {
+    "perform": null,
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -738,25 +736,27 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
-    "perform": null
+    "dynamicOutput": true,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   } ],
   "triggers": [ ]
 }

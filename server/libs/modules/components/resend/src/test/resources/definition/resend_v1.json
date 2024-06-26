@@ -42,6 +42,7 @@
       "title": "Bearer Token",
       "type": "BEARER_TOKEN",
       "acquire": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -51,8 +52,7 @@
       "tokenUrl": null,
       "authorizationUrl": null,
       "clientSecret": null,
-      "refreshToken": null,
-      "authorizationCallback": null
+      "refreshToken": null
     } ],
     "properties": null,
     "version": 1,
@@ -62,13 +62,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Description",
     "help": null,
     "metadata": null,
     "name": "sendEmail",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Sender email address.",
@@ -580,8 +578,11 @@
       "optionsDataSource": null
     } ],
     "title": "Send Email",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "perform": { },
-    "output": {
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -625,8 +626,7 @@
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true
   } ],
   "triggers": null
 }

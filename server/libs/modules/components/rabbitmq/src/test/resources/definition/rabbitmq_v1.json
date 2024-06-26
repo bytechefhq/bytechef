@@ -51,8 +51,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": null,
@@ -101,13 +101,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Send a new RabbitMQ message.",
     "help": null,
     "metadata": null,
     "name": "sendMessage",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The name of the queue to read from",
@@ -146,23 +144,23 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Send Message",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
+    "output": null,
     "perform": { },
-    "output": null
+    "outputResponse": null,
+    "dynamicOutput": false
   } ],
   "triggers": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Triggers on new RabbitMQ messages.",
     "help": null,
     "name": "newMessage",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The name of the queue to read from",
@@ -195,11 +193,13 @@
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": null,
     "staticWebhookRequest": null,
-    "listenerDisable": { },
-    "listenerEnable": { },
-    "webhookValidate": null,
+    "output": null,
     "deduplicate": null,
     "poll": null,
-    "output": null
+    "outputResponse": null,
+    "dynamicOutput": true,
+    "listenerDisable": { },
+    "listenerEnable": { },
+    "webhookValidate": null
   } ]
 }

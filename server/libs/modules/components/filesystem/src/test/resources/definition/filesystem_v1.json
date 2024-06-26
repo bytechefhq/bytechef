@@ -15,13 +15,11 @@
   "connection": null,
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": null,
     "help": null,
     "metadata": null,
     "name": "readFile",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The path of the file to read.",
@@ -44,7 +42,9 @@
       "optionsDataSource": null
     } ],
     "title": "Read from file",
-    "output": {
+    "perform": { },
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -144,18 +144,16 @@
       },
       "sampleOutput": null
     },
-    "perform": { },
+    "dynamicOutput": true,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": null,
     "help": null,
     "metadata": null,
     "name": "writeFile",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The object property which contains a reference to the file to be written.",
@@ -274,7 +272,9 @@
       "optionsDataSource": null
     } ],
     "title": "Write to file",
-    "output": {
+    "perform": { },
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -319,21 +319,21 @@
         "bytes": 1024
       }
     },
-    "perform": { },
+    "dynamicOutput": true,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a temporary directory on the filesystem.",
     "help": null,
     "metadata": null,
     "name": "createTempDir",
-    "outputFunction": null,
     "properties": null,
     "title": "Create Temp Directory",
-    "output": {
+    "perform": { },
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -357,18 +357,16 @@
       },
       "sampleOutput": "/sample_tmp_dir"
     },
-    "perform": { },
+    "dynamicOutput": true,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Gets the full path from a full filename, which is the prefix + path, and also excluding the final directory separator.",
     "help": null,
     "metadata": null,
     "name": "getFilePath",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The path to full filename.",
@@ -391,7 +389,9 @@
       "optionsDataSource": null
     } ],
     "title": "File Path",
-    "output": {
+    "perform": { },
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -415,18 +415,16 @@
       },
       "sampleOutput": "/sample_data"
     },
-    "perform": { },
+    "dynamicOutput": true,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Lists a content of directory for the given path.",
     "help": null,
     "metadata": null,
     "name": "ls",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The path of a directory.",
@@ -473,7 +471,9 @@
       "controlType": "SELECT"
     } ],
     "title": "List",
-    "output": {
+    "perform": { },
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -577,18 +577,16 @@
       },
       "sampleOutput": null
     },
-    "perform": { },
+    "dynamicOutput": true,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a directory.",
     "help": null,
     "metadata": null,
     "name": "mkdir",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The path of a directory.",
@@ -611,7 +609,9 @@
       "optionsDataSource": null
     } ],
     "title": "Create",
-    "output": {
+    "perform": { },
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -635,18 +635,16 @@
       },
       "sampleOutput": "/sample_data"
     },
-    "perform": { },
+    "dynamicOutput": true,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Removes the content of a directory.",
     "help": null,
     "metadata": null,
     "name": "rm",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The path of a directory.",
@@ -669,7 +667,9 @@
       "optionsDataSource": null
     } ],
     "title": "Remove",
-    "output": {
+    "perform": { },
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -697,7 +697,7 @@
       },
       "sampleOutput": true
     },
-    "perform": { },
+    "dynamicOutput": true,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   } ],

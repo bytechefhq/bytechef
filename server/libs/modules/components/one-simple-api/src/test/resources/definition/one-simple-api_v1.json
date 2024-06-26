@@ -42,9 +42,7 @@
       "title": "One Simple API Connection",
       "type": "CUSTOM",
       "acquire": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
-      "refreshToken": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -52,7 +50,9 @@
       "refreshUrl": null,
       "scopes": { },
       "tokenUrl": null,
-      "authorizationCallback": null
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "refreshToken": null
     } ],
     "properties": null,
     "version": 1,
@@ -62,13 +62,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Convert your currency into any other",
     "help": null,
     "metadata": null,
     "name": "currencyConverter",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Select a currency from which you want to convert",
@@ -135,11 +133,15 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     } ],
     "title": "Currency Converter",
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "output": null,
+    "perform": { },
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -238,23 +240,19 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
-    "perform": { },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Shorten your desired URL",
     "help": null,
     "metadata": null,
     "name": "urlShortener",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Place the URL you want to shorten",
@@ -277,7 +275,11 @@
       "optionsDataSource": null
     } ],
     "title": "URL Shortener",
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "output": null,
+    "perform": { },
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -336,23 +338,19 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
-    "perform": { },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Get information about a certain webpage",
     "help": null,
     "metadata": null,
     "name": "url",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Place the web page url you want to get info from",
@@ -375,7 +373,11 @@
       "optionsDataSource": null
     } ],
     "title": "Web Page Information",
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "output": null,
+    "perform": { },
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -471,8 +473,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -551,8 +553,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -671,17 +673,15 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
-    "perform": { },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true
   } ],
   "triggers": null
 }

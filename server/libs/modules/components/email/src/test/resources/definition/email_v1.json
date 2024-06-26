@@ -145,13 +145,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Send an email to any address.",
     "help": null,
     "metadata": null,
     "name": "send",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "From who to send the email.",
@@ -496,6 +494,8 @@
     "title": "Send",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
+    "outputResponse": null,
+    "dynamicOutput": false,
     "perform": { },
     "output": null
   } ],

@@ -83,16 +83,16 @@
       "type": "BASIC_AUTH",
       "acquire": null,
       "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
-      "refreshToken": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null
+      "tokenUrl": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "refreshToken": null
     } ],
     "properties": null,
     "version": 1,
@@ -102,13 +102,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Create a new contact",
     "help": null,
     "metadata": null,
     "name": "createContact",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "First name of the contact",
@@ -173,7 +171,9 @@
     "title": "Create a contact",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "output": {
+    "perform": { },
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -289,24 +289,22 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Create a new Product for your CRM",
     "help": null,
     "metadata": null,
     "name": "createProduct",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Name of the product",
@@ -359,7 +357,9 @@
     "title": "Create a Product",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "output": {
+    "perform": { },
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -515,29 +515,29 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Get more information about yourself",
     "help": null,
     "metadata": null,
     "name": "getMe",
-    "outputFunction": null,
     "properties": null,
     "title": "Get Me",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "output": {
+    "perform": { },
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -913,15 +913,15 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "dynamicOutput": true
   } ],
   "triggers": null
 }

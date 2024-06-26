@@ -82,13 +82,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new contact",
     "help": null,
     "metadata": null,
     "name": "createContact",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The first name of the contact",
@@ -233,7 +231,7 @@
     "title": "Create contact",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -561,16 +559,16 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "dynamicOutput": true,
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new group",
     "help": null,
     "metadata": null,
     "name": "createGroup",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The name of the group",
@@ -595,7 +593,7 @@
     "title": "Create groups",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -639,7 +637,9 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "dynamicOutput": true,
+    "perform": { },
+    "output": null
   } ],
   "triggers": null
 }

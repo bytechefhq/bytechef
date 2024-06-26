@@ -63,16 +63,16 @@
       "type": "CUSTOM",
       "acquire": null,
       "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
-      "refreshToken": null,
       "apply": { },
       "clientId": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null
+      "tokenUrl": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "refreshToken": null
     } ],
     "properties": null,
     "version": 1,
@@ -82,13 +82,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Send a message via WhatsApp",
     "help": null,
     "metadata": null,
     "name": "sendMessage",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Message to send via WhatsApp",
@@ -133,7 +131,9 @@
     "title": "Send Message",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "output": {
+    "perform": { },
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -229,8 +229,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -269,24 +269,22 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "dynamicOutput": true
   } ],
   "triggers": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Triggers when you get a new message from certain number.",
     "help": null,
     "name": "messageReceived",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Type in the number from whom you want to trigger",
@@ -319,10 +317,10 @@
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": { },
     "staticWebhookRequest": null,
-    "listenerDisable": null,
-    "listenerEnable": null,
-    "webhookValidate": null,
-    "output": {
+    "deduplicate": null,
+    "poll": null,
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -509,11 +507,11 @@
                   "options": null,
                   "optionsDataSource": null
                 } ],
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               } ],
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -569,8 +567,8 @@
                   "options": null,
                   "optionsDataSource": null
                 } ],
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               }, {
                 "advancedOption": null,
                 "description": null,
@@ -592,8 +590,8 @@
                 "options": null,
                 "optionsDataSource": null
               } ],
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -709,24 +707,26 @@
                   "options": null,
                   "optionsDataSource": null
                 } ],
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               } ],
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
-    "deduplicate": null,
-    "poll": null
+    "dynamicOutput": true,
+    "listenerDisable": null,
+    "listenerEnable": null,
+    "webhookValidate": null
   } ]
 }

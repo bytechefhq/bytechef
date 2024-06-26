@@ -82,13 +82,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new empty folder within the specified parent folder.",
     "help": null,
     "metadata": null,
     "name": "createFolder",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The name for the new folder.",
@@ -134,7 +132,7 @@
       }
     } ],
     "title": "Create folder",
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -278,18 +276,18 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
     "perform": { },
+    "output": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Download a selected file.",
     "help": null,
     "metadata": null,
     "name": "downloadFile",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Folder from which you want to download the file.",
@@ -338,7 +336,7 @@
       }
     } ],
     "title": "Download file",
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -438,18 +436,18 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
     "perform": { },
+    "output": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Uploads a small file to Box.",
     "help": null,
     "metadata": null,
     "name": "uploadFile",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Folder where the file should be uploaded; if no folder is selected, the file will be uploaded in the root folder.",
@@ -571,7 +569,7 @@
       "controlType": "FILE_ENTRY"
     } ],
     "title": "Upload file",
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -776,7 +774,9 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
     "perform": { },
+    "output": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   } ],

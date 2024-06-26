@@ -82,7 +82,6 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new company",
     "help": null,
@@ -93,7 +92,6 @@
       "bodyContentType": "JSON"
     },
     "name": "createCompany",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -180,7 +178,9 @@
     "title": "Create company",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "output": {
+    "perform": null,
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -308,10 +308,9 @@
       },
       "sampleOutput": null
     },
-    "perform": null
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new contact",
     "help": null,
@@ -322,7 +321,6 @@
       "bodyContentType": "JSON"
     },
     "name": "createContact",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -469,7 +467,9 @@
     "title": "Create contact",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "output": {
+    "perform": null,
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -597,10 +597,9 @@
       },
       "sampleOutput": null
     },
-    "perform": null
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new ticket",
     "help": null,
@@ -611,7 +610,6 @@
       "bodyContentType": "JSON"
     },
     "name": "createTicket",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -768,7 +766,9 @@
     "title": "Create ticket",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "output": {
+    "perform": null,
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -912,7 +912,7 @@
       },
       "sampleOutput": null
     },
-    "perform": null
+    "dynamicOutput": true
   } ],
   "triggers": [ ]
 }

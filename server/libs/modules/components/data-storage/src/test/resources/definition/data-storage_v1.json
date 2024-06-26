@@ -15,13 +15,11 @@
   "connection": null,
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Append value to the end of a list. If the list does not exist, it will be created.",
     "help": null,
     "metadata": null,
     "name": "appendValueToList",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The namespace for appending a value.",
@@ -351,19 +349,19 @@
       "controlType": "SELECT"
     } ],
     "title": "Append Value to List",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "perform": { },
     "output": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "outputResponse": null,
+    "dynamicOutput": false
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "The numeric value can be incremented atomically, and the action can be used concurrently from multiple executions.",
     "help": null,
     "metadata": null,
     "name": "atomicIncrement",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The identifier of a value to increment.",
@@ -437,8 +435,11 @@
       "optionsDataSource": null
     } ],
     "title": "Atomic Increment",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "perform": { },
-    "output": {
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -461,17 +462,14 @@
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Wait for a value under a specified key, until it's available.",
     "help": null,
     "metadata": null,
     "name": "awaitGetValue",
-    "outputFunction": { },
     "properties": [ {
       "advancedOption": null,
       "description": "The identifier of a value to wait for.",
@@ -796,19 +794,19 @@
       "optionsDataSource": null
     } ],
     "title": "Await Get Value",
-    "perform": { },
-    "output": null,
     "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "workflowNodeDescription": null,
+    "perform": { },
+    "output": { },
+    "outputResponse": null,
+    "dynamicOutput": false
   }, {
     "batch": null,
-    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Remove a value associated with a key in the specified scope.",
     "help": null,
     "metadata": null,
     "name": "deleteValue",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The identifier of a value to delete, stored earlier in the selected scope.",
@@ -863,19 +861,19 @@
       "optionsDataSource": null
     } ],
     "title": "Delete Value",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "perform": { },
     "output": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "outputResponse": null,
+    "dynamicOutput": false
   }, {
     "batch": null,
-    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Delete a value from the given index in a list.",
     "help": null,
     "metadata": null,
     "name": "deleteValueFromlist",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The identifier of a list to delete value from, stored earlier in the selected scope.",
@@ -949,19 +947,19 @@
       "optionsDataSource": null
     } ],
     "title": "Delete Value from List",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "perform": { },
     "output": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "outputResponse": null,
+    "dynamicOutput": false
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Retrieve all the currently existing keys from storage, along with their values within the provided scope.",
     "help": null,
     "metadata": null,
     "name": "getAllEntries",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The namespace to get keys from.",
@@ -996,8 +994,11 @@
       "optionsDataSource": null
     } ],
     "title": "Get All Entries(Keys and Values)",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "perform": { },
-    "output": {
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -1042,17 +1043,14 @@
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Retrieve a previously assigned value within the specified scope using its corresponding key.",
     "help": null,
     "metadata": null,
     "name": "getValue",
-    "outputFunction": { },
     "properties": [ {
       "advancedOption": null,
       "description": "The identifier of a value to get, stored earlier in the selected scope.",
@@ -1358,19 +1356,19 @@
       "optionsDataSource": null
     } ],
     "title": "Get Value",
-    "perform": { },
-    "output": null,
     "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "workflowNodeDescription": null,
+    "perform": { },
+    "output": { },
+    "outputResponse": null,
+    "dynamicOutput": false
   }, {
     "batch": null,
-    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Set a value under a key, in the specified scope.",
     "help": null,
     "metadata": null,
     "name": "setValue",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The identifier of a value. Must be unique across all keys within the chosen scope to prevent overwriting the existing value with a new one. Also, it must be less than 1024 bytes in length.",
@@ -1676,19 +1674,19 @@
       "optionsDataSource": null
     } ],
     "title": "Set Value",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "perform": { },
     "output": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "outputResponse": null,
+    "dynamicOutput": false
   }, {
     "batch": null,
-    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Set value under a specified index in a list.",
     "help": null,
     "metadata": null,
     "name": "setValueInList",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The identifier of a list. Must be unique across all keys within the chosen scope to prevent overwriting the existing value with a new one. Also, it must be less than 1024 bytes in length.",
@@ -2013,10 +2011,12 @@
       "optionsDataSource": null
     } ],
     "title": "Set Value in List",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "perform": { },
     "output": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "outputResponse": null,
+    "dynamicOutput": false
   } ],
   "triggers": null
 }

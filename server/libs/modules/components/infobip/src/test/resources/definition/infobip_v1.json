@@ -42,6 +42,7 @@
       "title": "API Key",
       "type": "API_KEY",
       "acquire": null,
+      "authorizationCallback": null,
       "authorizationUrl": null,
       "clientSecret": null,
       "refreshToken": null,
@@ -51,8 +52,7 @@
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null,
-      "authorizationCallback": null
+      "tokenUrl": null
     } ],
     "properties": null,
     "version": 1,
@@ -62,13 +62,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Send a new SMS message",
     "help": null,
     "metadata": null,
     "name": "sendSMS",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Unique ID assigned to the request if messaging multiple recipients or sending multiple messages via a single API request. If not provided, it will be auto-generated and returned in the API response. Typically, used to fetch delivery reports and message logs.",
@@ -1322,7 +1320,9 @@
       "controlType": "SELECT"
     } ],
     "title": "Send SMS",
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -1584,18 +1584,16 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
     "perform": { },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "output": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Send a new SMS message",
     "help": null,
     "metadata": null,
     "name": "sendWhatsappTextMessage",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Registered WhatsApp sender number. Must be in international format and comply with WhatsApp's requirements.",
@@ -1934,7 +1932,9 @@
       "optionsDataSource": null
     } ],
     "title": "Send Whatsapp Text Message",
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -2155,9 +2155,9 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
     "perform": { },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "output": null
   } ],
   "triggers": null
 }

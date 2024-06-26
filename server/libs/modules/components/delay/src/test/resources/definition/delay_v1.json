@@ -15,13 +15,11 @@
   "connection": null,
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Delay action execution.",
     "help": null,
     "metadata": null,
     "name": "sleep",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Time in milliseconds.",
@@ -43,8 +41,10 @@
       "optionsDataSource": null
     } ],
     "title": "Sleep",
-    "perform": { },
     "output": null,
+    "perform": { },
+    "outputResponse": null,
+    "dynamicOutput": false,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   } ],

@@ -62,7 +62,6 @@
       "title": "API Key",
       "type": "API_KEY",
       "acquire": null,
-      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -72,7 +71,8 @@
       "tokenUrl": null,
       "authorizationUrl": null,
       "clientSecret": null,
-      "refreshToken": null
+      "refreshToken": null,
+      "authorizationCallback": null
     } ],
     "properties": null,
     "version": 1,
@@ -82,7 +82,6 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Create email template",
     "help": null,
@@ -93,7 +92,6 @@
       "bodyContentType": "JSON"
     },
     "name": "createEmail",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -198,9 +196,9 @@
       "optionsDataSource": null
     } ],
     "title": "Create email template",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
-    "output": {
+    "output": null,
+    "perform": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -365,10 +363,11 @@
       },
       "sampleOutput": null
     },
-    "perform": null
+    "dynamicOutput": true,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates new People",
     "help": null,
@@ -379,7 +378,6 @@
       "bodyContentType": "JSON"
     },
     "name": "createPeople",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -545,9 +543,9 @@
       "optionsDataSource": null
     } ],
     "title": "Create people",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
-    "output": {
+    "output": null,
+    "perform": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -774,10 +772,11 @@
       },
       "sampleOutput": null
     },
-    "perform": null
+    "dynamicOutput": true,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Add tag(s) to an existing user.",
     "help": null,
@@ -788,7 +787,6 @@
       "bodyContentType": "JSON"
     },
     "name": "addTag",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -856,10 +854,12 @@
       "optionsDataSource": null
     } ],
     "title": "Add tag",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
     "output": null,
-    "perform": null
+    "perform": null,
+    "outputResponse": null,
+    "dynamicOutput": false,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   } ],
   "triggers": [ ]
 }

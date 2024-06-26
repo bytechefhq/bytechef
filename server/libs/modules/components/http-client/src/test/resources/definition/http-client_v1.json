@@ -90,9 +90,7 @@
       "title": "API Key",
       "type": "API_KEY",
       "acquire": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
-      "refreshToken": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -100,7 +98,9 @@
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
-      "authorizationCallback": null
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "refreshToken": null
     }, {
       "detectOn": null,
       "description": null,
@@ -130,9 +130,7 @@
       "title": "Bearer Token",
       "type": "BEARER_TOKEN",
       "acquire": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
-      "refreshToken": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -140,7 +138,9 @@
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
-      "authorizationCallback": null
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "refreshToken": null
     }, {
       "detectOn": null,
       "description": null,
@@ -190,9 +190,7 @@
       "title": "Basic Auth",
       "type": "BASIC_AUTH",
       "acquire": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
-      "refreshToken": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -200,7 +198,9 @@
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
-      "authorizationCallback": null
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "refreshToken": null
     }, {
       "detectOn": null,
       "description": null,
@@ -250,9 +250,7 @@
       "title": "Digest Auth",
       "type": "DIGEST_AUTH",
       "acquire": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
-      "refreshToken": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -260,7 +258,9 @@
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
-      "authorizationCallback": null
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "refreshToken": null
     }, {
       "detectOn": null,
       "description": null,
@@ -390,9 +390,7 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
-      "refreshToken": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -400,7 +398,9 @@
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
-      "authorizationCallback": null
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "refreshToken": null
     }, {
       "detectOn": null,
       "description": null,
@@ -510,9 +510,7 @@
       "title": "OAuth2 Implicit Code",
       "type": "OAUTH2_IMPLICIT_CODE",
       "acquire": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
-      "refreshToken": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -520,7 +518,9 @@
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
-      "authorizationCallback": null
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "refreshToken": null
     }, {
       "detectOn": null,
       "description": null,
@@ -630,9 +630,7 @@
       "title": "OAuth2 Client Credentials",
       "type": "OAUTH2_CLIENT_CREDENTIALS",
       "acquire": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
-      "refreshToken": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -640,7 +638,9 @@
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
-      "authorizationCallback": null
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "refreshToken": null
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -670,13 +670,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "The request method to use.",
     "help": null,
     "metadata": null,
     "name": "get",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The URI to make the request to",
@@ -830,14 +828,14 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Query parameters to send.",
@@ -891,14 +889,14 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "Returns the full response data instead of only the body.",
@@ -1032,23 +1030,23 @@
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "title": "GET",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": null,
     "perform": { },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "outputResponse": null,
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "The request method to use.",
     "help": null,
     "metadata": null,
     "name": "post",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The URI to make the request to",
@@ -1202,14 +1200,14 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Query parameters to send.",
@@ -1263,14 +1261,14 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Body Parameters to send.",
@@ -1304,8 +1302,8 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1345,8 +1343,8 @@
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE"
+        "controlType": "DATE",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1362,8 +1360,8 @@
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE_TIME"
+        "controlType": "DATE_TIME",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1381,8 +1379,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1418,8 +1416,8 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "NUMBER"
+        "controlType": "NUMBER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1438,8 +1436,8 @@
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1475,14 +1473,14 @@
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "TIME"
+        "controlType": "TIME",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "XML content to send.",
@@ -1501,8 +1499,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Body parameters to send.",
@@ -1637,8 +1635,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Body parameters to send.",
@@ -1677,8 +1675,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The raw text to send.",
@@ -1992,23 +1990,23 @@
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "title": "POST",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": null,
     "perform": { },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "outputResponse": null,
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "The request method to use.",
     "help": null,
     "metadata": null,
     "name": "put",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The URI to make the request to",
@@ -2162,14 +2160,14 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Query parameters to send.",
@@ -2223,14 +2221,14 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Body Parameters to send.",
@@ -2264,8 +2262,8 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -2305,8 +2303,8 @@
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE"
+        "controlType": "DATE",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -2322,8 +2320,8 @@
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE_TIME"
+        "controlType": "DATE_TIME",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -2341,8 +2339,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -2378,8 +2376,8 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "NUMBER"
+        "controlType": "NUMBER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -2398,8 +2396,8 @@
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -2435,14 +2433,14 @@
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "TIME"
+        "controlType": "TIME",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "XML content to send.",
@@ -2461,8 +2459,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Body parameters to send.",
@@ -2597,8 +2595,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Body parameters to send.",
@@ -2637,8 +2635,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The raw text to send.",
@@ -2952,23 +2950,23 @@
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "title": "PUT",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": null,
     "perform": { },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "outputResponse": null,
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "The request method to use.",
     "help": null,
     "metadata": null,
     "name": "patch",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The URI to make the request to",
@@ -3122,14 +3120,14 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Query parameters to send.",
@@ -3183,14 +3181,14 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Body Parameters to send.",
@@ -3224,8 +3222,8 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -3265,8 +3263,8 @@
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE"
+        "controlType": "DATE",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -3282,8 +3280,8 @@
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE_TIME"
+        "controlType": "DATE_TIME",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -3301,8 +3299,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -3338,8 +3336,8 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "NUMBER"
+        "controlType": "NUMBER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -3358,8 +3356,8 @@
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -3395,14 +3393,14 @@
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "TIME"
+        "controlType": "TIME",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "XML content to send.",
@@ -3421,8 +3419,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Body parameters to send.",
@@ -3557,8 +3555,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Body parameters to send.",
@@ -3597,8 +3595,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The raw text to send.",
@@ -3912,23 +3910,23 @@
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "title": "PATCH",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": null,
     "perform": { },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "outputResponse": null,
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "The request method to use.",
     "help": null,
     "metadata": null,
     "name": "delete",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The URI to make the request to",
@@ -4082,14 +4080,14 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Query parameters to send.",
@@ -4143,14 +4141,14 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "Returns the full response data instead of only the body.",
@@ -4284,23 +4282,23 @@
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "title": "DELETE",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": null,
     "perform": { },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "outputResponse": null,
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "The request method to use.",
     "help": null,
     "metadata": null,
     "name": "head",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The URI to make the request to",
@@ -4454,14 +4452,14 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Query parameters to send.",
@@ -4515,14 +4513,14 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "Returns the full response data instead of only the body.",
@@ -4656,14 +4654,16 @@
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "title": "HEAD",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": null,
     "perform": { },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "outputResponse": null,
+    "dynamicOutput": true
   } ],
   "triggers": null
 }

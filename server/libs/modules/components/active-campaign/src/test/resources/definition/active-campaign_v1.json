@@ -82,6 +82,7 @@
       "title": "API Key",
       "type": "API_KEY",
       "acquire": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -91,8 +92,7 @@
       "tokenUrl": null,
       "authorizationUrl": null,
       "clientSecret": null,
-      "refreshToken": null,
-      "authorizationCallback": null
+      "refreshToken": null
     } ],
     "properties": null,
     "version": 1,
@@ -102,7 +102,6 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new account",
     "help": null,
@@ -113,7 +112,6 @@
       "bodyContentType": "JSON"
     },
     "name": "createAccount",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -198,8 +196,11 @@
       "optionsDataSource": null
     } ],
     "title": "Create account",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "perform": null,
-    "output": {
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -305,11 +306,9 @@
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new contact",
     "help": null,
@@ -320,7 +319,6 @@
       "bodyContentType": "JSON"
     },
     "name": "createContact",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -445,8 +443,11 @@
       "optionsDataSource": null
     } ],
     "title": "Create contact",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "perform": null,
-    "output": {
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -592,11 +593,9 @@
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new task",
     "help": null,
@@ -607,7 +606,6 @@
       "bodyContentType": "JSON"
     },
     "name": "createTask",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -727,8 +725,11 @@
       "optionsDataSource": null
     } ],
     "title": "Creates a task",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "perform": null,
-    "output": {
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -889,8 +890,7 @@
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true
   } ],
   "triggers": [ ]
 }

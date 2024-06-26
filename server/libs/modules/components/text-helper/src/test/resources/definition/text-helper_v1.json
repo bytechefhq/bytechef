@@ -15,13 +15,11 @@
   "connection": null,
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Extract content from the HTML content.",
     "help": null,
     "metadata": null,
     "name": "extractContentFromHtml",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The HTML content.",
@@ -143,7 +141,9 @@
     "processErrorResponse": null,
     "workflowNodeDescription": null,
     "output": null,
-    "perform": { }
+    "perform": { },
+    "outputResponse": null,
+    "dynamicOutput": true
   } ],
   "triggers": null
 }

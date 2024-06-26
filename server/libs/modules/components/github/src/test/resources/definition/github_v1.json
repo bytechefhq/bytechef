@@ -82,13 +82,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Create a new issue",
     "help": null,
     "metadata": null,
     "name": "createIssue",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Select an repository",
@@ -154,7 +152,7 @@
       "optionsDataSource": null
     } ],
     "title": "Create issue",
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -258,18 +256,18 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
+    "output": null,
     "perform": { },
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Create a specific issue",
     "help": null,
     "metadata": null,
     "name": "getIssue",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Select an repository",
@@ -318,7 +316,7 @@
       }
     } ],
     "title": "Get issue",
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -442,18 +440,18 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
+    "output": null,
     "perform": { },
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Create a comment for the issue",
     "help": null,
     "metadata": null,
     "name": "createIssueComment",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Select an repository",
@@ -522,7 +520,7 @@
       "optionsDataSource": null
     } ],
     "title": "Create Issue Comment",
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -626,6 +624,8 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
+    "output": null,
     "perform": { },
     "processErrorResponse": null,
     "workflowNodeDescription": null

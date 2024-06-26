@@ -82,13 +82,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates draft bill (Accounts Payable).",
     "help": null,
     "metadata": null,
     "name": "createBill",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Contact to create the bill for.",
@@ -353,7 +351,9 @@
     "title": "Create bill",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "output": {
+    "output": null,
+    "perform": { },
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -699,16 +699,14 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new contact.",
     "help": null,
     "metadata": null,
     "name": "createContact",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Full name of a contact or organisation.",
@@ -1191,7 +1189,9 @@
     "title": "Create contact",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "output": {
+    "output": null,
+    "perform": { },
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -1677,16 +1677,14 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates draft invoice (Acount Receivable).",
     "help": null,
     "metadata": null,
     "name": "createSalesInvoice",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Contact to create the invoice for.",
@@ -1947,7 +1945,9 @@
     "title": "Create invoice",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "output": {
+    "output": null,
+    "perform": { },
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -2293,16 +2293,14 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new quote draft.",
     "help": null,
     "metadata": null,
     "name": "createQuote",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Full name of a contact or organisation.",
@@ -2666,7 +2664,9 @@
     "title": "Create quote",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "output": {
+    "output": null,
+    "perform": { },
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -3151,7 +3151,7 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "dynamicOutput": true
   } ],
   "triggers": null
 }

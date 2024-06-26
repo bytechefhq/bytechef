@@ -218,17 +218,17 @@
       "title": null,
       "type": "CUSTOM",
       "acquire": null,
-      "authorizationCallback": null,
       "authorizationUrl": null,
       "clientSecret": null,
       "refreshToken": null,
-      "refreshUrl": null,
-      "scopes": null,
-      "tokenUrl": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
-      "refresh": null
+      "refresh": null,
+      "refreshUrl": null,
+      "scopes": null,
+      "tokenUrl": null,
+      "authorizationCallback": null
     } ],
     "properties": null,
     "version": 1,
@@ -238,13 +238,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Get the AWS S3 object.",
     "help": null,
     "metadata": null,
     "name": "getObject",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Filename to set for binary data.",
@@ -287,10 +285,7 @@
       "optionsDataSource": null
     } ],
     "title": "Get Object",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
-    "perform": { },
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -389,16 +384,19 @@
         "controlType": "FILE_ENTRY"
       },
       "sampleOutput": null
-    }
+    },
+    "dynamicOutput": true,
+    "perform": { },
+    "output": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Get the url of an AWS S3 object.",
     "help": null,
     "metadata": null,
     "name": "getUrl",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Key is most likely the name of the file.",
@@ -421,10 +419,7 @@
       "optionsDataSource": null
     } ],
     "title": "Get URL",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
-    "perform": { },
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -447,16 +442,19 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "dynamicOutput": true,
+    "perform": { },
+    "output": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Get the list AWS S3 objects. Every object needs to have read permission in order to be seen.",
     "help": null,
     "metadata": null,
     "name": "listObjects",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The prefix of an AWS S3 objects.",
@@ -479,10 +477,7 @@
       "optionsDataSource": null
     } ],
     "title": "List Objects",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
-    "perform": { },
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -586,16 +581,19 @@
         "controlType": "ARRAY_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "dynamicOutput": true,
+    "perform": { },
+    "output": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "You can share an object with a pre-signed URL for up to 12 hours or until your session expires.",
     "help": null,
     "metadata": null,
     "name": "presignGetObject",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Key is most likely the name of the file.",
@@ -638,10 +636,7 @@
       "optionsDataSource": null
     } ],
     "title": "Get Pre-signed Object",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
-    "perform": { },
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -664,16 +659,19 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "dynamicOutput": true,
+    "perform": { },
+    "output": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Store an object to AWS S3.",
     "help": null,
     "metadata": null,
     "name": "putObject",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The object property which contains a reference to the file that needs to be written to AWS S3.",
@@ -840,10 +838,7 @@
       "optionsDataSource": null
     } ],
     "title": "Put Object",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
-    "perform": { },
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -866,7 +861,12 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "dynamicOutput": true,
+    "perform": { },
+    "output": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   } ],
   "triggers": null
 }

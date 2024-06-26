@@ -42,6 +42,7 @@
       "title": "Bearer Token",
       "type": "BEARER_TOKEN",
       "acquire": null,
+      "authorizationCallback": null,
       "authorizationUrl": null,
       "clientSecret": null,
       "refreshToken": null,
@@ -51,8 +52,7 @@
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null,
-      "authorizationCallback": null
+      "tokenUrl": null
     } ],
     "properties": null,
     "version": 1,
@@ -62,13 +62,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Sends an email.",
     "help": null,
     "metadata": null,
     "name": "sendEmail",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Email address from which you want to send.",
@@ -474,8 +472,9 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Send an email",
-    "perform": { },
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -598,8 +597,9 @@
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true,
+    "output": null,
+    "perform": { }
   } ],
   "triggers": null
 }

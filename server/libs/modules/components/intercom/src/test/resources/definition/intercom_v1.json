@@ -62,6 +62,7 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
+      "authorizationCallback": null,
       "apply": { },
       "clientId": null,
       "pkce": null,
@@ -71,8 +72,7 @@
       "tokenUrl": { },
       "authorizationUrl": { },
       "clientSecret": null,
-      "refreshToken": null,
-      "authorizationCallback": null
+      "refreshToken": null
     } ],
     "properties": null,
     "version": 1,
@@ -82,13 +82,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Create new contact",
     "help": null,
     "metadata": null,
     "name": "createContact",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Role of the contact",
@@ -199,7 +197,11 @@
       "optionsDataSource": null
     } ],
     "title": "Create Contact",
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": { },
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -343,18 +345,14 @@
       },
       "sampleOutput": null
     },
-    "perform": { },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Get a single Contact",
     "help": null,
     "metadata": null,
     "name": "getContact",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -380,7 +378,11 @@
       }
     } ],
     "title": "Get Contact",
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": { },
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -524,18 +526,14 @@
       },
       "sampleOutput": null
     },
-    "perform": { },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Send a new message",
     "help": null,
     "metadata": null,
     "name": "sendMessage",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "In app message or email message",
@@ -657,7 +655,11 @@
       }
     } ],
     "title": "Send Message",
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": { },
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -681,9 +683,7 @@
       },
       "sampleOutput": null
     },
-    "perform": { },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true
   } ],
   "triggers": null
 }

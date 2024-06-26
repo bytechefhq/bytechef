@@ -42,17 +42,17 @@
       "title": "Bearer Token",
       "type": "BEARER_TOKEN",
       "acquire": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "refreshToken": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
-      "refreshToken": null,
-      "authorizationCallback": null
+      "tokenUrl": null
     } ],
     "properties": null,
     "version": 1,
@@ -62,13 +62,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new opportunity",
     "help": null,
     "metadata": null,
     "name": "createNote",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The name of the opportunity.",
@@ -91,8 +89,9 @@
       "optionsDataSource": null
     } ],
     "title": "Create opportunity",
-    "perform": { },
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -127,8 +126,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -150,22 +149,21 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true,
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new organization",
     "help": null,
     "metadata": null,
     "name": "createOrganization",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The name of the organization.",
@@ -208,8 +206,9 @@
       "optionsDataSource": null
     } ],
     "title": "Create organization",
-    "perform": { },
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -244,8 +243,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -287,22 +286,21 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true,
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new person",
     "help": null,
     "metadata": null,
     "name": "createPerson",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The first name of the person.",
@@ -382,12 +380,13 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Create person",
-    "perform": { },
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -422,8 +421,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -503,16 +502,17 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true,
+    "output": null,
+    "perform": { }
   } ],
   "triggers": null
 }

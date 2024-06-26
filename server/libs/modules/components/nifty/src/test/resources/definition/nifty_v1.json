@@ -62,9 +62,7 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "authorizationUrl": { },
-      "clientSecret": null,
-      "refreshToken": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -72,7 +70,9 @@
       "refreshUrl": null,
       "scopes": { },
       "tokenUrl": { },
-      "authorizationCallback": null
+      "authorizationUrl": { },
+      "clientSecret": null,
+      "refreshToken": null
     } ],
     "properties": null,
     "version": 1,
@@ -82,13 +82,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Create a new task",
     "help": null,
     "metadata": null,
     "name": "createTask",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Name of the task",
@@ -190,12 +188,15 @@
       "label": "Due date",
       "placeholder": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "DATE_TIME"
+      "controlType": "DATE_TIME",
+      "optionsDataSource": null
     } ],
     "title": "Create Task",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "perform": { },
-    "output": {
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -334,13 +335,12 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true
   } ],
   "triggers": null
 }

@@ -62,17 +62,17 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
+      "authorizationCallback": null,
+      "authorizationUrl": { },
+      "clientSecret": null,
+      "refreshToken": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": { },
       "scopes": { },
-      "tokenUrl": { },
-      "authorizationUrl": { },
-      "clientSecret": null,
-      "refreshToken": null,
-      "authorizationCallback": null
+      "tokenUrl": { }
     } ],
     "properties": null,
     "version": 1,
@@ -82,13 +82,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Clear a sheet of all values while preserving formats.",
     "help": null,
     "metadata": null,
     "name": "clearSheet",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The spreadsheet to apply the updates to.",
@@ -153,11 +151,11 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "SELECT",
       "optionsDataSource": {
         "optionsLookupDependsOn": [ "spreadsheetId" ],
         "options": { }
-      }
+      },
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "If the first row is header",
@@ -184,19 +182,19 @@
       "controlType": "SELECT"
     } ],
     "title": "Clear sheet",
-    "perform": { },
-    "output": null,
     "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "workflowNodeDescription": null,
+    "outputResponse": null,
+    "dynamicOutput": false,
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
-    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Delete row on an existing sheet",
     "help": null,
     "metadata": null,
     "name": "deleteRow",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The spreadsheet to apply the updates to.",
@@ -261,11 +259,11 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "SELECT",
       "optionsDataSource": {
         "optionsLookupDependsOn": [ "spreadsheetId" ],
         "options": { }
-      }
+      },
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The row number to delete",
@@ -283,23 +281,23 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "Delete row",
-    "perform": { },
-    "output": null,
     "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "workflowNodeDescription": null,
+    "outputResponse": null,
+    "dynamicOutput": false,
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Get a row in a Google Sheet by row number",
     "help": null,
     "metadata": null,
     "name": "findRowByNum",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The spreadsheet to apply the updates to.",
@@ -411,12 +409,13 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "Find row by number",
-    "perform": { },
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -475,8 +474,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -501,22 +500,21 @@
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true,
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Append a row of values to an existing sheet",
     "help": null,
     "metadata": null,
     "name": "insertRow",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The spreadsheet to apply the updates to.",
@@ -656,8 +654,9 @@
       }
     } ],
     "title": "Insert row",
-    "perform": { },
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -716,8 +715,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -742,22 +741,21 @@
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true,
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Overwrite values in an existing row",
     "help": null,
     "metadata": null,
     "name": "updateRow",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The spreadsheet to apply the updates to.",
@@ -845,8 +843,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "If the first row is header",
@@ -888,8 +886,9 @@
       }
     } ],
     "title": "Update row",
-    "perform": { },
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -948,8 +947,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -974,22 +973,21 @@
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true,
+    "output": null,
+    "perform": { }
   } ],
   "triggers": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Triggers when you add a row in google sheets. Refresh the page when you're done putting input.",
     "help": null,
     "name": "onRowAdded",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The spreadsheet to apply the updates to.",
@@ -1067,9 +1065,12 @@
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
-    "deduplicate": null,
-    "poll": null,
-    "output": {
+    "dynamicWebhookDisable": { },
+    "dynamicWebhookEnable": { },
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": { },
+    "staticWebhookRequest": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -1157,31 +1158,30 @@
             "minItems": null,
             "multipleValues": null,
             "options": null,
-            "controlType": "ARRAY_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "ARRAY_BUILDER"
           } ],
           "multipleValues": null,
           "options": null,
           "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
         "maxItems": null,
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "controlType": "ARRAY_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "ARRAY_BUILDER"
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
     "listenerDisable": null,
     "listenerEnable": null,
     "webhookValidate": null,
-    "dynamicWebhookDisable": { },
-    "dynamicWebhookEnable": { },
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": { },
-    "staticWebhookRequest": null
+    "output": null,
+    "deduplicate": null,
+    "poll": null
   } ]
 }

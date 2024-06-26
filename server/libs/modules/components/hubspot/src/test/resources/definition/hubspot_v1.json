@@ -62,9 +62,7 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "authorizationUrl": { },
-      "clientSecret": null,
-      "refreshToken": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -72,7 +70,9 @@
       "refreshUrl": null,
       "scopes": { },
       "tokenUrl": { },
-      "authorizationCallback": null
+      "authorizationUrl": { },
+      "clientSecret": null,
+      "refreshToken": null
     } ],
     "properties": null,
     "version": 1,
@@ -82,7 +82,6 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Create a contact with the given properties and return a copy of the object, including the ID. Documentation and examples for creating standard contacts is provided.",
     "help": null,
@@ -93,7 +92,6 @@
       "bodyContentType": "JSON"
     },
     "name": "createContact",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -271,8 +269,8 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -342,8 +340,8 @@
               "options": null,
               "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -424,34 +422,38 @@
                 "maxValue": null,
                 "minValue": null,
                 "options": null,
-                "optionsDataSource": null,
-                "controlType": "INTEGER"
+                "controlType": "INTEGER",
+                "optionsDataSource": null
               } ],
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
             "maxItems": null,
             "minItems": null,
             "multipleValues": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "ARRAY_BUILDER"
+            "controlType": "ARRAY_BUILDER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "maxItems": null,
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Create",
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": null,
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -529,8 +531,8 @@
           "multipleValues": null,
           "options": null,
           "properties": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -564,14 +566,14 @@
             "minItems": null,
             "multipleValues": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "ARRAY_BUILDER"
+            "controlType": "ARRAY_BUILDER",
+            "optionsDataSource": null
           } ],
           "multipleValues": null,
           "options": null,
           "properties": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -587,8 +589,8 @@
           "label": "Created At",
           "placeholder": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE_TIME"
+          "controlType": "DATE_TIME",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -604,8 +606,8 @@
           "label": "Updated At",
           "placeholder": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE_TIME"
+          "controlType": "DATE_TIME",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -645,20 +647,17 @@
           "label": "Archived At",
           "placeholder": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE_TIME"
+          "controlType": "DATE_TIME",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
-    "perform": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Perform a partial update of an Object identified by `{contactId}`. `{contactId}` refers to the internal object ID. Provided property values will be overwritten. Read-only and non-existent properties will be ignored. Properties values can be cleared by passing an empty string.",
     "help": null,
@@ -669,7 +668,6 @@
       "bodyContentType": "JSON"
     },
     "name": "updateContact",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -869,14 +867,18 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Update",
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": null,
+    "output": null,
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -954,8 +956,8 @@
           "multipleValues": null,
           "options": null,
           "properties": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -989,14 +991,14 @@
             "minItems": null,
             "multipleValues": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "ARRAY_BUILDER"
+            "controlType": "ARRAY_BUILDER",
+            "optionsDataSource": null
           } ],
           "multipleValues": null,
           "options": null,
           "properties": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1012,8 +1014,8 @@
           "label": "Created At",
           "placeholder": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE_TIME"
+          "controlType": "DATE_TIME",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1029,8 +1031,8 @@
           "label": "Updated At",
           "placeholder": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE_TIME"
+          "controlType": "DATE_TIME",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1070,26 +1072,22 @@
           "label": "Archived At",
           "placeholder": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE_TIME"
+          "controlType": "DATE_TIME",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
-    "perform": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true
   } ],
   "triggers": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Triggers when an event of the subscribed type happens inside HubSpot.",
     "help": null,
     "name": "subscribe",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The id of a Hubspot app used to register this trigger to. See the <a href=\"https://legacydocs.hubspot.com/docs/faq/integration-platform-api-requirements\">prerequisites documentation</a> for more details about creating an app",
@@ -1321,10 +1319,18 @@
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
+    "dynamicWebhookDisable": { },
+    "dynamicWebhookEnable": { },
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": { },
+    "staticWebhookRequest": null,
+    "deduplicate": null,
+    "poll": null,
+    "output": null,
     "listenerDisable": null,
     "listenerEnable": null,
     "webhookValidate": null,
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -1390,8 +1396,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -1469,8 +1475,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -1488,8 +1494,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -1507,8 +1513,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -1526,8 +1532,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -1545,8 +1551,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -1584,8 +1590,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -1603,8 +1609,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -1626,27 +1632,21 @@
               "options": null,
               "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "maxItems": null,
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": "[\n    {\n        \"objectId\": 1246965,\n        \"propertyName\": \"lifecyclestage\",\n        \"propertyValue\": \"subscriber\",\n        \"changeSource\": \"ACADEMY\",\n        \"eventId\": 3816279340,\n        \"subscriptionId\": 25,\n        \"portalId\": 33,\n        \"appId\": 1160452,\n        \"occurredAt\": 1462216307945,\n        \"eventType\":\"contact.propertyChange\",\n        \"attemptNumber\": 0\n   }\n]\n"
     },
-    "deduplicate": null,
-    "poll": null,
-    "dynamicWebhookDisable": { },
-    "dynamicWebhookEnable": { },
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": { },
-    "staticWebhookRequest": null
+    "dynamicOutput": true
   } ]
 }

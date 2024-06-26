@@ -15,13 +15,11 @@
   "connection": null,
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Reads data from a JSON file.",
     "help": null,
     "metadata": null,
     "name": "read",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The file type to choose.",
@@ -207,8 +205,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "The page number to get.",
@@ -226,23 +224,23 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "title": "Read from file",
     "output": null,
     "perform": { },
+    "outputResponse": null,
+    "dynamicOutput": true,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Writes the data to a JSON file.",
     "help": null,
     "metadata": null,
     "name": "write",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The file type to choose.",
@@ -296,8 +294,8 @@
         "label": "Array",
         "value": 2
       } ],
-      "optionsDataSource": null,
-      "controlType": "SELECT"
+      "controlType": "SELECT",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The object to write to the file.",
@@ -316,8 +314,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The array to write to the file.",
@@ -337,8 +335,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "Filename to set for binary data. By default, \"file.json\" will be used.",
@@ -361,7 +359,9 @@
       "optionsDataSource": null
     } ],
     "title": "Write to file",
-    "output": {
+    "output": null,
+    "perform": { },
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -461,7 +461,7 @@
       },
       "sampleOutput": null
     },
-    "perform": { },
+    "dynamicOutput": true,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   } ],

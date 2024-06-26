@@ -15,13 +15,11 @@
   "connection": null,
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Assign value to a variable that can be used in the following steps.",
     "help": null,
     "metadata": null,
     "name": "set",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The value type.",
@@ -469,6 +467,8 @@
     "title": "Set value",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
+    "outputResponse": null,
+    "dynamicOutput": true,
     "perform": { },
     "output": null
   } ],

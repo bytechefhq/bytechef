@@ -102,13 +102,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new company",
     "help": null,
     "metadata": null,
     "name": "createCompany",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The name of the company",
@@ -191,8 +189,7 @@
       "optionsDataSource": null
     } ],
     "title": "Create company",
-    "perform": { },
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -356,17 +353,18 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
+    "perform": { },
+    "output": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new contact",
     "help": null,
     "metadata": null,
     "name": "createContact",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The firstname of the contact.",
@@ -492,8 +490,7 @@
       "optionsDataSource": null
     } ],
     "title": "Create contact",
-    "perform": { },
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -697,17 +694,18 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
+    "perform": { },
+    "output": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new task",
     "help": null,
     "metadata": null,
     "name": "createTask",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -798,8 +796,7 @@
       "controlType": "DATE"
     } ],
     "title": "Create task",
-    "perform": { },
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -963,6 +960,9 @@
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
+    "perform": { },
+    "output": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   } ],

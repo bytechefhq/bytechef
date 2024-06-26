@@ -15,13 +15,11 @@
   "connection": null,
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Reads data from the file as string.",
     "help": null,
     "metadata": null,
     "name": "read",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The object property which contains a reference to the file to read from.",
@@ -122,8 +120,7 @@
     "title": "Read from file as string",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "perform": { },
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -146,16 +143,17 @@
         "optionsDataSource": null
       },
       "sampleOutput": "Sample content"
-    }
+    },
+    "dynamicOutput": true,
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Writes the data to the file.",
     "help": null,
     "metadata": null,
     "name": "write",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "String to write to the file.",
@@ -200,8 +198,7 @@
     "title": "Write to file",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "perform": { },
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -300,16 +297,17 @@
         "controlType": "FILE_ENTRY"
       },
       "sampleOutput": null
-    }
+    },
+    "dynamicOutput": true,
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Download a file from the URL.",
     "help": null,
     "metadata": null,
     "name": "download",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The URL to download a file from.",
@@ -354,8 +352,7 @@
     "title": "Download file",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "perform": { },
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -454,7 +451,10 @@
         "controlType": "FILE_ENTRY"
       },
       "sampleOutput": null
-    }
+    },
+    "dynamicOutput": true,
+    "perform": { },
+    "output": null
   } ],
   "triggers": null
 }

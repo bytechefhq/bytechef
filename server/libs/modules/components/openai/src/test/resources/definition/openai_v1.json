@@ -42,6 +42,7 @@
       "title": "Bearer Token",
       "type": "BEARER_TOKEN",
       "acquire": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -51,8 +52,7 @@
       "tokenUrl": null,
       "authorizationUrl": null,
       "clientSecret": null,
-      "refreshToken": null,
-      "authorizationCallback": null
+      "refreshToken": null
     } ],
     "properties": null,
     "version": 1,
@@ -62,13 +62,11 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Ask ChatGPT anything you want.",
     "help": null,
     "metadata": null,
     "name": "askChatGPT",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "A list of messages comprising the conversation so far.",
@@ -440,7 +438,11 @@
       "optionsDataSource": null
     } ],
     "title": "Ask ChatGPT",
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "output": null,
+    "perform": { },
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -584,18 +586,14 @@
       },
       "sampleOutput": null
     },
-    "perform": { },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Create an assistant with a model and instructions.",
     "help": null,
     "metadata": null,
     "name": "createAssistant",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "ID of the model to use.",
@@ -935,7 +933,11 @@
       "optionsDataSource": null
     } ],
     "title": "Create assistant",
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "output": null,
+    "perform": { },
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -1300,18 +1302,14 @@
       },
       "sampleOutput": null
     },
-    "perform": { },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Create an image using text-to-image models",
     "help": null,
     "metadata": null,
     "name": "createImage",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -1484,7 +1482,11 @@
       "optionsDataSource": null
     } ],
     "title": "Create image",
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "output": null,
+    "perform": { },
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -1628,18 +1630,14 @@
       },
       "sampleOutput": null
     },
-    "perform": { },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Generate an audio recording from the input text",
     "help": null,
     "metadata": null,
     "name": "createSpeech",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Text-to-Speech model which will generate the audio.",
@@ -1792,7 +1790,11 @@
       "optionsDataSource": null
     } ],
     "title": "Create speech",
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "output": null,
+    "perform": { },
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -1892,18 +1894,14 @@
       },
       "sampleOutput": null
     },
-    "perform": { },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Transcribes audio into the input language.",
     "help": null,
     "metadata": null,
     "name": "createTranscription",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The audio file object to transcribe, in one of these formats: flac, mp3, mp4, mpeg, mpga, m4a, ogg, wav, or webm.",
@@ -2356,7 +2354,11 @@
       "optionsDataSource": null
     } ],
     "title": "Create transcriptions",
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "output": null,
+    "perform": { },
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -2757,18 +2759,14 @@
       },
       "sampleOutput": null
     },
-    "perform": { },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Translates audio into English.",
     "help": null,
     "metadata": null,
     "name": "createTranslation",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The audio file object translate, in one of these formats: flac, mp3, mp4, mpeg, mpga, m4a, ogg, wav, or webm.",
@@ -2973,7 +2971,11 @@
       "optionsDataSource": null
     } ],
     "title": "Create translation",
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "output": null,
+    "perform": { },
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -3374,18 +3376,14 @@
       },
       "sampleOutput": null
     },
-    "perform": { },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Ask GPT a question about an image",
     "help": null,
     "metadata": null,
     "name": "visionPrompt",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "A list of messages comprising the conversation so far.",
@@ -3858,7 +3856,11 @@
       "optionsDataSource": null
     } ],
     "title": "Vision Prompt",
-    "output": {
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "output": null,
+    "perform": { },
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -4002,9 +4004,7 @@
       },
       "sampleOutput": null
     },
-    "perform": { },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "dynamicOutput": true
   } ],
   "triggers": null
 }

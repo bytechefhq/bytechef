@@ -42,6 +42,9 @@
       "title": "Bearer Token",
       "type": "BEARER_TOKEN",
       "acquire": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "refreshToken": null,
       "apply": { },
       "clientId": null,
       "pkce": null,
@@ -49,9 +52,6 @@
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
-      "refreshToken": null,
       "authorizationCallback": null
     } ],
     "properties": null,
@@ -62,7 +62,6 @@
   },
   "actions": [ {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Post a new message to a specific #channel you choose.",
     "help": null,
@@ -73,7 +72,6 @@
       "bodyContentType": "JSON"
     },
     "name": "sendChannelMessage",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -186,11 +184,11 @@
         } ],
         "controlType": "SELECT"
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Send channel message",
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -292,20 +290,21 @@
             } ],
             "controlType": "SELECT"
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
     "perform": null,
+    "output": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Create a new channel",
     "help": null,
@@ -316,7 +315,6 @@
       "bodyContentType": "JSON"
     },
     "name": "createChannel",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -410,14 +408,14 @@
           "label": "GUILD_CATEGORY",
           "value": 4
         } ],
-        "controlType": "SELECT",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "SELECT"
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Create channel",
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -491,8 +489,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "INTEGER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -514,26 +512,26 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
     "perform": null,
+    "output": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Send direct message guild member",
     "help": null,
     "metadata": null,
     "name": "sendDirectMessage",
-    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -626,7 +624,7 @@
       "controlType": "SELECT"
     } ],
     "title": "Send direct message",
-    "output": {
+    "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -682,15 +680,17 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
     },
+    "dynamicOutput": true,
     "perform": { },
+    "output": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   } ],
