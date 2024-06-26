@@ -58,11 +58,12 @@ public class DataMapperMapOneValueAction {
                     option("Date", 3),
                     option("Date Time", 4),
                     option("Integer", 5),
-                    option("Nullable", 6),
+//                    option("Nullable", 6),
                     option("Number", 7),
                     option("Object", 8),
                     option("String", 9),
-                    option("Time", 10)),
+                    option("Time", 10))
+                .required(true),
             array(VALUE)
                 .label("Value")
                 .description("The value you want to map.")
@@ -88,11 +89,11 @@ public class DataMapperMapOneValueAction {
                 .description("The value you want to map.")
                 .displayCondition("type == 5")
                 .required(true),
-            nullable(VALUE)
-                .label("Value")
-                .description("The value you want to map.")
-                .displayCondition("type == 6")
-                .required(true),
+//            nullable(VALUE)
+//                .label("Value")
+//                .description("The value you want to map.")
+//                .displayCondition("type == 6")
+//                .required(true),
             number(VALUE)
                 .label("Value")
                 .description("The value you want to map.")
@@ -140,11 +141,11 @@ public class DataMapperMapOneValueAction {
                 .description("If there is no existing mapping, assign this value a default mapping.")
                 .displayCondition("type == 5")
                 .required(true),
-            nullable(DEFAULT_VALUE)
-                .label("Default value")
-                .description("If there is no existing mapping, assign this value a default mapping.")
-                .displayCondition("type == 6")
-                .required(true),
+//            nullable(DEFAULT_VALUE)
+//                .label("Default value")
+//                .description("If there is no existing mapping, assign this value a default mapping.")
+//                .displayCondition("type == 6")
+//                .required(true),
             number(DEFAULT_VALUE)
                 .label("Default value")
                 .description("If there is no existing mapping, assign this value a default mapping.")
@@ -169,89 +170,120 @@ public class DataMapperMapOneValueAction {
                 .label("Mappings")
                 .description(
                     "The collection of \"mappings\" associated with a certain value. When the specified value matches the \"From\" value, the connector will provide the corresponding \"To\" value.")
+                .displayCondition("type == 1")
                 .items(
                     object().properties(
                         array(FROM)
                             .label("From")
-                            .displayCondition("type == 1")
-                            .required(true),
-                        bool(FROM)
-                            .label("From")
-                            .displayCondition("type == 2")
-                            .required(true),
-                        date(FROM)
-                            .label("From")
-                            .displayCondition("type == 3")
-                            .required(true),
-                        dateTime(FROM)
-                            .label("From")
-                            .displayCondition("type == 4")
-                            .required(true),
-                        integer(FROM)
-                            .label("From")
-                            .displayCondition("type == 5")
-                            .required(true),
-                        nullable(FROM)
-                            .label("From")
-                            .displayCondition("type == 6")
-                            .required(true),
-                        number(FROM)
-                            .label("From")
-                            .displayCondition("type == 7")
-                            .required(true),
-                        object(FROM)
-                            .label("From")
-                            .displayCondition("type == 8")
-                            .required(true),
-                        string(FROM)
-                            .label("From")
-                            .displayCondition("type == 9")
-                            .required(true),
-                        time(FROM)
-                            .label("From")
-                            .displayCondition("type == 10")
                             .required(true),
                         array(TO)
                             .label("To")
-                            .displayCondition("type == 1")
+                            .required(true))),
+            array(MAPPINGS)
+                .label("Mappings")
+                .description(
+                    "The collection of \"mappings\" associated with a certain value. When the specified value matches the \"From\" value, the connector will provide the corresponding \"To\" value.")
+                .displayCondition("type == 2")
+                .items(
+                    object().properties(
+                        bool(FROM)
+                            .label("From")
                             .required(true),
                         bool(TO)
                             .label("To")
-                            .displayCondition("type == 2")
+                            .required(true))),
+            array(MAPPINGS)
+                .label("Mappings")
+                .description(
+                    "The collection of \"mappings\" associated with a certain value. When the specified value matches the \"From\" value, the connector will provide the corresponding \"To\" value.")
+                .displayCondition("type == 3")
+                .items(
+                    object().properties(
+                        date(FROM)
+                            .label("From")
                             .required(true),
+
                         date(TO)
                             .label("To")
-                            .displayCondition("type == 3")
+                            .required(true))),
+            array(MAPPINGS)
+                .label("Mappings")
+                .description(
+                    "The collection of \"mappings\" associated with a certain value. When the specified value matches the \"From\" value, the connector will provide the corresponding \"To\" value.")
+                .displayCondition("type == 4")
+                .items(
+                    object().properties(
+                        dateTime(FROM)
+                            .label("From")
                             .required(true),
                         dateTime(TO)
                             .label("To")
-                            .displayCondition("type == 4")
+                            .required(true))),
+            array(MAPPINGS)
+                .label("Mappings")
+                .description(
+                    "The collection of \"mappings\" associated with a certain value. When the specified value matches the \"From\" value, the connector will provide the corresponding \"To\" value.")
+                .displayCondition("type == 5")
+                .items(
+                    object().properties(
+                        integer(FROM)
+                            .label("From")
                             .required(true),
                         integer(TO)
                             .label("To")
-                            .displayCondition("type == 5")
-                            .required(true),
-                        nullable(TO)
-                            .label("To")
-                            .displayCondition("type == 6")
+                            .required(true))),
+            array(MAPPINGS)
+                .label("Mappings")
+                .description(
+                    "The collection of \"mappings\" associated with a certain value. When the specified value matches the \"From\" value, the connector will provide the corresponding \"To\" value.")
+                .displayCondition("type == 7")
+                .items(
+                    object().properties(
+                        number(FROM)
+                            .label("From")
                             .required(true),
                         number(TO)
                             .label("To")
-                            .displayCondition("type == 7")
+                            .required(true))),
+            array(MAPPINGS)
+                .label("Mappings")
+                .description(
+                    "The collection of \"mappings\" associated with a certain value. When the specified value matches the \"From\" value, the connector will provide the corresponding \"To\" value.")
+                .displayCondition("type == 8")
+                .items(
+                    object().properties(
+                        object(FROM)
+                            .label("From")
                             .required(true),
                         object(TO)
                             .label("To")
-                            .displayCondition("type == 8")
+                            .required(true))),
+            array(MAPPINGS)
+                .label("Mappings")
+                .description(
+                    "The collection of \"mappings\" associated with a certain value. When the specified value matches the \"From\" value, the connector will provide the corresponding \"To\" value.")
+                .displayCondition("type == 9")
+                .items(
+                    object().properties(
+                        string(FROM)
+                            .label("From")
                             .required(true),
                         string(TO)
                             .label("To")
-                            .displayCondition("type == 9")
+                            .required(true))),
+            array(MAPPINGS)
+                .label("Mappings")
+                .description(
+                    "The collection of \"mappings\" associated with a certain value. When the specified value matches the \"From\" value, the connector will provide the corresponding \"To\" value.")
+                .displayCondition("type == 10")
+                .items(
+                    object().properties(
+                        time(FROM)
+                            .label("From")
                             .required(true),
                         time(TO)
                             .label("To")
-                            .displayCondition("type == 10")
-                            .required(true)))
-                .required(true))
+                            .required(true))))
         .output()
         .perform(DataMapperMapOneValueAction::perform);
 

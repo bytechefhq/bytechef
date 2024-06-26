@@ -22,16 +22,10 @@ import static com.bytechef.component.data.mapper.constant.DataMapperConstants.MA
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.TO;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.TYPE;
 import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.bool;
-import static com.bytechef.component.definition.ComponentDSL.date;
-import static com.bytechef.component.definition.ComponentDSL.dateTime;
 import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.nullable;
-import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.ComponentDSL.time;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL;
@@ -53,11 +47,13 @@ public class DataMapperMapValuesAction {
                 .description("The value type.")
                 .options(
                     option("Object", 1),
-                    option("Array", 2)),
+                    option("Array", 2))
+                .required(true),
             object(INPUT)
                 .label("Input")
                 .description("The object to map.")
-                .displayCondition("type == 1"),
+                .displayCondition("type == 1")
+                .required(true),
             array(INPUT)
                 .label("Input")
                 .description("The array of values to map.")
@@ -68,87 +64,12 @@ public class DataMapperMapValuesAction {
                 .description(
                     "The collection of of \"mappings\" where \"From\" refers to a particular key from the Input, while \"To\" represents the name of a new key that is assigned the corresponding value of the \"From\" key.")
                 .items(
-                    object().properties(
-                        array(FROM)
-                            .label("From")
-                            .displayCondition("type == 1")
-                            .required(true),
-                        bool(FROM)
-                            .label("From")
-                            .displayCondition("type == 2")
-                            .required(true),
-                        date(FROM)
-                            .label("From")
-                            .displayCondition("type == 3")
-                            .required(true),
-                        dateTime(FROM)
-                            .label("From")
-                            .displayCondition("type == 4")
-                            .required(true),
-                        integer(FROM)
-                            .label("From")
-                            .displayCondition("type == 5")
-                            .required(true),
-                        nullable(FROM)
-                            .label("From")
-                            .displayCondition("type == 6")
-                            .required(true),
-                        number(FROM)
-                            .label("From")
-                            .displayCondition("type == 7")
-                            .required(true),
-                        object(FROM)
-                            .label("From")
-                            .displayCondition("type == 8")
-                            .required(true),
-                        string(FROM)
-                            .label("From")
-                            .displayCondition("type == 9")
-                            .required(true),
-                        time(FROM)
-                            .label("From")
-                            .displayCondition("type == 10")
-                            .required(true),
-                        array(TO)
-                            .label("To")
-                            .displayCondition("type == 1")
-                            .required(true),
-                        bool(TO)
-                            .label("To")
-                            .displayCondition("type == 2")
-                            .required(true),
-                        date(TO)
-                            .label("To")
-                            .displayCondition("type == 3")
-                            .required(true),
-                        dateTime(TO)
-                            .label("To")
-                            .displayCondition("type == 4")
-                            .required(true),
-                        integer(TO)
-                            .label("To")
-                            .displayCondition("type == 5")
-                            .required(true),
-                        nullable(TO)
-                            .label("To")
-                            .displayCondition("type == 6")
-                            .required(true),
-                        number(TO)
-                            .label("To")
-                            .displayCondition("type == 7")
-                            .required(true),
-                        object(TO)
-                            .label("To")
-                            .displayCondition("type == 8")
-                            .required(true),
-                        string(TO)
-                            .label("To")
-                            .displayCondition("type == 9")
-                            .required(true),
-                        time(TO)
-                            .label("To")
-                            .displayCondition("type == 10")
-                            .required(true)))
+                    object()
+                        .properties(
+                            string(FROM)
+                                .label("From"),
+                            string(TO)
+                                .label("To")))
                 .required(true))
         .output()
         .perform(DataMapperMapValuesAction::perform);
