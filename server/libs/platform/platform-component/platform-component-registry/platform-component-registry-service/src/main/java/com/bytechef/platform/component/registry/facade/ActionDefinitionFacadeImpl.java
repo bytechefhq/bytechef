@@ -40,11 +40,15 @@ import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.exception.ErrorType;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.springframework.lang.NonNull;
@@ -56,6 +60,12 @@ import org.springframework.stereotype.Service;
  */
 @Service("actionDefinitionFacade")
 public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
+
+    private static final Cache<Long, ReentrantLock> REENTRANT_LOCK_CACHE =
+        Caffeine.newBuilder()
+            .expireAfterAccess(1, TimeUnit.MINUTES)
+            .maximumSize(100000)
+            .build();
 
     private final ConnectionService connectionService;
     private final ConnectionDefinitionService connectionDefinitionService;
@@ -294,8 +304,16 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
                     componentConnection.authorizationName(), componentConnection.getParameters(), actionContext);
             }
 
+            ReentrantLock reentrantLock = REENTRANT_LOCK_CACHE.get(
+                componentConnection.connectionId(), (key) -> new ReentrantLock(true));
+
+            reentrantLock.lock();
+
+            try {
                 connection = connectionService.updateConnectionParameters(
                     componentConnection.connectionId(), parameters);
+            } finally {
+                reentrantLock.unlock();
             }
         } catch (Exception e) {
             connectionService.updateConnectionCredentialStatus(

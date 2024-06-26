@@ -1,5 +1,6 @@
 dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
+    implementation("com.github.ben-manes.caffeine:caffeine")
     implementation(libs.com.github.mizosoft.methanol)
     implementation("org.apache.commons:commons-lang3")
     implementation("org.slf4j:slf4j-api")
