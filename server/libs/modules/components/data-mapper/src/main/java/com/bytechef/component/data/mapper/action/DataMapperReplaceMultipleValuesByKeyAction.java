@@ -33,8 +33,6 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition
 import com.bytechef.component.definition.Parameters;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -43,6 +41,9 @@ import java.util.stream.Collectors;
  * @author Ivica Cardic
  */
 public class DataMapperReplaceMultipleValuesByKeyAction {
+
+    private DataMapperReplaceMultipleValuesByKeyAction() {
+    }
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL.action("replaceMultipleValuesByKey")
         .title("Replace multiple values by key")
@@ -66,7 +67,8 @@ public class DataMapperReplaceMultipleValuesByKeyAction {
                         .properties(
                             string(FROM)
                                 .label("From Path")
-                                .description("Defines the input path of property key of the value you want to change. Dot notation."),
+                                .description(
+                                    "Defines the input path of property key of the value you want to change. Dot notation."),
                             string(TO)
                                 .label("To Path")
                                 .description(
@@ -78,7 +80,8 @@ public class DataMapperReplaceMultipleValuesByKeyAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         List<StringMapping> mappingList = inputParameters.getList(MAPPINGS, StringMapping.class, List.of());
-        Map<String, String> mappings = mappingList.stream().collect(Collectors.toMap(Mapping::getFrom, Mapping::getTo));
+        Map<String, String> mappings = mappingList.stream()
+            .collect(Collectors.toMap(Mapping::getFrom, Mapping::getTo));
 
         DocumentContext input = JsonPath.parse(inputParameters.get(INPUT));
         DocumentContext output = JsonPath.parse(inputParameters.get(OUTPUT));

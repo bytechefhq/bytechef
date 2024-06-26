@@ -35,7 +35,6 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.time;
 
 import com.bytechef.commons.util.ConvertUtils;
-import com.bytechef.commons.util.ExceptionUtils;
 import com.bytechef.component.data.mapper.util.DataMapperUtils;
 import com.bytechef.component.data.mapper.util.mapping.Mapping;
 import com.bytechef.component.data.mapper.util.mapping.ObjectMapping;
@@ -43,13 +42,15 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-
 import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
 public class DataMapperReplaceValueAction {
+
+    private DataMapperReplaceValueAction() {
+    }
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL.action("replaceValue")
         .title("Replace value")
@@ -290,8 +291,10 @@ public class DataMapperReplaceValueAction {
         List<ObjectMapping> mappingList = inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of());
 
         for (Mapping<Object, Object> mapping : mappingList) {
-            if(ConvertUtils.canConvert(mapping.getFrom(), type)) {
-                if(ConvertUtils.convertValue(mapping.getFrom(), type).equals(inputParameters.get(VALUE, type))) return ConvertUtils.convertValue(mapping.getTo(), type);
+            if (ConvertUtils.canConvert(mapping.getFrom(), type)) {
+                if (ConvertUtils.convertValue(mapping.getFrom(), type)
+                    .equals(inputParameters.get(VALUE, type)))
+                    return ConvertUtils.convertValue(mapping.getTo(), type);
             }
         }
 
