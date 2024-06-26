@@ -12,6 +12,7 @@
   "resources": null,
   "version": 1,
   "title": "Object Helper",
+  "connection": null,
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -44,8 +45,8 @@
     } ],
     "title": "Convert from JSON string",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -126,9 +127,8 @@
     } ],
     "title": "Convert to JSON string",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   } ],
-  "triggers": null,
-  "connection": null
+  "triggers": null
 }

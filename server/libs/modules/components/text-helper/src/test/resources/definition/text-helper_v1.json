@@ -12,6 +12,7 @@
   "resources": null,
   "version": 1,
   "title": "Text Helper",
+  "connection": null,
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -143,6 +144,5 @@
     "output": null,
     "perform": { }
   } ],
-  "triggers": null,
-  "connection": null
+  "triggers": null
 }

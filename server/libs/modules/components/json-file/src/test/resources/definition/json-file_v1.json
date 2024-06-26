@@ -12,6 +12,7 @@
   "resources": null,
   "version": 1,
   "title": "JSON File",
+  "connection": null,
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -462,6 +463,5 @@
     },
     "perform": { }
   } ],
-  "connection": null,
   "triggers": null
 }
