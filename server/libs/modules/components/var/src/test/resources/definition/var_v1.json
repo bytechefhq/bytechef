@@ -12,6 +12,7 @@
   "resources": null,
   "version": 1,
   "title": "Var",
+  "connection": null,
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -192,7 +193,7 @@
       "exampleValue": null,
       "label": "Value",
       "placeholder": null,
-      "controlType": null
+      "controlType": "NULL"
     }, {
       "advancedOption": null,
       "description": "Value of any type to set.",
@@ -341,7 +342,7 @@
         "exampleValue": null,
         "label": null,
         "placeholder": null,
-        "controlType": null
+        "controlType": "NULL"
       }, {
         "advancedOption": null,
         "description": null,
@@ -467,9 +468,8 @@
     } ],
     "title": "Set value",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   } ],
-  "triggers": null,
-  "connection": null
+  "triggers": null
 }

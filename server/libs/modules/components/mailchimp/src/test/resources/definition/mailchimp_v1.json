@@ -12,6 +12,74 @@
   "resources": null,
   "version": 1,
   "title": "Mailchimp",
+  "connection": {
+    "authorizations": [ {
+      "detectOn": null,
+      "description": null,
+      "name": "oauth2_authorization_code",
+      "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "clientId",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Client Id",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "clientSecret",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Client Secret",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
+      "refreshOn": null,
+      "title": "OAuth2 Authorization Code",
+      "type": "OAUTH2_AUTHORIZATION_CODE",
+      "acquire": null,
+      "authorizationUrl": { },
+      "clientSecret": null,
+      "refreshToken": null,
+      "apply": null,
+      "clientId": null,
+      "pkce": null,
+      "refresh": null,
+      "refreshUrl": null,
+      "scopes": null,
+      "tokenUrl": { },
+      "authorizationCallback": null
+    } ],
+    "properties": null,
+    "version": 1,
+    "authorizationRequired": null,
+    "baseUri": { },
+    "test": null
+  },
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -584,6 +652,7 @@
     } ],
     "title": "Add a new member to the list",
     "workflowNodeDescriptionFunction": null,
+    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1869,43 +1938,26 @@
         "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": {
-        "_links": [ {
-          "href": "string",
-          "rel": "string",
-          "method": "GET",
-          "targetSchema": "string",
-          "schema": "string"
-        } ],
-        "web_id": 0,
-        "member_rating": 0,
-        "vip": true,
-        "last_changed": "2019-08-24T14:15:22",
-        "source": "string",
-        "consents_to_one_to_one_messaging": true,
-        "email_client": "string",
-        "unique_email_id": "string",
-        "tags_count": 0,
-        "list_id": "string",
         "full_name": "string",
         "merge_fields": {
           "property1": "",
           "property2": ""
         },
         "stats": {
+          "avg_click_rate": 0,
           "avg_open_rate": 0,
           "ecommerce_data": {
-            "currency_code": "USD",
             "total_revenue": 0,
-            "number_of_orders": 0
-          },
-          "avg_click_rate": 0
+            "number_of_orders": 0,
+            "currency_code": "USD"
+          }
         },
         "contact_id": "string",
         "last_note": {
-          "note_id": 0,
-          "created_at": "2019-08-24T14:15:22",
           "note": "string",
-          "created_by": "string"
+          "created_by": "string",
+          "note_id": 0,
+          "created_at": "2019-08-24T14:15:22"
         },
         "email_address": "string",
         "status": "subscribed",
@@ -1913,18 +1965,18 @@
         "timestamp_opt": "2019-08-24T14:15:22",
         "ip_opt": "string",
         "location": {
-          "dstoff": 0,
-          "timezone": "string",
-          "country_code": "string",
           "gmtoff": 0,
           "longitude": 0,
           "region": "string",
-          "latitude": 0
+          "latitude": 0,
+          "dstoff": 0,
+          "timezone": "string",
+          "country_code": "string"
         },
         "ip_signup": "string",
         "tags": [ {
-          "name": "string",
-          "id": 0
+          "id": 0,
+          "name": "string"
         } ],
         "marketing_permissions": [ {
           "text": "string",
@@ -1938,10 +1990,26 @@
           "property2": true
         },
         "timestamp_signup": "2019-08-24T14:15:22",
-        "id": "string"
+        "id": "string",
+        "_links": [ {
+          "method": "GET",
+          "targetSchema": "string",
+          "schema": "string",
+          "href": "string",
+          "rel": "string"
+        } ],
+        "web_id": 0,
+        "member_rating": 0,
+        "vip": true,
+        "last_changed": "2019-08-24T14:15:22",
+        "source": "string",
+        "consents_to_one_to_one_messaging": true,
+        "email_client": "string",
+        "unique_email_id": "string",
+        "tags_count": 0,
+        "list_id": "string"
       }
-    },
-    "perform": null
+    }
   } ],
   "triggers": [ {
     "batch": null,
@@ -1981,6 +2049,11 @@
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
+    "listenerDisable": null,
+    "listenerEnable": null,
+    "webhookValidate": null,
+    "deduplicate": null,
+    "poll": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2282,83 +2355,10 @@
       },
       "sampleOutput": null
     },
-    "poll": null,
-    "deduplicate": null,
     "dynamicWebhookDisable": { },
     "dynamicWebhookEnable": { },
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": { },
-    "listenerDisable": null,
-    "listenerEnable": null,
-    "staticWebhookRequest": null,
-    "webhookValidate": null
-  } ],
-  "connection": {
-    "authorizations": [ {
-      "detectOn": null,
-      "description": null,
-      "name": "oauth2_authorization_code",
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "clientId",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Client Id",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "clientSecret",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Client Secret",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      } ],
-      "refreshOn": null,
-      "title": "OAuth2 Authorization Code",
-      "type": "OAUTH2_AUTHORIZATION_CODE",
-      "acquire": null,
-      "apply": null,
-      "authorizationCallback": null,
-      "authorizationUrl": { },
-      "clientId": null,
-      "clientSecret": null,
-      "pkce": null,
-      "refresh": null,
-      "refreshUrl": null,
-      "scopes": null,
-      "refreshToken": null,
-      "tokenUrl": { }
-    } ],
-    "properties": null,
-    "version": 1,
-    "authorizationRequired": null,
-    "baseUri": { },
-    "test": null
-  }
+    "staticWebhookRequest": null
+  } ]
 }

@@ -134,7 +134,7 @@
         "exampleValue": null,
         "label": null,
         "placeholder": null,
-        "controlType": null
+        "controlType": "NULL"
       }, {
         "advancedOption": null,
         "description": null,
@@ -243,8 +243,8 @@
     } ],
     "title": "JavaScript",
     "perform": { },
-    "outputFunction": null,
-    "defaultOutputFunction": true
+    "defaultOutputFunction": true,
+    "outputFunction": null
   }, {
     "batch": null,
     "deprecated": null,
@@ -380,7 +380,7 @@
         "exampleValue": null,
         "label": null,
         "placeholder": null,
-        "controlType": null
+        "controlType": "NULL"
       }, {
         "advancedOption": null,
         "description": null,
@@ -489,8 +489,8 @@
     } ],
     "title": "Python",
     "perform": { },
-    "outputFunction": null,
-    "defaultOutputFunction": true
+    "defaultOutputFunction": true,
+    "outputFunction": null
   }, {
     "batch": null,
     "deprecated": null,
@@ -626,7 +626,7 @@
         "exampleValue": null,
         "label": null,
         "placeholder": null,
-        "controlType": null
+        "controlType": "NULL"
       }, {
         "advancedOption": null,
         "description": null,
@@ -735,8 +735,8 @@
     } ],
     "title": "Ruby",
     "perform": { },
-    "outputFunction": null,
-    "defaultOutputFunction": true
+    "defaultOutputFunction": true,
+    "outputFunction": null
   } ],
   "categories": [ "HELPERS", "DEVELOPER_TOOLS" ],
   "connection": null,

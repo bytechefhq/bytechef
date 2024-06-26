@@ -132,8 +132,8 @@
     } ],
     "title": "Create document",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -246,8 +246,8 @@
     } ],
     "title": "Edit template file",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -280,8 +280,8 @@
     } ],
     "title": "Read document",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   } ],
   "triggers": null
 }

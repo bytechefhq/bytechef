@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
  * @author Monika Domiter
  */
 public class AITableComponentHandlerTest {
+
     @Test
     public void testGetDefinition() {
         JsonFileAssert.assertEquals("definition/aitable_v1.json", new AITableComponentHandler().getDefinition());

@@ -62,7 +62,6 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "authorizationCallback": null,
       "authorizationUrl": { },
       "clientSecret": null,
       "refreshToken": null,
@@ -72,7 +71,8 @@
       "refresh": null,
       "refreshUrl": { },
       "scopes": { },
-      "tokenUrl": { }
+      "tokenUrl": { },
+      "authorizationCallback": null
     } ],
     "properties": null,
     "version": 1,
@@ -211,6 +211,7 @@
     } ],
     "title": "Upload file",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -294,12 +295,11 @@
         "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": {
-        "mimeType": "plain/text",
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+        "mimeType": "plain/text",
         "name": "new-file.txt"
       }
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -335,6 +335,7 @@
     } ],
     "title": "Read file",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -434,8 +435,7 @@
         "controlType": "FILE_ENTRY"
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -491,6 +491,7 @@
     } ],
     "title": "Create new folder",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -574,12 +575,11 @@
         "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": {
-        "mimeType": "plain/text",
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+        "mimeType": "plain/text",
         "name": "new-file.txt"
       }
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -687,6 +687,7 @@
     } ],
     "title": "Create new text file",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -770,12 +771,11 @@
         "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": {
-        "mimeType": "plain/text",
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+        "mimeType": "plain/text",
         "name": "new-file.txt"
       }
-    },
-    "perform": { }
+    }
   } ],
   "triggers": null
 }

@@ -12,6 +12,7 @@
   "resources": null,
   "version": 1,
   "title": "Data Mapper",
+  "connection": null,
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -915,7 +916,7 @@
       "exampleValue": null,
       "label": "Value",
       "placeholder": null,
-      "controlType": null
+      "controlType": "NULL"
     }, {
       "advancedOption": null,
       "description": "The value you want to map.",
@@ -1064,7 +1065,7 @@
         "exampleValue": null,
         "label": null,
         "placeholder": null,
-        "controlType": null
+        "controlType": "NULL"
       }, {
         "advancedOption": null,
         "description": null,
@@ -1299,7 +1300,7 @@
       "exampleValue": null,
       "label": "Default value",
       "placeholder": null,
-      "controlType": null
+      "controlType": "NULL"
     }, {
       "advancedOption": null,
       "description": "If there is no existing mapping, assign this value a default mapping.",
@@ -1522,7 +1523,7 @@
           "exampleValue": null,
           "label": "From",
           "placeholder": null,
-          "controlType": null
+          "controlType": "NULL"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1714,7 +1715,7 @@
           "exampleValue": null,
           "label": "To",
           "placeholder": null,
-          "controlType": null
+          "controlType": "NULL"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2029,7 +2030,7 @@
           "exampleValue": null,
           "label": "From",
           "placeholder": null,
-          "controlType": null
+          "controlType": "NULL"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2221,7 +2222,7 @@
           "exampleValue": null,
           "label": "To",
           "placeholder": null,
-          "controlType": null
+          "controlType": "NULL"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2317,6 +2318,5 @@
     "output": null,
     "perform": { }
   } ],
-  "triggers": null,
-  "connection": null
+  "triggers": null
 }

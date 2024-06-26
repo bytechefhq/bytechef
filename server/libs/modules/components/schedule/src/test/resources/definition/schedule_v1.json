@@ -39,8 +39,8 @@
       "maxValue": 23,
       "minValue": 0,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "The minute at which a workflow will be triggered.",
@@ -58,8 +58,8 @@
       "maxValue": 59,
       "minValue": 0,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "Days at which a workflow will be triggered.",
@@ -246,8 +246,8 @@
         } ],
         "controlType": "SELECT"
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The timezone at which the cron expression will be scheduled.",
@@ -383,6 +383,16 @@
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
+    "dynamicWebhookDisable": null,
+    "dynamicWebhookEnable": null,
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": null,
+    "staticWebhookRequest": null,
+    "listenerDisable": { },
+    "listenerEnable": { },
+    "webhookValidate": null,
+    "deduplicate": null,
+    "poll": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -438,8 +448,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -457,8 +467,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -645,8 +655,8 @@
             } ],
             "controlType": "SELECT"
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -668,21 +678,11 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    },
-    "deduplicate": null,
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
-    "listenerDisable": { },
-    "listenerEnable": { },
-    "poll": null,
-    "staticWebhookRequest": null,
-    "webhookValidate": null
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -708,8 +708,8 @@
       "maxValue": 23,
       "minValue": 0,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "The minute at which a workflow will be triggered.",
@@ -727,8 +727,8 @@
       "maxValue": 59,
       "minValue": 0,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "Days at which a workflow will be triggered.",
@@ -774,8 +774,8 @@
         "label": "Sunday",
         "value": 7
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The timezone at which the cron expression will be scheduled.",
@@ -911,6 +911,16 @@
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
+    "dynamicWebhookDisable": null,
+    "dynamicWebhookEnable": null,
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": null,
+    "staticWebhookRequest": null,
+    "listenerDisable": { },
+    "listenerEnable": { },
+    "webhookValidate": null,
+    "deduplicate": null,
+    "poll": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -966,8 +976,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -985,8 +995,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1004,8 +1014,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1027,21 +1037,11 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    },
-    "deduplicate": null,
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
-    "listenerDisable": { },
-    "listenerEnable": { },
-    "poll": null,
-    "staticWebhookRequest": null,
-    "webhookValidate": null
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -1067,8 +1067,8 @@
       "maxValue": 23,
       "minValue": 0,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "The minute at which a workflow will be triggered.",
@@ -1086,8 +1086,8 @@
       "maxValue": 59,
       "minValue": 0,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "The day of the month  at which a workflow will be triggered.",
@@ -1105,8 +1105,8 @@
       "maxValue": 31,
       "minValue": 1,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "The timezone at which the cron expression will be scheduled.",
@@ -1242,6 +1242,16 @@
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
+    "dynamicWebhookDisable": null,
+    "dynamicWebhookEnable": null,
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": null,
+    "staticWebhookRequest": null,
+    "listenerDisable": { },
+    "listenerEnable": { },
+    "webhookValidate": null,
+    "deduplicate": null,
+    "poll": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1297,8 +1307,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1316,8 +1326,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1335,8 +1345,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1358,21 +1368,11 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    },
-    "deduplicate": null,
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
-    "listenerDisable": { },
-    "listenerEnable": { },
-    "poll": null,
-    "staticWebhookRequest": null,
-    "webhookValidate": null
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -1398,8 +1398,8 @@
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "Days at which a workflow will be triggered.",
@@ -1433,8 +1433,8 @@
         "label": "Month",
         "value": 4
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     } ],
     "title": "Interval",
     "type": "LISTENER",
@@ -1442,6 +1442,16 @@
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
+    "dynamicWebhookDisable": null,
+    "dynamicWebhookEnable": null,
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": null,
+    "staticWebhookRequest": null,
+    "listenerDisable": { },
+    "listenerEnable": { },
+    "webhookValidate": null,
+    "deduplicate": null,
+    "poll": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1497,8 +1507,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1516,24 +1526,14 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    },
-    "deduplicate": null,
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
-    "listenerDisable": { },
-    "listenerEnable": { },
-    "poll": null,
-    "staticWebhookRequest": null,
-    "webhookValidate": null
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -1697,6 +1697,16 @@
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
+    "dynamicWebhookDisable": null,
+    "dynamicWebhookEnable": null,
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": null,
+    "staticWebhookRequest": null,
+    "listenerDisable": { },
+    "listenerEnable": { },
+    "webhookValidate": null,
+    "deduplicate": null,
+    "poll": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1776,20 +1786,10 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    },
-    "deduplicate": null,
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
-    "listenerDisable": { },
-    "listenerEnable": { },
-    "poll": null,
-    "staticWebhookRequest": null,
-    "webhookValidate": null
+    }
   } ]
 }
