@@ -18,17 +18,22 @@ package com.bytechef.component.data.mapper.action;
 
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.FROM;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INPUT;
+import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INPUT_TYPE;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.MAPPINGS;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.TO;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.TYPE;
-import static com.bytechef.component.data.mapper.constant.DataMapperConstants.VALUE_TYPE_FROM;
-import static com.bytechef.component.data.mapper.constant.DataMapperConstants.VALUE_TYPE_TO;
+import static com.bytechef.component.data.mapper.util.DataMapperUtils.FROM_DESCRIPTION;
+import static com.bytechef.component.data.mapper.util.DataMapperUtils.LABEL_FROM;
+import static com.bytechef.component.data.mapper.util.DataMapperUtils.LABEL_TO;
+import static com.bytechef.component.data.mapper.util.DataMapperUtils.MAPPINGS_DESCRIPTION;
+import static com.bytechef.component.data.mapper.util.DataMapperUtils.MAPPINGS_LABEL;
+import static com.bytechef.component.data.mapper.util.DataMapperUtils.TO_DESCRIPTION;
+import static com.bytechef.component.data.mapper.util.DataMapperUtils.getDisplayCondition;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.date;
 import static com.bytechef.component.definition.ComponentDSL.dateTime;
 import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.nullable;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
@@ -37,7 +42,6 @@ import static com.bytechef.component.definition.ComponentDSL.time;
 
 import com.bytechef.component.data.mapper.util.mapping.Mapping;
 import com.bytechef.component.data.mapper.util.mapping.ObjectMapping;
-import com.bytechef.component.data.mapper.util.mapping.ObjectTypeMapping;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -60,8 +64,8 @@ public class DataMapperReplaceAllSpecifiedValuesAction {
         .description(
             "Goes through all object parameters and replaces all specified input parameter values.")
         .properties(
-            integer(TYPE)
-                .label("Type")
+            integer(INPUT_TYPE)
+                .label("Input type")
                 .description("The input type.")
                 .options(
                     option("Object", 1),
@@ -70,15 +74,15 @@ public class DataMapperReplaceAllSpecifiedValuesAction {
             object(INPUT)
                 .label("Input")
                 .description("An object containing one or more properties.")
-                .displayCondition("type == 1")
+                .displayCondition("inputType == 1")
                 .required(true),
             array(INPUT)
                 .label("Input")
                 .description("An array containing one or more objects.")
-                .displayCondition("type == 2")
+                .displayCondition("inputType == 2")
                 .items(object())
                 .required(true),
-            integer(VALUE_TYPE_FROM)
+            integer(TYPE)
                 .label("Value type From")
                 .description("The value type of 'from' property value.")
                 .required(true)
@@ -94,129 +98,133 @@ public class DataMapperReplaceAllSpecifiedValuesAction {
                     option("String", 9),
                     option("Time", 10))
                 .required(true),
-            integer(VALUE_TYPE_TO)
-                .label("Value type To")
-                .description("The value type of 'to' property value.")
-                .required(true)
-                .options(
-                    option("Array", 1),
-                    option("Boolean", 2),
-                    option("Date", 3),
-                    option("Date Time", 4),
-                    option("Integer", 5),
-                    option("Nullable", 6),
-                    option("Number", 7),
-                    option("Object", 8),
-                    option("String", 9),
-                    option("Time", 10))
-                .required(true),
             array(MAPPINGS)
-                .label("Mappings")
-                .description(
-                    "Object that contains properties 'from' and 'to'.")
+                .label(MAPPINGS_LABEL)
+                .description(MAPPINGS_DESCRIPTION)
+                .displayCondition(getDisplayCondition("1"))
                 .items(
                     object().properties(
                         array(FROM)
-                            .label("Value from")
-                            .description("Defines the property value you want to change.")
-                            .displayCondition("valueTypeFrom == 1")
-                            .required(true),
-                        bool(FROM)
-                            .label("Value from")
-                            .description("Defines the property value you want to change.")
-                            .displayCondition("valueTypeFrom == 2")
-                            .required(true),
-                        date(FROM)
-                            .label("Value from")
-                            .description("Defines the property value you want to change.")
-                            .displayCondition("valueTypeFrom == 3")
-                            .required(true),
-                        dateTime(FROM)
-                            .label("Value from")
-                            .description("Defines the property value you want to change.")
-                            .displayCondition("valueTypeFrom == 4")
-                            .required(true),
-                        integer(FROM)
-                            .label("Value from")
-                            .description("Defines the property value you want to change.")
-                            .displayCondition("valueTypeFrom == 5")
-                            .required(true),
-                        nullable(FROM)
-                            .label("Value from")
-                            .description("Defines the property value you want to change.")
-                            .displayCondition("valueTypeFrom == 6")
-                            .required(true),
-                        number(FROM)
-                            .label("Value from")
-                            .description("Defines the property value you want to change.")
-                            .displayCondition("valueTypeFrom == 7")
-                            .required(true),
-                        object(FROM)
-                            .label("Value from")
-                            .description("Defines the property value you want to change.")
-                            .displayCondition("valueTypeFrom == 8")
-                            .required(true),
-                        string(FROM)
-                            .label("Value from")
-                            .description("Defines the property value you want to change.")
-                            .displayCondition("valueTypeFrom == 9")
-                            .required(true),
-                        time(FROM)
-                            .label("Value from")
-                            .description("Defines the property value you want to change.")
-                            .displayCondition("valueTypeFrom == 10")
+                            .label(LABEL_FROM)
+                            .description(FROM_DESCRIPTION)
                             .required(true),
                         array(TO)
-                            .label("Value to")
-                            .description("Defines what you want to change the property value to.")
-                            .displayCondition("valueTypeTo == 1")
+                            .label(LABEL_TO)
+                            .description(TO_DESCRIPTION)
+                            .required(true))),
+            array(MAPPINGS)
+                .label(MAPPINGS_LABEL)
+                .description(MAPPINGS_DESCRIPTION)
+                .displayCondition(getDisplayCondition("2"))
+                .items(
+                    object().properties(
+                        bool(FROM)
+                            .label(LABEL_FROM)
+                            .description(FROM_DESCRIPTION)
                             .required(true),
                         bool(TO)
-                            .label("Value to")
-                            .description("Defines what you want to change the property value to.")
-                            .displayCondition("valueTypeTo == 2")
+                            .label(LABEL_TO)
+                            .description(TO_DESCRIPTION)
+                            .required(true))),
+            array(MAPPINGS)
+                .label(MAPPINGS_LABEL)
+                .description(MAPPINGS_DESCRIPTION)
+                .displayCondition(getDisplayCondition("3"))
+                .items(
+                    object().properties(
+                        date(FROM)
+                            .label(LABEL_FROM)
+                            .description(FROM_DESCRIPTION)
                             .required(true),
+
                         date(TO)
-                            .label("Value to")
-                            .description("Defines what you want to change the property value to.")
-                            .displayCondition("valueTypeTo == 3")
+                            .label(LABEL_TO)
+                            .description(TO_DESCRIPTION)
+                            .required(true))),
+            array(MAPPINGS)
+                .label(MAPPINGS_LABEL)
+                .description(MAPPINGS_DESCRIPTION)
+                .displayCondition(getDisplayCondition("4"))
+                .items(
+                    object().properties(
+                        dateTime(FROM)
+                            .label(LABEL_FROM)
+                            .description(FROM_DESCRIPTION)
                             .required(true),
                         dateTime(TO)
-                            .label("Value to")
-                            .description("Defines what you want to change the property value to.")
-                            .displayCondition("valueTypeTo == 4")
+                            .label(LABEL_TO)
+                            .description(TO_DESCRIPTION)
+                            .required(true))),
+            array(MAPPINGS)
+                .label(MAPPINGS_LABEL)
+                .description(MAPPINGS_DESCRIPTION)
+                .displayCondition(getDisplayCondition("5"))
+                .items(
+                    object().properties(
+                        integer(FROM)
+                            .label(LABEL_FROM)
+                            .description(FROM_DESCRIPTION)
                             .required(true),
                         integer(TO)
-                            .label("Value to")
-                            .description("Defines what you want to change the property value to.")
-                            .displayCondition("valueTypeTo == 5")
-                            .required(true),
-                        nullable(TO)
-                            .label("Value to")
-                            .description("Defines what you want to change the property value to.")
-                            .displayCondition("valueTypeTo == 6")
+                            .label(LABEL_TO)
+                            .description(TO_DESCRIPTION)
+                            .required(true))),
+            array(MAPPINGS)
+                .label(MAPPINGS_LABEL)
+                .description(MAPPINGS_DESCRIPTION)
+                .displayCondition(getDisplayCondition("7"))
+                .items(
+                    object().properties(
+                        number(FROM)
+                            .label(LABEL_FROM)
+                            .description(FROM_DESCRIPTION)
                             .required(true),
                         number(TO)
-                            .label("Value to")
-                            .description("Defines what you want to change the property value to.")
-                            .displayCondition("valueTypeTo == 7")
+                            .label(LABEL_TO)
+                            .description(TO_DESCRIPTION)
+                            .required(true))),
+            array(MAPPINGS)
+                .label(MAPPINGS_LABEL)
+                .description(MAPPINGS_DESCRIPTION)
+                .displayCondition(getDisplayCondition("8"))
+                .items(
+                    object().properties(
+                        object(FROM)
+                            .label(LABEL_FROM)
+                            .description(FROM_DESCRIPTION)
                             .required(true),
                         object(TO)
-                            .label("Value to")
-                            .description("Defines what you want to change the property value to.")
-                            .displayCondition("valueTypeTo == 8")
+                            .label(LABEL_TO)
+                            .description(TO_DESCRIPTION)
+                            .required(true))),
+            array(MAPPINGS)
+                .label(MAPPINGS_LABEL)
+                .description(MAPPINGS_DESCRIPTION)
+                .displayCondition(getDisplayCondition("9"))
+                .items(
+                    object().properties(
+                        string(FROM)
+                            .label(LABEL_FROM)
+                            .description(FROM_DESCRIPTION)
                             .required(true),
                         string(TO)
-                            .label("Value to")
-                            .description("Defines what you want to change the property value to.")
-                            .displayCondition("valueTypeTo == 9")
+                            .label(LABEL_TO)
+                            .description(TO_DESCRIPTION)
+                            .required(true))),
+            array(MAPPINGS)
+                .label(MAPPINGS_LABEL)
+                .description(MAPPINGS_DESCRIPTION)
+                .displayCondition(getDisplayCondition("10"))
+                .items(
+                    object().properties(
+                        time(FROM)
+                            .label(LABEL_FROM)
+                            .description(FROM_DESCRIPTION)
                             .required(true),
                         time(TO)
-                            .label("Value to")
-                            .description("Defines what you want to change the property value to.")
-                            .displayCondition("valueTypeTo == 10")
-                            .required(true)))
-                .required(true))
+                            .label(LABEL_TO)
+                            .description(TO_DESCRIPTION)
+                            .required(true))))
         .output()
         .perform(DataMapperReplaceAllSpecifiedValuesAction::perform);
 
@@ -228,7 +236,7 @@ public class DataMapperReplaceAllSpecifiedValuesAction {
             .collect(Collectors.toMap(Mapping::getFrom, Mapping::getTo));
 
         Map<String, Object> output = new HashMap<>();
-        if (inputParameters.getInteger(TYPE)
+        if (inputParameters.getInteger(INPUT_TYPE)
             .equals(1)) {
             Map<String, Object> input = inputParameters.getMap(INPUT, Object.class, Map.of());
 

@@ -78,6 +78,7 @@ public class DataMapperRenameKeysAction {
 
         DocumentContext input = JsonPath.parse(inputParameters.get(INPUT));
         for (Map.Entry<String, String> entry : mappings.entrySet()) {
+
             String[] split = entry.getKey()
                 .split("\\.(?=[^\\.]+$)");
             if (split.length > 1)

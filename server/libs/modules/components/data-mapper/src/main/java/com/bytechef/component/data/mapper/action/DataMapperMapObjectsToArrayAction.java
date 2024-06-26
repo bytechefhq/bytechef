@@ -18,7 +18,7 @@ package com.bytechef.component.data.mapper.action;
 
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.FIELD_KEY;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INPUT;
-import static com.bytechef.component.data.mapper.constant.DataMapperConstants.TYPE;
+import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INPUT_TYPE;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.VALUE_KEY;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.integer;
@@ -47,8 +47,8 @@ public class DataMapperMapObjectsToArrayAction {
         .title("Map objects to array")
         .description("Transform an object or array of objects into an array of key-value pairs.")
         .properties(
-            integer(TYPE)
-                .label("Type")
+            integer(INPUT_TYPE)
+                .label("Input type")
                 .description("Type of the input. Cam be an object or an array of objects.")
                 .options(
                     option("Object", 1),
@@ -57,12 +57,12 @@ public class DataMapperMapObjectsToArrayAction {
             object(INPUT)
                 .label("Input")
                 .description("An input object containing one or more properties.")
-                .displayCondition("type == 1")
+                .displayCondition("inputType == 1")
                 .required(true),
             array(INPUT)
                 .label("Input")
                 .description("An input array containing one or more objects.")
-                .displayCondition("type == 2")
+                .displayCondition("inputType == 2")
                 .items(object())
                 .required(true),
             string(FIELD_KEY)
@@ -82,7 +82,7 @@ public class DataMapperMapObjectsToArrayAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         List<Map<String, Object>> output = new ArrayList<>();
 
-        if (inputParameters.getInteger(TYPE)
+        if (inputParameters.getInteger(INPUT_TYPE)
             .equals(1)) {
             Map<String, Object> input = inputParameters.getMap(INPUT, Object.class, Map.of());
 
