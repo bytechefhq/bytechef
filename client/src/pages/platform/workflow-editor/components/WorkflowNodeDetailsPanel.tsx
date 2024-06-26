@@ -168,9 +168,9 @@ const WorkflowNodeDetailsPanel = ({
 
     const hasOutputData =
         currentActionDefinition?.outputDefined ||
-        currentActionDefinition?.outputFunctionDefined ||
+        currentActionDefinition?.dynamicOutput ||
         currentTriggerDefinition?.outputDefined ||
-        currentTriggerDefinition?.outputFunctionDefined;
+        currentTriggerDefinition?.dynamicOutput;
 
     const {data: workflowNodeOutput, refetch: refetchWorkflowNodeOutput} = useGetWorkflowNodeOutputQuery(
         {
@@ -404,7 +404,7 @@ const WorkflowNodeDetailsPanel = ({
     }, [
         activeTab,
         currentActionDefinition?.outputDefined,
-        currentActionDefinition?.outputFunctionDefined,
+        currentActionDefinition?.dynamicOutput,
         currentActionFetched,
         currentOperationProperties?.length,
         currentComponentDefinition?.name,

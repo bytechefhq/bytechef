@@ -28,9 +28,9 @@ const DataPillPanel = ({
                   (workflowNodeOutput) =>
                       workflowNodeOutput.workflowNodeName !== currentNode?.name &&
                       (workflowNodeOutput.actionDefinition?.outputDefined ||
-                          workflowNodeOutput.actionDefinition?.outputFunctionDefined ||
+                          workflowNodeOutput.actionDefinition?.dynamicOutput ||
                           workflowNodeOutput.triggerDefinition?.outputDefined ||
-                          workflowNodeOutput.triggerDefinition?.outputFunctionDefined)
+                          workflowNodeOutput.triggerDefinition?.dynamicOutput)
               )
               .map(
                   (workflowNodeOutput) =>
