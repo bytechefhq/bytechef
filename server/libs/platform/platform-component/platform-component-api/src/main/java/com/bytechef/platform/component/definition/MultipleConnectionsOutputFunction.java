@@ -18,7 +18,7 @@ package com.bytechef.platform.component.definition;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.Output;
+import com.bytechef.component.definition.OutputResponse;
 import com.bytechef.component.definition.Parameters;
 import java.util.Map;
 
@@ -36,7 +36,7 @@ public interface MultipleConnectionsOutputFunction extends ActionDefinition.Outp
      * @return
      * @throws Exception
      */
-    Output apply(
+    OutputResponse apply(
         Parameters inputParameters, Map<String, ? extends ParameterConnection> parameterConnections,
         ActionContext context) throws Exception;
 }

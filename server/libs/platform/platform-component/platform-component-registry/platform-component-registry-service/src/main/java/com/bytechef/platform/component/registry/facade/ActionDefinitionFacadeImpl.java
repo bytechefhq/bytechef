@@ -216,6 +216,10 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         try {
             return function.apply(componentConnection, actionContext);
         } catch (Exception exception) {
+            if (componentConnection == null) {
+                throw exception;
+            }
+
             List<Object> refreshOn = connectionDefinitionService.getAuthorizationRefreshOn(
                 componentName, componentConnection.version(), componentConnection.authorizationName());
 

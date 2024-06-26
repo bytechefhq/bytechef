@@ -117,7 +117,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             workflowNodeType.componentName(), workflowNodeType.componentVersion(),
             workflowNodeType.componentOperationName());
 
-        if (triggerDefinition.isOutputFunctionDefined()) {
+        if (triggerDefinition.isDynamicOutput()) {
             Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
 
             Output output = triggerDefinitionFacade.executeOutput(
@@ -151,7 +151,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         Map<String, ?> inputParameters = workflowTask.evaluateParameters(
             MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs));
 
-        if (actionDefinition.isOutputFunctionDefined()) {
+        if (actionDefinition.isDynamicOutput()) {
             Output output = actionDefinitionFacade.executeOutput(
                 workflowNodeType.componentName(), workflowNodeType.componentVersion(),
                 workflowNodeType.componentOperationName(), inputParameters, connectionIds);

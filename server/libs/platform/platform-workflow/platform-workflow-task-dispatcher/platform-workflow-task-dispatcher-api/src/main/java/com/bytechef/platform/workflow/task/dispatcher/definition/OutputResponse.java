@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.definition;
+package com.bytechef.platform.workflow.task.dispatcher.definition;
 
-import com.bytechef.component.definition.ComponentDSL.ModifiableValueProperty;
-import com.bytechef.definition.BaseOutput;
+import com.bytechef.definition.BaseOutputResponse;
+import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.ModifiableValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
 
@@ -25,14 +25,14 @@ import java.util.Objects;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record Output(ModifiableValueProperty<?, ?> outputSchema, Object sampleOutput)
-    implements BaseOutput<Property.ValueProperty<?>> {
+public record OutputResponse(ModifiableValueProperty<?, ?> outputSchema, Object sampleOutput)
+    implements BaseOutputResponse<Property.ValueProperty<?>> {
 
-    public Output(ModifiableValueProperty<?, ?> outputSchema) {
+    public OutputResponse(ModifiableValueProperty<?, ?> outputSchema) {
         this(outputSchema, null);
     }
 
-    public Output {
+    public OutputResponse {
         Objects.requireNonNull(outputSchema, "'outputSchema' mut not be null");
     }
 

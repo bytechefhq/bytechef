@@ -224,7 +224,7 @@ public final class ComponentDSL {
     public static final class ModifiableActionDefinition implements ActionDefinition {
 
         private Boolean batch;
-        private boolean defaultOutputFunction;
+        private boolean dynamicOutput;
         private Boolean deprecated;
         private String description;
         private ProcessErrorResponseFunction processErrorResponseFunction;
@@ -309,28 +309,28 @@ public final class ComponentDSL {
         }
 
         public ModifiableActionDefinition output() {
-            this.defaultOutputFunction = true;
+            this.dynamicOutput = true;
 
             return this;
         }
 
         public ModifiableActionDefinition output(OutputFunction output) {
             this.outputFunction = output;
-            this.defaultOutputFunction = false;
+            this.dynamicOutput = false;
 
             return this;
         }
 
         public ModifiableActionDefinition output(SingleConnectionOutputFunction output) {
             this.outputFunction = output;
-            this.defaultOutputFunction = false;
+            this.dynamicOutput = false;
 
             return this;
         }
 
         public <P extends ModifiableValueProperty<?, ?>> ModifiableActionDefinition outputSchema(P outputSchema) {
             this.outputSchema = outputSchema;
-            this.defaultOutputFunction = true;
+            this.dynamicOutput = true;
 
             return this;
         }
@@ -382,21 +382,21 @@ public final class ComponentDSL {
                 return false;
             }
 
-            return Objects.equals(description, that.description)
-                && Objects.equals(performFunction, that.performFunction) && Objects.equals(help, that.help)
-                && Objects.equals(metadata, that.metadata) && Objects.equals(name, that.name)
-                && Objects.equals(outputSchema, that.outputSchema)
-                && Objects.equals(defaultOutputFunction, that.defaultOutputFunction)
-                && Objects.equals(outputFunction, that.outputFunction)
-                && Objects.equals(sampleOutput, that.sampleOutput)
-                && Objects.equals(properties, that.properties) && Objects.equals(title, that.title)
-                && Objects.equals(workflowNodeDescriptionFunction, that.workflowNodeDescriptionFunction);
+            return Objects.equals(description, that.description) &&
+                Objects.equals(dynamicOutput, that.dynamicOutput) &&
+                Objects.equals(performFunction, that.performFunction) && Objects.equals(help, that.help) &&
+                Objects.equals(metadata, that.metadata) && Objects.equals(name, that.name) &&
+                Objects.equals(outputSchema, that.outputSchema) &&
+                Objects.equals(outputFunction, that.outputFunction) &&
+                Objects.equals(sampleOutput, that.sampleOutput) &&
+                Objects.equals(properties, that.properties) && Objects.equals(title, that.title) &&
+                Objects.equals(workflowNodeDescriptionFunction, that.workflowNodeDescriptionFunction);
         }
 
         @Override
         public int hashCode() {
             return Objects.hash(batch, deprecated, description, performFunction, help, metadata, name,
-                outputSchema, defaultOutputFunction, outputFunction, sampleOutput, properties, title,
+                outputSchema, dynamicOutput, outputFunction, sampleOutput, properties, title,
                 workflowNodeDescriptionFunction);
         }
 
@@ -441,13 +441,13 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<Output> getOutput() {
-            return Optional.ofNullable(outputSchema == null ? null : new Output(outputSchema, sampleOutput));
+        public Optional<OutputFunction> getOutput() {
+            return Optional.ofNullable(outputFunction);
         }
 
         @Override
-        public Optional<OutputFunction> getOutputFunction() {
-            return Optional.ofNullable(outputFunction);
+        public Optional<OutputResponse> getOutputResponse() {
+            return Optional.ofNullable(outputSchema == null ? null : new OutputResponse(outputSchema, sampleOutput));
         }
 
         @Override
@@ -466,8 +466,8 @@ public final class ComponentDSL {
         }
 
         @Override
-        public boolean isDefaultOutputFunction() {
-            return defaultOutputFunction;
+        public boolean isDynamicOutput() {
+            return dynamicOutput;
         }
 
         @Override
@@ -2930,7 +2930,7 @@ public final class ComponentDSL {
 
         private Boolean batch;
         private DeduplicateFunction deduplicateFunction;
-        private boolean defaultOutputFunction;
+        private boolean dynamicOutput;
         private Boolean deprecated;
         private String description;
         private DynamicWebhookDisableConsumer dynamicWebhookDisableConsumer;
@@ -3038,42 +3038,42 @@ public final class ComponentDSL {
         }
 
         public ModifiableTriggerDefinition output() {
-            this.defaultOutputFunction = true;
+            this.dynamicOutput = true;
 
             return this;
         }
 
         public ModifiableTriggerDefinition output(DynamicWebhookTriggerOutputFunction output) {
             this.outputFunction = output;
-            this.defaultOutputFunction = false;
+            this.dynamicOutput = false;
 
             return this;
         }
 
         public ModifiableTriggerDefinition output(ListenerTriggerOutputFunction output) {
             this.outputFunction = output;
-            this.defaultOutputFunction = false;
+            this.dynamicOutput = false;
 
             return this;
         }
 
         public ModifiableTriggerDefinition output(PollTriggerOutputFunction output) {
             this.outputFunction = output;
-            this.defaultOutputFunction = false;
+            this.dynamicOutput = false;
 
             return this;
         }
 
         public ModifiableTriggerDefinition output(StaticWebhookTriggerOutputFunction output) {
             this.outputFunction = output;
-            this.defaultOutputFunction = false;
+            this.dynamicOutput = false;
 
             return this;
         }
 
         public <P extends ModifiableValueProperty<?, ?>> ModifiableTriggerDefinition outputSchema(P outputSchema) {
             this.outputSchema = outputSchema;
-            this.defaultOutputFunction = true;
+            this.dynamicOutput = true;
 
             return this;
         }
@@ -3159,39 +3159,38 @@ public final class ComponentDSL {
                 return false;
             }
 
-            return Objects.equals(batch, that.batch)
-                && Objects.equals(deduplicateFunction, that.deduplicateFunction)
-                && Objects.equals(deprecated, that.deprecated) && Objects.equals(description, that.description)
-                && Objects.equals(dynamicWebhookDisableConsumer, that.dynamicWebhookDisableConsumer)
-                && Objects.equals(dynamicWebhookEnableFunction, that.dynamicWebhookEnableFunction)
-                && Objects.equals(dynamicWebhookRefreshFunction, that.dynamicWebhookRefreshFunction)
-                && Objects.equals(dynamicWebhookRequestFunction, that.dynamicWebhookRequestFunction)
-                && Objects.equals(help, that.help)
-                && Objects.equals(listenerDisableConsumer, that.listenerDisableConsumer)
-                && Objects.equals(listenerEnableConsumer, that.listenerEnableConsumer)
-                && Objects.equals(name, that.name)
-                && Objects.equals(outputSchema, that.outputSchema)
-                && Objects.equals(defaultOutputFunction, that.defaultOutputFunction)
-                && Objects.equals(outputFunction, that.outputFunction)
-                && Objects.equals(sampleOutput, that.sampleOutput)
-                && Objects.equals(pollFunction, that.pollFunction) && Objects.equals(properties, that.properties)
-                && Objects.equals(staticWebhookRequestFunction, that.staticWebhookRequestFunction)
-                && Objects.equals(title, that.title) && type == that.type
-                && Objects.equals(webhookRawBody, that.webhookRawBody)
-                && Objects.equals(webhookValidateFunction, that.webhookValidateFunction)
-                && Objects.equals(workflowNodeDescriptionFunction, that.workflowNodeDescriptionFunction)
-                && Objects.equals(workflowSyncExecution, that.workflowSyncExecution)
-                && Objects.equals(workflowSyncValidation, that.workflowSyncValidation);
+            return Objects.equals(batch, that.batch) &&
+                Objects.equals(deduplicateFunction, that.deduplicateFunction) &&
+                Objects.equals(deprecated, that.deprecated) && Objects.equals(description, that.description) &&
+                Objects.equals(dynamicOutput, that.dynamicOutput) &&
+                Objects.equals(dynamicWebhookDisableConsumer, that.dynamicWebhookDisableConsumer) &&
+                Objects.equals(dynamicWebhookEnableFunction, that.dynamicWebhookEnableFunction) &&
+                Objects.equals(dynamicWebhookRefreshFunction, that.dynamicWebhookRefreshFunction) &&
+                Objects.equals(dynamicWebhookRequestFunction, that.dynamicWebhookRequestFunction) &&
+                Objects.equals(help, that.help) &&
+                Objects.equals(listenerDisableConsumer, that.listenerDisableConsumer) &&
+                Objects.equals(listenerEnableConsumer, that.listenerEnableConsumer) &&
+                Objects.equals(name, that.name) && Objects.equals(outputSchema, that.outputSchema) &&
+                Objects.equals(outputFunction, that.outputFunction) &&
+                Objects.equals(sampleOutput, that.sampleOutput) &&
+                Objects.equals(pollFunction, that.pollFunction) && Objects.equals(properties, that.properties) &&
+                Objects.equals(staticWebhookRequestFunction, that.staticWebhookRequestFunction) &&
+                Objects.equals(title, that.title) && type == that.type &&
+                Objects.equals(webhookRawBody, that.webhookRawBody) &&
+                Objects.equals(webhookValidateFunction, that.webhookValidateFunction) &&
+                Objects.equals(workflowNodeDescriptionFunction, that.workflowNodeDescriptionFunction) &&
+                Objects.equals(workflowSyncExecution, that.workflowSyncExecution) &&
+                Objects.equals(workflowSyncValidation, that.workflowSyncValidation);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(batch, deduplicateFunction, deprecated, description, dynamicWebhookDisableConsumer,
-                dynamicWebhookEnableFunction, dynamicWebhookRefreshFunction, dynamicWebhookRequestFunction,
-                help, listenerDisableConsumer, listenerEnableConsumer, name, outputSchema, defaultOutputFunction,
-                outputFunction, sampleOutput, pollFunction, properties, staticWebhookRequestFunction, title, type,
-                webhookRawBody, webhookValidateFunction, workflowNodeDescriptionFunction, workflowSyncExecution,
-                workflowSyncValidation);
+            return Objects.hash(batch, deduplicateFunction, deprecated, description, dynamicOutput,
+                dynamicWebhookDisableConsumer, dynamicWebhookEnableFunction, dynamicWebhookRefreshFunction,
+                dynamicWebhookRequestFunction, help, listenerDisableConsumer, listenerEnableConsumer, name,
+                outputSchema, outputFunction, sampleOutput, pollFunction, properties, staticWebhookRequestFunction,
+                title, type, webhookRawBody, webhookValidateFunction, workflowNodeDescriptionFunction,
+                workflowSyncExecution, workflowSyncValidation);
         }
 
         @Override
@@ -3255,13 +3254,13 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<Output> getOutput() {
-            return Optional.ofNullable(outputSchema == null ? null : new Output(outputSchema, sampleOutput));
+        public Optional<TriggerOutputFunction> getOutput() {
+            return Optional.ofNullable(outputFunction);
         }
 
         @Override
-        public Optional<TriggerOutputFunction> getOutputFunction() {
-            return Optional.ofNullable(outputFunction);
+        public Optional<OutputResponse> getOutputResponse() {
+            return Optional.ofNullable(outputSchema == null ? null : new OutputResponse(outputSchema, sampleOutput));
         }
 
         @Override
@@ -3315,8 +3314,8 @@ public final class ComponentDSL {
         }
 
         @Override
-        public boolean isDefaultOutputFunction() {
-            return defaultOutputFunction;
+        public boolean isDynamicOutput() {
+            return dynamicOutput;
         }
 
         @Override

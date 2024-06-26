@@ -21,7 +21,7 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.definition.BaseControlType;
 import com.bytechef.definition.BaseFileEntry;
-import com.bytechef.definition.BaseOutput;
+import com.bytechef.definition.BaseOutputResponse;
 import com.bytechef.definition.BaseProperty.BaseArrayProperty;
 import com.bytechef.definition.BaseProperty.BaseBooleanProperty;
 import com.bytechef.definition.BaseProperty.BaseDateProperty;
@@ -103,7 +103,7 @@ public class SchemaUtils {
     }
 
     public static <P extends BaseProperty, O extends com.bytechef.platform.registry.domain.BaseOutput<P>> O toOutput(
-        BaseOutput<? extends com.bytechef.definition.BaseProperty> output,
+        BaseOutputResponse<? extends com.bytechef.definition.BaseProperty> output,
         OutputFactoryFunction<P, O> outputFactoryFunction) {
 
         Object sampleOutput = output.getSampleOutput();

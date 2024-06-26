@@ -28,5 +28,5 @@ public interface OutputFunction {
      * @param inputParameters
      * @return
      */
-    Output apply(Map<String, ?> inputParameters) throws Exception;
+    OutputResponse apply(Map<String, ?> inputParameters) throws Exception;
 }

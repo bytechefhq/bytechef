@@ -22,7 +22,7 @@ import static com.bytechef.component.webhook.constant.WebhookConstants.HEADERS;
 import static com.bytechef.component.webhook.constant.WebhookConstants.METHOD;
 import static com.bytechef.component.webhook.constant.WebhookConstants.PARAMETERS;
 
-import com.bytechef.component.definition.Output;
+import com.bytechef.component.definition.OutputResponse;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
  */
 public class WebhookUtils {
 
-    public static Output getOutput(
+    public static OutputResponse getOutput(
         Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
         WebhookMethod method, TriggerContext context) {
 

@@ -29,6 +29,7 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.DynamicOptionsProperty;
 import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.definition.OutputResponse;
 import com.bytechef.component.definition.PropertiesDataSource;
 import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
@@ -103,15 +104,15 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             (MultipleConnectionsOutputFunction) getOutputFunction(componentName, componentVersion, actionName);
 
         try {
-            com.bytechef.component.definition.Output output = multipleConnectionsOutputFunction.apply(
+            OutputResponse outputResponse = multipleConnectionsOutputFunction.apply(
                 new ParametersImpl(inputParameters), connections, context);
 
-            if (output == null) {
+            if (outputResponse == null) {
                 return null;
             }
 
             return SchemaUtils.toOutput(
-                output,
+                outputResponse,
                 (property, sampleOutput) -> new Output(
                     Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput));
         } catch (Exception e) {
@@ -193,16 +194,16 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             (SingleConnectionOutputFunction) getOutputFunction(componentName, componentVersion, actionName);
 
         try {
-            com.bytechef.component.definition.Output output = singleConnectionOutputFunction.apply(
+            OutputResponse outputResponse = singleConnectionOutputFunction.apply(
                 new ParametersImpl(inputParameters),
                 new ParametersImpl(getConnectionParameters(connection)), context);
 
-            if (output == null) {
+            if (outputResponse == null) {
                 return null;
             }
 
             return SchemaUtils.toOutput(
-                output,
+                outputResponse,
                 (property, sampleOutput) -> new Output(
                     Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput));
         } catch (Exception e) {
@@ -364,9 +365,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
 
         return actionDefinition
-            .getOutputFunction()
+            .getOutput()
             .orElseGet(() -> {
-                if (!actionDefinition.isDefaultOutputFunction()) {
+                if (!actionDefinition.isDynamicOutput()) {
                     throw new IllegalStateException("Default output schema function not allowed");
                 }
 

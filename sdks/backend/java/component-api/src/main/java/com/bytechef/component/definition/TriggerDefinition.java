@@ -130,13 +130,13 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    Optional<Output> getOutput();
+    Optional<TriggerOutputFunction> getOutput();
 
     /**
      *
      * @return
      */
-    Optional<TriggerOutputFunction> getOutputFunction();
+    Optional<OutputResponse> getOutputResponse();
 
     /**
      *
@@ -199,7 +199,7 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    boolean isDefaultOutputFunction();
+    boolean isDynamicOutput();
 
     /**
      *
@@ -312,7 +312,7 @@ public interface TriggerDefinition {
          * @param context
          * @return
          */
-        Output apply(
+        OutputResponse apply(
             Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
             HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
             TriggerContext context) throws Exception;
@@ -441,7 +441,7 @@ public interface TriggerDefinition {
          * @param connectionParameters
          * @param workflowExecutionId
          */
-        Output accept(
+        OutputResponse accept(
             Parameters inputParameters, Parameters connectionParameters, String workflowExecutionId,
             TriggerContext context) throws Exception;
     }
@@ -490,7 +490,7 @@ public interface TriggerDefinition {
          * @param context
          * @return
          */
-        Output apply(Parameters inputParameters, Parameters closureParameters, TriggerContext context)
+        OutputResponse apply(Parameters inputParameters, Parameters closureParameters, TriggerContext context)
             throws Exception;
 
     }
@@ -532,7 +532,7 @@ public interface TriggerDefinition {
          * @param context
          * @return
          */
-        Output apply(
+        OutputResponse apply(
             Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
             WebhookMethod method, TriggerContext context) throws Exception;
     }

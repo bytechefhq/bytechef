@@ -31,7 +31,7 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
 
     private Output output;
     private boolean outputDefined;
-    private boolean outputFunctionDefined;
+    private boolean dynamicOutput;
     private List<? extends Property> properties;
     private boolean webhookRawBody;
     private boolean workflowNodeDescriptionDefined;
@@ -47,16 +47,16 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
 
         super(triggerDefinition, componentName, componentVersion);
 
+        this.dynamicOutput = OptionalUtils.mapOrElse(
+            triggerDefinition.getOutput(), outputFunction -> true, triggerDefinition.isDynamicOutput());
         this.output = OptionalUtils.mapOrElse(
-            triggerDefinition.getOutput(),
-            output -> SchemaUtils.toOutput(
-                output,
+            triggerDefinition.getOutputResponse(),
+            outputResponse -> SchemaUtils.toOutput(
+                outputResponse,
                 (property, sampleOutput) -> new Output(
                     Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput)),
             null);
-        this.outputDefined = OptionalUtils.mapOrElse(triggerDefinition.getOutput(), output -> true, false);
-        this.outputFunctionDefined = OptionalUtils.mapOrElse(
-            triggerDefinition.getOutputFunction(), outputFunction -> true, triggerDefinition.isDefaultOutputFunction());
+        this.outputDefined = OptionalUtils.mapOrElse(triggerDefinition.getOutputResponse(), output -> true, false);
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(triggerDefinition.getProperties(), List.of()), Property::toProperty);
         this.webhookRawBody = OptionalUtils.orElse(triggerDefinition.getWebhookRawBody(), false);
@@ -80,17 +80,17 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
             return false;
         }
 
-        return output == that.output && outputDefined == that.outputDefined
-            && outputFunctionDefined == that.outputFunctionDefined && webhookRawBody == that.webhookRawBody
+        return dynamicOutput == that.dynamicOutput && output == that.output && outputDefined == that.outputDefined
+            && Objects.equals(properties, that.properties) && webhookRawBody == that.webhookRawBody
             && workflowNodeDescriptionDefined == that.workflowNodeDescriptionDefined
             && workflowSyncExecution == that.workflowSyncExecution
-            && workflowSyncValidation == that.workflowSyncValidation && Objects.equals(properties, that.properties);
+            && workflowSyncValidation == that.workflowSyncValidation;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-            super.hashCode(), output, outputDefined, outputFunctionDefined, properties,
+            super.hashCode(), dynamicOutput, output, outputDefined, properties,
             webhookRawBody, workflowNodeDescriptionDefined, workflowSyncExecution, workflowSyncValidation);
     }
 
@@ -106,8 +106,8 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
         return outputDefined;
     }
 
-    public boolean isOutputFunctionDefined() {
-        return outputFunctionDefined;
+    public boolean isDynamicOutput() {
+        return dynamicOutput;
     }
 
     public boolean isWebhookRawBody() {
@@ -129,20 +129,20 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
     @Override
     public String toString() {
         return "TriggerDefinition{" +
-            "workflowNodeDescriptionDefined=" + workflowNodeDescriptionDefined +
+            "name='" + name + '\'' +
+            ", title='" + title + '\'' +
+            ", type=" + type +
+            ", description='" + description + '\'' +
             ", output=" + output +
             ", outputDefined=" + outputDefined +
-            ", outputFunctionDefined=" + outputFunctionDefined +
+            ", outputFunctionDefined=" + dynamicOutput +
             ", properties=" + properties +
             ", webhookRawBody=" + webhookRawBody +
             ", workflowSyncExecution=" + workflowSyncExecution +
             ", workflowSyncValidation=" + workflowSyncValidation +
             ", batch=" + batch +
-            ", description='" + description + '\'' +
             ", help=" + help +
-            ", name='" + name + '\'' +
-            ", title='" + title + '\'' +
-            ", type=" + type +
+            ", workflowNodeDescriptionDefined=" + workflowNodeDescriptionDefined +
             "} ";
     }
 }

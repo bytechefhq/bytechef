@@ -1185,7 +1185,7 @@ public final class TaskDispatcherDSL {
         private Help help;
         private String icon;
         private final String name;
-        private Output output;
+        private OutputResponse outputResponse;
         private OutputFunction outputFunction;
         private List<? extends Property> properties;
         private Resources resources;
@@ -1226,7 +1226,7 @@ public final class TaskDispatcherDSL {
         public ModifiableTaskDispatcherDefinition output(
             ModifiableValueProperty<?, ?> outputSchema, Map<String, ?> sampleOutput) {
 
-            this.output = new Output(outputSchema, sampleOutput);
+            this.outputResponse = new OutputResponse(outputSchema, sampleOutput);
 
             return this;
         }
@@ -1327,8 +1327,8 @@ public final class TaskDispatcherDSL {
         }
 
         @Override
-        public Optional<Output> getOutput() {
-            return Optional.ofNullable(output);
+        public Optional<OutputResponse> getOutput() {
+            return Optional.ofNullable(outputResponse);
         }
 
         @Override

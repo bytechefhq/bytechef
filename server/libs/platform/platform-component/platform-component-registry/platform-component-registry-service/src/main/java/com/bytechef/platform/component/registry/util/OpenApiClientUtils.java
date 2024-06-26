@@ -28,7 +28,7 @@ import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
-import com.bytechef.component.definition.Output;
+import com.bytechef.component.definition.OutputResponse;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.exception.ProviderException;
@@ -51,10 +51,10 @@ public class OpenApiClientUtils {
 
     public static Response execute(
         Map<String, ?> inputParameters, List<? extends Property> properties,
-        @Nullable Output output, Map<String, Object> metadata,
+        @Nullable OutputResponse outputResponse, Map<String, Object> metadata,
         @Nullable ProcessErrorResponseFunction processErrorResponseFunction, ActionContext context) {
 
-        ValueProperty<?> outputSchema = output == null ? null : output.getOutputSchema();
+        ValueProperty<?> outputSchema = outputResponse == null ? null : outputResponse.getOutputSchema();
 
         Response response = context
             .http(http -> http.exchange(

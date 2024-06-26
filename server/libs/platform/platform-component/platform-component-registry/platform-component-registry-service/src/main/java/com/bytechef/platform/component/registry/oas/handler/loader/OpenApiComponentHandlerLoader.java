@@ -36,7 +36,7 @@ public class OpenApiComponentHandlerLoader extends AbstractComponentHandlerLoade
     public static final Function<ActionDefinition, SingleConnectionPerformFunction> PERFORM_FUNCTION_FUNCTION =
         actionDefinition -> (inputParameters, connectionParameters, context) -> OpenApiClientUtils.execute(
             inputParameters, OptionalUtils.orElse(actionDefinition.getProperties(), List.of()),
-            OptionalUtils.orElse(actionDefinition.getOutput(), null),
+            OptionalUtils.orElse(actionDefinition.getOutputResponse(), null),
             OptionalUtils.orElse(actionDefinition.getMetadata(), Map.of()),
             OptionalUtils.orElse(actionDefinition.getProcessErrorResponse(), null), context);
 

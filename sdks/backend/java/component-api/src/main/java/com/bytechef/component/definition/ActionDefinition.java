@@ -81,13 +81,13 @@ public interface ActionDefinition {
      *
      * @return
      */
-    Optional<Output> getOutput();
+    Optional<OutputFunction> getOutput();
 
     /**
      *
      * @return
      */
-    Optional<OutputFunction> getOutputFunction();
+    Optional<OutputResponse> getOutputResponse();
 
     /**
      *
@@ -111,7 +111,7 @@ public interface ActionDefinition {
      *
      * @return
      */
-    boolean isDefaultOutputFunction();
+    boolean isDynamicOutput();
 
     /**
      *
@@ -169,7 +169,7 @@ public interface ActionDefinition {
          * @param context
          * @return
          */
-        Output apply(
+        OutputResponse apply(
             Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws Exception;
     }
 }

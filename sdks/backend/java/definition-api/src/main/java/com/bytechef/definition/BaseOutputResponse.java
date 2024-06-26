@@ -21,7 +21,7 @@ import com.bytechef.definition.BaseProperty.BaseValueProperty;
 /**
  * @author Ivica Cardic
  */
-public interface BaseOutput<V extends BaseValueProperty<?>> {
+public interface BaseOutputResponse<V extends BaseValueProperty<?>> {
 
     V getOutputSchema();
 

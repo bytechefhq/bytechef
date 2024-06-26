@@ -31,13 +31,13 @@ import java.util.Objects;
 @SuppressFBWarnings("EI")
 public class TaskDispatcherDefinition {
 
+    private boolean defaultOutput;
     private String description;
     private Help help;
     private String icon;
     private String name;
     private Output output;
     private boolean outputDefined;
-    private boolean outputFunctionDefined;
     private List<? extends Property> properties;
     private Resources resources;
     private List<? extends Property> taskProperties;
@@ -58,14 +58,14 @@ public class TaskDispatcherDefinition {
     public TaskDispatcherDefinition(
         com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition taskDispatcherDefinition) {
 
+        this.defaultOutput = OptionalUtils.mapOrElse(
+            taskDispatcherDefinition.getOutputFunction(), outputFunction -> true, false);
         this.description = OptionalUtils.orElse(taskDispatcherDefinition.getDescription(), null);
         this.help = OptionalUtils.mapOrElse(taskDispatcherDefinition.getHelp(), Help::new, null);
         this.icon = OptionalUtils.mapOrElse(taskDispatcherDefinition.getIcon(), IconUtils::readIcon, null);
         this.name = taskDispatcherDefinition.getName();
         this.output = getOutput(taskDispatcherDefinition);
         this.outputDefined = OptionalUtils.mapOrElse(taskDispatcherDefinition.getOutput(), outputSchema -> true, false);
-        this.outputFunctionDefined = OptionalUtils.mapOrElse(
-            taskDispatcherDefinition.getOutputFunction(), outputFunction -> true, false);
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(taskDispatcherDefinition.getProperties(), List.of()), Property::toProperty);
         this.resources = OptionalUtils.mapOrElse(taskDispatcherDefinition.getResources(), Resources::new, null);
@@ -93,19 +93,19 @@ public class TaskDispatcherDefinition {
             return false;
         }
 
-        return Objects.equals(description, that.description) && Objects.equals(help, that.help)
-            && Objects.equals(icon, that.icon) && Objects.equals(name, that.name)
-            && Objects.equals(output, that.output) && outputDefined == that.outputDefined
-            && outputFunctionDefined == that.outputFunctionDefined && Objects.equals(properties, that.properties)
-            && Objects.equals(resources, that.resources) && Objects.equals(taskProperties, that.taskProperties)
-            && Objects.equals(title, that.title) && Objects.equals(variableProperties, that.variableProperties)
-            && Objects.equals(variablePropertiesDefined, that.variablePropertiesDefined) && version == that.version;
+        return defaultOutput == that.defaultOutput && Objects.equals(description, that.description) &&
+            Objects.equals(help, that.help) && Objects.equals(icon, that.icon) && Objects.equals(name, that.name) &&
+            Objects.equals(output, that.output) && outputDefined == that.outputDefined &&
+            Objects.equals(properties, that.properties) && Objects.equals(resources, that.resources) &&
+            Objects.equals(taskProperties, that.taskProperties) && Objects.equals(title, that.title) &&
+            Objects.equals(variableProperties, that.variableProperties) &&
+            Objects.equals(variablePropertiesDefined, that.variablePropertiesDefined) && version == that.version;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-            description, help, icon, name, output, outputDefined, properties, resources, taskProperties,
+            defaultOutput, description, help, icon, name, output, outputDefined, properties, resources, taskProperties,
             title, variableProperties, variablePropertiesDefined, version);
     }
 
@@ -158,12 +158,12 @@ public class TaskDispatcherDefinition {
         return version;
     }
 
-    public boolean isOutputDefined() {
-        return outputDefined;
+    public boolean isDynamicOutput() {
+        return defaultOutput;
     }
 
-    public boolean isOutputFunctionDefined() {
-        return outputFunctionDefined;
+    public boolean isOutputDefined() {
+        return outputDefined;
     }
 
     public boolean isVariablePropertiesDefined() {
@@ -194,7 +194,7 @@ public class TaskDispatcherDefinition {
             ", properties=" + properties +
             ", output=" + output +
             ", outputDefined=" + outputDefined +
-            ", outputFunctionDefined=" + outputFunctionDefined +
+            ", outputFunctionDefined=" + defaultOutput +
             ", resources=" + resources +
             ", taskProperties=" + taskProperties +
             ", title='" + title + '\'' +

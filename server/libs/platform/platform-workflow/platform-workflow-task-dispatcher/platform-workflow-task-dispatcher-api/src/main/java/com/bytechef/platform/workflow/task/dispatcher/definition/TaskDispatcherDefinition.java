@@ -57,7 +57,7 @@ public interface TaskDispatcherDefinition {
      *
      * @return
      */
-    Optional<Output> getOutput();
+    Optional<OutputResponse> getOutput();
 
     /**
      *

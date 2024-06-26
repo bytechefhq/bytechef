@@ -27,7 +27,7 @@ import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ConnectionDefinition;
-import com.bytechef.component.definition.Output;
+import com.bytechef.component.definition.OutputResponse;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
@@ -285,7 +285,8 @@ public class ComponentDefinitionRegistry {
                 PropertyUtils.checkInputProperties(
                     OptionalUtils.orElse(actionDefinition.getProperties(), List.of()));
                 PropertyUtils.checkOutputProperty(
-                    OptionalUtils.mapOrElse(actionDefinition.getOutput(), Output::getOutputSchema, null));
+                    OptionalUtils.mapOrElse(actionDefinition.getOutputResponse(), OutputResponse::getOutputSchema,
+                        null));
             }
 
             List<? extends TriggerDefinition> triggerDefinitions = OptionalUtils.orElse(
@@ -298,7 +299,8 @@ public class ComponentDefinitionRegistry {
 
                 PropertyUtils.checkInputProperties(OptionalUtils.orElse(triggerDefinition.getProperties(), List.of()));
                 PropertyUtils.checkOutputProperty(
-                    OptionalUtils.mapOrElse(triggerDefinition.getOutput(), Output::getOutputSchema, null));
+                    OptionalUtils.mapOrElse(triggerDefinition.getOutputResponse(), OutputResponse::getOutputSchema,
+                        null));
 
                 if (triggerDefinition.getType() == null) {
                     throw new IllegalArgumentException(

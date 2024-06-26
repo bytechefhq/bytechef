@@ -29,11 +29,11 @@ import java.util.Objects;
 @SuppressFBWarnings("EI")
 public class ActionDefinition extends ActionDefinitionBasic {
 
-    private boolean workflowNodeDescriptionDefined;
+    private boolean dynamicOutput;
     private Output output;
     private boolean outputDefined;
-    private boolean outputFunctionDefined;
     private List<? extends Property> properties;
+    private boolean workflowNodeDescriptionDefined;
 
     private ActionDefinition() {
     }
@@ -44,16 +44,16 @@ public class ActionDefinition extends ActionDefinitionBasic {
 
         super(actionDefinition, componentName, componentVersion);
 
+        this.dynamicOutput = OptionalUtils.mapOrElse(
+            actionDefinition.getOutput(), outputFunction -> true, actionDefinition.isDynamicOutput());
         this.output = OptionalUtils.mapOrElse(
-            actionDefinition.getOutput(),
-            output -> SchemaUtils.toOutput(
-                output,
+            actionDefinition.getOutputResponse(),
+            outputResponse -> SchemaUtils.toOutput(
+                outputResponse,
                 (property, sampleOutput) -> new Output(
                     Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput)),
             null);
-        this.outputDefined = OptionalUtils.mapOrElse(actionDefinition.getOutput(), output -> true, false);
-        this.outputFunctionDefined = OptionalUtils.mapOrElse(
-            actionDefinition.getOutputFunction(), outputFunction -> true, actionDefinition.isDefaultOutputFunction());
+        this.outputDefined = OptionalUtils.mapOrElse(actionDefinition.getOutputResponse(), output -> true, false);
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(actionDefinition.getProperties(), List.of()), Property::toProperty);
         this.workflowNodeDescriptionDefined = OptionalUtils.mapOrElse(
@@ -74,15 +74,16 @@ public class ActionDefinition extends ActionDefinitionBasic {
             return false;
         }
 
-        return workflowNodeDescriptionDefined == that.workflowNodeDescriptionDefined
-            && Objects.equals(output, that.output) && outputDefined == that.outputDefined
-            && outputFunctionDefined == that.outputFunctionDefined && Objects.equals(properties, that.properties);
+        return dynamicOutput == that.dynamicOutput &&
+            Objects.equals(output, that.output) && outputDefined == that.outputDefined &&
+            Objects.equals(properties, that.properties) &&
+            workflowNodeDescriptionDefined == that.workflowNodeDescriptionDefined;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-            super.hashCode(), output, outputDefined, outputFunctionDefined, properties, workflowNodeDescriptionDefined);
+            super.hashCode(), dynamicOutput, output, outputDefined, properties, workflowNodeDescriptionDefined);
     }
 
     public Output getOutput() {
@@ -93,12 +94,12 @@ public class ActionDefinition extends ActionDefinitionBasic {
         return properties;
     }
 
-    public boolean isOutputDefined() {
-        return outputDefined;
+    public boolean isDynamicOutput() {
+        return dynamicOutput;
     }
 
-    public boolean isOutputFunctionDefined() {
-        return outputFunctionDefined;
+    public boolean isOutputDefined() {
+        return outputDefined;
     }
 
     public boolean isWorkflowNodeDescriptionDefined() {
@@ -108,16 +109,16 @@ public class ActionDefinition extends ActionDefinitionBasic {
     @Override
     public String toString() {
         return "Definition{" +
-            "workflowNodeDescriptionDefined=" + workflowNodeDescriptionDefined +
-            ", output=" + output +
+            "name='" + name + '\'' +
+            ", title='" + title + '\'' +
+            ", description='" + description + '\'' +
             ", outputDefined=" + outputDefined +
-            ", outputFunctionDefined=" + outputFunctionDefined +
+            ", dynamicOutput=" + dynamicOutput +
+            ", output=" + output +
             ", properties=" + properties +
             ", batch=" + batch +
-            ", description='" + description + '\'' +
             ", help=" + help +
-            ", name='" + name + '\'' +
-            ", title='" + title + '\'' +
+            ", workflowNodeDescriptionDefined=" + workflowNodeDescriptionDefined +
             "} ";
     }
 

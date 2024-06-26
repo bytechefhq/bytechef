@@ -54,17 +54,16 @@ public interface Context {
 
     /**
      *
-     * @param logFunction
+     * @param logConsumer
      */
-    void logger(ContextConsumer<Logger> logFunction);
+    void logger(ContextConsumer<Logger> logConsumer);
 
     /**
      *
      * @param outputFunction
      * @return
      */
-    com.bytechef.component.definition.Output output(
-        ContextFunction<Output, com.bytechef.component.definition.Output> outputFunction);
+    OutputResponse output(ContextFunction<Output, OutputResponse> outputFunction);
 
     /**
      *
@@ -1123,7 +1122,7 @@ public interface Context {
          * @param value
          * @return
          */
-        com.bytechef.component.definition.Output get(Object value);
+        OutputResponse get(Object value);
     }
 
     /**

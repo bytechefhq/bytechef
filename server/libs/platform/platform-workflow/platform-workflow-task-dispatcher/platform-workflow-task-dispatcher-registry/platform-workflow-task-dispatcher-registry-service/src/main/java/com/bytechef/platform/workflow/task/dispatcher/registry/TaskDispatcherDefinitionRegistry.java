@@ -20,7 +20,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.registry.util.PropertyUtils;
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFactory;
-import com.bytechef.platform.workflow.task.dispatcher.definition.Output;
+import com.bytechef.platform.workflow.task.dispatcher.definition.OutputResponse;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -77,7 +77,7 @@ public class TaskDispatcherDefinitionRegistry {
             PropertyUtils.checkInputProperties(
                 OptionalUtils.orElse(taskDispatcherDefinition.getProperties(), List.of()));
             PropertyUtils.checkOutputProperty(
-                OptionalUtils.mapOrElse(taskDispatcherDefinition.getOutput(), Output::getOutputSchema, null));
+                OptionalUtils.mapOrElse(taskDispatcherDefinition.getOutput(), OutputResponse::getOutputSchema, null));
         }
     }
 }
