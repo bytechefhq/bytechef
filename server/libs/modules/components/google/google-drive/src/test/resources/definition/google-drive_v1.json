@@ -12,6 +12,74 @@
   "resources": null,
   "version": 1,
   "title": "Google Drive",
+  "connection": {
+    "authorizations": [ {
+      "detectOn": null,
+      "description": null,
+      "name": "oauth2_authorization_code",
+      "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "clientId",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Client Id",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "clientSecret",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Client Secret",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
+      "refreshOn": [ "^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$" ],
+      "title": "OAuth2 Authorization Code",
+      "type": "OAUTH2_AUTHORIZATION_CODE",
+      "acquire": null,
+      "authorizationCallback": null,
+      "authorizationUrl": { },
+      "clientSecret": null,
+      "refreshToken": null,
+      "apply": null,
+      "clientId": null,
+      "pkce": null,
+      "refresh": null,
+      "refreshUrl": { },
+      "scopes": { },
+      "tokenUrl": { }
+    } ],
+    "properties": null,
+    "version": 1,
+    "authorizationRequired": null,
+    "baseUri": null,
+    "test": null
+  },
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -222,13 +290,13 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": {
+        "mimeType": "plain/text",
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "name": "new-file.txt",
-        "mimeType": "plain/text"
+        "name": "new-file.txt"
       }
     },
     "perform": { }
@@ -502,13 +570,13 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": {
+        "mimeType": "plain/text",
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "name": "new-file.txt",
-        "mimeType": "plain/text"
+        "name": "new-file.txt"
       }
     },
     "perform": { }
@@ -698,84 +766,16 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": {
+        "mimeType": "plain/text",
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "name": "new-file.txt",
-        "mimeType": "plain/text"
+        "name": "new-file.txt"
       }
     },
     "perform": { }
   } ],
-  "connection": {
-    "authorizations": [ {
-      "detectOn": null,
-      "description": null,
-      "name": "oauth2_authorization_code",
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "clientId",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Client Id",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "clientSecret",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Client Secret",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      } ],
-      "refreshOn": null,
-      "title": "OAuth2 Authorization Code",
-      "type": "OAUTH2_AUTHORIZATION_CODE",
-      "acquire": null,
-      "apply": null,
-      "authorizationCallback": null,
-      "authorizationUrl": { },
-      "clientId": null,
-      "clientSecret": null,
-      "pkce": null,
-      "refresh": null,
-      "refreshUrl": null,
-      "refreshToken": null,
-      "scopes": { },
-      "tokenUrl": { }
-    } ],
-    "properties": null,
-    "version": 1,
-    "authorizationRequired": null,
-    "baseUri": null,
-    "test": null
-  },
   "triggers": null
 }
