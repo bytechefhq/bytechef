@@ -435,9 +435,6 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         for (int i = 0; i < pathItems.length; i++) {
             String pathItem = pathItems[i];
 
-            pathItem = pathItem.replace("__dash__", "-")
-                .replace("__nbsp__", " ");
-
             if (pathItem.endsWith("]")) {
                 String name = pathItem.substring(0, pathItem.indexOf("["));
                 String arrays = pathItem.substring(pathItem.indexOf("["));
