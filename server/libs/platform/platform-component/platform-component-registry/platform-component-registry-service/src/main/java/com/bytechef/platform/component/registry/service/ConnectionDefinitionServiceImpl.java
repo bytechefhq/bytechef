@@ -100,17 +100,17 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public ApplyResponse executeAuthorizationApply(
-        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParams,
-        @NonNull Context context) {
+        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
+        @NonNull Map<String, ?> connectionParameters, @NonNull Context context) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
-            componentName, authorizationName);
+            componentName, connectionVersion, authorizationName);
 
         ApplyFunction applyFunction = OptionalUtils.orElse(
             authorization.getApply(), getDefaultApply(authorization.getType()));
 
         try {
-            return applyFunction.apply(new ParametersImpl(authorizationParams), context);
+            return applyFunction.apply(new ParametersImpl(connectionParameters), context);
         } catch (Exception e) {
             throw new ComponentExecutionException(e, ConnectionDefinitionErrorType.EXECUTE_AUTHORIZATION_APPLY);
         }
@@ -118,11 +118,11 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public AuthorizationCallbackResponse executeAuthorizationCallback(
-        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParams,
-        @NonNull Context context, @NonNull String redirectUri) {
+        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
+        @NonNull Map<String, ?> connectionParameters, @NonNull Context context, @NonNull String redirectUri) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
-            componentName, authorizationName);
+            componentName, connectionVersion, authorizationName);
         String verifier = null;
 
         if (authorization.getType() == AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
@@ -146,20 +146,20 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             getDefaultAuthorizationCallbackFunction(
                 OptionalUtils.orElse(
                     authorization.getClientId(),
-                    (connectionParameters, context1) -> getDefaultClientId(
-                        connectionParameters)),
+                    (connectionParameters1, context1) -> getDefaultClientId(
+                        connectionParameters1)),
                 OptionalUtils.orElse(
                     authorization.getClientSecret(),
-                    (connectionParameters, context1) -> getDefaultClientSecret(
-                        connectionParameters)),
+                    (connectionParameters1, context1) -> getDefaultClientSecret(
+                        connectionParameters1)),
                 OptionalUtils.orElse(
                     authorization.getTokenUrl(),
-                    (connectionParameters, context1) -> getDefaultTokenUrl(
-                        connectionParameters))));
+                    (connectionParameters1, context1) -> getDefaultTokenUrl(
+                        connectionParameters1))));
 
         try {
             return authorizationCallbackFunction.apply(
-                new ParametersImpl(authorizationParams), MapUtils.getString(authorizationParams, CODE),
+                new ParametersImpl(connectionParameters), MapUtils.getString(connectionParameters, CODE),
                 redirectUri, verifier, context);
         } catch (Exception e) {
             throw new ComponentExecutionException(e, ConnectionDefinitionErrorType.EXECUTE_AUTHORIZATION_CALLBACK);
@@ -171,7 +171,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
 
         com.bytechef.component.definition.ConnectionDefinition connectionDefinition =
-            componentDefinitionRegistry.getConnectionDefinition(componentName);
+            componentDefinitionRegistry.getConnectionDefinition(componentName, connection.getVersion());
 
         BaseUriFunction baseUriFunction =
             OptionalUtils.orElse(
@@ -183,34 +183,35 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public RefreshTokenResponse executeRefresh(
-        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParms,
-        @NonNull Context context) {
+        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
+        @NonNull Map<String, ?> connectionParameters, @NonNull Context context) {
+
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
-            componentName, authorizationName);
+            componentName, connectionVersion, authorizationName);
 
         RefreshFunction refreshFunction = OptionalUtils.orElse(
             authorization.getRefresh(),
             getDefaultRefreshFunction(
                 OptionalUtils.orElse(
                     authorization.getClientId(),
-                    (connectionParameters, context1) -> getDefaultClientId(connectionParameters)),
+                    (connectionParameters1, context1) -> getDefaultClientId(connectionParameters1)),
                 OptionalUtils.orElse(
                     authorization.getClientSecret(),
-                    (connectionParameters, context1) -> getDefaultClientSecret(connectionParameters)),
+                    (connectionParameters1, context1) -> getDefaultClientSecret(connectionParameters1)),
                 OptionalUtils.orElse(
                     authorization.getRefreshToken(),
-                    (connectionParameters, context1) -> getDefaultRefreshToken(connectionParameters)),
+                    (connectionParameters1, context1) -> getDefaultRefreshToken(connectionParameters1)),
                 OptionalUtils.orElse(
                     authorization.getRefreshUrl(),
-                    (connectionParameters, context1) -> getDefaultRefreshUrl(
-                        connectionParameters,
+                    (connectionParameters1, context1) -> getDefaultRefreshUrl(
+                        connectionParameters1,
                         OptionalUtils.orElse(
                             authorization.getTokenUrl(),
-                            (connectionParameters1, context2) -> getDefaultTokenUrl(connectionParameters1)),
+                            (connectionParameters2, context2) -> getDefaultTokenUrl(connectionParameters2)),
                         context1))));
 
         try {
-            return refreshFunction.apply(new ParametersImpl(authorizationParms), context);
+            return refreshFunction.apply(new ParametersImpl(connectionParameters), context);
 
         } catch (Exception exception) {
             throw new ComponentExecutionException("Unable to perform oauth token refresh", exception,
@@ -219,11 +220,31 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
+    public List<String> getAuthorizationDetectOn(
+        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName) {
+
+        Authorization authorization = componentDefinitionRegistry.getAuthorization(
+            componentName, connectionVersion, authorizationName);
+
+        return OptionalUtils.orElse(authorization.getDetectOn(), List.of());
+    }
+
+    @Override
+    public List<Object> getAuthorizationRefreshOn(
+        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName) {
+
+        Authorization authorization = componentDefinitionRegistry.getAuthorization(
+            componentName, connectionVersion, authorizationName);
+
+        return OptionalUtils.orElse(authorization.getRefreshOn(), List.of());
+    }
+
+    @Override
     public AuthorizationType getAuthorizationType(
         @NonNull String componentName, int connectionVersion, @NonNull String authorizationName) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
-            componentName, authorizationName);
+            componentName, connectionVersion, authorizationName);
 
         return authorization.getType();
     }
@@ -245,11 +266,11 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParams,
-        @NonNull Context context) {
+        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
+        @NonNull Map<String, ?> authorizationParams, @NonNull Context context) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
-            componentName, authorizationName);
+            componentName, connectionVersion, authorizationName);
 
         AuthorizationUrlFunction authorizationUrlFunction = OptionalUtils.orElse(
             authorization.getAuthorizationUrl(),
@@ -451,7 +472,10 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 Map<String, Object> responseMap = JsonUtils.read(httpResponse.body(), new TypeReference<>() {});
 
                 return new RefreshTokenResponse(
-                    (String) responseMap.get("access_token"), Long.valueOf((Integer) responseMap.get("expires_in")));
+                    (String) responseMap.get(Authorization.ACCESS_TOKEN),
+                    (String) responseMap.get(Authorization.REFRESH_TOKEN),
+                    responseMap.containsKey(Authorization.EXPIRES_IN)
+                        ? Long.valueOf((Integer) responseMap.get(Authorization.EXPIRES_IN)) : null);
             }
         };
     }

@@ -39,23 +39,29 @@ public interface ConnectionDefinitionService {
         @NonNull Map<String, ?> connectionParameters, @NonNull Context context);
 
     ApplyResponse executeAuthorizationApply(
-        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParams,
-        @NonNull Context context);
+        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
+        @NonNull Map<String, ?> connectionParameters, @NonNull Context context);
 
     AuthorizationCallbackResponse executeAuthorizationCallback(
-        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParams,
-        @NonNull Context context, @NonNull String redirectUri);
+        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
+        @NonNull Map<String, ?> connectionParameters, @NonNull Context context, @NonNull String redirectUri);
 
     Optional<String> executeBaseUri(
         @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context);
 
     RefreshTokenResponse executeRefresh(
-        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParms,
-        @NonNull Context context);
+        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
+        @NonNull Map<String, ?> connectionParameters, @NonNull Context context);
 
     OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParms,
-        @NonNull Context context);
+        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
+        @NonNull Map<String, ?> connectionParameters, @NonNull Context context);
+
+    List<String> getAuthorizationDetectOn(
+        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName);
+
+    List<Object> getAuthorizationRefreshOn(
+        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName);
 
     Authorization.AuthorizationType getAuthorizationType(
         @NonNull String componentName, int connectionVersion, @NonNull String authorizationName);
@@ -66,5 +72,4 @@ public interface ConnectionDefinitionService {
 
     List<ConnectionDefinition> getConnectionDefinitions(
         @NonNull String componentName, @NonNull Integer componentVersion);
-
 }

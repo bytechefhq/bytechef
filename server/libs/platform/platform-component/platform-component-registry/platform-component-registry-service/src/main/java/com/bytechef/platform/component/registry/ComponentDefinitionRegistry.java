@@ -119,8 +119,8 @@ public class ComponentDefinitionRegistry {
         return getProperty(propertyName, OptionalUtils.get(actionDefinition.getProperties()));
     }
 
-    public Authorization getAuthorization(String componentName, String authorizationName) {
-        ConnectionDefinition connectionDefinition = getConnectionDefinition(componentName);
+    public Authorization getAuthorization(String componentName, int connectionVersion, String authorizationName) {
+        ConnectionDefinition connectionDefinition = getConnectionDefinition(componentName, connectionVersion);
 
         return connectionDefinition.getAuthorization(authorizationName);
     }
@@ -169,10 +169,18 @@ public class ComponentDefinitionRegistry {
         return componentDefinitions;
     }
 
-    public ConnectionDefinition getConnectionDefinition(String componentName) {
+    public ConnectionDefinition getConnectionDefinition(String componentName, int connectionVersion) {
         return CollectionUtils.getFirstFilter(
             componentDefinitions,
-            componentDefinition -> componentName.equalsIgnoreCase(componentDefinition.getName()),
+            componentDefinition -> {
+                if (componentName.equalsIgnoreCase(componentDefinition.getName())) {
+                    return componentDefinition.getConnection()
+                        .map(connectionDefinition -> connectionDefinition.getVersion() == connectionVersion)
+                        .orElse(false);
+                }
+
+                return false;
+            },
             componentDefinition -> OptionalUtils.get(componentDefinition.getConnection()));
     }
 
