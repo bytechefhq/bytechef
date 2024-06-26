@@ -28,24 +28,22 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerDefinition", description = "A trigger definition defines ways to trigger workflows from the outside services.")
 @JsonTypeName("TriggerDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-26T12:24:38.500893+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-26T23:39:11.255305+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class TriggerDefinitionModel {
 
   private String componentName;
 
   private Integer componentVersion;
 
-  private String description;
+  private Boolean dynamicOutput;
 
-  private Boolean workflowNodeDescriptionDefined;
+  private String description;
 
   private HelpModel help;
 
   private String name;
 
   private Boolean outputDefined;
-
-  private Boolean outputFunctionDefined;
 
   @Valid
   private List<@Valid PropertyModel> properties = new ArrayList<>();
@@ -54,6 +52,8 @@ public class TriggerDefinitionModel {
 
   private TriggerTypeModel type;
 
+  private Boolean workflowNodeDescriptionDefined;
+
   public TriggerDefinitionModel() {
     super();
   }
@@ -61,10 +61,10 @@ public class TriggerDefinitionModel {
   /**
    * Constructor with only required parameters
    */
-  public TriggerDefinitionModel(String name, Boolean outputDefined, Boolean outputFunctionDefined, TriggerTypeModel type) {
+  public TriggerDefinitionModel(Boolean dynamicOutput, String name, Boolean outputDefined, TriggerTypeModel type) {
+    this.dynamicOutput = dynamicOutput;
     this.name = name;
     this.outputDefined = outputDefined;
-    this.outputFunctionDefined = outputFunctionDefined;
     this.type = type;
   }
 
@@ -108,6 +108,26 @@ public class TriggerDefinitionModel {
     this.componentVersion = componentVersion;
   }
 
+  public TriggerDefinitionModel dynamicOutput(Boolean dynamicOutput) {
+    this.dynamicOutput = dynamicOutput;
+    return this;
+  }
+
+  /**
+   * Does trigger define dynamic output schema.
+   * @return dynamicOutput
+  */
+  @NotNull 
+  @Schema(name = "dynamicOutput", description = "Does trigger define dynamic output schema.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("dynamicOutput")
+  public Boolean getDynamicOutput() {
+    return dynamicOutput;
+  }
+
+  public void setDynamicOutput(Boolean dynamicOutput) {
+    this.dynamicOutput = dynamicOutput;
+  }
+
   public TriggerDefinitionModel description(String description) {
     this.description = description;
     return this;
@@ -126,26 +146,6 @@ public class TriggerDefinitionModel {
 
   public void setDescription(String description) {
     this.description = description;
-  }
-
-  public TriggerDefinitionModel workflowNodeDescriptionDefined(Boolean workflowNodeDescriptionDefined) {
-    this.workflowNodeDescriptionDefined = workflowNodeDescriptionDefined;
-    return this;
-  }
-
-  /**
-   * Does trigger define dynamic node description.
-   * @return workflowNodeDescriptionDefined
-  */
-  
-  @Schema(name = "workflowNodeDescriptionDefined", description = "Does trigger define dynamic node description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("workflowNodeDescriptionDefined")
-  public Boolean getWorkflowNodeDescriptionDefined() {
-    return workflowNodeDescriptionDefined;
-  }
-
-  public void setWorkflowNodeDescriptionDefined(Boolean workflowNodeDescriptionDefined) {
-    this.workflowNodeDescriptionDefined = workflowNodeDescriptionDefined;
   }
 
   public TriggerDefinitionModel help(HelpModel help) {
@@ -206,26 +206,6 @@ public class TriggerDefinitionModel {
 
   public void setOutputDefined(Boolean outputDefined) {
     this.outputDefined = outputDefined;
-  }
-
-  public TriggerDefinitionModel outputFunctionDefined(Boolean outputFunctionDefined) {
-    this.outputFunctionDefined = outputFunctionDefined;
-    return this;
-  }
-
-  /**
-   * Does trigger define dynamic output schema.
-   * @return outputFunctionDefined
-  */
-  @NotNull 
-  @Schema(name = "outputFunctionDefined", description = "Does trigger define dynamic output schema.", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("outputFunctionDefined")
-  public Boolean getOutputFunctionDefined() {
-    return outputFunctionDefined;
-  }
-
-  public void setOutputFunctionDefined(Boolean outputFunctionDefined) {
-    this.outputFunctionDefined = outputFunctionDefined;
   }
 
   public TriggerDefinitionModel properties(List<@Valid PropertyModel> properties) {
@@ -296,6 +276,26 @@ public class TriggerDefinitionModel {
     this.type = type;
   }
 
+  public TriggerDefinitionModel workflowNodeDescriptionDefined(Boolean workflowNodeDescriptionDefined) {
+    this.workflowNodeDescriptionDefined = workflowNodeDescriptionDefined;
+    return this;
+  }
+
+  /**
+   * Does trigger define dynamic node description.
+   * @return workflowNodeDescriptionDefined
+  */
+  
+  @Schema(name = "workflowNodeDescriptionDefined", description = "Does trigger define dynamic node description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("workflowNodeDescriptionDefined")
+  public Boolean getWorkflowNodeDescriptionDefined() {
+    return workflowNodeDescriptionDefined;
+  }
+
+  public void setWorkflowNodeDescriptionDefined(Boolean workflowNodeDescriptionDefined) {
+    this.workflowNodeDescriptionDefined = workflowNodeDescriptionDefined;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -307,20 +307,20 @@ public class TriggerDefinitionModel {
     TriggerDefinitionModel triggerDefinition = (TriggerDefinitionModel) o;
     return Objects.equals(this.componentName, triggerDefinition.componentName) &&
         Objects.equals(this.componentVersion, triggerDefinition.componentVersion) &&
+        Objects.equals(this.dynamicOutput, triggerDefinition.dynamicOutput) &&
         Objects.equals(this.description, triggerDefinition.description) &&
-        Objects.equals(this.workflowNodeDescriptionDefined, triggerDefinition.workflowNodeDescriptionDefined) &&
         Objects.equals(this.help, triggerDefinition.help) &&
         Objects.equals(this.name, triggerDefinition.name) &&
         Objects.equals(this.outputDefined, triggerDefinition.outputDefined) &&
-        Objects.equals(this.outputFunctionDefined, triggerDefinition.outputFunctionDefined) &&
         Objects.equals(this.properties, triggerDefinition.properties) &&
         Objects.equals(this.title, triggerDefinition.title) &&
-        Objects.equals(this.type, triggerDefinition.type);
+        Objects.equals(this.type, triggerDefinition.type) &&
+        Objects.equals(this.workflowNodeDescriptionDefined, triggerDefinition.workflowNodeDescriptionDefined);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, description, workflowNodeDescriptionDefined, help, name, outputDefined, outputFunctionDefined, properties, title, type);
+    return Objects.hash(componentName, componentVersion, dynamicOutput, description, help, name, outputDefined, properties, title, type, workflowNodeDescriptionDefined);
   }
 
   @Override
@@ -329,15 +329,15 @@ public class TriggerDefinitionModel {
     sb.append("class TriggerDefinitionModel {\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
     sb.append("    componentVersion: ").append(toIndentedString(componentVersion)).append("\n");
+    sb.append("    dynamicOutput: ").append(toIndentedString(dynamicOutput)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
-    sb.append("    workflowNodeDescriptionDefined: ").append(toIndentedString(workflowNodeDescriptionDefined)).append("\n");
     sb.append("    help: ").append(toIndentedString(help)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    outputDefined: ").append(toIndentedString(outputDefined)).append("\n");
-    sb.append("    outputFunctionDefined: ").append(toIndentedString(outputFunctionDefined)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
+    sb.append("    workflowNodeDescriptionDefined: ").append(toIndentedString(workflowNodeDescriptionDefined)).append("\n");
     sb.append("}");
     return sb.toString();
   }
