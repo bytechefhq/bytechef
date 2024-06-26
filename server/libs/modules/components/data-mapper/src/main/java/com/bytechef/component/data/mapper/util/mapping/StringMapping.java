@@ -21,7 +21,7 @@ public class StringMapping extends Mapping<String, String> {
         super();
     }
 
-    public StringMapping(String to, String from) {
-        super(to, from);
+    public StringMapping(String from, String to) {
+        super(from, to);
     }
 }

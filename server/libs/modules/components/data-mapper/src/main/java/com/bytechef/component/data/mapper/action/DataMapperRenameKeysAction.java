@@ -34,6 +34,7 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -74,7 +75,7 @@ public class DataMapperRenameKeysAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         List<StringMapping> mappingList = inputParameters.getList(MAPPINGS, StringMapping.class, List.of());
         Map<String, String> mappings = mappingList.stream()
-            .collect(Collectors.toMap(Mapping::getFrom, Mapping::getTo));
+            .collect(Collectors.toMap(Mapping::getFrom, Mapping::getTo, (x, y) -> y, LinkedHashMap::new));
 
         DocumentContext input = JsonPath.parse(inputParameters.get(INPUT));
         for (Map.Entry<String, String> entry : mappings.entrySet()) {
