@@ -28,6 +28,7 @@ export const ControlTypeModel = {
     ObjectBuilder: 'OBJECT_BUILDER',
     MultiSelect: 'MULTI_SELECT',
     Number: 'NUMBER',
+    Null: 'NULL',
     Password: 'PASSWORD',
     Phone: 'PHONE',
     Select: 'SELECT',
