@@ -51,17 +51,17 @@ export interface TriggerDefinitionModel {
      */
     componentVersion?: number;
     /**
+     * Does trigger define dynamic output schema.
+     * @type {boolean}
+     * @memberof TriggerDefinitionModel
+     */
+    dynamicOutput: boolean;
+    /**
      * The description.
      * @type {string}
      * @memberof TriggerDefinitionModel
      */
     description?: string;
-    /**
-     * Does trigger define dynamic node description.
-     * @type {boolean}
-     * @memberof TriggerDefinitionModel
-     */
-    workflowNodeDescriptionDefined?: boolean;
     /**
      * 
      * @type {HelpModel}
@@ -81,12 +81,6 @@ export interface TriggerDefinitionModel {
      */
     outputDefined: boolean;
     /**
-     * Does trigger define dynamic output schema.
-     * @type {boolean}
-     * @memberof TriggerDefinitionModel
-     */
-    outputFunctionDefined: boolean;
-    /**
      * The list of action properties.
      * @type {Array<PropertyModel>}
      * @memberof TriggerDefinitionModel
@@ -104,15 +98,21 @@ export interface TriggerDefinitionModel {
      * @memberof TriggerDefinitionModel
      */
     type: TriggerTypeModel;
+    /**
+     * Does trigger define dynamic node description.
+     * @type {boolean}
+     * @memberof TriggerDefinitionModel
+     */
+    workflowNodeDescriptionDefined?: boolean;
 }
 
 /**
  * Check if a given object implements the TriggerDefinitionModel interface.
  */
 export function instanceOfTriggerDefinitionModel(value: object): boolean {
+    if (!('dynamicOutput' in value)) return false;
     if (!('name' in value)) return false;
     if (!('outputDefined' in value)) return false;
-    if (!('outputFunctionDefined' in value)) return false;
     if (!('type' in value)) return false;
     return true;
 }
@@ -129,15 +129,15 @@ export function TriggerDefinitionModelFromJSONTyped(json: any, ignoreDiscriminat
         
         'componentName': json['componentName'] == null ? undefined : json['componentName'],
         'componentVersion': json['componentVersion'] == null ? undefined : json['componentVersion'],
+        'dynamicOutput': json['dynamicOutput'],
         'description': json['description'] == null ? undefined : json['description'],
-        'workflowNodeDescriptionDefined': json['workflowNodeDescriptionDefined'] == null ? undefined : json['workflowNodeDescriptionDefined'],
         'help': json['help'] == null ? undefined : HelpModelFromJSON(json['help']),
         'name': json['name'],
         'outputDefined': json['outputDefined'],
-        'outputFunctionDefined': json['outputFunctionDefined'],
         'properties': json['properties'] == null ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
         'title': json['title'] == null ? undefined : json['title'],
         'type': TriggerTypeModelFromJSON(json['type']),
+        'workflowNodeDescriptionDefined': json['workflowNodeDescriptionDefined'] == null ? undefined : json['workflowNodeDescriptionDefined'],
     };
 }
 
@@ -149,15 +149,15 @@ export function TriggerDefinitionModelToJSON(value?: TriggerDefinitionModel | nu
         
         'componentName': value['componentName'],
         'componentVersion': value['componentVersion'],
+        'dynamicOutput': value['dynamicOutput'],
         'description': value['description'],
-        'workflowNodeDescriptionDefined': value['workflowNodeDescriptionDefined'],
         'help': HelpModelToJSON(value['help']),
         'name': value['name'],
         'outputDefined': value['outputDefined'],
-        'outputFunctionDefined': value['outputFunctionDefined'],
         'properties': value['properties'] == null ? undefined : ((value['properties'] as Array<any>).map(PropertyModelToJSON)),
         'title': value['title'],
         'type': TriggerTypeModelToJSON(value['type']),
+        'workflowNodeDescriptionDefined': value['workflowNodeDescriptionDefined'],
     };
 }
 

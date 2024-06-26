@@ -45,17 +45,17 @@ export interface ActionDefinitionModel {
      */
     componentVersion?: number;
     /**
+     * Does action define dynamic output schema.
+     * @type {boolean}
+     * @memberof ActionDefinitionModel
+     */
+    dynamicOutput: boolean;
+    /**
      * The description.
      * @type {string}
      * @memberof ActionDefinitionModel
      */
     description?: string;
-    /**
-     * Does action define dynamic node description.
-     * @type {boolean}
-     * @memberof ActionDefinitionModel
-     */
-    workflowNodeDescriptionDefined?: boolean;
     /**
      * 
      * @type {HelpModel}
@@ -75,12 +75,6 @@ export interface ActionDefinitionModel {
      */
     outputDefined: boolean;
     /**
-     * Does action define dynamic output schema.
-     * @type {boolean}
-     * @memberof ActionDefinitionModel
-     */
-    outputFunctionDefined: boolean;
-    /**
      * The list of action properties.
      * @type {Array<PropertyModel>}
      * @memberof ActionDefinitionModel
@@ -92,15 +86,21 @@ export interface ActionDefinitionModel {
      * @memberof ActionDefinitionModel
      */
     title?: string;
+    /**
+     * Does action define dynamic node description.
+     * @type {boolean}
+     * @memberof ActionDefinitionModel
+     */
+    workflowNodeDescriptionDefined?: boolean;
 }
 
 /**
  * Check if a given object implements the ActionDefinitionModel interface.
  */
 export function instanceOfActionDefinitionModel(value: object): boolean {
+    if (!('dynamicOutput' in value)) return false;
     if (!('name' in value)) return false;
     if (!('outputDefined' in value)) return false;
-    if (!('outputFunctionDefined' in value)) return false;
     return true;
 }
 
@@ -116,14 +116,14 @@ export function ActionDefinitionModelFromJSONTyped(json: any, ignoreDiscriminato
         
         'componentName': json['componentName'] == null ? undefined : json['componentName'],
         'componentVersion': json['componentVersion'] == null ? undefined : json['componentVersion'],
+        'dynamicOutput': json['dynamicOutput'],
         'description': json['description'] == null ? undefined : json['description'],
-        'workflowNodeDescriptionDefined': json['workflowNodeDescriptionDefined'] == null ? undefined : json['workflowNodeDescriptionDefined'],
         'help': json['help'] == null ? undefined : HelpModelFromJSON(json['help']),
         'name': json['name'],
         'outputDefined': json['outputDefined'],
-        'outputFunctionDefined': json['outputFunctionDefined'],
         'properties': json['properties'] == null ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
         'title': json['title'] == null ? undefined : json['title'],
+        'workflowNodeDescriptionDefined': json['workflowNodeDescriptionDefined'] == null ? undefined : json['workflowNodeDescriptionDefined'],
     };
 }
 
@@ -135,14 +135,14 @@ export function ActionDefinitionModelToJSON(value?: ActionDefinitionModel | null
         
         'componentName': value['componentName'],
         'componentVersion': value['componentVersion'],
+        'dynamicOutput': value['dynamicOutput'],
         'description': value['description'],
-        'workflowNodeDescriptionDefined': value['workflowNodeDescriptionDefined'],
         'help': HelpModelToJSON(value['help']),
         'name': value['name'],
         'outputDefined': value['outputDefined'],
-        'outputFunctionDefined': value['outputFunctionDefined'],
         'properties': value['properties'] == null ? undefined : ((value['properties'] as Array<any>).map(PropertyModelToJSON)),
         'title': value['title'],
+        'workflowNodeDescriptionDefined': value['workflowNodeDescriptionDefined'],
     };
 }
 

@@ -33,6 +33,12 @@ import {
  */
 export interface TaskDispatcherDefinitionModel {
     /**
+     * Does task dispatcher define dynamic output schema.
+     * @type {boolean}
+     * @memberof TaskDispatcherDefinitionModel
+     */
+    dynamicOutput: boolean;
+    /**
      * The description.
      * @type {string}
      * @memberof TaskDispatcherDefinitionModel
@@ -56,12 +62,6 @@ export interface TaskDispatcherDefinitionModel {
      * @memberof TaskDispatcherDefinitionModel
      */
     outputDefined: boolean;
-    /**
-     * Does task dispatcher define dynamic output schema.
-     * @type {boolean}
-     * @memberof TaskDispatcherDefinitionModel
-     */
-    outputFunctionDefined: boolean;
     /**
      * The list of task dispatcher properties.
      * @type {Array<PropertyModel>}
@@ -104,9 +104,9 @@ export interface TaskDispatcherDefinitionModel {
  * Check if a given object implements the TaskDispatcherDefinitionModel interface.
  */
 export function instanceOfTaskDispatcherDefinitionModel(value: object): boolean {
+    if (!('dynamicOutput' in value)) return false;
     if (!('name' in value)) return false;
     if (!('outputDefined' in value)) return false;
-    if (!('outputFunctionDefined' in value)) return false;
     if (!('version' in value)) return false;
     return true;
 }
@@ -121,11 +121,11 @@ export function TaskDispatcherDefinitionModelFromJSONTyped(json: any, ignoreDisc
     }
     return {
         
+        'dynamicOutput': json['dynamicOutput'],
         'description': json['description'] == null ? undefined : json['description'],
         'icon': json['icon'] == null ? undefined : json['icon'],
         'name': json['name'],
         'outputDefined': json['outputDefined'],
-        'outputFunctionDefined': json['outputFunctionDefined'],
         'properties': json['properties'] == null ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
         'resources': json['resources'] == null ? undefined : ResourcesModelFromJSON(json['resources']),
         'taskProperties': json['taskProperties'] == null ? undefined : ((json['taskProperties'] as Array<any>).map(PropertyModelFromJSON)),
@@ -141,11 +141,11 @@ export function TaskDispatcherDefinitionModelToJSON(value?: TaskDispatcherDefini
     }
     return {
         
+        'dynamicOutput': value['dynamicOutput'],
         'description': value['description'],
         'icon': value['icon'],
         'name': value['name'],
         'outputDefined': value['outputDefined'],
-        'outputFunctionDefined': value['outputFunctionDefined'],
         'properties': value['properties'] == null ? undefined : ((value['properties'] as Array<any>).map(PropertyModelToJSON)),
         'resources': ResourcesModelToJSON(value['resources']),
         'taskProperties': value['taskProperties'] == null ? undefined : ((value['taskProperties'] as Array<any>).map(PropertyModelToJSON)),
