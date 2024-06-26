@@ -36,5 +36,6 @@ public class DataMapperConstants {
     public static final String VALUE_KEY = "valueKey";
     public static final String DEFAULT_VALUE = "defaultValue";
     public static final String TYPE = "type";
-    public static final String VALUE_TYPE = "valueType";
+    public static final String VALUE_TYPE_FROM = "valueTypeFrom";
+    public static final String VALUE_TYPE_TO = "valueTypeTo";
 }

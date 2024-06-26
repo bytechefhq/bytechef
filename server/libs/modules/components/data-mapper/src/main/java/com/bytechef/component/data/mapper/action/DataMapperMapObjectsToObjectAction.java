@@ -61,7 +61,8 @@ public class DataMapperMapObjectsToObjectAction {
                 .description("The input type.")
                 .options(
                     option("Object", 1),
-                    option("Array", 2)),
+                    option("Array", 2))
+                .required(true),
             object(INPUT)
                 .label("Input")
                 .description("An object containing one or more properties.")
