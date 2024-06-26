@@ -22,6 +22,17 @@ import static com.bytechef.component.data.mapper.constant.DataMapperConstants.MA
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.TO;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.TYPE;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.VALUE;
+import static com.bytechef.component.data.mapper.util.DataMapperUtils.DEFAULT_VALUE_DESCRIPTION;
+import static com.bytechef.component.data.mapper.util.DataMapperUtils.DEFAULT_VALUE_LABEL;
+import static com.bytechef.component.data.mapper.util.DataMapperUtils.FROM_DESCRIPTION;
+import static com.bytechef.component.data.mapper.util.DataMapperUtils.LABEL_FROM;
+import static com.bytechef.component.data.mapper.util.DataMapperUtils.LABEL_TO;
+import static com.bytechef.component.data.mapper.util.DataMapperUtils.MAPPINGS_DESCRIPTION;
+import static com.bytechef.component.data.mapper.util.DataMapperUtils.MAPPINGS_LABEL;
+import static com.bytechef.component.data.mapper.util.DataMapperUtils.TO_DESCRIPTION;
+import static com.bytechef.component.data.mapper.util.DataMapperUtils.VALUE_DESCRIPTION;
+import static com.bytechef.component.data.mapper.util.DataMapperUtils.VALUE_LABEL;
+import static com.bytechef.component.data.mapper.util.DataMapperUtils.getDisplayCondition;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.date;
@@ -74,242 +85,233 @@ public class DataMapperReplaceValueAction {
                     option("Time", 10))
                 .required(true),
             array(VALUE)
-                .label("Value")
-                .description("The value you want to replace.")
-                .displayCondition("type == 1")
+                .label(VALUE_LABEL)
+                .description(VALUE_DESCRIPTION)
+                .displayCondition(getDisplayCondition("1"))
                 .required(true),
             bool(VALUE)
-                .label("Value")
-                .description("The value you want to replace.")
-                .displayCondition("type == 2")
+                .label(VALUE_LABEL)
+                .description(VALUE_DESCRIPTION)
+                .displayCondition(getDisplayCondition("2"))
                 .required(true),
             date(VALUE)
-                .label("Value")
-                .description("The value you want to replace.")
-                .displayCondition("type == 3")
+                .label(VALUE_LABEL)
+                .description(VALUE_DESCRIPTION)
+                .displayCondition(getDisplayCondition("3"))
                 .required(true),
             dateTime(VALUE)
-                .label("Value")
-                .description("The value you want to replace.")
-                .displayCondition("type == 4")
+                .label(VALUE_LABEL)
+                .description(VALUE_DESCRIPTION)
+                .displayCondition(getDisplayCondition("4"))
                 .required(true),
             integer(VALUE)
-                .label("Value")
-                .description("The value you want to replace.")
-                .displayCondition("type == 5")
+                .label(VALUE_LABEL)
+                .description(VALUE_DESCRIPTION)
+                .displayCondition(getDisplayCondition("5"))
                 .required(true),
             nullable(VALUE)
-                .label("Value")
-                .description("The value you want to replace.")
-                .displayCondition("type == 6")
+                .label(VALUE_LABEL)
+                .description(VALUE_DESCRIPTION)
+                .displayCondition(getDisplayCondition("6"))
                 .required(true),
             number(VALUE)
-                .label("Value")
-                .description("The value you want to replace.")
-                .displayCondition("type == 7")
+                .label(VALUE_LABEL)
+                .description(VALUE_DESCRIPTION)
+                .displayCondition(getDisplayCondition("7"))
                 .required(true),
             object(VALUE)
-                .label("Value")
-                .description("The value you want to replace.")
-                .displayCondition("type == 8")
+                .label(VALUE_LABEL)
+                .description(VALUE_DESCRIPTION)
+                .displayCondition(getDisplayCondition("8"))
                 .additionalProperties(
                     array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
                 .required(true),
             string(VALUE)
-                .label("Value")
-                .description("The value you want to replace.")
-                .displayCondition("type == 9")
+                .label(VALUE_LABEL)
+                .description(VALUE_DESCRIPTION)
+                .displayCondition(getDisplayCondition("9"))
                 .required(true),
             time(VALUE)
-                .label("Value")
-                .description("The value you want to replace.")
-                .displayCondition("type == 10")
+                .label(VALUE_LABEL)
+                .description(VALUE_DESCRIPTION)
+                .displayCondition(getDisplayCondition("10"))
                 .required(true),
             array(DEFAULT_VALUE)
-                .label("Default value")
-                .description("If there is no existing mapping, assign this value as default.")
-                .displayCondition("type == 1")
+                .label(DEFAULT_VALUE_LABEL)
+                .description(DEFAULT_VALUE_DESCRIPTION)
+                .displayCondition(getDisplayCondition("1"))
                 .required(true),
             bool(DEFAULT_VALUE)
-                .label("Default value")
-                .description("If there is no existing mapping, assign this value as default.")
-                .displayCondition("type == 2")
+                .label(DEFAULT_VALUE_LABEL)
+                .description(DEFAULT_VALUE_DESCRIPTION)
+                .displayCondition(getDisplayCondition("2"))
                 .required(true),
             date(DEFAULT_VALUE)
-                .label("Default value")
-                .description("If there is no existing mapping, assign this value as default.")
-                .displayCondition("type == 3")
+                .label(DEFAULT_VALUE_LABEL)
+                .description(DEFAULT_VALUE_DESCRIPTION)
+                .displayCondition(getDisplayCondition("3"))
                 .required(true),
             dateTime(DEFAULT_VALUE)
-                .label("Default value")
-                .description("If there is no existing mapping, assign this value as default.")
-                .displayCondition("type == 4")
+                .label(DEFAULT_VALUE_LABEL)
+                .description(DEFAULT_VALUE_DESCRIPTION)
+                .displayCondition(getDisplayCondition("4"))
                 .required(true),
             integer(DEFAULT_VALUE)
-                .label("Default value")
-                .description("If there is no existing mapping, assign this value as default.")
-                .displayCondition("type == 5")
+                .label(DEFAULT_VALUE_LABEL)
+                .description(DEFAULT_VALUE_DESCRIPTION)
+                .displayCondition(getDisplayCondition("5"))
                 .required(true),
             nullable(DEFAULT_VALUE)
-                .label("Default value")
-                .description("If there is no existing mapping, assign this value as default.")
-                .displayCondition("type == 6")
+                .label(DEFAULT_VALUE_LABEL)
+                .description(DEFAULT_VALUE_DESCRIPTION)
+                .displayCondition(getDisplayCondition("6"))
                 .required(true),
             number(DEFAULT_VALUE)
-                .label("Default value")
-                .description("If there is no existing mapping, assign this value as default.")
-                .displayCondition("type == 7")
+                .label(DEFAULT_VALUE_LABEL)
+                .description(DEFAULT_VALUE_DESCRIPTION)
+                .displayCondition(getDisplayCondition("7"))
                 .required(true),
             object(DEFAULT_VALUE)
-                .label("Default value")
-                .description("If there is no existing mapping, assign this value as default.")
-                .displayCondition("type == 8")
+                .label(DEFAULT_VALUE_LABEL)
+                .description(DEFAULT_VALUE_DESCRIPTION)
+                .displayCondition(getDisplayCondition("8"))
                 .required(true),
             string(DEFAULT_VALUE)
-                .label("Default value")
-                .description("If there is no existing mapping, assign this value as default.")
-                .displayCondition("type == 9")
+                .label(DEFAULT_VALUE_LABEL)
+                .description(DEFAULT_VALUE_DESCRIPTION)
+                .displayCondition(getDisplayCondition("9"))
                 .required(true),
             time(DEFAULT_VALUE)
-                .label("Default value")
-                .description("If there is no existing mapping, assign this value as default.")
-                .displayCondition("type == 10")
+                .label(DEFAULT_VALUE_LABEL)
+                .description(DEFAULT_VALUE_DESCRIPTION)
+                .displayCondition(getDisplayCondition("10"))
                 .required(true),
             array(MAPPINGS)
-                .label("Mappings")
-                .description(
-                    "An array of objects that contains properties 'from' and 'to'.")
-                .displayCondition("type == 1")
+                .label(MAPPINGS_LABEL)
+                .description(MAPPINGS_DESCRIPTION)
+                .displayCondition(getDisplayCondition("1"))
                 .items(
                     object().properties(
                         array(FROM)
-                            .label("Value from")
-                            .description("Defines the property value you want to change.")
+                            .label(LABEL_FROM)
+                            .description(FROM_DESCRIPTION)
                             .required(true),
                         array(TO)
-                            .label("Value to")
-                            .description("Defines what you want to change the property value to.")
+                            .label(LABEL_TO)
+                            .description(TO_DESCRIPTION)
                             .required(true))),
             array(MAPPINGS)
-                .label("Mappings")
-                .description(
-                    "An array of objects that contains properties 'from' and 'to'.")
-                .displayCondition("type == 2")
+                .label(MAPPINGS_LABEL)
+                .description(MAPPINGS_DESCRIPTION)
+                .displayCondition(getDisplayCondition("2"))
                 .items(
                     object().properties(
                         bool(FROM)
-                            .label("Value from")
-                            .description("Defines the property value you want to change.")
+                            .label(LABEL_FROM)
+                            .description(FROM_DESCRIPTION)
                             .required(true),
                         bool(TO)
-                            .label("Value to")
-                            .description("Defines what you want to change the property value to.")
+                            .label(LABEL_TO)
+                            .description(TO_DESCRIPTION)
                             .required(true))),
             array(MAPPINGS)
-                .label("Mappings")
-                .description(
-                    "An array of objects that contains properties 'from' and 'to'.")
-                .displayCondition("type == 3")
+                .label(MAPPINGS_LABEL)
+                .description(MAPPINGS_DESCRIPTION)
+                .displayCondition(getDisplayCondition("3"))
                 .items(
                     object().properties(
                         date(FROM)
-                            .label("Value from")
-                            .description("Defines the property value you want to change.")
+                            .label(LABEL_FROM)
+                            .description(FROM_DESCRIPTION)
                             .required(true),
 
                         date(TO)
-                            .label("Value to")
-                            .description("Defines what you want to change the property value to.")
+                            .label(LABEL_TO)
+                            .description(TO_DESCRIPTION)
                             .required(true))),
             array(MAPPINGS)
-                .label("Mappings")
-                .description(
-                    "An array of objects that contains properties 'from' and 'to'.")
-                .displayCondition("type == 4")
+                .label(MAPPINGS_LABEL)
+                .description(MAPPINGS_DESCRIPTION)
+                .displayCondition(getDisplayCondition("4"))
                 .items(
                     object().properties(
                         dateTime(FROM)
-                            .label("Value from")
-                            .description("Defines the property value you want to change.")
+                            .label(LABEL_FROM)
+                            .description(FROM_DESCRIPTION)
                             .required(true),
                         dateTime(TO)
-                            .label("Value to")
-                            .description("Defines what you want to change the property value to.")
+                            .label(LABEL_TO)
+                            .description(TO_DESCRIPTION)
                             .required(true))),
             array(MAPPINGS)
-                .label("Mappings")
-                .description(
-                    "An array of objects that contains properties 'from' and 'to'.")
-                .displayCondition("type == 5")
+                .label(MAPPINGS_LABEL)
+                .description(MAPPINGS_DESCRIPTION)
+                .displayCondition(getDisplayCondition("5"))
                 .items(
                     object().properties(
                         integer(FROM)
-                            .label("Value from")
-                            .description("Defines the property value you want to change.")
+                            .label(LABEL_FROM)
+                            .description(FROM_DESCRIPTION)
                             .required(true),
                         integer(TO)
-                            .label("Value to")
-                            .description("Defines what you want to change the property value to.")
+                            .label(LABEL_TO)
+                            .description(TO_DESCRIPTION)
                             .required(true))),
             array(MAPPINGS)
-                .label("Mappings")
-                .description(
-                    "An array of objects that contains properties 'from' and 'to'.")
-                .displayCondition("type == 7")
+                .label(MAPPINGS_LABEL)
+                .description(MAPPINGS_DESCRIPTION)
+                .displayCondition(getDisplayCondition("7"))
                 .items(
                     object().properties(
                         number(FROM)
-                            .label("Value from")
-                            .description("Defines the property value you want to change.")
+                            .label(LABEL_FROM)
+                            .description(FROM_DESCRIPTION)
                             .required(true),
                         number(TO)
-                            .label("Value to")
-                            .description("Defines what you want to change the property value to.")
+                            .label(LABEL_TO)
+                            .description(TO_DESCRIPTION)
                             .required(true))),
             array(MAPPINGS)
-                .label("Mappings")
-                .description(
-                    "An array of objects that contains properties 'from' and 'to'.")
-                .displayCondition("type == 8")
+                .label(MAPPINGS_LABEL)
+                .description(MAPPINGS_DESCRIPTION)
+                .displayCondition(getDisplayCondition("8"))
                 .items(
                     object().properties(
                         object(FROM)
-                            .label("Value from")
-                            .description("Defines the property value you want to change.")
+                            .label(LABEL_FROM)
+                            .description(FROM_DESCRIPTION)
                             .required(true),
                         object(TO)
-                            .label("Value to")
-                            .description("Defines what you want to change the property value to.")
+                            .label(LABEL_TO)
+                            .description(TO_DESCRIPTION)
                             .required(true))),
             array(MAPPINGS)
-                .label("Mappings")
-                .description(
-                    "An array of objects that contains properties 'from' and 'to'.")
-                .displayCondition("type == 9")
+                .label(MAPPINGS_LABEL)
+                .description(MAPPINGS_DESCRIPTION)
+                .displayCondition(getDisplayCondition("9"))
                 .items(
                     object().properties(
                         string(FROM)
-                            .label("Value from")
-                            .description("Defines the property value you want to change.")
+                            .label(LABEL_FROM)
+                            .description(FROM_DESCRIPTION)
                             .required(true),
                         string(TO)
-                            .label("Value to")
-                            .description("Defines what you want to change the property value to.")
+                            .label(LABEL_TO)
+                            .description(TO_DESCRIPTION)
                             .required(true))),
             array(MAPPINGS)
-                .label("Mappings")
-                .description(
-                    "An array of objects that contains properties 'from' and 'to'.")
-                .displayCondition("type == 10")
+                .label(MAPPINGS_LABEL)
+                .description(MAPPINGS_DESCRIPTION)
+                .displayCondition(getDisplayCondition("10"))
                 .items(
                     object().properties(
                         time(FROM)
-                            .label("Value from")
-                            .description("Defines the property value you want to change.")
+                            .label(LABEL_FROM)
+                            .description(FROM_DESCRIPTION)
                             .required(true),
                         time(TO)
-                            .label("Value to")
-                            .description("Defines what you want to change the property value to.")
+                            .label(LABEL_TO)
+                            .description(TO_DESCRIPTION)
                             .required(true))))
         .output()
         .perform(DataMapperReplaceValueAction::perform);
@@ -321,10 +323,9 @@ public class DataMapperReplaceValueAction {
         List<ObjectMapping> mappingList = inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of());
 
         for (Mapping<Object, Object> mapping : mappingList) {
-            if (ConvertUtils.canConvert(mapping.getFrom(), type)) {
-                if (ConvertUtils.convertValue(mapping.getFrom(), type)
-                    .equals(inputParameters.get(VALUE, type)))
-                    return ConvertUtils.convertValue(mapping.getTo(), type);
+            if (ConvertUtils.canConvert(mapping.getFrom(), type) && ConvertUtils.convertValue(mapping.getFrom(), type)
+                .equals(inputParameters.get(VALUE, type))) {
+                return ConvertUtils.convertValue(mapping.getTo(), type);
             }
         }
 

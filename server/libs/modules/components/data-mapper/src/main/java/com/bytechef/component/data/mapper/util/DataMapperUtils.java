@@ -35,6 +35,18 @@ import org.apache.commons.lang3.Validate;
 import org.graalvm.collections.Pair;
 
 public class DataMapperUtils {
+    public static final String VALUE_DESCRIPTION = "The value you want to replace.";
+    public static final String VALUE_LABEL = "Value";
+    public static final String DEFAULT_VALUE_DESCRIPTION =
+        "If there is no existing mapping, assign this value as default.";
+    public static final String DEFAULT_VALUE_LABEL = "Default value";
+    public static final String MAPPINGS_DESCRIPTION = "An array of objects that contains properties 'from' and 'to'.";
+    public static final String MAPPINGS_LABEL = "Mappings";
+    public static final String LABEL_TO = "Value to";
+    public static final String LABEL_FROM = "Value from";
+    public static final String FROM_DESCRIPTION = "Defines the property value you want to change.";
+    public static final String TO_DESCRIPTION = "Defines what you want to change the property value to.";
+
     public static Class<?> getType(Parameters inputParameters) {
         return switch (inputParameters.getRequiredInteger(TYPE)) {
             case 1 -> ArrayList.class;
@@ -91,29 +103,8 @@ public class DataMapperUtils {
         return value;
     }
 
-    public static void mapEntry(
-        Parameters inputParameters, Map<String, Object> output, Map<String, Pair<String, Boolean>> mappings,
-        Map.Entry<String, Object> entry) {
-        if ((inputParameters.getBoolean(INCLUDE_NULLS) == null || (inputParameters.getBoolean(INCLUDE_NULLS) != null
-            && (inputParameters.getBoolean(INCLUDE_NULLS) || ObjectUtils.anyNotNull(entry.getValue()))))
-            && (inputParameters.getBoolean(INCLUDE_EMPTY_STRINGS) == null || (inputParameters
-                .getBoolean(INCLUDE_EMPTY_STRINGS) != null
-                && (inputParameters.getBoolean(INCLUDE_EMPTY_STRINGS) || ObjectUtils.isNotEmpty(entry.getValue()))))) {
-
-            if (mappings.containsKey(entry.getKey())) {
-                if (mappings.get(entry.getKey())
-                    .getRight() != null && mappings.get(entry.getKey())
-                        .getRight()) {
-                    Objects.requireNonNull(entry.getValue(), "Required field " + entry.getKey() + " cannot be null.");
-                    Validate.notBlank(entry.getValue()
-                        .toString(), "Required field " + entry.getKey() + " cannot be empty.");
-                }
-
-                output.put(mappings.get(entry.getKey())
-                    .getLeft(), entry.getValue());
-            } else if (inputParameters.getBoolean(INCLUDE_UNMAPPED) != null
-                && inputParameters.getBoolean(INCLUDE_UNMAPPED))
-                output.put(entry.getKey(), entry.getValue());
-        }
+    public static String getDisplayCondition(String number) {
+        return "type == " + number;
     }
+
 }
