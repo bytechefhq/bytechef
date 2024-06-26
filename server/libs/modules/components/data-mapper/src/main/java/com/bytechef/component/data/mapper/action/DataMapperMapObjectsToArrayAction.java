@@ -52,7 +52,8 @@ public class DataMapperMapObjectsToArrayAction {
                 .description("Type of the input. Cam be an object or an array of objects.")
                 .options(
                     option("Object", 1),
-                    option("Array", 2)),
+                    option("Array", 2))
+                .required(true),
             object(INPUT)
                 .label("Input")
                 .description("An input object containing one or more properties.")
