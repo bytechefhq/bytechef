@@ -34,14 +34,11 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.time;
 
 import com.bytechef.component.data.mapper.util.mapping.Mapping;
-import com.bytechef.component.data.mapper.util.mapping.ObjectMapping;
 import com.bytechef.component.data.mapper.util.mapping.ObjectTypeMapping;
-import com.bytechef.component.data.mapper.util.mapping.StringMapping;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +48,9 @@ import java.util.stream.Collectors;
  * @author Ivica Cardic
  */
 public class DataMapperReplaceAllSpecifiedValuesAction {
+
+    private DataMapperReplaceAllSpecifiedValuesAction() {
+    }
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL.action("replaceAllSpecifiedValues")
         .title("Replace all specified values")
@@ -203,32 +203,33 @@ public class DataMapperReplaceAllSpecifiedValuesAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         List<ObjectTypeMapping> mappingList = inputParameters.getList(MAPPINGS, ObjectTypeMapping.class, List.of());
-        Map<Object, Object> mappings = mappingList.stream().collect(Collectors.toMap(Mapping::getFrom, Mapping::getTo));
+        Map<Object, Object> mappings = mappingList.stream()
+            .collect(Collectors.toMap(Mapping::getFrom, Mapping::getTo));
 
         Map<String, Object> output = new HashMap<>();
-        if(inputParameters.getInteger(TYPE).equals(1)) {
+        if (inputParameters.getInteger(TYPE)
+            .equals(1)) {
             Map<String, Object> input = inputParameters.getMap(INPUT, Object.class, Map.of());
 
-            for (Map.Entry<String, Object> entry : input.entrySet()) {
-                if (mappings.containsKey(entry.getValue()))
-                    output.put(entry.getKey(), mappings.get(entry.getValue()));
-                else
-                    output.put(entry.getKey(), entry.getValue());
-            }
-        }
-        else{
+            fillOutput(input, mappings, output);
+        } else {
             List<Object> input = inputParameters.getList(INPUT, Object.class, List.of());
 
-            for(Object object : input) {
-                for (Map.Entry<String, Object> entry : ((Map<String, Object>) object).entrySet()) {
-                    if (mappings.containsKey(entry.getValue()))
-                        output.put(entry.getKey(), mappings.get(entry.getValue()));
-                    else
-                        output.put(entry.getKey(), entry.getValue());
-                }
+            for (Object object : input) {
+                fillOutput(((Map<String, Object>) object), mappings, output);
             }
         }
 
         return output;
+    }
+
+    private static void
+        fillOutput(Map<String, Object> input, Map<Object, Object> mappings, Map<String, Object> output) {
+        for (Map.Entry<String, Object> entry : input.entrySet()) {
+            if (mappings.containsKey(entry.getValue()))
+                output.put(entry.getKey(), mappings.get(entry.getValue()));
+            else
+                output.put(entry.getKey(), entry.getValue());
+        }
     }
 }

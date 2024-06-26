@@ -18,7 +18,6 @@ package com.bytechef.component.data.mapper.action;
 
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.FIELD_KEY;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INPUT;
-import static com.bytechef.component.data.mapper.constant.DataMapperConstants.MAPPINGS;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.TYPE;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.VALUE_KEY;
 import static com.bytechef.component.definition.ComponentDSL.array;
@@ -27,17 +26,12 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
-import com.bytechef.commons.util.MapUtils;
-import com.bytechef.component.data.mapper.util.mapping.ObjectMapping;
-import com.bytechef.component.data.mapper.util.mapping.StringMapping;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -45,6 +39,9 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 public class DataMapperMapObjectsToArrayAction {
+
+    private DataMapperMapObjectsToArrayAction() {
+    }
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL.action("mapObjectsToArray")
         .title("Map objects to array")
@@ -84,29 +81,29 @@ public class DataMapperMapObjectsToArrayAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         List<Map<String, Object>> output = new ArrayList<>();
 
-        if(inputParameters.getInteger(TYPE).equals(1)){
+        if (inputParameters.getInteger(TYPE)
+            .equals(1)) {
             Map<String, Object> input = inputParameters.getMap(INPUT, Object.class, Map.of());
 
-            for(Map.Entry<String, Object> entry : input.entrySet()){
-                Map<String, Object> objectHashMap = new HashMap<>();
-                objectHashMap.put(inputParameters.getRequiredString(FIELD_KEY), entry.getKey());
-                objectHashMap.put(inputParameters.getRequiredString(VALUE_KEY), entry.getValue());
-                output.add(objectHashMap);
-            }
-        }
-        else {
+            fillOutput(inputParameters, input, output);
+        } else {
             List<Object> input = inputParameters.getList(INPUT, Object.class, List.of());
 
-            for(Object object : input) {
-                for (Map.Entry<String, Object> entry : ((Map<String, Object>)object).entrySet()) {
-                    Map<String, Object> objectHashMap = new HashMap<>();
-                    objectHashMap.put(inputParameters.getRequiredString(FIELD_KEY), entry.getKey());
-                    objectHashMap.put(inputParameters.getRequiredString(VALUE_KEY), entry.getValue());
-                    output.add(objectHashMap);
-                }
+            for (Object object : input) {
+                fillOutput(inputParameters, ((Map<String, Object>) object), output);
             }
         }
 
         return output;
+    }
+
+    private static void
+        fillOutput(Parameters inputParameters, Map<String, Object> input, List<Map<String, Object>> output) {
+        for (Map.Entry<String, Object> entry : input.entrySet()) {
+            Map<String, Object> objectHashMap = new HashMap<>();
+            objectHashMap.put(inputParameters.getRequiredString(FIELD_KEY), entry.getKey());
+            objectHashMap.put(inputParameters.getRequiredString(VALUE_KEY), entry.getValue());
+            output.add(objectHashMap);
+        }
     }
 }
