@@ -1364,6 +1364,7 @@ components:
       - "OBJECT_BUILDER"
       - "MULTI_SELECT"
       - "NUMBER"
+      - "NULL"
       - "PASSWORD"
       - "PHONE"
       - "SELECT"
