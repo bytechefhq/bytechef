@@ -29,8 +29,7 @@ import org.springframework.lang.NonNull;
 @SuppressFBWarnings("EI")
 public record ComponentConnection(
     String componentName, int version, long connectionId, @NonNull Map<String, ?> parameters,
-    @NonNull String authorizationName)
-    implements ParameterConnection {
+    @NonNull String authorizationName) implements ParameterConnection {
 
     public ComponentConnection {
         authorizationName = authorizationName.trim();
