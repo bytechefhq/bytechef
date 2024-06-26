@@ -71,9 +71,7 @@ public interface Authorization {
     }
 
     /**
-     * TODO
-     *
-     * @return
+     * @return the implementation of {@link AcquireFunction} interface if defined
      */
     Optional<AcquireFunction> getAcquire();
 
@@ -108,9 +106,21 @@ public interface Authorization {
     Optional<ClientSecretFunction> getClientSecret();
 
     /**
-     * TODO
+     * This is an optional list of signals that identify when the system must raise the excpetion even if the response
+     * has 200 status code . Some APIs don't signal errors with explicit response status code, such as 401. Instead,
+     * they return a 200 (pseudo-successful response) with a payload that signals the error. For such APIs, ByteChef
+     * does not pick up an error (expired credentials, bad requests, and so on). It interprets it as a successful
+     * request because of the 200 response code. When it finds a match with signals
+     * {@link com.bytechef.component.exception.ProviderException} is thrown, and two things can happen:
      *
-     * @return
+     * 1. There can also be a match with <b>refreshOn</b> signals. This triggers a re-authorization where the
+     * {@link RefreshFunction} or {@link AcquireFunction} function runs instead of the system raising an exception.
+     *
+     * 2. If there is no match with signals that are defined in <b>refreshOn</b>, the system raises an exception.
+     *
+     * Regex expression samples: "Error message", "^\{"response":\{"error".+$", "^.*(4\d\d)(\s(Unauthorized)?.*)?$"
+     *
+     * @return the list of Regex expressions which are matched on the response body
      */
     Optional<List<String>> getDetectOn();
 
@@ -136,14 +146,21 @@ public interface Authorization {
     Optional<List<? extends Property>> getProperties();
 
     /**
-     * @return
+     * @return the implementation of {@link RefreshFunction} interface if defined
      */
     Optional<RefreshFunction> getRefresh();
 
     /**
-     * TODO
+     * This is an optional array of signals that identify when the system must re-acquire credentials. When it receives
+     * an error response (400, 401, 500...), the list of signals is checked. If there is a match, re-authorization is
+     * triggered by running either the {@link RefreshFunction}} function for <b>OAUTH2_AUTHORIZATION_CODE</b> or
+     * <b>OAUTH2_AUTHORIZATION_CODE</b> {@link AuthorizationType}s, or the {@link AcquireFunction} function for
+     * <b>CUSTOM</b> {@link AuthorizationType}.
      *
-     * @return
+     * Regex expression samples: 401, "Unauthorized", "^.*Unathorized.*$",
+     *
+     * @return the list of integers which are matched to HTTP response codes or Regex expressions which are matched on
+     *         the response body
      */
     Optional<List<Object>> getRefreshOn();
 
@@ -184,15 +201,18 @@ public interface Authorization {
     AuthorizationType getType();
 
     /**
-     *
+     * If {@link AuthorizationType} is <b>CUSTOM</b>, the acquire lambda function is only run if <b>refreshOn</b> or
+     * <b>detectOn</b> is triggered.
      */
     @FunctionalInterface
     interface AcquireFunction {
 
         /**
-         * @param connectionParameters
-         * @param context
-         * @return
+         * Applies this function to the given arguments.
+         *
+         * @param connectionParameters the connection parameters
+         * @param context              the context
+         * @return the refreshed connection authorization parameters
          */
         Map<String, ?> apply(Parameters connectionParameters, Context context) throws Exception;
     }
@@ -297,15 +317,20 @@ public interface Authorization {
     }
 
     /**
-     *
+     * This function applies only to <b>OAUTH2_AUTHORIZATION_CODE</b> or <b>OAUTH2_AUTHORIZATION_CODE</b>
+     * {@link AuthorizationType}s. In many situations, the API expires the access token after a prescribed amount of
+     * time. The system then uses a refresh token to obtain a new access token. Refresh tokens usually do not expire.
+     * Not all APIs issue refresh token credentials. You need to heck with your provider about this requirement.
      */
     @FunctionalInterface
     interface RefreshFunction {
 
         /**
-         * @param connectionParameters
-         * @param context
-         * @return
+         * Applies this function to the given arguments.
+         *
+         * @param connectionParameters the connection parameters
+         * @param context              the context
+         * @return the refreshed connection authorization parameters
          */
         RefreshTokenResponse apply(Parameters connectionParameters, Context context) throws Exception;
     }
