@@ -470,8 +470,8 @@
       "optionsDataSource": null
     } ],
     "title": "Send message",
-    "workflowNodeDescriptionFunction": null,
-    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -962,7 +962,8 @@
         "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -1353,8 +1354,8 @@
       "optionsDataSource": null
     } ],
     "title": "Send direct message",
-    "workflowNodeDescriptionFunction": null,
-    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1845,7 +1846,8 @@
         "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   } ],
   "triggers": null
 }

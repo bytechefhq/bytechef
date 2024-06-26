@@ -120,7 +120,8 @@
       "controlType": "FILE_ENTRY"
     } ],
     "title": "Read from file as string",
-    "workflowNodeDescriptionFunction": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "perform": { },
     "output": {
       "outputSchema": {
@@ -197,7 +198,8 @@
       "optionsDataSource": null
     } ],
     "title": "Write to file",
-    "workflowNodeDescriptionFunction": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "perform": { },
     "output": {
       "outputSchema": {
@@ -350,7 +352,8 @@
       "optionsDataSource": null
     } ],
     "title": "Download file",
-    "workflowNodeDescriptionFunction": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "perform": { },
     "output": {
       "outputSchema": {

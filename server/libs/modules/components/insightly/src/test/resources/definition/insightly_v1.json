@@ -218,8 +218,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create contact",
-    "workflowNodeDescriptionFunction": null,
-    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -364,7 +362,10 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -463,8 +464,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create organization",
-    "workflowNodeDescriptionFunction": null,
-    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -569,7 +568,10 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -668,8 +670,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create task",
-    "workflowNodeDescriptionFunction": null,
-    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -754,7 +754,10 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   } ],
   "triggers": [ ]
 }

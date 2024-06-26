@@ -62,7 +62,6 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "authorizationCallback": null,
       "authorizationUrl": { },
       "clientSecret": null,
       "refreshToken": null,
@@ -72,7 +71,8 @@
       "refresh": null,
       "refreshUrl": null,
       "scopes": { },
-      "tokenUrl": { }
+      "tokenUrl": { },
+      "authorizationCallback": null
     } ],
     "properties": null,
     "version": 1,
@@ -451,8 +451,6 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Create",
-    "workflowNodeDescriptionFunction": null,
-    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -654,7 +652,10 @@
         "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "perform": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -875,8 +876,6 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Update",
-    "workflowNodeDescriptionFunction": null,
-    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1078,7 +1077,10 @@
         "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "perform": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   } ],
   "triggers": [ {
     "batch": null,
@@ -1319,16 +1321,9 @@
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
-    "dynamicWebhookDisable": { },
-    "dynamicWebhookEnable": { },
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": { },
-    "staticWebhookRequest": null,
     "listenerDisable": null,
     "listenerEnable": null,
     "webhookValidate": null,
-    "deduplicate": null,
-    "poll": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1645,6 +1640,13 @@
         "controlType": "ARRAY_BUILDER"
       },
       "sampleOutput": "[\n    {\n        \"objectId\": 1246965,\n        \"propertyName\": \"lifecyclestage\",\n        \"propertyValue\": \"subscriber\",\n        \"changeSource\": \"ACADEMY\",\n        \"eventId\": 3816279340,\n        \"subscriptionId\": 25,\n        \"portalId\": 33,\n        \"appId\": 1160452,\n        \"occurredAt\": 1462216307945,\n        \"eventType\":\"contact.propertyChange\",\n        \"attemptNumber\": 0\n   }\n]\n"
-    }
+    },
+    "deduplicate": null,
+    "poll": null,
+    "dynamicWebhookDisable": { },
+    "dynamicWebhookEnable": { },
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": { },
+    "staticWebhookRequest": null
   } ]
 }

@@ -194,7 +194,6 @@
       "controlType": "DATE_TIME"
     } ],
     "title": "Create Task",
-    "workflowNodeDescriptionFunction": null,
     "perform": { },
     "output": {
       "outputSchema": {
@@ -339,7 +338,9 @@
         "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   } ],
   "triggers": null
 }

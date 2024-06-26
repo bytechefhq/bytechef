@@ -250,9 +250,10 @@
       "controlType": "SELECT"
     } ],
     "title": "Read from file",
-    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": null,
-    "perform": { }
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -496,7 +497,7 @@
       "optionsDataSource": null
     } ],
     "title": "Write to file",
-    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -597,7 +598,8 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   } ],
   "triggers": null
 }

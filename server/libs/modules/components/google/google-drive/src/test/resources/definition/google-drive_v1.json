@@ -62,9 +62,7 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "authorizationUrl": { },
-      "clientSecret": null,
-      "refreshToken": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -72,7 +70,9 @@
       "refreshUrl": { },
       "scopes": { },
       "tokenUrl": { },
-      "authorizationCallback": null
+      "authorizationUrl": { },
+      "clientSecret": null,
+      "refreshToken": null
     } ],
     "properties": null,
     "version": 1,
@@ -210,8 +210,8 @@
       }
     } ],
     "title": "Upload file",
-    "workflowNodeDescriptionFunction": null,
-    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -291,15 +291,16 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": {
-        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
         "mimeType": "plain/text",
-        "name": "new-file.txt"
+        "name": "new-file.txt",
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -334,8 +335,8 @@
       }
     } ],
     "title": "Read file",
-    "workflowNodeDescriptionFunction": null,
-    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -435,7 +436,8 @@
         "controlType": "FILE_ENTRY"
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -490,8 +492,8 @@
       }
     } ],
     "title": "Create new folder",
-    "workflowNodeDescriptionFunction": null,
-    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -571,15 +573,16 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": {
-        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
         "mimeType": "plain/text",
-        "name": "new-file.txt"
+        "name": "new-file.txt",
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -686,8 +689,8 @@
       }
     } ],
     "title": "Create new text file",
-    "workflowNodeDescriptionFunction": null,
-    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -767,15 +770,16 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": {
-        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
         "mimeType": "plain/text",
-        "name": "new-file.txt"
+        "name": "new-file.txt",
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
-    }
+    },
+    "perform": { }
   } ],
   "triggers": null
 }

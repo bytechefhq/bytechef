@@ -24,7 +24,8 @@
     "outputFunction": null,
     "properties": [ ],
     "title": "Title",
-    "workflowNodeDescriptionFunction": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,

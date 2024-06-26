@@ -196,7 +196,7 @@
       }
     } ],
     "title": "Append row",
-    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -287,7 +287,8 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -369,9 +370,10 @@
       "controlType": "SELECT"
     } ],
     "title": "Clear worksheet",
-    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": null,
-    "perform": { }
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -448,9 +450,10 @@
       "optionsDataSource": null
     } ],
     "title": "Delete row",
-    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": null,
-    "perform": { }
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -551,7 +554,7 @@
       "optionsDataSource": null
     } ],
     "title": "Find row by number",
-    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -642,7 +645,8 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -758,7 +762,7 @@
       }
     } ],
     "title": "Update row",
-    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -849,7 +853,8 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   } ],
   "triggers": null
 }

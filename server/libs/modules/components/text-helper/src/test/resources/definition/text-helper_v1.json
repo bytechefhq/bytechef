@@ -140,7 +140,8 @@
       "controlType": "SELECT"
     } ],
     "title": "Extract Content from HTML",
-    "workflowNodeDescriptionFunction": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": null,
     "perform": { }
   } ],

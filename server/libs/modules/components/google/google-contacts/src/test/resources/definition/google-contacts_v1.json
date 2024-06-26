@@ -62,6 +62,7 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
+      "authorizationCallback": null,
       "authorizationUrl": { },
       "clientSecret": null,
       "refreshToken": null,
@@ -71,8 +72,7 @@
       "refresh": null,
       "refreshUrl": { },
       "scopes": { },
-      "tokenUrl": { },
-      "authorizationCallback": null
+      "tokenUrl": { }
     } ],
     "properties": null,
     "version": 1,
@@ -231,8 +231,8 @@
       "optionsDataSource": null
     } ],
     "title": "Create contact",
-    "workflowNodeDescriptionFunction": null,
-    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -560,7 +560,8 @@
         "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -592,8 +593,8 @@
       "optionsDataSource": null
     } ],
     "title": "Create groups",
-    "workflowNodeDescriptionFunction": null,
-    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -637,7 +638,8 @@
         "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   } ],
   "triggers": null
 }

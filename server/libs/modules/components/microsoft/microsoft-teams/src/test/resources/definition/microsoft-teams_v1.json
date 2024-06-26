@@ -82,7 +82,6 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -92,7 +91,8 @@
       "tokenUrl": { },
       "authorizationUrl": { },
       "clientSecret": null,
-      "refreshToken": null
+      "refreshToken": null,
+      "authorizationCallback": null
     } ],
     "properties": null,
     "version": 1,
@@ -174,7 +174,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create channel",
-    "workflowNodeDescriptionFunction": null,
     "perform": { },
     "output": {
       "outputSchema": {
@@ -259,7 +258,9 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -365,7 +366,6 @@
       "optionsDataSource": null
     } ],
     "title": "Send channel message",
-    "workflowNodeDescriptionFunction": null,
     "perform": { },
     "output": {
       "outputSchema": {
@@ -530,7 +530,9 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -613,7 +615,6 @@
       "optionsDataSource": null
     } ],
     "title": "Send chat message",
-    "workflowNodeDescriptionFunction": null,
     "perform": { },
     "output": {
       "outputSchema": {
@@ -738,7 +739,9 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   } ],
   "triggers": null
 }

@@ -253,9 +253,10 @@
       "optionsDataSource": null
     } ],
     "title": "Query",
-    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": null,
-    "perform": { }
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -581,9 +582,10 @@
       "optionsDataSource": null
     } ],
     "title": "Insert",
-    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": null,
-    "perform": { }
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -929,9 +931,10 @@
       "optionsDataSource": null
     } ],
     "title": "Update",
-    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": null,
-    "perform": { }
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -1236,9 +1239,10 @@
       "optionsDataSource": null
     } ],
     "title": "Delete",
-    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": null,
-    "perform": { }
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -1606,9 +1610,10 @@
       "optionsDataSource": null
     } ],
     "title": "Execute",
-    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": null,
-    "perform": { }
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   } ],
   "triggers": null
 }

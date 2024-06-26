@@ -62,7 +62,6 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -72,7 +71,8 @@
       "tokenUrl": { },
       "authorizationUrl": { },
       "clientSecret": null,
-      "refreshToken": null
+      "refreshToken": null,
+      "authorizationCallback": null
     } ],
     "properties": null,
     "version": 1,
@@ -184,9 +184,10 @@
       "controlType": "SELECT"
     } ],
     "title": "Clear sheet",
-    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": null,
-    "perform": { }
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -286,9 +287,10 @@
       "optionsDataSource": null
     } ],
     "title": "Delete row",
-    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": null,
-    "perform": { }
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -413,7 +415,7 @@
       "optionsDataSource": null
     } ],
     "title": "Find row by number",
-    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -504,7 +506,8 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -653,7 +656,7 @@
       }
     } ],
     "title": "Insert row",
-    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -744,7 +747,8 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -884,7 +888,7 @@
       }
     } ],
     "title": "Update row",
-    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -975,7 +979,8 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   } ],
   "triggers": [ {
     "batch": null,
@@ -1062,11 +1067,8 @@
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
-    "dynamicWebhookDisable": { },
-    "dynamicWebhookEnable": { },
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": { },
-    "staticWebhookRequest": null,
+    "deduplicate": null,
+    "poll": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1173,10 +1175,13 @@
       },
       "sampleOutput": null
     },
-    "deduplicate": null,
-    "poll": null,
     "listenerDisable": null,
     "listenerEnable": null,
-    "webhookValidate": null
+    "webhookValidate": null,
+    "dynamicWebhookDisable": { },
+    "dynamicWebhookEnable": { },
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": { },
+    "staticWebhookRequest": null
   } ]
 }

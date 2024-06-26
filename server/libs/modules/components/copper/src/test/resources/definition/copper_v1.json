@@ -193,7 +193,8 @@
       }
     } ],
     "title": "Create activity",
-    "workflowNodeDescriptionFunction": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -963,7 +964,8 @@
       "optionsDataSource": null
     } ],
     "title": "Create company",
-    "workflowNodeDescriptionFunction": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2213,7 +2215,8 @@
       "optionsDataSource": null
     } ],
     "title": "Create person",
-    "workflowNodeDescriptionFunction": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,

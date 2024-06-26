@@ -44,8 +44,8 @@
       "optionsDataSource": null
     } ],
     "title": "Execute",
-    "workflowNodeDescriptionFunction": null,
-    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -69,7 +69,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": "Sample result"
-    }
+    },
+    "perform": { }
   } ],
   "triggers": null
 }

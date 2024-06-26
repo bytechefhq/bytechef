@@ -42,7 +42,6 @@
       "title": "API Key",
       "type": "API_KEY",
       "acquire": null,
-      "authorizationCallback": null,
       "authorizationUrl": null,
       "clientSecret": null,
       "refreshToken": null,
@@ -52,7 +51,8 @@
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null
+      "tokenUrl": null,
+      "authorizationCallback": null
     } ],
     "properties": null,
     "version": 1,
@@ -1322,7 +1322,6 @@
       "controlType": "SELECT"
     } ],
     "title": "Send SMS",
-    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1585,7 +1584,9 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -1933,7 +1934,6 @@
       "optionsDataSource": null
     } ],
     "title": "Send Whatsapp Text Message",
-    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2155,7 +2155,9 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   } ],
   "triggers": null
 }

@@ -42,7 +42,6 @@
       "title": "Bearer Token",
       "type": "BEARER_TOKEN",
       "acquire": null,
-      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -52,7 +51,8 @@
       "tokenUrl": null,
       "authorizationUrl": null,
       "clientSecret": null,
-      "refreshToken": null
+      "refreshToken": null,
+      "authorizationCallback": null
     } ],
     "properties": null,
     "version": 1,
@@ -91,7 +91,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create opportunity",
-    "workflowNodeDescriptionFunction": null,
     "perform": { },
     "output": {
       "outputSchema": {
@@ -155,7 +154,9 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -207,7 +208,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create organization",
-    "workflowNodeDescriptionFunction": null,
     "perform": { },
     "output": {
       "outputSchema": {
@@ -291,7 +291,9 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -384,7 +386,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create person",
-    "workflowNodeDescriptionFunction": null,
     "perform": { },
     "output": {
       "outputSchema": {
@@ -509,7 +510,9 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   } ],
   "triggers": null
 }

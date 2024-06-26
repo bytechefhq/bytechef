@@ -42,7 +42,6 @@
       "title": "Bearer Token",
       "type": "BEARER_TOKEN",
       "acquire": null,
-      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -52,7 +51,8 @@
       "tokenUrl": null,
       "authorizationUrl": null,
       "clientSecret": null,
-      "refreshToken": null
+      "refreshToken": null,
+      "authorizationCallback": null
     } ],
     "properties": null,
     "version": 1,
@@ -440,7 +440,6 @@
       "optionsDataSource": null
     } ],
     "title": "Ask ChatGPT",
-    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -585,7 +584,9 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -934,7 +935,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create assistant",
-    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1300,7 +1300,9 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -1482,7 +1484,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create image",
-    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1627,7 +1628,9 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -1789,7 +1792,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create speech",
-    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1890,7 +1892,9 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -2352,7 +2356,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create transcriptions",
-    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2754,7 +2757,9 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -2968,7 +2973,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create translation",
-    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -3370,7 +3374,9 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -3852,7 +3858,6 @@
       "optionsDataSource": null
     } ],
     "title": "Vision Prompt",
-    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -3997,7 +4002,9 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   } ],
   "triggers": null
 }

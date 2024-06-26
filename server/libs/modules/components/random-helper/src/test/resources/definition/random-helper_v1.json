@@ -62,7 +62,8 @@
       "controlType": "INTEGER"
     } ],
     "title": "Int",
-    "workflowNodeDescriptionFunction": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "perform": { },
     "output": {
       "outputSchema": {
@@ -136,7 +137,8 @@
       "controlType": "INTEGER"
     } ],
     "title": "Float",
-    "workflowNodeDescriptionFunction": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "perform": { },
     "output": {
       "outputSchema": {

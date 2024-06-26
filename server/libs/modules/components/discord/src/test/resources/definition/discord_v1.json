@@ -190,8 +190,6 @@
       "optionsDataSource": null
     } ],
     "title": "Send channel message",
-    "workflowNodeDescriptionFunction": null,
-    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -301,7 +299,10 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -416,8 +417,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create channel",
-    "workflowNodeDescriptionFunction": null,
-    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -522,7 +521,10 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -624,8 +626,6 @@
       "controlType": "SELECT"
     } ],
     "title": "Send direct message",
-    "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -689,7 +689,10 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   } ],
   "triggers": [ ]
 }

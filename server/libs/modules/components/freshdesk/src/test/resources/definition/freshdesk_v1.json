@@ -178,7 +178,8 @@
       "optionsDataSource": null
     } ],
     "title": "Create company",
-    "workflowNodeDescriptionFunction": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -466,7 +467,8 @@
       "optionsDataSource": null
     } ],
     "title": "Create contact",
-    "workflowNodeDescriptionFunction": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -764,7 +766,8 @@
       "optionsDataSource": null
     } ],
     "title": "Create ticket",
-    "workflowNodeDescriptionFunction": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,

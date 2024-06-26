@@ -218,17 +218,17 @@
       "title": null,
       "type": "CUSTOM",
       "acquire": null,
+      "authorizationCallback": null,
       "authorizationUrl": null,
       "clientSecret": null,
       "refreshToken": null,
-      "apply": null,
-      "clientId": null,
-      "pkce": null,
-      "refresh": null,
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
-      "authorizationCallback": null
+      "apply": null,
+      "clientId": null,
+      "pkce": null,
+      "refresh": null
     } ],
     "properties": null,
     "version": 1,
@@ -287,7 +287,8 @@
       "optionsDataSource": null
     } ],
     "title": "Get Object",
-    "workflowNodeDescriptionFunction": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "perform": { },
     "output": {
       "outputSchema": {
@@ -420,7 +421,8 @@
       "optionsDataSource": null
     } ],
     "title": "Get URL",
-    "workflowNodeDescriptionFunction": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "perform": { },
     "output": {
       "outputSchema": {
@@ -477,7 +479,8 @@
       "optionsDataSource": null
     } ],
     "title": "List Objects",
-    "workflowNodeDescriptionFunction": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "perform": { },
     "output": {
       "outputSchema": {
@@ -635,7 +638,8 @@
       "optionsDataSource": null
     } ],
     "title": "Get Pre-signed Object",
-    "workflowNodeDescriptionFunction": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "perform": { },
     "output": {
       "outputSchema": {
@@ -836,7 +840,8 @@
       "optionsDataSource": null
     } ],
     "title": "Put Object",
-    "workflowNodeDescriptionFunction": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "perform": { },
     "output": {
       "outputSchema": {

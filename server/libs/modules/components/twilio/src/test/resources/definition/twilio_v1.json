@@ -755,7 +755,8 @@
       "optionsDataSource": null
     } ],
     "title": "Send SMS",
-    "workflowNodeDescriptionFunction": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "perform": { },
     "output": {
       "outputSchema": {

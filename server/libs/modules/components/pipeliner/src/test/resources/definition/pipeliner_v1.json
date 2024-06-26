@@ -118,6 +118,7 @@
       "title": "Basic Auth",
       "type": "BASIC_AUTH",
       "acquire": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -127,8 +128,7 @@
       "tokenUrl": null,
       "authorizationUrl": null,
       "clientSecret": null,
-      "refreshToken": null,
-      "authorizationCallback": null
+      "refreshToken": null
     } ],
     "properties": null,
     "version": 1,
@@ -217,7 +217,8 @@
       "optionsDataSource": null
     } ],
     "title": "Create account",
-    "workflowNodeDescriptionFunction": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "perform": null,
     "output": {
       "outputSchema": {
@@ -450,7 +451,8 @@
       "optionsDataSource": null
     } ],
     "title": "Create contact",
-    "workflowNodeDescriptionFunction": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "perform": null,
     "output": {
       "outputSchema": {
@@ -729,7 +731,8 @@
       "optionsDataSource": null
     } ],
     "title": "Create task",
-    "workflowNodeDescriptionFunction": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "perform": null,
     "output": {
       "outputSchema": {

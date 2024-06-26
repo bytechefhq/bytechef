@@ -151,7 +151,7 @@
       "optionsDataSource": null
     } ],
     "title": "Create account",
-    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -258,7 +258,8 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -570,7 +571,7 @@
       "optionsDataSource": null
     } ],
     "title": "Create contact",
-    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -917,7 +918,8 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -989,7 +991,7 @@
       "optionsDataSource": null
     } ],
     "title": "Create lead",
-    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1096,7 +1098,8 @@
       },
       "sampleOutput": null
     },
-    "perform": { }
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   } ],
   "triggers": null
 }

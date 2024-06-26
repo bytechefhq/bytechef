@@ -3,7 +3,6 @@
     "batch": null,
     "deprecated": null,
     "description": "Executes custom JavaScript code.",
-    "workflowNodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "javascript",
@@ -244,12 +243,13 @@
     "title": "JavaScript",
     "perform": { },
     "defaultOutputFunction": true,
+    "workflowNodeDescription": null,
+    "processErrorResponse": null,
     "outputFunction": null
   }, {
     "batch": null,
     "deprecated": null,
     "description": "Executes custom Python code.",
-    "workflowNodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "python",
@@ -490,12 +490,13 @@
     "title": "Python",
     "perform": { },
     "defaultOutputFunction": true,
+    "workflowNodeDescription": null,
+    "processErrorResponse": null,
     "outputFunction": null
   }, {
     "batch": null,
     "deprecated": null,
     "description": "Executes custom Ruby code.",
-    "workflowNodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "ruby",
@@ -736,6 +737,8 @@
     "title": "Ruby",
     "perform": { },
     "defaultOutputFunction": true,
+    "workflowNodeDescription": null,
+    "processErrorResponse": null,
     "outputFunction": null
   } ],
   "categories": [ "HELPERS", "DEVELOPER_TOOLS" ],

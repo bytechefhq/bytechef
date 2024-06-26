@@ -44,9 +44,10 @@
       "optionsDataSource": null
     } ],
     "title": "Debug",
-    "workflowNodeDescriptionFunction": null,
-    "perform": { },
-    "output": null
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -78,9 +79,10 @@
       "optionsDataSource": null
     } ],
     "title": "Error",
-    "workflowNodeDescriptionFunction": null,
-    "perform": { },
-    "output": null
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -112,9 +114,10 @@
       "optionsDataSource": null
     } ],
     "title": "Info",
-    "workflowNodeDescriptionFunction": null,
-    "perform": { },
-    "output": null
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -146,9 +149,10 @@
       "optionsDataSource": null
     } ],
     "title": "Warn",
-    "workflowNodeDescriptionFunction": null,
-    "perform": { },
-    "output": null
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "output": null,
+    "perform": { }
   } ],
   "triggers": null
 }

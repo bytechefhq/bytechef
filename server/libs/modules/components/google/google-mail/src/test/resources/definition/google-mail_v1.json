@@ -62,7 +62,6 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "authorizationCallback": null,
       "authorizationUrl": { },
       "clientSecret": null,
       "refreshToken": null,
@@ -72,7 +71,8 @@
       "refresh": null,
       "refreshUrl": { },
       "scopes": { },
-      "tokenUrl": { }
+      "tokenUrl": { },
+      "authorizationCallback": null
     } ],
     "properties": null,
     "version": 1,
@@ -191,7 +191,6 @@
       "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Get Mail",
-    "workflowNodeDescriptionFunction": null,
     "perform": { },
     "output": {
       "outputSchema": {
@@ -659,7 +658,9 @@
         "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -771,7 +772,6 @@
       "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Get Thread",
-    "workflowNodeDescriptionFunction": null,
     "perform": { },
     "output": {
       "outputSchema": {
@@ -1340,7 +1340,9 @@
         "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -1590,7 +1592,6 @@
       "controlType": "SELECT"
     } ],
     "title": "Search Email",
-    "workflowNodeDescriptionFunction": null,
     "perform": { },
     "output": {
       "outputSchema": {
@@ -2141,7 +2142,9 @@
         "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -2494,7 +2497,6 @@
       "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Send Email",
-    "workflowNodeDescriptionFunction": null,
     "perform": { },
     "output": {
       "outputSchema": {
@@ -2962,7 +2964,9 @@
         "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   } ],
   "triggers": null
 }
