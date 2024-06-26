@@ -24,19 +24,14 @@ import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
-import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.data.mapper.util.mapping.Mapping;
 import com.bytechef.component.data.mapper.util.mapping.StringMapping;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-import org.apache.commons.lang3.ObjectUtils;
-
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -45,6 +40,8 @@ import java.util.stream.Collectors;
  * @author Ivica Cardic
  */
 public class DataMapperRenameKeysAction {
+    private DataMapperRenameKeysAction() {
+    }
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL.action("renameKeys")
         .title("Rename keys")
@@ -76,13 +73,17 @@ public class DataMapperRenameKeysAction {
     protected static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         List<StringMapping> mappingList = inputParameters.getList(MAPPINGS, StringMapping.class, List.of());
-        Map<String, String> mappings = mappingList.stream().collect(Collectors.toMap(Mapping::getFrom, Mapping::getTo));
+        Map<String, String> mappings = mappingList.stream()
+            .collect(Collectors.toMap(Mapping::getFrom, Mapping::getTo));
 
         DocumentContext input = JsonPath.parse(inputParameters.get(INPUT));
         for (Map.Entry<String, String> entry : mappings.entrySet()) {
-            String[] split = entry.getKey().split("\\.(?=[^\\.]+$)");
-            if(split.length > 1) input.renameKey(split[0], split[1], entry.getValue());
-            else input.renameKey("$", entry.getKey(), entry.getValue());
+            String[] split = entry.getKey()
+                .split("\\.(?=[^\\.]+$)");
+            if (split.length > 1)
+                input.renameKey(split[0], split[1], entry.getValue());
+            else
+                input.renameKey("$", entry.getKey(), entry.getValue());
         }
 
         return input.read("$");

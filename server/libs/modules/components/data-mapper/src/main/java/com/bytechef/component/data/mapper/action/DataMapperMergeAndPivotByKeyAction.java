@@ -19,7 +19,6 @@ package com.bytechef.component.data.mapper.action;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.FIELD_KEY;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.FIELD_VALUE;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INPUT;
-import static com.bytechef.component.data.mapper.constant.DataMapperConstants.VALUE_KEY;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
@@ -28,8 +27,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +35,9 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 public class DataMapperMergeAndPivotByKeyAction {
+
+    private DataMapperMergeAndPivotByKeyAction() {
+    }
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL
         .action("mergeAndPivotPropertiesByKey")
@@ -67,9 +67,10 @@ public class DataMapperMergeAndPivotByKeyAction {
         String key = inputParameters.getRequiredString(FIELD_KEY);
 
         Map<Object, Object> objectHashMap = new HashMap<>();
-        for(Object object : input) {
-            for (Map.Entry<String, Object> entry : ((Map<String, Object>)object).entrySet()) {
-                if (entry.getKey().equals(key))
+        for (Object object : input) {
+            for (Map.Entry<String, Object> entry : ((Map<String, Object>) object).entrySet()) {
+                if (entry.getKey()
+                    .equals(key))
                     objectHashMap.put(entry.getValue(), inputParameters.getRequiredString(FIELD_VALUE));
             }
         }
