@@ -1030,9 +1030,9 @@ components:
         \ the task inside the workflow."
       type: "object"
       required:
+      - "dynamicOutput"
       - "name"
       - "outputDefined"
-      - "outputFunctionDefined"
       properties:
         componentName:
           description: "The component name."
@@ -1040,12 +1040,12 @@ components:
         componentVersion:
           description: "The component version."
           type: "integer"
+        dynamicOutput:
+          description: "Does action define dynamic output schema."
+          type: "boolean"
         description:
           description: "The description."
           type: "string"
-        workflowNodeDescriptionDefined:
-          description: "Does action define dynamic node description."
-          type: "boolean"
         help:
           $ref: "#/components/schemas/Help"
         name:
@@ -1053,9 +1053,6 @@ components:
           type: "string"
         outputDefined:
           description: "Does action define output schema."
-          type: "boolean"
-        outputFunctionDefined:
-          description: "Does action define dynamic output schema."
           type: "boolean"
         properties:
           description: "The list of action properties."
@@ -1065,6 +1062,9 @@ components:
         title:
           description: "The title"
           type: "string"
+        workflowNodeDescriptionDefined:
+          description: "Does action define dynamic node description."
+          type: "boolean"
     ActionDefinitionBasic:
       description: "An action is a portion of reusable code that accomplish a specific\
         \ task. When building a workflow, each action is represented as a task inside\
@@ -1744,11 +1744,14 @@ components:
         \ be executed."
       type: "object"
       required:
+      - "dynamicOutput"
       - "name"
       - "outputDefined"
-      - "outputFunctionDefined"
       - "version"
       properties:
+        dynamicOutput:
+          description: "Does task dispatcher define dynamic output schema."
+          type: "boolean"
         description:
           description: "The description."
           type: "string"
@@ -1760,9 +1763,6 @@ components:
           type: "string"
         outputDefined:
           description: "Does task dispatcher define output schema."
-          type: "boolean"
-        outputFunctionDefined:
-          description: "Does task dispatcher define dynamic output schema."
           type: "boolean"
         properties:
           description: "The list of task dispatcher properties."
@@ -1852,9 +1852,9 @@ components:
         \ outside services."
       type: "object"
       required:
+      - "dynamicOutput"
       - "name"
       - "outputDefined"
-      - "outputFunctionDefined"
       - "type"
       properties:
         componentName:
@@ -1863,12 +1863,12 @@ components:
         componentVersion:
           description: "The component version."
           type: "integer"
+        dynamicOutput:
+          description: "Does trigger define dynamic output schema."
+          type: "boolean"
         description:
           description: "The description."
           type: "string"
-        workflowNodeDescriptionDefined:
-          description: "Does trigger define dynamic node description."
-          type: "boolean"
         help:
           $ref: "#/components/schemas/Help"
         name:
@@ -1876,9 +1876,6 @@ components:
           type: "string"
         outputDefined:
           description: "Does trigger define output schema."
-          type: "boolean"
-        outputFunctionDefined:
-          description: "Does trigger define dynamic output schema."
           type: "boolean"
         properties:
           description: "The list of action properties."
@@ -1890,6 +1887,9 @@ components:
           type: "string"
         type:
           $ref: "#/components/schemas/TriggerType"
+        workflowNodeDescriptionDefined:
+          description: "Does trigger define dynamic node description."
+          type: "boolean"
     TriggerDefinitionBasic:
       description: "A trigger definition defines ways to trigger workflows from the\
         \ outside services."
