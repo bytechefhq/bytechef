@@ -17,4 +17,11 @@
 package com.bytechef.component.data.mapper.util.mapping;
 
 public class StringMapping extends Mapping<String, String> {
+    public StringMapping() {
+        super();
+    }
+
+    public StringMapping(String to, String from) {
+        super(to, from);
+    }
 }
