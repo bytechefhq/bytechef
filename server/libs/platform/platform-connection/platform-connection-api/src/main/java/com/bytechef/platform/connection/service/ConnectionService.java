@@ -45,5 +45,7 @@ public interface ConnectionService {
 
     Connection update(Connection connection);
 
+    Connection updateConnectionCredentialStatus(long connectionId, Connection.CredentialStatus status);
+
     Connection updateConnectionParameters(long connectionId, Map<String, ?> parameters);
 }

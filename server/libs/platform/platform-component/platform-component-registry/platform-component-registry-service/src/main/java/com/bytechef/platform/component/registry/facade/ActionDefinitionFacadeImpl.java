@@ -36,6 +36,7 @@ import com.bytechef.platform.component.registry.service.ActionDefinitionService;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.registry.util.RefreshCredentialsUtils;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.exception.ErrorType;
@@ -267,6 +268,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         Connection connection;
         Map<String, ?> parameters;
 
+        try {
             if (componentConnection.isAuthorizationOauth2AuthorizationCode()) {
                 RefreshTokenResponse refreshTokenResponse =
                     connectionDefinitionService.executeRefresh(
@@ -295,8 +297,11 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
                 connection = connectionService.updateConnectionParameters(
                     componentConnection.connectionId(), parameters);
             }
+        } catch (Exception e) {
+            connectionService.updateConnectionCredentialStatus(
+                componentConnection.connectionId(), CredentialStatus.INVALID);
 
-            connection = connectionService.updateConnectionParameters(componentConnection.connectionId(), parameters);
+            throw e;
         }
 
         return new ComponentConnection(

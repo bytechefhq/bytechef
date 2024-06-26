@@ -19,6 +19,7 @@ package com.bytechef.platform.connection.service;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.constant.AppType;
@@ -141,6 +142,17 @@ public class ConnectionServiceImpl implements ConnectionService {
         curConnection.setVersion(connection.getVersion());
 
         return connectionRepository.save(curConnection);
+    }
+
+    @Override
+    public Connection updateConnectionCredentialStatus(long connectionId, CredentialStatus status) {
+        Validate.notNull(status, "'status' must not be null");
+
+        Connection connection = getConnection(connectionId);
+
+        connection.setCredentialStatus(status);
+
+        return connectionRepository.save(connection);
     }
 
     @Override
