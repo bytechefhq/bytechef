@@ -83,6 +83,22 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
+    public Map<String, ?> executeAcquire(
+        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
+        @NonNull Map<String, ?> connectionParameters, @NonNull Context context) {
+
+        Authorization authorization = componentDefinitionRegistry.getAuthorization(
+            componentName, connectionVersion, authorizationName);
+
+        try {
+            return OptionalUtils.get(authorization.getAcquire())
+                .apply(new ParametersImpl(connectionParameters), context);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e, ConnectionDefinitionErrorType.EXECUTE_ACQUIRE);
+        }
+    }
+
+    @Override
     public ApplyResponse executeAuthorizationApply(
         @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParams,
         @NonNull Context context) {

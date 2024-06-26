@@ -34,6 +34,10 @@ import org.springframework.lang.NonNull;
  */
 public interface ConnectionDefinitionService {
 
+    Map<String, ?> executeAcquire(
+        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
+        @NonNull Map<String, ?> connectionParameters, @NonNull Context context);
+
     ApplyResponse executeAuthorizationApply(
         @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParams,
         @NonNull Context context);
