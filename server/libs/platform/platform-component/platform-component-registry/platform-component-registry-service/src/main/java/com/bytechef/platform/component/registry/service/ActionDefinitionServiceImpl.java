@@ -79,11 +79,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 .apply(
                     new ParametersImpl(inputParameters),
                     new ParametersImpl(connection == null ? Map.of() : connection.parameters()),
-                    MapUtils.toMap(
-                        lookupDependsOnPaths,
-                        item -> item.substring(item.lastIndexOf(".") + 1),
-                        item -> item),
-                    context)
+                    getLookupDependsOnPathsMap(lookupDependsOnPaths), context)
                 .stream()
                 .map(valueProperty -> (Property) Property.toProperty(valueProperty))
                 .toList();
@@ -153,11 +149,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 .apply(
                     new ParametersImpl(inputParameters),
                     new ParametersImpl(connection == null ? Map.of() : connection.parameters()),
-                    MapUtils.toMap(
-                        lookupDependsOnPaths,
-                        item -> item.substring(item.lastIndexOf(".") + 1),
-                        item -> item),
-                    searchText, context)
+                    getLookupDependsOnPathsMap(lookupDependsOnPaths), searchText, context)
                 .stream()
                 .map(Option::new)
                 .toList();
@@ -335,6 +327,10 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             MapUtils.concatDifferentTypes(
                 componentConnection.getParameters(),
                 Map.of(Authorization.AUTHORIZATION_TYPE, componentConnection.authorizationName())));
+    }
+
+    private static Map<String, String> getLookupDependsOnPathsMap(List<String> lookupDependsOnPaths) {
+        return MapUtils.toMap(lookupDependsOnPaths, item -> item.substring(item.lastIndexOf(".") + 1), item -> item);
     }
 
     private OutputFunction getOutputFunction(String componentName, int componentVersion, String actionName) {

@@ -276,7 +276,8 @@ public class HttpClientExecutor {
         int statusCode = httpResponse.statusCode();
 
         if ((responseType == null) || !matches(responseType, httpHeaders.firstValue("content-type"))) {
-            logger.warn("Unexpected response body content-type type: {} can not be converted to {}",
+            logger.warn(
+                "Unexpected response body content-type type: {} can not be converted to {}",
                 httpHeaders.firstValue("content-type"), responseType);
 
             return new ResponseImpl(httpHeaders.map(), null, statusCode);
@@ -333,8 +334,7 @@ public class HttpClientExecutor {
             String parameter = queryParameters
                 .entrySet()
                 .stream()
-                .flatMap(entry -> entry
-                    .getValue()
+                .flatMap(entry -> entry.getValue()
                     .stream()
                     .map(value -> entry.getKey() + "=" + value))
                 .collect(Collectors.joining("&"));
@@ -416,13 +416,8 @@ public class HttpClientExecutor {
     }
 
     private boolean matches(ResponseType responseType, Optional<String> contentTypeValueOptional) {
-        if (contentTypeValueOptional.isEmpty() ||
-            !StringUtils.containsIgnoreCase(contentTypeValueOptional.get(), responseType.name())) {
-
-            return false;
-        }
-
-        return true;
+        return contentTypeValueOptional.isPresent() &&
+            StringUtils.containsIgnoreCase(contentTypeValueOptional.get(), responseType.name());
     }
 
     private FileEntry storeBinaryResponseBody(
