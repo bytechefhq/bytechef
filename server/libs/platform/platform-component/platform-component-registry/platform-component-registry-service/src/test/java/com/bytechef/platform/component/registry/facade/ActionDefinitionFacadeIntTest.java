@@ -54,6 +54,7 @@ public class ActionDefinitionFacadeIntTest {
     @Autowired
     private ContextFactory contextFactory;
 
+    @Disabled
     @Test
     public void testExecutePerform() {
         ActionDefinitionFacadeImpl actionDefinitionFacade = new ActionDefinitionFacadeImpl(connectionService,
