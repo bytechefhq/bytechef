@@ -66,7 +66,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
 
         const clickedItemParameterValue = resolvePath(currentComponent.parameters, path);
 
-        if (clickedItemParameterValue !== undefined || clickedItemParameterValue !== null) {
+        if (clickedItemParameterValue !== undefined) {
             onDeleteClick(path);
         }
     };
@@ -125,16 +125,10 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
             return;
         }
 
-        let parameterValue = resolvePath(currentComponent.parameters, path);
+        const parameterValue = resolvePath(currentComponent.parameters, path);
 
-        if (parameterValue === null || parameterValue === undefined) {
+        if (parameterValue === undefined) {
             return;
-        }
-
-        if (path) {
-            if (Array.isArray(parameterValue)) {
-                parameterValue = parameterValue.filter((param: ArrayPropertyType) => param !== null);
-            }
         }
 
         if (items?.length && items[0].type === 'OBJECT' && Array.isArray(parameterValue)) {
