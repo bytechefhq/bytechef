@@ -40,16 +40,15 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.time;
 
-import com.bytechef.component.data.mapper.util.mapping.Mapping;
 import com.bytechef.component.data.mapper.util.mapping.ObjectMapping;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic
@@ -83,8 +82,8 @@ public class DataMapperReplaceAllSpecifiedValuesAction {
                 .items(object())
                 .required(true),
             integer(TYPE)
-                .label("Value type From")
-                .description("The value type of 'from' property value.")
+                .label("Value type")
+                .description("The value type of 'from' and 'to' property values.")
                 .required(true)
                 .options(
                     option("Array", 1),
@@ -92,7 +91,7 @@ public class DataMapperReplaceAllSpecifiedValuesAction {
                     option("Date", 3),
                     option("Date Time", 4),
                     option("Integer", 5),
-                    option("Nullable", 6),
+//                    option("Nullable", 6),
                     option("Number", 7),
                     option("Object", 8),
                     option("String", 9),
@@ -233,32 +232,34 @@ public class DataMapperReplaceAllSpecifiedValuesAction {
 
         List<ObjectMapping> mappingList = inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of());
         Map<Object, Object> mappings = mappingList.stream()
-            .collect(Collectors.toMap(Mapping::getFrom, Mapping::getTo));
+            .collect(HashMap::new, (map, value)->map.put(value.getFrom(), value.getTo()), HashMap::putAll);
 
-        Map<String, Object> output = new HashMap<>();
-        if (inputParameters.getInteger(INPUT_TYPE)
-            .equals(1)) {
+        if (inputParameters.getInteger(INPUT_TYPE).equals(1)) {
             Map<String, Object> input = inputParameters.getMap(INPUT, Object.class, Map.of());
 
-            fillOutput(input, mappings, output);
+            return fillOutput(input, mappings);
         } else {
             List<Object> input = inputParameters.getList(INPUT, Object.class, List.of());
 
+            List<Map<String, Object>> output = new LinkedList<>();
             for (Object object : input) {
-                fillOutput(((Map<String, Object>) object), mappings, output);
+                output.add(fillOutput(((Map<String, Object>) object), mappings));
             }
+            return output;
         }
 
-        return output;
     }
 
-    private static void
-        fillOutput(Map<String, Object> input, Map<Object, Object> mappings, Map<String, Object> output) {
+    private static Map<String, Object>
+        fillOutput(Map<String, Object> input, Map<Object, Object> mappings) {
+        Map<String, Object> output = new HashMap<>();
+
         for (Map.Entry<String, Object> entry : input.entrySet()) {
             if (mappings.containsKey(entry.getValue()))
                 output.put(entry.getKey(), mappings.get(entry.getValue()));
             else
                 output.put(entry.getKey(), entry.getValue());
         }
+        return output;
     }
 }
