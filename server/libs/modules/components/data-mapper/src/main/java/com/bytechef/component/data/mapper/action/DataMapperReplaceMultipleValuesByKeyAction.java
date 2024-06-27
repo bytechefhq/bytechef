@@ -77,7 +77,7 @@ public class DataMapperReplaceMultipleValuesByKeyAction {
         .output()
         .perform(DataMapperReplaceMultipleValuesByKeyAction::perform);
 
-    protected static Object perform(
+    protected static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         List<StringMapping> mappingList = inputParameters.getList(MAPPINGS, StringMapping.class, List.of());
         Map<String, String> mappings = mappingList.stream()
