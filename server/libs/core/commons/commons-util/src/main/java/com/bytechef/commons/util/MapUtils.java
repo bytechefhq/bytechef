@@ -742,9 +742,13 @@ public class MapUtils {
         Map<K, V> map, Function<Map.Entry<K, V>, ? extends K1> keyMapper,
         Function<Map.Entry<K, V>, ? extends V1> valueMapper) {
 
-        return map.entrySet()
-            .stream()
-            .collect(Collectors.toMap(keyMapper, valueMapper));
+        Map<K1, V1> newMap = new HashMap<>();
+
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            newMap.put(keyMapper.apply(entry), valueMapper.apply(entry));
+        }
+
+        return newMap;
     }
 
     public static <K, V> MultiValueMap<K, V> toMultiValueMap(Map<K, List<V>> targetMap) {
