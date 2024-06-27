@@ -14,17 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.commons.util;
+package com.bytechef.audit.config;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
+import org.springframework.context.annotation.Configuration;
 
-/**
- * @author Ivica Cardic
- */
-public class InstantUtils {
-
-    public static Instant toInstant(LocalDateTime localDateTime) {
-        return Instant.ofEpochMilli(LocalDateTimeUtils.getTime(localDateTime));
-    }
+@Configuration
+public class AuditEventConfiguration {
 }

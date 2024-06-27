@@ -200,6 +200,7 @@ dependencies {
     implementation(project(":server:ee:libs:config:tenant-multi-data-config"))
     implementation(project(":server:ee:libs:config:tenant-multi-message-event-config"))
     implementation(project(":server:ee:libs:config:tenant-multi-security-config"))
+    implementation(project(":server:ee:libs:core:audit:audit-service"))
     implementation(project(":server:ee:libs:core:tenant:tenant-multi-service"))
 
     runtimeOnly("com.h2database:h2")
