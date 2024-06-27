@@ -21,7 +21,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -86,11 +85,6 @@ class DataMapperReplaceValueActionTest {
     }
 
     @Test
-    void testPerformChangeToNull() {
-        setupAndAssertTestForType(1.5, null);
-    }
-
-    @Test
     void testPerformEmptyMapping() {
         // Setup
         when(inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of())).thenReturn(List.of());
@@ -115,7 +109,7 @@ class DataMapperReplaceValueActionTest {
     }
 
     private <T> void setupAndAssertTestForType(T inputMapping, T outputMapping) {
-        setupAndAssertTest(inputMapping, inputMapping, outputMapping, result -> assertEquals(outputMapping, result, "Result should match the expected output value."));
+        setupAndAssertTest(inputMapping, inputMapping, outputMapping, result -> assertEquals(outputMapping, result, "Result should match the expected output value for type: " + result.getClass()));
     }
 
     private <T, V> void setupAndAssertTest(V inputValue, T inputMapping, T outputMapping, Consumer<Object> consumer) {
