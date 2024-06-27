@@ -509,15 +509,11 @@ const Property = ({
             return;
         }
 
-        const workflowComponents = [...(workflow.triggers || []), ...(workflow.tasks || [])];
-
-        const currentWorkflowComponent = workflowComponents?.find((component) => component.name === currentNode?.name);
-
-        if (!currentWorkflowComponent || !currentWorkflowComponent.parameters) {
+        if (!currentComponent || !currentComponent.parameters) {
             return;
         }
 
-        const {parameters} = currentWorkflowComponent;
+        const {parameters} = currentComponent;
 
         if (!propertyParameterValue || propertyParameterValue === defaultValue) {
             if (!path) {
