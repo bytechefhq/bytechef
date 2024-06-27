@@ -24,6 +24,7 @@ import com.bytechef.component.airtable.trigger.AirtableNewRecordTrigger;
 import com.bytechef.component.airtable.util.AirtableUtils;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableDynamicPropertiesProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
@@ -31,8 +32,10 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.DataStreamItemReader;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.exception.ProviderException;
 import com.google.auto.service.AutoService;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -44,6 +47,24 @@ public class AirtableComponentHandler extends AbstractAirtableComponentHandler {
     @Override
     public List<ModifiableTriggerDefinition> getTriggers() {
         return List.of(AirtableNewRecordTrigger.TRIGGER_DEFINITION);
+    }
+
+    @Override
+    public ModifiableActionDefinition modifyAction(ModifiableActionDefinition modifiableActionDefinition) {
+        modifiableActionDefinition.processErrorResponse(
+            (statusCode, body, context) -> {
+                String message;
+
+                if (body instanceof Map<?, ?> map) {
+                    message = (String) ((Map<?, ?>) map.get("error")).get("message");
+                } else {
+                    message = body == null ? null : body.toString();
+                }
+
+                return new ProviderException(statusCode, message);
+            });
+
+        return modifiableActionDefinition;
     }
 
     @Override
