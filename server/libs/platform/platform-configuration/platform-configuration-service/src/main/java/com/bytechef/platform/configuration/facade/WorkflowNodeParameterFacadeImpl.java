@@ -89,7 +89,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         setParameter(pathItems, null, true, result.parameterMap);
 
         workflowService.update(
-            workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
+            workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap, true), workflow.getVersion());
 
         return result.parameterMap;
     }
@@ -153,7 +153,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         }
 
         workflowService.update(
-            workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
+            workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap, true), workflow.getVersion());
 
         return new UpdateParameterResultDTO(displayConditionMap, metadataMap, result.parameterMap);
     }
