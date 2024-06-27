@@ -78,7 +78,7 @@ public class DataMapperReplaceValueAction {
                     option("Date", 3),
                     option("Date Time", 4),
                     option("Integer", 5),
-                    option("Nullable", 6),
+//                    option("Nullable", 6),
                     option("Number", 7),
                     option("Object", 8),
                     option("String", 9),
@@ -109,11 +109,11 @@ public class DataMapperReplaceValueAction {
                 .description(VALUE_DESCRIPTION)
                 .displayCondition(getDisplayCondition("5"))
                 .required(true),
-            nullable(VALUE)
-                .label(VALUE_LABEL)
-                .description(VALUE_DESCRIPTION)
-                .displayCondition(getDisplayCondition("6"))
-                .required(true),
+//            nullable(VALUE)
+//                .label(VALUE_LABEL)
+//                .description(VALUE_DESCRIPTION)
+//                .displayCondition(getDisplayCondition("6"))
+//                .required(true),
             number(VALUE)
                 .label(VALUE_LABEL)
                 .description(VALUE_DESCRIPTION)
@@ -323,8 +323,9 @@ public class DataMapperReplaceValueAction {
         List<ObjectMapping> mappingList = inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of());
 
         for (Mapping<Object, Object> mapping : mappingList) {
-            if (ConvertUtils.canConvert(mapping.getFrom(), type) && ConvertUtils.convertValue(mapping.getFrom(), type)
-                .equals(inputParameters.get(VALUE, type))) {
+            if (ConvertUtils.canConvert(mapping.getFrom(), type) &&
+                ConvertUtils.convertValue(mapping.getFrom(), type)
+                    .equals(inputParameters.get(VALUE, type))) {
                 return ConvertUtils.convertValue(mapping.getTo(), type);
             }
         }
