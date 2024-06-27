@@ -312,6 +312,7 @@ include("server:ee:libs:config:tenant-multi-data-config")
 include("server:ee:libs:config:tenant-multi-message-event-config")
 include("server:ee:libs:config:tenant-multi-security-config")
 
+include("server:ee:libs:core:audit:audit-service")
 include("server:ee:libs:core:discovery:discovery-metadata-api")
 include("server:ee:libs:core:discovery:discovery-redis")
 include("server:ee:libs:core:discovery:discovery-util")

@@ -32,4 +32,8 @@
 
     <!-- spring batch -->
     <includeAll path="classpath:config/liquibase/changelog/batch/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or batch" />
+
+    <!-- audit -->
+    <includeAll path="classpath:config/liquibase/changelog/audit/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or connection or multitenant" />
+
 </databaseChangeLog>
