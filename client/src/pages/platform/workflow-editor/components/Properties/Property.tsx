@@ -539,7 +539,7 @@ const Property = ({
 
     // set value to propertyParameterValue
     useEffect(() => {
-        if (propertyParameterValue === '') {
+        if (propertyParameterValue === '' || propertyParameterValue === undefined) {
             if (mentionInput) {
                 setMentionInputValue('');
             } else {
@@ -981,7 +981,7 @@ const Property = ({
                             placeholder={
                                 isNumericalInput && minValue && maxValue
                                     ? `From ${minValue} to ${maxValue}`
-                                    : placeholder || 'Type number'
+                                    : placeholder || 'Type something...'
                             }
                             ref={inputRef}
                             required={required}
