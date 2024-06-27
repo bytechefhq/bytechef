@@ -667,6 +667,10 @@ const Property = ({
         if (controlType === 'SELECT') {
             setShowInputTypeSwitchButton(true);
         }
+
+        if (controlType === 'NULL') {
+            setShowInputTypeSwitchButton(false);
+        }
     }, [controlType]);
 
     // update propertyParameterValue when workflow definition changes
@@ -754,6 +758,27 @@ const Property = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [mentionInputValue]);
 
+    useEffect(() => {
+        if (
+            type === 'NULL' &&
+            propertyParameterValue === undefined &&
+            currentComponent &&
+            path &&
+            updateWorkflowNodeParameterMutation
+        ) {
+            saveProperty({
+                currentComponent,
+                includeInMetadata: property.custom,
+                path,
+                setCurrentComponent,
+                type,
+                updateWorkflowNodeParameterMutation,
+                value: null,
+                workflowId: workflow.id!,
+            });
+        }
+    }, [propertyParameterValue]);
+
     return (
         <li
             className={twMerge(
@@ -795,9 +820,11 @@ const Property = ({
 
             {!mentionInput && (
                 <>
-                    {((controlType === 'OBJECT_BUILDER' && name !== '__item') || controlType === 'ARRAY_BUILDER') && (
-                        <div className="flex items-center pb-1">
-                            {typeIcon && (
+                    {((controlType === 'OBJECT_BUILDER' && name !== '__item') ||
+                        controlType === 'ARRAY_BUILDER' ||
+                        controlType === 'NULL') && (
+                        <div className={twMerge('flex items-center', controlType !== 'NULL' && 'pb-1')}>
+                            {typeIcon && controlType !== 'NULL' && (
                                 <span className={twMerge(label ? 'pr-2' : 'pr-1')} title={type}>
                                     {typeIcon}
                                 </span>
@@ -1061,7 +1088,7 @@ const Property = ({
                         />
                     )}
 
-                    {type === 'NULL' && <span>NULL</span>}
+                    {controlType === 'NULL' && <span>NULL</span>}
                 </>
             )}
 
