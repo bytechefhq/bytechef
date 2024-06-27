@@ -29,9 +29,9 @@ import com.bytechef.component.definition.Context.Http.RequestMethod;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
-import com.bytechef.component.exception.ProviderException;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
+import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.registry.util.RefreshCredentialsUtils;
 import com.bytechef.platform.workflow.execution.constants.FileEntryConstants;
@@ -73,6 +73,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
@@ -80,10 +83,11 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class HttpClientExecutor {
+public class HttpClientExecutor implements ApplicationContextAware {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpClientExecutor.class);
 
+    private ApplicationContext applicationContext;
     private final ConnectionDefinitionService connectionDefinitionService;
     private final FileStorageService fileStorageService;
     private final ObjectMapper objectMapper;
@@ -100,14 +104,14 @@ public class HttpClientExecutor {
 
     public Response execute(
         String urlString, Map<String, List<String>> headers, Map<String, List<String>> queryParameters, Body body,
-        Configuration configuration, RequestMethod requestMethod, String componentName,
-        ComponentConnection componentConnection,
-        Context context) throws Exception {
+        Configuration configuration, RequestMethod requestMethod, String componentName, int componentVersion,
+        String componentOperationName, ComponentConnection componentConnection, Context context) throws Exception {
 
         HttpResponse<?> httpResponse;
 
         try (HttpClient httpClient = createHttpClient(
-            headers, queryParameters, configuration, componentName, componentConnection, context)) {
+            headers, queryParameters, configuration, componentName, componentVersion, componentOperationName,
+            componentConnection, context)) {
 
             HttpRequest httpRequest = createHTTPRequest(
                 urlString, requestMethod, headers, queryParameters, body, componentName, componentConnection, context);
@@ -168,7 +172,8 @@ public class HttpClientExecutor {
 
     HttpClient createHttpClient(
         Map<String, List<String>> headers, Map<String, List<String>> queryParameters, Configuration configuration,
-        String componentName, ComponentConnection componentConnection, Context context) {
+        String componentName, int componentVersion, String componentOperationName,
+        ComponentConnection componentConnection, Context context) {
 
         Methanol.Builder builder = Methanol.newBuilder()
             .version(HttpClient.Version.HTTP_1_1);
@@ -190,11 +195,10 @@ public class HttpClientExecutor {
         if (!configuration.isDisableAuthorization() && (componentConnection != null)) {
             applyAuthorization(headers, queryParameters, componentName, componentConnection, context);
 
-            if (componentConnection.canCredentialsBeRefreshed()) {
-                builder.interceptor(
-                    getInterceptor(
-                        componentName, componentConnection.version(), componentConnection.authorizationName()));
-            }
+            builder.interceptor(
+                getInterceptor(
+                    componentName, componentVersion, componentOperationName, componentConnection.version(),
+                    componentConnection.authorizationName(), componentConnection.canCredentialsBeRefreshed()));
         }
 
         if (configuration.isFollowRedirect()) {
@@ -223,13 +227,16 @@ public class HttpClientExecutor {
         return builder.build();
     }
 
-    private Methanol.Interceptor getInterceptor(String componentName, int connectionVersion, String authorizationName) {
+    private Methanol.Interceptor getInterceptor(
+        String componentName, int componentVersion, String componentOperationName, int connectionVersion,
+        String authorizationName, boolean credentialsBeRefreshed) {
+
         return new Methanol.Interceptor() {
             @Override
             public <T> HttpResponse<T> intercept(HttpRequest httpRequest, Chain<T> chain)
                 throws IOException, InterruptedException {
 
-                logger.trace("Intercepting Authorized request to analyze response");
+                logger.trace("Intercepting request to analyze response");
 
                 HttpResponse<T> httpResponse = chain.forward(httpRequest);
 
@@ -237,11 +244,16 @@ public class HttpClientExecutor {
                     List<String> detectOn = connectionDefinitionService.getAuthorizationDetectOn(
                         componentName, connectionVersion, authorizationName);
 
-                    if (!detectOn.isEmpty()) {
+                    if (credentialsBeRefreshed && !detectOn.isEmpty()) {
                         Object body = httpResponse.body();
 
-                        if (RefreshCredentialsUtils.matches(body.toString(), detectOn)) {
-                            throw new ProviderException(body.toString());
+                        if (body != null && RefreshCredentialsUtils.matches(body.toString(), detectOn)) {
+                            ActionDefinitionFacade actionDefinitionFacade = applicationContext.getBean(
+                                ActionDefinitionFacade.class);
+
+                            throw actionDefinitionFacade.executeProcessErrorResponse(
+                                componentName, componentVersion, componentOperationName, httpResponse.statusCode(),
+                                body);
                         }
                     }
 
@@ -250,12 +262,16 @@ public class HttpClientExecutor {
 
                 Object body = httpResponse.body();
 
-                throw new ProviderException(httpResponse.statusCode(), body.toString());
+                ActionDefinitionFacade actionDefinitionFacade = applicationContext.getBean(
+                    ActionDefinitionFacade.class);
+
+                throw actionDefinitionFacade.executeProcessErrorResponse(
+                    componentName, componentVersion, componentOperationName, httpResponse.statusCode(), body);
             }
 
             @Override
             public <T> CompletableFuture<HttpResponse<T>> interceptAsync(HttpRequest httpRequest, Chain<T> chain) {
-                logger.trace("Intercepting ASYNC OAuth Authorized request to analyze response");
+                logger.trace("Intercepting ASYNC request to analyze response");
 
                 return chain.forwardAsync(httpRequest);
             }
@@ -463,6 +479,11 @@ public class HttpClientExecutor {
     private BodyPublisher getXmlBodyPublisher(Body body) {
         return MoreBodyPublishers.ofMediaType(
             BodyPublishers.ofString(XmlUtils.write(body.getContent())), MediaType.APPLICATION_XML);
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 
     private class ResponseImpl implements Response {
