@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.registry.service;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.registry.domain.ActionDefinition;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
@@ -89,6 +90,10 @@ public interface ActionDefinitionService {
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         @NonNull Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths, String searchText,
         @Nullable ComponentConnection connection, @NonNull ActionContext context);
+
+    ProviderException executeProcessErrorResponse(
+        String componentName, int componentVersion, String actionName, int statusCode, Object body,
+        ActionContext actionContext);
 
     Output executeSingleConnectionOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,

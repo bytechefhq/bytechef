@@ -36,6 +36,7 @@ public abstract class AbstractActionDefinitionWrapper implements ActionDefinitio
     protected final Boolean deprecated;
     protected final String description;
     protected final ActionWorkflowNodeDescriptionFunction workflowNodeDescriptionFunction;
+    protected final ProcessErrorResponseFunction processErrorResponseFunction;
     protected final Help help;
     protected final Map<String, Object> metadata;
     protected final String name;
@@ -50,6 +51,7 @@ public abstract class AbstractActionDefinitionWrapper implements ActionDefinitio
         this.batch = OptionalUtils.orElse(actionDefinition.getBatch(), null);
         this.deprecated = OptionalUtils.orElse(actionDefinition.getDeprecated(), null);
         this.description = OptionalUtils.orElse(actionDefinition.getDescription(), null);
+        this.processErrorResponseFunction = OptionalUtils.orElse(actionDefinition.getProcessErrorResponse(), null);
         this.help = OptionalUtils.orElse(actionDefinition.getHelp(), null);
         this.metadata = OptionalUtils.orElse(actionDefinition.getMetadata(), null);
         this.name = actionDefinition.getName();
@@ -60,7 +62,7 @@ public abstract class AbstractActionDefinitionWrapper implements ActionDefinitio
         this.properties = OptionalUtils.orElse(actionDefinition.getProperties(), null);
         this.title = OptionalUtils.orElse(actionDefinition.getTitle(), null);
         this.workflowNodeDescriptionFunction =
-            OptionalUtils.orElse(actionDefinition.getWorkflowNodeDescriptionFunction(), null);
+            OptionalUtils.orElse(actionDefinition.getWorkflowNodeDescription(), null);
     }
 
     @Override
@@ -76,6 +78,11 @@ public abstract class AbstractActionDefinitionWrapper implements ActionDefinitio
     @Override
     public Optional<String> getDescription() {
         return Optional.ofNullable(description);
+    }
+
+    @Override
+    public Optional<ProcessErrorResponseFunction> getProcessErrorResponse() {
+        return Optional.ofNullable(processErrorResponseFunction);
     }
 
     @Override
@@ -119,7 +126,7 @@ public abstract class AbstractActionDefinitionWrapper implements ActionDefinitio
     }
 
     @Override
-    public Optional<ActionWorkflowNodeDescriptionFunction> getWorkflowNodeDescriptionFunction() {
+    public Optional<ActionWorkflowNodeDescriptionFunction> getWorkflowNodeDescription() {
         return Optional.ofNullable(workflowNodeDescriptionFunction);
     }
 

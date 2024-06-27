@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.registry.facade;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.component.registry.domain.Output;
@@ -50,8 +51,13 @@ public interface ActionDefinitionFacade {
         @NonNull Map<String, Long> connectionIds);
 
     Object executePerformForPolyglot(
-        String componentName, int componentVersion, String actionName, @NonNull Map<String, ?> inputParameters,
-        ComponentConnection componentConnection, ActionContext actionContext);
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, ?> inputParameters, ComponentConnection componentConnection,
+        @NonNull ActionContext actionContext);
+
+    ProviderException executeProcessErrorResponse(
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, int statusCode,
+        Object body);
 
     String executeWorkflowNodeDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,

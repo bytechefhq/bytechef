@@ -25,7 +25,7 @@ import com.bytechef.platform.exception.ErrorType;
 public enum ActionDefinitionErrorType implements ErrorType {
 
     EXECUTE_DYNAMIC_PROPERTIES(100), EXECUTE_WORKFLOW_NODE_DESCRIPTION(101), EXECUTE_OPTIONS(102), EXECUTE_OUTPUT(103),
-    EXECUTE_PERFORM(104);
+    EXECUTE_PERFORM(104), EXECUTE_PROCESS_ERROR_RESPONSE(105);
 
     private final int errorKey;
 

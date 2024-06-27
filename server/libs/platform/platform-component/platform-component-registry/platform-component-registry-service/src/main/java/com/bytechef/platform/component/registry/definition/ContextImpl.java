@@ -45,10 +45,11 @@ public class ContextImpl implements Context {
 
     @SuppressFBWarnings("EI")
     public ContextImpl(
-        String componentName, String componentOperationName, ComponentConnection connection,
+        String componentName, int componentVersion, String componentOperationName, ComponentConnection connection,
         HttpClientExecutor httpClientExecutor) {
 
-        this.http = new HttpImpl(componentName, connection, this, httpClientExecutor);
+        this.http = new HttpImpl(
+            componentName, componentVersion, componentOperationName, connection, this, httpClientExecutor);
         this.json = new JsonImpl();
         this.logger = new LoggerImpl(componentName, componentOperationName);
         this.output = new OutputImpl();
@@ -103,51 +104,64 @@ public class ContextImpl implements Context {
     }
 
     private record HttpImpl(
-        String componentName, ComponentConnection connection, Context context, HttpClientExecutor httpClientExecutor)
+        String componentName, int componentVersion, String componentOperationName, ComponentConnection connection,
+        Context context, HttpClientExecutor httpClientExecutor)
+
         implements Http {
 
         @Override
         public Executor delete(String url) {
-            return new ExecutorImpl(url, RequestMethod.DELETE, componentName, connection, httpClientExecutor, context);
+            return new ExecutorImpl(
+                url, RequestMethod.DELETE, componentName, componentVersion, componentOperationName, connection,
+                httpClientExecutor, context);
         }
 
         @Override
         public Executor exchange(String url, RequestMethod requestMethod) {
-            return new ExecutorImpl(url, requestMethod, componentName, connection, httpClientExecutor, context);
+            return new ExecutorImpl(url, requestMethod, componentName, componentVersion, componentOperationName,
+                connection, httpClientExecutor, context);
         }
 
         @Override
         public Executor head(String url) {
             return new ExecutorImpl(
-                url, RequestMethod.HEAD, componentName, connection, httpClientExecutor, context);
+                url, RequestMethod.HEAD, componentName, componentVersion, componentOperationName, connection,
+                httpClientExecutor, context);
         }
 
         @Override
         public Executor get(String url) {
-            return new ExecutorImpl(url, RequestMethod.GET, componentName, connection, httpClientExecutor, context);
+            return new ExecutorImpl(url, RequestMethod.GET, componentName, componentVersion, componentOperationName,
+                connection, httpClientExecutor, context);
         }
 
         @Override
         public Executor patch(String url) {
             return new ExecutorImpl(
-                url, RequestMethod.PATCH, componentName, connection, httpClientExecutor, context);
+                url, RequestMethod.PATCH, componentName, componentVersion, componentOperationName, connection,
+                httpClientExecutor, context);
         }
 
         @Override
         public Executor post(String url) {
             return new ExecutorImpl(
-                url, RequestMethod.POST, componentName, connection, httpClientExecutor, context);
+                url, RequestMethod.POST, componentName, componentVersion, componentOperationName, connection,
+                httpClientExecutor, context);
         }
 
         @Override
         public Executor put(String url) {
-            return new ExecutorImpl(url, RequestMethod.PUT, componentName, connection, httpClientExecutor, context);
+            return new ExecutorImpl(
+                url, RequestMethod.PUT, componentName, componentVersion, componentOperationName, connection,
+                httpClientExecutor, context);
         }
 
         private static class ExecutorImpl implements Executor {
 
             private Body body;
             private final String componentName;
+            private final int componentVersion;
+            private final String componentOperationName;
             private Configuration configuration = new Configuration();
             private final ComponentConnection connection;
             private final Context context;
@@ -158,10 +172,13 @@ public class ContextImpl implements Context {
             private final String url;
 
             private ExecutorImpl(
-                String url, RequestMethod requestMethod, String componentName, ComponentConnection connection,
-                HttpClientExecutor httpClientExecutor, Context context) {
+                String url, RequestMethod requestMethod, String componentName, int componentVersion,
+                String componentOperationName, ComponentConnection connection, HttpClientExecutor httpClientExecutor,
+                Context context) {
 
                 this.componentName = componentName;
+                this.componentVersion = componentVersion;
+                this.componentOperationName = componentOperationName;
                 this.connection = connection;
                 this.context = context;
                 this.httpClientExecutor = httpClientExecutor;
@@ -215,8 +232,8 @@ public class ContextImpl implements Context {
             public Response execute() {
                 try {
                     return httpClientExecutor.execute(
-                        url, headers, queryParameters, body, configuration, requestMethod, componentName, connection,
-                        context);
+                        url, headers, queryParameters, body, configuration, requestMethod, componentName,
+                        componentVersion, componentOperationName, connection, context);
                 } catch (Exception e) {
                     throw new RuntimeException("Unable to execute HTTP request", e);
                 }

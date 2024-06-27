@@ -20,7 +20,8 @@ import static com.bytechef.component.definition.Context.Http.RequestMethod;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.OpenApiComponentHandler.PropertyType;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.ProcessErrorResponseFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.BodyContentType;
@@ -31,6 +32,8 @@ import com.bytechef.component.definition.Output;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.exception.ProviderException;
+import com.bytechef.platform.component.exception.ComponentExecutionException;
+import com.bytechef.platform.component.registry.exception.ActionDefinitionErrorType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +51,8 @@ public class OpenApiClientUtils {
 
     public static Response execute(
         Map<String, ?> inputParameters, List<? extends Property> properties,
-        @Nullable Output output, Map<String, Object> metadata, Context context) {
+        @Nullable Output output, Map<String, Object> metadata,
+        @Nullable ProcessErrorResponseFunction processErrorResponseFunction, ActionContext context) {
 
         ValueProperty<?> outputSchema = output == null ? null : output.getOutputSchema();
 
@@ -71,7 +75,16 @@ public class OpenApiClientUtils {
         if (response.getStatusCode() < 200 || response.getStatusCode() > 299) {
             Object body = response.getBody();
 
-            throw new ProviderException(response.getStatusCode(), body == null ? null : body.toString());
+            if (processErrorResponseFunction == null) {
+                throw new ProviderException(response.getStatusCode(), body == null ? null : body.toString());
+            } else {
+                try {
+                    throw processErrorResponseFunction.apply(response.getStatusCode(), body, context);
+                } catch (Exception e) {
+                    throw new ComponentExecutionException(
+                        e, ActionDefinitionErrorType.EXECUTE_PROCESS_ERROR_RESPONSE);
+                }
+            }
         }
 
         return response;

@@ -25,6 +25,7 @@ import com.bytechef.platform.component.registry.handler.loader.AbstractComponent
 import com.bytechef.platform.component.registry.oas.handler.OpenApiComponentTaskHandler;
 import com.bytechef.platform.component.registry.util.OpenApiClientUtils;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -36,7 +37,8 @@ public class OpenApiComponentHandlerLoader extends AbstractComponentHandlerLoade
         actionDefinition -> (inputParameters, connectionParameters, context) -> OpenApiClientUtils.execute(
             inputParameters, OptionalUtils.orElse(actionDefinition.getProperties(), List.of()),
             OptionalUtils.orElse(actionDefinition.getOutput(), null),
-            OptionalUtils.orElse(actionDefinition.getMetadata(), null), context);
+            OptionalUtils.orElse(actionDefinition.getMetadata(), Map.of()),
+            OptionalUtils.orElse(actionDefinition.getProcessErrorResponse(), null), context);
 
     public OpenApiComponentHandlerLoader() {
         super(

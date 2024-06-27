@@ -16,6 +16,7 @@
 
 package com.bytechef.component.definition;
 
+import com.bytechef.component.exception.ProviderException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -51,6 +52,12 @@ public interface ActionDefinition {
      * @return an optional execute function implementation
      */
     Optional<PerformFunction> getPerform();
+
+    /**
+     *
+     * @return
+     */
+    Optional<ProcessErrorResponseFunction> getProcessErrorResponse();
 
     /**
      *
@@ -98,7 +105,7 @@ public interface ActionDefinition {
      *
      * @return
      */
-    Optional<ActionWorkflowNodeDescriptionFunction> getWorkflowNodeDescriptionFunction();
+    Optional<ActionWorkflowNodeDescriptionFunction> getWorkflowNodeDescription();
 
     /**
      *
@@ -127,6 +134,22 @@ public interface ActionDefinition {
          */
         Object apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
             throws Exception;
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface ProcessErrorResponseFunction {
+
+        /**
+         *
+         * @param statusCode
+         * @param body
+         * @param context
+         * @return
+         */
+        ProviderException apply(int statusCode, Object body, ActionContext context) throws Exception;
     }
 
     /**

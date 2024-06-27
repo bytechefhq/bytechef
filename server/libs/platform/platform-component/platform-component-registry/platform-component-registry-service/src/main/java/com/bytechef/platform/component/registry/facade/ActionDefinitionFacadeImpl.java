@@ -148,8 +148,9 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
     @Override
     public Object executePerformForPolyglot(
-        String componentName, int componentVersion, String actionName, @NonNull Map<String, ?> inputParameters,
-        ComponentConnection componentConnection, ActionContext actionContext) {
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, ?> inputParameters, ComponentConnection componentConnection,
+        @NonNull ActionContext actionContext) {
 
         return executeSingleConnectionFunction(
             componentName, componentVersion, componentConnection, actionContext,
@@ -157,6 +158,18 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
             (componentConnection1, actionContext1) -> actionDefinitionService.executeSingleConnectionPerform(
                 componentName, componentVersion, actionName, inputParameters, componentConnection1,
                 actionContext1));
+    }
+
+    @Override
+    public ProviderException executeProcessErrorResponse(
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, int statusCode,
+        Object body) {
+
+        ActionContext actionContext = contextFactory.createActionContext(
+            componentName, componentVersion, actionName, null, null, null, null);
+
+        return actionDefinitionService.executeProcessErrorResponse(
+            componentName, componentVersion, actionName, statusCode, body, actionContext);
     }
 
     @Override

@@ -16,11 +16,15 @@
 
 package com.bytechef.platform.component.registry.domain;
 
+import static com.bytechef.component.definition.Authorization.AuthorizationType.CUSTOM;
+
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.component.definition.ParameterConnection;
 import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import java.util.Objects;
 import org.springframework.lang.NonNull;
 
 /**
@@ -67,5 +71,16 @@ public record ComponentConnection(
     @Override
     public String getAuthorizationName() {
         return authorizationName;
+    }
+
+    public boolean isAuthorizationOauth2AuthorizationCode() {
+        return Objects.equals(AuthorizationType.OAUTH2_AUTHORIZATION_CODE.getName(), getAuthorizationName()) ||
+            Objects.equals(AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE.getName(), getAuthorizationName());
+    }
+
+    public boolean canCredentialsBeRefreshed() {
+        return Objects.equals(getAuthorizationName(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE.getName()) ||
+            Objects.equals(getAuthorizationName(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE.getName()) ||
+            Objects.equals(CUSTOM.getName(), getAuthorizationName());
     }
 }

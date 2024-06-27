@@ -227,6 +227,7 @@ public final class ComponentDSL {
         private boolean defaultOutputFunction;
         private Boolean deprecated;
         private String description;
+        private ProcessErrorResponseFunction processErrorResponseFunction;
         private PerformFunction performFunction;
         private Help help;
         private Map<String, Object> metadata;
@@ -256,6 +257,12 @@ public final class ComponentDSL {
 
         public ModifiableActionDefinition description(String description) {
             this.description = description;
+
+            return this;
+        }
+
+        public ModifiableActionDefinition processErrorResponse(ProcessErrorResponseFunction processErrorResponse) {
+            this.processErrorResponseFunction = processErrorResponse;
 
             return this;
         }
@@ -414,6 +421,11 @@ public final class ComponentDSL {
         }
 
         @Override
+        public Optional<ProcessErrorResponseFunction> getProcessErrorResponse() {
+            return Optional.ofNullable(processErrorResponseFunction);
+        }
+
+        @Override
         public Optional<Help> getHelp() {
             return Optional.ofNullable(help);
         }
@@ -449,7 +461,7 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<ActionWorkflowNodeDescriptionFunction> getWorkflowNodeDescriptionFunction() {
+        public Optional<ActionWorkflowNodeDescriptionFunction> getWorkflowNodeDescription() {
             return Optional.ofNullable(workflowNodeDescriptionFunction);
         }
 

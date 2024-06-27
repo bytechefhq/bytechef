@@ -65,7 +65,7 @@ public class ContextFactory {
     }
 
     public Context createContext(@NonNull String componentName, @Nullable ComponentConnection connection) {
-        return new ContextImpl(componentName, null, connection, httpClientExecutor);
+        return new ContextImpl(componentName, -1, null, connection, httpClientExecutor);
     }
 
     public TriggerContext createTriggerContext(

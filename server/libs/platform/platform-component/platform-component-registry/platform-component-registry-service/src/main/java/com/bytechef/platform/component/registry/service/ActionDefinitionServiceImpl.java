@@ -167,6 +167,24 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
+    public ProviderException executeProcessErrorResponse(
+        String componentName, int componentVersion, String actionName, int statusCode, Object body,
+        ActionContext actionContext) {
+
+        com.bytechef.component.definition.ActionDefinition actionDefinition =
+            componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
+
+        try {
+            return actionDefinition.getProcessErrorResponse()
+                .orElseGet(() -> (statusCode1, body1, context) -> new ProviderException(
+                    statusCode1, body1 == null ? null : body1.toString()))
+                .apply(statusCode, body, actionContext);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e, ActionDefinitionErrorType.EXECUTE_PROCESS_ERROR_RESPONSE);
+        }
+    }
+
+    @Override
     public Output executeSingleConnectionOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
@@ -309,7 +327,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
 
         return actionDefinition
-            .getWorkflowNodeDescriptionFunction()
+            .getWorkflowNodeDescription()
             .orElse((inputParameters, context) -> getComponentTitle(componentDefinition) + ": " +
                 getActionTitle(actionDefinition));
     }

@@ -57,7 +57,7 @@ public class ActionDefinition extends ActionDefinitionBasic {
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(actionDefinition.getProperties(), List.of()), Property::toProperty);
         this.workflowNodeDescriptionDefined = OptionalUtils.mapOrElse(
-            actionDefinition.getWorkflowNodeDescriptionFunction(), actionNodeDescriptionFunction -> true, false);
+            actionDefinition.getWorkflowNodeDescription(), workflowNodeDescriptionFunction -> true, false);
     }
 
     @Override

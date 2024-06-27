@@ -38,6 +38,5 @@ public interface MultipleConnectionsOutputFunction extends ActionDefinition.Outp
      */
     Output apply(
         Parameters inputParameters, Map<String, ? extends ParameterConnection> parameterConnections,
-        ActionContext context)
-        throws Exception;
+        ActionContext context) throws Exception;
 }

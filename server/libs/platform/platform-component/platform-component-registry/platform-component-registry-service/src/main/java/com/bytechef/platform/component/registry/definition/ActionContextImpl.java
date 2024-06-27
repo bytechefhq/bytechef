@@ -56,7 +56,7 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
         ApplicationEventPublisher eventPublisher, FileStorageService fileStorageService,
         HttpClientExecutor httpClientExecutor) {
 
-        super(componentName, actionName, connection, httpClientExecutor);
+        super(componentName, componentVersion, actionName, connection, httpClientExecutor);
 
         this.actionName = actionName;
         this.appType = appType;

@@ -52,7 +52,7 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
         ApplicationEventPublisher eventPublisher, FileStorageService fileStorageService,
         HttpClientExecutor httpClientExecutor) {
 
-        super(componentName, triggerName, connection, httpClientExecutor);
+        super(componentName, componentVersion, triggerName, connection, httpClientExecutor);
 
         this.data = type == null ? new NoOpDataImpl() : new DataImpl(
             componentName, componentVersion, triggerName, type, workflowId, jobId,
