@@ -309,6 +309,21 @@ public class JsonUtils {
         }
     }
 
+    public static String write(Object object, boolean includeNulls) {
+        ObjectMapper currentObjectMapper = objectMapper;
+
+        if (includeNulls) {
+            currentObjectMapper = currentObjectMapper.copy()
+                .setSerializationInclusion(JsonInclude.Include.ALWAYS);
+        }
+
+        try {
+            return currentObjectMapper.writeValueAsString(object);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static String writeWithDefaultPrettyPrinter(Object object) {
         try {
             DefaultPrettyPrinter printer = new DefaultPrettyPrinter()
