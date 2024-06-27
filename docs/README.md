@@ -15,7 +15,7 @@ This repository contains the ByteChef documentation website code and Markdown so
 - [Local setup](#local-setup)
 
 ## Feedback
-If you want to give documentation feedback, please join our [Discord Community](https://discord.gg/PybnUM3Y) or go to our [Forum](https://github.com/bytechefhq/bytechef/discussions) and drop us a message.
+If you want to give documentation feedback, please join our [Discord Community](https://discord.gg/VKvNxHjpYx) or go to our [Forum](https://github.com/bytechefhq/bytechef/discussions) and drop us a message.
 
 ## Documentation Issues
 To enter documentation bugs or submit any feature request for documentation, please create a new [GitHub issue](https://github.com/bytechefhq/bytechef/issues/new?assignees=&labels=documentation&template=03_documentation_report.yml&title=%5Bdocs%5D%3A+). Please check if there is an existing issue first.

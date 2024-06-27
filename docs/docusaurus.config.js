@@ -66,7 +66,7 @@ const config = {
             // class: 'header-github-link'
           },
           {
-            href: 'https://discord.gg/PybnUM3Y',
+            href: 'https://discord.gg/VKvNxHjpYx',
             label: 'Discord',
             position: 'right',
           },
@@ -102,7 +102,7 @@ const config = {
       //         },
       //         {
       //           label: 'Discord',
-      //           href: 'https://discord.gg/PybnUM3Y',
+      //           href: 'https://discord.gg/VKvNxHjpYx',
       //         },
       //         {
       //           label: 'Twitter',

@@ -35,4 +35,4 @@ For more details about how ByteChef works, plase check [architecture details her
 - For help and questions about best practices, we have a discussion forum set up on **[GitHub](https://github.com/bytechefhq/bytechef/discussions)**.
 <!--- - If you are using ByteChef cloud, click on the chat icon at the bottom right corner for instant help. -->
 - If you have found a bug, please create a **[GitHub issue](https://github.com/bytechefhq/bytechef/issues)** for the same.
-- Feel free to join our **[Discord Community](https://discord.gg/PybnUM3Y)**.
+- Feel free to join our **[Discord Community](https://discord.gg/VKvNxHjpYx)**.

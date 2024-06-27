@@ -231,4 +231,4 @@ docker compose -f server/docker-compose.dev.infra.yml down -v
 ```
 
 ## Questions?
-Contact us on [Discord](https://discord.gg/CBAC2rCDsq) or mail us at [support@bytechef.io](mailto:support@bytechef.io).
+Contact us on [Discord](https://discord.gg/VKvNxHjpYx) or mail us at [support@bytechef.io](mailto:support@bytechef.io).
