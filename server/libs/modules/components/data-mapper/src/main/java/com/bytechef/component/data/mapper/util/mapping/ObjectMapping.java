@@ -21,7 +21,7 @@ public class ObjectMapping extends Mapping<Object, Object> {
         super();
     }
 
-    public ObjectMapping(String from, String to) {
+    public ObjectMapping(Object from, Object to) {
         super(from, to);
     }
 }
