@@ -164,7 +164,7 @@ const Property = ({
     }
 
     if (path) {
-        path = path.replace(/[^a-zA-Z0-9_.]/g, (char) => {
+        path = path.replace(/[^a-zA-Z0-9_.[]]/g, (char) => {
             const charCode = char.charCodeAt(0);
 
             return charCode ? `0x${charCode.toString()}` : '0x00';
