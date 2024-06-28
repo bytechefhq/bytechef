@@ -241,57 +241,6 @@ public class HttpClientExecutor implements ApplicationContextAware {
         return builder.build();
     }
 
-    private Methanol.Interceptor getInterceptor(
-        String componentName, int componentVersion, String componentOperationName, int connectionVersion,
-        String authorizationName, boolean credentialsBeRefreshed) {
-
-        return new Methanol.Interceptor() {
-            @Override
-            public <T> HttpResponse<T> intercept(HttpRequest httpRequest, Chain<T> chain)
-                throws IOException, InterruptedException {
-
-                logger.trace("Intercepting request to analyze response");
-
-                HttpResponse<T> httpResponse = chain.forward(httpRequest);
-
-                if ((httpResponse.statusCode() > 199) && (httpResponse.statusCode() < 300)) {
-                    List<String> detectOn = connectionDefinitionService.getAuthorizationDetectOn(
-                        componentName, connectionVersion, authorizationName);
-
-                    if (credentialsBeRefreshed && !detectOn.isEmpty()) {
-                        Object body = httpResponse.body();
-
-                        if (body != null && RefreshCredentialsUtils.matches(body.toString(), detectOn)) {
-                            ActionDefinitionFacade actionDefinitionFacade = applicationContext.getBean(
-                                ActionDefinitionFacade.class);
-
-                            throw actionDefinitionFacade.executeProcessErrorResponse(
-                                componentName, componentVersion, componentOperationName, httpResponse.statusCode(),
-                                body);
-                        }
-                    }
-
-                    return httpResponse;
-                }
-
-                Object body = httpResponse.body();
-
-                ActionDefinitionFacade actionDefinitionFacade = applicationContext.getBean(
-                    ActionDefinitionFacade.class);
-
-                throw actionDefinitionFacade.executeProcessErrorResponse(
-                    componentName, componentVersion, componentOperationName, httpResponse.statusCode(), body);
-            }
-
-            @Override
-            public <T> CompletableFuture<HttpResponse<T>> interceptAsync(HttpRequest httpRequest, Chain<T> chain) {
-                logger.trace("Intercepting ASYNC request to analyze response");
-
-                return chain.forwardAsync(httpRequest);
-            }
-        };
-    }
-
     HttpRequest createHTTPRequest(
         String urlString, RequestMethod requestMethod, Map<String, List<String>> headers,
         Map<String, List<String>> queryParameters, Body body, String componentName,
@@ -441,12 +390,67 @@ public class HttpClientExecutor implements ApplicationContextAware {
         return builder.build();
     }
 
+    private Methanol.Interceptor getInterceptor(
+        String componentName, int componentVersion, String componentOperationName, int connectionVersion,
+        String authorizationName, boolean credentialsBeRefreshed) {
+
+        return new Methanol.Interceptor() {
+            @Override
+            public <T> HttpResponse<T> intercept(HttpRequest httpRequest, Chain<T> chain)
+                throws IOException, InterruptedException {
+
+                logger.trace("Intercepting request to analyze response");
+
+                HttpResponse<T> httpResponse = chain.forward(httpRequest);
+
+                if ((httpResponse.statusCode() > 199) && (httpResponse.statusCode() < 300)) {
+                    List<String> detectOn = connectionDefinitionService.getAuthorizationDetectOn(
+                        componentName, connectionVersion, authorizationName);
+
+                    if (credentialsBeRefreshed && !detectOn.isEmpty()) {
+                        Object body = httpResponse.body();
+
+                        if (body != null && RefreshCredentialsUtils.matches(body.toString(), detectOn)) {
+                            throw getActionDefinitionFacade().executeProcessErrorResponse(
+                                componentName, componentVersion, componentOperationName, httpResponse.statusCode(),
+                                body);
+                        }
+                    }
+
+                    return httpResponse;
+                }
+
+                Object body = httpResponse.body();
+
+                throw getActionDefinitionFacade().executeProcessErrorResponse(
+                    componentName, componentVersion, componentOperationName, httpResponse.statusCode(), body);
+            }
+
+            @Override
+            public <T> CompletableFuture<HttpResponse<T>> interceptAsync(HttpRequest httpRequest, Chain<T> chain) {
+                logger.trace("Intercepting ASYNC request to analyze response");
+
+                return chain.forwardAsync(httpRequest);
+            }
+        };
+    }
+
+    private BodyPublisher getJsonBodyPublisher(Body body) {
+        return MoreBodyPublishers.ofMediaType(
+            BodyPublishers.ofString(JsonUtils.write(body.getContent())), MediaType.APPLICATION_JSON);
+    }
+
     private BodyPublisher getStringBodyPublisher(Body body) {
         Object content = body.getContent();
 
         return MoreBodyPublishers.ofMediaType(
             BodyPublishers.ofString(content.toString()),
             MediaType.parse(body.getMimeType()));
+    }
+
+    private BodyPublisher getXmlBodyPublisher(Body body) {
+        return MoreBodyPublishers.ofMediaType(
+            BodyPublishers.ofString(XmlUtils.write(body.getContent())), MediaType.APPLICATION_XML);
     }
 
     private boolean isEmpty(final Object object) {
@@ -483,21 +487,6 @@ public class HttpClientExecutor implements ApplicationContextAware {
 
         return new FileEntryImpl(
             fileStorageService.storeFileContent(FileEntryConstants.FILES_DIR, filename, httpResponseBody));
-    }
-
-    private BodyPublisher getJsonBodyPublisher(Body body) {
-        return MoreBodyPublishers.ofMediaType(
-            BodyPublishers.ofString(JsonUtils.write(body.getContent())), MediaType.APPLICATION_JSON);
-    }
-
-    private BodyPublisher getXmlBodyPublisher(Body body) {
-        return MoreBodyPublishers.ofMediaType(
-            BodyPublishers.ofString(XmlUtils.write(body.getContent())), MediaType.APPLICATION_XML);
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
     }
 
     private class ResponseImpl implements Response {
