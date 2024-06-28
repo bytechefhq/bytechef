@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2020 the original author or authors.
+ * Copyright 2023-present ByteChef Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,25 +12,35 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Modifications copyright (C) 2023 ByteChef Inc.
  */
 
-package com.bytechef.component.data.mapper;
+package com.bytechef.component.data.mapper.util.mapping;
 
-import com.bytechef.test.jsonasssert.JsonFileAssert;
-import org.junit.jupiter.api.Test;
+public abstract class Mapping<F, T> {
+    private F from;
+    private T to;
 
-/**
- * @author Arik Cohen
- * @author Ivica Cardic
- */
-class DataMapperComponentHandlerTest {
-
-    @Test
-    void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals(
-            "definition/data-mapper_v1.json", new DataMapperComponentHandler().getDefinition());
+    protected Mapping() {
     }
 
+    protected Mapping(F from, T to) {
+        this.from = from;
+        this.to = to;
+    }
+
+    public F getFrom() {
+        return from;
+    }
+
+    public void setFrom(F from) {
+        this.from = from;
+    }
+
+    public T getTo() {
+        return to;
+    }
+
+    public void setTo(T to) {
+        this.to = to;
+    }
 }

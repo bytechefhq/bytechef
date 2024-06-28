@@ -19,13 +19,13 @@ package com.bytechef.component.data.mapper;
 import static com.bytechef.component.definition.ComponentDSL.component;
 
 import com.bytechef.component.ComponentHandler;
-import com.bytechef.component.data.mapper.action.DataMapperMapKeysAction;
-import com.bytechef.component.data.mapper.action.DataMapperMapListToObjectAction;
-import com.bytechef.component.data.mapper.action.DataMapperMapMultipleValuesBetweenObjectsAction;
-import com.bytechef.component.data.mapper.action.DataMapperMapObjectsAction;
-import com.bytechef.component.data.mapper.action.DataMapperMapObjectsToListAction;
-import com.bytechef.component.data.mapper.action.DataMapperMapOneValueAction;
-import com.bytechef.component.data.mapper.action.DataMapperMapValuesAction;
+import com.bytechef.component.data.mapper.action.DataMapperMapObjectsToArrayAction;
+import com.bytechef.component.data.mapper.action.DataMapperMapObjectsToObjectAction;
+import com.bytechef.component.data.mapper.action.DataMapperMergeAndPivotByKeyAction;
+import com.bytechef.component.data.mapper.action.DataMapperRenameKeysAction;
+import com.bytechef.component.data.mapper.action.DataMapperReplaceAllSpecifiedValuesAction;
+import com.bytechef.component.data.mapper.action.DataMapperReplaceMultipleValuesByKeyAction;
+import com.bytechef.component.data.mapper.action.DataMapperReplaceValueAction;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
@@ -42,13 +42,13 @@ public class DataMapperComponentHandler implements ComponentHandler {
         .icon("path:assets/data-mapper.svg")
         .categories(ComponentCategory.HELPERS)
         .actions(
-            DataMapperMapKeysAction.ACTION_DEFINITION,
-            DataMapperMapListToObjectAction.ACTION_DEFINITION,
-            DataMapperMapMultipleValuesBetweenObjectsAction.ACTION_DEFINITION,
-            DataMapperMapObjectsAction.ACTION_DEFINITION,
-            DataMapperMapObjectsToListAction.ACTION_DEFINITION,
-            DataMapperMapOneValueAction.ACTION_DEFINITION,
-            DataMapperMapValuesAction.ACTION_DEFINITION);
+            DataMapperRenameKeysAction.ACTION_DEFINITION,
+            DataMapperReplaceValueAction.ACTION_DEFINITION,
+            DataMapperReplaceAllSpecifiedValuesAction.ACTION_DEFINITION,
+            DataMapperReplaceMultipleValuesByKeyAction.ACTION_DEFINITION,
+            DataMapperMapObjectsToObjectAction.ACTION_DEFINITION,
+            DataMapperMapObjectsToArrayAction.ACTION_DEFINITION,
+            DataMapperMergeAndPivotByKeyAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
