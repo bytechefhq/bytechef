@@ -6,7 +6,7 @@ import {NodeProps, useReactFlow} from 'reactflow';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 
 export default function useNodeClick(data: NodeProps['data'], id: NodeProps['id']) {
-    const {setCurrentNode, setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
+    const {setCurrentComponent, setCurrentNode, setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
     const {setRightSidebarOpen} = useRightSidebarStore();
 
     const {getNode} = useReactFlow();
@@ -32,5 +32,17 @@ export default function useNodeClick(data: NodeProps['data'], id: NodeProps['id'
         setWorkflowNodeDetailsPanelOpen(true);
 
         setCurrentNode(nodeData);
-    }, [data, getNode, id, setCurrentNode, setWorkflowNodeDetailsPanelOpen, setRightSidebarOpen]);
+
+        if (nodeData.componentName && nodeData.operationName) {
+            setCurrentComponent({
+                componentName: nodeData.componentName,
+                displayConditions: nodeData.displayConditions,
+                metadata: nodeData.metadata,
+                operationName: nodeData.operationName,
+                parameters: nodeData.parameters,
+                title: nodeData.label,
+                workflowNodeName: nodeData.name,
+            });
+        }
+    }, [getNode, id, data, setRightSidebarOpen, setWorkflowNodeDetailsPanelOpen, setCurrentNode, setCurrentComponent]);
 }
