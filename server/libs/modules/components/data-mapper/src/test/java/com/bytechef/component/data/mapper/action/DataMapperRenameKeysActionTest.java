@@ -1,15 +1,20 @@
+/*
+ * Copyright 2023-present ByteChef Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.bytechef.component.data.mapper.action;
-
-import com.bytechef.component.data.mapper.util.mapping.StringMapping;
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Parameters;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INPUT;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.MAPPINGS;
@@ -17,10 +22,21 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.data.mapper.util.mapping.StringMapping;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Parameters;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 class DataMapperRenameKeysActionTest {
     private Parameters inputParameters;
     private Parameters connectionParameters;
     private ActionContext context;
+
     @BeforeEach
     void setUp() {
         inputParameters = mock(Parameters.class);
@@ -69,7 +85,8 @@ class DataMapperRenameKeysActionTest {
         inputJson.put("oldKey1", "value1");
         inputJson.put("oldKey2", "value2");
 
-        List<StringMapping> mappingList = List.of(new StringMapping("oldKey1", "newKey1"), new StringMapping("oldKey2", "newKey2"));
+        List<StringMapping> mappingList =
+            List.of(new StringMapping("oldKey1", "newKey1"), new StringMapping("oldKey2", "newKey2"));
         when(inputParameters.getList(MAPPINGS, StringMapping.class, List.of())).thenReturn(mappingList);
         when(inputParameters.get(INPUT)).thenReturn(inputJson);
 
@@ -99,8 +116,9 @@ class DataMapperRenameKeysActionTest {
         Map<String, Object> result = DataMapperRenameKeysAction.perform(inputParameters, connectionParameters, context);
 
         // Verify
-        assertTrue(((Map<?, ?>)result.get("parent")).containsKey("newKey"), "Result should contain new nested key");
-        assertFalse(((Map<?, ?>)result.get("parent")).containsKey("oldKey"), "Result should not contain old nested key");
+        assertTrue(((Map<?, ?>) result.get("parent")).containsKey("newKey"), "Result should contain new nested key");
+        assertFalse(((Map<?, ?>) result.get("parent")).containsKey("oldKey"),
+            "Result should not contain old nested key");
     }
 
     @Test
@@ -111,7 +129,8 @@ class DataMapperRenameKeysActionTest {
         Map<String, Object> inputJson = new LinkedHashMap<>();
         inputJson.put("parent", secondJson);
 
-        List<StringMapping> mappingList = List.of(new StringMapping("parent", "father"), new StringMapping("father.oldKey", "newKey"));
+        List<StringMapping> mappingList =
+            List.of(new StringMapping("parent", "father"), new StringMapping("father.oldKey", "newKey"));
         when(inputParameters.getList(MAPPINGS, StringMapping.class, List.of())).thenReturn(mappingList);
         when(inputParameters.get(INPUT)).thenReturn(inputJson);
 
@@ -120,8 +139,9 @@ class DataMapperRenameKeysActionTest {
 
         // Verify
         assertTrue(result.containsKey("father"), "Result should contain renamed parent key");
-        assertTrue(((Map<?, ?>)result.get("father")).containsKey("newKey"), "Result should contain new nested key");
-        assertFalse(((Map<?, ?>)result.get("father")).containsKey("oldKey"), "Result should not contain old nested key");
+        assertTrue(((Map<?, ?>) result.get("father")).containsKey("newKey"), "Result should contain new nested key");
+        assertFalse(((Map<?, ?>) result.get("father")).containsKey("oldKey"),
+            "Result should not contain old nested key");
     }
 
     @Test
@@ -142,8 +162,10 @@ class DataMapperRenameKeysActionTest {
         Map<String, Object> result = DataMapperRenameKeysAction.perform(inputParameters, connectionParameters, context);
 
         // Verify
-        assertTrue(((Map<?, ?>)((List<?>)result.get("parent")).getFirst()).containsKey("newKey"), "Result should contain new nested key");
-        assertFalse(((Map<?, ?>)((List<?>)result.get("parent")).getFirst()).containsKey("oldKey"), "Result should not contain old nested key");
+        assertTrue(((Map<?, ?>) ((List<?>) result.get("parent")).getFirst()).containsKey("newKey"),
+            "Result should contain new nested key");
+        assertFalse(((Map<?, ?>) ((List<?>) result.get("parent")).getFirst()).containsKey("oldKey"),
+            "Result should not contain old nested key");
     }
 
     @Test
@@ -156,7 +178,8 @@ class DataMapperRenameKeysActionTest {
         Map<String, List<Map<String, String>>> inputJson = new LinkedHashMap<>();
         inputJson.put("parent", list);
 
-        List<StringMapping> mappingList = List.of(new StringMapping("parent", "father"), new StringMapping("father[0].oldKey", "newKey"));
+        List<StringMapping> mappingList =
+            List.of(new StringMapping("parent", "father"), new StringMapping("father[0].oldKey", "newKey"));
         when(inputParameters.getList(MAPPINGS, StringMapping.class, List.of())).thenReturn(mappingList);
         when(inputParameters.get(INPUT)).thenReturn(inputJson);
 
@@ -165,7 +188,9 @@ class DataMapperRenameKeysActionTest {
 
         // Verify
         assertTrue(result.containsKey("father"), "Result should contain renamed parent key");
-        assertTrue(((Map<?, ?>)((List<?>)result.get("father")).getFirst()).containsKey("newKey"), "Result should contain new nested key");
-        assertFalse(((Map<?, ?>)((List<?>)result.get("father")).getFirst()).containsKey("oldKey"), "Result should not contain old nested key");
+        assertTrue(((Map<?, ?>) ((List<?>) result.get("father")).getFirst()).containsKey("newKey"),
+            "Result should contain new nested key");
+        assertFalse(((Map<?, ?>) ((List<?>) result.get("father")).getFirst()).containsKey("oldKey"),
+            "Result should not contain old nested key");
     }
 }

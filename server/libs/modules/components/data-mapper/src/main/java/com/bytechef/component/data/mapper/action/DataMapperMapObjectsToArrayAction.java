@@ -82,7 +82,8 @@ public class DataMapperMapObjectsToArrayAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         List<Map<String, Object>> output = new ArrayList<>();
 
-        if (inputParameters.getInteger(INPUT_TYPE).equals(1)) {
+        if (inputParameters.getInteger(INPUT_TYPE)
+            .equals(1)) {
             Map<String, Object> input = inputParameters.getMap(INPUT, Object.class, new HashMap<>());
 
             fillOutput(inputParameters, input, output);

@@ -42,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.Validate;
 import org.graalvm.collections.Pair;
@@ -144,15 +143,19 @@ public class DataMapperMapObjectsToObjectAction {
         for (Map.Entry<String, Object> entry : input.entrySet()) {
             if (isAllowedToMap(inputParameters, entry)) {
                 if (mappings.containsKey(entry.getKey())) {
-                    if (mappings.get(entry.getKey()).getRight() != null
-                        && mappings.get(entry.getKey()).getRight()) {
+                    if (mappings.get(entry.getKey())
+                        .getRight() != null
+                        && mappings.get(entry.getKey())
+                            .getRight()) {
                         Objects.requireNonNull(entry.getValue(),
                             "Required field " + entry.getKey() + " cannot be null.");
-                        Validate.notBlank(entry.getValue().toString(),
+                        Validate.notBlank(entry.getValue()
+                            .toString(),
                             "Required field " + entry.getKey() + " cannot be empty.");
                     }
 
-                    output.put(mappings.get(entry.getKey()).getLeft(),
+                    output.put(mappings.get(entry.getKey())
+                        .getLeft(),
                         entry.getValue());
                 } else if (inputParameters.getBoolean(INCLUDE_UNMAPPED) != null
                     && inputParameters.getBoolean(INCLUDE_UNMAPPED))
@@ -162,16 +165,13 @@ public class DataMapperMapObjectsToObjectAction {
     }
 
     private static boolean isAllowedToMap(Parameters inputParameters, Map.Entry<String, Object> entry) {
-        return (
-            inputParameters.getBoolean(INCLUDE_NULLS) == null || (
-                inputParameters.getBoolean(INCLUDE_NULLS) != null && (
-                    inputParameters.getBoolean(INCLUDE_NULLS) ||
-                        ObjectUtils.anyNotNull(entry.getValue()))))
-            && (
-                inputParameters.getBoolean(INCLUDE_EMPTY_STRINGS) == null || (
-                    inputParameters.getBoolean(INCLUDE_EMPTY_STRINGS) != null && (
-                        inputParameters.getBoolean(INCLUDE_EMPTY_STRINGS) ||
-                            ObjectUtils.isNotEmpty(entry.getValue()))));
+        return (inputParameters.getBoolean(INCLUDE_NULLS) == null
+            || (inputParameters.getBoolean(INCLUDE_NULLS) != null && (inputParameters.getBoolean(INCLUDE_NULLS) ||
+                ObjectUtils.anyNotNull(entry.getValue()))))
+            && (inputParameters.getBoolean(INCLUDE_EMPTY_STRINGS) == null
+                || (inputParameters.getBoolean(INCLUDE_EMPTY_STRINGS) != null
+                    && (inputParameters.getBoolean(INCLUDE_EMPTY_STRINGS) ||
+                        ObjectUtils.isNotEmpty(entry.getValue()))));
     }
 
 }
