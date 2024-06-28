@@ -232,9 +232,10 @@ public class DataMapperReplaceAllSpecifiedValuesAction {
 
         List<ObjectMapping> mappingList = inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of());
         Map<Object, Object> mappings = mappingList.stream()
-            .collect(HashMap::new, (map, value)->map.put(value.getFrom(), value.getTo()), HashMap::putAll);
+            .collect(HashMap::new, (map, value) -> map.put(value.getFrom(), value.getTo()), HashMap::putAll);
 
-        if (inputParameters.getInteger(INPUT_TYPE).equals(1)) {
+        if (inputParameters.getInteger(INPUT_TYPE)
+            .equals(1)) {
             Map<String, Object> input = inputParameters.getMap(INPUT, Object.class, Map.of());
 
             return fillOutput(input, mappings);

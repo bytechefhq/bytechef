@@ -16,9 +16,6 @@
 
 package com.bytechef.component.data.mapper.util;
 
-import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INCLUDE_EMPTY_STRINGS;
-import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INCLUDE_NULLS;
-import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INCLUDE_UNMAPPED;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.TYPE;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.VALUE;
 import static com.bytechef.component.definition.ComponentDSL.nullable;
@@ -28,11 +25,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.Objects;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.Validate;
-import org.graalvm.collections.Pair;
 
 public class DataMapperUtils {
     public static final String VALUE_DESCRIPTION = "The value you want to replace.";

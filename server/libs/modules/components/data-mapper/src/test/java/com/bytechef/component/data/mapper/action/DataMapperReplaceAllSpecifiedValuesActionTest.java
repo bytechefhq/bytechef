@@ -1,18 +1,20 @@
+/*
+ * Copyright 2023-present ByteChef Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.bytechef.component.data.mapper.action;
-
-import com.bytechef.component.data.mapper.util.mapping.ObjectMapping;
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Parameters;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
 
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INPUT;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INPUT_TYPE;
@@ -20,6 +22,19 @@ import static com.bytechef.component.data.mapper.constant.DataMapperConstants.MA
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import com.bytechef.component.data.mapper.util.mapping.ObjectMapping;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Parameters;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class DataMapperReplaceAllSpecifiedValuesActionTest {
     private Parameters inputParameters;
@@ -45,12 +60,14 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
 
     @Test
     void testPerformWithDateTypeObject() {
-        setupAndAssertTestForType(LocalDate.now(), LocalDate.now().plusDays(1), false);
+        setupAndAssertTestForType(LocalDate.now(), LocalDate.now()
+            .plusDays(1), false);
     }
 
     @Test
     void testPerformWithDateTimeTypeObject() {
-        setupAndAssertTestForType(LocalDateTime.now(), LocalDateTime.now().plusDays(1), false);
+        setupAndAssertTestForType(LocalDateTime.now(), LocalDateTime.now()
+            .plusDays(1), false);
     }
 
     @Test
@@ -67,7 +84,7 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
     void testPerformWithObjectTypeObject() {
         Object inputObject = new Object();
         Object outputObject = new Object();
-        setupAndAssertTestForType( inputObject, outputObject, false);
+        setupAndAssertTestForType(inputObject, outputObject, false);
     }
 
     @Test
@@ -77,7 +94,8 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
 
     @Test
     void testPerformWithTimeTypeObject() {
-        setupAndAssertTestForType( LocalTime.now(), LocalTime.now().plusHours(1), false);
+        setupAndAssertTestForType(LocalTime.now(), LocalTime.now()
+            .plusHours(1), false);
     }
 
     @Test
@@ -92,12 +110,14 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
 
     @Test
     void testPerformWithDateTypeArray() {
-        setupAndAssertTestForType(LocalDate.now(), LocalDate.now().plusDays(1), true);
+        setupAndAssertTestForType(LocalDate.now(), LocalDate.now()
+            .plusDays(1), true);
     }
 
     @Test
     void testPerformWithDateTimeTypeArray() {
-        setupAndAssertTestForType(LocalDateTime.now(), LocalDateTime.now().plusDays(1), true);
+        setupAndAssertTestForType(LocalDateTime.now(), LocalDateTime.now()
+            .plusDays(1), true);
     }
 
     @Test
@@ -114,7 +134,7 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
     void testPerformWithObjectTypeArray() {
         Object inputObject = new Object();
         Object outputObject = new Object();
-        setupAndAssertTestForType( inputObject, outputObject, true);
+        setupAndAssertTestForType(inputObject, outputObject, true);
     }
 
     @Test
@@ -124,21 +144,25 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
 
     @Test
     void testPerformWithTimeTypeArray() {
-        setupAndAssertTestForType(LocalTime.now(), LocalTime.now().plusHours(1), true);
+        setupAndAssertTestForType(LocalTime.now(), LocalTime.now()
+            .plusHours(1), true);
     }
 
     @Test
     void testPerformChangeToNullObject() {
         setupAndAssertTestForType(1.5, null, false);
     }
+
     @Test
     void testPerformChangeToNullArray() {
         setupAndAssertTestForType(1.5, null, true);
     }
+
     @Test
     void testPerformChangeFromNullObject() {
         setupAndAssertTestForType(null, 1.5, false);
     }
+
     @Test
     void testPerformChangeFromNullArray() {
         setupAndAssertTestForType(null, 1.5, true);
@@ -148,7 +172,7 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
         Map<String, Object> map = new HashMap<>();
         map.put("key", inputMapping);
 
-        if(isArray) {
+        if (isArray) {
             setupAndAssertTest(List.of(map),
                 List.of(new ObjectMapping(inputMapping, outputMapping)),
                 (List<?> result) -> assertEquals(outputMapping,
@@ -162,7 +186,6 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
                     "Value in result should match the expected output value."));
         }
     }
-
 
     @Test
     void testPerformEmptyMappingObject() {
@@ -183,8 +206,10 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
         setupAndAssertTest(Map.of("key1", 1, "key2", 2),
             List.of(new ObjectMapping(1, 3), new ObjectMapping(2, 4)),
             result -> {
-                assertEquals(3, ((Map<?, ?>)result).get("key1"), "Value of result should match the expected output value.");
-                assertEquals(4, ((Map<?, ?>)result).get("key2"), "Value of result should match the expected output value.");
+                assertEquals(3, ((Map<?, ?>) result).get("key1"),
+                    "Value of result should match the expected output value.");
+                assertEquals(4, ((Map<?, ?>) result).get("key2"),
+                    "Value of result should match the expected output value.");
             });
     }
 
@@ -193,8 +218,10 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
         setupAndAssertTest(List.of(Map.of("key1", 1), Map.of("key2", 2)),
             List.of(new ObjectMapping(1, 3), new ObjectMapping(2, 4)),
             result -> {
-                assertEquals(3, ((Map<?, ?>)result.getFirst()).get("key1"), "Value of result should match the expected output value.");
-                assertEquals(4, ((Map<?, ?>)result.get(1)).get("key2"), "Value of result should match the expected output value.");
+                assertEquals(3, ((Map<?, ?>) result.getFirst()).get("key1"),
+                    "Value of result should match the expected output value.");
+                assertEquals(4, ((Map<?, ?>) result.get(1)).get("key2"),
+                    "Value of result should match the expected output value.");
             });
     }
 
@@ -203,8 +230,10 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
         setupAndAssertTest(Map.of("key1", 1, "key2", 1),
             List.of(new ObjectMapping(1, 3)),
             result -> {
-                assertEquals(3, ((Map<?, ?>)result).get("key1"), "Value of result should match the expected output value.");
-                assertEquals(3, ((Map<?, ?>)result).get("key2"), "Value of result should match the expected output value.");
+                assertEquals(3, ((Map<?, ?>) result).get("key1"),
+                    "Value of result should match the expected output value.");
+                assertEquals(3, ((Map<?, ?>) result).get("key2"),
+                    "Value of result should match the expected output value.");
             });
     }
 
@@ -213,8 +242,10 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
         setupAndAssertTest(List.of(Map.of("key1", 1), Map.of("key2", 1)),
             List.of(new ObjectMapping(1, 3)),
             result -> {
-                assertEquals(3, ((Map<?, ?>)result.getFirst()).get("key1"), "Value of result should match the expected output value.");
-                assertEquals(3, ((Map<?, ?>)result.get(1)).get("key2"), "Value of result should match the expected output value.");
+                assertEquals(3, ((Map<?, ?>) result.getFirst()).get("key1"),
+                    "Value of result should match the expected output value.");
+                assertEquals(3, ((Map<?, ?>) result.get(1)).get("key2"),
+                    "Value of result should match the expected output value.");
             });
     }
 

@@ -1,15 +1,20 @@
+/*
+ * Copyright 2023-present ByteChef Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.bytechef.component.data.mapper.action;
-
-import com.bytechef.commons.util.ConvertUtils;
-import com.bytechef.component.data.mapper.util.mapping.ObjectMapping;
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Parameters;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.function.Consumer;
 
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.DEFAULT_VALUE;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.MAPPINGS;
@@ -21,6 +26,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.commons.util.ConvertUtils;
+import com.bytechef.component.data.mapper.util.mapping.ObjectMapping;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Parameters;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -49,12 +63,14 @@ class DataMapperReplaceValueActionTest {
 
     @Test
     void testPerformWithDateType() {
-        setupAndAssertTestForType( LocalDate.now(), LocalDate.now().plusDays(1));
+        setupAndAssertTestForType(LocalDate.now(), LocalDate.now()
+            .plusDays(1));
     }
 
     @Test
     void testPerformWithDateTimeType() {
-        setupAndAssertTestForType( LocalDateTime.now(), LocalDateTime.now().plusDays(1));
+        setupAndAssertTestForType(LocalDateTime.now(), LocalDateTime.now()
+            .plusDays(1));
     }
 
     @Test
@@ -71,7 +87,7 @@ class DataMapperReplaceValueActionTest {
     void testPerformWithObjectType() {
         Object inputObject = new Object();
         Object outputObject = new Object();
-        setupAndAssertTestForType( inputObject, outputObject);
+        setupAndAssertTestForType(inputObject, outputObject);
     }
 
     @Test
@@ -81,7 +97,8 @@ class DataMapperReplaceValueActionTest {
 
     @Test
     void testPerformWithTimeType() {
-        setupAndAssertTestForType( LocalTime.now(), LocalTime.now().plusHours(1));
+        setupAndAssertTestForType(LocalTime.now(), LocalTime.now()
+            .plusHours(1));
     }
 
     @Test
@@ -105,11 +122,13 @@ class DataMapperReplaceValueActionTest {
 
     @Test
     void testPerformWithUnconvertibleType() {
-        setupAndAssertTest("1", 1, 2, result -> assertEquals("defaultValue", result, "Result should be defalut value due to unconvertible type"));
+        setupAndAssertTest("1", 1, 2,
+            result -> assertEquals("defaultValue", result, "Result should be defalut value due to unconvertible type"));
     }
 
     private <T> void setupAndAssertTestForType(T inputMapping, T outputMapping) {
-        setupAndAssertTest(inputMapping, inputMapping, outputMapping, result -> assertEquals(outputMapping, result, "Result should match the expected output value for type: " + result.getClass()));
+        setupAndAssertTest(inputMapping, inputMapping, outputMapping, result -> assertEquals(outputMapping, result,
+            "Result should match the expected output value for type: " + result.getClass()));
     }
 
     private <T, V> void setupAndAssertTest(V inputValue, T inputMapping, T outputMapping, Consumer<Object> consumer) {

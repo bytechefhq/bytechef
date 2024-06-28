@@ -1,15 +1,20 @@
+/*
+ * Copyright 2023-present ByteChef Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.bytechef.component.data.mapper.action;
-
-import com.bytechef.component.data.mapper.util.mapping.RequiredStringMapping;
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Parameters;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
 
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INCLUDE_EMPTY_STRINGS;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INCLUDE_NULLS;
@@ -21,10 +26,21 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.data.mapper.util.mapping.RequiredStringMapping;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Parameters;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 class DataMapperMapObjectsToObjectActionTest {
     private Parameters inputParameters;
     private Parameters connectionParameters;
     private ActionContext context;
+
     @BeforeEach
     void setUp() {
         inputParameters = mock(Parameters.class);
@@ -83,7 +99,8 @@ class DataMapperMapObjectsToObjectActionTest {
         inputJson.put("oldKey2", "oldValue2");
 
         setupAndAssertTest(false, inputJson,
-            List.of(new RequiredStringMapping("oldKey1", "newKey1", false), new RequiredStringMapping("oldKey2", "newKey2", false)),
+            List.of(new RequiredStringMapping("oldKey1", "newKey1", false),
+                new RequiredStringMapping("oldKey2", "newKey2", false)),
             result -> {
                 assertTrue(result.containsKey("newKey1"), "Result should contain new key1");
                 assertFalse(result.containsKey("oldKey1"), "Result should not contain old key1");
@@ -99,7 +116,8 @@ class DataMapperMapObjectsToObjectActionTest {
         inputJson.put("oldKey2", "oldValue2");
 
         setupAndAssertTest(true, inputJson,
-            List.of(new RequiredStringMapping("oldKey1", "newKey1", false), new RequiredStringMapping("oldKey2", "newKey2", false)),
+            List.of(new RequiredStringMapping("oldKey1", "newKey1", false),
+                new RequiredStringMapping("oldKey2", "newKey2", false)),
             result -> {
                 assertTrue(result.containsKey("newKey1"), "Result should contain new key1");
                 assertFalse(result.containsKey("oldKey1"), "Result should not contain old key1");
@@ -117,6 +135,7 @@ class DataMapperMapObjectsToObjectActionTest {
     void testPerformNotIncludeNullsRequiredObject() {
         testPerformIncludeNulls(false, false, true);
     }
+
     @Test
     void testPerformNotIncludeNullsNotRequiredArray() {
         testPerformIncludeNulls(true, false, false);
@@ -136,6 +155,7 @@ class DataMapperMapObjectsToObjectActionTest {
     void testPerformIncludeNullsRequiredObject() {
         testPerformIncludeNulls(false, true, true);
     }
+
     @Test
     void testPerformIncludeNullsNotRequiredArray() {
         testPerformIncludeNulls(true, true, false);
@@ -149,18 +169,19 @@ class DataMapperMapObjectsToObjectActionTest {
     void testPerformIncludeNulls(boolean isArray, boolean includeNulls, boolean isRequired) {
         Map<String, Object> inputJson = new LinkedHashMap<>();
         inputJson.put("oldKey", null);
-        List<RequiredStringMapping> requiredStringMappings = List.of(new RequiredStringMapping("oldKey", "newKey", isRequired));
+        List<RequiredStringMapping> requiredStringMappings =
+            List.of(new RequiredStringMapping("oldKey", "newKey", isRequired));
 
-        if(!includeNulls){
+        if (!includeNulls) {
             setupAndAssertTest(isArray, inputJson, requiredStringMappings,
                 result -> {
                     assertFalse(result.containsKey("newKey"), "Result should not contain new key");
                     assertFalse(result.containsKey("oldKey"), "Result should not contain old key");
                 }, null, false, null);
-        } else if(isRequired) {
-            assertThrows(NullPointerException.class, () ->
-                    setupAndAssertTest(isArray, inputJson, requiredStringMappings,
-                        result -> {}, null, true, null),
+        } else if (isRequired) {
+            assertThrows(NullPointerException.class,
+                () -> setupAndAssertTest(isArray, inputJson, requiredStringMappings,
+                    result -> {}, null, true, null),
                 "Required field oldKey cannot be null.");
         } else {
             setupAndAssertTest(isArray, inputJson, requiredStringMappings,
@@ -180,6 +201,7 @@ class DataMapperMapObjectsToObjectActionTest {
     void testPerformNotIncludeEmptyStringRequiredObject() {
         testPerformIncludeEmptyString(false, false, true);
     }
+
     @Test
     void testPerformNotIncludeEmptyStringNotRequiredArray() {
         testPerformIncludeEmptyString(true, false, false);
@@ -199,6 +221,7 @@ class DataMapperMapObjectsToObjectActionTest {
     void testPerformIncludeEmptyStringRequiredObject() {
         testPerformIncludeEmptyString(false, true, true);
     }
+
     @Test
     void testPerformIncludeEmptyStringNotRequiredArray() {
         testPerformIncludeEmptyString(true, true, false);
@@ -212,19 +235,19 @@ class DataMapperMapObjectsToObjectActionTest {
     void testPerformIncludeEmptyString(boolean isArray, boolean includeEmpty, boolean isRequired) {
         Map<String, Object> inputJson = new LinkedHashMap<>();
         inputJson.put("oldKey", null);
-        List<RequiredStringMapping> requiredStringMappings = List.of(new RequiredStringMapping("oldKey", "newKey", isRequired));
+        List<RequiredStringMapping> requiredStringMappings =
+            List.of(new RequiredStringMapping("oldKey", "newKey", isRequired));
 
-        if(!includeEmpty){
+        if (!includeEmpty) {
             setupAndAssertTest(isArray, inputJson, requiredStringMappings,
                 result -> {
                     assertFalse(result.containsKey("newKey"), "Result should not contain new key");
                     assertFalse(result.containsKey("oldKey"), "Result should not contain old key");
                 }, null, null, false);
-        } else if(isRequired) {
-            assertThrows(NullPointerException.class, () ->
-                    setupAndAssertTest(isArray, inputJson, requiredStringMappings,
-                        result -> {
-                        }, null, null, true),
+        } else if (isRequired) {
+            assertThrows(NullPointerException.class,
+                () -> setupAndAssertTest(isArray, inputJson, requiredStringMappings,
+                    result -> {}, null, null, true),
                 "Required field oldKey cannot be empty.");
         } else {
             setupAndAssertTest(isArray, inputJson, requiredStringMappings,
@@ -279,17 +302,23 @@ class DataMapperMapObjectsToObjectActionTest {
             false, null, null);
     }
 
-    private void setupAndAssertTest(boolean isArray, Map<String, Object> inputValue, List<RequiredStringMapping> mappings, Consumer<Map<String, Object>> consumer) {
-        if(isArray){
+    private void setupAndAssertTest(
+        boolean isArray, Map<String, Object> inputValue, List<RequiredStringMapping> mappings,
+        Consumer<Map<String, Object>> consumer) {
+        if (isArray) {
             setupAndAssertTest(List.of(inputValue), mappings, consumer, null, null, null);
         } else {
             setupAndAssertTest(inputValue, mappings, consumer, null, null, null);
         }
     }
 
-    private void setupAndAssertTest(boolean isArray, Map<String, Object> inputValue, List<RequiredStringMapping> mappings, Consumer<Map<String, Object>> consumer, Boolean includeUnmapped, Boolean includeNulls, Boolean includeEmptyStrings) {
-        if(isArray){
-            setupAndAssertTest(List.of(inputValue), mappings, consumer, includeUnmapped, includeNulls, includeEmptyStrings);
+    private void setupAndAssertTest(
+        boolean isArray, Map<String, Object> inputValue, List<RequiredStringMapping> mappings,
+        Consumer<Map<String, Object>> consumer, Boolean includeUnmapped, Boolean includeNulls,
+        Boolean includeEmptyStrings) {
+        if (isArray) {
+            setupAndAssertTest(List.of(inputValue), mappings, consumer, includeUnmapped, includeNulls,
+                includeEmptyStrings);
         } else {
             setupAndAssertTest(inputValue, mappings, consumer, includeUnmapped, includeNulls, includeEmptyStrings);
         }

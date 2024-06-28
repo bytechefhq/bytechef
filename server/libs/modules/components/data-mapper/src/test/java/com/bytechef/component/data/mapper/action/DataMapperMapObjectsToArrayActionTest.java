@@ -1,17 +1,20 @@
+/*
+ * Copyright 2023-present ByteChef Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.bytechef.component.data.mapper.action;
-
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Parameters;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
 
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.FIELD_KEY;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INPUT;
@@ -20,6 +23,18 @@ import static com.bytechef.component.data.mapper.constant.DataMapperConstants.VA
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Parameters;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class DataMapperMapObjectsToArrayActionTest {
     private Parameters inputParameters;
@@ -35,7 +50,7 @@ class DataMapperMapObjectsToArrayActionTest {
 
     @Test
     void testPerformWithStringTypeObject() {
-        setupAndAssertTestForType("inputString",  false);
+        setupAndAssertTestForType("inputString", false);
     }
 
     @Test
@@ -55,7 +70,7 @@ class DataMapperMapObjectsToArrayActionTest {
 
     @Test
     void testPerformWithIntegerTypeObject() {
-        setupAndAssertTestForType(1,  false);
+        setupAndAssertTestForType(1, false);
     }
 
     @Test
@@ -66,7 +81,7 @@ class DataMapperMapObjectsToArrayActionTest {
     @Test
     void testPerformWithObjectTypeObject() {
         Object inputObject = new Object();
-        setupAndAssertTestForType( inputObject, false);
+        setupAndAssertTestForType(inputObject, false);
     }
 
     @Test
@@ -76,7 +91,7 @@ class DataMapperMapObjectsToArrayActionTest {
 
     @Test
     void testPerformWithTimeTypeObject() {
-        setupAndAssertTestForType( LocalTime.now(), false);
+        setupAndAssertTestForType(LocalTime.now(), false);
     }
 
     @Test
@@ -101,12 +116,12 @@ class DataMapperMapObjectsToArrayActionTest {
 
     @Test
     void testPerformWithIntegerTypeArray() {
-        setupAndAssertTestForType(1,  true);
+        setupAndAssertTestForType(1, true);
     }
 
     @Test
     void testPerformWithNumberTypeArray() {
-        setupAndAssertTestForType(1.5,  true);
+        setupAndAssertTestForType(1.5, true);
     }
 
     @Test
@@ -124,28 +139,30 @@ class DataMapperMapObjectsToArrayActionTest {
     void testPerformWithTimeTypeArray() {
         setupAndAssertTestForType(LocalTime.now(), true);
     }
+
     @Test
     void testPerformWithTypeNullObject() {
-        setupAndAssertTestForType( null, false);
+        setupAndAssertTestForType(null, false);
     }
+
     @Test
     void testPerformWithTypeNullArray() {
-        setupAndAssertTestForType( null, true);
+        setupAndAssertTestForType(null, true);
     }
 
     private <T> void setupAndAssertTestForType(T input, boolean isArray) {
         Map<String, Object> map = new HashMap<>();
         map.put("key", input);
 
-        if(isArray) {
+        if (isArray) {
             setupAndAssertTest(List.of(map),
                 (List<?> result) -> {
-                assertEquals("key",
-                    ((Map<?, ?>) result.getFirst()).get("fieldKey"),
-                    "'fieldKey' value in result with should be 'key'.");
-                assertEquals(input,
-                    ((Map<?, ?>) result.getFirst()).get("fieldValue"),
-                    "'fieldValue' value in result with should match the expected key input value.");
+                    assertEquals("key",
+                        ((Map<?, ?>) result.getFirst()).get("fieldKey"),
+                        "'fieldKey' value in result with should be 'key'.");
+                    assertEquals(input,
+                        ((Map<?, ?>) result.getFirst()).get("fieldValue"),
+                        "'fieldValue' value in result with should match the expected key input value.");
                 });
         } else {
             setupAndAssertTest(map,
