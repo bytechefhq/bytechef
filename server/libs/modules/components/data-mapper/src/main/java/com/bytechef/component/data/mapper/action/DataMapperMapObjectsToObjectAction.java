@@ -130,7 +130,7 @@ public class DataMapperMapObjectsToObjectAction {
             List<Object> input = inputParameters.getList(INPUT, Object.class, List.of());
 
             for (Object object : input) {
-                fillOutput(inputParameters, ((Map<String, Object>) object), output, mappings);
+                fillOutput(inputParameters, (Map<String, Object>) object, output, mappings);
             }
         }
 

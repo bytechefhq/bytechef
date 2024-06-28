@@ -19,7 +19,7 @@ package com.bytechef.component.data.mapper.action;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INPUT;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.MAPPINGS;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.OUTPUT;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
