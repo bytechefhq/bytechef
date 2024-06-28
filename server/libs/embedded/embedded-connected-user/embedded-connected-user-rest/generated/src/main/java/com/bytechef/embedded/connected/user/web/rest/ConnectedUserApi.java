@@ -7,6 +7,7 @@ package com.bytechef.embedded.connected.user.web.rest;
 
 import com.bytechef.embedded.connected.user.web.rest.model.ConnectedUserModel;
 import org.springframework.format.annotation.DateTimeFormat;
+import com.bytechef.embedded.connected.user.web.rest.model.EnvironmentModel;
 import java.time.LocalDate;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-26T11:09:38.213984+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-28T07:24:14.874857+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 @Validated
 @Tag(name = "connected-user", description = "The Embedded Connected User API")
 public interface ConnectedUserApi {
@@ -148,12 +149,13 @@ public interface ConnectedUserApi {
      * GET /connected-users : Get all connected users
      * Get all connected users.
      *
-     * @param search The name, email or external reference code of a connected user. (optional)
+     * @param environment The environment. (optional)
      * @param credentialStatus The id of an integration instance. (optional)
-     * @param integrationId The id of an integration. (optional)
      * @param createDateFrom The start range of a create date. (optional)
      * @param createDateTo The end range of a create date . (optional)
+     * @param integrationId The id of an integration. (optional)
      * @param pageNumber The number of the page to return. (optional, default to 0)
+     * @param search The name, email or external reference code of a connected user. (optional)
      * @return The page of connected users. (status code 200)
      */
     @Operation(
@@ -174,12 +176,13 @@ public interface ConnectedUserApi {
     )
     
     default ResponseEntity<org.springframework.data.domain.Page> getConnectedUsers(
-        @Parameter(name = "search", description = "The name, email or external reference code of a connected user.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "search", required = false) String search,
+        @Parameter(name = "environment", description = "The environment.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "environment", required = false) EnvironmentModel environment,
         @Parameter(name = "credentialStatus", description = "The id of an integration instance.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "credentialStatus", required = false) com.bytechef.platform.connection.web.rest.model.CredentialStatusModel credentialStatus,
-        @Parameter(name = "integrationId", description = "The id of an integration.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "integrationId", required = false) Long integrationId,
         @Parameter(name = "createDateFrom", description = "The start range of a create date.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "createDateFrom", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate createDateFrom,
         @Parameter(name = "createDateTo", description = "The end range of a create date .", in = ParameterIn.QUERY) @Valid @RequestParam(value = "createDateTo", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate createDateTo,
-        @Parameter(name = "pageNumber", description = "The number of the page to return.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "pageNumber", required = false, defaultValue = "0") Integer pageNumber
+        @Parameter(name = "integrationId", description = "The id of an integration.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "integrationId", required = false) Long integrationId,
+        @Parameter(name = "pageNumber", description = "The number of the page to return.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "pageNumber", required = false, defaultValue = "0") Integer pageNumber,
+        @Parameter(name = "search", description = "The name, email or external reference code of a connected user.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "search", required = false) String search
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
