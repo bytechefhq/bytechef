@@ -71,11 +71,24 @@ export type NodeType = {
     componentName?: string;
     connections?: Array<WorkflowConnectionType>;
     connectionId?: number;
+    displayConditions?: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        [key: string]: boolean;
+    };
+    metadata?: {
+        ui?: {
+            dynamicPropertyTypes?: {[key: string]: string};
+        };
+    };
     icon?: ReactNode;
     id: string;
     label?: string;
     name: string;
     operationName?: string;
+    parameters?: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        [key: string]: any;
+    };
     trigger?: boolean;
     type: 'component' | 'flowControl';
     version: number;
