@@ -17,6 +17,7 @@ import * as runtime from '../runtime';
 import type {
   ConnectedUserModel,
   CredentialStatusModel,
+  EnvironmentModel,
   PageModel,
 } from '../models/index';
 import {
@@ -24,6 +25,8 @@ import {
     ConnectedUserModelToJSON,
     CredentialStatusModelFromJSON,
     CredentialStatusModelToJSON,
+    EnvironmentModelFromJSON,
+    EnvironmentModelToJSON,
     PageModelFromJSON,
     PageModelToJSON,
 } from '../models/index';
@@ -42,12 +45,13 @@ export interface GetConnectedUserRequest {
 }
 
 export interface GetConnectedUsersRequest {
-    search?: string;
+    environment?: EnvironmentModel;
     credentialStatus?: CredentialStatusModel;
-    integrationId?: number;
     createDateFrom?: Date;
     createDateTo?: Date;
+    integrationId?: number;
     pageNumber?: number;
+    search?: string;
 }
 
 /**
@@ -172,16 +176,12 @@ export class ConnectedUserApi extends runtime.BaseAPI {
     async getConnectedUsersRaw(requestParameters: GetConnectedUsersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PageModel>> {
         const queryParameters: any = {};
 
-        if (requestParameters['search'] != null) {
-            queryParameters['search'] = requestParameters['search'];
+        if (requestParameters['environment'] != null) {
+            queryParameters['environment'] = requestParameters['environment'];
         }
 
         if (requestParameters['credentialStatus'] != null) {
             queryParameters['credentialStatus'] = requestParameters['credentialStatus'];
-        }
-
-        if (requestParameters['integrationId'] != null) {
-            queryParameters['integrationId'] = requestParameters['integrationId'];
         }
 
         if (requestParameters['createDateFrom'] != null) {
@@ -192,8 +192,16 @@ export class ConnectedUserApi extends runtime.BaseAPI {
             queryParameters['createDateTo'] = (requestParameters['createDateTo'] as any).toISOString().substring(0,10);
         }
 
+        if (requestParameters['integrationId'] != null) {
+            queryParameters['integrationId'] = requestParameters['integrationId'];
+        }
+
         if (requestParameters['pageNumber'] != null) {
             queryParameters['pageNumber'] = requestParameters['pageNumber'];
+        }
+
+        if (requestParameters['search'] != null) {
+            queryParameters['search'] = requestParameters['search'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
