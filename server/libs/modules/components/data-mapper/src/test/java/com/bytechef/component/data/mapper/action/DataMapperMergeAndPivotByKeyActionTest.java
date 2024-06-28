@@ -1,17 +1,20 @@
+/*
+ * Copyright 2023-present ByteChef Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.bytechef.component.data.mapper.action;
-
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Parameters;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
 
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.FIELD_KEY;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.FIELD_VALUE;
@@ -19,6 +22,18 @@ import static com.bytechef.component.data.mapper.constant.DataMapperConstants.IN
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Parameters;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class DataMapperMergeAndPivotByKeyActionTest {
     private Parameters inputParameters;
@@ -77,6 +92,7 @@ class DataMapperMergeAndPivotByKeyActionTest {
     void testPerformWithTimeType() {
         setupAndAssertTestForType(LocalTime.now());
     }
+
     @Test
     void testPerformWithTypeNull() {
         setupAndAssertTestForType(null);
@@ -88,9 +104,11 @@ class DataMapperMergeAndPivotByKeyActionTest {
 
         setupAndAssertTest(List.of(map),
             result -> {
-                assertTrue(result.get("key").containsKey(input),
+                assertTrue(result.get("key")
+                    .containsKey(input),
                     "Result should contain input as key");
-                assertEquals("value", result.get("key").get(input),
+                assertEquals("value", result.get("key")
+                    .get(input),
                     "Value in result with input key should be 'value'.");
             });
     }
@@ -98,28 +116,34 @@ class DataMapperMergeAndPivotByKeyActionTest {
     @Test
     void testPerformEmptyList() {
         setupAndAssertTest(List.of(),
-            result -> assertTrue(result.get("key").isEmpty(),
+            result -> assertTrue(result.get("key")
+                .isEmpty(),
                 "Result should be empty."));
     }
 
     @Test
     void testPerformReplaceNotSameKey() {
         setupAndAssertTest(List.of(Map.of("key1", "value")),
-            result -> assertFalse(result.get("key").containsKey("value"),
-                    "Result should not contain 'value' as key"));
+            result -> assertFalse(result.get("key")
+                .containsKey("value"),
+                "Result should not contain 'value' as key"));
     }
 
     @Test
     void testPerformReplaceMultipleValues() {
         setupAndAssertTest(List.of(Map.of("key", "value1"), Map.of("key", "value2")),
             result -> {
-                assertTrue(result.get("key").containsKey("value1"),
+                assertTrue(result.get("key")
+                    .containsKey("value1"),
                     "Result should contain 'value1' as key");
-                assertEquals("value", result.get("key").get("value1"),
+                assertEquals("value", result.get("key")
+                    .get("value1"),
                     "Value in result with 'value1' key should be 'value'.");
-                assertTrue(result.get("key").containsKey("value2"),
+                assertTrue(result.get("key")
+                    .containsKey("value2"),
                     "Result should contain 'value2' as key");
-                assertEquals("value", result.get("key").get("value2"),
+                assertEquals("value", result.get("key")
+                    .get("value2"),
                     "Value in result with 'value2' key should be 'value'.");
             });
     }
@@ -128,11 +152,14 @@ class DataMapperMergeAndPivotByKeyActionTest {
     void testPerformReplaceMultipleValuesNotSameKey() {
         setupAndAssertTest(List.of(Map.of("key", "value1"), Map.of("key1", "value2")),
             result -> {
-                assertTrue(result.get("key").containsKey("value1"),
+                assertTrue(result.get("key")
+                    .containsKey("value1"),
                     "Result should contain 'value1' as key");
-                assertEquals("value", result.get("key").get("value1"),
+                assertEquals("value", result.get("key")
+                    .get("value1"),
                     "Value in result with 'value1' key should be 'value'.");
-                assertFalse(result.get("key").containsKey("value2"),
+                assertFalse(result.get("key")
+                    .containsKey("value2"),
                     "Result should not contain 'value2' as key");
             });
     }

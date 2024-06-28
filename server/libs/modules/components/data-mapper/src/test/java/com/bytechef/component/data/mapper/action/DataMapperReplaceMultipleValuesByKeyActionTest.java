@@ -1,15 +1,20 @@
+/*
+ * Copyright 2023-present ByteChef Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.bytechef.component.data.mapper.action;
-
-import com.bytechef.component.data.mapper.util.mapping.StringMapping;
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Parameters;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INPUT;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.MAPPINGS;
@@ -18,10 +23,21 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.data.mapper.util.mapping.StringMapping;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Parameters;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 class DataMapperReplaceMultipleValuesByKeyActionTest {
     private Parameters inputParameters;
     private Parameters connectionParameters;
     private ActionContext context;
+
     @BeforeEach
     void setUp() {
         inputParameters = mock(Parameters.class);
@@ -42,7 +58,8 @@ class DataMapperReplaceMultipleValuesByKeyActionTest {
         when(inputParameters.get(OUTPUT)).thenReturn(outputJson);
 
         // Execute
-        Map<String, Object> result = DataMapperReplaceMultipleValuesByKeyAction.perform(inputParameters, connectionParameters, context);
+        Map<String, Object> result =
+            DataMapperReplaceMultipleValuesByKeyAction.perform(inputParameters, connectionParameters, context);
 
         // Verify
         assertEquals(inputJson, result, "Result should be unchanged when mappings are empty");
@@ -62,7 +79,8 @@ class DataMapperReplaceMultipleValuesByKeyActionTest {
         when(inputParameters.get(OUTPUT)).thenReturn(outputJson);
 
         // Execute
-        Map<String, Object> result = DataMapperReplaceMultipleValuesByKeyAction.perform(inputParameters, connectionParameters, context);
+        Map<String, Object> result =
+            DataMapperReplaceMultipleValuesByKeyAction.perform(inputParameters, connectionParameters, context);
 
         // Verify
         assertEquals("value2", result.get("oldKey"), "Result should contain new value");
@@ -78,13 +96,15 @@ class DataMapperReplaceMultipleValuesByKeyActionTest {
         outputJson.put("newKey1", "newValue1");
         outputJson.put("newKey2", "newValue2");
 
-        List<StringMapping> mappingList = List.of(new StringMapping("oldKey1", "newKey1"), new StringMapping("oldKey2", "newKey2"));
+        List<StringMapping> mappingList =
+            List.of(new StringMapping("oldKey1", "newKey1"), new StringMapping("oldKey2", "newKey2"));
         when(inputParameters.getList(MAPPINGS, StringMapping.class, List.of())).thenReturn(mappingList);
         when(inputParameters.get(INPUT)).thenReturn(inputJson);
         when(inputParameters.get(OUTPUT)).thenReturn(outputJson);
 
         // Execute
-        Map<String, Object> result = DataMapperReplaceMultipleValuesByKeyAction.perform(inputParameters, connectionParameters, context);
+        Map<String, Object> result =
+            DataMapperReplaceMultipleValuesByKeyAction.perform(inputParameters, connectionParameters, context);
 
         // Verify
         assertEquals("newValue1", result.get("oldKey1"), "Result should contain new value1");
@@ -107,10 +127,12 @@ class DataMapperReplaceMultipleValuesByKeyActionTest {
         when(inputParameters.get(OUTPUT)).thenReturn(outputJson);
 
         // Execute
-        Map<String, Object> result = DataMapperReplaceMultipleValuesByKeyAction.perform(inputParameters, connectionParameters, context);
+        Map<String, Object> result =
+            DataMapperReplaceMultipleValuesByKeyAction.perform(inputParameters, connectionParameters, context);
 
         // Verify
-        assertEquals("newValue", ((Map<?, ?>)result.get("parent")).get("oldKey"), "Result should contain new nested value");
+        assertEquals("newValue", ((Map<?, ?>) result.get("parent")).get("oldKey"),
+            "Result should contain new nested value");
     }
 
     @Test
@@ -129,7 +151,8 @@ class DataMapperReplaceMultipleValuesByKeyActionTest {
         when(inputParameters.get(OUTPUT)).thenReturn(outputJson);
 
         // Execute
-        Map<String, Object> result = DataMapperReplaceMultipleValuesByKeyAction.perform(inputParameters, connectionParameters, context);
+        Map<String, Object> result =
+            DataMapperReplaceMultipleValuesByKeyAction.perform(inputParameters, connectionParameters, context);
 
         // Verify
         assertEquals("newValue", result.get("oldKey"), "Result should contain new value");
@@ -151,10 +174,12 @@ class DataMapperReplaceMultipleValuesByKeyActionTest {
         when(inputParameters.get(OUTPUT)).thenReturn(outputJson);
 
         // Execute
-        Map<String, Object> result = DataMapperReplaceMultipleValuesByKeyAction.perform(inputParameters, connectionParameters, context);
+        Map<String, Object> result =
+            DataMapperReplaceMultipleValuesByKeyAction.perform(inputParameters, connectionParameters, context);
 
         // Verify
-        assertEquals("newValue", ((Map<?, ?>)((List<?>)result.get("parent")).getFirst()).get("oldKey"), "Result should contain new value");
+        assertEquals("newValue", ((Map<?, ?>) ((List<?>) result.get("parent")).getFirst()).get("oldKey"),
+            "Result should contain new value");
     }
 
     @Test
@@ -173,7 +198,8 @@ class DataMapperReplaceMultipleValuesByKeyActionTest {
         when(inputParameters.get(OUTPUT)).thenReturn(outputJson);
 
         // Execute
-        Map<String, Object> result = DataMapperReplaceMultipleValuesByKeyAction.perform(inputParameters, connectionParameters, context);
+        Map<String, Object> result =
+            DataMapperReplaceMultipleValuesByKeyAction.perform(inputParameters, connectionParameters, context);
 
         // Verify
         assertEquals("newValue", result.get("oldKey"), "Result should contain new value");
@@ -182,8 +208,10 @@ class DataMapperReplaceMultipleValuesByKeyActionTest {
     @Test
     void testPerformReplaceValuesLargeObject() {
         // Setup
-        List<Object> largeObject1 = List.of(Map.of("prvi", Map.of("podprvi", 1)), "drugi", Map.of("poddrugi", Map.of("podpoddrugi", 2)));
-        List<Object> largeObject2 = List.of(Map.of("first", Map.of("underFirst", 10)), "second", Map.of("underSecond", Map.of("underunderSecond", 20)));
+        List<Object> largeObject1 =
+            List.of(Map.of("prvi", Map.of("podprvi", 1)), "drugi", Map.of("poddrugi", Map.of("podpoddrugi", 2)));
+        List<Object> largeObject2 = List.of(Map.of("first", Map.of("underFirst", 10)), "second",
+            Map.of("underSecond", Map.of("underunderSecond", 20)));
         List<Object> array = new ArrayList<>();
         array.add(largeObject1);
 
@@ -194,16 +222,18 @@ class DataMapperReplaceMultipleValuesByKeyActionTest {
         outputJson.put("newKey", "newValue");
         outputJson.put("newLargeKey", List.of(largeObject2));
 
-        List<StringMapping> mappingList = List.of(new StringMapping("oldKey", "newLargeKey[0]"), new StringMapping("oldLargeKey[0]", "newKey"));
+        List<StringMapping> mappingList =
+            List.of(new StringMapping("oldKey", "newLargeKey[0]"), new StringMapping("oldLargeKey[0]", "newKey"));
         when(inputParameters.getList(MAPPINGS, StringMapping.class, List.of())).thenReturn(mappingList);
         when(inputParameters.get(INPUT)).thenReturn(inputJson);
         when(inputParameters.get(OUTPUT)).thenReturn(outputJson);
 
         // Execute
-        Map<String, Object> result = DataMapperReplaceMultipleValuesByKeyAction.perform(inputParameters, connectionParameters, context);
+        Map<String, Object> result =
+            DataMapperReplaceMultipleValuesByKeyAction.perform(inputParameters, connectionParameters, context);
 
         // Verify
-        assertEquals("newValue", ((List<?>)result.get("oldLargeKey")).getFirst(), "Result should contain new value");
+        assertEquals("newValue", ((List<?>) result.get("oldLargeKey")).getFirst(), "Result should contain new value");
         assertEquals(largeObject2, result.get("oldKey"), "Result should contain new large value");
     }
 }
