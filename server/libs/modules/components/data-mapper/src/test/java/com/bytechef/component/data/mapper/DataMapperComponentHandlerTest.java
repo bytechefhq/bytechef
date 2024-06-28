@@ -19,60 +19,18 @@
 package com.bytechef.component.data.mapper;
 
 import com.bytechef.test.jsonasssert.JsonFileAssert;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Arik Cohen
  * @author Ivica Cardic
  */
-public class DataMapperComponentHandlerTest {
+class DataMapperComponentHandlerTest {
 
     @Test
-    public void testGetComponentDefinition() {
+    void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
             "definition/data-mapper_v1.json", new DataMapperComponentHandler().getDefinition());
     }
 
-    @Test
-    @Disabled
-    public void testMapKeysAction() {
-        // TODO
-    }
-
-    @Test
-    @Disabled
-    public void testMapListToObjectAction() {
-        // TODO
-    }
-
-    @Test
-    @Disabled
-    public void testMapMultipleValuesBetweenObjectsAction() {
-        // TODO
-    }
-
-    @Test
-    @Disabled
-    public void testMapObjectsAction() {
-        // TODO
-    }
-
-    @Test
-    @Disabled
-    public void testMapObjectsToListAction() {
-        // TODO
-    }
-
-    @Test
-    @Disabled
-    public void testMapOneValueAction() {
-        // TODO
-    }
-
-    @Test
-    @Disabled
-    public void testMapValuesAction() {
-        // TODO
-    }
 }

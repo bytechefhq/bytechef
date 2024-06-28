@@ -19,7 +19,7 @@ package com.bytechef.component.data.mapper.action;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INPUT;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INPUT_TYPE;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.MAPPINGS;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -256,7 +256,7 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
 
         Object result = DataMapperReplaceAllSpecifiedValuesAction.perform(inputParameters, connectionParameters, context);
 
-        consumer.accept((List<?>)result);
+        consumer.accept((List<?>) result);
     }
 
     private void setupAndAssertTest(Map<String, Object> inputValue,  List<ObjectMapping> mappings, Consumer<Object> consumer) {

@@ -244,7 +244,7 @@ public class DataMapperReplaceAllSpecifiedValuesAction {
 
             List<Map<String, Object>> output = new LinkedList<>();
             for (Object object : input) {
-                output.add(fillOutput(((Map<String, Object>) object), mappings));
+                output.add(fillOutput((Map<String, Object>) object, mappings));
             }
             return output;
         }
