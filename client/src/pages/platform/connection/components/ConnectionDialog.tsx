@@ -161,8 +161,6 @@ const ConnectionDialog = ({
                 queryKey: connectionTagsQueryKey,
             });
 
-            console.log('connection created');
-
             closeDialog();
         },
     });

@@ -603,7 +603,10 @@ const Property = ({
             setInputValue(propertyParameterValue);
         }
 
-        if (selectValue === '' || (selectValue === defaultValue && propertyParameterValue !== undefined)) {
+        if (
+            controlType === 'SELECT' &&
+            (selectValue === '' || (selectValue === defaultValue && propertyParameterValue !== undefined))
+        ) {
             if (propertyParameterValue !== undefined) {
                 if (type === 'BOOLEAN') {
                     setSelectValue(propertyParameterValue.toString());
