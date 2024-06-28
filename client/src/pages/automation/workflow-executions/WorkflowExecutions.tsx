@@ -103,12 +103,7 @@ export const WorkflowExecutions = () => {
         error: workflowExecutionsError,
         isLoading: workflowExecutionsIsLoading,
     } = useGetWorkflowExecutionsQuery({
-        environment:
-            filterEnvironment === '1'
-                ? EnvironmentModel.Test
-                : filterEnvironment === '2'
-                  ? EnvironmentModel.Production
-                  : undefined,
+        environment: filterEnvironment as EnvironmentModel,
         jobEndDate: filterEndDate,
         jobStartDate: filterStartDate,
         jobStatus: filterStatus,
@@ -332,9 +327,9 @@ export const WorkflowExecutions = () => {
                             </SelectTrigger>
 
                             <SelectContent>
-                                <SelectItem value="1">Test</SelectItem>
+                                <SelectItem value="TEST">Test</SelectItem>
 
-                                <SelectItem value="2">Production</SelectItem>
+                                <SelectItem value="PRODUCTION">Production</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
