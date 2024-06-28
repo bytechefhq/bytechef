@@ -64,19 +64,20 @@ public class DataMapperMergeAndPivotByKeyAction {
     protected static Map<String, Map<Object, Object>> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         List<Object> input = inputParameters.getList(INPUT, Object.class, List.of());
-        String key = inputParameters.getRequiredString(FIELD_KEY);
+        String fieldKey = inputParameters.getRequiredString(FIELD_KEY);
+        String fieldValue = inputParameters.getRequiredString(FIELD_VALUE);
 
         Map<Object, Object> objectHashMap = new HashMap<>();
         for (Object object : input) {
             for (Map.Entry<String, Object> entry : ((Map<String, Object>) object).entrySet()) {
                 if (entry.getKey()
-                    .equals(key))
-                    objectHashMap.put(entry.getValue(), inputParameters.getRequiredString(FIELD_VALUE));
+                    .equals(fieldKey))
+                    objectHashMap.put(entry.getValue(), fieldValue);
             }
         }
 
         Map<String, Map<Object, Object>> output = new HashMap<>();
-        output.put(key, objectHashMap);
+        output.put(fieldKey, objectHashMap);
         return output;
     }
 }
