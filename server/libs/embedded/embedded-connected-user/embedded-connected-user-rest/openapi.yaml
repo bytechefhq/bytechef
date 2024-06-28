@@ -17,25 +17,18 @@ paths:
         - "connected-user"
       operationId: "getConnectedUsers"
       parameters:
-        - name: "search"
-          description: "The name, email or external reference code of a connected user."
+        - name: "environment"
+          description: "The environment."
           in: "query"
           required: false
           schema:
-            type: "string"
+            $ref: "#/components/schemas/Environment"
         - name: "credentialStatus"
           description: "The id of an integration instance."
           in: "query"
           required: false
           schema:
             $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml/#/components/schemas/CredentialStatus"
-        - name: "integrationId"
-          description: "The id of an integration."
-          in: "query"
-          required: false
-          schema:
-            type: "integer"
-            format: "int64"
         - name: "createDateFrom"
           description: "The start range of a create date."
           in: "query"
@@ -50,6 +43,13 @@ paths:
           schema:
             type: "string"
             format: "date"
+        - name: "integrationId"
+          description: "The id of an integration."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
         - name: "pageNumber"
           description: "The number of the page to return."
           in: "query"
@@ -58,6 +58,12 @@ paths:
             type: "integer"
             format: "int32"
             default: 0
+        - name: "search"
+          description: "The name, email or external reference code of a connected user."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
       responses:
         "200":
           description: "The page of connected users."
@@ -212,6 +218,12 @@ components:
           readOnly: true
         credentialStatus:
           $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml/#/components/schemas/CredentialStatus"
+    Environment:
+      description: "The environment of a project."
+      type: "string"
+      enum:
+        - "TEST"
+        - "PRODUCTION"
     Page:
       description: "A sublist of a list of objects. It allows gain information about\
         \ the position of it in the containing entire list."
