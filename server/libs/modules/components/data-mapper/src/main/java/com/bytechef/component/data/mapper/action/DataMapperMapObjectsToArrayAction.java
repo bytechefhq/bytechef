@@ -91,7 +91,7 @@ public class DataMapperMapObjectsToArrayAction {
             List<Object> input = inputParameters.getList(INPUT, Object.class, List.of());
 
             for (Object object : input) {
-                fillOutput(inputParameters, ((Map<String, Object>) object), output);
+                fillOutput(inputParameters, (Map<String, Object>) object, output);
             }
         }
 
