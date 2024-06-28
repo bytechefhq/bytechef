@@ -88,6 +88,7 @@ public class HttpClientExecutor implements ApplicationContextAware {
     private static final Logger logger = LoggerFactory.getLogger(HttpClientExecutor.class);
 
     private ApplicationContext applicationContext;
+    private ActionDefinitionFacade actionDefinitionFacade;
     private final ConnectionDefinitionService connectionDefinitionService;
     private final FileStorageService fileStorageService;
     private final ObjectMapper objectMapper;
@@ -126,6 +127,19 @@ public class HttpClientExecutor implements ApplicationContextAware {
         }
 
         return handleResponse(httpResponse, configuration);
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+
+    private ActionDefinitionFacade getActionDefinitionFacade() {
+        if (actionDefinitionFacade == null) {
+            actionDefinitionFacade = applicationContext.getBean(ActionDefinitionFacade.class);
+        }
+
+        return actionDefinitionFacade;
     }
 
     HttpResponse.BodyHandler<?> createBodyHandler(Configuration configuration) {
