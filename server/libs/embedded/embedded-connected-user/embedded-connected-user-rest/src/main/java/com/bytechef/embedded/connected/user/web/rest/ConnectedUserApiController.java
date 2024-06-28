@@ -19,9 +19,11 @@ package com.bytechef.embedded.connected.user.web.rest;
 import com.bytechef.embedded.connected.user.facade.ConnectedUserFacade;
 import com.bytechef.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.embedded.connected.user.web.rest.model.ConnectedUserModel;
+import com.bytechef.embedded.connected.user.web.rest.model.EnvironmentModel;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import com.bytechef.platform.connection.web.rest.model.CredentialStatusModel;
+import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
 import org.springframework.core.convert.ConversionService;
@@ -68,12 +70,13 @@ public class ConnectedUserApiController implements ConnectedUserApi {
 
     @Override
     public ResponseEntity<Page> getConnectedUsers(
-        String search, CredentialStatusModel credentialStatus, Long integrationId, LocalDate createDateFrom,
-        LocalDate createDateTo, Integer pageNumber) {
+        EnvironmentModel environment, CredentialStatusModel credentialStatus, LocalDate createDateFrom,
+        LocalDate createDateTo, Long integrationId, Integer pageNumber, String search) {
 
         return ResponseEntity.ok(
             connectedUserFacade
                 .getConnectedUsers(
+                    environment == null ? null : Environment.valueOf(environment.name()),
                     search, credentialStatus == null ? null : CredentialStatus.valueOf(credentialStatus.name()),
                     createDateFrom, createDateTo, integrationId, pageNumber)
                 .map(connectedUser -> conversionService.convert(connectedUser, ConnectedUserModel.class)));

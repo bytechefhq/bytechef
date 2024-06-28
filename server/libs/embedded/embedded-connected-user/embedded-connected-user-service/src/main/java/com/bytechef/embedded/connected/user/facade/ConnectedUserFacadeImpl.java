@@ -29,6 +29,7 @@ import com.bytechef.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
 import java.util.List;
@@ -89,11 +90,11 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
     @Override
     @Transactional(readOnly = true)
     public Page<ConnectedUserDTO> getConnectedUsers(
-        String search, CredentialStatus credentialStatus, LocalDate createDateFrom, LocalDate createDateTo,
-        Long integrationId, int pageNumber) {
+        Environment environment, String search, CredentialStatus credentialStatus, LocalDate createDateFrom,
+        LocalDate createDateTo, Long integrationId, int pageNumber) {
 
         Page<ConnectedUser> connectedUsers = connectedUserService.getConnectedUsers(
-            search, createDateFrom, createDateTo, integrationId, pageNumber);
+            environment, search, createDateFrom, createDateTo, integrationId, pageNumber);
 
         Stream<ConnectedUser> stream = connectedUsers.stream();
 

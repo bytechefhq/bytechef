@@ -84,10 +84,13 @@ public class ConnectedUserServiceImpl implements ConnectedUserService {
     @Override
     @Transactional(readOnly = true)
     public Page<ConnectedUser> getConnectedUsers(
-        String search, LocalDate createDateFrom, LocalDate createDateTo, Long integrationId, int pageNumber) {
+        Environment environment, String search, LocalDate createDateFrom, LocalDate createDateTo, Long integrationId,
+        int pageNumber) {
 
         PageRequest pageRequest = PageRequest.of(pageNumber, ConnectedUserRepository.DEFAULT_PAGE_SIZE);
 
-        return connectedUserRepository.findAll(search, createDateFrom, createDateTo, integrationId, pageRequest);
+        return connectedUserRepository.findAll(
+            environment == null ? null : environment.ordinal(), search, createDateFrom, createDateTo, integrationId,
+            pageRequest);
     }
 }
