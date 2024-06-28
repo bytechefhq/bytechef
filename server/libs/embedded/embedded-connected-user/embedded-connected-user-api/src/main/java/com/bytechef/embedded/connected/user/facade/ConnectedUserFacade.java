@@ -18,6 +18,7 @@ package com.bytechef.embedded.connected.user.facade;
 
 import com.bytechef.embedded.connected.user.dto.ConnectedUserDTO;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
+import com.bytechef.platform.constant.Environment;
 import java.time.LocalDate;
 import org.springframework.data.domain.Page;
 
@@ -29,6 +30,6 @@ public interface ConnectedUserFacade {
     ConnectedUserDTO getConnectedUser(long id);
 
     Page<ConnectedUserDTO> getConnectedUsers(
-        String search, CredentialStatus credentialStatus, LocalDate createDateFrom, LocalDate createDateTo,
-        Long integrationId, int pageNumber);
+        Environment environment, String search, CredentialStatus credentialStatus, LocalDate createDateFrom,
+        LocalDate createDateTo, Long integrationId, int pageNumber);
 }

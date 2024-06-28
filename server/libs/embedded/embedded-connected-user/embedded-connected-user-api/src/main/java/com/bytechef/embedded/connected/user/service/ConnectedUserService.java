@@ -38,5 +38,6 @@ public interface ConnectedUserService {
     ConnectedUser getConnectedUser(long id);
 
     Page<ConnectedUser> getConnectedUsers(
-        String name, LocalDate createDateFrom, LocalDate createDateTo, Long integrationId, int pageNumber);
+        Environment environment, String name, LocalDate createDateFrom, LocalDate createDateTo, Long integrationId,
+        int pageNumber);
 }

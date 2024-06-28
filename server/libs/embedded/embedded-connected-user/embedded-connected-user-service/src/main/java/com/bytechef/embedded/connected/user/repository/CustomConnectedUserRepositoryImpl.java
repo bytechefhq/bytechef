@@ -43,11 +43,12 @@ public class CustomConnectedUserRepositoryImpl implements CustomConnectedUserRep
 
     @Override
     public Page<ConnectedUser> findAll(
-        String search, LocalDate createDateFrom, LocalDate createDateTo, Long integrationId, Pageable pageable) {
+        Integer environment, String search, LocalDate createDateFrom, LocalDate createDateTo, Long integrationId,
+        Pageable pageable) {
 
         Page<ConnectedUser> page;
         JdbcClient.StatementSpec statementSpec = buildQuery(
-            search, createDateFrom, createDateFrom, integrationId, pageable, true);
+            environment, search, createDateFrom, createDateFrom, integrationId, pageable, true);
 
         long total = statementSpec.query(Long.class)
             .single();
@@ -55,7 +56,8 @@ public class CustomConnectedUserRepositoryImpl implements CustomConnectedUserRep
         if (total == 0) {
             page = Page.empty();
         } else {
-            statementSpec = buildQuery(search, createDateFrom, createDateFrom, integrationId, pageable, false);
+            statementSpec =
+                buildQuery(environment, search, createDateFrom, createDateFrom, integrationId, pageable, false);
 
             List<ConnectedUser> connectedUsers = statementSpec
                 .query(ConnectedUser.class)
@@ -83,7 +85,8 @@ public class CustomConnectedUserRepositoryImpl implements CustomConnectedUserRep
     }
 
     private JdbcClient.StatementSpec buildQuery(
-        String search, LocalDate createDateFrom, LocalDate createDateTo, Long integrationId, Pageable pageable,
+        Integer environment, String search, LocalDate createDateFrom, LocalDate createDateTo, Long integrationId,
+        Pageable pageable,
         boolean countQuery) {
 
         String query;
@@ -102,20 +105,32 @@ public class CustomConnectedUserRepositoryImpl implements CustomConnectedUserRep
                     """;
         }
 
-        if (search != null || createDateFrom != null || createDateTo != null || integrationId != null) {
+        if (environment != null || search != null || createDateFrom != null || createDateTo != null ||
+            integrationId != null) {
+
             query += "WHERE ";
         }
 
         List<Object> arguments = new ArrayList<>();
 
+        if (environment != null) {
+            query += "environment = ? ";
+
+            arguments.add(environment);
+        }
+
         if (search != null) {
+            if (environment != null) {
+                query += "AND ";
+            }
+
             query += "name LIKE ? or email LIKE ? or external_id LIKE ? ";
 
             arguments.addAll(List.of("%" + search + "%", "%" + search + "%", "%" + search + "%"));
         }
 
         if (createDateFrom != null) {
-            if (search != null) {
+            if (environment != null || search != null) {
                 query += "AND ";
             }
 
@@ -125,7 +140,7 @@ public class CustomConnectedUserRepositoryImpl implements CustomConnectedUserRep
         }
 
         if (createDateTo != null) {
-            if (search != null || createDateFrom != null) {
+            if (environment != null || search != null || createDateFrom != null) {
                 query += "AND ";
             }
 
@@ -135,7 +150,7 @@ public class CustomConnectedUserRepositoryImpl implements CustomConnectedUserRep
         }
 
         if (integrationId != null) {
-            if (search != null || createDateFrom != null || createDateTo != null) {
+            if (environment != null || search != null || createDateFrom != null || createDateTo != null) {
                 query += "AND ";
             }
 

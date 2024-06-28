@@ -29,5 +29,6 @@ import org.springframework.stereotype.Repository;
 public interface CustomConnectedUserRepository {
 
     Page<ConnectedUser> findAll(
-        String search, LocalDate createDateFrom, LocalDate createDateTo, Long integrationId, Pageable pageable);
+        Integer environment, String search, LocalDate createDateFrom, LocalDate createDateTo, Long integrationId,
+        Pageable pageable);
 }
