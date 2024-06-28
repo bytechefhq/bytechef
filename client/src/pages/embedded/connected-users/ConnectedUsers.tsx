@@ -13,6 +13,7 @@ import ConnectedUserTable from '@/pages/embedded/connected-users/components/Conn
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
+import {EnvironmentModel} from '@/shared/middleware/automation/configuration';
 import {IntegrationModel} from '@/shared/middleware/embedded/configuration';
 import {ConnectedUserModelFromJSON, type CredentialStatusModel} from '@/shared/middleware/embedded/connected-user';
 import {useGetConnectedUsersQuery} from '@/shared/queries/embedded/connectedUsers.queries';
@@ -30,6 +31,7 @@ import {z} from 'zod';
 const formSchema = z.object({
     createDateRange: z.any().optional(),
     credentialStatus: z.string().optional(),
+    environment: z.string().optional(),
     integrationId: z.number().optional(),
     search: z.string().optional(),
 });
@@ -132,6 +134,9 @@ const ConnectedUsers = () => {
         credentialStatus: searchParams.get('credentialStatus')
             ? (searchParams.get('credentialStatus')! as CredentialStatusModel)
             : undefined,
+        environment: searchParams.get('environment')
+            ? (searchParams.get('environment') as EnvironmentModel)
+            : undefined,
         integrationId: searchParams.get('integrationId') ? +searchParams.get('integrationId')! : undefined,
         pageNumber: searchParams.get('pageNumber') ? +searchParams.get('pageNumber')! : undefined,
         search: searchParams.get('search') ? searchParams.get('search')! : undefined,
@@ -144,6 +149,7 @@ const ConnectedUsers = () => {
     const {data: integrations} = useGetIntegrationsQuery({});
 
     function filter(
+        environment?: string,
         search?: string,
         credentialStatus?: string,
         integrationIdId?: number,
@@ -151,18 +157,26 @@ const ConnectedUsers = () => {
         pageNumber?: number
     ) {
         navigate(
-            `/embedded/connected-users?search=${search ? search : ''}&credentialStatus=${credentialStatus ? credentialStatus : ''}&integrationIdId=${integrationIdId ? integrationIdId : ''}&createDateFrom=${createDateRange?.from ? createDateRange.from?.getTime() : ''}&createDateTo=${createDateRange?.to ? createDateRange.to?.getTime() : ''}&pageNumber=${pageNumber ? pageNumber : ''}`
+            `/embedded/connected-users?environment=${environment ? environment : ''}&search=${search ? search : ''}&credentialStatus=${credentialStatus ? credentialStatus : ''}&integrationIdId=${integrationIdId ? integrationIdId : ''}&createDateFrom=${createDateRange?.from ? createDateRange.from?.getTime() : ''}&createDateTo=${createDateRange?.to ? createDateRange.to?.getTime() : ''}&pageNumber=${pageNumber ? pageNumber : ''}`
         );
     }
 
     function filterConnectedUsers(values: z.infer<typeof formSchema>) {
-        filter(values.search, values.credentialStatus, values.integrationId, values.createDateRange, pageNumber);
+        filter(
+            values.environment,
+            values.search,
+            values.credentialStatus,
+            values.integrationId,
+            values.createDateRange,
+            pageNumber
+        );
     }
 
     const handlePaginationClick = (pageNumber: number) => {
         setPageNumber(pageNumber);
 
         filter(
+            form.getValues().environment,
             form.getValues().search,
             form.getValues().credentialStatus,
             form.getValues().integrationId,
@@ -191,6 +205,39 @@ const ConnectedUsers = () => {
             leftSidebarBody={
                 <Form {...form}>
                     <form className="space-y-4 px-4" onSubmit={form.handleSubmit(filterConnectedUsers)}>
+                        <FormField
+                            control={form.control}
+                            name="environment"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Environment</FormLabel>
+
+                                    <FormControl>
+                                        <Select
+                                            onValueChange={(value) => {
+                                                field.onChange(value);
+
+                                                form.handleSubmit(filterConnectedUsers)();
+                                            }}
+                                            value={field.value}
+                                        >
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="Select environment" />
+                                            </SelectTrigger>
+
+                                            <SelectContent>
+                                                <SelectItem value="TEST">Test</SelectItem>
+
+                                                <SelectItem value="PRODUCTION">Production</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </FormControl>
+
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
                         <FormField
                             control={form.control}
                             name="search"
@@ -228,9 +275,9 @@ const ConnectedUsers = () => {
                                             </SelectTrigger>
 
                                             <SelectContent>
-                                                <SelectItem value="valid">Valid</SelectItem>
+                                                <SelectItem value="VALID">Valid</SelectItem>
 
-                                                <SelectItem value="invalid">Invalid</SelectItem>
+                                                <SelectItem value="INVALID">Invalid</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     </FormControl>
