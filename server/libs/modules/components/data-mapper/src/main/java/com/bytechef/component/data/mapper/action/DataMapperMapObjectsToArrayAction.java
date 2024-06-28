@@ -82,9 +82,8 @@ public class DataMapperMapObjectsToArrayAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         List<Map<String, Object>> output = new ArrayList<>();
 
-        if (inputParameters.getInteger(INPUT_TYPE)
-            .equals(1)) {
-            Map<String, Object> input = inputParameters.getMap(INPUT, Object.class, Map.of());
+        if (inputParameters.getInteger(INPUT_TYPE).equals(1)) {
+            Map<String, Object> input = inputParameters.getMap(INPUT, Object.class, new HashMap<>());
 
             fillOutput(inputParameters, input, output);
         } else {
@@ -100,10 +99,13 @@ public class DataMapperMapObjectsToArrayAction {
 
     private static void
         fillOutput(Parameters inputParameters, Map<String, Object> input, List<Map<String, Object>> output) {
+        String fieldKey = inputParameters.getRequiredString(FIELD_KEY);
+        String valueKey = inputParameters.getRequiredString(VALUE_KEY);
+
         for (Map.Entry<String, Object> entry : input.entrySet()) {
             Map<String, Object> objectHashMap = new HashMap<>();
-            objectHashMap.put(inputParameters.getRequiredString(FIELD_KEY), entry.getKey());
-            objectHashMap.put(inputParameters.getRequiredString(VALUE_KEY), entry.getValue());
+            objectHashMap.put(fieldKey, entry.getKey());
+            objectHashMap.put(valueKey, entry.getValue());
             output.add(objectHashMap);
         }
     }
