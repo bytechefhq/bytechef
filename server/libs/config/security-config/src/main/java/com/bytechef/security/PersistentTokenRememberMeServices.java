@@ -83,6 +83,7 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
     private static final long UPGRADED_TOKEN_VALIDITY_MILLIS = 5000L;
 
     private ApplicationContext applicationContext;
+    private UserService userService;
     private final PersistentTokenCache<UpgradedRememberMeToken> upgradedTokenCache;
     private final PersistentTokenService persistentTokenService;
 
@@ -115,9 +116,7 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
             if (login == null) {
                 PersistentToken token = getPersistentToken(cookieTokens);
 
-                UserService userService = applicationContext.getBean(UserService.class);
-
-                User user = userService.getUser(token.getUserId());
+                User user = getUserService().getUser(token.getUserId());
 
                 login = user.getLogin();
 
@@ -152,9 +151,7 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
 
         logger.debug("Creating new persistent login for user {}", login);
 
-        UserService userService = applicationContext.getBean(UserService.class);
-
-        PersistentToken token = userService.fetchUserByLogin(login)
+        PersistentToken token = getUserService().fetchUserByLogin(login)
             .map(u -> {
                 PersistentToken t = new PersistentToken();
 
@@ -261,6 +258,14 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
+    }
+
+    private UserService getUserService() {
+        if (userService == null) {
+            userService = applicationContext.getBean(UserService.class);
+        }
+
+        return userService;
     }
 
     private static String getKey(SecurityProperties securityProperties) {

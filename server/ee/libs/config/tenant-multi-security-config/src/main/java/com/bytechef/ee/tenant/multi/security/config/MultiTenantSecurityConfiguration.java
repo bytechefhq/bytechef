@@ -12,6 +12,7 @@ import com.bytechef.ee.tenant.multi.security.MultiTenantUserDetailsService;
 import com.bytechef.ee.tenant.multi.security.web.authentication.MultiTenantAuthenticationFailureHandler;
 import com.bytechef.ee.tenant.multi.security.web.authentication.MultiTenantAuthenticationSuccessHandler;
 import com.bytechef.ee.tenant.multi.security.web.filter.MultiTenantFilterAfterContributor;
+import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
 import com.bytechef.tenant.service.TenantService;
 import org.springframework.context.annotation.Bean;
@@ -43,7 +44,9 @@ public class MultiTenantSecurityConfiguration {
     }
 
     @Bean("userDetailsService")
-    MultiTenantUserDetailsService multiTenantUserDetailsService(TenantService tenantService) {
-        return new MultiTenantUserDetailsService(tenantService);
+    MultiTenantUserDetailsService multiTenantUserDetailsService(
+        AuthorityService authorityService, TenantService tenantService) {
+
+        return new MultiTenantUserDetailsService(authorityService, tenantService);
     }
 }

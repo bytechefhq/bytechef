@@ -22,6 +22,7 @@ import com.bytechef.platform.user.exception.UserNotActivatedException;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.annotation.ConditionalOnSingleTenant;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -49,6 +50,13 @@ public class SingleTenantUserDetailsService implements UserDetailsService, Appli
     private static final Logger log = LoggerFactory.getLogger(SingleTenantUserDetailsService.class);
 
     private ApplicationContext applicationContext;
+    private final AuthorityService authorityService;
+    private UserService userService;
+
+    @SuppressFBWarnings("EI")
+    public SingleTenantUserDetailsService(AuthorityService authorityService) {
+        this.authorityService = authorityService;
+    }
 
     @Override
     public UserDetails loadUserByUsername(final String login) {
@@ -56,10 +64,8 @@ public class SingleTenantUserDetailsService implements UserDetailsService, Appli
 
         EmailValidator emailValidator = EmailValidator.getInstance();
 
-        UserService userService = applicationContext.getBean(UserService.class);
-
         if (emailValidator.isValid(login)) {
-            return userService.fetchUserByEmail(login)
+            return getUserService().fetchUserByEmail(login)
                 .map(user -> createSpringSecurityUser(login, user))
                 .orElseThrow(() -> new UsernameNotFoundException(
                     "User with email " + login + " was not found in the database"));
@@ -67,7 +73,7 @@ public class SingleTenantUserDetailsService implements UserDetailsService, Appli
 
         String lowercaseLogin = login.toLowerCase(Locale.ENGLISH);
 
-        return userService.fetchUserByLogin(lowercaseLogin)
+        return getUserService().fetchUserByLogin(lowercaseLogin)
             .map(user -> createSpringSecurityUser(lowercaseLogin, user))
             .orElseThrow(
                 () -> new UsernameNotFoundException("User " + lowercaseLogin + " was not found in the database"));
@@ -79,8 +85,6 @@ public class SingleTenantUserDetailsService implements UserDetailsService, Appli
         if (!user.isActivated()) {
             throw new UserNotActivatedException("User " + lowercaseLogin + " was not activated");
         }
-
-        AuthorityService authorityService = applicationContext.getBean(AuthorityService.class);
 
         List<SimpleGrantedAuthority> grantedAuthorities = user.getAuthorityIds()
             .stream()
@@ -97,5 +101,13 @@ public class SingleTenantUserDetailsService implements UserDetailsService, Appli
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
+    }
+
+    private UserService getUserService() {
+        if (userService == null) {
+            userService = applicationContext.getBean(UserService.class);
+        }
+
+        return userService;
     }
 }

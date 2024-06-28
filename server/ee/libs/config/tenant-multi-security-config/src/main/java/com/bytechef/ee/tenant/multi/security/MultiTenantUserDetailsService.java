@@ -48,10 +48,13 @@ public class MultiTenantUserDetailsService implements UserDetailsService, Applic
     private static final Logger log = LoggerFactory.getLogger(MultiTenantUserDetailsService.class);
 
     private ApplicationContext applicationContext;
+    private final AuthorityService authorityService;
     private final TenantService tenantService;
+    private UserService userService;
 
     @SuppressFBWarnings("EI")
-    public MultiTenantUserDetailsService(TenantService tenantService) {
+    public MultiTenantUserDetailsService(AuthorityService authorityService, TenantService tenantService) {
+        this.authorityService = authorityService;
         this.tenantService = tenantService;
     }
 
@@ -60,8 +63,6 @@ public class MultiTenantUserDetailsService implements UserDetailsService, Applic
         log.debug("Authenticating {}", login);
 
         EmailValidator emailValidator = EmailValidator.getInstance();
-
-        UserService userService = applicationContext.getBean(UserService.class);
 
         if (emailValidator.isValid(login)) {
             List<String> tenantIds = tenantService.getTenantIdsByUserEmail(login);
@@ -72,7 +73,7 @@ public class MultiTenantUserDetailsService implements UserDetailsService, Applic
 
             return TenantUtils.callWithTenantId(
                 tenantIds.getFirst(),
-                () -> userService.fetchUserByEmail(login)
+                () -> getUserService().fetchUserByEmail(login)
                     .map(user -> createSpringSecurityUser(login, user))
                     .orElseThrow(() -> new UsernameNotFoundException(
                         "User with email " + login + " was not found in the database")));
@@ -88,7 +89,7 @@ public class MultiTenantUserDetailsService implements UserDetailsService, Applic
 
         return TenantUtils.callWithTenantId(
             tenantIds.getFirst(),
-            () -> userService.fetchUserByLogin(lowercaseLogin)
+            () -> getUserService().fetchUserByLogin(lowercaseLogin)
                 .map(user -> createSpringSecurityUser(lowercaseLogin, user))
                 .orElseThrow(
                     () -> new UsernameNotFoundException("User " + lowercaseLogin + " was not found in the database")));
@@ -100,8 +101,6 @@ public class MultiTenantUserDetailsService implements UserDetailsService, Applic
         if (!user.isActivated()) {
             throw new UserNotActivatedException("User " + lowercaseLogin + " was not activated");
         }
-
-        AuthorityService authorityService = applicationContext.getBean(AuthorityService.class);
 
         List<SimpleGrantedAuthority> grantedAuthorities = user.getAuthorityIds()
             .stream()
@@ -118,5 +117,13 @@ public class MultiTenantUserDetailsService implements UserDetailsService, Applic
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
+    }
+
+    private UserService getUserService() {
+        if (userService == null) {
+            userService = applicationContext.getBean(UserService.class);
+        }
+
+        return userService;
     }
 }
