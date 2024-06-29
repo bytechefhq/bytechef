@@ -9,6 +9,7 @@ import 'quill-paste-smart';
 
 import './propertyMentionsInput.css';
 
+import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/Properties/components/InputTypeSwitchButton';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
@@ -41,20 +42,21 @@ const MentionInputListItem = (item: DataPillType) => {
 };
 
 interface PropertyMentionsInputProps {
-    controlType: ControlTypeModel;
-    defaultValue: string;
+    controlType?: ControlTypeModel;
+    defaultValue?: string;
     deletePropertyButton?: ReactNode;
     description?: string;
-    handleInputTypeSwitchButtonClick: () => void;
+    handleInputTypeSwitchButtonClick?: () => void;
     label?: string;
-    leadingIcon: ReactNode;
-    onChange: (value: string) => void;
-    onKeyPress: (event: KeyboardEvent) => void;
-    placeholder: string;
+    leadingIcon?: ReactNode;
+    onChange?: (value: string) => void;
+    onKeyPress?: (event: KeyboardEvent) => void;
+    overriddenDataPills?: Array<DataPillType>;
+    placeholder?: string;
     required?: boolean;
     singleMention?: boolean;
     showInputTypeSwitchButton?: boolean;
-    value: string;
+    value?: string;
 }
 
 const PropertyMentionsInput = forwardRef(
@@ -69,6 +71,7 @@ const PropertyMentionsInput = forwardRef(
             leadingIcon,
             onChange,
             onKeyPress,
+            overriddenDataPills,
             placeholder,
             required = false,
             showInputTypeSwitchButton = false,
@@ -80,7 +83,7 @@ const PropertyMentionsInput = forwardRef(
         const [isFocused, setIsFocused] = useState(false);
         const [mentionOccurences, setMentionOccurences] = useState(0);
 
-        const {dataPills} = useWorkflowDataStore();
+        let {dataPills} = useWorkflowDataStore();
         const {focusedInput, setFocusedInput} = useWorkflowNodeDetailsPanelStore();
         const {setDataPillPanelOpen} = useDataPillPanelStore();
 
@@ -131,6 +134,8 @@ const PropertyMentionsInput = forwardRef(
                         leaf.deleteAt(0, offset);
                     }
 
+                    console.log('item: ', item);
+
                     insertItem(
                         {
                             componentIcon: item.componentIcon,
@@ -146,11 +151,15 @@ const PropertyMentionsInput = forwardRef(
                 renderItem: (item: DataPillType) => MentionInputListItem(item),
                 showDenotationChar: false,
                 source: (searchTerm: string, renderList: (arg1: Array<object>, arg2: string) => void) => {
+                    if (overriddenDataPills) {
+                        dataPills = overriddenDataPills;
+                    }
+
                     if (!dataPills) {
                         return;
                     }
 
-                    const formattedData = dataPills.map((dataPill) => {
+                    const formattedDataPills = dataPills.map((dataPill) => {
                         const {componentIcon, componentName, id, value} = dataPill;
 
                         return {
@@ -162,9 +171,9 @@ const PropertyMentionsInput = forwardRef(
                     });
 
                     if (searchTerm.length === 0) {
-                        renderList(formattedData, searchTerm);
+                        renderList(formattedDataPills, searchTerm);
                     } else {
-                        const matches = formattedData.filter(
+                        const matches = formattedDataPills.filter(
                             (datum) => ~datum.value.toLowerCase().indexOf(searchTerm.toLowerCase())
                         );
 
@@ -268,7 +277,7 @@ const PropertyMentionsInput = forwardRef(
                                 <Label className={twMerge(description && 'mr-1', 'leading-normal')} htmlFor={elementId}>
                                     {label}
 
-                                    {required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
+                                    {required && <RequiredMark />}
                                 </Label>
 
                                 {description && (
@@ -284,7 +293,7 @@ const PropertyMentionsInput = forwardRef(
                         )}
 
                         <div className="flex items-center">
-                            {showInputTypeSwitchButton && (
+                            {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
                                 <InputTypeSwitchButton handleClick={handleInputTypeSwitchButtonClick} mentionInput />
                             )}
 

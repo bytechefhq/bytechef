@@ -1,4 +1,5 @@
 import ComboBox from '@/components/ComboBox';
+import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {GetDataStreamComponentDefinitionsComponentTypeEnum} from '@/shared/middleware/platform/configuration';
 import {useGetDataStreamComponentDefinitions} from '@/shared/queries/platform/componentDefinitions.queries';
@@ -14,7 +15,7 @@ const DestinationTab = () => {
                 <fieldset className="space-y-2">
                     <Label>
                         Component
-                        <span className="ml-0.5 leading-3 text-red-500">*</span>
+                        <RequiredMark />
                     </Label>
 
                     <ComboBox
