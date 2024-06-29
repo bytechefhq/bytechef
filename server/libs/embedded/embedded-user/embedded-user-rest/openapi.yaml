@@ -271,6 +271,7 @@ components:
       description: "Contains generated public key used for signing JWT tokens."
       type: "object"
       required:
+        - keyId
         - name
       properties:
         createdBy:
@@ -288,6 +289,10 @@ components:
           description: "The id of a public key."
           type: "integer"
           format: "int64"
+          readOnly: true
+        keyId:
+          description: "The id of a key used for identifying corresponding private key when validating the JWT token."
+          type: "string"
           readOnly: true
         lastModifiedBy:
           description: "The last modified by."
