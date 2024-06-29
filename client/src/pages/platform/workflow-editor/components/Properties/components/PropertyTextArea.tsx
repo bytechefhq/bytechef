@@ -1,3 +1,4 @@
+import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Textarea, TextareaProps} from '@/components/ui/textarea';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -26,7 +27,7 @@ const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
                     <Label className={twMerge(description && 'mr-1', 'leading-normal')} htmlFor={name}>
                         {label}
 
-                        {required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
+                        {required && <RequiredMark />}
                     </Label>
 
                     {description && (

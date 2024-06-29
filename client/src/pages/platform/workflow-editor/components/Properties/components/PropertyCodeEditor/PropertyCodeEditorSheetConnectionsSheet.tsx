@@ -1,4 +1,5 @@
 import ComboBox from '@/components/ComboBox';
+import RequiredMark from '@/components/RequiredMark';
 import {Button} from '@/components/ui/button';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
@@ -65,7 +66,7 @@ const ConnectionLabel = ({
                     <Label>
                         <span>{componentDefinition?.title}</span>
 
-                        {workflowConnection.required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
+                        {workflowConnection.required && <RequiredMark />}
                     </Label>
                 )}
 

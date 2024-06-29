@@ -1,3 +1,4 @@
+import RequiredMark from '@/components/RequiredMark';
 import {Button} from '@/components/ui/button';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -51,7 +52,7 @@ const PropertyCodeEditor = forwardRef<HTMLButtonElement, PropertyCodeEditorProps
                             <Label className={twMerge(description && 'mr-1', 'leading-normal')} htmlFor={name}>
                                 {label}
 
-                                {required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
+                                {required && <RequiredMark />}
                             </Label>
 
                             {description && (

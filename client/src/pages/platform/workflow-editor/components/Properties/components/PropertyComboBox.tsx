@@ -1,4 +1,5 @@
 import LoadingIcon from '@/components/LoadingIcon';
+import RequiredMark from '@/components/RequiredMark';
 import {Button} from '@/components/ui/button';
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from '@/components/ui/command';
 import {Label} from '@/components/ui/label';
@@ -127,7 +128,7 @@ const PropertyComboBox = ({
                         <Label className={twMerge(description && 'mr-1', 'leading-normal')} htmlFor={name}>
                             {label}
 
-                            {required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
+                            {required && <RequiredMark />}
                         </Label>
 
                         {description && (

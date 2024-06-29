@@ -1,3 +1,4 @@
+import RequiredMark from '@/components/RequiredMark';
 import {Button} from '@/components/ui/button';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
@@ -113,7 +114,7 @@ const ConnectionTabConnectionSelect = ({
                     <Label className="font-normal">
                         {componentDefinition.title}
 
-                        {workflowConnection.required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
+                        {workflowConnection.required && <RequiredMark />}
                     </Label>
                 )}
 

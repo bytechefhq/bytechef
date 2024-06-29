@@ -1,3 +1,4 @@
+import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/Properties/components/InputTypeSwitchButton';
@@ -813,7 +814,7 @@ const Property = ({
                                             <Label className="leading-normal">
                                                 {label}
 
-                                                {required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
+                                                {required && <RequiredMark />}
                                             </Label>
                                         )}
 
