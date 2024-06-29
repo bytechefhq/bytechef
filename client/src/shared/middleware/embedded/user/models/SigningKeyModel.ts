@@ -51,6 +51,12 @@ export interface SigningKeyModel {
      */
     readonly id?: number;
     /**
+     * The id of a key used for identifying corresponding private key when validating the JWT token.
+     * @type {string}
+     * @memberof SigningKeyModel
+     */
+    readonly keyId: string;
+    /**
      * The last modified by.
      * @type {string}
      * @memberof SigningKeyModel
@@ -80,6 +86,7 @@ export interface SigningKeyModel {
  * Check if a given object implements the SigningKeyModel interface.
  */
 export function instanceOfSigningKeyModel(value: object): boolean {
+    if (!('keyId' in value)) return false;
     if (!('name' in value)) return false;
     return true;
 }
@@ -98,6 +105,7 @@ export function SigningKeyModelFromJSONTyped(json: any, ignoreDiscriminator: boo
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'environment': json['environment'] == null ? undefined : EnvironmentModelFromJSON(json['environment']),
         'id': json['id'] == null ? undefined : json['id'],
+        'keyId': json['keyId'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'lastUsedDate': json['lastUsedDate'] == null ? undefined : (new Date(json['lastUsedDate'])),
@@ -105,7 +113,7 @@ export function SigningKeyModelFromJSONTyped(json: any, ignoreDiscriminator: boo
     };
 }
 
-export function SigningKeyModelToJSON(value?: Omit<SigningKeyModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'> | null): any {
+export function SigningKeyModelToJSON(value?: Omit<SigningKeyModel, 'createdBy'|'createdDate'|'id'|'keyId'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'> | null): any {
     if (value == null) {
         return value;
     }
