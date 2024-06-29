@@ -26,7 +26,7 @@ import {
 } from '../models/index';
 
 export interface CreateSigningKeyRequest {
-    signingKeyModel: Omit<SigningKeyModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'>;
+    signingKeyModel: Omit<SigningKeyModel, 'createdBy'|'createdDate'|'id'|'keyId'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'>;
 }
 
 export interface DeleteSigningKeyRequest {
@@ -39,7 +39,7 @@ export interface GetSigningKeyRequest {
 
 export interface UpdateSigningKeyRequest {
     id: number;
-    signingKeyModel: Omit<SigningKeyModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'>;
+    signingKeyModel: Omit<SigningKeyModel, 'createdBy'|'createdDate'|'id'|'keyId'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'>;
 }
 
 /**
