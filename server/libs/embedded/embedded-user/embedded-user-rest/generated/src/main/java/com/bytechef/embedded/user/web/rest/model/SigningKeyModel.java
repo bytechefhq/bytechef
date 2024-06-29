@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "SigningKey", description = "Contains generated public key used for signing JWT tokens.")
 @JsonTypeName("SigningKey")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-26T11:09:38.425772+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-29T08:47:23.140561+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class SigningKeyModel {
 
   private String createdBy;
@@ -36,6 +36,8 @@ public class SigningKeyModel {
   private EnvironmentModel environment;
 
   private Long id;
+
+  private String keyId;
 
   private String lastModifiedBy;
 
@@ -54,7 +56,8 @@ public class SigningKeyModel {
   /**
    * Constructor with only required parameters
    */
-  public SigningKeyModel(String name) {
+  public SigningKeyModel(String keyId, String name) {
+    this.keyId = keyId;
     this.name = name;
   }
 
@@ -136,6 +139,26 @@ public class SigningKeyModel {
 
   public void setId(Long id) {
     this.id = id;
+  }
+
+  public SigningKeyModel keyId(String keyId) {
+    this.keyId = keyId;
+    return this;
+  }
+
+  /**
+   * The id of a key used for identifying corresponding private key when validating the JWT token.
+   * @return keyId
+  */
+  
+  @Schema(name = "keyId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a key used for identifying corresponding private key when validating the JWT token.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("keyId")
+  public String getKeyId() {
+    return keyId;
+  }
+
+  public void setKeyId(String keyId) {
+    this.keyId = keyId;
   }
 
   public SigningKeyModel lastModifiedBy(String lastModifiedBy) {
@@ -231,6 +254,7 @@ public class SigningKeyModel {
         Objects.equals(this.createdDate, signingKey.createdDate) &&
         Objects.equals(this.environment, signingKey.environment) &&
         Objects.equals(this.id, signingKey.id) &&
+        Objects.equals(this.keyId, signingKey.keyId) &&
         Objects.equals(this.lastModifiedBy, signingKey.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, signingKey.lastModifiedDate) &&
         Objects.equals(this.lastUsedDate, signingKey.lastUsedDate) &&
@@ -239,7 +263,7 @@ public class SigningKeyModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, environment, id, lastModifiedBy, lastModifiedDate, lastUsedDate, name);
+    return Objects.hash(createdBy, createdDate, environment, id, keyId, lastModifiedBy, lastModifiedDate, lastUsedDate, name);
   }
 
   @Override
@@ -250,6 +274,7 @@ public class SigningKeyModel {
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    environment: ").append(toIndentedString(environment)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    keyId: ").append(toIndentedString(keyId)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    lastUsedDate: ").append(toIndentedString(lastUsedDate)).append("\n");
