@@ -1,17 +1,17 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "The Embedded Configuration by User-Token accessible API"
+  title: "The Embedded Configuration by Connected User Token accessible API"
   version: "1"
 servers:
-- url: "/api/embedded"
+- url: "/api/embedded/by-connected-user-token"
 tags:
 - name: "integration"
-  description: "The Embedded Integration API"
+  description: "The Embedded Integration by Connected User Token accessible API"
 - name: "workflow"
-  description: "The Embedded Workflow API"
+  description: "The Embedded Workflow by Connected User Token accessible API"
 paths:
-  /by-user-token/{environment}/integrations:
+  /{environment}/integrations:
     get:
       description: "Get active integrations."
       summary: "Get active configurations"

@@ -1,13 +1,13 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "The Automation User API"
+  title: "The Automation User Internal API"
   version: "1"
 servers:
-- url: "/api/automation"
+- url: "/api/automation/internal"
 tags:
   - name: "api-key"
-    description: "The Automation User API Key API"
+    description: "The Automation User API Key Internal API"
 paths:
   /api-keys:
     get:

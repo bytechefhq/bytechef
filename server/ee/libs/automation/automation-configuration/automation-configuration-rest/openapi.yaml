@@ -1,13 +1,13 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "The Automation Configuration API"
+  title: "The Automation Configuration Internal API"
   version: "1"
 servers:
-- url: "/api/automation"
+- url: "/api/automation/internal"
 tags:
 - name: "workspace"
-  description: "The Automation Workspace API"
+  description: "The Automation Workspace Internal API"
 paths:
   /users/{id}/workspaces:
     get:

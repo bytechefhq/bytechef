@@ -1,10 +1,10 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "The Platform Connection API"
+  title: "The Platform Connection Internal API"
   version: "1"
 servers:
-  - url: "/api/platform"
+  - url: "/api/platform/internal"
 paths:
   /dummy:
     get:

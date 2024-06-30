@@ -1,15 +1,15 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "The Embedded User API"
+  title: "The Embedded User Internal API"
   version: "1"
 servers:
-- url: "/api/embedded"
+- url: "/api/embedded/internal"
 tags:
   - name: "api-key"
-    description: "The Embedded User API Key API"
+    description: "The Embedded User API Key Internal API"
   - name: "signing-key"
-    description: "The Embedded User Signing Key API"
+    description: "The Embedded User Signing Key Internal API"
 paths:
   /api-keys:
     get:

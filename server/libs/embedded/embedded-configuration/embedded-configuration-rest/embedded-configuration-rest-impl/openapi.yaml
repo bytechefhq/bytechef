@@ -1,23 +1,23 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "The Embedded Configuration API"
+  title: "The Embedded Configuration Internal API"
   version: "1"
 servers:
-- url: "/api/embedded"
+- url: "/api/embedded/internal"
 tags:
 - name: "app-event"
-  description: "The Embedded App Event API"
+  description: "The Embedded App Event Internal API"
 - name: "category"
-  description: "The Embedded Category API"
+  description: "The Embedded Category Internal API"
 - name: "connected-user"
-  description: "The Embedded Connected User API"
+  description: "The Embedded Connected User Internal API"
 - name: "integration-tag"
-  description: "The Embedded Tag API"
+  description: "The Embedded Tag Internal API"
 - name: "integration"
-  description: "The Embedded Integration API"
+  description: "The Embedded Integration Internal API"
 - name: "workflow"
-  description: "The Embedded Workflow API"
+  description: "The Embedded Workflow Internal API"
 paths:
   /app-events:
     get:

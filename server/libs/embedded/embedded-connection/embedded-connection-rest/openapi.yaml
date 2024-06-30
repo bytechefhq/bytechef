@@ -1,15 +1,15 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "Project Connection API"
+  title: "The Embedded Connection Internal API"
   version: "1"
 servers:
-- url: "/api/embedded"
+- url: "/api/embedded/internal"
 tags:
 - name: "connection-tag"
-  description: "The Embedded Connection Tag API"
+  description: "The Embedded Connection Tag Internal API"
 - name: "connection"
-  description: "The Embedded Connection API"
+  description: "The Embedded Connection Internal API"
 paths:
   /connections:
     get:
