@@ -1,19 +1,19 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "Embedded API"
+  title: "The Embedded Public API"
   version: "1"
 servers:
-- url: "/api/embedded/public"
+- url: "/api/embedded"
 tags:
 - name: "action"
-  description: "The Embedded Connector Action API"
+  description: "The Embedded Connector Action Public API"
 - name: "connector"
-  description: "The Embedded Connector API"
+  description: "The Embedded Connector Public API"
 - name: "trigger"
-  description: "The Embedded Connector Trigger API"
+  description: "The Embedded Connector Trigger Public API"
 - name: "trigger-subscription"
-  description: "The Embedded Connector Trigger Subscription API"
+  description: "The Embedded Connector Trigger Subscription Public API"
 paths:
 #  /connectors:
 #    get:

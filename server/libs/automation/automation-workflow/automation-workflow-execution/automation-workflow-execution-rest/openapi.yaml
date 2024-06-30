@@ -1,13 +1,13 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "The Automation Execution API"
+  title: "The Automation Execution Internal API"
   version: "1"
 servers:
-- url: "/api/automation"
+- url: "/api/automation/internal"
 tags:
 - name: "workflow-execution"
-  description: "The Automation Workflow Execution API"
+  description: "The Automation Workflow Execution Internal API"
 paths:
   /workflow-executions:
     get:

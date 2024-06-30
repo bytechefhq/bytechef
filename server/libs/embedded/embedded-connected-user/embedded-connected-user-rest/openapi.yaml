@@ -1,13 +1,13 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "The Embedded Connected User API"
+  title: "The Embedded Connected User Internal API"
   version: "1"
 servers:
-- url: "/api/embedded"
+- url: "/api/embedded/internal"
 tags:
 - name: "connected-user"
-  description: "The Embedded Connected User API"
+  description: "The Embedded Connected User Internal API"
 paths:
   /connected-users:
     get:

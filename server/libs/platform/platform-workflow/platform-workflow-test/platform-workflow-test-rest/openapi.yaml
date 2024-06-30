@@ -1,13 +1,13 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "The Platform Workflow Test API"
+  title: "The Platform Workflow Test Internal API"
   version: "1"
 servers:
-  - url: "/api/platform"
+  - url: "/api/platform/internal"
 tags:
   - name: "workflow-test"
-    description: "The Platform Workflow Test API"
+    description: "The Platform Workflow Test Internal API"
 paths:
   /workflows/{id}/tests:
     post:

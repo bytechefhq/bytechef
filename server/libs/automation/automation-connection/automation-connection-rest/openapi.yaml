@@ -1,15 +1,15 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "The Automation Connection API"
+  title: "The Automation Connection Internal API"
   version: "1"
 servers:
-- url: "/api/automation"
+- url: "/api/automation/internal"
 tags:
 - name: "connection-tag"
-  description: "The Automation Connection Tag API"
+  description: "The Automation Connection Tag Internal API"
 - name: "connection"
-  description: "The Automation Connection API"
+  description: "The Automation Connection Internal API"
 paths:
   /connections:
     get:

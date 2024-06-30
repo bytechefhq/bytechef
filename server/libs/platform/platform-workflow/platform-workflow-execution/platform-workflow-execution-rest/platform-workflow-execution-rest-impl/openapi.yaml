@@ -1,15 +1,15 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "The Platform Workflow Execution API"
+  title: "The Platform Workflow Execution Internal API"
   version: "1"
 servers:
-- url: "/api/platform"
+- url: "/api/platform/internal"
 tags:
 - name: "job"
   description: "The Platform Workflow Job API"
 - name: "trigger-execution"
-  description: "The Platform Workflow Trigger Execution API"
+  description: "The Platform Workflow Trigger Execution Internal API"
 paths:
   /jobs:
     get:

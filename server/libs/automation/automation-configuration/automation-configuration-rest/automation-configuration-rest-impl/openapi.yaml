@@ -1,25 +1,25 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "The Automation Configuration API"
+  title: "The Automation Configuration Internal API"
   version: "1"
 servers:
-- url: "/api/automation"
+- url: "/api/automation/internal"
 tags:
 - name: "category"
   description: "The Automation Category API"
 - name: "project-instance-tag"
-  description: "The Automation Project Instance Tag API"
+  description: "The Automation Project Instance Tag Internal API"
 - name: "project-instance"
-  description: "The Automation Project Instance API"
+  description: "The Automation Project Instance Internal API"
 - name: "project-tag"
-  description: "The Automation Project Tag API"
+  description: "The Automation Project Tag Internal API"
 - name: "project"
-  description: "The Automation Project API"
+  description: "The Automation Project Internal API"
 - name: "workflow"
-  description: "The Automation Workflow API"
+  description: "The Automation Workflow Internal API"
 - name: "workspace"
-  description: "The Automation Workspace API"
+  description: "The Automation Workspace Internal API"
 paths:
   /project-instances:
     get:
