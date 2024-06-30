@@ -33,9 +33,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-26T11:09:38.387336+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-30T07:20:51.699336+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 @Validated
-@Tag(name = "action", description = "The Embedded Connector Action API")
+@Tag(name = "action", description = "The Embedded Connector Action Public API")
 public interface ActionApi {
 
     default Optional<NativeWebRequest> getRequest() {

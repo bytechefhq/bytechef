@@ -33,9 +33,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-30T06:31:39.741461+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-30T07:20:51.740212+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 @Validated
-@Tag(name = "signing-key", description = "The Embedded User Signing Key API")
+@Tag(name = "signing-key", description = "The Embedded User Signing Key Internal API")
 public interface SigningKeyApi {
 
     default Optional<NativeWebRequest> getRequest() {
