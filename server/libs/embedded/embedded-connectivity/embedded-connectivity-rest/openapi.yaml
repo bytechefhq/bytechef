@@ -1,10 +1,10 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "The Embedded Public API"
+  title: "The Embedded Public V1 API"
   version: "1"
 servers:
-- url: "/api/embedded"
+- url: "/api/embedded/v1"
 tags:
 - name: "action"
   description: "The Embedded Connector Action Public API"
