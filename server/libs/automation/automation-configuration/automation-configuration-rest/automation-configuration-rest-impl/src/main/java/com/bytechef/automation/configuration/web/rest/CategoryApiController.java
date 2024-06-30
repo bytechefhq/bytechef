@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Ivica Cardic
  */
 @RestController("com.bytechef.automation.configuration.web.rest.CategoryApiController")
-@RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
+@RequestMapping("${openapi.openAPIDefinition.base-path.automation:}/internal")
 @ConditionalOnEndpoint
 public class CategoryApiController implements CategoryApi {
 

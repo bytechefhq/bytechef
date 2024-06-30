@@ -42,7 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Ivica Cardic
  */
 @RestController("com.bytechef.embedded.configuration.web.rest.WorkflowApiController")
-@RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}")
+@RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/internal")
 @ConditionalOnEndpoint
 public class WorkflowApiController implements WorkflowApi {
 

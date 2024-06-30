@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/public")
+@RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}")
 @ConditionalOnEndpoint
 public class ActionApiController implements ActionApi {
 

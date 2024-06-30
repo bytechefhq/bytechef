@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}")
+@RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/internal")
 @ConditionalOnEndpoint
 public class IntegrationTagApiController implements IntegrationTagApi {
 

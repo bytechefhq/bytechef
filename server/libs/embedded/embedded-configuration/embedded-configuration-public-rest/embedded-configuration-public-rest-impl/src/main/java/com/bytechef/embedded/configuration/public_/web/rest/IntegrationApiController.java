@@ -31,16 +31,16 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @author Ivica Cardic
  */
-@RestController
+@RestController("com.bytechef.embedded.configuration.public_.web.rest.IntegrationApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}")
 @ConditionalOnEndpoint
-public class PublicIntegrationApiController implements IntegrationApi {
+public class IntegrationApiController implements IntegrationApi {
 
     private final ConversionService conversionService;
     private final IntegrationFacade integrationFacade;
 
     @SuppressFBWarnings("EI")
-    public PublicIntegrationApiController(ConversionService conversionService, IntegrationFacade integrationFacade) {
+    public IntegrationApiController(ConversionService conversionService, IntegrationFacade integrationFacade) {
         this.conversionService = conversionService;
         this.integrationFacade = integrationFacade;
     }
