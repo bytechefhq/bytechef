@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Ivica Cardic
  */
 @RestController("com.bytechef.embedded.connection.web.rest.ConnectionTagApiController")
-@RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}")
+@RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/internal")
 @ConditionalOnEndpoint
 public class ConnectionTagApiController implements ConnectionTagApi {
 

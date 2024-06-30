@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path.platform:}")
+@RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
 @ConditionalOnEndpoint
 public class ComponentDefinitionApiController implements ComponentDefinitionApi {
 

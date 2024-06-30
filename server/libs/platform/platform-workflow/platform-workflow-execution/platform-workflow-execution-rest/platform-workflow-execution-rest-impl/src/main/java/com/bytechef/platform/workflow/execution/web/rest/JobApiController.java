@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path.core:}")
+@RequestMapping("${openapi.openAPIDefinition.base-path.core:}/internal")
 @ConditionalOnEndpoint
 public class JobApiController implements JobApi {
 
