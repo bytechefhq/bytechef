@@ -33,9 +33,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-30T07:20:53.279792+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-30T21:13:45.595507+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 @Validated
-@Tag(name = "integration", description = "The Embedded Integration Internal API")
+@Tag(name = "integration", description = "The Embedded Integration Public API")
 public interface IntegrationApi {
 
     default Optional<NativeWebRequest> getRequest() {
@@ -43,7 +43,7 @@ public interface IntegrationApi {
     }
 
     /**
-     * GET /public/{environment}/integrations : Get active configurations
+     * GET /{environment}/integrations : Get active configurations
      * Get active integrations.
      *
      * @param environment The environment. (required)
@@ -62,7 +62,7 @@ public interface IntegrationApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/public/{environment}/integrations",
+        value = "/{environment}/integrations",
         produces = { "application/json" }
     )
     
