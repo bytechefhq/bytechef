@@ -7,7 +7,7 @@ servers:
 - url: "/api/automation"
 tags:
   - name: "api-key"
-    description: "The Automation API Key API"
+    description: "The Automation User API Key API"
 paths:
   /api-keys:
     get:

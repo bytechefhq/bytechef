@@ -7,9 +7,9 @@ servers:
 - url: "/api/embedded"
 tags:
   - name: "api-key"
-    description: "The Embedded API Key API"
+    description: "The Embedded User API Key API"
   - name: "signing-key"
-    description: "The Embedded Signing Key API"
+    description: "The Embedded User Signing Key API"
 paths:
   /api-keys:
     get:
