@@ -7,9 +7,10 @@ dependencies {
     implementation("org.springframework:spring-context-support")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.data:spring-data-jdbc")
-    implementation("org.springframework.security:spring-security-core")
+    implementation("org.springframework.security:spring-security-crypto")
     implementation("org.thymeleaf:thymeleaf-spring6")
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-security:platform-security-api"))
 
     testImplementation("org.springframework.boot:spring-boot-starter-mail")
