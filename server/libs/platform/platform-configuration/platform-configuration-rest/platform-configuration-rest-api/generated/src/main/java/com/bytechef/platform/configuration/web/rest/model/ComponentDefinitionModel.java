@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinition", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-26T23:39:11.255305+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-30T07:20:54.243996+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class ComponentDefinitionModel {
 
   @Valid

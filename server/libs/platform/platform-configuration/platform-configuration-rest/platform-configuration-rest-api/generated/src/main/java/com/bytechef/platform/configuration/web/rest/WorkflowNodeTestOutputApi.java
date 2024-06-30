@@ -32,9 +32,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-26T23:39:11.255305+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-30T07:20:54.243996+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 @Validated
-@Tag(name = "workflow-node-test-output", description = "The Platform Workflow Node Test Output API")
+@Tag(name = "workflow-node-test-output", description = "The Platform Workflow Node Test Output Internal API")
 public interface WorkflowNodeTestOutputApi {
 
     default Optional<NativeWebRequest> getRequest() {

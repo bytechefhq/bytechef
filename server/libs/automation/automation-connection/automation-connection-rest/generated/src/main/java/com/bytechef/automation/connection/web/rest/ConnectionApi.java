@@ -31,9 +31,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-26T11:09:37.823963+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-30T07:20:51.114650+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 @Validated
-@Tag(name = "connection", description = "The Automation Connection API")
+@Tag(name = "connection", description = "The Automation Connection Internal API")
 public interface ConnectionApi {
 
     default Optional<NativeWebRequest> getRequest() {
