@@ -1,17 +1,17 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "The Embedded Configuration Internal API"
+  title: "The Embedded Configuration Public V1 API"
   version: "1"
 servers:
-- url: "/api/embedded/internal"
+- url: "/api/embedded/v1"
 tags:
 - name: "integration"
-  description: "The Embedded Integration Internal API"
+  description: "The Embedded Integration Public API"
 - name: "workflow"
-  description: "The Embedded Workflow Internal API"
+  description: "The Embedded Workflow Public API"
 paths:
-  /public/{environment}/integrations:
+  /{environment}/integrations:
     get:
       description: "Get active integrations."
       summary: "Get active configurations"
