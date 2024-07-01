@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.user.web.rest.mapper;
+package com.bytechef.platform.user.web.rest;
 
-import com.bytechef.automation.user.web.rest.mapper.config.AutomationUserMapperSpringConfig;
-import com.bytechef.automation.user.web.rest.model.ApiKeyModel;
-import com.bytechef.platform.user.domain.ApiKey;
+import com.bytechef.platform.user.domain.SigningKey;
+import com.bytechef.platform.user.web.rest.config.PlatformUserMapperSpringConfig;
+import com.bytechef.platform.user.web.rest.model.SigningKeyModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
@@ -26,11 +26,12 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = AutomationUserMapperSpringConfig.class, implementationName = "Automation<CLASS_NAME>Impl")
-public interface ApiKeyModelMapper extends Converter<ApiKeyModel, ApiKey> {
+@Mapper(config = PlatformUserMapperSpringConfig.class)
+public interface SigningKeyModelMapper extends Converter<SigningKeyModel, SigningKey> {
 
     @Override
+    @Mapping(target = "publicKey", ignore = true)
     @Mapping(target = "type", ignore = true)
     @Mapping(target = "userId", ignore = true)
-    ApiKey convert(ApiKeyModel apiKeyModel);
+    SigningKey convert(SigningKeyModel signingKeyModel);
 }

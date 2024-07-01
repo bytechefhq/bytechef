@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
-package com.bytechef.embedded.user.web.rest.mapper.config;
+package com.bytechef.platform.user.web.rest;
 
-import com.bytechef.embedded.user.web.rest.adapter.EmbeddedUserConversionServiceAdapter;
-import org.mapstruct.MapperConfig;
-import org.mapstruct.extensions.spring.SpringMapperConfig;
+import com.bytechef.platform.user.domain.SigningKey;
+import com.bytechef.platform.user.web.rest.config.PlatformUserMapperSpringConfig;
+import com.bytechef.platform.user.web.rest.model.SigningKeyModel;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
-@MapperConfig(componentModel = "spring", uses = EmbeddedUserConversionServiceAdapter.class)
-@SpringMapperConfig(
-    conversionServiceAdapterPackage = "com.bytechef.embedded.user.web.rest.adapter",
-    conversionServiceAdapterClassName = "EmbeddedUserConversionServiceAdapter")
-public interface EmbeddedUserMapperSpringConfig {
+@Mapper(config = PlatformUserMapperSpringConfig.class)
+public interface SigningKeyMapper extends Converter<SigningKey, SigningKeyModel> {
+
+    @Override
+    @Mapping(target = "keyId", ignore = true)
+    SigningKeyModel convert(SigningKey signingKey);
 }
