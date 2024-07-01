@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-30T07:20:52.185585+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-01T06:30:41.744529+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 @Validated
 @Tag(name = "workspace", description = "The Automation Workspace Internal API")
 public interface WorkspaceApi {
@@ -197,7 +197,7 @@ public interface WorkspaceApi {
      * GET /workspaces : Get workspaces
      * Get workspaces.
      *
-     * @return A list of workspaces. (status code 200)
+     * @return The list of workspaces. (status code 200)
      */
     @Operation(
         operationId = "getWorkspaces",
@@ -205,7 +205,7 @@ public interface WorkspaceApi {
         description = "Get workspaces.",
         tags = { "workspace" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "A list of workspaces.", content = {
+            @ApiResponse(responseCode = "200", description = "The list of workspaces.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = com.bytechef.automation.configuration.web.rest.model.WorkspaceModel.class)))
             })
         }

@@ -6,7 +6,6 @@
 package com.bytechef.embedded.user.web.rest;
 
 import com.bytechef.embedded.user.web.rest.model.CreateSigningKey200ResponseModel;
-import com.bytechef.embedded.user.web.rest.model.SigningKeyModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-30T07:20:51.740212+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-01T06:30:41.644913+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 @Validated
 @Tag(name = "signing-key", description = "The Embedded User Signing Key Internal API")
 public interface SigningKeyApi {
@@ -46,7 +45,7 @@ public interface SigningKeyApi {
      * POST /signing-keys : Create a new Signing key
      * Create a new Signing key.
      *
-     * @param signingKeyModel  (required)
+     * @param comBytechefPlatformUserWebRestModelSigningKeyModel  (required)
      * @return The Signing key object. (status code 200)
      */
     @Operation(
@@ -68,7 +67,7 @@ public interface SigningKeyApi {
     )
     
     default ResponseEntity<CreateSigningKey200ResponseModel> createSigningKey(
-        @Parameter(name = "SigningKeyModel", description = "", required = true) @Valid @RequestBody SigningKeyModel signingKeyModel
+        @Parameter(name = "com.bytechef.platform.user.web.rest.model.SigningKeyModel", description = "", required = true) @Valid @RequestBody com.bytechef.platform.user.web.rest.model.SigningKeyModel comBytechefPlatformUserWebRestModelSigningKeyModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
@@ -127,7 +126,7 @@ public interface SigningKeyApi {
         tags = { "signing-key" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The Signing key object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = SigningKeyModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = com.bytechef.platform.user.web.rest.model.SigningKeyModel.class))
             })
         }
     )
@@ -137,7 +136,7 @@ public interface SigningKeyApi {
         produces = { "application/json" }
     )
     
-    default ResponseEntity<SigningKeyModel> getSigningKey(
+    default ResponseEntity<com.bytechef.platform.user.web.rest.model.SigningKeyModel> getSigningKey(
         @Parameter(name = "id", description = "The id of an Signing key.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
         getRequest().ifPresent(request -> {
@@ -158,7 +157,7 @@ public interface SigningKeyApi {
      * GET /signing-keys : Get Signing keys
      * Get Signing keys.
      *
-     * @return A list of Signing keys. (status code 200)
+     * @return The list of Signing keys. (status code 200)
      */
     @Operation(
         operationId = "getSigningKeys",
@@ -166,8 +165,8 @@ public interface SigningKeyApi {
         description = "Get Signing keys.",
         tags = { "signing-key" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "A list of Signing keys.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = SigningKeyModel.class)))
+            @ApiResponse(responseCode = "200", description = "The list of Signing keys.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = com.bytechef.platform.user.web.rest.model.SigningKeyModel.class)))
             })
         }
     )
@@ -177,7 +176,7 @@ public interface SigningKeyApi {
         produces = { "application/json" }
     )
     
-    default ResponseEntity<List<SigningKeyModel>> getSigningKeys(
+    default ResponseEntity<List<com.bytechef.platform.user.web.rest.model.SigningKeyModel>> getSigningKeys(
         
     ) {
         getRequest().ifPresent(request -> {
@@ -199,7 +198,7 @@ public interface SigningKeyApi {
      * Update an existing Signing key.
      *
      * @param id The id of an Signing key. (required)
-     * @param signingKeyModel  (required)
+     * @param comBytechefPlatformUserWebRestModelSigningKeyModel  (required)
      * @return The updated Signing key object. (status code 200)
      */
     @Operation(
@@ -209,7 +208,7 @@ public interface SigningKeyApi {
         tags = { "signing-key" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated Signing key object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = SigningKeyModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = com.bytechef.platform.user.web.rest.model.SigningKeyModel.class))
             })
         }
     )
@@ -220,9 +219,9 @@ public interface SigningKeyApi {
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<SigningKeyModel> updateSigningKey(
+    default ResponseEntity<com.bytechef.platform.user.web.rest.model.SigningKeyModel> updateSigningKey(
         @Parameter(name = "id", description = "The id of an Signing key.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "SigningKeyModel", description = "", required = true) @Valid @RequestBody SigningKeyModel signingKeyModel
+        @Parameter(name = "com.bytechef.platform.user.web.rest.model.SigningKeyModel", description = "", required = true) @Valid @RequestBody com.bytechef.platform.user.web.rest.model.SigningKeyModel comBytechefPlatformUserWebRestModelSigningKeyModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

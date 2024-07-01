@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-30T07:20:53.361037+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-01T06:30:41.926363+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 @Validated
 @Tag(name = "integration-instance-configuration-tag", description = "the integration-instance-configuration-tag API")
 public interface IntegrationInstanceConfigurationTagApi {
@@ -46,7 +46,7 @@ public interface IntegrationInstanceConfigurationTagApi {
      * GET /integration-instance-configurations/tags : Get integration instance configuration tags
      * Get integration instance configuration tags.
      *
-     * @return A list of integration instance configuration tags. (status code 200)
+     * @return The list of integration instance configuration tags. (status code 200)
      */
     @Operation(
         operationId = "getIntegrationInstanceConfigurationTags",
@@ -54,7 +54,7 @@ public interface IntegrationInstanceConfigurationTagApi {
         description = "Get integration instance configuration tags.",
         tags = { "integration-instance-configuration-tag" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "A list of integration instance configuration tags.", content = {
+            @ApiResponse(responseCode = "200", description = "The list of integration instance configuration tags.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = TagModel.class)))
             })
         }

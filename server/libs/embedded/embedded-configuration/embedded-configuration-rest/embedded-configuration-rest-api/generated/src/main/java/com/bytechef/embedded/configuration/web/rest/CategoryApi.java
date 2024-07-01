@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-30T07:20:53.361037+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-01T06:30:41.926363+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 @Validated
 @Tag(name = "category", description = "The Embedded Category Internal API")
 public interface CategoryApi {
@@ -45,7 +45,7 @@ public interface CategoryApi {
      * GET /integrations/categories : Get integration categories
      * Get integration categories.
      *
-     * @return A list of categories. (status code 200)
+     * @return The list of categories. (status code 200)
      */
     @Operation(
         operationId = "getIntegrationCategories",
@@ -53,7 +53,7 @@ public interface CategoryApi {
         description = "Get integration categories.",
         tags = { "category" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "A list of categories.", content = {
+            @ApiResponse(responseCode = "200", description = "The list of categories.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = CategoryModel.class)))
             })
         }
