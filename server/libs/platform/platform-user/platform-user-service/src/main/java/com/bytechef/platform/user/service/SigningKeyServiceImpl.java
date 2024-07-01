@@ -70,15 +70,13 @@ public class SigningKeyServiceImpl implements SigningKeyService {
         Validate.notNull(signingKey, "'signingKey' must not be null");
         Validate.isTrue(signingKey.getId() == null, "'id' must be null");
         Validate.notNull(signingKey.getName(), "'name' must not be null");
+        Validate.notNull(signingKey.getType(), "'type' must not be null");
 
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
 
         PublicKey publicKey = keyPair.getPublic();
 
         signingKey.setPublicKey(keyToPublicString(publicKey));
-
-        // TODO
-        signingKey.setUserId(1050L);
 
         signingKeyRepository.save(signingKey);
 

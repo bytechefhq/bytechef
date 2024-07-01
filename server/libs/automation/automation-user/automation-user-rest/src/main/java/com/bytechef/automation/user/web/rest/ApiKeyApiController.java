@@ -22,6 +22,7 @@ import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.user.domain.ApiKey;
+import com.bytechef.platform.user.facade.ApiKeyFacade;
 import com.bytechef.platform.user.service.ApiKeyService;
 import com.bytechef.platform.user.web.rest.model.ApiKeyModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -39,11 +40,15 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnEndpoint
 public class ApiKeyApiController implements ApiKeyApi {
 
+    private final ApiKeyFacade apiKeyFacade;
     private final ApiKeyService apiKeyService;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
-    public ApiKeyApiController(ApiKeyService apiKeyService, ConversionService conversionService) {
+    public ApiKeyApiController(
+        ApiKeyFacade apiKeyFacade, ApiKeyService apiKeyService, ConversionService conversionService) {
+
+        this.apiKeyFacade = apiKeyFacade;
         this.apiKeyService = apiKeyService;
         this.conversionService = conversionService;
     }
@@ -51,11 +56,9 @@ public class ApiKeyApiController implements ApiKeyApi {
     @Override
     @SuppressFBWarnings("NP")
     public ResponseEntity<CreateApiKey200ResponseModel> createApiKey(ApiKeyModel appEventModel) {
-        ApiKey apiKey = conversionService.convert(appEventModel, ApiKey.class);
-
-        apiKey.setType(AppType.AUTOMATION);
-
-        return ResponseEntity.ok(new CreateApiKey200ResponseModel().secretKey(apiKeyService.create(apiKey)));
+        return ResponseEntity.ok(
+            new CreateApiKey200ResponseModel().secretKey(
+                apiKeyFacade.create(conversionService.convert(appEventModel, ApiKey.class), AppType.AUTOMATION)));
     }
 
     @Override

@@ -17,6 +17,7 @@
 package com.bytechef.platform.user.service;
 
 import com.bytechef.commons.util.LocalDateTimeUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.user.constant.AuthorityConstants;
@@ -393,6 +394,11 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public Page<User> getAllManagedUsers(Pageable pageable) {
         return userRepository.findAll(pageable);
+    }
+
+    @Override
+    public User getCurrentUser() {
+        return OptionalUtils.get(fetchCurrentUser());
     }
 
     @Override

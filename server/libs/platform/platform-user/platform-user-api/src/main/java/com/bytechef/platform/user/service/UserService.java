@@ -49,6 +49,8 @@ public interface UserService {
 
     Page<User> getAllManagedUsers(Pageable pageable);
 
+    User getCurrentUser();
+
     User getUser(long id);
 
     void saveUser(User user);

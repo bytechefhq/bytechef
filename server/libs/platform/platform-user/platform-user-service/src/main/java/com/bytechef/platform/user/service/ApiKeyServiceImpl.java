@@ -47,11 +47,9 @@ public class ApiKeyServiceImpl implements ApiKeyService {
         Validate.notNull(apiKey, "'apiKey' must not be null");
         Validate.isTrue(apiKey.getId() == null, "'id' must be null");
         Validate.notNull(apiKey.getName(), "'name' must not be null");
+        Validate.notNull(apiKey.getType(), "'type' must not be null");
 
         apiKey.setSecretKey(generateSecretKey());
-
-        // TODO
-        apiKey.setUserId(1050L);
 
         apiKey = apiKeyRepository.save(apiKey);
 
