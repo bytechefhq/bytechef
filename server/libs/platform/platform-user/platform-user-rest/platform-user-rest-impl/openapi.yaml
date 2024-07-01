@@ -1,0 +1,131 @@
+---
+openapi: "3.0.1"
+info:
+  title: "The Platform User Internal API"
+  version: "1"
+servers:
+- url: "/api/platform/internal"
+tags:
+  - name: "authority"
+    description: "The Platform User Authority Internal API"
+paths:
+  /authorities:
+    get:
+      description: "Get all authorities."
+      summary: "Get all authorities"
+      tags:
+        - "authority"
+      operationId: "getAuthorities"
+      responses:
+        "200":
+          description: "The list of authorities."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Authority"
+components:
+  schemas:
+    ApiKey:
+      description: "Contains generated key required for calling API."
+      type: "object"
+      required:
+        - name
+        - secretKey
+      properties:
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        environment:
+          $ref: '#/components/schemas/Environment'
+        id:
+          description: "The id of an API key."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        lastUsedDate:
+          description: "The last used date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        name:
+          description: "The name of an API key."
+          type: "string"
+        secretKey:
+          description: "The preview of secret API key."
+          type: "string"
+          readOnly: true
+    Authority:
+      description: "A user authority."
+      required:
+        - "name"
+      properties:
+        name:
+          description: "The name of an authority."
+          type: "string"
+    SigningKey:
+      description: "Contains generated public key used for signing JWT tokens."
+      type: "object"
+      required:
+        - keyId
+        - name
+      properties:
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        environment:
+          $ref: '#/components/schemas/Environment'
+        id:
+          description: "The id of a public key."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        keyId:
+          description: "The id of a key used for identifying corresponding private key when validating the JWT token."
+          type: "string"
+          readOnly: true
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        lastUsedDate:
+          description: "The last used date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        name:
+          description: "The name of a public key."
+          type: "string"
+    Environment:
+      description: "The environment of a project."
+      type: "string"
+      enum:
+        - "TEST"
+        - "PRODUCTION"
