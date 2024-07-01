@@ -82,11 +82,8 @@ public class ApiKeyApiController implements ApiKeyApi {
         return ResponseEntity.ok(
             CollectionUtils.map(
                 apiKeyService.getApiKeys(AppType.AUTOMATION),
-                apiKey -> {
-                    ApiKeyModel apiKeyModel = conversionService.convert(apiKey, ApiKeyModel.class);
-
-                    return apiKeyModel.secretKey(obfuscate(apiKeyModel.getSecretKey()));
-                }));
+                apiKey -> conversionService.convert(apiKey, ApiKeyModel.class)
+                    .secretKey(obfuscate(apiKey.getSecretKey()))));
     }
 
     @Override
@@ -99,6 +96,6 @@ public class ApiKeyApiController implements ApiKeyApi {
     }
 
     private static String obfuscate(String secretKey) {
-        return StringUtils.obfuscate(secretKey, 28, 4);
+        return StringUtils.obfuscate(secretKey, 26, 6);
     }
 }

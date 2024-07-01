@@ -16,14 +16,14 @@
 
 package com.bytechef.platform.user.service;
 
-import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.user.domain.ApiKey;
+import com.bytechef.platform.user.domain.ApiKey.TenantSecretKey;
 import com.bytechef.platform.user.repository.ApiKeyRepository;
 import java.util.List;
+import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -49,19 +49,11 @@ public class ApiKeyServiceImpl implements ApiKeyService {
         Validate.notNull(apiKey.getName(), "'name' must not be null");
         Validate.notNull(apiKey.getType(), "'type' must not be null");
 
-        apiKey.setSecretKey(generateSecretKey());
+        apiKey.setSecretKey(String.valueOf(TenantSecretKey.of()));
 
         apiKey = apiKeyRepository.save(apiKey);
 
         return apiKey.getSecretKey();
-    }
-
-    private String generateSecretKey() {
-        byte[] token = new byte[32];
-
-        RandomUtils.nextBytes(token);
-
-        return EncodingUtils.encodeToString(token);
     }
 
     @Override
@@ -70,9 +62,8 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     }
 
     @Override
-    public boolean hasApiKey(String secretKey, Environment environment) {
-        return apiKeyRepository.findBySecretKeyAndEnvironment(secretKey, environment.ordinal())
-            .isPresent();
+    public Optional<ApiKey> fetchApiKey(Environment environment, String secretKey) {
+        return apiKeyRepository.findByEnvironmentAndSecretKey(environment.ordinal(), secretKey);
     }
 
     @Override

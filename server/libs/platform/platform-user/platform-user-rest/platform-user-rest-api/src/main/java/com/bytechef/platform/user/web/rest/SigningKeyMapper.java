@@ -20,7 +20,6 @@ import com.bytechef.platform.user.domain.SigningKey;
 import com.bytechef.platform.user.web.rest.config.PlatformUserMapperSpringConfig;
 import com.bytechef.platform.user.web.rest.model.SigningKeyModel;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -30,6 +29,5 @@ import org.springframework.core.convert.converter.Converter;
 public interface SigningKeyMapper extends Converter<SigningKey, SigningKeyModel> {
 
     @Override
-    @Mapping(target = "keyId", ignore = true)
     SigningKeyModel convert(SigningKey signingKey);
 }

@@ -20,6 +20,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.user.domain.SigningKey;
+import com.bytechef.platform.user.domain.SigningKey.TenantKeyId;
 import com.bytechef.platform.user.repository.SigningKeyRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.security.KeyFactory;
@@ -74,6 +75,8 @@ public class SigningKeyServiceImpl implements SigningKeyService {
 
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
 
+        signingKey.setKeyId(String.valueOf(TenantKeyId.of()));
+
         PublicKey publicKey = keyPair.getPublic();
 
         signingKey.setPublicKey(keyToPublicString(publicKey));
@@ -99,8 +102,9 @@ public class SigningKeyServiceImpl implements SigningKeyService {
     }
 
     @Override
-    public PublicKey getPublicKey(Environment environment) {
-        SigningKey signingKey = OptionalUtils.get(signingKeyRepository.findByEnvironment(environment.ordinal()));
+    public PublicKey getPublicKey(String keyId, Environment environment) {
+        SigningKey signingKey = OptionalUtils.get(signingKeyRepository.findByKeyIdAndEnvironment(
+            keyId, environment.ordinal()));
 
         return stringToPublicKey(signingKey.getPublicKey());
     }

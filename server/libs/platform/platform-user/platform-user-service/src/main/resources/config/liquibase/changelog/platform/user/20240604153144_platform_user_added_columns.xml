@@ -4,6 +4,12 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
     <changeSet id="20240604153144" author="Ivica Cardic">
+        <addColumn tableName="signing_key">
+            <column name="key_id" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
        <addColumn tableName="signing_key">
            <column name="type" type="INT">
                <constraints nullable="false"/>

@@ -14,29 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.user.service;
+package com.bytechef.platform.security.web.authentication;
 
-import com.bytechef.platform.constant.AppType;
-import com.bytechef.platform.constant.Environment;
-import com.bytechef.platform.user.domain.ApiKey;
-import java.util.List;
-import java.util.Optional;
-import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.AuthenticationProvider;
 
 /**
  * @author Ivica Cardic
  */
-public interface ApiKeyService {
+public interface AuthenticationProviderContributor {
 
-    String create(@NonNull ApiKey apiKey);
-
-    void delete(long id);
-
-    Optional<ApiKey> fetchApiKey(Environment environment, String secretKey);
-
-    ApiKey getApiKey(long id);
-
-    List<ApiKey> getApiKeys(AppType type);
-
-    ApiKey update(@NonNull ApiKey apiKey);
+    AuthenticationProvider getAuthenticationProvider();
 }

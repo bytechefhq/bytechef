@@ -17,13 +17,14 @@
 package com.bytechef.platform.security.web.filter;
 
 import jakarta.servlet.Filter;
+import org.springframework.security.authentication.AuthenticationManager;
 
 /**
  * @author Ivica Cardic
  */
 public interface FilterBeforeContributor {
 
-    Filter getFilter();
+    Filter getFilter(AuthenticationManager authenticationManager);
 
     Class<? extends Filter> getBeforeFilter();
 }

@@ -17,6 +17,7 @@
 package com.bytechef.embedded.user.web.rest;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.StringUtils;
 import com.bytechef.embedded.user.web.rest.model.CreateApiKey200ResponseModel;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.constant.AppType;
@@ -73,7 +74,7 @@ public class ApiKeyApiController implements ApiKeyApi {
     public ResponseEntity<ApiKeyModel> getApiKey(Long id) {
         ApiKeyModel apiKeyModel = conversionService.convert(apiKeyService.getApiKey(id), ApiKeyModel.class);
 
-        return ResponseEntity.ok(apiKeyModel.secretKey(abbreviateSecretKey(apiKeyModel.getSecretKey())));
+        return ResponseEntity.ok(apiKeyModel.secretKey(obfuscate(apiKeyModel.getSecretKey())));
     }
 
     @Override
@@ -81,11 +82,8 @@ public class ApiKeyApiController implements ApiKeyApi {
         return ResponseEntity.ok(
             CollectionUtils.map(
                 apiKeyService.getApiKeys(AppType.EMBEDDED),
-                apiKey -> {
-                    ApiKeyModel apiKeyModel = conversionService.convert(apiKey, ApiKeyModel.class);
-
-                    return apiKeyModel.secretKey(abbreviateSecretKey(apiKeyModel.getSecretKey()));
-                }));
+                apiKey -> conversionService.convert(apiKey, ApiKeyModel.class)
+                    .secretKey(obfuscate(apiKey.getSecretKey()))));
     }
 
     @Override
@@ -97,7 +95,7 @@ public class ApiKeyApiController implements ApiKeyApi {
                 ApiKeyModel.class));
     }
 
-    private String abbreviateSecretKey(String secretKey) {
-        return ".".repeat(28) + secretKey.substring(secretKey.length() - 4);
+    private static String obfuscate(String secretKey) {
+        return StringUtils.obfuscate(secretKey, 26, 6);
     }
 }

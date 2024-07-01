@@ -14,41 +14,37 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.user.facade;
+package com.bytechef.embedded.security.authentication;
 
-import com.bytechef.platform.constant.AppType;
-import com.bytechef.platform.user.domain.ApiKey;
-import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.security.web.authentication.AuthenticationProviderContributor;
 import com.bytechef.platform.user.service.ApiKeyService;
+import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-@Service
-@Transactional
-public class ApiKeyFacadeImpl implements ApiKeyFacade {
+@Component
+public class ApiKeyAuthenticationProviderContributor implements AuthenticationProviderContributor {
 
     private final ApiKeyService apiKeyService;
+    private final AuthorityService authorityService;
     private final UserService userService;
 
     @SuppressFBWarnings("EI")
-    public ApiKeyFacadeImpl(ApiKeyService apiKeyService, UserService userService) {
+    public ApiKeyAuthenticationProviderContributor(
+        ApiKeyService apiKeyService, AuthorityService authorityService, UserService userService) {
+
         this.apiKeyService = apiKeyService;
+        this.authorityService = authorityService;
         this.userService = userService;
     }
 
     @Override
-    public String create(@NonNull ApiKey apiKey, @NonNull AppType type) {
-        User user = userService.getCurrentUser();
-
-        apiKey.setType(type);
-        apiKey.setUserId(user.getId());
-
-        return apiKeyService.create(apiKey);
+    public AuthenticationProvider getAuthenticationProvider() {
+        return new ApiKeyAuthenticationProvider(apiKeyService, authorityService, userService);
     }
 }

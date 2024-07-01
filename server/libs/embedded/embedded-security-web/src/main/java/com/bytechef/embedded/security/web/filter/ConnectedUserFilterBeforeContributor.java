@@ -16,11 +16,11 @@
 
 package com.bytechef.embedded.security.web.filter;
 
-import com.bytechef.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.security.web.filter.FilterBeforeContributor;
 import com.bytechef.platform.user.service.SigningKeyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.Filter;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.stereotype.Component;
 
@@ -30,20 +30,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class ConnectedUserFilterBeforeContributor implements FilterBeforeContributor {
 
-    private final ConnectedUserAuthenticationFilter connectedUserAuthenticationFilter;
+    private final SigningKeyService signingKeyService;
 
     @SuppressFBWarnings("EI")
-    public ConnectedUserFilterBeforeContributor(
-        ConnectedUserService connectedUserService, SigningKeyService signingKeyService) {
-
-        this.connectedUserAuthenticationFilter = new ConnectedUserAuthenticationFilter(
-            connectedUserService, signingKeyService);
+    public ConnectedUserFilterBeforeContributor(SigningKeyService signingKeyService) {
+        this.signingKeyService = signingKeyService;
     }
 
     @Override
     @SuppressFBWarnings("EI")
-    public Filter getFilter() {
-        return connectedUserAuthenticationFilter;
+    public Filter getFilter(AuthenticationManager authenticationManager) {
+        return new ConnectedUserAuthenticationFilter(authenticationManager, signingKeyService);
     }
 
     @Override

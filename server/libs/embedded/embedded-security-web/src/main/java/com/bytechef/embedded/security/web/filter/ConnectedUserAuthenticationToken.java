@@ -16,23 +16,35 @@
 
 package com.bytechef.embedded.security.web.filter;
 
-import java.util.Collection;
+import com.bytechef.platform.constant.Environment;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 
 /**
  * @author Ivica Cardic
  */
 public class ConnectedUserAuthenticationToken extends AbstractAuthenticationToken {
 
-    private final String externalId;
+    private Environment environment;
+    private String externalUserId;
+    private String tenantId;
+    private User user;
 
-    public ConnectedUserAuthenticationToken(
-        String externalId, Collection<? extends GrantedAuthority> authorities) {
+    public ConnectedUserAuthenticationToken(Environment environment, String externalUserId, String tenantId) {
+        super(List.of());
 
-        super(authorities);
+        this.environment = environment;
+        this.externalUserId = externalUserId;
+        this.tenantId = tenantId;
+    }
 
-        this.externalId = externalId;
+    @SuppressFBWarnings("EI")
+    public ConnectedUserAuthenticationToken(User user) {
+        super(List.of());
+
+        this.user = user;
 
         setAuthenticated(true);
     }
@@ -42,8 +54,21 @@ public class ConnectedUserAuthenticationToken extends AbstractAuthenticationToke
         return null;
     }
 
+    public Environment getEnvironment() {
+        return environment;
+    }
+
+    public String getExternalUserId() {
+        return externalUserId;
+    }
+
     @Override
+    @SuppressFBWarnings("EI")
     public Object getPrincipal() {
-        return externalId;
+        return user;
+    }
+
+    public String getTenantId() {
+        return tenantId;
     }
 }

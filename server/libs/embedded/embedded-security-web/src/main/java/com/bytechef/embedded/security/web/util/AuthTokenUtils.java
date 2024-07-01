@@ -47,7 +47,7 @@ public class AuthTokenUtils {
             throw new BadCredentialsException("Unknown environment");
         }
 
-        return new AuthToken(token, environment);
+        return new AuthToken(token.replace("Bearer ", ""), environment);
     }
 
     public record AuthToken(String token, Environment environment) {

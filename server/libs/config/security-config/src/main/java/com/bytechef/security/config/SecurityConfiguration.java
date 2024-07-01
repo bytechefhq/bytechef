@@ -19,6 +19,7 @@ package com.bytechef.security.config;
 import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
+import com.bytechef.platform.security.web.authentication.AuthenticationProviderContributor;
 import com.bytechef.platform.security.web.filter.FilterAfterContributor;
 import com.bytechef.platform.security.web.filter.FilterBeforeContributor;
 import com.bytechef.platform.security.web.matcher.AuthenticatedRequestMatcherContributor;
@@ -34,6 +35,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
@@ -92,13 +95,32 @@ public class SecurityConfiguration {
     }
 
     @Bean
+    public AuthenticationManager authenticationManager(
+        HttpSecurity http, List<AuthenticationProviderContributor> authenticationProviderContributors)
+        throws Exception {
+
+        AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(
+            AuthenticationManagerBuilder.class);
+
+        for (AuthenticationProviderContributor authenticationProviderContributor : authenticationProviderContributors) {
+            http.authenticationProvider(authenticationProviderContributor.getAuthenticationProvider());
+        }
+
+        return authenticationManagerBuilder.build();
+    }
+
+    @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, MvcRequestMatcher.Builder mvc) throws Exception {
+    public SecurityFilterChain filterChain(
+        HttpSecurity http, MvcRequestMatcher.Builder mvc, AuthenticationManager authenticationManager)
+        throws Exception {
+
         http
+            .authenticationManager(authenticationManager)
             .cors(withDefaults())
             .csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
@@ -106,7 +128,8 @@ public class SecurityConfiguration {
                 .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler()));
 
         for (FilterBeforeContributor filterBeforeContributor : filterBeforeContributors) {
-            http.addFilterAfter(filterBeforeContributor.getFilter(), filterBeforeContributor.getBeforeFilter());
+            http.addFilterBefore(
+                filterBeforeContributor.getFilter(authenticationManager), filterBeforeContributor.getBeforeFilter());
         }
 
         http.addFilterAfter(new SpaWebFilter(), BasicAuthenticationFilter.class)
