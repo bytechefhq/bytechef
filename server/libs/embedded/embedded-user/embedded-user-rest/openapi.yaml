@@ -20,7 +20,7 @@ paths:
       operationId: "getApiKeys"
       responses:
         "200":
-          description: "A list of API keys."
+          description: "The list of API keys."
           content:
             application/json:
               schema:
@@ -125,7 +125,7 @@ paths:
       operationId: "getSigningKeys"
       responses:
         "200":
-          description: "A list of Signing keys."
+          description: "The list of Signing keys."
           content:
             application/json:
               schema:

@@ -27,7 +27,7 @@ paths:
             $ref: '../embedded-configuration-public-rest/embedded-configuration-public-rest-impl/openapi.yaml#/components/schemas/Environment'
       responses:
         "200":
-          description: "A list of active integrations."
+          description: "The list of active integrations."
           content:
             application/json:
               schema:

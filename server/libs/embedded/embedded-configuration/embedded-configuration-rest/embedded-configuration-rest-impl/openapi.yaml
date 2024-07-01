@@ -28,7 +28,7 @@ paths:
       operationId: "getAppEvents"
       responses:
         "200":
-          description: "A list of app events."
+          description: "The list of app events."
           content:
             application/json:
               schema:
@@ -129,7 +129,7 @@ paths:
       operationId: "getIntegrationInstanceConfigurationTags"
       responses:
         "200":
-          description: "A list of integration instance configuration tags."
+          description: "The list of integration instance configuration tags."
           content:
             application/json:
               schema:
@@ -167,7 +167,7 @@ paths:
             format: "int64"
       responses:
         "200":
-          description: "A list of integration instance configurations."
+          description: "The list of integration instance configurations."
           content:
             application/json:
               schema:
@@ -429,7 +429,7 @@ paths:
 #            format: "int64"
 #      responses:
 #        "200":
-#          description: "A list of integration instances."
+#          description: "The list of integration instances."
 #          content:
 #            application/json:
 #              schema:
@@ -565,7 +565,7 @@ paths:
           $ref: '#/components/schemas/IntegrationStatus'
       responses:
         "200":
-          description: "A list of integrations."
+          description: "The list of integrations."
           content:
             application/json:
               schema:
@@ -600,7 +600,7 @@ paths:
       operationId: "getIntegrationCategories"
       responses:
         "200":
-          description: "A list of categories."
+          description: "The list of categories."
           content:
             application/json:
               schema:
@@ -617,7 +617,7 @@ paths:
       operationId: "getIntegrationTags"
       responses:
         "200":
-          description: "A list of integration tags."
+          description: "The list of integration tags."
           content:
             application/json:
               schema:

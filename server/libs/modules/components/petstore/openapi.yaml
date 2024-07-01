@@ -728,7 +728,7 @@ components:
           schema:
             $ref: "#/components/schemas/Pet"
     UserArray:
-      description: "A list of user objects"
+      description: "The list of user objects"
       content:
         application/json:
           schema:

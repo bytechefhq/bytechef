@@ -305,7 +305,7 @@ paths:
                     description: "The list id."
                     type: "string"
                   _links:
-                    description: "A list of link types and descriptions for the API\
+                    description: "The list of link types and descriptions for the API\
                       \ schema documents."
                     type: "array"
                     items:

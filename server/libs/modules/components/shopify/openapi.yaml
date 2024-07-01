@@ -23,7 +23,7 @@ paths:
                   type: "object"
                   properties:
                     line_items:
-                      description: "A list of line item objects, each containing information about an item in the order."
+                      description: "The list of line item objects, each containing information about an item in the order."
                       type: "array"
                       items:
                         type: "object"

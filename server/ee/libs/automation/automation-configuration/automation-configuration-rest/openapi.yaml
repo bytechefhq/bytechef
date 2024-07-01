@@ -42,7 +42,7 @@ paths:
       operationId: "getWorkspaces"
       responses:
         "200":
-          description: "A list of workspaces."
+          description: "The list of workspaces."
           content:
             application/json:
               schema:
