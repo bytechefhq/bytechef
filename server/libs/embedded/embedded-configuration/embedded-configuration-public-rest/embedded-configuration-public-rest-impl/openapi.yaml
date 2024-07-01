@@ -27,7 +27,7 @@ paths:
             $ref: '#/components/schemas/Environment'
       responses:
         "200":
-          description: "A list of active integrations."
+          description: "The list of active integrations."
           content:
             application/json:
               schema:

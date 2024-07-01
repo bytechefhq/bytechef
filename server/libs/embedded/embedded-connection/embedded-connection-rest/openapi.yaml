@@ -46,7 +46,7 @@ paths:
           format: "int64"
       responses:
         "200":
-          description: "A list of connections."
+          description: "The list of connections."
           content:
             application/json:
               schema:
@@ -81,7 +81,7 @@ paths:
       operationId: "getConnectionTags"
       responses:
         "200":
-          description: "A list of connection tags."
+          description: "The list of connection tags."
           content:
             application/json:
               schema:
