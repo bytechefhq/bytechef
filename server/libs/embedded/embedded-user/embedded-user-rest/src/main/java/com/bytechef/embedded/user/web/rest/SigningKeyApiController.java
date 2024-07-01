@@ -18,12 +18,12 @@ package com.bytechef.embedded.user.web.rest;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.embedded.user.web.rest.model.CreateSigningKey200ResponseModel;
-import com.bytechef.embedded.user.web.rest.model.SigningKeyModel;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.user.domain.SigningKey;
 import com.bytechef.platform.user.jwt.JwtKeyId;
 import com.bytechef.platform.user.service.SigningKeyService;
+import com.bytechef.platform.user.web.rest.model.SigningKeyModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;

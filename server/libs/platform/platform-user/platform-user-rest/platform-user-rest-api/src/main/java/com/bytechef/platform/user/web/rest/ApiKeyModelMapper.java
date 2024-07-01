@@ -14,18 +14,23 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.user.web.rest.mapper.config;
+package com.bytechef.platform.user.web.rest;
 
-import com.bytechef.platform.user.web.rest.adapter.AutomationUserConversionServiceAdapter;
-import org.mapstruct.MapperConfig;
-import org.mapstruct.extensions.spring.SpringMapperConfig;
+import com.bytechef.platform.user.domain.ApiKey;
+import com.bytechef.platform.user.web.rest.config.PlatformUserMapperSpringConfig;
+import com.bytechef.platform.user.web.rest.model.ApiKeyModel;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
-@MapperConfig(componentModel = "spring", uses = AutomationUserConversionServiceAdapter.class)
-@SpringMapperConfig(
-    conversionServiceAdapterPackage = "com.bytechef.platform.user.web.rest.adapter",
-    conversionServiceAdapterClassName = "AutomationUserConversionServiceAdapter")
-public interface AutomationUserMapperSpringConfig {
+@Mapper(config = PlatformUserMapperSpringConfig.class)
+public interface ApiKeyModelMapper extends Converter<ApiKeyModel, ApiKey> {
+
+    @Override
+    @Mapping(target = "type", ignore = true)
+    @Mapping(target = "userId", ignore = true)
+    ApiKey convert(ApiKeyModel apiKeyModel);
 }

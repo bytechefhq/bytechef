@@ -17,12 +17,12 @@
 package com.bytechef.embedded.user.web.rest;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.embedded.user.web.rest.model.ApiKeyModel;
 import com.bytechef.embedded.user.web.rest.model.CreateApiKey200ResponseModel;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.user.domain.ApiKey;
 import com.bytechef.platform.user.service.ApiKeyService;
+import com.bytechef.platform.user.web.rest.model.ApiKeyModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
