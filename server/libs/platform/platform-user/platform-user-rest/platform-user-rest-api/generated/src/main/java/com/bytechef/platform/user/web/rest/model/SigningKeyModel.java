@@ -1,8 +1,8 @@
-package com.bytechef.embedded.user.web.rest.model;
+package com.bytechef.platform.user.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.embedded.user.web.rest.model.EnvironmentModel;
+import com.bytechef.platform.user.web.rest.model.EnvironmentModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -20,13 +20,13 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * Contains generated key required for calling API.
+ * Contains generated public key used for signing JWT tokens.
  */
 
-@Schema(name = "ApiKey", description = "Contains generated key required for calling API.")
-@JsonTypeName("ApiKey")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-30T07:20:51.740212+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
-public class ApiKeyModel {
+@Schema(name = "SigningKey", description = "Contains generated public key used for signing JWT tokens.")
+@JsonTypeName("SigningKey")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-01T06:39:59.074090+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+public class SigningKeyModel {
 
   private String createdBy;
 
@@ -36,6 +36,8 @@ public class ApiKeyModel {
   private EnvironmentModel environment;
 
   private Long id;
+
+  private String keyId;
 
   private String lastModifiedBy;
 
@@ -47,21 +49,19 @@ public class ApiKeyModel {
 
   private String name;
 
-  private String secretKey;
-
-  public ApiKeyModel() {
+  public SigningKeyModel() {
     super();
   }
 
   /**
    * Constructor with only required parameters
    */
-  public ApiKeyModel(String name, String secretKey) {
+  public SigningKeyModel(String keyId, String name) {
+    this.keyId = keyId;
     this.name = name;
-    this.secretKey = secretKey;
   }
 
-  public ApiKeyModel createdBy(String createdBy) {
+  public SigningKeyModel createdBy(String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -81,7 +81,7 @@ public class ApiKeyModel {
     this.createdBy = createdBy;
   }
 
-  public ApiKeyModel createdDate(LocalDateTime createdDate) {
+  public SigningKeyModel createdDate(LocalDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -101,7 +101,7 @@ public class ApiKeyModel {
     this.createdDate = createdDate;
   }
 
-  public ApiKeyModel environment(EnvironmentModel environment) {
+  public SigningKeyModel environment(EnvironmentModel environment) {
     this.environment = environment;
     return this;
   }
@@ -121,17 +121,17 @@ public class ApiKeyModel {
     this.environment = environment;
   }
 
-  public ApiKeyModel id(Long id) {
+  public SigningKeyModel id(Long id) {
     this.id = id;
     return this;
   }
 
   /**
-   * The id of an API key.
+   * The id of a public key.
    * @return id
   */
   
-  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an API key.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a public key.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
   public Long getId() {
     return id;
@@ -141,7 +141,27 @@ public class ApiKeyModel {
     this.id = id;
   }
 
-  public ApiKeyModel lastModifiedBy(String lastModifiedBy) {
+  public SigningKeyModel keyId(String keyId) {
+    this.keyId = keyId;
+    return this;
+  }
+
+  /**
+   * The id of a key used for identifying corresponding private key when validating the JWT token.
+   * @return keyId
+  */
+  
+  @Schema(name = "keyId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a key used for identifying corresponding private key when validating the JWT token.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("keyId")
+  public String getKeyId() {
+    return keyId;
+  }
+
+  public void setKeyId(String keyId) {
+    this.keyId = keyId;
+  }
+
+  public SigningKeyModel lastModifiedBy(String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -161,7 +181,7 @@ public class ApiKeyModel {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public ApiKeyModel lastModifiedDate(LocalDateTime lastModifiedDate) {
+  public SigningKeyModel lastModifiedDate(LocalDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -181,7 +201,7 @@ public class ApiKeyModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public ApiKeyModel lastUsedDate(LocalDateTime lastUsedDate) {
+  public SigningKeyModel lastUsedDate(LocalDateTime lastUsedDate) {
     this.lastUsedDate = lastUsedDate;
     return this;
   }
@@ -201,17 +221,17 @@ public class ApiKeyModel {
     this.lastUsedDate = lastUsedDate;
   }
 
-  public ApiKeyModel name(String name) {
+  public SigningKeyModel name(String name) {
     this.name = name;
     return this;
   }
 
   /**
-   * The name of an API key.
+   * The name of a public key.
    * @return name
   */
   @NotNull 
-  @Schema(name = "name", description = "The name of an API key.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "name", description = "The name of a public key.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
   public String getName() {
     return name;
@@ -219,26 +239,6 @@ public class ApiKeyModel {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public ApiKeyModel secretKey(String secretKey) {
-    this.secretKey = secretKey;
-    return this;
-  }
-
-  /**
-   * The preview of secret API key.
-   * @return secretKey
-  */
-  
-  @Schema(name = "secretKey", accessMode = Schema.AccessMode.READ_ONLY, description = "The preview of secret API key.", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("secretKey")
-  public String getSecretKey() {
-    return secretKey;
-  }
-
-  public void setSecretKey(String secretKey) {
-    this.secretKey = secretKey;
   }
 
   @Override
@@ -249,36 +249,36 @@ public class ApiKeyModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ApiKeyModel apiKey = (ApiKeyModel) o;
-    return Objects.equals(this.createdBy, apiKey.createdBy) &&
-        Objects.equals(this.createdDate, apiKey.createdDate) &&
-        Objects.equals(this.environment, apiKey.environment) &&
-        Objects.equals(this.id, apiKey.id) &&
-        Objects.equals(this.lastModifiedBy, apiKey.lastModifiedBy) &&
-        Objects.equals(this.lastModifiedDate, apiKey.lastModifiedDate) &&
-        Objects.equals(this.lastUsedDate, apiKey.lastUsedDate) &&
-        Objects.equals(this.name, apiKey.name) &&
-        Objects.equals(this.secretKey, apiKey.secretKey);
+    SigningKeyModel signingKey = (SigningKeyModel) o;
+    return Objects.equals(this.createdBy, signingKey.createdBy) &&
+        Objects.equals(this.createdDate, signingKey.createdDate) &&
+        Objects.equals(this.environment, signingKey.environment) &&
+        Objects.equals(this.id, signingKey.id) &&
+        Objects.equals(this.keyId, signingKey.keyId) &&
+        Objects.equals(this.lastModifiedBy, signingKey.lastModifiedBy) &&
+        Objects.equals(this.lastModifiedDate, signingKey.lastModifiedDate) &&
+        Objects.equals(this.lastUsedDate, signingKey.lastUsedDate) &&
+        Objects.equals(this.name, signingKey.name);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, environment, id, lastModifiedBy, lastModifiedDate, lastUsedDate, name, secretKey);
+    return Objects.hash(createdBy, createdDate, environment, id, keyId, lastModifiedBy, lastModifiedDate, lastUsedDate, name);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ApiKeyModel {\n");
+    sb.append("class SigningKeyModel {\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    environment: ").append(toIndentedString(environment)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    keyId: ").append(toIndentedString(keyId)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    lastUsedDate: ").append(toIndentedString(lastUsedDate)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    secretKey: ").append(toIndentedString(secretKey)).append("\n");
     sb.append("}");
     return sb.toString();
   }

@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-30T07:20:53.361037+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-01T06:30:41.926363+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 @Validated
 @Tag(name = "app-event", description = "The Embedded App Event Internal API")
 public interface AppEventApi {
@@ -157,7 +157,7 @@ public interface AppEventApi {
      * GET /app-events : Get app events
      * Get app events.
      *
-     * @return A list of app events. (status code 200)
+     * @return The list of app events. (status code 200)
      */
     @Operation(
         operationId = "getAppEvents",
@@ -165,7 +165,7 @@ public interface AppEventApi {
         description = "Get app events.",
         tags = { "app-event" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "A list of app events.", content = {
+            @ApiResponse(responseCode = "200", description = "The list of app events.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = AppEventModel.class)))
             })
         }

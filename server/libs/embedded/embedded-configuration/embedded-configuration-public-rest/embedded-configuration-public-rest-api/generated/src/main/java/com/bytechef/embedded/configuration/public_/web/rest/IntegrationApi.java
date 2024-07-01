@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-30T21:13:45.595507+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-01T06:30:41.820958+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 @Validated
 @Tag(name = "integration", description = "The Embedded Integration Public API")
 public interface IntegrationApi {
@@ -47,7 +47,7 @@ public interface IntegrationApi {
      * Get active integrations.
      *
      * @param environment The environment. (required)
-     * @return A list of active integrations. (status code 200)
+     * @return The list of active integrations. (status code 200)
      */
     @Operation(
         operationId = "getIntegrations",
@@ -55,7 +55,7 @@ public interface IntegrationApi {
         description = "Get active integrations.",
         tags = { "integration" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "A list of active integrations.", content = {
+            @ApiResponse(responseCode = "200", description = "The list of active integrations.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = IntegrationModel.class)))
             })
         }

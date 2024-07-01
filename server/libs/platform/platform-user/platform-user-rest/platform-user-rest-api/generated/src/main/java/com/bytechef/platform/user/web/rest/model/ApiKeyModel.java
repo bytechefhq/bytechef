@@ -1,8 +1,8 @@
-package com.bytechef.automation.user.web.rest.model;
+package com.bytechef.platform.user.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.automation.user.web.rest.model.EnvironmentModel;
+import com.bytechef.platform.user.web.rest.model.EnvironmentModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ApiKey", description = "Contains generated key required for calling API.")
 @JsonTypeName("ApiKey")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-30T07:20:51.368572+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-01T06:39:59.074090+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class ApiKeyModel {
 
   private String createdBy;
@@ -56,8 +56,9 @@ public class ApiKeyModel {
   /**
    * Constructor with only required parameters
    */
-  public ApiKeyModel(String name) {
+  public ApiKeyModel(String name, String secretKey) {
     this.name = name;
+    this.secretKey = secretKey;
   }
 
   public ApiKeyModel createdBy(String createdBy) {
@@ -230,7 +231,7 @@ public class ApiKeyModel {
    * @return secretKey
   */
   
-  @Schema(name = "secretKey", description = "The preview of secret API key.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "secretKey", accessMode = Schema.AccessMode.READ_ONLY, description = "The preview of secret API key.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("secretKey")
   public String getSecretKey() {
     return secretKey;

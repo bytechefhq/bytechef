@@ -5,7 +5,6 @@
  */
 package com.bytechef.automation.user.web.rest;
 
-import com.bytechef.automation.user.web.rest.model.ApiKeyModel;
 import com.bytechef.automation.user.web.rest.model.CreateApiKey200ResponseModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-30T07:20:51.368572+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-01T06:30:40.992381+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 @Validated
 @Tag(name = "api-key", description = "The Automation User API Key Internal API")
 public interface ApiKeyApi {
@@ -46,7 +45,7 @@ public interface ApiKeyApi {
      * POST /api-keys : Create a new API key
      * Create a new API key.
      *
-     * @param apiKeyModel  (required)
+     * @param comBytechefPlatformUserWebRestModelApiKeyModel  (required)
      * @return The secret API key object. (status code 200)
      */
     @Operation(
@@ -68,7 +67,7 @@ public interface ApiKeyApi {
     )
     
     default ResponseEntity<CreateApiKey200ResponseModel> createApiKey(
-        @Parameter(name = "ApiKeyModel", description = "", required = true) @Valid @RequestBody ApiKeyModel apiKeyModel
+        @Parameter(name = "com.bytechef.platform.user.web.rest.model.ApiKeyModel", description = "", required = true) @Valid @RequestBody com.bytechef.platform.user.web.rest.model.ApiKeyModel comBytechefPlatformUserWebRestModelApiKeyModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
@@ -127,7 +126,7 @@ public interface ApiKeyApi {
         tags = { "api-key" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The API key object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = ApiKeyModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = com.bytechef.platform.user.web.rest.model.ApiKeyModel.class))
             })
         }
     )
@@ -137,7 +136,7 @@ public interface ApiKeyApi {
         produces = { "application/json" }
     )
     
-    default ResponseEntity<ApiKeyModel> getApiKey(
+    default ResponseEntity<com.bytechef.platform.user.web.rest.model.ApiKeyModel> getApiKey(
         @Parameter(name = "id", description = "The id of an API key.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
         getRequest().ifPresent(request -> {
@@ -158,7 +157,7 @@ public interface ApiKeyApi {
      * GET /api-keys : Get API keys
      * Get API keys.
      *
-     * @return A list of API keys. (status code 200)
+     * @return The list of API keys. (status code 200)
      */
     @Operation(
         operationId = "getApiKeys",
@@ -166,8 +165,8 @@ public interface ApiKeyApi {
         description = "Get API keys.",
         tags = { "api-key" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "A list of API keys.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ApiKeyModel.class)))
+            @ApiResponse(responseCode = "200", description = "The list of API keys.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = com.bytechef.platform.user.web.rest.model.ApiKeyModel.class)))
             })
         }
     )
@@ -177,7 +176,7 @@ public interface ApiKeyApi {
         produces = { "application/json" }
     )
     
-    default ResponseEntity<List<ApiKeyModel>> getApiKeys(
+    default ResponseEntity<List<com.bytechef.platform.user.web.rest.model.ApiKeyModel>> getApiKeys(
         
     ) {
         getRequest().ifPresent(request -> {
@@ -199,7 +198,7 @@ public interface ApiKeyApi {
      * Update an existing API key.
      *
      * @param id The id of an API key. (required)
-     * @param apiKeyModel  (required)
+     * @param comBytechefPlatformUserWebRestModelApiKeyModel  (required)
      * @return The updated API key object. (status code 200)
      */
     @Operation(
@@ -209,7 +208,7 @@ public interface ApiKeyApi {
         tags = { "api-key" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated API key object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = ApiKeyModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = com.bytechef.platform.user.web.rest.model.ApiKeyModel.class))
             })
         }
     )
@@ -220,9 +219,9 @@ public interface ApiKeyApi {
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<ApiKeyModel> updateApiKey(
+    default ResponseEntity<com.bytechef.platform.user.web.rest.model.ApiKeyModel> updateApiKey(
         @Parameter(name = "id", description = "The id of an API key.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "ApiKeyModel", description = "", required = true) @Valid @RequestBody ApiKeyModel apiKeyModel
+        @Parameter(name = "com.bytechef.platform.user.web.rest.model.ApiKeyModel", description = "", required = true) @Valid @RequestBody com.bytechef.platform.user.web.rest.model.ApiKeyModel comBytechefPlatformUserWebRestModelApiKeyModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

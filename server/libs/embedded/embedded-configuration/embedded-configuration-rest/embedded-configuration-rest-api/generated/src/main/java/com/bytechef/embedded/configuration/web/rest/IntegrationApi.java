@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-30T07:20:53.361037+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-01T06:30:41.926363+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 @Validated
 @Tag(name = "integration", description = "The Embedded Integration Internal API")
 public interface IntegrationApi {
@@ -250,7 +250,7 @@ public interface IntegrationApi {
      * @param integrationInstanceConfigurations Use for filtering integrations for which integration instance configurations exist. (optional)
      * @param tagId The tag id of used for filtering integrations. (optional)
      * @param status Use for filtering integrations by status. (optional)
-     * @return A list of integrations. (status code 200)
+     * @return The list of integrations. (status code 200)
      */
     @Operation(
         operationId = "getIntegrations",
@@ -258,7 +258,7 @@ public interface IntegrationApi {
         description = "Get integrations.",
         tags = { "integration" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "A list of integrations.", content = {
+            @ApiResponse(responseCode = "200", description = "The list of integrations.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = IntegrationModel.class)))
             })
         }
