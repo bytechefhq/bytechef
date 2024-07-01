@@ -16,17 +16,22 @@
 
 package com.bytechef.component.twilio.connection;
 
-import static com.bytechef.component.definition.Authorization.PASSWORD;
-import static com.bytechef.component.definition.Authorization.USERNAME;
+import static com.bytechef.component.definition.Authorization.AUTHORIZATION;
+import static com.bytechef.component.definition.Authorization.ApplyResponse.ofHeaders;
+import static com.bytechef.component.definition.Authorization.AuthorizationType.BASIC_AUTH;
 import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.connection;
 import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.twilio.constant.TwilioConstants.ACCOUNT_SID;
+import static com.bytechef.component.twilio.constant.TwilioConstants.AUTH_TOKEN;
 
-import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Domiter
+ * @author Luka Ljubić
  */
 public class TwilioConnection {
 
@@ -34,14 +39,20 @@ public class TwilioConnection {
     }
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .baseUri((connectionParameters, context) -> "https://api.twilio.com/2010-04-01/Accounts/"
+            + connectionParameters.getRequiredString(ACCOUNT_SID))
         .authorizations(
-            authorization(AuthorizationType.BASIC_AUTH)
+            authorization(BASIC_AUTH)
                 .title("Basic Auth")
                 .properties(
-                    string(USERNAME)
-                        .label("Username")
+                    string(ACCOUNT_SID)
+                        .label("Account SID")
                         .required(true),
-                    string(PASSWORD)
-                        .label("Password")
-                        .required(true)));
+                    string(AUTH_TOKEN)
+                        .label("Auth Token")
+                        .required(true))
+                .apply((connectionParameters, context) -> ofHeaders(
+                    Map.of(AUTHORIZATION,
+                        List.of("Basic " + connectionParameters.getRequiredString(ACCOUNT_SID)
+                            + ":" + connectionParameters.getRequiredString(AUTH_TOKEN))))));
 }

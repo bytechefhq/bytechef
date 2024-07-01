@@ -12,83 +12,16 @@
   "resources": null,
   "version": 1,
   "title": "Twilio",
-  "connection": {
-    "authorizations": [ {
-      "detectOn": null,
-      "description": null,
-      "name": "basic_auth",
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "username",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Username",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "password",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Password",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      } ],
-      "refreshOn": null,
-      "title": "Basic Auth",
-      "type": "BASIC_AUTH",
-      "acquire": null,
-      "authorizationCallback": null,
-      "apply": null,
-      "clientId": null,
-      "pkce": null,
-      "refresh": null,
-      "refreshUrl": null,
-      "scopes": null,
-      "tokenUrl": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
-      "refreshToken": null
-    } ],
-    "properties": null,
-    "version": 1,
-    "authorizationRequired": null,
-    "baseUri": null,
-    "test": null
-  },
   "actions": [ {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Send a new SMS message",
     "help": null,
     "metadata": null,
     "name": "sendSMS",
     "properties": [ {
-      "advancedOption": null,
+      "advancedOption": true,
       "description": "The SID of the Account creating the Message resource.",
       "displayCondition": null,
       "expressionEnabled": null,
@@ -195,13 +128,13 @@
       "options": null,
       "optionsDataSource": null
     }, {
-      "advancedOption": null,
+      "advancedOption": true,
       "description": null,
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
-      "required": true,
+      "required": false,
       "name": "content",
       "type": "INTEGER",
       "defaultValue": null,
@@ -242,13 +175,13 @@
       "options": null,
       "optionsDataSource": null
     }, {
-      "advancedOption": null,
+      "advancedOption": true,
       "description": "The URL of media to include in the Message content. jpeg, jpg, gif, and png file types are fully supported by Twilio and content is formatted for delivery on destination devices. The media size limit is 5 MB for supported file types (jpeg, jpg, png, gif) and 500 KB for other types of accepted media. To send more than one image in the message, provide multiple media_url parameters in the POST request. You can include up to ten media_url parameters per message. International and carrier limits apply.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
-      "required": true,
+      "required": false,
       "name": "mediaUrl",
       "type": "ARRAY",
       "defaultValue": null,
@@ -283,7 +216,7 @@
       "controlType": "ARRAY_BUILDER",
       "optionsDataSource": null
     }, {
-      "advancedOption": null,
+      "advancedOption": true,
       "description": "The URL of the endpoint to which Twilio sends Message status callback requests. URL must contain a valid hostname and underscores are not allowed. If you include this parameter with the messaging_service_sid, Twilio uses this URL instead of the Status Callback URL of the Messaging Service.",
       "displayCondition": null,
       "expressionEnabled": null,
@@ -303,7 +236,7 @@
       "options": null,
       "optionsDataSource": null
     }, {
-      "advancedOption": null,
+      "advancedOption": true,
       "description": "The SID of the associated TwiML Application. If this parameter is provided, the status_callback parameter of this request is ignored; Message status callback requests are sent to the TwiML App's message_status_callback URL.",
       "displayCondition": null,
       "expressionEnabled": null,
@@ -323,7 +256,7 @@
       "options": null,
       "optionsDataSource": null
     }, {
-      "advancedOption": null,
+      "advancedOption": true,
       "description": "The maximum price in US dollars that you are willing to pay for this Message's delivery. When the max_price parameter is provided, the cost of a message is checked before it is sent. If the cost exceeds max_price, the message is not sent and the Message status is failed.",
       "displayCondition": null,
       "expressionEnabled": null,
@@ -345,7 +278,7 @@
       "controlType": "NUMBER",
       "optionsDataSource": null
     }, {
-      "advancedOption": null,
+      "advancedOption": true,
       "description": "Boolean indicating whether or not you intend to provide delivery confirmation feedback to Twilio (used in conjunction with the Message Feedback subresource). Boolean indicating whether or not you intend to provide delivery confirmation feedback to Twilio (used in conjunction with the Message Feedback subresource).",
       "displayCondition": null,
       "expressionEnabled": null,
@@ -369,7 +302,7 @@
       } ],
       "controlType": "SELECT"
     }, {
-      "advancedOption": null,
+      "advancedOption": true,
       "description": "Total number of attempts made (including this request) to send the message regardless of the provider used.",
       "displayCondition": null,
       "expressionEnabled": null,
@@ -388,7 +321,7 @@
       "controlType": "INTEGER",
       "optionsDataSource": null
     }, {
-      "advancedOption": null,
+      "advancedOption": true,
       "description": "The maximum length in seconds that the Message can remain in Twilio's outgoing message queue. If a queued Message exceeds the validity_period, the Message is not sent. A validity_period greater than 5 is recommended.",
       "displayCondition": null,
       "expressionEnabled": null,
@@ -407,7 +340,7 @@
       "controlType": "INTEGER",
       "optionsDataSource": null
     }, {
-      "advancedOption": null,
+      "advancedOption": true,
       "description": "Reserved",
       "displayCondition": null,
       "expressionEnabled": null,
@@ -431,7 +364,7 @@
       } ],
       "controlType": "SELECT"
     }, {
-      "advancedOption": null,
+      "advancedOption": true,
       "description": "Determines if the message content can be stored or redacted based on privacy settings.",
       "displayCondition": null,
       "expressionEnabled": null,
@@ -459,7 +392,7 @@
       } ],
       "optionsDataSource": null
     }, {
-      "advancedOption": null,
+      "advancedOption": true,
       "description": "Determines if the address can be stored or obfuscated based on privacy settings.",
       "displayCondition": null,
       "expressionEnabled": null,
@@ -487,7 +420,7 @@
       } ],
       "optionsDataSource": null
     }, {
-      "advancedOption": null,
+      "advancedOption": true,
       "description": "Whether to detect Unicode characters that have a similar GSM-7 character and replace them.",
       "displayCondition": null,
       "expressionEnabled": null,
@@ -511,7 +444,7 @@
       } ],
       "controlType": "SELECT"
     }, {
-      "advancedOption": null,
+      "advancedOption": true,
       "description": "Rich actions for non-SMS/MMS channels. Used for sending location in WhatsApp messages.",
       "displayCondition": null,
       "expressionEnabled": null,
@@ -552,7 +485,7 @@
       "controlType": "ARRAY_BUILDER",
       "optionsDataSource": null
     }, {
-      "advancedOption": null,
+      "advancedOption": true,
       "description": "For Messaging Services with Link Shortening configured only: A Boolean indicating whether or not Twilio should shorten links in the body of the Message.",
       "displayCondition": null,
       "expressionEnabled": null,
@@ -576,7 +509,7 @@
       } ],
       "controlType": "SELECT"
     }, {
-      "advancedOption": null,
+      "advancedOption": true,
       "description": "For Messaging Services only: Include this parameter with a value of fixed in conjuction with the send_time parameter in order to schedule a Message.",
       "displayCondition": null,
       "expressionEnabled": null,
@@ -600,7 +533,7 @@
       } ],
       "optionsDataSource": null
     }, {
-      "advancedOption": null,
+      "advancedOption": true,
       "description": "The time that Twilio will send the message. Must be in ISO 8601 format.",
       "displayCondition": null,
       "expressionEnabled": null,
@@ -660,7 +593,7 @@
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
     }, {
-      "advancedOption": null,
+      "advancedOption": true,
       "description": "If set to true, Twilio delivers the message as a single MMS message, regardless of the presence of media.",
       "displayCondition": null,
       "expressionEnabled": null,
@@ -684,7 +617,7 @@
       } ],
       "controlType": "SELECT"
     }, {
-      "advancedOption": null,
+      "advancedOption": true,
       "description": "For Content Editor/API only: Key-value pairs of Template variables and their substitution values. content_sid parameter must also be provided. If values are not defined in the content_variables parameter, the Template's default placeholder values are used.",
       "displayCondition": null,
       "expressionEnabled": null,
@@ -704,7 +637,7 @@
       "options": null,
       "optionsDataSource": null
     }, {
-      "advancedOption": null,
+      "advancedOption": true,
       "description": "For SMS pumping protection feature only: Include this parameter with a value of disable to skip any kind of risk check on the respective message request.",
       "displayCondition": null,
       "expressionEnabled": null,
@@ -732,7 +665,7 @@
       } ],
       "optionsDataSource": null
     }, {
-      "advancedOption": null,
+      "advancedOption": true,
       "description": "For Content Editor/API only: The SID of the Content Template to be used with the Message, e.g., HXXXXXXXXXXXXXXXXXXXXXXXXXXXXX. If this parameter is not provided, a Content Template is not used. Find the SID in the Console on the Content Editor page. For Content API users, the SID is found in Twilio's response when creating the Template or by fetching your Templates.",
       "displayCondition": "content == 2",
       "expressionEnabled": null,
@@ -753,10 +686,8 @@
       "optionsDataSource": null
     } ],
     "title": "Send SMS",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
     "output": null,
-    "perform": { },
+    "processErrorResponse": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -1389,7 +1320,76 @@
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true
+    "workflowNodeDescription": null,
+    "perform": { }
   } ],
-  "triggers": null
+  "triggers": null,
+  "connection": {
+    "authorizations": [ {
+      "detectOn": null,
+      "description": null,
+      "name": "basic_auth",
+      "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "accountSid",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Account SID",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "authToken",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Auth Token",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
+      "refreshOn": null,
+      "title": "Basic Auth",
+      "type": "BASIC_AUTH",
+      "acquire": null,
+      "apply": { },
+      "authorizationCallback": null,
+      "authorizationUrl": null,
+      "clientId": null,
+      "clientSecret": null,
+      "pkce": null,
+      "refresh": null,
+      "refreshUrl": null,
+      "scopes": null,
+      "refreshToken": null,
+      "tokenUrl": null
+    } ],
+    "properties": null,
+    "version": 1,
+    "authorizationRequired": null,
+    "baseUri": { },
+    "test": null
+  }
 }
