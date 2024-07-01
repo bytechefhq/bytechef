@@ -61,7 +61,7 @@ const DataPillPanelBodyPropertiesItem = ({
                         </div>
                     )}
 
-                    <div className="flex max-w-48 items-center text-sm">
+                    <div className="flex items-center text-sm">
                         {title}
 
                         <div className="truncate pl-1 text-xs text-gray-400">({workflowNodeName})</div>
