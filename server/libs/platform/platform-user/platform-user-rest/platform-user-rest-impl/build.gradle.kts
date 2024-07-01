@@ -1,3 +1,34 @@
+plugins {
+    alias(libs.plugins.org.openapi.generator)
+}
+
+val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
+    apiPackage.set("com.bytechef.platform.user.web.rest")
+    configOptions.set(
+        mapOf(
+            "dateLibrary" to "java8-localdatetime",
+            "interfaceOnly" to "true",
+            "useSpringBoot3" to "true",
+            "useTags" to "true"
+        )
+    )
+    generatorName.set("spring")
+    inputSpec.set( "$projectDir/openapi.yaml")
+    modelNameSuffix.set("Model")
+    modelPackage.set("com.bytechef.platform.user.web.rest.model")
+    outputDir.set("$projectDir/../platform-user-rest-api/generated")
+    schemaMappings.set(
+        mapOf(
+            "Page" to "org.springframework.data.domain.Page"
+        )
+    )
+}
+
+tasks.register("generateOpenAPI") {
+    dependsOn(generateOpenAPISpring)
+}
+
+
 dependencies {
     compileOnly("jakarta.servlet:jakarta.servlet-api")
 
@@ -14,6 +45,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-rest:platform-rest-api"))
     implementation(project(":server:libs:platform:platform-security:platform-security-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
+    implementation(project(":server:libs:platform:platform-user:platform-user-rest:platform-user-rest-api"))
 
     testImplementation("com.zaxxer:HikariCP")
     testImplementation("org.springframework:spring-tx")
