@@ -34,7 +34,7 @@ public interface SigningKeyService {
 
     PublicKey getPublicKey(long id);
 
-    PublicKey getPublicKey(Environment environment);
+    PublicKey getPublicKey(String keyId, Environment environment);
 
     SigningKey getSigningKey(long id);
 

@@ -43,6 +43,8 @@ public interface UserService {
 
     Optional<User> fetchCurrentUser();
 
+    Optional<User> fetchUser(long id);
+
     Optional<User> fetchUserByEmail(String email);
 
     Optional<User> fetchUserByLogin(String login);

@@ -76,7 +76,11 @@ public final class RandomUtils {
         return generateRandomAlphanumericString();
     }
 
-    public static void nextBytes(byte[] token) {
+    public static byte[] nextBytes(int size) {
+        byte[] token = new byte[size];
+
         SECURE_RANDOM.nextBytes(token);
+
+        return token;
     }
 }

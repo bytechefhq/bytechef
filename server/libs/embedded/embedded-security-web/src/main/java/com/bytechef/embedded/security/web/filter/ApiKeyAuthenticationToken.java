@@ -16,22 +16,38 @@
 
 package com.bytechef.embedded.security.web.filter;
 
-import java.util.Collection;
+import com.bytechef.platform.constant.Environment;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 
 /**
  * @author Ivica Cardic
  */
 public class ApiKeyAuthenticationToken extends AbstractAuthenticationToken {
 
-    private final String apiKey;
+    private Environment environment;
+    private String secretKey;
+    private String tenantId;
+    private User user;
 
-    public ApiKeyAuthenticationToken(String apiKey, Collection<? extends GrantedAuthority> authorities) {
-        super(authorities);
+    public ApiKeyAuthenticationToken(Environment environment, String secretKey, String tenantId) {
+        super(List.of());
 
-        this.apiKey = apiKey;
+        this.environment = environment;
+        this.secretKey = secretKey;
+        this.tenantId = tenantId;
+    }
+
+    @SuppressFBWarnings("EI")
+    public ApiKeyAuthenticationToken(User user) {
+        super(user.getAuthorities());
+
+        this.user = user;
+
         setAuthenticated(true);
+        setDetails(user);
     }
 
     @Override
@@ -39,8 +55,21 @@ public class ApiKeyAuthenticationToken extends AbstractAuthenticationToken {
         return null;
     }
 
+    public Environment getEnvironment() {
+        return environment;
+    }
+
     @Override
+    @SuppressFBWarnings("EI")
     public Object getPrincipal() {
-        return apiKey;
+        return user;
+    }
+
+    public String getSecretKey() {
+        return secretKey;
+    }
+
+    public String getTenantId() {
+        return tenantId;
     }
 }

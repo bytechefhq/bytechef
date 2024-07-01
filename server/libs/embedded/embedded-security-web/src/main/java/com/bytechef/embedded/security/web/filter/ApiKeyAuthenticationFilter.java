@@ -18,17 +18,15 @@ package com.bytechef.embedded.security.web.filter;
 
 import com.bytechef.embedded.security.web.util.AuthTokenUtils;
 import com.bytechef.embedded.security.web.util.AuthTokenUtils.AuthToken;
-import com.bytechef.platform.user.service.ApiKeyService;
+import com.bytechef.platform.user.domain.ApiKey.TenantSecretKey;
+import com.bytechef.tenant.util.TenantUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.regex.Pattern;
-import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -45,38 +43,40 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
     private static final RequestMatcher REQUEST_MATCHER = new NegatedRequestMatcher(
         new AntPathRequestMatcher("/api/embedded/v1/**"));
 
-    private final ApiKeyService apiKeyService;
+    private final AuthenticationManager authenticationManager;
 
     @SuppressFBWarnings("EI")
-    public ApiKeyAuthenticationFilter(ApiKeyService apiKeyService) {
-        this.apiKeyService = apiKeyService;
+    public ApiKeyAuthenticationFilter(AuthenticationManager authenticationManager) {
+        this.authenticationManager = authenticationManager;
     }
 
     @Override
     protected void doFilterInternal(
-        HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain)
-        throws IOException, ServletException {
+        HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) {
 
         Authentication authentication = getAuthentication(httpServletRequest);
 
-        SecurityContext context = SecurityContextHolder.getContext();
+        String tenantId = ((ApiKeyAuthenticationToken) authentication).getTenantId();
 
-        context.setAuthentication(authentication);
+        TenantUtils.runWithTenantId(
+            tenantId,
+            () -> {
+                Authentication authenticatedAuthentication = authenticationManager.authenticate(authentication);
 
-        filterChain.doFilter(httpServletRequest, httpServletResponse);
+                SecurityContext context = SecurityContextHolder.getContext();
+
+                context.setAuthentication(authenticatedAuthentication);
+
+                filterChain.doFilter(httpServletRequest, httpServletResponse);
+            });
     }
 
     private Authentication getAuthentication(HttpServletRequest request) {
         AuthToken authToken = AuthTokenUtils.getAuthToken(PATH_PATTERN, request);
 
-        String secretKey = authToken.token()
-            .replace("Bearer ", "");
+        TenantSecretKey tenantSecretKey = TenantSecretKey.parse(authToken.token());
 
-        if (!apiKeyService.hasApiKey(secretKey, authToken.environment())) {
-            throw new BadCredentialsException("Unknown API key");
-        }
-
-        return new ApiKeyAuthenticationToken(secretKey, AuthorityUtils.NO_AUTHORITIES);
+        return new ApiKeyAuthenticationToken(authToken.environment(), authToken.token(), tenantSecretKey.getTenantId());
     }
 
     @Override

@@ -16,8 +16,11 @@
 
 package com.bytechef.platform.user.domain;
 
+import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.constant.Environment;
+import com.bytechef.tenant.TenantContext;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import org.springframework.data.annotation.CreatedBy;
@@ -48,6 +51,9 @@ public class SigningKey {
 
     @Column
     private int environment;
+
+    @Column("key_id")
+    private String keyId;
 
     @Column("last_modified_by")
     @LastModifiedBy
@@ -109,6 +115,10 @@ public class SigningKey {
         return Environment.values()[environment];
     }
 
+    public String getKeyId() {
+        return keyId;
+    }
+
     public String getLastModifiedBy() {
         return lastModifiedBy;
     }
@@ -153,6 +163,10 @@ public class SigningKey {
         this.createdDate = createdDate;
     }
 
+    public void setKeyId(String keyId) {
+        this.keyId = keyId;
+    }
+
     public void setLastUsedDate(LocalDateTime lastUsedDate) {
         this.lastUsedDate = lastUsedDate;
     }
@@ -177,6 +191,7 @@ public class SigningKey {
     public String toString() {
         return "SigningKey{" +
             "id=" + id +
+            ",keyId=" + keyId +
             ", name='" + name + '\'' +
             ", type=" + type +
             ", publicKey='" + publicKey + '\'' +
@@ -186,5 +201,36 @@ public class SigningKey {
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
             '}';
+    }
+
+    public static class TenantKeyId {
+
+        private final String tenantId;
+
+        private TenantKeyId(String tenantId) {
+            this.tenantId = tenantId;
+        }
+
+        public static TenantKeyId of() {
+            return new TenantKeyId(TenantContext.getCurrentTenantId());
+        }
+
+        public static TenantKeyId parse(String keyId) {
+            keyId = EncodingUtils.decodeBase64ToString(keyId);
+
+            String[] items = keyId.split(":");
+
+            return new TenantKeyId(items[0]);
+        }
+
+        public String getTenantId() {
+            return tenantId;
+        }
+
+        @Override
+        public String toString() {
+            return EncodingUtils.encodeBase64ToString(
+                tenantId + ":" + EncodingUtils.encodeToString(RandomUtils.nextBytes(24)));
+        }
     }
 }

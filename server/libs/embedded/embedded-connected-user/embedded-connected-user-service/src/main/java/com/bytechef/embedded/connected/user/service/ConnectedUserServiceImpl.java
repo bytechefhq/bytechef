@@ -21,6 +21,7 @@ import com.bytechef.embedded.connected.user.repository.ConnectedUserRepository;
 import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.lang.NonNull;
@@ -42,14 +43,14 @@ public class ConnectedUserServiceImpl implements ConnectedUserService {
     }
 
     @Override
-    public void createConnectedUser(@NonNull String externalId, @NonNull Environment environment) {
+    public ConnectedUser createConnectedUser(@NonNull Environment environment, @NonNull String externalId) {
         ConnectedUser connectedUser = new ConnectedUser();
 
         connectedUser.setEnabled(true);
         connectedUser.setEnvironment(environment);
         connectedUser.setExternalId(externalId);
 
-        connectedUserRepository.save(connectedUser);
+        return connectedUserRepository.save(connectedUser);
     }
 
     @Override
@@ -68,10 +69,8 @@ public class ConnectedUserServiceImpl implements ConnectedUserService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean hasConnectedUser(@NonNull String externalId, @NonNull Environment environment) {
-        return connectedUserRepository
-            .findByExternalIdAndEnvironment(externalId, environment.ordinal())
-            .isPresent();
+    public Optional<ConnectedUser> fetchConnectedUser(@NonNull Environment environment, @NonNull String externalId) {
+        return connectedUserRepository.findByExternalIdAndEnvironment(externalId, environment.ordinal());
     }
 
     @Override

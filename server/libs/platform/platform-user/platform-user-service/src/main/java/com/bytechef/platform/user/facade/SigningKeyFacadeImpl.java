@@ -21,6 +21,7 @@ import com.bytechef.platform.user.domain.SigningKey;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.SigningKeyService;
 import com.bytechef.platform.user.service.UserService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +36,7 @@ public class SigningKeyFacadeImpl implements SigningKeyFacade {
     private final SigningKeyService signingKeyService;
     private final UserService userService;
 
+    @SuppressFBWarnings("EI")
     public SigningKeyFacadeImpl(SigningKeyService signingKeyService, UserService userService) {
         this.signingKeyService = signingKeyService;
         this.userService = userService;

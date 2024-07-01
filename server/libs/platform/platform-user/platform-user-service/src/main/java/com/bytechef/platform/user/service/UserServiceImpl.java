@@ -414,6 +414,11 @@ public class UserServiceImpl implements UserService {
             .flatMap(userRepository::findByLogin);
     }
 
+    @Override
+    public Optional<User> fetchUser(long id) {
+        return userRepository.findById(id);
+    }
+
     /**
      * Persistent Token are used for providing automatic authentication, they should be automatically deleted after 30
      * days.

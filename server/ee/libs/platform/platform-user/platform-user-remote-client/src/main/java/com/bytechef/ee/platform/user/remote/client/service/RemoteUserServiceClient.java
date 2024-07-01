@@ -64,6 +64,11 @@ public class RemoteUserServiceClient implements UserService {
     }
 
     @Override
+    public Optional<User> fetchUser(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Optional<User> fetchUserByEmail(String email) {
         throw new UnsupportedOperationException();
     }

@@ -14,29 +14,29 @@
  * limitations under the License.
  */
 
-package com.bytechef.embedded.security.web.filter;
+package com.bytechef.embedded.security.authentication;
 
-import com.bytechef.platform.security.web.filter.FilterBeforeContributor;
+import com.bytechef.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.platform.security.web.authentication.AuthenticationProviderContributor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import jakarta.servlet.Filter;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
 @Component
-public class ApiKeyAuthenticationFilterBeforeContributor implements FilterBeforeContributor {
+public class ConnectedUserAuthenticationProviderContributor implements AuthenticationProviderContributor {
 
-    @Override
+    private final ConnectedUserService connectedUserService;
+
     @SuppressFBWarnings("EI")
-    public Filter getFilter(AuthenticationManager authenticationManager) {
-        return new ApiKeyAuthenticationFilter(authenticationManager);
+    public ConnectedUserAuthenticationProviderContributor(ConnectedUserService connectedUserService) {
+        this.connectedUserService = connectedUserService;
     }
 
     @Override
-    public Class<? extends Filter> getBeforeFilter() {
-        return BasicAuthenticationFilter.class;
+    public AuthenticationProvider getAuthenticationProvider() {
+        return new ConnectedUserAuthenticationProvider(connectedUserService);
     }
 }

@@ -22,7 +22,6 @@ import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.user.domain.SigningKey;
 import com.bytechef.platform.user.facade.SigningKeyFacade;
-import com.bytechef.platform.user.jwt.JwtKeyId;
 import com.bytechef.platform.user.service.SigningKeyService;
 import com.bytechef.platform.user.web.rest.model.SigningKeyModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -85,11 +84,11 @@ public class SigningKeyApiController implements SigningKeyApi {
     @SuppressFBWarnings("NP")
     public ResponseEntity<SigningKeyModel> updateSigningKey(Long id, SigningKeyModel signingKeyModel) {
         return ResponseEntity.ok(
-            getSigningKeyModel(signingKeyService.update(conversionService.convert(signingKeyModel, SigningKey.class))));
+            getSigningKeyModel(
+                signingKeyService.update(conversionService.convert(signingKeyModel.id(id), SigningKey.class))));
     }
 
     private SigningKeyModel getSigningKeyModel(SigningKey signingKey) {
-        return conversionService.convert(signingKey, SigningKeyModel.class)
-            .keyId(String.valueOf(JwtKeyId.of(signingKey.getId())));
+        return conversionService.convert(signingKey, SigningKeyModel.class);
     }
 }

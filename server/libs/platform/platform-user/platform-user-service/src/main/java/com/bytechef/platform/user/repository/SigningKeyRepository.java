@@ -28,7 +28,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SigningKeyRepository extends ListCrudRepository<SigningKey, Long> {
 
-    Optional<SigningKey> findByEnvironment(int environment);
+    Optional<SigningKey> findByKeyIdAndEnvironment(String keyId, int environment);
 
     List<SigningKey> findAllByType(int environment);
 }

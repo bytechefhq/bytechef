@@ -19,6 +19,7 @@ package com.bytechef.embedded.connected.user.service;
 import com.bytechef.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.platform.constant.Environment;
 import java.time.LocalDate;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.lang.NonNull;
 
@@ -27,13 +28,13 @@ import org.springframework.lang.NonNull;
  */
 public interface ConnectedUserService {
 
-    void createConnectedUser(@NonNull String externalId, @NonNull Environment environment);
+    ConnectedUser createConnectedUser(@NonNull Environment environment, @NonNull String externalId);
 
     void deleteConnectedUser(long id);
 
     void enableConnectedUser(long id, boolean enable);
 
-    boolean hasConnectedUser(@NonNull String externalId, @NonNull Environment environment);
+    Optional<ConnectedUser> fetchConnectedUser(@NonNull Environment environment, @NonNull String externalId);
 
     ConnectedUser getConnectedUser(long id);
 
