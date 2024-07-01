@@ -74,6 +74,16 @@ public class RemoteUserServiceClient implements UserService {
     }
 
     @Override
+    public Page<User> getAllManagedUsers(Pageable pageable) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public User getCurrentUser() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public User getUser(long id) {
         throw new UnsupportedOperationException();
     }
@@ -110,11 +120,6 @@ public class RemoteUserServiceClient implements UserService {
 
     @Override
     public void updateUser(String firstName, String lastName, String email, String langKey, String imageUrl) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Page<User> getAllManagedUsers(Pageable pageable) {
         throw new UnsupportedOperationException();
     }
 }

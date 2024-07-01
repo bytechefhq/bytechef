@@ -21,6 +21,7 @@ import com.bytechef.embedded.user.web.rest.model.CreateSigningKey200ResponseMode
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.user.domain.SigningKey;
+import com.bytechef.platform.user.facade.SigningKeyFacade;
 import com.bytechef.platform.user.jwt.JwtKeyId;
 import com.bytechef.platform.user.service.SigningKeyService;
 import com.bytechef.platform.user.web.rest.model.SigningKeyModel;
@@ -39,11 +40,15 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnEndpoint
 public class SigningKeyApiController implements SigningKeyApi {
 
+    private final SigningKeyFacade signingKeyFacade;
     private final SigningKeyService signingKeyService;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
-    public SigningKeyApiController(SigningKeyService signingKeyService, ConversionService conversionService) {
+    public SigningKeyApiController(
+        SigningKeyFacade signingKeyFacade, SigningKeyService signingKeyService, ConversionService conversionService) {
+
+        this.signingKeyFacade = signingKeyFacade;
         this.signingKeyService = signingKeyService;
         this.conversionService = conversionService;
     }
@@ -51,12 +56,10 @@ public class SigningKeyApiController implements SigningKeyApi {
     @Override
     @SuppressFBWarnings("NP")
     public ResponseEntity<CreateSigningKey200ResponseModel> createSigningKey(SigningKeyModel signingKeyModel) {
-        SigningKey signingKey = conversionService.convert(signingKeyModel, SigningKey.class);
-
-        signingKey.setType(AppType.EMBEDDED);
-
         return ResponseEntity.ok(
-            new CreateSigningKey200ResponseModel().privateKey(signingKeyService.create(signingKey)));
+            new CreateSigningKey200ResponseModel().privateKey(
+                signingKeyFacade.create(
+                    conversionService.convert(signingKeyModel, SigningKey.class), AppType.EMBEDDED)));
     }
 
     @Override
