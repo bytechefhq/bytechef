@@ -19,7 +19,10 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     outputDir.set("$projectDir/generated")
     schemaMappings.set(
         mapOf(
-            "Page" to "org.springframework.data.domain.Page"
+            "ApiKey" to "com.bytechef.platform.user.web.rest.model.ApiKeyModel",
+            "Environment" to "com.bytechef.platform.user.web.rest.model.EnvironmentModel",
+            "Page" to "org.springframework.data.domain.Page",
+            "SigningKey" to "com.bytechef.platform.user.web.rest.model.SigningKeyModel"
         )
     )
 }
@@ -61,7 +64,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:platform:platform-api"))
-    implementation(project(":server:libs:platform:platform-user:platform-user-api"))
+    implementation(project(":server:libs:platform:platform-user:platform-user-rest:platform-user-rest-api"))
 
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-web")
