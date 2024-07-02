@@ -170,7 +170,7 @@ class UserControllerIntTest {
 
         restUserMockMvc
             .perform(
-                post("/api/admin/users").contentType(MediaType.APPLICATION_JSON)
+                post("/api/platform/internal/users").contentType(MediaType.APPLICATION_JSON)
                     .content(om.writeValueAsBytes(user))
                     .with(csrf()))
             .andExpect(status().isCreated());
@@ -212,7 +212,7 @@ class UserControllerIntTest {
         // An entity with an existing ID cannot be created, so this API call must fail
         restUserMockMvc
             .perform(
-                post("/api/admin/users").contentType(MediaType.APPLICATION_JSON)
+                post("/api/platform/internal/users").contentType(MediaType.APPLICATION_JSON)
                     .content(om.writeValueAsBytes(user))
                     .with(csrf()))
             .andExpect(status().isBadRequest());
@@ -244,7 +244,7 @@ class UserControllerIntTest {
 
         // Create the User
         restUserMockMvc
-            .perform(post("/api/admin/users").contentType(MediaType.APPLICATION_JSON)
+            .perform(post("/api/platform/internal/users").contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsBytes(user))
                 .with(csrf()))
             .andExpect(status().isBadRequest());
@@ -276,7 +276,7 @@ class UserControllerIntTest {
         // Create the User
         restUserMockMvc
             .perform(
-                post("/api/admin/users").contentType(MediaType.APPLICATION_JSON)
+                post("/api/platform/internal/users").contentType(MediaType.APPLICATION_JSON)
                     .content(om.writeValueAsBytes(user))
                     .with(csrf()))
             .andExpect(status().isBadRequest());
@@ -293,7 +293,7 @@ class UserControllerIntTest {
 
         // Get all the users
         restUserMockMvc
-            .perform(get("/api/admin/users?sort=id,desc").accept(MediaType.APPLICATION_JSON))
+            .perform(get("/api/platform/internal/users?sort=id,desc").accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].login").value(hasItem(DEFAULT_LOGIN)))
@@ -317,7 +317,7 @@ class UserControllerIntTest {
 
         // Get the user
         restUserMockMvc
-            .perform(get("/api/admin/users/{login}", user.getLogin()))
+            .perform(get("/api/platform/internal/users/{login}", user.getLogin()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.login").value(user.getLogin()))
@@ -335,7 +335,7 @@ class UserControllerIntTest {
     @Test
     @Transactional
     void getNonExistingUser() throws Exception {
-        restUserMockMvc.perform(get("/api/admin/users/unknown"))
+        restUserMockMvc.perform(get("/api/platform/internal/users/unknown"))
             .andExpect(status().isNotFound());
     }
 
@@ -371,7 +371,7 @@ class UserControllerIntTest {
 
         restUserMockMvc
             .perform(
-                put("/api/admin/users").contentType(MediaType.APPLICATION_JSON)
+                put("/api/platform/internal/users").contentType(MediaType.APPLICATION_JSON)
                     .content(om.writeValueAsBytes(user))
                     .with(csrf()))
             .andExpect(status().isOk());
@@ -424,7 +424,7 @@ class UserControllerIntTest {
 
         restUserMockMvc
             .perform(
-                put("/api/admin/users").contentType(MediaType.APPLICATION_JSON)
+                put("/api/platform/internal/users").contentType(MediaType.APPLICATION_JSON)
                     .content(om.writeValueAsBytes(user))
                     .with(csrf()))
             .andExpect(status().isOk());
@@ -489,7 +489,7 @@ class UserControllerIntTest {
 
         restUserMockMvc
             .perform(
-                put("/api/admin/users").contentType(MediaType.APPLICATION_JSON)
+                put("/api/platform/internal/users").contentType(MediaType.APPLICATION_JSON)
                     .content(om.writeValueAsBytes(user))
                     .with(csrf()))
             .andExpect(status().isBadRequest());
@@ -536,7 +536,7 @@ class UserControllerIntTest {
 
         restUserMockMvc
             .perform(
-                put("/api/admin/users").contentType(MediaType.APPLICATION_JSON)
+                put("/api/platform/internal/users").contentType(MediaType.APPLICATION_JSON)
                     .content(om.writeValueAsBytes(user))
                     .with(csrf()))
             .andExpect(status().isBadRequest());
@@ -556,7 +556,7 @@ class UserControllerIntTest {
         // Delete the user
         restUserMockMvc
             .perform(
-                delete("/api/admin/users/{login}", user.getLogin()).accept(MediaType.APPLICATION_JSON)
+                delete("/api/platform/internal/users/{login}", user.getLogin()).accept(MediaType.APPLICATION_JSON)
                     .with(csrf()))
             .andExpect(status().isNoContent());
 

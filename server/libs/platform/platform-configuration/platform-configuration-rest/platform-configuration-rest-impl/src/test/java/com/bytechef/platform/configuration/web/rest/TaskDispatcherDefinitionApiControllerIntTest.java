@@ -92,7 +92,7 @@ public class TaskDispatcherDefinitionApiControllerIntTest {
         try {
             webTestClient
                 .get()
-                .uri("/core/task-dispatcher-definitions")
+                .uri("/internal/core/task-dispatcher-definitions")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()

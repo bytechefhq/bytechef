@@ -1,3 +1,8 @@
+openapi:
+  openAPIDefinition:
+    base-path:
+      platform: /api/platform
+
 spring:
   liquibase:
     contexts: user

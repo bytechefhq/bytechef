@@ -54,7 +54,7 @@ import org.springframework.transaction.annotation.Transactional;
 })
 class AuthorityControllerIntTest {
 
-    private static final String ENTITY_API_URL = "/api/authorities";
+    private static final String ENTITY_API_URL = "/api/platform/internal/authorities";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{name}";
 
     @Autowired

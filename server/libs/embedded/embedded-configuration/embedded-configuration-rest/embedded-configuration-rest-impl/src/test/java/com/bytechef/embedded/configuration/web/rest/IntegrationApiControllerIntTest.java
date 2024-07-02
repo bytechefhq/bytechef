@@ -89,7 +89,7 @@ public class IntegrationApiControllerIntTest {
         try {
             this.webTestClient
                 .delete()
-                .uri("/integrations/1")
+                .uri("/internal/integrations/1")
                 .exchange()
                 .expectStatus()
                 .isOk();
@@ -113,7 +113,7 @@ public class IntegrationApiControllerIntTest {
 
             this.webTestClient
                 .get()
-                .uri("/integrations/1")
+                .uri("/internal/integrations/1")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
@@ -132,7 +132,7 @@ public class IntegrationApiControllerIntTest {
 
             this.webTestClient
                 .get()
-                .uri("/integrations/categories")
+                .uri("/internal/integrations/categories")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
@@ -151,7 +151,7 @@ public class IntegrationApiControllerIntTest {
         try {
             this.webTestClient
                 .get()
-                .uri("/integrations/tags")
+                .uri("/internal/integrations/tags")
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -180,7 +180,7 @@ public class IntegrationApiControllerIntTest {
 
             this.webTestClient
                 .get()
-                .uri("/integrations/1/workflows")
+                .uri("/internal/integrations/1/workflows")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
@@ -201,7 +201,7 @@ public class IntegrationApiControllerIntTest {
 
         this.webTestClient
             .get()
-            .uri("/integrations")
+            .uri("/internal/integrations")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -214,7 +214,7 @@ public class IntegrationApiControllerIntTest {
 
         this.webTestClient
             .get()
-            .uri("/integrations?categoryIds=1")
+            .uri("/internal/integrations?categoryIds=1")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -226,7 +226,7 @@ public class IntegrationApiControllerIntTest {
 
         this.webTestClient
             .get()
-            .uri("/integrations?tagIds=1")
+            .uri("/internal/integrations?tagIds=1")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -238,7 +238,7 @@ public class IntegrationApiControllerIntTest {
 
         this.webTestClient
             .get()
-            .uri("/integrations?categoryIds=1&tagIds=1")
+            .uri("/internal/integrations?categoryIds=1&tagIds=1")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -257,7 +257,7 @@ public class IntegrationApiControllerIntTest {
 
             this.webTestClient
                 .post()
-                .uri("/integrations")
+                .uri("/internal/integrations")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(integrationModel)
@@ -295,7 +295,7 @@ public class IntegrationApiControllerIntTest {
         try {
             this.webTestClient
                 .post()
-                .uri("/integrations/1/workflows")
+                .uri("/internal/integrations/1/workflows")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(workflowModel)
@@ -339,7 +339,7 @@ public class IntegrationApiControllerIntTest {
         try {
             this.webTestClient
                 .put()
-                .uri("/integrations/1")
+                .uri("/internal/integrations/1")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(integrationModel)
@@ -364,7 +364,7 @@ public class IntegrationApiControllerIntTest {
         try {
             this.webTestClient
                 .put()
-                .uri("/integrations/1/tags")
+                .uri("/internal/integrations/1/tags")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new UpdateTagsRequestModel().tags(List.of(new TagModel().name("tag1"))))
