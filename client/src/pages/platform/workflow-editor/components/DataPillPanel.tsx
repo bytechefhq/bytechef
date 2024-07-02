@@ -22,33 +22,35 @@ const DataPillPanel = ({
     const {workflow} = useWorkflowDataStore();
     const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
 
-    const componentOperations: Array<ComponentOperationType> = previousComponentDefinitions.length
-        ? workflowNodeOutputs
-              .filter(
-                  (workflowNodeOutput) =>
-                      workflowNodeOutput.workflowNodeName !== currentNode?.name &&
-                      (workflowNodeOutput.actionDefinition?.outputDefined ||
-                          workflowNodeOutput.actionDefinition?.dynamicOutput ||
-                          workflowNodeOutput.triggerDefinition?.outputDefined ||
-                          workflowNodeOutput.triggerDefinition?.dynamicOutput)
-              )
-              .map(
-                  (workflowNodeOutput) =>
-                      ({
-                          ...workflowNodeOutput.actionDefinition,
-                          componentDefinition: previousComponentDefinitions?.find(
-                              (currentComponentDefinition) =>
-                                  currentComponentDefinition.name ===
-                                      workflowNodeOutput.actionDefinition?.componentName ||
-                                  currentComponentDefinition.name ===
-                                      workflowNodeOutput.triggerDefinition?.componentName
-                          ),
-                          outputSchema: workflowNodeOutput.outputSchema,
-                          sampleOutput: workflowNodeOutput.sampleOutput,
-                          workflowNodeName: workflowNodeOutput.workflowNodeName,
-                      }) as ComponentOperationType
-              )
-        : [];
+    const validWorkflowNodeOutputs = workflowNodeOutputs.filter((workflowNodeOutput) => {
+        const {actionDefinition, triggerDefinition, workflowNodeName} = workflowNodeOutput;
+
+        return (
+            workflowNodeName !== currentNode?.name &&
+            (actionDefinition?.outputDefined ||
+                actionDefinition?.dynamicOutput ||
+                triggerDefinition?.outputDefined ||
+                triggerDefinition?.dynamicOutput)
+        );
+    });
+
+    const componentOperations = validWorkflowNodeOutputs.map((workflowNodeOutput) => {
+        const {actionDefinition, triggerDefinition} = workflowNodeOutput;
+
+        const componentDefinition = previousComponentDefinitions?.find(
+            (currentComponentDefinition) =>
+                currentComponentDefinition.name === actionDefinition?.componentName ||
+                currentComponentDefinition.name === triggerDefinition?.componentName
+        );
+
+        return {
+            ...actionDefinition,
+            componentDefinition,
+            outputSchema: workflowNodeOutput.outputSchema,
+            sampleOutput: workflowNodeOutput.sampleOutput,
+            workflowNodeName: workflowNodeOutput.workflowNodeName,
+        } as ComponentOperationType;
+    });
 
     useEffect(() => {
         if (!workflowNodeDetailsPanelOpen) {
