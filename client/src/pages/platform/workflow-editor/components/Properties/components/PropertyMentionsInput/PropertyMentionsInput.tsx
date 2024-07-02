@@ -304,7 +304,7 @@ const PropertyMentionsInput = forwardRef(
 
                 <div
                     className={twMerge(
-                        'flex items-center rounded-md shadow-sm',
+                        'flex items-center rounded-md border-gray-200 shadow-sm',
                         isFocused && 'ring-2 ring-blue-500',
                         label && 'mt-1',
                         leadingIcon && 'relative rounded-md border'
