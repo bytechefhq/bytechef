@@ -9,12 +9,15 @@ package com.bytechef.ee.tenant.multi.security.web.filter;
 
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.constant.TenantConstants;
+import com.bytechef.tenant.util.TenantUtils;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.io.IOException;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
@@ -24,20 +27,26 @@ import org.springframework.web.filter.OncePerRequestFilter;
  */
 public class MultiTenantFilter extends OncePerRequestFilter {
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-        throws ServletException, IOException {
+    private static final RequestMatcher REQUEST_MATCHER = new NegatedRequestMatcher(
+        new OrRequestMatcher(
+            new AntPathRequestMatcher("/api/account/**"),
+            new AntPathRequestMatcher("/api/**/internal/**")));
 
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
         HttpSession session = request.getSession();
 
-        String currentTenantId = (String) session.getAttribute(TenantConstants.CURRENT_TENANT_ID);
+        String sessionCurrentTenantId = (String) session.getAttribute(TenantConstants.CURRENT_TENANT_ID);
 
-        if (currentTenantId == null) {
-            TenantContext.resetCurrentTenantId();
-        } else {
-            TenantContext.setCurrentTenantId(currentTenantId);
+        if (sessionCurrentTenantId == null) {
+            sessionCurrentTenantId = TenantContext.DEFAULT_TENANT_ID;
         }
 
-        filterChain.doFilter(request, response);
+        TenantUtils.runWithTenantId(sessionCurrentTenantId, () -> filterChain.doFilter(request, response));
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return REQUEST_MATCHER.matches(request);
     }
 }
