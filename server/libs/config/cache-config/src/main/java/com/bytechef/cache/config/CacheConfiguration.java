@@ -16,9 +16,12 @@
 
 package com.bytechef.cache.config;
 
+import com.bytechef.cache.interceptor.TenantKeyGenerator;
 import java.time.Duration;
 import org.springframework.boot.autoconfigure.cache.RedisCacheManagerBuilderCustomizer;
+import org.springframework.cache.annotation.CachingConfigurer;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -31,7 +34,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  */
 @Configuration
 @EnableCaching
-public class CacheConfiguration {
+public class CacheConfiguration implements CachingConfigurer {
 
     @Bean
     public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() {
@@ -43,5 +46,10 @@ public class CacheConfiguration {
                 .serializeKeysWith(SerializationPair.fromSerializer(new StringRedisSerializer()))
                 .serializeValuesWith(SerializationPair.fromSerializer(
                     new JdkSerializationRedisSerializer(clazz.getClassLoader()))));
+    }
+
+    @Override
+    public KeyGenerator keyGenerator() {
+        return new TenantKeyGenerator();
     }
 }

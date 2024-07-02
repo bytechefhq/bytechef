@@ -32,6 +32,7 @@ import com.bytechef.platform.user.exception.LoginAlreadyUsedException;
 import com.bytechef.platform.user.repository.AuthorityRepository;
 import com.bytechef.platform.user.repository.PersistentTokenRepository;
 import com.bytechef.platform.user.repository.UserRepository;
+import com.bytechef.tenant.cache.TenantCacheKeyGenerator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -105,9 +106,12 @@ public class UserServiceImpl implements UserService {
         logger.debug("Reset user password for reset key {}", key);
 
         return userRepository.findByResetKey(key)
-            .filter(user -> user.getResetDate()
-                .isAfter(Instant.now()
-                    .minus(1, ChronoUnit.DAYS)))
+            .filter(user -> {
+                Instant resetDate = user.getResetDate();
+
+                return resetDate.isAfter(Instant.now()
+                    .minus(1, ChronoUnit.DAYS));
+            })
             .map(user -> {
                 user.setPassword(passwordEncoder.encode(newPassword));
                 user.setResetKey(null);
@@ -473,11 +477,11 @@ public class UserServiceImpl implements UserService {
     @SuppressFBWarnings("NP")
     private void clearUserCaches(User user) {
         Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE))
-            .evict(user.getLogin());
+            .evict(TenantCacheKeyGenerator.generateKey(user.getLogin()));
 
         if (user.getEmail() != null) {
             Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE))
-                .evict(user.getEmail());
+                .evict(TenantCacheKeyGenerator.generateKey(user.getEmail()));
         }
     }
 
