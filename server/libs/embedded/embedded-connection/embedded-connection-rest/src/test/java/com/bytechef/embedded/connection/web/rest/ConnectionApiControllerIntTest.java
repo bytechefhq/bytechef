@@ -79,7 +79,7 @@ public class ConnectionApiControllerIntTest {
         try {
             this.webTestClient
                 .delete()
-                .uri("/connections/1")
+                .uri("/internal/connections/1")
                 .exchange()
                 .expectStatus()
                 .isOk();
@@ -104,7 +104,7 @@ public class ConnectionApiControllerIntTest {
 
             this.webTestClient
                 .get()
-                .uri("/connections/1")
+                .uri("/internal/connections/1")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
@@ -125,7 +125,7 @@ public class ConnectionApiControllerIntTest {
         try {
             this.webTestClient
                 .get()
-                .uri("/connections/tags")
+                .uri("/internal/connections/tags")
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -152,7 +152,7 @@ public class ConnectionApiControllerIntTest {
 
         this.webTestClient
             .get()
-            .uri("/connections")
+            .uri("/internal/connections")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -167,7 +167,7 @@ public class ConnectionApiControllerIntTest {
 
         this.webTestClient
             .get()
-            .uri("/connections?componentNames=component1")
+            .uri("/internal/connections?componentNames=component1")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -179,7 +179,7 @@ public class ConnectionApiControllerIntTest {
 
         this.webTestClient
             .get()
-            .uri("/connections?tagIds=1")
+            .uri("/internal/connections?tagIds=1")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -192,7 +192,7 @@ public class ConnectionApiControllerIntTest {
 
         this.webTestClient
             .get()
-            .uri("/connections?componentNames=component1&tagIds=1")
+            .uri("/internal/connections?componentNames=component1&tagIds=1")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -212,7 +212,7 @@ public class ConnectionApiControllerIntTest {
             assert connectionDTO.id() != null;
             this.webTestClient
                 .post()
-                .uri("/connections")
+                .uri("/internal/connections")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(connectionModel)
@@ -259,7 +259,7 @@ public class ConnectionApiControllerIntTest {
         try {
             this.webTestClient
                 .put()
-                .uri("/connections/1")
+                .uri("/internal/connections/1")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(connectionModel)

@@ -89,7 +89,7 @@ public class ComponentDefinitionApiControllerIntTest {
         try {
             webTestClient
                 .get()
-                .uri("/core/component-definitions")
+                .uri("/internal/core/component-definitions")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()

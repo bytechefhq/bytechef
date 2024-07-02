@@ -106,7 +106,7 @@ public class WorkflowApiControllerIntTest {
 
             this.webTestClient
                 .get()
-                .uri("/workflows/1")
+                .uri("/internal/workflows/1")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
@@ -133,7 +133,7 @@ public class WorkflowApiControllerIntTest {
         try {
             this.webTestClient
                 .put()
-                .uri("/workflows/1")
+                .uri("/internal/workflows/1")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(workflowModel)
