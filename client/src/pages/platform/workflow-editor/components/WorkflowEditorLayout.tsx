@@ -124,6 +124,11 @@ const WorkflowEditorLayout = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflowNodeParameterDisplayConditions?.displayConditions, currentNode?.name]);
 
+    useEffect(() => {
+        refetchWorkflowNodeOutputs();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [workflow?.nodeNames]);
+
     return (
         <ReactFlowProvider>
             <WorkflowEditor
