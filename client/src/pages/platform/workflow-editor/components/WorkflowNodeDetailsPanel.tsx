@@ -16,7 +16,13 @@ import {WorkflowNodeDynamicPropertyKeys} from '@/shared/queries/platform/workflo
 import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {useGetWorkflowNodeOutputQuery} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
-import {DataPillType, PropertyType, UpdateWorkflowMutationType, WorkflowDefinitionType} from '@/shared/types';
+import {
+    ComponentPropertiesType,
+    DataPillType,
+    PropertyType,
+    UpdateWorkflowMutationType,
+    WorkflowDefinitionType,
+} from '@/shared/types';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {useQueryClient} from '@tanstack/react-query';
@@ -26,7 +32,7 @@ import {twMerge} from 'tailwind-merge';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
-import getSubProperties from '../utils/getSubProperties';
+import getDataPillsFromProperties from '../utils/getDataPillsFromProperties';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 import CurrentOperationSelect from './CurrentOperationSelect';
 import ConnectionTab from './node-details-tabs/ConnectionTab';
@@ -149,22 +155,24 @@ const WorkflowNodeDetailsPanel = ({
         .filter((workflowNodeOutput) => workflowNodeOutput?.actionDefinition)
         .map((workflowNodeOutput) => workflowNodeOutput.actionDefinition!);
 
-    const previousComponentProperties = previousComponentDefinitions?.map((componentDefinition, index) => {
-        if (!actionDefinitions?.length) {
-            return;
+    const previousComponentProperties: Array<ComponentPropertiesType> = previousComponentDefinitions?.map(
+        (componentDefinition, index) => {
+            if (!actionDefinitions?.length) {
+                return;
+            }
+
+            const outputSchemaDefinition: PropertyType | undefined = workflowNodeOutputs[index]?.outputSchema;
+
+            const properties = outputSchemaDefinition?.properties?.length
+                ? outputSchemaDefinition.properties
+                : outputSchemaDefinition?.items;
+
+            return {
+                componentDefinition,
+                properties,
+            };
         }
-
-        const outputSchemaDefinition: PropertyType | undefined = workflowNodeOutputs[index]?.outputSchema;
-
-        const properties = outputSchemaDefinition?.properties?.length
-            ? outputSchemaDefinition.properties
-            : outputSchemaDefinition?.items;
-
-        return {
-            componentDefinition,
-            properties,
-        };
-    });
+    );
 
     const hasOutputData =
         currentActionDefinition?.outputDefined ||
@@ -182,17 +190,6 @@ const WorkflowNodeDetailsPanel = ({
 
     const workflowConnections: WorkflowConnectionModel[] =
         currentWorkflowTask?.connections || currentWorkflowTrigger?.connections || [];
-
-    const getExistingProperties = (properties: Array<PropertyType>): Array<PropertyType> =>
-        properties.filter((property) => {
-            if (property.properties) {
-                return getExistingProperties(property.properties);
-            } else if (property.items) {
-                return getExistingProperties(property.items);
-            }
-
-            return !!property.name;
-        });
 
     const nodeTabs = TABS.filter(({name}) => {
         if (name === 'connection') {
@@ -312,45 +309,7 @@ const WorkflowNodeDetailsPanel = ({
             return;
         }
 
-        const dataPills: Array<DataPillType> = [];
-
-        previousComponentProperties.forEach((componentProperty, index) => {
-            if (!componentProperty || !componentProperty.properties?.length) {
-                return;
-            }
-
-            const {componentDefinition} = componentProperty;
-
-            const existingProperties = getExistingProperties(componentProperty.properties);
-
-            const nodeName = workflow.triggers?.length ? previousNodeNames[index] : previousNodeNames[index + 1];
-
-            dataPills.push({
-                componentIcon: componentDefinition.icon,
-                id: nodeName,
-                nodeName,
-                value: nodeName,
-            });
-
-            const formattedProperties: DataPillType[] = existingProperties.map((property) => {
-                if (property.properties) {
-                    return getSubProperties(componentDefinition.icon!, nodeName, property.properties, property.name);
-                } else if (property.items) {
-                    return getSubProperties(componentDefinition.icon!, nodeName, property.items, property.name);
-                }
-
-                return {
-                    componentIcon: componentDefinition.icon,
-                    id: property.name,
-                    nodeName,
-                    value: `${nodeName}.${property.name}`,
-                };
-            });
-
-            if (existingProperties.length && formattedProperties.length) {
-                dataPills.push(...formattedProperties);
-            }
-        });
+        const dataPills = getDataPillsFromProperties(previousComponentProperties!, workflow, previousNodeNames);
 
         setAvailableDataPills(dataPills.flat(Infinity));
         // eslint-disable-next-line react-hooks/exhaustive-deps

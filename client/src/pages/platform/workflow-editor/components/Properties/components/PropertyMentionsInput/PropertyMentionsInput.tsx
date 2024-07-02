@@ -42,6 +42,7 @@ const MentionInputListItem = (item: DataPillType) => {
 };
 
 interface PropertyMentionsInputProps {
+    className?: string;
     controlType?: ControlTypeModel;
     defaultValue?: string;
     deletePropertyButton?: ReactNode;
@@ -62,6 +63,7 @@ interface PropertyMentionsInputProps {
 const PropertyMentionsInput = forwardRef(
     (
         {
+            className,
             controlType,
             defaultValue,
             deletePropertyButton,
@@ -304,7 +306,7 @@ const PropertyMentionsInput = forwardRef(
 
                 <div
                     className={twMerge(
-                        'flex items-center shadow-sm',
+                        'flex items-center rounded-md shadow-sm',
                         isFocused && 'ring-2 ring-blue-500',
                         label && 'mt-1',
                         leadingIcon && 'relative rounded-md border'
@@ -321,7 +323,8 @@ const PropertyMentionsInput = forwardRef(
                         className={twMerge(
                             'h-full w-full bg-white rounded-md',
                             leadingIcon && 'border-0 pl-10',
-                            controlType === 'TEXT_AREA' && 'min-h-32'
+                            controlType === 'TEXT_AREA' && 'min-h-32',
+                            className
                         )}
                         defaultValue={defaultValue}
                         formats={['property-mention', 'mention']}

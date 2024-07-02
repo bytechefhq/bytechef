@@ -39,6 +39,13 @@ export type ComponentOperationType = {
     workflowNodeName?: string;
 };
 
+export type ComponentPropertiesType =
+    | {
+          componentDefinition: ComponentDefinitionBasicModel;
+          properties?: Array<PropertyModel>;
+      }
+    | undefined;
+
 export type ComponentType = {
     componentName: string;
     displayConditions?: {
