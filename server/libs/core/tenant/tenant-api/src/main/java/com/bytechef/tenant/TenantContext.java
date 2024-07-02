@@ -25,7 +25,7 @@ import org.springframework.util.Assert;
  */
 public class TenantContext {
 
-    private static final String DEFAULT_TENANT_ID = "public";
+    public static final String DEFAULT_TENANT_ID = "public";
 
     private static final ThreadLocal<String> currentTenant = ThreadLocal.withInitial(() -> DEFAULT_TENANT_ID);
 
