@@ -25,7 +25,7 @@
     @apply min-h-[34px];
     @apply h-auto;
     @apply w-full;
-    padding: 0.25rem;
+    padding: 0.312rem;
     white-space: preserve;
     @apply pl-3;
 }
@@ -68,7 +68,7 @@
 }
 
 .ql-mention-list-item svg {
-    @apply h-4 w-4;
+    @apply size-4;
 }
 
 .property-mention {
@@ -91,7 +91,7 @@
 
 .property-mention svg {
     @apply mr-1;
-    @apply h-4 w-4;
+    @apply size-4;
 }
 
 .quill.min-h-32 .ql-editor {
