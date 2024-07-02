@@ -32,6 +32,7 @@ import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.domain.TriggerDefinition;
 import com.bytechef.platform.component.registry.service.ActionDefinitionService;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
+import com.bytechef.platform.component.util.PropertyUtils;
 import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.bytechef.platform.configuration.dto.UpdateParameterResultDTO;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
@@ -200,7 +201,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
             String displayCondition = property.getDisplayCondition();
 
-            if (displayCondition != null && displayCondition.contains(name)) {
+            if (PropertyUtils.hasExpressionVariable(displayCondition, name)) {
                 parameterMap.remove(property.getName());
             }
 

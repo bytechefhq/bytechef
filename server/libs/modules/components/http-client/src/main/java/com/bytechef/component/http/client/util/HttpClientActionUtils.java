@@ -67,8 +67,9 @@ public class HttpClientActionUtils {
                 .label("Content Type")
                 .description("Mime-Type to use when sending raw body content.")
                 .displayCondition(
-                    "['%s', '%s'].includes('%s')".formatted(
+                    "'%s' == %s or '%s' == %s".formatted(
                         Http.BodyContentType.BINARY.name(),
+                        HttpClientComponentConstants.BODY_CONTENT_TYPE,
                         Http.BodyContentType.RAW.name(),
                         HttpClientComponentConstants.BODY_CONTENT_TYPE))
                 .defaultValue("text/plain")
