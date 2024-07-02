@@ -17,6 +17,9 @@ import {WorkflowDefinitionType} from '@/shared/types';
 import {CableIcon, EditIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
 
+import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import WorkflowOutputValue from './WorkflowOutputValue';
+
 const SPACE = 4;
 
 const WorkflowOutputsSheetTable = ({workflow}: {workflow: WorkflowModel}) => {
@@ -25,6 +28,8 @@ const WorkflowOutputsSheetTable = ({workflow}: {workflow: WorkflowModel}) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
     const {updateWorkflowMutation} = useWorkflowMutation();
+
+    const {componentDefinitions} = useWorkflowDataStore();
 
     function handleDelete(input: WorkflowInputModel) {
         const definitionObject: WorkflowDefinitionType = JSON.parse(workflow.definition!);
@@ -75,7 +80,12 @@ const WorkflowOutputsSheetTable = ({workflow}: {workflow: WorkflowModel}) => {
                                 <TableRow key={output.name}>
                                     <TableCell>{output.name}</TableCell>
 
-                                    <TableCell>{output.value.toString()}</TableCell>
+                                    <TableCell>
+                                        <WorkflowOutputValue
+                                            componentDefinitions={componentDefinitions}
+                                            value={output.value.toString()}
+                                        />
+                                    </TableCell>
 
                                     <TableCell className="flex justify-end">
                                         <Button
