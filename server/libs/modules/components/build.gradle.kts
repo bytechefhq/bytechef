@@ -1,3 +1,8 @@
+
+plugins {
+    kotlin("jvm") version "1.9.20"
+}
+
 subprojects {
     tasks.jar {
         archiveBaseName.set("component-" + project.name)
@@ -13,4 +18,6 @@ subprojects {
         testImplementation(rootProject.libs.org.json)
         testImplementation(project(":server:libs:test:test-support"))
     }
+
+    apply(plugin = "com.bytechef.documentation-generator")
 }

@@ -18,4 +18,11 @@ dependencies {
     implementation("com.google.cloud.tools:jib-gradle-plugin:${libs.versions.jib.gradle.plugin.get()}")
     implementation("com.gorylenko.gradle-git-properties:gradle-git-properties:${libs.versions.gradle.git.properties.get()}")
     implementation("org.springframework.boot:spring-boot-gradle-plugin:${libs.versions.spring.boot.get()}")
+
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.2")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.17.1")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.9")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.21")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:2.17.1")
+
 }

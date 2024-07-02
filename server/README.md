@@ -20,6 +20,7 @@ Initial users available:
 - `./gradlew compileTestJava` - Compiles the source code and tests
 - `./gradlew spotlessApply` - Source formats the source code and tests
 - `./gradlew generateOpenAPI` - Generates OpenAPI server models and API interfaces and client models and API implementations. Note: if during regeneration of existing specification models are not updated, they need to be deleted and task called again.
+- `./gradlew generateDocumentation` - Generates documentation of every component.
 
 ### Database upgrade process
 Upgrade database process uses [Liquibase](https://www.liquibase.com) as the engine. The upgrade liquibase files go under `src/main/resources/config/liquibase/changelog/[Module specific subpaths]` directory.
