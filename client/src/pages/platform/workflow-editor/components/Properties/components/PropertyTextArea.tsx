@@ -45,7 +45,7 @@ const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
             <div className={twMerge([label && 'mt-1', leadingIcon && 'relative'])} title={title}>
                 <div className={twMerge(leadingIcon && 'relative rounded-md')}>
                     {leadingIcon && (
-                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border border-gray-300 bg-gray-100 px-3">
+                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border border-gray-200 bg-gray-100 px-3">
                             {leadingIcon}
                         </div>
                     )}
