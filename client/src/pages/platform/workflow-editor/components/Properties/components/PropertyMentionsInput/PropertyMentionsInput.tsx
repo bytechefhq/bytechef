@@ -136,8 +136,6 @@ const PropertyMentionsInput = forwardRef(
                         leaf.deleteAt(0, offset);
                     }
 
-                    console.log('item: ', item);
-
                     insertItem(
                         {
                             componentIcon: item.componentIcon,
