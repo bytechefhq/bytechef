@@ -24,14 +24,7 @@ const SigningKeys = () => {
                         right={
                             signingKeys &&
                             signingKeys.length > 0 &&
-                            signingKeys && (
-                                <SigningKeyDialog
-                                    remainingEnvironments={signingKeys.map((signingKey) =>
-                                        signingKey.environment!.toString()
-                                    )}
-                                    triggerNode={<Button>New Signing Key</Button>}
-                                />
-                            )
+                            signingKeys && <SigningKeyDialog triggerNode={<Button>New Signing Key</Button>} />
                         }
                         title="Signing Keys"
                     />
@@ -49,12 +42,7 @@ const SigningKeys = () => {
                     />
                 )}
 
-                {showEditDialog && signingKeys && (
-                    <SigningKeyDialog
-                        onClose={() => setShowEditDialog(false)}
-                        remainingEnvironments={signingKeys.map((signingKey) => signingKey.environment!.toString())}
-                    />
-                )}
+                {showEditDialog && signingKeys && <SigningKeyDialog onClose={() => setShowEditDialog(false)} />}
             </LayoutContainer>
         </PageLoader>
     );

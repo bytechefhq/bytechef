@@ -9,6 +9,7 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
+import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Textarea} from '@/components/ui/textarea';
 import {useToast} from '@/components/ui/use-toast';
@@ -27,17 +28,19 @@ import {useForm} from 'react-hook-form';
 import {z} from 'zod';
 
 const formSchema = z.object({
-    environment: z.string(),
+    environment: z.string().min(1, {message: 'Environment is required'}),
+    name: z.string().min(2, {
+        message: 'Name must be at least 2 characters.',
+    }),
 });
 
 interface SigningKeyDialogProps {
     onClose?: () => void;
-    remainingEnvironments: string[];
     signingKey?: SigningKeyModel;
     triggerNode?: ReactNode;
 }
 
-const SigningKeyDialog = ({onClose, remainingEnvironments, signingKey, triggerNode}: SigningKeyDialogProps) => {
+const SigningKeyDialog = ({onClose, signingKey, triggerNode}: SigningKeyDialogProps) => {
     const [isOpen, setIsOpen] = useState(!triggerNode);
     const [privateKey, setPrivateKey] = useState<string | undefined>();
 
@@ -46,7 +49,10 @@ const SigningKeyDialog = ({onClose, remainingEnvironments, signingKey, triggerNo
     const {toast} = useToast();
 
     const form = useForm<z.infer<typeof formSchema>>({
-        defaultValues: {},
+        defaultValues: {
+            environment: signingKey?.environment || '',
+            name: signingKey?.name || '',
+        },
         resolver: zodResolver(formSchema),
     });
 
@@ -95,7 +101,6 @@ const SigningKeyDialog = ({onClose, remainingEnvironments, signingKey, triggerNo
         } else {
             createSigningKeyMutation.mutate({
                 ...getValues(),
-                name: getValues()?.environment,
             } as SigningKeyModel);
         }
     }
@@ -119,9 +124,8 @@ const SigningKeyDialog = ({onClose, remainingEnvironments, signingKey, triggerNo
                         <DialogHeader>
                             <div className="flex items-center justify-between">
                                 <DialogTitle>
-                                    {privateKey
-                                        ? 'Save your private '
-                                        : `${signingKey?.id ? 'Edit' : 'Create'}` + ' Signing Key'}
+                                    {(privateKey ? 'Save your private ' : `${signingKey?.id ? 'Edit' : 'Create'}`) +
+                                        ' Signing Key'}
                                 </DialogTitle>
                             </div>
                         </DialogHeader>
@@ -152,6 +156,22 @@ const SigningKeyDialog = ({onClose, remainingEnvironments, signingKey, triggerNo
                             </div>
                         ) : (
                             <>
+                                <FormField
+                                    control={control}
+                                    name="name"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Name</FormLabel>
+
+                                            <FormControl>
+                                                <Input {...field} />
+                                            </FormControl>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
                                 {!signingKey?.id && (
                                     <FormField
                                         control={control}
@@ -170,15 +190,9 @@ const SigningKeyDialog = ({onClose, remainingEnvironments, signingKey, triggerNo
                                                         </SelectTrigger>
 
                                                         <SelectContent>
-                                                            {!remainingEnvironments.find(
-                                                                (remainingEnvironment) =>
-                                                                    remainingEnvironment === 'TEST'
-                                                            ) && <SelectItem value="TEST">Test</SelectItem>}
+                                                            <SelectItem value="TEST">Test</SelectItem>
 
-                                                            {!remainingEnvironments.find(
-                                                                (remainingEnvironment) =>
-                                                                    remainingEnvironment === 'PRODUCTION'
-                                                            ) && <SelectItem value="PRODUCTION">Production</SelectItem>}
+                                                            <SelectItem value="PRODUCTION">Production</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                 </FormControl>
@@ -186,8 +200,6 @@ const SigningKeyDialog = ({onClose, remainingEnvironments, signingKey, triggerNo
                                                 <FormMessage />
                                             </FormItem>
                                         )}
-                                        rules={{required: true}}
-                                        shouldUnregister={false}
                                     />
                                 )}
                             </>
