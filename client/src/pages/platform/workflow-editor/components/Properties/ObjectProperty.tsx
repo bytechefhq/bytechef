@@ -145,6 +145,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
                 };
             } else {
                 return {
+                    ...property,
                     controlType: VALUE_PROPERTY_CONTROL_TYPES[
                         parameterItemType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
                     ] as ControlTypeModel,
