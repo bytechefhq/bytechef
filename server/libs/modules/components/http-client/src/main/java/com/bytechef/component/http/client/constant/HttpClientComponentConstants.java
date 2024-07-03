@@ -73,32 +73,38 @@ public class HttpClientComponentConstants {
                 .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.JSON.name()))
                 .additionalProperties(
                     array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
-                .placeholder("Add Parameter"),
+                .placeholder("Add Parameter")
+                .advancedOption(true),
             object(BODY_CONTENT)
                 .label("Body Content - XML")
                 .description("XML content to send.")
                 .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.XML.name()))
-                .placeholder("Add Parameter"),
+                .placeholder("Add Parameter")
+                .advancedOption(true),
             object(BODY_CONTENT)
                 .label("Body Content - Form Data")
                 .description("Body parameters to send.")
                 .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.FORM_DATA.name()))
                 .placeholder("Add Parameter")
-                .additionalProperties(string(), fileEntry()),
+                .additionalProperties(string(), fileEntry())
+                .advancedOption(true),
             object(BODY_CONTENT)
                 .label("Body Content - Form URL-Encoded")
                 .description("Body parameters to send.")
                 .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.FORM_URL_ENCODED.name()))
                 .placeholder("Add Parameter")
-                .additionalProperties(string()),
+                .additionalProperties(string())
+                .advancedOption(true),
             string(BODY_CONTENT)
                 .label("Body Content - Raw")
                 .description("The raw text to send.")
-                .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.RAW.name())),
+                .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.RAW.name()))
+                .advancedOption(true),
             fileEntry(BODY_CONTENT)
                 .label("Body Content - Binary")
                 .description("The object property which contains a reference to the file to upload.")
-                .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.BINARY.name()))));
+                .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.BINARY.name()))
+                .advancedOption(true)));
 
     public static final List<? extends Property> COMMON_PROPERTIES = Collections.unmodifiableList(
         Arrays.asList(

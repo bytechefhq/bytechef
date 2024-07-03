@@ -60,9 +60,13 @@ public class HttpClientActionUtils {
                     option("Binary", Http.BodyContentType.BINARY.name()))
                 .defaultValue("")
                 .advancedOption(true));
-        }
 
-        if (includeBodyContentProperties) {
+            //
+            // Body Content properties
+            //
+
+            properties.addAll(HttpClientComponentConstants.BODY_CONTENT_PROPERTIES);
+
             properties.add(string(HttpClientComponentConstants.BODY_CONTENT_MIME_TYPE)
                 .label("Content Type")
                 .description("Mime-Type to use when sending raw body content.")
