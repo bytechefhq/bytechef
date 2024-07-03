@@ -80,11 +80,6 @@ public class AsyncConfiguration implements AsyncConfigurer {
         }
 
         @Override
-        public void execute(Runnable task, long startTimeout) {
-            super.execute(getTenantRunnable(task), startTimeout);
-        }
-
-        @Override
         public Future<?> submit(Runnable task) {
             return super.submit(getTenantRunnable(task));
         }
