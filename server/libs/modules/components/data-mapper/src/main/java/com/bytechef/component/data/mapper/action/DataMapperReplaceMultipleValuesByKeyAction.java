@@ -21,14 +21,14 @@ import static com.bytechef.component.data.mapper.constant.DataMapperConstants.IN
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.MAPPINGS;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.OUTPUT;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.TO;
+import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
-import com.bytechef.component.data.mapper.util.mapping.Mapping;
-import com.bytechef.component.data.mapper.util.mapping.StringMapping;
+import com.bytechef.component.data.mapper.model.Mapping;
+import com.bytechef.component.data.mapper.model.StringMapping;
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.jayway.jsonpath.DocumentContext;
@@ -39,13 +39,11 @@ import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic
+ * @author Marko Kriskovic
  */
 public class DataMapperReplaceMultipleValuesByKeyAction {
 
-    private DataMapperReplaceMultipleValuesByKeyAction() {
-    }
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL.action("replaceMultipleValuesByKey")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("replaceMultipleValuesByKey")
         .title("Replace multiple values by key")
         .description(
             "Replaces all values specified by the keys in the input object with the values specified by keys in the output object.")
@@ -77,15 +75,21 @@ public class DataMapperReplaceMultipleValuesByKeyAction {
         .output()
         .perform(DataMapperReplaceMultipleValuesByKeyAction::perform);
 
+    private DataMapperReplaceMultipleValuesByKeyAction() {
+    }
+
     protected static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        List<StringMapping> mappingList = inputParameters.getList(MAPPINGS, StringMapping.class, List.of());
-        Map<String, String> mappings = mappingList.stream()
+
+        List<StringMapping> mappings = inputParameters.getList(MAPPINGS, StringMapping.class, List.of());
+
+        Map<String, String> mappingMap = mappings.stream()
             .collect(Collectors.toMap(Mapping::getFrom, Mapping::getTo));
 
         DocumentContext input = JsonPath.parse(inputParameters.get(INPUT));
         DocumentContext output = JsonPath.parse(inputParameters.get(OUTPUT));
-        for (Map.Entry<String, String> entry : mappings.entrySet()) {
+
+        for (Map.Entry<String, String> entry : mappingMap.entrySet()) {
             input.set(entry.getKey(), output.read(entry.getValue()));
         }
 

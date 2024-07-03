@@ -17,7 +17,6 @@
 package com.bytechef.component.data.mapper.util;
 
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.TYPE;
-import static com.bytechef.component.data.mapper.constant.DataMapperConstants.VALUE;
 import static com.bytechef.component.definition.ComponentDSL.nullable;
 
 import com.bytechef.component.definition.Parameters;
@@ -26,7 +25,11 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
+/**
+ * @author Marko Kriskovic
+ */
 public class DataMapperUtils {
+
     public static final String VALUE_DESCRIPTION = "The value you want to replace.";
     public static final String VALUE_LABEL = "Value";
     public static final String DEFAULT_VALUE_DESCRIPTION =
@@ -54,49 +57,7 @@ public class DataMapperUtils {
         };
     }
 
-    public static Object getValue(Parameters inputParameters) {
-        Object value = null;
-
-        switch (inputParameters.getRequiredInteger(TYPE)) {
-            case 1:
-                value = inputParameters.getRequiredArray(VALUE);
-                break;
-            case 2:
-                value = inputParameters.getRequiredBoolean(VALUE);
-                break;
-            case 3:
-                value = inputParameters.getRequiredLocalDate(VALUE);
-                break;
-            case 4:
-                value = inputParameters.getRequiredLocalDateTime(VALUE);
-                break;
-            case 5:
-                value = inputParameters.getRequiredInteger(VALUE);
-                break;
-            case 6:
-                value = nullable();
-                break;
-            case 7:
-                value = inputParameters.getRequiredDouble(VALUE);
-                break;
-            case 8:
-                value = inputParameters.getRequiredMap(VALUE);
-                break;
-            case 9:
-                value = inputParameters.getRequiredString(VALUE);
-                break;
-            case 10:
-                value = inputParameters.getRequiredLocalTime(VALUE);
-                break;
-            default:
-                break;
-        }
-
-        return value;
-    }
-
     public static String getDisplayCondition(String number) {
         return "type == " + number;
     }
-
 }

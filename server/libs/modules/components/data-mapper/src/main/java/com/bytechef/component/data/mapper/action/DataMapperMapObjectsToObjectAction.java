@@ -25,6 +25,7 @@ import static com.bytechef.component.data.mapper.constant.DataMapperConstants.IN
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.MAPPINGS;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.REQUIRED_FIELD;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.TO;
+import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.integer;
@@ -32,9 +33,9 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
-import com.bytechef.component.data.mapper.util.mapping.RequiredStringMapping;
+import com.bytechef.component.data.mapper.model.Pair;
+import com.bytechef.component.data.mapper.model.RequiredStringMapping;
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import java.util.HashMap;
@@ -44,17 +45,14 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.Validate;
-import org.graalvm.collections.Pair;
 
 /**
  * @author Ivica Cardic
+ * @author Marko Kriskovic
  */
 public class DataMapperMapObjectsToObjectAction {
 
-    private DataMapperMapObjectsToObjectAction() {
-    }
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL.action("mapObjectsToObject")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("mapObjectsToObject")
         .title("Map objects to object")
         .description("Creates a new object with the chosen input properties. You can also rename the property keys.")
         .properties(
@@ -111,26 +109,33 @@ public class DataMapperMapObjectsToObjectAction {
         .output()
         .perform(DataMapperMapObjectsToObjectAction::perform);
 
+    private DataMapperMapObjectsToObjectAction() {
+    }
+
+    @SuppressWarnings("unchecked")
     protected static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
         Map<String, Object> output = new HashMap<>();
+        List<RequiredStringMapping> mappings = inputParameters.getList(
+            MAPPINGS, RequiredStringMapping.class, List.of());
 
-        List<RequiredStringMapping> mappingList =
-            inputParameters.getList(MAPPINGS, RequiredStringMapping.class, List.of());
-        Map<String, Pair<String, Boolean>> mappings = mappingList.stream()
-            .collect(Collectors.toMap(RequiredStringMapping::getFrom,
-                value -> Pair.create(value.getTo(), value.isRequiredField())));
+        Map<String, Pair<String, Boolean>> mappingMap = mappings.stream()
+            .collect(
+                Collectors.toMap(
+                    RequiredStringMapping::getFrom, value -> Pair.create(value.getTo(), value.isRequiredField())));
 
-        if (inputParameters.getInteger(INPUT_TYPE)
-            .equals(1)) {
+        Integer inputType = inputParameters.getInteger(INPUT_TYPE);
+
+        if (inputType != null && inputType.equals(1)) {
             Map<String, Object> input = inputParameters.getMap(INPUT, Object.class, Map.of());
 
-            fillOutput(inputParameters, input, output, mappings);
+            fillOutput(inputParameters, input, output, mappingMap);
         } else {
             List<Object> input = inputParameters.getList(INPUT, Object.class, List.of());
 
             for (Object object : input) {
-                fillOutput(inputParameters, (Map<String, Object>) object, output, mappings);
+                fillOutput(inputParameters, (Map<String, Object>) object, output, mappingMap);
             }
         }
 
@@ -139,39 +144,36 @@ public class DataMapperMapObjectsToObjectAction {
 
     private static void fillOutput(
         Parameters inputParameters, Map<String, Object> input, Map<String, Object> output,
-        Map<String, Pair<String, Boolean>> mappings) {
+        Map<String, Pair<String, Boolean>> mappingMap) {
+
         for (Map.Entry<String, Object> entry : input.entrySet()) {
             if (isAllowedToMap(inputParameters, entry)) {
-                if (mappings.containsKey(entry.getKey())) {
-                    if (mappings.get(entry.getKey())
-                        .getRight() != null
-                        && mappings.get(entry.getKey())
-                            .getRight()) {
-                        Objects.requireNonNull(entry.getValue(),
-                            "Required field " + entry.getKey() + " cannot be null.");
-                        Validate.notBlank(entry.getValue()
-                            .toString(),
-                            "Required field " + entry.getKey() + " cannot be empty.");
+                Object value = entry.getValue();
+
+                if (mappingMap.containsKey(entry.getKey())) {
+                    Pair<String, Boolean> mapping = mappingMap.get(entry.getKey());
+
+                    if (mapping.getRight() != null && mapping.getRight()) {
+                        Objects.requireNonNull(value, "Required field " + entry.getKey() + " cannot be null.");
+                        Validate.notBlank(value.toString(), "Required field " + entry.getKey() + " cannot be empty.");
                     }
 
-                    output.put(mappings.get(entry.getKey())
-                        .getLeft(),
-                        entry.getValue());
-                } else if (inputParameters.getBoolean(INCLUDE_UNMAPPED) != null
-                    && inputParameters.getBoolean(INCLUDE_UNMAPPED))
-                    output.put(entry.getKey(), entry.getValue());
+                    output.put(mapping.getLeft(), value);
+                } else if (inputParameters.getBoolean(INCLUDE_UNMAPPED) != null &&
+                    inputParameters.getBoolean(INCLUDE_UNMAPPED))
+
+                    output.put(entry.getKey(), value);
             }
         }
     }
 
     private static boolean isAllowedToMap(Parameters inputParameters, Map.Entry<String, Object> entry) {
-        return (inputParameters.getBoolean(INCLUDE_NULLS) == null
-            || (inputParameters.getBoolean(INCLUDE_NULLS) != null && (inputParameters.getBoolean(INCLUDE_NULLS) ||
+        return (inputParameters.getBoolean(INCLUDE_NULLS) == null ||
+            (inputParameters.getBoolean(INCLUDE_NULLS) != null && (inputParameters.getBoolean(INCLUDE_NULLS) ||
                 ObjectUtils.anyNotNull(entry.getValue()))))
-            && (inputParameters.getBoolean(INCLUDE_EMPTY_STRINGS) == null
-                || (inputParameters.getBoolean(INCLUDE_EMPTY_STRINGS) != null
-                    && (inputParameters.getBoolean(INCLUDE_EMPTY_STRINGS) ||
-                        ObjectUtils.isNotEmpty(entry.getValue()))));
+            &&
+            (inputParameters.getBoolean(INCLUDE_EMPTY_STRINGS) == null ||
+                (inputParameters.getBoolean(INCLUDE_EMPTY_STRINGS) != null &&
+                    (inputParameters.getBoolean(INCLUDE_EMPTY_STRINGS) || ObjectUtils.isNotEmpty(entry.getValue()))));
     }
-
 }

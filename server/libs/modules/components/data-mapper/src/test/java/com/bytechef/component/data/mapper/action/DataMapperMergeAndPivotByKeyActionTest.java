@@ -37,16 +37,20 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+/**
+ * @author Marko Kriskovic
+ */
 class DataMapperMergeAndPivotByKeyActionTest {
-    private Parameters inputParameters;
+
     private Parameters connectionParameters;
     private ActionContext context;
+    private Parameters inputParameters;
 
     @BeforeEach
     public void setUp() {
-        inputParameters = mock(Parameters.class);
         connectionParameters = mock(Parameters.class);
         context = mock(ActionContext.class);
+        inputParameters = mock(Parameters.class);
     }
 
     @Test
@@ -81,8 +85,7 @@ class DataMapperMergeAndPivotByKeyActionTest {
 
     @Test
     void testPerformWithObjectType() {
-        Object inputObject = new Object();
-        setupAndAssertTestForType(inputObject);
+        setupAndAssertTestForType(new Object());
     }
 
     @Test
@@ -102,51 +105,49 @@ class DataMapperMergeAndPivotByKeyActionTest {
 
     private <T> void setupAndAssertTestForType(T input) {
         Map<String, Object> map = new HashMap<>();
+
         map.put("key", input);
 
-        setupAndAssertTest(List.of(map),
+        setupAndAssertTest(
+            List.of(map),
             result -> {
-                assertTrue(result.get("key")
-                    .containsKey(input),
-                    "Result should contain input as key");
-                assertEquals("value", result.get("key")
-                    .get(input),
-                    "Value in result with input key should be 'value'.");
+                Map<Object, Object> key = result.get("key");
+
+                assertTrue(key.containsKey(input), "Result should contain input as key");
+                assertEquals("value", key.get(input), "Value in result with input key should be 'value'.");
             });
     }
 
     @Test
     void testPerformEmptyList() {
         setupAndAssertTest(List.of(),
-            result -> assertTrue(result.get("key")
-                .isEmpty(),
-                "Result should be empty."));
+            result -> {
+                Map<Object, Object> key = result.get("key");
+
+                assertTrue(key.isEmpty(), "Result should be empty.");
+            });
     }
 
     @Test
     void testPerformReplaceNotSameKey() {
         setupAndAssertTest(List.of(Map.of("key1", "value")),
-            result -> assertFalse(result.get("key")
-                .containsKey("value"),
-                "Result should not contain 'value' as key"));
+            result -> {
+                Map<Object, Object> key = result.get("key");
+
+                assertFalse(key.containsKey("value"), "Result should not contain 'value' as key");
+            });
     }
 
     @Test
     void testPerformReplaceMultipleValues() {
         setupAndAssertTest(List.of(Map.of("key", "value1"), Map.of("key", "value2")),
             result -> {
-                assertTrue(result.get("key")
-                    .containsKey("value1"),
-                    "Result should contain 'value1' as key");
-                assertEquals("value", result.get("key")
-                    .get("value1"),
-                    "Value in result with 'value1' key should be 'value'.");
-                assertTrue(result.get("key")
-                    .containsKey("value2"),
-                    "Result should contain 'value2' as key");
-                assertEquals("value", result.get("key")
-                    .get("value2"),
-                    "Value in result with 'value2' key should be 'value'.");
+                Map<Object, Object> key = result.get("key");
+
+                assertTrue(key.containsKey("value1"), "Result should contain 'value1' as key");
+                assertEquals("value", key.get("value1"), "Value in result with 'value1' key should be 'value'.");
+                assertTrue(key.containsKey("value2"), "Result should contain 'value2' as key");
+                assertEquals("value", key.get("value2"), "Value in result with 'value2' key should be 'value'.");
             });
     }
 
@@ -154,15 +155,11 @@ class DataMapperMergeAndPivotByKeyActionTest {
     void testPerformReplaceMultipleValuesNotSameKey() {
         setupAndAssertTest(List.of(Map.of("key", "value1"), Map.of("key1", "value2")),
             result -> {
-                assertTrue(result.get("key")
-                    .containsKey("value1"),
-                    "Result should contain 'value1' as key");
-                assertEquals("value", result.get("key")
-                    .get("value1"),
-                    "Value in result with 'value1' key should be 'value'.");
-                assertFalse(result.get("key")
-                    .containsKey("value2"),
-                    "Result should not contain 'value2' as key");
+                Map<Object, Object> key = result.get("key");
+
+                assertTrue(key.containsKey("value1"), "Result should contain 'value1' as key");
+                assertEquals("value", key.get("value1"), "Value in result with 'value1' key should be 'value'.");
+                assertFalse(key.containsKey("value2"), "Result should not contain 'value2' as key");
             });
     }
 
@@ -171,7 +168,8 @@ class DataMapperMergeAndPivotByKeyActionTest {
         when(inputParameters.getRequiredString(FIELD_VALUE)).thenReturn("value");
         when(inputParameters.getList(INPUT, Object.class, List.of())).thenReturn(inputValue);
 
-        Map<String, Map<Object, Object>> result = DataMapperMergeAndPivotByKeyAction.perform(inputParameters, connectionParameters, context);
+        Map<String, Map<Object, Object>> result = DataMapperMergeAndPivotByKeyAction.perform(
+            inputParameters, connectionParameters, context);
 
         consumer.accept(result);
     }

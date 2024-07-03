@@ -14,14 +14,29 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.data.mapper.util.mapping;
+package com.bytechef.component.data.mapper.model;
 
-public class StringMapping extends Mapping<String, String> {
-    public StringMapping() {
+/**
+ * @author Marko Kriskovic
+ */
+public class RequiredStringMapping extends StringMapping {
+
+    private boolean requiredField;
+
+    public RequiredStringMapping() {
         super();
     }
 
-    public StringMapping(String from, String to) {
+    public RequiredStringMapping(String from, String to, boolean requiredField) {
         super(from, to);
+        this.requiredField = requiredField;
+    }
+
+    public boolean isRequiredField() {
+        return requiredField;
+    }
+
+    public void setRequiredField(boolean requiredField) {
+        this.requiredField = requiredField;
     }
 }

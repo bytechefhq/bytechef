@@ -46,9 +46,9 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.time;
 
 import com.bytechef.commons.util.ConvertUtils;
+import com.bytechef.component.data.mapper.model.Mapping;
+import com.bytechef.component.data.mapper.model.ObjectMapping;
 import com.bytechef.component.data.mapper.util.DataMapperUtils;
-import com.bytechef.component.data.mapper.util.mapping.Mapping;
-import com.bytechef.component.data.mapper.util.mapping.ObjectMapping;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -57,11 +57,9 @@ import java.util.List;
 
 /**
  * @author Ivica Cardic
+ * @author Marko Kriskovic
  */
 public class DataMapperReplaceValueAction {
-
-    private DataMapperReplaceValueAction() {
-    }
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL.action("replaceValue")
         .title("Replace value")
@@ -78,7 +76,6 @@ public class DataMapperReplaceValueAction {
                     option("Date", 3),
                     option("Date Time", 4),
                     option("Integer", 5),
-//                    option("Nullable", 6),
                     option("Number", 7),
                     option("Object", 8),
                     option("String", 9),
@@ -109,11 +106,6 @@ public class DataMapperReplaceValueAction {
                 .description(VALUE_DESCRIPTION)
                 .displayCondition(getDisplayCondition("5"))
                 .required(true),
-//            nullable(VALUE)
-//                .label(VALUE_LABEL)
-//                .description(VALUE_DESCRIPTION)
-//                .displayCondition(getDisplayCondition("6"))
-//                .required(true),
             number(VALUE)
                 .label(VALUE_LABEL)
                 .description(VALUE_DESCRIPTION)
@@ -316,17 +308,23 @@ public class DataMapperReplaceValueAction {
         .output()
         .perform(DataMapperReplaceValueAction::perform);
 
+    private DataMapperReplaceValueAction() {
+    }
+
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
         Class<?> type = DataMapperUtils.getType(inputParameters);
 
-        List<ObjectMapping> mappingList = inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of());
+        List<ObjectMapping> mappings = inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of());
 
-        for (Mapping<Object, Object> mapping : mappingList) {
-            if (ConvertUtils.canConvert(mapping.getFrom(), type) &&
-                ConvertUtils.convertValue(mapping.getFrom(), type)
-                    .equals(inputParameters.get(VALUE, type))) {
-                return ConvertUtils.convertValue(mapping.getTo(), type);
+        for (Mapping<Object, Object> mapping : mappings) {
+            if (ConvertUtils.canConvert(mapping.getFrom(), type)) {
+                Object from = ConvertUtils.convertValue(mapping.getFrom(), type);
+
+                if (from.equals(inputParameters.get(VALUE, type))) {
+                    return ConvertUtils.convertValue(mapping.getTo(), type);
+                }
             }
         }
 

@@ -20,6 +20,7 @@ import static com.bytechef.component.data.mapper.constant.DataMapperConstants.FI
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INPUT;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INPUT_TYPE;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.VALUE_KEY;
+import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
@@ -27,7 +28,6 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import java.util.ArrayList;
@@ -37,13 +37,11 @@ import java.util.Map;
 
 /**
  * @author Ivica Cardic
+ * @author Marko Kriskovic
  */
 public class DataMapperMapObjectsToArrayAction {
 
-    private DataMapperMapObjectsToArrayAction() {
-    }
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL.action("mapObjectsToArray")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("mapObjectsToArray")
         .title("Map objects to array")
         .description("Transform an object or array of objects into an array of key-value pairs.")
         .properties(
@@ -78,12 +76,17 @@ public class DataMapperMapObjectsToArrayAction {
         .output()
         .perform(DataMapperMapObjectsToArrayAction::perform);
 
+    private DataMapperMapObjectsToArrayAction() {
+    }
+
+    @SuppressWarnings("unchecked")
     protected static List<Map<String, Object>> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        List<Map<String, Object>> output = new ArrayList<>();
 
-        if (inputParameters.getInteger(INPUT_TYPE)
-            .equals(1)) {
+        List<Map<String, Object>> output = new ArrayList<>();
+        Integer inoutType = inputParameters.getInteger(INPUT_TYPE);
+
+        if (inoutType != null && inoutType.equals(1)) {
             Map<String, Object> input = inputParameters.getMap(INPUT, Object.class, new HashMap<>());
 
             fillOutput(inputParameters, input, output);
@@ -98,15 +101,18 @@ public class DataMapperMapObjectsToArrayAction {
         return output;
     }
 
-    private static void
-        fillOutput(Parameters inputParameters, Map<String, Object> input, List<Map<String, Object>> output) {
+    private static void fillOutput(
+        Parameters inputParameters, Map<String, Object> input, List<Map<String, Object>> output) {
+
         String fieldKey = inputParameters.getRequiredString(FIELD_KEY);
         String valueKey = inputParameters.getRequiredString(VALUE_KEY);
 
         for (Map.Entry<String, Object> entry : input.entrySet()) {
             Map<String, Object> objectHashMap = new HashMap<>();
+
             objectHashMap.put(fieldKey, entry.getKey());
             objectHashMap.put(valueKey, entry.getValue());
+
             output.add(objectHashMap);
         }
     }

@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.data.mapper.util.mapping;
+package com.bytechef.component.data.mapper.model;
 
+/**
+ * @author Marko Kriskovic
+ */
 public class ObjectMapping extends Mapping<Object, Object> {
+
     public ObjectMapping() {
         super();
     }

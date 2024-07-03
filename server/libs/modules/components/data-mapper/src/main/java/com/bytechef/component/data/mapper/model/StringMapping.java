@@ -14,33 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.data.mapper.util.mapping;
+package com.bytechef.component.data.mapper.model;
 
-public abstract class Mapping<F, T> {
-    private F from;
-    private T to;
+/**
+ * @author Marko Kriskovic
+ */
+public class StringMapping extends Mapping<String, String> {
 
-    protected Mapping() {
+    public StringMapping() {
+        super();
     }
 
-    protected Mapping(F from, T to) {
-        this.from = from;
-        this.to = to;
-    }
-
-    public F getFrom() {
-        return from;
-    }
-
-    public void setFrom(F from) {
-        this.from = from;
-    }
-
-    public T getTo() {
-        return to;
-    }
-
-    public void setTo(T to) {
-        this.to = to;
+    public StringMapping(String from, String to) {
+        super(from, to);
     }
 }
