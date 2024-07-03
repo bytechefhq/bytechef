@@ -64,7 +64,9 @@ public class BashExecuteAction {
         try {
             Runtime runtime = Runtime.getRuntime();
 
-            Process chmodProcess = runtime.exec(String.format("chmod u+x %s", scriptFile.getAbsolutePath()));
+            Process chmodProcess = runtime.exec(new String[] {
+                "chmod", "u+x", scriptFile.getAbsolutePath()
+            });
 
             int chmodRetCode = chmodProcess.waitFor();
 
