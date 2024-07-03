@@ -26,6 +26,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.exception.ComponentConfigurationException;
 import com.bytechef.component.file.storage.constant.FileStorageConstants;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -36,7 +37,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -66,7 +71,7 @@ public class FileStorageDownloadAction {
     protected static FileEntry perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
-        URL url = new URL(inputParameters.getRequiredString(FileStorageConstants.URL));
+        URL url = toURL(inputParameters.getRequiredString(FileStorageConstants.URL));
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
         connection.connect();
@@ -103,6 +108,18 @@ public class FileStorageDownloadAction {
         }
 
         return count;
+    }
+
+    private static URL toURL(String fileUrl) {
+        try {
+            URI uri = new URI(fileUrl);
+
+            uri = uri.parseServerAuthority();
+
+            return uri.toURL();
+        } catch (URISyntaxException | MalformedURLException e) {
+            throw new ComponentConfigurationException("Unable to create URL", e, Map.of("URL", fileUrl));
+        }
     }
 
     private static final class ProgressingOutputStream extends FilterOutputStream {
