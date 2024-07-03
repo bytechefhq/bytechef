@@ -29,6 +29,7 @@ import static com.bytechef.component.data.mapper.util.DataMapperUtils.MAPPINGS_D
 import static com.bytechef.component.data.mapper.util.DataMapperUtils.MAPPINGS_LABEL;
 import static com.bytechef.component.data.mapper.util.DataMapperUtils.TO_DESCRIPTION;
 import static com.bytechef.component.data.mapper.util.DataMapperUtils.getDisplayCondition;
+import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.date;
@@ -40,9 +41,8 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.time;
 
-import com.bytechef.component.data.mapper.util.mapping.ObjectMapping;
+import com.bytechef.component.data.mapper.model.ObjectMapping;
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import java.util.HashMap;
@@ -52,13 +52,11 @@ import java.util.Map;
 
 /**
  * @author Ivica Cardic
+ * @author Marko Kriskovic
  */
 public class DataMapperReplaceAllSpecifiedValuesAction {
 
-    private DataMapperReplaceAllSpecifiedValuesAction() {
-    }
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL.action("replaceAllSpecifiedValues")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("replaceAllSpecifiedValues")
         .title("Replace all specified values")
         .description(
             "Goes through all object parameters and replaces all specified input parameter values.")
@@ -91,7 +89,6 @@ public class DataMapperReplaceAllSpecifiedValuesAction {
                     option("Date", 3),
                     option("Date Time", 4),
                     option("Integer", 5),
-//                    option("Nullable", 6),
                     option("Number", 7),
                     option("Object", 8),
                     option("String", 9),
@@ -227,40 +224,47 @@ public class DataMapperReplaceAllSpecifiedValuesAction {
         .output()
         .perform(DataMapperReplaceAllSpecifiedValuesAction::perform);
 
+    private DataMapperReplaceAllSpecifiedValuesAction() {
+    }
+
+    @SuppressWarnings("unchecked")
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        List<ObjectMapping> mappingList = inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of());
-        Map<Object, Object> mappings = mappingList.stream()
+        List<ObjectMapping> mappings = inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of());
+
+        Map<Object, Object> mappingMap = mappings.stream()
             .collect(HashMap::new, (map, value) -> map.put(value.getFrom(), value.getTo()), HashMap::putAll);
 
-        if (inputParameters.getInteger(INPUT_TYPE)
-            .equals(1)) {
+        Integer inputType = inputParameters.getInteger(INPUT_TYPE);
+
+        if (inputType != null && inputType.equals(1)) {
             Map<String, Object> input = inputParameters.getMap(INPUT, Object.class, Map.of());
 
-            return fillOutput(input, mappings);
+            return fillOutput(input, mappingMap);
         } else {
             List<Object> input = inputParameters.getList(INPUT, Object.class, List.of());
-
             List<Map<String, Object>> output = new LinkedList<>();
+
             for (Object object : input) {
-                output.add(fillOutput((Map<String, Object>) object, mappings));
+                output.add(fillOutput((Map<String, Object>) object, mappingMap));
             }
+
             return output;
         }
-
     }
 
-    private static Map<String, Object>
-        fillOutput(Map<String, Object> input, Map<Object, Object> mappings) {
+    private static Map<String, Object> fillOutput(Map<String, Object> input, Map<Object, Object> mappings) {
         Map<String, Object> output = new HashMap<>();
 
         for (Map.Entry<String, Object> entry : input.entrySet()) {
-            if (mappings.containsKey(entry.getValue()))
+            if (mappings.containsKey(entry.getValue())) {
                 output.put(entry.getKey(), mappings.get(entry.getValue()));
-            else
+            } else {
                 output.put(entry.getKey(), entry.getValue());
+            }
         }
+
         return output;
     }
 }

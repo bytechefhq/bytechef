@@ -20,14 +20,14 @@ import static com.bytechef.component.data.mapper.constant.DataMapperConstants.FR
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INPUT;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.MAPPINGS;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.TO;
+import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
-import com.bytechef.component.data.mapper.util.mapping.Mapping;
-import com.bytechef.component.data.mapper.util.mapping.StringMapping;
+import com.bytechef.component.data.mapper.model.Mapping;
+import com.bytechef.component.data.mapper.model.StringMapping;
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.jayway.jsonpath.DocumentContext;
@@ -39,12 +39,11 @@ import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic
+ * @author Marko Kriskovic
  */
 public class DataMapperRenameKeysAction {
-    private DataMapperRenameKeysAction() {
-    }
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL.action("renameKeys")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("renameKeys")
         .title("Rename keys")
         .description(
             "The action renames keys of an input object defined by mappings.")
@@ -71,21 +70,29 @@ public class DataMapperRenameKeysAction {
         .output()
         .perform(DataMapperRenameKeysAction::perform);
 
+    private DataMapperRenameKeysAction() {
+    }
+
     protected static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        List<StringMapping> mappingList = inputParameters.getList(MAPPINGS, StringMapping.class, List.of());
-        Map<String, String> mappings = mappingList.stream()
+
+        List<StringMapping> mappings = inputParameters.getList(MAPPINGS, StringMapping.class, List.of());
+
+        Map<String, String> mappingMap = mappings.stream()
             .collect(Collectors.toMap(Mapping::getFrom, Mapping::getTo, (x, y) -> y, LinkedHashMap::new));
 
         DocumentContext input = JsonPath.parse(inputParameters.get(INPUT));
-        for (Map.Entry<String, String> entry : mappings.entrySet()) {
 
-            String[] split = entry.getKey()
-                .split("\\.(?=[^\\.]+$)");
-            if (split.length > 1)
+        for (Map.Entry<String, String> entry : mappingMap.entrySet()) {
+            String key = entry.getKey();
+
+            String[] split = key.split("\\.(?=[^\\.]+$)");
+
+            if (split.length > 1) {
                 input.renameKey(split[0], split[1], entry.getValue());
-            else
-                input.renameKey("$", entry.getKey(), entry.getValue());
+            } else {
+                input.renameKey("$", key, entry.getValue());
+            }
         }
 
         return input.read("$");

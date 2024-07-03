@@ -27,7 +27,7 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.commons.util.ConvertUtils;
-import com.bytechef.component.data.mapper.util.mapping.ObjectMapping;
+import com.bytechef.component.data.mapper.model.ObjectMapping;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import java.time.LocalDate;
@@ -39,16 +39,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
+/**
+ * @author Marko Kriskovic
+ */
 class DataMapperReplaceValueActionTest {
-    private Parameters inputParameters;
+
     private Parameters connectionParameters;
     private ActionContext context;
+    private Parameters inputParameters;
 
     @BeforeEach
     public void setUp() {
-        inputParameters = mock(Parameters.class);
         connectionParameters = mock(Parameters.class);
         context = mock(ActionContext.class);
+        inputParameters = mock(Parameters.class);
     }
 
     @Test
@@ -63,14 +67,16 @@ class DataMapperReplaceValueActionTest {
 
     @Test
     void testPerformWithDateType() {
-        setupAndAssertTestForType(LocalDate.now(), LocalDate.now()
-            .plusDays(1));
+        LocalDate now = LocalDate.now();
+
+        setupAndAssertTestForType(LocalDate.now(), now.plusDays(1));
     }
 
     @Test
     void testPerformWithDateTimeType() {
-        setupAndAssertTestForType(LocalDateTime.now(), LocalDateTime.now()
-            .plusDays(1));
+        LocalDateTime now = LocalDateTime.now();
+
+        setupAndAssertTestForType(now, now.plusDays(1));
     }
 
     @Test
@@ -85,9 +91,7 @@ class DataMapperReplaceValueActionTest {
 
     @Test
     void testPerformWithObjectType() {
-        Object inputObject = new Object();
-        Object outputObject = new Object();
-        setupAndAssertTestForType(inputObject, outputObject);
+        setupAndAssertTestForType(new Object(), new Object());
     }
 
     @Test
@@ -97,8 +101,9 @@ class DataMapperReplaceValueActionTest {
 
     @Test
     void testPerformWithTimeType() {
-        setupAndAssertTestForType(LocalTime.now(), LocalTime.now()
-            .plusHours(1));
+        LocalTime now = LocalTime.now();
+
+        setupAndAssertTestForType(now, now.plusHours(1));
     }
 
     @Test
@@ -112,33 +117,42 @@ class DataMapperReplaceValueActionTest {
         Object result = DataMapperReplaceValueAction.perform(inputParameters, connectionParameters, context);
 
         // Verify
-        assertEquals("defaultValue", result, "Result should be defalut value due to empty mapping.");
+        assertEquals("defaultValue", result, "Result should be default value due to empty mapping.");
     }
 
     @Test
     void testPerformDefaultValue() {
-        setupAndAssertTest(3, 1, 2, result -> assertEquals("defaultValue", result, "Result should be defalut value."));
+        setupAndAssertTest(3, 1, 2, result -> assertEquals("defaultValue", result, "Result should be default value."));
     }
 
     @Test
-    void testPerformWithUnconvertibleType() {
-        setupAndAssertTest("1", 1, 2,
-            result -> assertEquals("defaultValue", result, "Result should be defalut value due to unconvertible type"));
+    void testPerformWithNotConvertibleType() {
+        setupAndAssertTest(
+            "1", 1, 2,
+            result -> assertEquals("defaultValue", result,
+                "Result should be default value due to not convertible type"));
     }
 
     private <T> void setupAndAssertTestForType(T inputMapping, T outputMapping) {
-        setupAndAssertTest(inputMapping, inputMapping, outputMapping, result -> assertEquals(outputMapping, result,
-            "Result should match the expected output value for type: " + result.getClass()));
+        setupAndAssertTest(
+            inputMapping, inputMapping, outputMapping, result -> assertEquals(outputMapping, result,
+                "Result should match the expected output value for type: " + result.getClass()));
     }
 
-    private <T, V> void setupAndAssertTest(V inputValue, T inputMapping, T outputMapping, Consumer<Object> consumer) {
-        when(inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of())).thenReturn(List.of(new ObjectMapping(inputMapping, outputMapping)));
+    private <T, V> void setupAndAssertTest(
+        V inputValue, T inputMapping, T outputMapping, Consumer<Object> consumer) {
+
+        when(inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of()))
+            .thenReturn(List.of(new ObjectMapping(inputMapping, outputMapping)));
         when(inputParameters.get(eq(VALUE), any())).thenReturn(inputValue);
         when((String) inputParameters.get(eq(DEFAULT_VALUE), any())).thenReturn("defaultValue");
+
         try (MockedStatic<ConvertUtils> convertUtilsMockedStatic = mockStatic(ConvertUtils.class)) {
             convertUtilsMockedStatic.when(() -> ConvertUtils.canConvert(eq(inputValue), any())).thenReturn(true);
-            convertUtilsMockedStatic.when(() -> ConvertUtils.convertValue(eq(inputMapping), any())).thenReturn(inputMapping);
-            convertUtilsMockedStatic.when(() -> ConvertUtils.convertValue(eq(outputMapping), any())).thenReturn(outputMapping);
+            convertUtilsMockedStatic.when(
+                () -> ConvertUtils.convertValue(eq(inputMapping), any())).thenReturn(inputMapping);
+            convertUtilsMockedStatic.when(
+                () -> ConvertUtils.convertValue(eq(outputMapping), any())).thenReturn(outputMapping);
 
             Object result = DataMapperReplaceValueAction.perform(inputParameters, connectionParameters, context);
 

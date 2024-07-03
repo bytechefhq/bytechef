@@ -19,12 +19,12 @@ package com.bytechef.component.data.mapper.action;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.FIELD_KEY;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.FIELD_VALUE;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INPUT;
+import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import java.util.HashMap;
@@ -33,14 +33,11 @@ import java.util.Map;
 
 /**
  * @author Ivica Cardic
+ * @author Marko Kriskovic
  */
 public class DataMapperMergeAndPivotByKeyAction {
 
-    private DataMapperMergeAndPivotByKeyAction() {
-    }
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL
-        .action("mergeAndPivotPropertiesByKey")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("mergeAndPivotPropertiesByKey")
         .title("Merge and pivot properties by key")
         .description(
             "Creates a new object out of all objects that have the same key as the specified field kay and an object as value. That value of the new object contains values of all properties that share the specified field key as keys and the they all have the specified field value as a value.")
@@ -61,23 +58,33 @@ public class DataMapperMergeAndPivotByKeyAction {
         .output()
         .perform(DataMapperMergeAndPivotByKeyAction::perform);
 
+    private DataMapperMergeAndPivotByKeyAction() {
+    }
+
+    @SuppressWarnings("unchecked")
     protected static Map<String, Map<Object, Object>> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
         List<Object> input = inputParameters.getList(INPUT, Object.class, List.of());
         String fieldKey = inputParameters.getRequiredString(FIELD_KEY);
         String fieldValue = inputParameters.getRequiredString(FIELD_VALUE);
 
-        Map<Object, Object> objectHashMap = new HashMap<>();
+        Map<Object, Object> valueMap = new HashMap<>();
+
         for (Object object : input) {
             for (Map.Entry<String, Object> entry : ((Map<String, Object>) object).entrySet()) {
-                if (entry.getKey()
-                    .equals(fieldKey))
-                    objectHashMap.put(entry.getValue(), fieldValue);
+                String key = entry.getKey();
+
+                if (key.equals(fieldKey)) {
+                    valueMap.put(entry.getValue(), fieldValue);
+                }
             }
         }
 
         Map<String, Map<Object, Object>> output = new HashMap<>();
-        output.put(fieldKey, objectHashMap);
+
+        output.put(fieldKey, valueMap);
+
         return output;
     }
 }

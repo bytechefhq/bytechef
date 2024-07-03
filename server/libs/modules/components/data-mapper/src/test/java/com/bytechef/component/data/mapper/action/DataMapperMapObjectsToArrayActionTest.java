@@ -36,16 +36,20 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+/**
+ * @author Marko Kriskovic
+ */
 class DataMapperMapObjectsToArrayActionTest {
-    private Parameters inputParameters;
+
     private Parameters connectionParameters;
     private ActionContext context;
+    private Parameters inputParameters;
 
     @BeforeEach
     public void setUp() {
-        inputParameters = mock(Parameters.class);
         connectionParameters = mock(Parameters.class);
         context = mock(ActionContext.class);
+        inputParameters = mock(Parameters.class);
     }
 
     @Test
@@ -81,6 +85,7 @@ class DataMapperMapObjectsToArrayActionTest {
     @Test
     void testPerformWithObjectTypeObject() {
         Object inputObject = new Object();
+
         setupAndAssertTestForType(inputObject, false);
     }
 
@@ -127,6 +132,7 @@ class DataMapperMapObjectsToArrayActionTest {
     @Test
     void testPerformWithObjectTypeArray() {
         Object inputObject = new Object();
+
         setupAndAssertTestForType(inputObject, true);
     }
 
@@ -152,26 +158,27 @@ class DataMapperMapObjectsToArrayActionTest {
 
     private <T> void setupAndAssertTestForType(T input, boolean isArray) {
         Map<String, Object> map = new HashMap<>();
+
         map.put("key", input);
 
         if (isArray) {
             setupAndAssertTest(List.of(map),
                 (List<?> result) -> {
-                    assertEquals("key",
-                        ((Map<?, ?>) result.getFirst()).get("fieldKey"),
+                    assertEquals(
+                        "key", ((Map<?, ?>) result.getFirst()).get("fieldKey"),
                         "'fieldKey' value in result with should be 'key'.");
-                    assertEquals(input,
-                        ((Map<?, ?>) result.getFirst()).get("fieldValue"),
+                    assertEquals(
+                        input, ((Map<?, ?>) result.getFirst()).get("fieldValue"),
                         "'fieldValue' value in result with should match the expected key input value.");
                 });
         } else {
             setupAndAssertTest(map,
                 (List<?> result) -> {
-                    assertEquals("key",
-                        ((Map<?, ?>) result.getFirst()).get("fieldKey"),
+                    assertEquals(
+                        "key", ((Map<?, ?>) result.getFirst()).get("fieldKey"),
                         "'fieldKey' value in result with should 'key'.");
-                    assertEquals(input,
-                        ((Map<?, ?>) result.getFirst()).get("fieldValue"),
+                    assertEquals(
+                        input, ((Map<?, ?>) result.getFirst()).get("fieldValue"),
                         "'fieldValue' value in result with should match the expected key output value.");
                 });
         }
@@ -181,36 +188,37 @@ class DataMapperMapObjectsToArrayActionTest {
     void testPerformReplaceMultipleValuesObject() {
         setupAndAssertTest(Map.of("key1", "value1", "key2", "value2"),
             (List<?> result) -> {
-                assertEquals("key1",
-                    ((Map<?, ?>) result.getFirst()).get("fieldKey"),
+                assertEquals(
+                    "key1", ((Map<?, ?>) result.getFirst()).get("fieldKey"),
                     "'fieldKey' value in result with should be 'key1'.");
-                assertEquals("value1",
-                    ((Map<?, ?>) result.getFirst()).get("fieldValue"),
+                assertEquals(
+                    "value1", ((Map<?, ?>) result.getFirst()).get("fieldValue"),
                     "'fieldValue' value in result with should be 'value1.");
-                assertEquals("key2",
-                    ((Map<?, ?>) result.get(1)).get("fieldKey"),
+                assertEquals(
+                    "key2", ((Map<?, ?>) result.get(1)).get("fieldKey"),
                     "'fieldKey' value in result with should be 'key2'.");
-                assertEquals("value2",
-                    ((Map<?, ?>) result.get(1)).get("fieldValue"),
+                assertEquals(
+                    "value2", ((Map<?, ?>) result.get(1)).get("fieldValue"),
                     "'fieldValue' value in result with should be 'value2'.");
             });
     }
 
     @Test
     void testPerformReplaceMultipleValuesArray() {
-        setupAndAssertTest(List.of(Map.of("key1", "value1"), Map.of("key2", "value2")),
+        setupAndAssertTest(
+            List.of(Map.of("key1", "value1"), Map.of("key2", "value2")),
             (List<?> result) -> {
-                assertEquals("key1",
-                    ((Map<?, ?>) result.getFirst()).get("fieldKey"),
+                assertEquals(
+                    "key1", ((Map<?, ?>) result.getFirst()).get("fieldKey"),
                     "'fieldKey' value in result with should be 'key1'.");
-                assertEquals("value1",
-                    ((Map<?, ?>) result.getFirst()).get("fieldValue"),
+                assertEquals(
+                    "value1", ((Map<?, ?>) result.getFirst()).get("fieldValue"),
                     "'fieldValue' value in result with should be 'value1.");
-                assertEquals("key2",
-                    ((Map<?, ?>) result.get(1)).get("fieldKey"),
+                assertEquals(
+                    "key2", ((Map<?, ?>) result.get(1)).get("fieldKey"),
                     "'fieldKey' value in result with should be 'key2'.");
-                assertEquals("value2",
-                    ((Map<?, ?>) result.get(1)).get("fieldValue"),
+                assertEquals(
+                    "value2", ((Map<?, ?>) result.get(1)).get("fieldValue"),
                     "'fieldValue' value in result with should be 'value2'.");
             });
     }
@@ -221,7 +229,8 @@ class DataMapperMapObjectsToArrayActionTest {
         when(inputParameters.getList(INPUT, Object.class, List.of())).thenReturn(inputValue);
         when(inputParameters.getInteger(INPUT_TYPE)).thenReturn(2);
 
-        List<Map<String, Object>> result = DataMapperMapObjectsToArrayAction.perform(inputParameters, connectionParameters, context);
+        List<Map<String, Object>> result = DataMapperMapObjectsToArrayAction.perform(
+            inputParameters, connectionParameters, context);
 
         consumer.accept(result);
     }
@@ -232,7 +241,8 @@ class DataMapperMapObjectsToArrayActionTest {
         when(inputParameters.getMap(INPUT, Object.class, Map.of())).thenReturn(inputValue);
         when(inputParameters.getInteger(INPUT_TYPE)).thenReturn(1);
 
-        List<Map<String, Object>> result = DataMapperMapObjectsToArrayAction.perform(inputParameters, connectionParameters, context);
+        List<Map<String, Object>> result = DataMapperMapObjectsToArrayAction.perform(
+            inputParameters, connectionParameters, context);
 
         consumer.accept(result);
     }
