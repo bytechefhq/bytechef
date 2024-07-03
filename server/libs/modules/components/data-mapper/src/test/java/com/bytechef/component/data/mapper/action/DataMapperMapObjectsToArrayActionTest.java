@@ -30,6 +30,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -186,7 +187,12 @@ class DataMapperMapObjectsToArrayActionTest {
 
     @Test
     void testPerformReplaceMultipleValuesObject() {
-        setupAndAssertTest(Map.of("key1", "value1", "key2", "value2"),
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+
+        map.put("key1", "value1");
+        map.put("key2", "value2");
+
+        setupAndAssertTest(map,
             (List<?> result) -> {
                 assertEquals(
                     "key1", ((Map<?, ?>) result.getFirst()).get("fieldKey"),
