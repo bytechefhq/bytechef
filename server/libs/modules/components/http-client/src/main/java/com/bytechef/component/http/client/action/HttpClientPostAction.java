@@ -39,11 +39,7 @@ public class HttpClientPostAction {
                 //
 
                 HttpClientComponentConstants.COMMON_PROPERTIES,
-                //
-                // Body Content properties
-                //
 
-                HttpClientComponentConstants.BODY_CONTENT_PROPERTIES,
                 //
                 // Options
                 //
