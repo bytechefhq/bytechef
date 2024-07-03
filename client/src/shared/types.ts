@@ -161,6 +161,7 @@ export type WorkflowConnectionType = {
 };
 
 export type ArrayPropertyType = PropertyModel & {
+    additionalProperties?: Array<PropertyModel>;
     controlType?: ControlTypeModel;
     custom?: boolean;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -187,6 +188,7 @@ type PropertyTypeAllType = ArrayPropertyModel &
     ValuePropertyModel;
 
 export type PropertyType = Omit<PropertyTypeAllType, 'controlType'> & {
+    additionalProperties?: Array<PropertyModel>;
     controlType?: ControlTypeModel;
     custom?: boolean;
     expressionEnabled?: boolean;

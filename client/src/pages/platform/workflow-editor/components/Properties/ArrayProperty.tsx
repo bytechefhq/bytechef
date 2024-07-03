@@ -18,15 +18,22 @@ interface ArrayPropertyProps {
     property: PropertyType;
 }
 
+type ControlType = keyof typeof VALUE_PROPERTY_CONTROL_TYPES;
+
+const initialAvailablePropertyTypes = Object.keys(VALUE_PROPERTY_CONTROL_TYPES).map((type) => ({
+    label: type as ControlType,
+    value: type as ControlType,
+}));
+
 const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
     const [arrayItems, setArrayItems] = useState<Array<ArrayPropertyType | Array<ArrayPropertyType>>>([]);
-    const [newPropertyType, setNewPropertyType] = useState<keyof typeof VALUE_PROPERTY_CONTROL_TYPES>(
-        property.items?.[0]?.type as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
-    );
+    const [availablePropertyTypes, setAvailablePropertyTypes] =
+        useState<Array<{label: ControlType; value: ControlType}>>(initialAvailablePropertyTypes);
+    const [newPropertyType, setNewPropertyType] = useState<ControlType>();
 
     const {currentComponent} = useWorkflowNodeDetailsPanelStore();
 
-    const {items, name} = property;
+    const {additionalProperties, items, name} = property;
 
     const handleAddItemClick = () => {
         const matchingItem: ArrayPropertyType | undefined = items?.find((item) => item.type === newPropertyType);
@@ -64,21 +71,48 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
         }
     };
 
-    const availablePropertyTypes = items?.length
-        ? items?.reduce((types: Array<{label: string; value: string}>, item) => {
-              if (item.type) {
-                  types.push({
-                      label: item.type,
-                      value: item.type,
-                  });
-              }
+    // get available property types from items and additional properties
+    useEffect(() => {
+        let propertyTypes: Array<{label: ControlType; value: ControlType}> = [];
 
-              return types;
-          }, [])
-        : Object.keys(VALUE_PROPERTY_CONTROL_TYPES).map((type) => ({
-              label: type,
-              value: type,
-          }));
+        const processItems = (items: Array<PropertyType>) =>
+            items.reduce((types: Array<{label: ControlType; value: ControlType}>, item) => {
+                if (item.type) {
+                    types.push({
+                        label: item.type as ControlType,
+                        value: item.type as ControlType,
+                    });
+                }
+                return types;
+            }, []);
+
+        if (items?.length) {
+            propertyTypes = processItems(items);
+        }
+
+        if (additionalProperties?.length) {
+            const additionalPropertyItems: Array<PropertyType | undefined> = (
+                additionalProperties as Array<PropertyType>
+            )
+                .map((property: PropertyType) => property.items)
+                .flat();
+
+            if (additionalPropertyItems) {
+                propertyTypes = processItems(additionalPropertyItems as Array<PropertyType>);
+            }
+        }
+
+        if (propertyTypes.length) {
+            setAvailablePropertyTypes(propertyTypes);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        if (availablePropertyTypes.length) {
+            setNewPropertyType(availablePropertyTypes[0].value);
+        }
+    }, [availablePropertyTypes]);
 
     // render individual array items with data gathered from parameters
     useEffect(() => {
@@ -141,9 +175,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
 
                 const newSubProperty = {
                     arrayName: name,
-                    controlType: VALUE_PROPERTY_CONTROL_TYPES[
-                        parameterItemType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
-                    ] as ControlTypeModel,
+                    controlType: VALUE_PROPERTY_CONTROL_TYPES[parameterItemType as ControlType] as ControlTypeModel,
                     custom: true,
                     defaultValue: parameterItemValue,
                     expressionEnabled: true,
@@ -198,6 +230,14 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    // set new property type to the first available property type
+    useEffect(() => {
+        if (availablePropertyTypes.length) {
+            setNewPropertyType(availablePropertyTypes[0].value);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     return (
         <Fragment key={`${path}_${name}_arrayProperty`}>
             <ul className="ml-2 flex flex-col space-y-4 border-l">
@@ -230,7 +270,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                 )}
             </ul>
 
-            {availablePropertyTypes.length > 1 ? (
+            {availablePropertyTypes.length > 1 && !!newPropertyType ? (
                 <SubPropertyPopover
                     array
                     availablePropertyTypes={availablePropertyTypes}
