@@ -30,6 +30,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -214,8 +215,13 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
 
     @Test
     void testPerformMultipleMappingObject() {
+        Map<String, Object> map = new LinkedHashMap<>();
+
+        map.put("key1", 1);
+        map.put("key2", 2);
+
         setupAndAssertTest(
-            Map.of("key1", 1, "key2", 2),
+            map,
             List.of(new ObjectMapping(1, 3), new ObjectMapping(2, 4)),
             result -> {
                 assertEquals(
@@ -244,8 +250,13 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
 
     @Test
     void testPerformReplaceMultipleValuesObject() {
+        Map<String, Object> map = new LinkedHashMap<>();
+
+        map.put("key1", 1);
+        map.put("key2", 1);
+
         setupAndAssertTest(
-            Map.of("key1", 1, "key2", 1),
+            map,
             List.of(new ObjectMapping(1, 3)),
             result -> {
                 assertEquals(
