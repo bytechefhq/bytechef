@@ -24,7 +24,7 @@ import {useForm} from 'react-hook-form';
 import {z} from 'zod';
 
 const formSchema = z.object({
-    environment: z.string(),
+    environment: z.string().min(1, {message: 'Environment is required'}),
     name: z.string().min(2, {
         message: 'Name must be at least 2 characters.',
     }),
@@ -46,6 +46,7 @@ const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
 
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
+            environment: apiKey?.environment || '',
             name: apiKey?.name || '',
         },
         resolver: zodResolver(formSchema),
@@ -88,6 +89,7 @@ const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
     }
 
     function saveApiKey() {
+        console.log(apiKey);
         if (apiKey?.id) {
             updateApiKeyMutation.mutate({
                 ...apiKey,
@@ -193,8 +195,6 @@ const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
                                                 <FormMessage />
                                             </FormItem>
                                         )}
-                                        rules={{required: true}}
-                                        shouldUnregister={false}
                                     />
                                 )}
                             </>
@@ -208,9 +208,7 @@ const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
                             </DialogClose>
 
                             {!secretApiKey && (
-                                <Button onClick={handleSubmit(saveApiKey)} type="submit">
-                                    {apiKey?.id ? 'Save' : 'Create secret API Key'}
-                                </Button>
+                                <Button type="submit">{apiKey?.id ? 'Save' : 'Create secret API Key'}</Button>
                             )}
                         </DialogFooter>
                     </form>

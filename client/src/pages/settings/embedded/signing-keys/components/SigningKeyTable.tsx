@@ -10,12 +10,14 @@ import {
 } from '@/components/ui/alert-dialog';
 import {Button} from '@/components/ui/button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
+import SigningKeyDialog from '@/pages/settings/embedded/signing-keys/components/SigningKeyDialog';
 import {SigningKeyModel} from '@/shared/middleware/embedded/user';
 import {useDeleteSigningKeyMutation} from '@/shared/mutations/embedded/signingKeys.mutations';
 import {SigningKeyKeys} from '@/shared/queries/embedded/signingKeys.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
-import {Trash2Icon} from 'lucide-react';
+import {useCopyToClipboard} from '@uidotdev/usehooks';
+import {ClipboardIcon, EditIcon, Trash2Icon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -69,9 +71,34 @@ const SigningKeyDeleteDialog = ({apiKeyId, onClose}: {apiKeyId: number; onClose:
 const SigningKeyTable = ({signingKeys}: SigningKeyTableProps) => {
     const [currentSigningKey, setCurrentSigningKey] = useState<SigningKeyModel>();
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [showEditDialog, setShowEditDialog] = useState(false);
+
+    /* eslint-disable @typescript-eslint/no-unused-vars */
+    const [_, copyToClipboard] = useCopyToClipboard();
 
     const columns = useMemo(
         () => [
+            columnHelper.accessor('name', {
+                cell: (info) => info.getValue(),
+                header: 'Name',
+            }),
+            columnHelper.accessor('keyId', {
+                cell: (info) => (
+                    <div className="group flex items-center gap-0.5">
+                        <span>{info.getValue()}</span>
+
+                        <Button
+                            className="invisible group-hover:visible"
+                            onClick={() => copyToClipboard(info.getValue())}
+                            size="icon"
+                            variant="ghost"
+                        >
+                            <ClipboardIcon aria-hidden="true" className="size-4 text-gray-400" />
+                        </Button>
+                    </div>
+                ),
+                header: 'Key Id',
+            }),
             columnHelper.accessor('environment', {
                 cell: (info) => info.getValue(),
                 header: 'Environment',
@@ -91,6 +118,17 @@ const SigningKeyTable = ({signingKeys}: SigningKeyTableProps) => {
                         <Button
                             onClick={() => {
                                 setCurrentSigningKey(info.row.original);
+                                setShowEditDialog(true);
+                            }}
+                            size="icon"
+                            variant="ghost"
+                        >
+                            <EditIcon className="size-4" />
+                        </Button>
+
+                        <Button
+                            onClick={() => {
+                                setCurrentSigningKey(info.row.original);
                                 setShowDeleteDialog(true);
                             }}
                             size="icon"
@@ -104,7 +142,7 @@ const SigningKeyTable = ({signingKeys}: SigningKeyTableProps) => {
                 id: 'actions',
             }),
         ],
-        []
+        [copyToClipboard]
     );
 
     const reactTable = useReactTable<SigningKeyModel>({
@@ -174,6 +212,10 @@ const SigningKeyTable = ({signingKeys}: SigningKeyTableProps) => {
 
             {showDeleteDialog && currentSigningKey && (
                 <SigningKeyDeleteDialog apiKeyId={currentSigningKey.id!} onClose={() => setShowDeleteDialog(false)} />
+            )}
+
+            {showEditDialog && (
+                <SigningKeyDialog onClose={() => setShowEditDialog(false)} signingKey={currentSigningKey} />
             )}
         </div>
     );
