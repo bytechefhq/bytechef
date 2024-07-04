@@ -8,7 +8,7 @@ import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {zodResolver} from '@hookform/resolvers/zod';
 import React, {useEffect} from 'react';
 import {useForm} from 'react-hook-form';
-import {useSearchParams} from 'react-router-dom';
+import {Link, useSearchParams} from 'react-router-dom';
 import {z} from 'zod';
 
 const formSchema = z.object({
@@ -70,7 +70,7 @@ export const PasswordResetFinish = () => {
 
     return (
         <PublicLayoutContainer>
-            <Card className="mx-auto w-full max-w-sm shadow-none">
+            <Card className="mx-auto w-full max-w-lg shadow-none">
                 <CardHeader>
                     <CardTitle className="text-xl">Reset password</CardTitle>
 
@@ -78,19 +78,23 @@ export const PasswordResetFinish = () => {
                 </CardHeader>
 
                 <CardContent>
-                    {resetPasswordSuccess && (
-                        <Alert className="mb-4">
-                            <AlertDescription>Password has been reset successfully.</AlertDescription>
-                        </Alert>
-                    )}
-
                     {resetPasswordFailure && (
                         <Alert className="mb-4" variant="destructive">
                             <AlertDescription>Password has not been reset.</AlertDescription>
                         </Alert>
                     )}
 
-                    {key ? getResetForm() : null}
+                    {key && !resetPasswordSuccess ? getResetForm() : null}
+
+                    {resetPasswordSuccess && (
+                        <div className="space-x-2">
+                            <span>Password has been reset successfully.</span>
+
+                            <Link className="ml-auto inline-block text-sm underline" to="/login">
+                                Please sign in.
+                            </Link>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
         </PublicLayoutContainer>
