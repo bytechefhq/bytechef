@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.embedded.configuration.user.token.web.rest;
+package com.bytechef.embedded.configuration.connected.user.token.web.rest;
 
 import com.bytechef.embedded.configuration.facade.IntegrationFacade;
 import com.bytechef.embedded.configuration.public_.web.rest.model.EnvironmentModel;
@@ -31,16 +31,16 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @author Ivica Cardic
  */
-@RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/internal")
+@RestController("com.bytechef.embedded.configuration.connected.user.token.web.rest.IntegrationApiController")
+@RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/by-connected-user-token")
 @ConditionalOnEndpoint
-public class UserTokenIntegrationApiController implements IntegrationApi {
+public class IntegrationApiController implements IntegrationApi {
 
     private final ConversionService conversionService;
     private final IntegrationFacade integrationFacade;
 
     @SuppressFBWarnings("EI")
-    public UserTokenIntegrationApiController(ConversionService conversionService, IntegrationFacade integrationFacade) {
+    public IntegrationApiController(ConversionService conversionService, IntegrationFacade integrationFacade) {
         this.conversionService = conversionService;
         this.integrationFacade = integrationFacade;
     }
