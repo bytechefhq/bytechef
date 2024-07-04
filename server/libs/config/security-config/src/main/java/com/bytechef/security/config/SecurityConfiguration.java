@@ -173,8 +173,6 @@ public class SecurityConfiguration {
                     .permitAll()
                     .requestMatchers(mvc.pattern("/api/account/reset-password/finish"))
                     .permitAll()
-                    .requestMatchers(mvc.pattern("/api/admin/**"))
-                    .hasAuthority(AuthorityConstants.ADMIN)
                     .requestMatchers(mvc.pattern("/api/**"))
                     .authenticated()
                     .requestMatchers(mvc.pattern("/assets/**"))

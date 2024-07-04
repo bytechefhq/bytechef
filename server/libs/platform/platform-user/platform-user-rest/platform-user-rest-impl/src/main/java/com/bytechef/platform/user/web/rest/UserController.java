@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.user.web.rest;
 
+import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.user.constant.AuthorityConstants;
 import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.platform.user.domain.Authority;
@@ -81,7 +82,8 @@ import org.springframework.web.server.ResponseStatusException;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
+@ConditionalOnEndpoint
 public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -103,7 +105,7 @@ public class UserController {
     }
 
     /**
-     * {@code POST  /admin/users} : Creates a new user.
+     * {@code POST  /internal/users} : Creates a new user.
      * <p>
      * Creates a new user if the login and email are not already used, and sends an mail with an activation link. The
      * user needs to be activated on creation.
@@ -135,13 +137,13 @@ public class UserController {
 
             mailService.sendCreationEmail(newUser);
 
-            return ResponseEntity.created(new URI("/api/admin/users/" + newUser.getLogin()))
+            return ResponseEntity.created(new URI("/api/internal/users/" + newUser.getLogin()))
                 .body(newUser);
         }
     }
 
     /**
-     * {@code PUT /admin/users} : Updates an existing User.
+     * {@code PUT /internal/users} : Updates an existing User.
      *
      * @param userDTO the user to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated user.
@@ -189,7 +191,7 @@ public class UserController {
     }
 
     /**
-     * {@code GET /admin/users} : get all users with all the details - calling this are only allowed for the
+     * {@code GET /internal/users} : get all users with all the details - calling this are only allowed for the
      * administrators.
      *
      * @param pageable the pagination information.
@@ -221,7 +223,7 @@ public class UserController {
     }
 
     /**
-     * {@code GET /admin/users/:login} : get the "login" user.
+     * {@code GET /internal/users/:login} : get the "login" user.
      *
      * @param login the login of the user to find.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the "login" user, or with status
@@ -244,7 +246,7 @@ public class UserController {
     }
 
     /**
-     * {@code DELETE /admin/users/:login} : delete the "login" User.
+     * {@code DELETE /internal/users/:login} : delete the "login" User.
      *
      * @param login the login of the user to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
