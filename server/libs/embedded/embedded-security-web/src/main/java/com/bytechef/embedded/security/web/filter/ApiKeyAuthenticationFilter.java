@@ -41,9 +41,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
  */
 public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final Pattern PATH_PATTERN = Pattern.compile("^/api/embedded/public/([^/]+)");
+    private static final Pattern PATH_PATTERN = Pattern.compile("^/api/embedded/v1/([^/]+)");
     private static final RequestMatcher REQUEST_MATCHER = new NegatedRequestMatcher(
-        new AntPathRequestMatcher("/api/embedded/public/**"));
+        new AntPathRequestMatcher("/api/embedded/v1/**"));
 
     private final ApiKeyService apiKeyService;
 
