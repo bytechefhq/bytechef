@@ -17,6 +17,8 @@
 package com.bytechef.platform.user.service;
 
 import com.bytechef.commons.util.LocalDateTimeUtils;
+import com.bytechef.commons.util.RandomUtils;
+import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.user.constant.AuthorityConstants;
 import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.platform.user.domain.Authority;
@@ -29,8 +31,6 @@ import com.bytechef.platform.user.exception.LoginAlreadyUsedException;
 import com.bytechef.platform.user.repository.AuthorityRepository;
 import com.bytechef.platform.user.repository.PersistentTokenRepository;
 import com.bytechef.platform.user.repository.UserRepository;
-import com.bytechef.platform.user.util.RandomUtils;
-import com.bytechef.platform.user.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.time.LocalDate;

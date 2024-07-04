@@ -16,7 +16,7 @@
 
 package com.bytechef.jdbc.config;
 
-import com.bytechef.platform.user.util.SecurityUtils;
+import com.bytechef.platform.security.util.SecurityUtils;
 import java.util.Optional;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

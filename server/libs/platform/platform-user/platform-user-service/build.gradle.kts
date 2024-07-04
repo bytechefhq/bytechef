@@ -10,6 +10,7 @@ dependencies {
     implementation("org.springframework.security:spring-security-core")
     implementation("org.thymeleaf:thymeleaf-spring6")
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:platform:platform-security:platform-security-api"))
 
     testImplementation("org.springframework.boot:spring-boot-starter-mail")
     testImplementation(project(":server:libs:config:jdbc-config"))

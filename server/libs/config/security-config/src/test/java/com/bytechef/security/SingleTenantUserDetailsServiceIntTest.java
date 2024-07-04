@@ -21,8 +21,8 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.bytechef.jdbc.config.AuditingJdbcConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
+import com.bytechef.platform.security.exception.UserNotActivatedException;
 import com.bytechef.platform.user.domain.User;
-import com.bytechef.platform.user.exception.UserNotActivatedException;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.security.config.SecurityConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;

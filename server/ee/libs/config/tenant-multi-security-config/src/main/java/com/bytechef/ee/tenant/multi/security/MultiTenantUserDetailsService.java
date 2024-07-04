@@ -16,9 +16,9 @@
 
 package com.bytechef.ee.tenant.multi.security;
 
+import com.bytechef.platform.security.exception.UserNotActivatedException;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
-import com.bytechef.platform.user.exception.UserNotActivatedException;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.service.TenantService;

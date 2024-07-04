@@ -16,13 +16,13 @@
 
 package com.bytechef.platform.user.service;
 
+import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.user.domain.ApiKey;
 import com.bytechef.platform.user.repository.ApiKeyRepository;
-import java.security.SecureRandom;
-import java.util.Base64;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.springframework.lang.NonNull;
@@ -35,9 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class ApiKeyServiceImpl implements ApiKeyService {
-
-    private static final Base64.Encoder URL_ENCODER = Base64.getUrlEncoder();
-    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private final ApiKeyRepository apiKeyRepository;
 
@@ -64,10 +61,9 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     private String generateSecretKey() {
         byte[] token = new byte[32];
 
-        SECURE_RANDOM.nextBytes(token);
+        RandomUtils.nextBytes(token);
 
-        return URL_ENCODER.withoutPadding()
-            .encodeToString(token);
+        return EncodingUtils.encodeToString(token);
     }
 
     @Override

@@ -16,11 +16,11 @@
 
 package com.bytechef.security;
 
+import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.platform.user.domain.PersistentToken;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.PersistentTokenService;
 import com.bytechef.platform.user.service.UserService;
-import com.bytechef.platform.user.util.RandomUtils;
 import com.bytechef.security.config.SecurityProperties;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;

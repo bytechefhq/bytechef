@@ -20,12 +20,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.commons.util.LocalDateTimeUtils;
+import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.platform.user.config.UserIntTestConfiguration;
 import com.bytechef.platform.user.domain.PersistentToken;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.repository.PersistentTokenRepository;
 import com.bytechef.platform.user.repository.UserRepository;
-import com.bytechef.platform.user.util.RandomUtils;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;

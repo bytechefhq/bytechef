@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.user.util;
+package com.bytechef.platform.security.util;
 
 import com.bytechef.platform.user.constant.AuthorityConstants;
 import java.util.Arrays;

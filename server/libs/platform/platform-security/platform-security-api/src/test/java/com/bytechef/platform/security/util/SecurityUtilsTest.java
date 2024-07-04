@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.user.util;
+package com.bytechef.platform.security.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
