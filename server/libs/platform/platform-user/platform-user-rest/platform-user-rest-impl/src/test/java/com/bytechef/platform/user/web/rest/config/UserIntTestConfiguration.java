@@ -16,13 +16,13 @@
 
 package com.bytechef.platform.user.web.rest.config;
 
+import com.bytechef.cache.config.CacheConfiguration;
 import com.bytechef.jdbc.config.AuditingJdbcConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.security.config.SecurityConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -40,10 +40,9 @@ import org.springframework.security.web.authentication.RememberMeServices;
     "com.bytechef.platform.user", "com.bytechef.platform.web.rest", "com.bytechef.tenant", "com.bytechef.ee.tenant"
 })
 @EnableAutoConfiguration
-@EnableCaching
 @Import({
-    AuditingJdbcConfiguration.class, LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class,
-    SecurityConfiguration.class
+    AuditingJdbcConfiguration.class, CacheConfiguration.class, LiquibaseConfiguration.class,
+    PostgreSQLContainerConfiguration.class, SecurityConfiguration.class
 })
 @Configuration
 public class UserIntTestConfiguration {
