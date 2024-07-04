@@ -17,18 +17,20 @@
 package com.bytechef.embedded.security.web.filter;
 
 import com.bytechef.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.embedded.security.web.util.AuthTokenUtils;
+import com.bytechef.embedded.security.web.util.AuthTokenUtils.AuthToken;
 import com.bytechef.embedded.user.service.SigningKeyService;
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.embedded.user.util.KeyId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContext;
@@ -43,7 +45,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
  */
 public class ConnectedUserAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final String AUTH_TOKEN_HEADER_NAME = "Authorization";
     private static final Pattern PATH_PATTERN = Pattern.compile("^/api/embedded/by-user-token/([^/]+)");
     private static final RequestMatcher REQUEST_MATCHER = new NegatedRequestMatcher(
         new AntPathRequestMatcher("/api/embedded/by-user-token/**"));
@@ -74,36 +75,24 @@ public class ConnectedUserAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private Authentication getAuthentication(HttpServletRequest request) {
-        String token = request.getHeader(AUTH_TOKEN_HEADER_NAME);
+        AuthToken authToken = AuthTokenUtils.getAuthToken(PATH_PATTERN, request);
 
-        if (token == null) {
-            throw new BadCredentialsException("Authorization token does not exist");
-        }
-
-        Environment environment;
-
-        Matcher matcher = PATH_PATTERN.matcher(request.getRequestURI());
-
-        if (matcher.find()) {
-            String group = matcher.group(1);
-
-            environment = Environment.valueOf(group.toUpperCase());
-        } else {
-            throw new BadCredentialsException("Unknown environment");
-        }
-
-        String externalId = Jwts.parser()
-            .verifyWith(signingKeyService.getPublicKey(environment))
+        Jws<Claims> jws = Jwts.parser()
+//            .verifyWith(signingKeyService.getPublicKey(authToken.environment()))
             .build()
-            .parseSignedClaims(token.replace("Bearer ", ""))
-            .getPayload()
+            .parseSignedClaims(authToken.token()
+                .replace("Bearer ", ""));
+
+        KeyId keyId = KeyId.parse(jws.getHeader().getKeyId());
+
+        String externalUserId = jws.getPayload()
             .getSubject();
 
-        if (!connectedUserService.hasConnectedUser(externalId, environment)) {
-            connectedUserService.createConnectedUser(externalId, environment);
+        if (!connectedUserService.hasConnectedUser(externalUserId, authToken.environment())) {
+            connectedUserService.createConnectedUser(externalUserId, authToken.environment());
         }
 
-        return new ConnectedUserAuthenticationToken(externalId, AuthorityUtils.NO_AUTHORITIES);
+        return new ConnectedUserAuthenticationToken(externalUserId, AuthorityUtils.NO_AUTHORITIES);
     }
 
     @Override
