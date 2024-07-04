@@ -24,6 +24,9 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import java.io.IOException;
 import org.springframework.boot.jackson.JsonComponent;
 
+/**
+ * @author Ivica Cardic
+ */
 @JsonComponent
 public class UpdateWorkflowNodeParameter200ResponseModelJsonSerializer
     extends JsonSerializer<UpdateWorkflowNodeParameter200ResponseModel> {
