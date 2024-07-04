@@ -29,24 +29,20 @@ import org.springframework.context.annotation.Profile;
 public class SwaggerConfiguration {
 
     @Bean
-    public GroupedOpenApi embeddedByUserTokeOpenApi() {
+    public GroupedOpenApi embeddedByConnectedUserTokeOpenApi() {
         return GroupedOpenApi.builder()
-            .group("embedded-by-user-token")
-            .displayName("Embedded by User Token API")
-            .pathsToMatch(new String[] {
-                "/api/embedded/by-user-token/**"
-            })
+            .group("embedded-by-connected-user-token")
+            .displayName("Embedded by Connected User Token API")
+            .pathsToMatch("/api/embedded/by-connected-user-token/v1/**")
             .build();
     }
 
     @Bean
-    public GroupedOpenApi embeddedOpenApi() {
+    public GroupedOpenApi embeddedInternalOpenApi() {
         return GroupedOpenApi.builder()
-            .group("embedded")
-            .displayName("Embedded API")
-            .pathsToMatch(new String[] {
-                "/api/embedded/**"
-            })
+            .group("embedded-internal")
+            .displayName("Embedded Internal API")
+            .pathsToMatch("/api/embedded/internal/**")
             .build();
     }
 
@@ -54,10 +50,8 @@ public class SwaggerConfiguration {
     public GroupedOpenApi embeddedPublicOpenApi() {
         return GroupedOpenApi.builder()
             .group("embedded-public")
-            .displayName("Embedded Public API")
-            .pathsToMatch(new String[] {
-                "/api/embedded/public/**"
-            })
+            .displayName("Embedded Public V1 API")
+            .pathsToMatch("/api/embedded/v1/**")
             .build();
     }
 }

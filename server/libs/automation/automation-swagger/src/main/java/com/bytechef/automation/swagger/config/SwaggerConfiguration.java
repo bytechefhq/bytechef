@@ -29,13 +29,20 @@ import org.springframework.context.annotation.Profile;
 public class SwaggerConfiguration {
 
     @Bean
-    public GroupedOpenApi automationOpenApi() {
+    public GroupedOpenApi automationInternalOpenApi() {
         return GroupedOpenApi.builder()
-            .group("automation")
-            .displayName("Automation API")
-            .pathsToMatch(new String[] {
-                "/api/automation/**"
-            })
+            .group("automation-internal")
+            .displayName("Automation Internal API")
+            .pathsToMatch("/api/automation/internal/**")
+            .build();
+    }
+
+    @Bean
+    public GroupedOpenApi automationPublicOpenApi() {
+        return GroupedOpenApi.builder()
+            .group("automation-public")
+            .displayName("Automation Public V1 API")
+            .pathsToMatch("/api/automation/v1/**")
             .build();
     }
 }
