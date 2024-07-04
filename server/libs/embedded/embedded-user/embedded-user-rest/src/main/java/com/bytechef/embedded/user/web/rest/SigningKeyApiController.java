@@ -19,6 +19,7 @@ package com.bytechef.embedded.user.web.rest;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.embedded.user.domain.SigningKey;
 import com.bytechef.embedded.user.service.SigningKeyService;
+import com.bytechef.embedded.user.util.KeyId;
 import com.bytechef.embedded.user.web.rest.model.CreateSigningKey200ResponseModel;
 import com.bytechef.embedded.user.web.rest.model.SigningKeyModel;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
@@ -50,8 +51,8 @@ public class SigningKeyApiController implements SigningKeyApi {
     @SuppressFBWarnings("NP")
     public ResponseEntity<CreateSigningKey200ResponseModel> createSigningKey(SigningKeyModel signingKeyModel) {
         return ResponseEntity.ok(
-            new CreateSigningKey200ResponseModel().privateKey(
-                signingKeyService.create(conversionService.convert(signingKeyModel, SigningKey.class))));
+            new CreateSigningKey200ResponseModel()
+                .privateKey(signingKeyService.create(conversionService.convert(signingKeyModel, SigningKey.class))));
     }
 
     @Override
@@ -64,23 +65,23 @@ public class SigningKeyApiController implements SigningKeyApi {
 
     @Override
     public ResponseEntity<SigningKeyModel> getSigningKey(Long id) {
-        return ResponseEntity.ok(conversionService.convert(signingKeyService.getSigningKey(id), SigningKeyModel.class));
+        return ResponseEntity.ok(getSigningKeyModel(signingKeyService.getSigningKey(id)));
     }
 
     @Override
     public ResponseEntity<List<SigningKeyModel>> getSigningKeys() {
-        return ResponseEntity.ok(
-            CollectionUtils.map(
-                signingKeyService.getSigningKeys(), signingKey -> conversionService.convert(
-                    signingKey, SigningKeyModel.class)));
+        return ResponseEntity.ok(CollectionUtils.map(signingKeyService.getSigningKeys(), this::getSigningKeyModel));
     }
 
     @Override
     @SuppressFBWarnings("NP")
-    public ResponseEntity<SigningKeyModel> updateSigningKey(Long id, SigningKeyModel appEventModel) {
+    public ResponseEntity<SigningKeyModel> updateSigningKey(Long id, SigningKeyModel signingKeyModel) {
         return ResponseEntity.ok(
-            conversionService.convert(
-                signingKeyService.update(conversionService.convert(appEventModel, SigningKey.class)),
-                SigningKeyModel.class));
+            getSigningKeyModel(signingKeyService.update(conversionService.convert(signingKeyModel, SigningKey.class))));
+    }
+
+    private SigningKeyModel getSigningKeyModel(SigningKey signingKey) {
+        return conversionService.convert(signingKey, SigningKeyModel.class)
+            .keyId(KeyId.of(signingKey.getId()).toString());
     }
 }
