@@ -19,6 +19,7 @@ package com.bytechef.cache.config;
 import com.bytechef.cache.interceptor.TenantKeyGenerator;
 import java.time.Duration;
 import org.springframework.boot.autoconfigure.cache.RedisCacheManagerBuilderCustomizer;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.annotation.CachingConfigurer;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.interceptor.KeyGenerator;
@@ -37,6 +38,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class CacheConfiguration implements CachingConfigurer {
 
     @Bean
+    @ConditionalOnProperty(prefix = "bytechef", name = "cache.provider", havingValue = "redis")
     public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() {
         Class<?> clazz = getClass();
 
