@@ -14,24 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.embedded.security.web.matcher;
+package com.bytechef.platform.security.web.matcher;
 
-import com.bytechef.platform.security.web.matcher.RequestMatcherContributor;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-@Component
-public class EmbeddedRequestMatcherContributor implements RequestMatcherContributor {
+public interface AuthenticatedRequestMatcherContributor {
 
-    @Override
-    public RequestMatcher[] getRequestMatcher(MvcRequestMatcher.Builder mvc) {
-        return new RequestMatcher[] {
-            mvc.pattern("/api/embedded/public/**"),
-            mvc.pattern("/api/embedded/by-connected-user-token/**")
-        };
-    }
+    RequestMatcher[] getRequestMatcher(MvcRequestMatcher.Builder mvc);
 }
