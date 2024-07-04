@@ -29,14 +29,14 @@ import org.springframework.context.annotation.Profile;
 public class SwaggerConfiguration {
 
     @Bean
-    public GroupedOpenApi platformOpenApi() {
+    public GroupedOpenApi platformInternalOpenApi() {
         return GroupedOpenApi.builder()
-            .group("platform")
-            .displayName("Platform API")
+            .group("platform-internal")
+            .displayName("Platform Internal API")
             .pathsToMatch(
-                "/api/platform/**")
+                "/api/platform/internal/**")
             .pathsToExclude(
-                "/api/platform/dummy")
+                "/api/platform/internal/dummy")
             .build();
     }
 }
