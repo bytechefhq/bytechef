@@ -1,22 +1,17 @@
 package com.bytechef.embedded.user.web.rest.model;
 
-import java.net.URI;
 import java.util.Objects;
-import com.bytechef.embedded.user.web.rest.model.EnvironmentModel;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.annotation.JsonValue;
+
 import java.time.LocalDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.openapitools.jackson.nullable.JsonNullable;
-import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
-import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -70,7 +65,7 @@ public class ApiKeyModel {
    * The created by.
    * @return createdBy
   */
-  
+
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
   public String getCreatedBy() {
@@ -90,7 +85,7 @@ public class ApiKeyModel {
    * The created date.
    * @return createdDate
   */
-  @Valid 
+  @Valid
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
   public LocalDateTime getCreatedDate() {
@@ -110,7 +105,7 @@ public class ApiKeyModel {
    * Get environment
    * @return environment
   */
-  @Valid 
+  @Valid
   @Schema(name = "environment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("environment")
   public EnvironmentModel getEnvironment() {
@@ -130,7 +125,7 @@ public class ApiKeyModel {
    * The id of an API key.
    * @return id
   */
-  
+
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an API key.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
   public Long getId() {
@@ -150,7 +145,7 @@ public class ApiKeyModel {
    * The last modified by.
    * @return lastModifiedBy
   */
-  
+
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
   public String getLastModifiedBy() {
@@ -170,7 +165,7 @@ public class ApiKeyModel {
    * The last modified date.
    * @return lastModifiedDate
   */
-  @Valid 
+  @Valid
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
   public LocalDateTime getLastModifiedDate() {
@@ -190,7 +185,7 @@ public class ApiKeyModel {
    * The last used date.
    * @return lastUsedDate
   */
-  @Valid 
+  @Valid
   @Schema(name = "lastUsedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last used date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastUsedDate")
   public LocalDateTime getLastUsedDate() {
@@ -210,7 +205,7 @@ public class ApiKeyModel {
    * The name of an API key.
    * @return name
   */
-  @NotNull 
+  @NotNull
   @Schema(name = "name", description = "The name of an API key.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
   public String getName() {
@@ -230,7 +225,7 @@ public class ApiKeyModel {
    * The preview of secret API key.
    * @return secretKey
   */
-  
+
   @Schema(name = "secretKey", accessMode = Schema.AccessMode.READ_ONLY, description = "The preview of secret API key.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("secretKey")
   public String getSecretKey() {

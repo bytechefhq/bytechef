@@ -1,18 +1,11 @@
 package com.bytechef.embedded.user.web.rest.model;
 
-import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import org.openapitools.jackson.nullable.JsonNullable;
-import java.time.OffsetDateTime;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
-import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -34,7 +27,7 @@ public class CreateApiKey200ResponseModel {
    * The secret API key.
    * @return secretKey
   */
-  
+
   @Schema(name = "secretKey", description = "The secret API key.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("secretKey")
   public String getSecretKey() {
