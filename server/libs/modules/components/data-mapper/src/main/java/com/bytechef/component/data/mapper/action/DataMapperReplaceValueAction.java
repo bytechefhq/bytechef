@@ -64,7 +64,7 @@ public class DataMapperReplaceValueAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL.action("replaceValue")
         .title("Replace value")
         .description(
-            "Replaces a given value with the specified value defined in mappings. In case there is no mapping specified for the value, it returns the default value, and if there is no default defined, it returns null.")
+            "Replaces a given value with the specified value defined in mappings. In case there is no mapping specified for the value, it returns the default value, and if there is no default defined, it returns null. You can also change a string value with regex.")
         .properties(
             integer(TYPE)
                 .label("Value type")
@@ -285,11 +285,11 @@ public class DataMapperReplaceValueAction {
                     object().properties(
                         string(FROM)
                             .label(LABEL_FROM)
-                            .description(FROM_DESCRIPTION)
+                            .description("Part of the string value you want to change, defined by regex.")
                             .required(true),
                         string(TO)
                             .label(LABEL_TO)
-                            .description(TO_DESCRIPTION)
+                            .description("The value you want to change the defined part to, defined by regex.")
                             .required(true))),
             array(MAPPINGS)
                 .label(MAPPINGS_LABEL)
@@ -320,10 +320,14 @@ public class DataMapperReplaceValueAction {
 
         for (Mapping<Object, Object> mapping : mappings) {
             if (ConvertUtils.canConvert(mapping.getFrom(), type)) {
-                Object from = ConvertUtils.convertValue(mapping.getFrom(), type);
+                if(type.equals(String.class)){
+                    return inputParameters.getString(VALUE).replace(mapping.getFrom().toString(), mapping.getTo().toString());
+                } else {
+                    Object from = ConvertUtils.convertValue(mapping.getFrom(), type);
 
-                if (from.equals(inputParameters.get(VALUE, type))) {
-                    return ConvertUtils.convertValue(mapping.getTo(), type);
+                    if (from.equals(inputParameters.get(VALUE, type))) {
+                        return ConvertUtils.convertValue(mapping.getTo(), type);
+                    }
                 }
             }
         }
