@@ -45,9 +45,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
  */
 public class ConnectedUserAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final Pattern PATH_PATTERN = Pattern.compile("^/api/embedded/by-user-token/([^/]+)");
+    private static final Pattern PATH_PATTERN = Pattern.compile("^/api/embedded/by-connected-user-token/([^/]+)");
     private static final RequestMatcher REQUEST_MATCHER = new NegatedRequestMatcher(
-        new AntPathRequestMatcher("/api/embedded/by-user-token/**"));
+        new AntPathRequestMatcher("/api/embedded/by-connected-user-token/**"));
 
     private final ConnectedUserService connectedUserService;
     private final SigningKeyService signingKeyService;

@@ -21,14 +21,17 @@ import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author Ivica Cardic
+ */
 @Component
-public class UserRequestMatcherContributor implements RequestMatcherContributor {
+public class EmbeddedRequestMatcherContributor implements RequestMatcherContributor {
 
     @Override
     public RequestMatcher[] getRequestMatcher(MvcRequestMatcher.Builder mvc) {
         return new RequestMatcher[] {
             mvc.pattern("/api/embedded/public/**"),
-            mvc.pattern("/api/embedded/by-user-token/**")
+            mvc.pattern("/api/embedded/by-connected-user-token/**")
         };
     }
 }
