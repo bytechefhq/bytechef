@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @author Ivica Cardic
  */
-@RestController("com.bytechef.automation.user.web.rest.ApiKeyApiController")
+@RestController("com.bytechef.platform.user.web.rest.ApiKeyApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
 @ConditionalOnEndpoint
 public class ApiKeyApiController implements ApiKeyApi {

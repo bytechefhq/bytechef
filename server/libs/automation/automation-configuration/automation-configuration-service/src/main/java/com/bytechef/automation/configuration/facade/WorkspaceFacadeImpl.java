@@ -21,7 +21,7 @@ import com.bytechef.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.automation.configuration.service.WorkspaceService;
 import com.bytechef.automation.configuration.service.WorkspaceUserService;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.user.constant.AuthorityConstants;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.AuthorityService;

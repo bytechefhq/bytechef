@@ -53,7 +53,6 @@ dependencies {
     implementation("org.springframework.security:spring-security-web")
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:embedded:embedded-configuration:embedded-configuration-rest:embedded-configuration-rest-api"))
-    implementation(project(":server:libs:embedded:embedded-user:embedded-user-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-rest:platform-connection-rest-api"))
 

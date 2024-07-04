@@ -19,8 +19,8 @@ package com.bytechef.embedded.security.web.filter;
 import com.bytechef.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.embedded.security.web.util.AuthTokenUtils;
 import com.bytechef.embedded.security.web.util.AuthTokenUtils.AuthToken;
-import com.bytechef.embedded.user.service.SigningKeyService;
-import com.bytechef.embedded.user.util.KeyId;
+import com.bytechef.platform.user.jwt.JwtKeyId;
+import com.bytechef.platform.user.service.SigningKeyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -83,7 +83,8 @@ public class ConnectedUserAuthenticationFilter extends OncePerRequestFilter {
             .parseSignedClaims(authToken.token()
                 .replace("Bearer ", ""));
 
-        KeyId keyId = KeyId.parse(jws.getHeader().getKeyId());
+        JwtKeyId jwtKeyId = JwtKeyId.parse(jws.getHeader()
+            .getKeyId());
 
         String externalUserId = jws.getPayload()
             .getSubject();

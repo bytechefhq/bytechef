@@ -16,9 +16,9 @@
 
 package com.bytechef.embedded.user.web.rest.mapper;
 
-import com.bytechef.embedded.user.domain.SigningKey;
 import com.bytechef.embedded.user.web.rest.mapper.config.EmbeddedUserMapperSpringConfig;
 import com.bytechef.embedded.user.web.rest.model.SigningKeyModel;
+import com.bytechef.platform.user.domain.SigningKey;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
@@ -26,11 +26,12 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = EmbeddedUserMapperSpringConfig.class)
+@Mapper(config = EmbeddedUserMapperSpringConfig.class, implementationName = "Embedded<CLASS_NAME>Impl")
 public interface SigningKeyModelMapper extends Converter<SigningKeyModel, SigningKey> {
 
     @Override
     @Mapping(target = "publicKey", ignore = true)
+    @Mapping(target = "type", ignore = true)
     @Mapping(target = "userId", ignore = true)
     SigningKey convert(SigningKeyModel signingKeyModel);
 }

@@ -45,13 +45,13 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
     private final Event event;
     private final File file;
     private final String actionName;
-    private final AppType appType;
+    private final AppType type;
     private final Long instanceWorkflowId;
     private final Long jobId;
 
     @SuppressFBWarnings("EI")
     public ActionContextImpl(
-        String componentName, int componentVersion, String actionName, AppType appType,
+        String componentName, int componentVersion, String actionName, AppType type,
         Long instanceWorkflowId, Long jobId, ComponentConnection connection, DataStorageService dataStorageService,
         ApplicationEventPublisher eventPublisher, FileStorageService fileStorageService,
         HttpClientExecutor httpClientExecutor) {
@@ -59,15 +59,15 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
         super(componentName, componentVersion, actionName, connection, httpClientExecutor);
 
         this.actionName = actionName;
-        this.appType = appType;
+        this.type = type;
         this.instanceWorkflowId = instanceWorkflowId;
         this.jobId = jobId;
 
-        if (appType == null || instanceWorkflowId == null || jobId == null) {
+        if (type == null || instanceWorkflowId == null || jobId == null) {
             this.data = new NoOpDataImpl();
         } else {
             this.data = new DataImpl(
-                componentName, componentVersion, actionName, appType, instanceWorkflowId, jobId, dataStorageService);
+                componentName, componentVersion, actionName, type, instanceWorkflowId, jobId, dataStorageService);
         }
 
         this.event = jobId == null ? progress -> {} : new EventImpl(eventPublisher, jobId);
@@ -102,7 +102,7 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
     }
 
     public AppType getAppType() {
-        return appType;
+        return type;
     }
 
     public Long getInstanceWorkflowId() {

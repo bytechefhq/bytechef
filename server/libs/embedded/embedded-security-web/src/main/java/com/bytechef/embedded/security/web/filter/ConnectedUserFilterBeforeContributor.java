@@ -17,8 +17,8 @@
 package com.bytechef.embedded.security.web.filter;
 
 import com.bytechef.embedded.connected.user.service.ConnectedUserService;
-import com.bytechef.embedded.user.service.SigningKeyService;
 import com.bytechef.platform.security.web.filter.FilterBeforeContributor;
+import com.bytechef.platform.user.service.SigningKeyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.Filter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
