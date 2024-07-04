@@ -255,18 +255,20 @@ public class DataMapperReplaceAllSpecifiedValuesAction {
         }
     }
 
-    private static Map<String, Object> fillOutput(int mappingType, Map<String, Object> input, Map<Object, Object> mappings) {
+    private static Map<String, Object>
+        fillOutput(int mappingType, Map<String, Object> input, Map<Object, Object> mappings) {
         Map<String, Object> output = new HashMap<>(input);
 
-        if(mappingType==9) {
+        if (mappingType == 9) {
             for (Map.Entry<Object, Object> entry : mappings.entrySet()) {
                 output.entrySet()
-                    .forEach(outputEntry ->
-                        outputEntry.setValue(
-                            input.get(outputEntry.getKey())
-                                .toString()
-                                .replace(entry.getKey().toString(),
-                                    entry.getValue().toString())));
+                    .forEach(outputEntry -> outputEntry.setValue(
+                        input.get(outputEntry.getKey())
+                            .toString()
+                            .replace(entry.getKey()
+                                .toString(),
+                                entry.getValue()
+                                    .toString())));
             }
         } else {
             for (Map.Entry<String, Object> entry : input.entrySet()) {

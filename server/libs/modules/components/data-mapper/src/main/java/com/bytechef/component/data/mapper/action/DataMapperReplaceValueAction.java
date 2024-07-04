@@ -320,8 +320,12 @@ public class DataMapperReplaceValueAction {
 
         for (Mapping<Object, Object> mapping : mappings) {
             if (ConvertUtils.canConvert(mapping.getFrom(), type)) {
-                if(type.equals(String.class)){
-                    return inputParameters.getString(VALUE).replace(mapping.getFrom().toString(), mapping.getTo().toString());
+                if (type.equals(String.class)) {
+                    return inputParameters.getString(VALUE)
+                        .replace(mapping.getFrom()
+                            .toString(),
+                            mapping.getTo()
+                                .toString());
                 } else {
                     Object from = ConvertUtils.convertValue(mapping.getFrom(), type);
 
