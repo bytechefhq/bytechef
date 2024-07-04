@@ -35,6 +35,7 @@ const fetchResetPasswordFinish = async (data: string): Promise<Response> => {
         body: data,
         headers: {
             'Content-Type': 'application/json',
+            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
         },
         method: 'POST',
     }).then((response) => response);
