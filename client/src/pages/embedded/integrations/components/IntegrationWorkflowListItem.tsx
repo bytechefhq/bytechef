@@ -86,7 +86,7 @@ const IntegrationWorkflowListItem = ({
                 className="flex flex-1 items-center"
                 to={`/embedded/integrations/${integration.id}/integration-workflows/${workflow.integrationWorkflowId}`}
             >
-                <div className="w-96 text-sm font-semibold">{workflow.label}</div>
+                <div className="w-80 text-sm font-semibold">{workflow.label}</div>
 
                 <div className="flex">
                     {filteredComponentNames?.map((name) => {
