@@ -106,7 +106,7 @@ const ProjectInstanceWorkflowListItem = ({
             <div className="flex flex-1 cursor-pointer items-center" onClick={handleWorkflowClick}>
                 <span
                     className={twMerge(
-                        'w-96 text-sm font-semibold',
+                        'w-80 text-sm font-semibold',
                         !projectInstanceWorkflow.enabled && 'text-muted-foreground'
                     )}
                 >

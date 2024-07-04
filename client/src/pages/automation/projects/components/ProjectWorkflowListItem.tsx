@@ -98,7 +98,7 @@ const ProjectWorkflowListItem = ({
                 className="flex flex-1 items-center"
                 to={`/automation/projects/${project.id}/project-workflows/${workflow.projectWorkflowId}`}
             >
-                <div className="w-96 text-sm font-semibold">{workflow.label}</div>
+                <div className="w-80 text-sm font-semibold">{workflow.label}</div>
 
                 <div className="flex">
                     {filteredComponentNames?.map((name) => {
