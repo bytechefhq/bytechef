@@ -16,9 +16,12 @@
 
 package com.bytechef.platform.user.web.rest;
 
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.exception.AuthorityAlreadyUsedException;
 import com.bytechef.platform.user.service.AuthorityService;
+import com.bytechef.platform.user.web.rest.model.AuthorityModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -27,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -45,16 +49,19 @@ import org.springframework.web.server.ResponseStatusException;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("/api/authorities")
-public class AuthorityController {
+@RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
+@ConditionalOnEndpoint
+public class AuthorityController implements AuthorityApi {
 
-    private final Logger log = LoggerFactory.getLogger(AuthorityController.class);
+    private static final Logger log = LoggerFactory.getLogger(AuthorityController.class);
 
     private final AuthorityService authorityService;
+    private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
-    public AuthorityController(AuthorityService authorityService) {
+    public AuthorityController(AuthorityService authorityService, ConversionService conversionService) {
         this.authorityService = authorityService;
+        this.conversionService = conversionService;
     }
 
     /**
@@ -65,7 +72,7 @@ public class AuthorityController {
      *         status {@code 400 (Bad Request)} if the authority has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("")
+    @PostMapping("/authorities")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public ResponseEntity<Authority> createAuthority(@Valid @RequestBody Authority authority)
         throws URISyntaxException {
@@ -87,7 +94,7 @@ public class AuthorityController {
      * @param id the id of the authority to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/authorities/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public ResponseEntity<Void> deleteAuthority(@PathVariable("id") long id) {
         log.debug("REST request to delete Authority : {}", id);
@@ -103,12 +110,15 @@ public class AuthorityController {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of authorities in body.
      */
-    @GetMapping("")
+    @GetMapping("/authorities")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
-    public ResponseEntity<List<Authority>> getAllAuthorities() {
+    public ResponseEntity<List<AuthorityModel>> getAuthorities() {
         log.debug("REST request to get all Authorities");
 
-        return ResponseEntity.ok(authorityService.getAuthorities());
+        return ResponseEntity.ok(
+            CollectionUtils.map(
+                authorityService.getAuthorities(),
+                authority -> conversionService.convert(authority, AuthorityModel.class)));
     }
 
     /**
@@ -118,7 +128,7 @@ public class AuthorityController {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the authority, or with status
      *         {@code 404 (Not Found)}.
      */
-    @GetMapping("/{id}")
+    @GetMapping("/authorities/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public ResponseEntity<Authority> getAuthority(@PathVariable("id") long id) {
         log.debug("REST request to get Authority : {}", id);
