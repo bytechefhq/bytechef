@@ -21,7 +21,7 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 
 import com.bytechef.platform.security.web.filter.FilterAfterContributor;
 import com.bytechef.platform.security.web.filter.FilterBeforeContributor;
-import com.bytechef.platform.security.web.matcher.RequestMatcherContributor;
+import com.bytechef.platform.security.web.matcher.AuthenticatedRequestMatcherContributor;
 import com.bytechef.platform.user.constant.AuthorityConstants;
 import com.bytechef.security.web.filter.CookieCsrfFilter;
 import com.bytechef.security.web.filter.SpaWebFilter;
@@ -72,7 +72,7 @@ public class SecurityConfiguration {
     private final SecurityProperties securityProperties;
     private final List<FilterAfterContributor> filterAfterContributors;
     private final List<FilterBeforeContributor> filterBeforeContributors;
-    private final List<RequestMatcherContributor> requestMatcherContributors;
+    private final List<AuthenticatedRequestMatcherContributor> authenticatedRequestMatcherContributors;
 
     @SuppressFBWarnings("EI")
     public SecurityConfiguration(
@@ -80,7 +80,7 @@ public class SecurityConfiguration {
         AuthenticationSuccessHandler authenticationSuccessHandler, RememberMeServices rememberMeServices,
         SecurityProperties securityProperties, List<FilterAfterContributor> filterAfterContributors,
         List<FilterBeforeContributor> filterBeforeContributors,
-        List<RequestMatcherContributor> requestMatcherContributors) {
+        List<AuthenticatedRequestMatcherContributor> authenticatedRequestMatcherContributors) {
 
         this.authenticationFailureHandler = authenticationFailureHandler;
         this.authenticationSuccessHandler = authenticationSuccessHandler;
@@ -88,7 +88,7 @@ public class SecurityConfiguration {
         this.securityProperties = securityProperties;
         this.filterAfterContributors = filterAfterContributors;
         this.filterBeforeContributors = filterBeforeContributors;
-        this.requestMatcherContributors = requestMatcherContributors;
+        this.authenticatedRequestMatcherContributors = authenticatedRequestMatcherContributors;
     }
 
     @Bean
@@ -196,8 +196,8 @@ public class SecurityConfiguration {
         AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authz,
         MvcRequestMatcher.Builder mvc) {
 
-        for (RequestMatcherContributor requestMatcherContributor : requestMatcherContributors) {
-            authz.requestMatchers(requestMatcherContributor.getRequestMatcher(mvc))
+        for (AuthenticatedRequestMatcherContributor authenticatedRequestMatcherContributor : authenticatedRequestMatcherContributors) {
+            authz.requestMatchers(authenticatedRequestMatcherContributor.getRequestMatcher(mvc))
                 .authenticated();
         }
 
