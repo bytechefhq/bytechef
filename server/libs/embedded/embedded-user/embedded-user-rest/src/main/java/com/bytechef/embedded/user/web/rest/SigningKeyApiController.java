@@ -17,12 +17,13 @@
 package com.bytechef.embedded.user.web.rest;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.embedded.user.domain.SigningKey;
-import com.bytechef.embedded.user.service.SigningKeyService;
-import com.bytechef.embedded.user.util.KeyId;
 import com.bytechef.embedded.user.web.rest.model.CreateSigningKey200ResponseModel;
 import com.bytechef.embedded.user.web.rest.model.SigningKeyModel;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
+import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.user.domain.SigningKey;
+import com.bytechef.platform.user.jwt.JwtKeyId;
+import com.bytechef.platform.user.service.SigningKeyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -50,9 +51,12 @@ public class SigningKeyApiController implements SigningKeyApi {
     @Override
     @SuppressFBWarnings("NP")
     public ResponseEntity<CreateSigningKey200ResponseModel> createSigningKey(SigningKeyModel signingKeyModel) {
+        SigningKey signingKey = conversionService.convert(signingKeyModel, SigningKey.class);
+
+        signingKey.setType(AppType.EMBEDDED);
+
         return ResponseEntity.ok(
-            new CreateSigningKey200ResponseModel()
-                .privateKey(signingKeyService.create(conversionService.convert(signingKeyModel, SigningKey.class))));
+            new CreateSigningKey200ResponseModel().privateKey(signingKeyService.create(signingKey)));
     }
 
     @Override
@@ -70,7 +74,8 @@ public class SigningKeyApiController implements SigningKeyApi {
 
     @Override
     public ResponseEntity<List<SigningKeyModel>> getSigningKeys() {
-        return ResponseEntity.ok(CollectionUtils.map(signingKeyService.getSigningKeys(), this::getSigningKeyModel));
+        return ResponseEntity.ok(
+            CollectionUtils.map(signingKeyService.getSigningKeys(AppType.EMBEDDED), this::getSigningKeyModel));
     }
 
     @Override
@@ -82,6 +87,6 @@ public class SigningKeyApiController implements SigningKeyApi {
 
     private SigningKeyModel getSigningKeyModel(SigningKey signingKey) {
         return conversionService.convert(signingKey, SigningKeyModel.class)
-            .keyId(KeyId.of(signingKey.getId()).toString());
+            .keyId(String.valueOf(JwtKeyId.of(signingKey.getId())));
     }
 }

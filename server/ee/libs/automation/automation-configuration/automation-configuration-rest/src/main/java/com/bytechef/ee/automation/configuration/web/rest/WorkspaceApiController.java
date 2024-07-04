@@ -23,7 +23,7 @@ import com.bytechef.automation.configuration.web.rest.WorkspaceApi;
 import com.bytechef.automation.configuration.web.rest.model.WorkspaceModel;
 import com.bytechef.edition.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
-import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.user.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;

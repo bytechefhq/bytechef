@@ -73,7 +73,6 @@ dependencies {
     implementation(project(":server:libs:embedded:embedded-security-web"))
     implementation(project(":server:libs:embedded:embedded-swagger"))
     implementation(project(":server:libs:embedded:embedded-user:embedded-user-rest"))
-    implementation(project(":server:libs:embedded:embedded-user:embedded-user-service"))
     implementation(project(":server:libs:embedded:embedded-workflow:embedded-workflow-coordinator"))
     implementation(project(":server:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-rest"))
     implementation(project(":server:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-service"))

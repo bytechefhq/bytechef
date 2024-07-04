@@ -19,11 +19,10 @@ package com.bytechef.security.config;
 import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
-import com.bytechef.platform.security.config.SecurityProperties;
-import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.web.filter.FilterAfterContributor;
 import com.bytechef.platform.security.web.filter.FilterBeforeContributor;
 import com.bytechef.platform.security.web.matcher.RequestMatcherContributor;
+import com.bytechef.platform.user.constant.AuthorityConstants;
 import com.bytechef.security.web.filter.CookieCsrfFilter;
 import com.bytechef.security.web.filter.SpaWebFilter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

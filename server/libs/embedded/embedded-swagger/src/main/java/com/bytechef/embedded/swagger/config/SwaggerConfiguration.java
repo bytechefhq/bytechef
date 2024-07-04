@@ -31,8 +31,8 @@ public class SwaggerConfiguration {
     @Bean
     public GroupedOpenApi embeddedByUserTokeOpenApi() {
         return GroupedOpenApi.builder()
-            .group("embedded-public")
-            .displayName("Embedded Public API")
+            .group("embedded-by-user-token")
+            .displayName("Embedded by User Token API")
             .pathsToMatch(new String[] {
                 "/api/embedded/by-user-token/**"
             })
@@ -53,8 +53,8 @@ public class SwaggerConfiguration {
     @Bean
     public GroupedOpenApi embeddedPublicOpenApi() {
         return GroupedOpenApi.builder()
-            .group("embedded-by-user-token")
-            .displayName("Embedded by User Token API")
+            .group("embedded-public")
+            .displayName("Embedded Public API")
             .pathsToMatch(new String[] {
                 "/api/embedded/public/**"
             })

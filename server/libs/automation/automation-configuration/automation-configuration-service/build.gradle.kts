@@ -8,7 +8,6 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
-    implementation(project(":server:libs:platform:platform-security:platform-security-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
 
