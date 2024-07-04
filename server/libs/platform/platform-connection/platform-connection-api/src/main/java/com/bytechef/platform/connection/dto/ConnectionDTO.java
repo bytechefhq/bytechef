@@ -53,6 +53,7 @@ public record ConnectionDTO(
         connection.setAuthorizationName(authorizationName);
         connection.setComponentName(componentName);
         connection.setConnectionVersion(connectionVersion);
+        connection.setEnvironment(environment);
         connection.setId(id);
         connection.setName(name);
         connection.setParameters(parameters);
