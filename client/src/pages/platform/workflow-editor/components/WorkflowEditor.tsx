@@ -343,7 +343,7 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
         setViewportWidth(width);
 
         const adaptedViewportWidth = workflowNodeDetailsPanelOpen
-            ? width / 2 - window.innerWidth / 9.5
+            ? width / 2 - window.innerWidth / 6.5
             : width / 2 - 38;
 
         setViewport({
