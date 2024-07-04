@@ -201,11 +201,11 @@ public class DataMapperReplaceAllSpecifiedValuesAction {
                     object().properties(
                         string(FROM)
                             .label(LABEL_FROM)
-                            .description(FROM_DESCRIPTION)
+                            .description("Part of the string value you want to change, defined by regex.")
                             .required(true),
                         string(TO)
                             .label(LABEL_TO)
-                            .description(TO_DESCRIPTION)
+                            .description("The value you want to change the defined part to, defined by regex.")
                             .required(true))),
             array(MAPPINGS)
                 .label(MAPPINGS_LABEL)
@@ -237,31 +237,42 @@ public class DataMapperReplaceAllSpecifiedValuesAction {
             .collect(HashMap::new, (map, value) -> map.put(value.getFrom(), value.getTo()), HashMap::putAll);
 
         Integer inputType = inputParameters.getInteger(INPUT_TYPE);
+        int mappingType = inputParameters.getRequiredInteger(TYPE);
 
         if (inputType != null && inputType.equals(1)) {
             Map<String, Object> input = inputParameters.getMap(INPUT, Object.class, Map.of());
 
-            return fillOutput(input, mappingMap);
+            return fillOutput(mappingType, input, mappingMap);
         } else {
             List<Object> input = inputParameters.getList(INPUT, Object.class, List.of());
             List<Map<String, Object>> output = new LinkedList<>();
 
             for (Object object : input) {
-                output.add(fillOutput((Map<String, Object>) object, mappingMap));
+                output.add(fillOutput(mappingType, (Map<String, Object>) object, mappingMap));
             }
 
             return output;
         }
     }
 
-    private static Map<String, Object> fillOutput(Map<String, Object> input, Map<Object, Object> mappings) {
-        Map<String, Object> output = new HashMap<>();
+    private static Map<String, Object> fillOutput(int mappingType, Map<String, Object> input, Map<Object, Object> mappings) {
+        Map<String, Object> output = new HashMap<>(input);
 
-        for (Map.Entry<String, Object> entry : input.entrySet()) {
-            if (mappings.containsKey(entry.getValue())) {
-                output.put(entry.getKey(), mappings.get(entry.getValue()));
-            } else {
-                output.put(entry.getKey(), entry.getValue());
+        if(mappingType==9) {
+            for (Map.Entry<Object, Object> entry : mappings.entrySet()) {
+                output.entrySet()
+                    .forEach(outputEntry ->
+                        outputEntry.setValue(
+                            input.get(outputEntry.getKey())
+                                .toString()
+                                .replace(entry.getKey().toString(),
+                                    entry.getValue().toString())));
+            }
+        } else {
+            for (Map.Entry<String, Object> entry : input.entrySet()) {
+                if (mappings.containsKey(entry.getValue())) {
+                    output.put(entry.getKey(), mappings.get(entry.getValue()));
+                }
             }
         }
 

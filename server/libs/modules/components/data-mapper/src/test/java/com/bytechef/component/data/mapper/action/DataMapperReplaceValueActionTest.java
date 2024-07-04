@@ -18,6 +18,7 @@ package com.bytechef.component.data.mapper.action;
 
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.DEFAULT_VALUE;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.MAPPINGS;
+import static com.bytechef.component.data.mapper.constant.DataMapperConstants.TYPE;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.VALUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -53,11 +54,6 @@ class DataMapperReplaceValueActionTest {
         connectionParameters = mock(Parameters.class);
         context = mock(ActionContext.class);
         inputParameters = mock(Parameters.class);
-    }
-
-    @Test
-    void testPerformWithStringType() {
-        setupAndAssertTestForType("inputString", "outputString");
     }
 
     @Test
@@ -107,6 +103,35 @@ class DataMapperReplaceValueActionTest {
     }
 
     @Test
+    void testPerformWithStringType() {
+        setupAndAssertTestForType("inputString", "outputString");
+    }
+
+    @Test
+    void testPerformWithStringTypeRegex() {
+        String inputValue = "input value";
+
+        when(inputParameters.getRequiredInteger(TYPE)).thenReturn(9);
+        when(inputParameters.getString(VALUE)).thenReturn(inputValue);
+
+        setupAndAssertTest(
+            inputValue, " ", "_", result -> assertEquals("input_value", result,
+                "The ' ' should be replaced by '_'"));
+    }
+
+    @Test
+    void testPerformWithStringTypeRegexNotExists() {
+        String inputValue = "input value";
+
+        when(inputParameters.getRequiredInteger(TYPE)).thenReturn(9);
+        when(inputParameters.getString(VALUE)).thenReturn(inputValue);
+
+        setupAndAssertTest(
+            inputValue, "m", "_", result -> assertEquals("input value", result,
+                "Result should match the expected output value for type: " + result.getClass()));
+    }
+
+    @Test
     void testPerformEmptyMapping() {
         // Setup
         when(inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of())).thenReturn(List.of());
@@ -148,7 +173,7 @@ class DataMapperReplaceValueActionTest {
         when((String) inputParameters.get(eq(DEFAULT_VALUE), any())).thenReturn("defaultValue");
 
         try (MockedStatic<ConvertUtils> convertUtilsMockedStatic = mockStatic(ConvertUtils.class)) {
-            convertUtilsMockedStatic.when(() -> ConvertUtils.canConvert(eq(inputValue), any())).thenReturn(true);
+            convertUtilsMockedStatic.when(() -> ConvertUtils.canConvert(eq(inputMapping), any())).thenReturn(true);
             convertUtilsMockedStatic.when(
                 () -> ConvertUtils.convertValue(eq(inputMapping), any())).thenReturn(inputMapping);
             convertUtilsMockedStatic.when(
