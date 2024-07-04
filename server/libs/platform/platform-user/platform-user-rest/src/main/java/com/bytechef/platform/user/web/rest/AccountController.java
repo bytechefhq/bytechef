@@ -17,6 +17,7 @@
 package com.bytechef.platform.user.web.rest;
 
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.PersistentToken;
 import com.bytechef.platform.user.domain.User;
@@ -30,7 +31,6 @@ import com.bytechef.platform.user.service.MailService;
 import com.bytechef.platform.user.service.PersistentTokenService;
 import com.bytechef.platform.user.service.TempEmailService;
 import com.bytechef.platform.user.service.UserService;
-import com.bytechef.platform.user.util.SecurityUtils;
 import com.bytechef.platform.user.web.rest.exception.AccountErrorType;
 import com.bytechef.platform.user.web.rest.exception.AccountResourceException;
 import com.bytechef.platform.user.web.rest.vm.KeyAndPasswordVM;

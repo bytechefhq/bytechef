@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.user.util;
+package com.bytechef.commons.util;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.security.SecureRandom;
@@ -74,5 +74,9 @@ public final class RandomUtils {
      */
     public static String generateResetKey() {
         return generateRandomAlphanumericString();
+    }
+
+    public static void nextBytes(byte[] token) {
+        SECURE_RANDOM.nextBytes(token);
     }
 }

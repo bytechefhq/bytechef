@@ -26,6 +26,7 @@ public class EncodingUtils {
 
     private static final Base64.Decoder DECODER = Base64.getDecoder();
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
+    private static final Base64.Encoder URL_ENCODER = Base64.getUrlEncoder();
 
     public static byte[] decodeBase64(final byte[] bytes) {
         return DECODER.decode(bytes);
@@ -53,5 +54,10 @@ public class EncodingUtils {
 
     public static String encodeBase64ToString(final String data) {
         return ENCODER.encodeToString(data.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public static String encodeToString(byte[] token) {
+        return URL_ENCODER.withoutPadding()
+            .encodeToString(token);
     }
 }

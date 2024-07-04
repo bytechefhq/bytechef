@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.user.exception;
+package com.bytechef.platform.security.exception;
 
 import org.springframework.security.core.AuthenticationException;
 
