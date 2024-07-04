@@ -16,7 +16,8 @@
 
 package com.bytechef.embedded.security.web.filter;
 
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.embedded.security.web.util.AuthTokenUtils;
+import com.bytechef.embedded.security.web.util.AuthTokenUtils.AuthToken;
 import com.bytechef.platform.user.service.ApiKeyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.FilterChain;
@@ -24,7 +25,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -41,7 +41,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
  */
 public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final String AUTH_TOKEN_HEADER_NAME = "Authorization";
     private static final Pattern PATH_PATTERN = Pattern.compile("^/api/embedded/public/([^/]+)");
     private static final RequestMatcher REQUEST_MATCHER = new NegatedRequestMatcher(
         new AntPathRequestMatcher("/api/embedded/public/**"));
@@ -68,27 +67,12 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private Authentication getAuthentication(HttpServletRequest request) {
-        String token = request.getHeader(AUTH_TOKEN_HEADER_NAME);
+        AuthToken authToken = AuthTokenUtils.getAuthToken(PATH_PATTERN, request);
 
-        if (token == null) {
-            throw new BadCredentialsException("Authorization token does not exist");
-        }
+        String secretKey = authToken.token()
+            .replace("Bearer ", "");
 
-        Environment environment;
-
-        Matcher matcher = PATH_PATTERN.matcher(request.getRequestURI());
-
-        if (matcher.find()) {
-            String group = matcher.group(1);
-
-            environment = Environment.valueOf(group.toUpperCase());
-        } else {
-            throw new BadCredentialsException("Unknown environment");
-        }
-
-        String secretKey = token.replace("Bearer ", "");
-
-        if (!apiKeyService.hasApiKey(secretKey, environment)) {
+        if (!apiKeyService.hasApiKey(secretKey, authToken.environment())) {
             throw new BadCredentialsException("Unknown API key");
         }
 
