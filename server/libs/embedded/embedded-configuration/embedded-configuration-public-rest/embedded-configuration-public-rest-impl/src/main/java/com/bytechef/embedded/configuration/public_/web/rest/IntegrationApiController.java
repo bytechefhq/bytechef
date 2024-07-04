@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Ivica Cardic
  */
 @RestController("com.bytechef.embedded.configuration.public_.web.rest.IntegrationApiController")
-@RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}")
+@RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/v1")
 @ConditionalOnEndpoint
 public class IntegrationApiController implements IntegrationApi {
 
