@@ -181,9 +181,14 @@ public final class Workflow implements Persistable<String>, Serializable {
             } else if (WorkflowConstants.MAX_RETRIES.equals(entry.getKey())) {
                 this.maxRetries = MapUtils.getInteger(sourceMap, WorkflowConstants.MAX_RETRIES, 0);
             } else if (WorkflowConstants.TASKS.equals(entry.getKey())) {
-                this.tasks = CollectionUtils.map(
-                    MapUtils.getList(sourceMap, WorkflowConstants.TASKS, Map.class, List.of()),
-                    WorkflowTask::new);
+                // Keep null value in parameters map
+                List<Map<String, ?>> tasks = (List<Map<String, ?>>) MapUtils.get(sourceMap, WorkflowConstants.TASKS);
+
+                if (tasks == null) {
+                    tasks = List.of();
+                }
+
+                this.tasks = CollectionUtils.map(tasks, WorkflowTask::new);
             } else {
                 extensions.put(entry.getKey(), entry.getValue());
             }

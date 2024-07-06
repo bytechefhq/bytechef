@@ -53,6 +53,7 @@ public class WorkflowTask implements Task, Serializable {
     private String timeout;
     private String type;
 
+    @SuppressWarnings("unchecked")
     public WorkflowTask(Map<String, ?> source) {
         Validate.notNull(source, "'source' must not be null");
 
@@ -73,7 +74,13 @@ public class WorkflowTask implements Task, Serializable {
             } else if (WorkflowConstants.NODE.equals(entry.getKey())) {
                 this.node = MapUtils.getString(source, WorkflowConstants.NODE);
             } else if (WorkflowConstants.PARAMETERS.equals(entry.getKey())) {
-                this.parameters = MapUtils.getMap(source, WorkflowConstants.PARAMETERS, Collections.emptyMap());
+                // Keep null value in parameters map
+
+                this.parameters = (Map<String, ?>) MapUtils.get(source, WorkflowConstants.PARAMETERS);
+
+                if (this.parameters == null) {
+                    this.parameters = Map.of();
+                }
             } else if (WorkflowConstants.POST.equals(entry.getKey())) {
                 this.post = MapUtils.getList(
                     source, WorkflowConstants.POST, WorkflowTask.class, Collections.emptyList());

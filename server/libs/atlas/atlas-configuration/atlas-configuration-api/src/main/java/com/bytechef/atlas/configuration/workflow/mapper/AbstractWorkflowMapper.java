@@ -22,7 +22,6 @@ import com.bytechef.atlas.configuration.workflow.contributor.WorkflowReservedWor
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.FileCopyUtils;
 import com.bytechef.commons.util.LocalDateTimeUtils;
-import com.bytechef.commons.util.MapUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -96,13 +95,15 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
             workflowResource.getMetadata());
     }
 
+    @SuppressWarnings("unchecked")
     private Map<String, Object> parse(String workflow) throws JsonProcessingException {
         Map<String, Object> workflowMap = objectMapper.readValue(workflow, new TypeReference<>() {});
 
         validate(workflowMap);
 
-        List<Map<String, Object>> rawTasks = MapUtils.getList(
-            workflowMap, WorkflowConstants.TASKS, new TypeReference<>() {}, List.of());
+        // Keep null value in parameters map
+
+        List<Map<String, Object>> rawTasks = (List<Map<String, Object>>) workflowMap.get(WorkflowConstants.TASKS);
 
         if (rawTasks == null) {
             rawTasks = Collections.emptyList();
