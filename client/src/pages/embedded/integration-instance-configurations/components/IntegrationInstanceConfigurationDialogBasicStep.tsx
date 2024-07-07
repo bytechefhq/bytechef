@@ -122,7 +122,6 @@ const IntegrationInstanceConfigurationDialogBasicStep = ({
                                 <FormMessage />
                             </FormItem>
                         )}
-                        rules={{required: true}}
                         shouldUnregister={false}
                     />
                 )}
