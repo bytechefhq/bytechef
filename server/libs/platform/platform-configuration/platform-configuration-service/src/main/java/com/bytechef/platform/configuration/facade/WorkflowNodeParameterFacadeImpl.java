@@ -55,6 +55,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFacade {
 
+    private static final String DYNAMIC_PROPERTY_TYPES = "dynamicPropertyTypes";
+    private static final String METADATA = "metadata";
+    private static final String UI = "ui";
+
     private final ActionDefinitionService actionDefinitionService;
     private final TriggerDefinitionService triggerDefinitionService;
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
@@ -85,7 +89,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         String[] pathItems = path.split("\\.");
 
-        setMetadata(workflowNodeName, path, null, definitionMap);
+        setDynamicPropertyTypeItem(path, null, getMetadataMap(workflowNodeName, definitionMap));
         setParameter(pathItems, null, true, result.parameterMap);
 
         workflowService.update(
@@ -113,7 +117,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             displayConditionMap.putAll(
                 checkDisplayConditionsParameters(
                     workflowNodeName, name, parameterMapProperties.properties, workflow,
-                    parameterMapProperties.parameterMap, inputMap, parameterMapProperties.taskParameters));
+                    parameterMapProperties.parameterMap, inputMap, parameterMapProperties.taskParameters, Map.of()));
         }
 
         return displayConditionMap;
@@ -133,23 +137,23 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         setParameter(pathItems, value, false, result.parameterMap);
 
-        Map<String, Boolean> displayConditionMap;
+        Map<String, Object> metadataMap = getMetadataMap(workflowNodeName, definitionMap);
+
+        Map<String, ?> dynamicPropertyTypeMap = getDynamicPropertyTypeMap(metadataMap);
 
         // For now only check the first, root level of properties on which other properties could depend on
 
-        checkDependOn(pathItems[0], result.properties(), result.parameterMap);
+        checkDependOn(pathItems[0], result.properties(), result.parameterMap, dynamicPropertyTypeMap);
 
         Map<String, ?> inputMap = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
             workflow.getId());
 
-        displayConditionMap = checkDisplayConditionsParameters(
+        Map<String, Boolean> displayConditionMap = checkDisplayConditionsParameters(
             workflowNodeName, pathItems[0], result.properties, workflow, result.parameterMap, inputMap,
-            result.taskParameters);
-
-        Map<String, ?> metadataMap = Map.of();
+            result.taskParameters, dynamicPropertyTypeMap);
 
         if (includeInMetadata) {
-            metadataMap = setMetadata(workflowNodeName, path, type, definitionMap);
+            setDynamicPropertyTypeItem(path, type, metadataMap);
         }
 
         workflowService.update(
@@ -158,7 +162,10 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         return new UpdateParameterResultDTO(displayConditionMap, metadataMap, result.parameterMap);
     }
 
-    private void checkDependOn(String name, List<? extends Property> properties, Map<String, ?> parameterMap) {
+    private void checkDependOn(
+        String name, List<? extends Property> properties, Map<String, ?> parameterMap,
+        Map<String, ?> dynamicPropertyTypesMap) {
+
         for (Property property : properties) {
             List<String> dependOnPropertyNames = List.of();
 
@@ -182,6 +189,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
             if (dependOnPropertyNames.contains(name)) {
                 parameterMap.remove(property.getName());
+
+                checkDynamicPropertyTypeItem(property.getName(), dynamicPropertyTypesMap);
             }
         }
     }
@@ -190,7 +199,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     @SuppressWarnings("unchecked")
     private Map<String, Boolean> checkDisplayConditionsParameters(
         String workflowNodeName, String name, List<? extends Property> properties, Workflow workflow,
-        Map<String, ?> parameterMap, Map<String, ?> inputMap, boolean taskParameters) {
+        Map<String, ?> parameterMap, Map<String, ?> inputMap, boolean taskParameters,
+        Map<String, ?> dynamicPropertyTypeMap) {
 
         Map<String, Boolean> displayConditionMap = new HashMap<>();
 
@@ -203,6 +213,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
             if (PropertyUtils.hasExpressionVariable(displayCondition, name)) {
                 parameterMap.remove(property.getName());
+
+                checkDynamicPropertyTypeItem(property.getName(), dynamicPropertyTypeMap);
             }
 
             boolean result;
@@ -232,6 +244,16 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         return displayConditionMap;
     }
 
+    private static void checkDynamicPropertyTypeItem(String name, Map<String, ?> dynamicPropertyTypeMap) {
+        Set<String> keySet = new HashSet<>(dynamicPropertyTypeMap.keySet());
+
+        for (String key : keySet) {
+            if (key.equals(name) || key.startsWith(name + ".") || key.startsWith(name + "[")) {
+                dynamicPropertyTypeMap.remove(key);
+            }
+        }
+    }
+
     private boolean evaluate(String displayCondition, Map<String, ?> inputParameters) {
         Map<String, Object> result = Evaluator.evaluate(
             Map.of("displayCondition", "${" + displayCondition + "}"), inputParameters);
@@ -239,6 +261,41 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         Object displayConditionResult = result.get("displayCondition");
 
         return !(displayConditionResult instanceof String) && (boolean) displayConditionResult;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> getMetadataMap(String workflowNodeName, Map<String, ?> definitionMap) {
+        Map<String, Object> metadataMap;
+
+        Map<String, ?> triggerMap = getTrigger(
+            workflowNodeName, (List<Map<String, ?>>) definitionMap.get(WorkflowExtConstants.TRIGGERS));
+
+        if (triggerMap == null) {
+            Map<String, ?> taskMap = getTask(
+                workflowNodeName, (List<Map<String, ?>>) definitionMap.get(WorkflowConstants.TASKS));
+
+            if (taskMap == null) {
+                throw new IllegalArgumentException("Workflow node %s does not exist".formatted(workflowNodeName));
+            }
+
+            metadataMap = (Map<String, Object>) taskMap.get(METADATA);
+
+            if (metadataMap == null) {
+                metadataMap = new HashMap<>();
+
+                ((Map<String, Object>) taskMap).put(METADATA, metadataMap);
+            }
+        } else {
+            metadataMap = (Map<String, Object>) triggerMap.get(METADATA);
+
+            if (metadataMap == null) {
+                metadataMap = new HashMap<>();
+
+                ((Map<String, Object>) triggerMap).put(METADATA, metadataMap);
+            }
+        }
+
+        return metadataMap;
     }
 
     @SuppressWarnings("unchecked")
@@ -370,63 +427,37 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         return null;
     }
 
-    @SuppressWarnings("unchecked")
-    private Map<String, ?> setMetadata(
-        String workflowNodeName, String path, String type, Map<String, ?> definitionMap) {
+    private void setDynamicPropertyTypeItem(
+        String path, String type, Map<String, Object> metadataMap) {
 
-        Map<String, Object> metadataMap;
+        Map<String, Object> dynamicPropertyTypeMap = getDynamicPropertyTypeMap(metadataMap);
 
-        Map<String, ?> triggerMap = getTrigger(
-            workflowNodeName, (List<Map<String, ?>>) definitionMap.get(WorkflowExtConstants.TRIGGERS));
-
-        if (triggerMap == null) {
-            Map<String, ?> taskMap = getTask(
-                workflowNodeName, (List<Map<String, ?>>) definitionMap.get(WorkflowConstants.TASKS));
-
-            if (taskMap == null) {
-                throw new IllegalArgumentException("Workflow node %s does not exist".formatted(workflowNodeName));
-            }
-
-            metadataMap = (Map<String, Object>) taskMap.get("metadata");
-
-            if (metadataMap == null) {
-                metadataMap = new HashMap<>();
-
-                ((Map<String, Object>) taskMap).put("metadata", metadataMap);
-            }
+        if (type == null) {
+            dynamicPropertyTypeMap.remove(path);
         } else {
-            metadataMap = (Map<String, Object>) triggerMap.get("metadata");
-
-            if (metadataMap == null) {
-                metadataMap = new HashMap<>();
-
-                ((Map<String, Object>) triggerMap).put("metadata", metadataMap);
-            }
+            dynamicPropertyTypeMap.put(path, type);
         }
+    }
 
-        Map<String, Object> uiMap = (Map<String, Object>) metadataMap.get("ui");
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> getDynamicPropertyTypeMap(Map<String, Object> metadataMap) {
+        Map<String, Object> uiMap = (Map<String, Object>) metadataMap.get(UI);
 
         if (uiMap == null) {
             uiMap = new HashMap<>();
 
-            metadataMap.put("ui", uiMap);
+            metadataMap.put(UI, uiMap);
         }
 
-        Map<String, Object> dynamicPropertyTypesMap = (Map<String, Object>) uiMap.get("dynamicPropertyTypes");
+        Map<String, Object> dynamicPropertyTypesMap = (Map<String, Object>) uiMap.get(DYNAMIC_PROPERTY_TYPES);
 
         if (dynamicPropertyTypesMap == null) {
             dynamicPropertyTypesMap = new HashMap<>();
 
-            uiMap.put("dynamicPropertyTypes", dynamicPropertyTypesMap);
+            uiMap.put(DYNAMIC_PROPERTY_TYPES, dynamicPropertyTypesMap);
         }
 
-        if (type == null) {
-            dynamicPropertyTypesMap.remove(path);
-        } else {
-            dynamicPropertyTypesMap.put(path, type);
-        }
-
-        return metadataMap;
+        return dynamicPropertyTypesMap;
     }
 
     @SuppressWarnings("unchecked")
