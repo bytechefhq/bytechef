@@ -18,9 +18,7 @@ package com.bytechef.embedded.configuration.service;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.embedded.configuration.domain.IntegrationWorkflow;
-import com.bytechef.embedded.configuration.exception.IntegrationErrorType;
 import com.bytechef.embedded.configuration.repository.IntegrationWorkflowRepository;
-import com.bytechef.platform.exception.PlatformException;
 import java.util.List;
 import java.util.UUID;
 import org.apache.commons.lang3.Validate;
@@ -124,12 +122,6 @@ public class IntegrationWorkflowServiceImpl implements IntegrationWorkflowServic
 
     @Override
     public void removeWorkflow(long integrationId, int integrationVersion, String workflowId) {
-        if (integrationWorkflowRepository.countByIntegrationIdAndIntegrationVersion(integrationId,
-            integrationVersion) == 1) {
-            throw new PlatformException(
-                "The last workflow cannot be deleted", IntegrationErrorType.REMOVE_WORKFLOW);
-        }
-
         integrationWorkflowRepository
             .findByIntegrationIdAndIntegrationVersionAndWorkflowId(integrationId, integrationVersion, workflowId)
             .ifPresent(IntegrationWorkflow -> integrationWorkflowRepository.deleteById(IntegrationWorkflow.getId()));
