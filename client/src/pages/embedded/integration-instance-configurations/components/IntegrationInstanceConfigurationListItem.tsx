@@ -123,6 +123,14 @@ const IntegrationInstanceConfigurationListItem = ({
                                     </span>
                                 </div>
 
+                                {integrationInstanceConfiguration.integrationVersion ? (
+                                    <Badge variant="secondary">
+                                        V{integrationInstanceConfiguration.integrationVersion}
+                                    </Badge>
+                                ) : (
+                                    ''
+                                )}
+
                                 <span className="text-xs uppercase text-gray-700">
                                     {integrationInstanceConfiguration?.environment}
                                 </span>
