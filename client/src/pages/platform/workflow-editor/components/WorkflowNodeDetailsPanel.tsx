@@ -325,15 +325,6 @@ const WorkflowNodeDetailsPanel = ({
 
     // Tab switching logic
     useEffect(() => {
-        if (
-            activeTab !== 'output' &&
-            ((!currentNode?.trigger && currentActionFetched) || (currentNode?.trigger && currentTriggerFetched))
-        ) {
-            if (!currentOperationProperties?.length) {
-                setActiveTab('description');
-            }
-        }
-
         if (activeTab === 'connection' && workflowConnections.length === 0) {
             setActiveTab('description');
         }
