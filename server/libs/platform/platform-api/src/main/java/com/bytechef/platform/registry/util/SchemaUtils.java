@@ -59,11 +59,11 @@ public class SchemaUtils {
     public static com.bytechef.definition.BaseProperty getOutputSchema(
         @NonNull Object value, @NonNull SchemaPropertyFactory propertyFactoryFunction) {
 
-        return getOutputSchema(value, null, propertyFactoryFunction);
+        return getOutputSchema(null, value, propertyFactoryFunction);
     }
 
     public static com.bytechef.definition.BaseProperty getOutputSchema(
-        @NonNull Object value, String name, @NonNull SchemaPropertyFactory propertyFactory) {
+        String name, Object value, @NonNull SchemaPropertyFactory propertyFactory) {
 
         Validate.notNull(value, "value must not be null");
         Validate.notNull(propertyFactory, "propertyFactory must not be null");

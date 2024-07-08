@@ -78,7 +78,7 @@ public class LoopTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
         } else {
             variableProperties = object().properties(
                 (ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(
-                    list.getFirst(), ITEM, new PropertyFactory(list.getFirst())),
+                    ITEM, list.getFirst(), new PropertyFactory(list.getFirst())),
                 integer(INDEX));
         }
 

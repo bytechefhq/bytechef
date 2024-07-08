@@ -74,7 +74,7 @@ public record PropertyFactory(Object value) implements SchemaPropertyFactory {
             if (!list.isEmpty()) {
                 arrayProperty.items(
                     (ModifiableProperty<?>) SchemaUtils.getOutputSchema(
-                        list.getFirst(), null, new PropertyFactory(list.getFirst())));
+                        null, list.getFirst(), new PropertyFactory(list.getFirst())));
             }
         }
 
@@ -96,7 +96,7 @@ public record PropertyFactory(Object value) implements SchemaPropertyFactory {
 
         for (Map.Entry<?, ?> entry : map.entrySet()) {
             properties.add((ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(
-                entry.getValue(), (String) entry.getKey(), new PropertyFactory(entry.getValue())));
+                (String) entry.getKey(), entry.getValue(), new PropertyFactory(entry.getValue())));
         }
 
         return objectProperty.properties(properties);
