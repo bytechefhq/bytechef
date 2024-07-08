@@ -109,9 +109,9 @@ const ConnectionTabConnectionSelect = ({
 
     return (
         <div className="flex flex-col gap-6">
-            <div>
+            <div className="flex flex-col">
                 {componentDefinition && (
-                    <Label className="font-normal">
+                    <Label className="mb-2 font-normal">
                         {componentDefinition.title}
 
                         {workflowConnection.required && <RequiredMark />}
