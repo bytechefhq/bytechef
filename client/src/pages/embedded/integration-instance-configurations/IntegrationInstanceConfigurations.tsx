@@ -160,7 +160,7 @@ const IntegrationInstanceConfigurations = () => {
                                                 setEnvironment(id as number);
                                             },
                                         }}
-                                        key={item.value}
+                                        key={item.value ?? ''}
                                         toLink={`?environment=${item.value ?? ''}${filterData.id ? `&${filterData.type === Type.Integration ? 'integrationId' : 'tagId'}=${filterData.id}` : ''}`}
                                     />
                                 ))}

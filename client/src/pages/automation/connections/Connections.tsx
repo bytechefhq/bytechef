@@ -146,7 +146,7 @@ export const Connections = () => {
                                                 setEnvironment(id as number);
                                             },
                                         }}
-                                        key={item.value}
+                                        key={item.value ?? ''}
                                         toLink={`?environment=${item.value ?? ''}${filterData.id ? `&${filterData.type === Type.Component ? 'componentName' : 'tagId'}=${filterData.id}` : ''}`}
                                     />
                                 ))}
