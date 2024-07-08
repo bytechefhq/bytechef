@@ -16,5 +16,6 @@ dependencies {
     implementation(libs.org.mapstruct.extensions.spring.mapstruct.spring.annotations)
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-web")
+    implementation("org.springframework.boot:spring-boot")
     implementation(project(":server:libs:core:commons:commons-util"))
 }

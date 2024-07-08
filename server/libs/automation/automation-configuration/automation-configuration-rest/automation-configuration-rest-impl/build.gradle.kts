@@ -20,6 +20,21 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     schemaMappings.set(
         mapOf(
             "DataStreamComponent" to "com.bytechef.platform.configuration.web.rest.model.DataStreamComponentModel",
+            "Page" to "org.springframework.data.domain.Page",
+            "WorkflowConnection" to "com.bytechef.platform.configuration.web.rest.model.WorkflowConnectionModel",
+            "WorkflowFormat" to "com.bytechef.platform.configuration.web.rest.model.WorkflowFormatModel",
+            "WorkflowInput" to "WorkflowInputModel",
+            "WorkflowOutput" to "WorkflowOutputModel",
+            "WorkflowTask" to "WorkflowTaskModel",
+            "WorkflowTrigger" to "WorkflowTriggerModel"
+        )
+    )
+    importMappings.set(
+        mapOf(
+            "WorkflowInputModel" to "com.bytechef.platform.configuration.web.rest.model.WorkflowInputModel",
+            "WorkflowOutputModel" to "com.bytechef.platform.configuration.web.rest.model.WorkflowOutputModel",
+            "WorkflowTaskModel" to "com.bytechef.platform.configuration.web.rest.model.WorkflowTaskModel",
+            "WorkflowTriggerModel" to "com.bytechef.platform.configuration.web.rest.model.WorkflowTriggerModel"
         )
     )
 }
