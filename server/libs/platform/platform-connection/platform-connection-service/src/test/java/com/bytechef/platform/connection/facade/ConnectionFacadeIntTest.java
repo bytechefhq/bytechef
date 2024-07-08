@@ -33,6 +33,7 @@ import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.constant.AppType;
@@ -96,6 +97,7 @@ public class ConnectionFacadeIntTest {
     public void testCreate() {
         ConnectionDTO connectionDTO = ConnectionDTO.builder()
             .componentName("componentName")
+            .environment(ConnectionEnvironment.TEST)
             .name("name1")
             .tags(List.of(new Tag("tag1")))
             .build();
@@ -114,6 +116,7 @@ public class ConnectionFacadeIntTest {
     public void testDelete() {
         ConnectionDTO connectionDTO1 = ConnectionDTO.builder()
             .componentName("componentName")
+            .environment(ConnectionEnvironment.TEST)
             .name("name1")
             .tags(List.of(new Tag("tag1")))
             .build();
@@ -122,6 +125,7 @@ public class ConnectionFacadeIntTest {
 
         ConnectionDTO connectionDTO2 = ConnectionDTO.builder()
             .componentName("componentName")
+            .environment(ConnectionEnvironment.TEST)
             .name("name2")
             .tags(List.of(new Tag("tag1")))
             .build();
@@ -249,6 +253,7 @@ public class ConnectionFacadeIntTest {
 
         ConnectionDTO connectionDTO = ConnectionDTO.builder()
             .componentName("componentName")
+            .environment(ConnectionEnvironment.TEST)
             .name("name")
             .tags(List.of(tag1, tagRepository.save(new Tag("tag2"))))
             .build();
@@ -260,6 +265,7 @@ public class ConnectionFacadeIntTest {
 
         connectionDTO = ConnectionDTO.builder()
             .componentName("componentName")
+            .environment(ConnectionEnvironment.TEST)
             .id(connectionDTO.id())
             .name("name")
             .tags(List.of(tag1))
