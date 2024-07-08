@@ -65,37 +65,41 @@ public class SchemaUtils {
     public static com.bytechef.definition.BaseProperty getOutputSchema(
         String name, Object value, @NonNull SchemaPropertyFactory propertyFactory) {
 
-        Validate.notNull(value, "value must not be null");
         Validate.notNull(propertyFactory, "propertyFactory must not be null");
 
         com.bytechef.definition.BaseProperty outputProperty;
-        Class<?> valueClass = value.getClass();
 
-        if (value instanceof List<?> || valueClass.isArray()) {
-            outputProperty = propertyFactory.create(name, BaseArrayProperty.class);
-        } else if (value instanceof Boolean) {
-            outputProperty = propertyFactory.create(name, BaseBooleanProperty.class);
-        } else if (value instanceof Date || value instanceof LocalDate) {
-            outputProperty = propertyFactory.create(name, BaseDateProperty.class);
-        } else if (value instanceof LocalDateTime) {
-            outputProperty = propertyFactory.create(name, BaseDateTimeProperty.class);
-        } else if (value instanceof BaseFileEntry) {
-            outputProperty = propertyFactory.create(name, BaseFileEntryProperty.class);
-        } else if (value instanceof Integer) {
-            outputProperty = propertyFactory.create(name, BaseIntegerProperty.class);
-        } else if (value instanceof Number) {
-            outputProperty = propertyFactory.create(name, BaseNumberProperty.class);
-        } else if (value instanceof Map<?, ?>) {
-            outputProperty = propertyFactory.create(name, BaseObjectProperty.class);
-        } else if (value instanceof String) {
-            outputProperty = propertyFactory.create(name, BaseStringProperty.class);
-        } else if (value instanceof LocalTime) {
-            outputProperty = propertyFactory.create(name, BaseTimeProperty.class);
+        if (value == null) {
+            outputProperty = propertyFactory.create(name, BaseNullProperty.class);
         } else {
-            if (ConvertUtils.canConvert(value, Map.class)) {
+            Class<?> valueClass = value.getClass();
+
+            if (value instanceof List<?> || valueClass.isArray()) {
+                outputProperty = propertyFactory.create(name, BaseArrayProperty.class);
+            } else if (value instanceof Boolean) {
+                outputProperty = propertyFactory.create(name, BaseBooleanProperty.class);
+            } else if (value instanceof Date || value instanceof LocalDate) {
+                outputProperty = propertyFactory.create(name, BaseDateProperty.class);
+            } else if (value instanceof LocalDateTime) {
+                outputProperty = propertyFactory.create(name, BaseDateTimeProperty.class);
+            } else if (value instanceof BaseFileEntry) {
+                outputProperty = propertyFactory.create(name, BaseFileEntryProperty.class);
+            } else if (value instanceof Integer) {
+                outputProperty = propertyFactory.create(name, BaseIntegerProperty.class);
+            } else if (value instanceof Number) {
+                outputProperty = propertyFactory.create(name, BaseNumberProperty.class);
+            } else if (value instanceof Map<?, ?>) {
                 outputProperty = propertyFactory.create(name, BaseObjectProperty.class);
+            } else if (value instanceof String) {
+                outputProperty = propertyFactory.create(name, BaseStringProperty.class);
+            } else if (value instanceof LocalTime) {
+                outputProperty = propertyFactory.create(name, BaseTimeProperty.class);
             } else {
-                outputProperty = propertyFactory.create(name, com.bytechef.definition.BaseProperty.class);
+                if (ConvertUtils.canConvert(value, Map.class)) {
+                    outputProperty = propertyFactory.create(name, BaseObjectProperty.class);
+                } else {
+                    outputProperty = propertyFactory.create(name, com.bytechef.definition.BaseProperty.class);
+                }
             }
         }
 

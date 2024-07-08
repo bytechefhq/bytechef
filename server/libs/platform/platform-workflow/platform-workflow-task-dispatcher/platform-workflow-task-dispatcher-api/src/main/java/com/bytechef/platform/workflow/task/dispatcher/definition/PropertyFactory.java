@@ -49,6 +49,8 @@ public record PropertyFactory(Object value) implements SchemaPropertyFactory {
             return TaskDispatcherDSL.integer(name);
         } else if (baseValueProperty == BaseProperty.BaseNumberProperty.class) {
             return TaskDispatcherDSL.number(name);
+        } else if (baseValueProperty == BaseProperty.BaseNullProperty.class) {
+            return TaskDispatcherDSL.nullable(name);
         } else if (baseValueProperty == BaseProperty.BaseObjectProperty.class) {
             return getObjectProperty();
         } else if (baseValueProperty == BaseProperty.BaseStringProperty.class) {

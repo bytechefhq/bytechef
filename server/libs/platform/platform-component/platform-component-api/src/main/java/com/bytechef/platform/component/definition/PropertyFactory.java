@@ -50,6 +50,8 @@ public record PropertyFactory(Object value) implements SchemaPropertyFactory {
             return ComponentDSL.fileEntry(name);
         } else if (baseValueProperty == BaseProperty.BaseIntegerProperty.class) {
             return ComponentDSL.integer(name);
+        } else if (baseValueProperty == BaseProperty.BaseNullProperty.class) {
+            return ComponentDSL.nullable(name);
         } else if (baseValueProperty == BaseProperty.BaseNumberProperty.class) {
             return ComponentDSL.number(name);
         } else if (baseValueProperty == BaseProperty.BaseObjectProperty.class) {
