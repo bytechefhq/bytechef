@@ -49,6 +49,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Ivica Cardic
@@ -255,29 +256,33 @@ public class DataMapperReplaceAllSpecifiedValuesAction {
         }
     }
 
-    private static Map<String, Object>
-        fillOutput(int mappingType, Map<String, Object> input, Map<Object, Object> mappings) {
-        Map<String, Object> output = new HashMap<>(input);
+    private static Map<String, Object> fillOutput(
+        int mappingType, Map<String, Object> inputMap, Map<Object, Object> mappingMap) {
+
+        Map<String, Object> outputMap = new HashMap<>(inputMap);
 
         if (mappingType == 9) {
-            for (Map.Entry<Object, Object> entry : mappings.entrySet()) {
-                output.entrySet()
-                    .forEach(outputEntry -> outputEntry.setValue(
-                        input.get(outputEntry.getKey())
-                            .toString()
-                            .replace(entry.getKey()
-                                .toString(),
-                                entry.getValue()
-                                    .toString())));
+            for (Map.Entry<Object, Object> entry : mappingMap.entrySet()) {
+                Set<Map.Entry<String, Object>> entries = outputMap.entrySet();
+
+                for (Map.Entry<String, Object> outputEntry : entries) {
+                    Object inputValue = inputMap.get(outputEntry.getKey());
+                    Object key = entry.getKey();
+                    Object value = entry.getValue();
+
+                    String inputValueString = inputValue.toString();
+
+                    outputEntry.setValue(inputValueString.replace(key.toString(), value.toString()));
+                }
             }
         } else {
-            for (Map.Entry<String, Object> entry : input.entrySet()) {
-                if (mappings.containsKey(entry.getValue())) {
-                    output.put(entry.getKey(), mappings.get(entry.getValue()));
+            for (Map.Entry<String, Object> entry : inputMap.entrySet()) {
+                if (mappingMap.containsKey(entry.getValue())) {
+                    outputMap.put(entry.getKey(), mappingMap.get(entry.getValue()));
                 }
             }
         }
 
-        return output;
+        return outputMap;
     }
 }

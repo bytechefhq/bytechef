@@ -183,12 +183,14 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
         inputMap.put("key", inputMapping);
 
         if (isArray) {
-            setupAndAssertTest(List.of(inputMap), mappings,
+            setupAndAssertTest(
+                List.of(inputMap), mappings,
                 (List<?> result) -> assertEquals(
                     outputMapping, ((Map<?, ?>) result.getFirst()).get("key"),
                     "Value in result should match the expected output value."));
         } else {
-            setupAndAssertTest(inputMap, mappings,
+            setupAndAssertTest(
+                inputMap, mappings,
                 result -> assertEquals(
                     outputMapping, ((Map<?, ?>) result).get("key"),
                     "Value in result should match the expected output value."));
@@ -201,7 +203,8 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
 
         when(inputParameters.getRequiredInteger(TYPE)).thenReturn(9);
 
-        setupAndAssertTest(inputMap, List.of(new ObjectMapping(" ", "_")),
+        setupAndAssertTest(
+            inputMap, List.of(new ObjectMapping(" ", "_")),
             result -> assertEquals(
                 Map.of("key", "input_value"), result,
                 "The value should contain underlines ('_') instead of spaces (' ')."));
@@ -213,7 +216,8 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
 
         when(inputParameters.getRequiredInteger(TYPE)).thenReturn(9);
 
-        setupAndAssertTest(list, List.of(new ObjectMapping(" ", "_")),
+        setupAndAssertTest(
+            list, List.of(new ObjectMapping(" ", "_")),
             result -> assertEquals(
                 Map.of("key", "input_value"), result.getFirst(),
                 "The value should contain underlines ('_') instead of spaces (' ')."));
@@ -223,20 +227,16 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
     void testPerformEmptyMappingObject() {
         Map<String, Object> inputMap = Map.of("key", "value");
 
-        setupAndAssertTest(inputMap, List.of(),
-            result -> assertEquals(
-                inputMap, result,
-                "Result should be the same as input."));
+        setupAndAssertTest(
+            inputMap, List.of(), result -> assertEquals(inputMap, result, "Result should be the same as input."));
     }
 
     @Test
     void testPerformEmptyMappingArray() {
         List<Object> list = List.of(Map.of("key", "value"));
 
-        setupAndAssertTest(list, List.of(),
-            (List<?> result) -> assertEquals(
-                list, result,
-                "Result should be the same as input."));
+        setupAndAssertTest(
+            list, List.of(), (List<?> result) -> assertEquals(list, result, "Result should be the same as input."));
     }
 
     @Test
@@ -247,23 +247,19 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
         inputMap.put("key2", 2);
 
         setupAndAssertTest(
-            inputMap,
-            List.of(new ObjectMapping(1, 3), new ObjectMapping(2, 4)),
+            inputMap, List.of(new ObjectMapping(1, 3), new ObjectMapping(2, 4)),
             result -> {
-                assertEquals(3,
-                    ((Map<?, ?>) result).get("key1"),
-                    "Value of result should match the expected output value.");
-                assertEquals(4,
-                    ((Map<?, ?>) result).get("key2"),
-                    "Value of result should match the expected output value.");
+                assertEquals(
+                    3, ((Map<?, ?>) result).get("key1"), "Value of result should match the expected output value.");
+                assertEquals(
+                    4, ((Map<?, ?>) result).get("key2"), "Value of result should match the expected output value.");
             });
     }
 
     @Test
     void testPerformMultipleMappingArray() {
         setupAndAssertTest(
-            List.of(Map.of("key1", 1), Map.of("key2", 2)),
-            List.of(new ObjectMapping(1, 3), new ObjectMapping(2, 4)),
+            List.of(Map.of("key1", 1), Map.of("key2", 2)), List.of(new ObjectMapping(1, 3), new ObjectMapping(2, 4)),
             result -> {
                 assertEquals(
                     3, ((Map<?, ?>) result.getFirst()).get("key1"),
@@ -282,8 +278,7 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
         inputMap.put("key2", 1);
 
         setupAndAssertTest(
-            inputMap,
-            List.of(new ObjectMapping(1, 3)),
+            inputMap, List.of(new ObjectMapping(1, 3)),
             result -> {
                 assertEquals(
                     3, ((Map<?, ?>) result).get("key1"),
@@ -297,8 +292,7 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
     @Test
     void testPerformReplaceMultipleValuesArray() {
         setupAndAssertTest(
-            List.of(Map.of("key1", 1), Map.of("key2", 1)),
-            List.of(new ObjectMapping(1, 3)),
+            List.of(Map.of("key1", 1), Map.of("key2", 1)), List.of(new ObjectMapping(1, 3)),
             result -> {
                 assertEquals(
                     3, ((Map<?, ?>) result.getFirst()).get("key1"),
