@@ -49,9 +49,11 @@ const PropertyField = ({
             <span className="px-2">{label}</span>
 
             <div className="flex truncate">
+                {sampleValue === null && <span className="flex-1 truncate text-xs text-muted-foreground">null</span>}
+
                 {(sampleValue || sampleValue === 0 || sampleValue === false) && typeof sampleValue !== 'object' && (
                     <span className="flex-1 truncate text-xs text-muted-foreground">
-                        {sampleValue === true ? 'true' : sampleValue === false ? false : sampleValue}
+                        {sampleValue === true ? 'true' : sampleValue === false ? 'false' : sampleValue}
                     </span>
                 )}
 
