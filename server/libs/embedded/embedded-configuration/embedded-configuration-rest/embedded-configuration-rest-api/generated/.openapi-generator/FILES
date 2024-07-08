@@ -32,10 +32,4 @@ src/main/java/com/bytechef/embedded/configuration/web/rest/model/UpdateTagsReque
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/Workflow1Model.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/WorkflowBasic1Model.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/WorkflowBasicModel.java
-src/main/java/com/bytechef/embedded/configuration/web/rest/model/WorkflowConnectionModel.java
-src/main/java/com/bytechef/embedded/configuration/web/rest/model/WorkflowFormatModel.java
-src/main/java/com/bytechef/embedded/configuration/web/rest/model/WorkflowInputModel.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/WorkflowModel.java
-src/main/java/com/bytechef/embedded/configuration/web/rest/model/WorkflowOutputModel.java
-src/main/java/com/bytechef/embedded/configuration/web/rest/model/WorkflowTaskModel.java
-src/main/java/com/bytechef/embedded/configuration/web/rest/model/WorkflowTriggerModel.java

@@ -2,11 +2,10 @@ package com.bytechef.embedded.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.embedded.configuration.web.rest.model.WorkflowFormatModel;
-import com.bytechef.embedded.configuration.web.rest.model.WorkflowInputModel;
-import com.bytechef.embedded.configuration.web.rest.model.WorkflowOutputModel;
-import com.bytechef.embedded.configuration.web.rest.model.WorkflowTaskModel;
-import com.bytechef.embedded.configuration.web.rest.model.WorkflowTriggerModel;
+import com.bytechef.platform.configuration.web.rest.model.WorkflowInputModel;
+import com.bytechef.platform.configuration.web.rest.model.WorkflowOutputModel;
+import com.bytechef.platform.configuration.web.rest.model.WorkflowTaskModel;
+import com.bytechef.platform.configuration.web.rest.model.WorkflowTriggerModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -33,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-01T06:30:41.926363+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-08T07:14:48.939090+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class WorkflowModel implements com.bytechef.platform.configuration.web.rest.model.WorkflowModelAware {
 
   private String createdBy;
@@ -47,7 +46,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
 
   private String description;
 
-  private WorkflowFormatModel format;
+  private com.bytechef.platform.configuration.web.rest.model.WorkflowFormatModel format;
 
   private String id;
 
@@ -227,7 +226,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
     this.description = description;
   }
 
-  public WorkflowModel format(WorkflowFormatModel format) {
+  public WorkflowModel format(com.bytechef.platform.configuration.web.rest.model.WorkflowFormatModel format) {
     this.format = format;
     return this;
   }
@@ -239,11 +238,11 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
   @Valid 
   @Schema(name = "format", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("format")
-  public WorkflowFormatModel getFormat() {
+  public com.bytechef.platform.configuration.web.rest.model.WorkflowFormatModel getFormat() {
     return format;
   }
 
-  public void setFormat(WorkflowFormatModel format) {
+  public void setFormat(com.bytechef.platform.configuration.web.rest.model.WorkflowFormatModel format) {
     this.format = format;
   }
 
