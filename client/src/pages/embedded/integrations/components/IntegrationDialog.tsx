@@ -171,8 +171,6 @@ const IntegrationDialog = ({integration, onClose, triggerNode}: IntegrationDialo
                             <FormItem>
                                 <FormLabel>Component</FormLabel>
 
-                                {field.value}
-
                                 <FormControl>
                                     {componentDefinitions && (
                                         <ComboBox
