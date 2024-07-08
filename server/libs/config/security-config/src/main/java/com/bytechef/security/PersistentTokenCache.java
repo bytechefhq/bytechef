@@ -17,6 +17,7 @@
 package com.bytechef.security;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -63,7 +64,6 @@ public class PersistentTokenCache<T> {
         purge();
 
         Value val = map.get(key);
-
         long time = System.currentTimeMillis();
 
         return val != null && time < val.expire ? val.token : null;
@@ -77,11 +77,15 @@ public class PersistentTokenCache<T> {
      */
     public void put(String key, T token) {
         purge();
+
         if (map.containsKey(key)) {
             map.remove(key);
         }
+
         long time = System.currentTimeMillis();
+
         map.put(key, new Value(token, time + expireMillis));
+
         latestWriteTime = time;
     }
 
@@ -107,12 +111,13 @@ public class PersistentTokenCache<T> {
             map.clear();
         } else {
             // Iterate and remove until the first non-expired token
-            Iterator<Value> values = map.values()
-                .iterator();
+            Collection<Value> values = map.values();
 
-            while (values.hasNext()) {
-                if (time >= values.next().expire) {
-                    values.remove();
+            Iterator<Value> valueIterator = values.iterator();
+
+            while (valueIterator.hasNext()) {
+                if (time >= valueIterator.next().expire) {
+                    valueIterator.remove();
                 } else {
                     break;
                 }
@@ -130,5 +135,4 @@ public class PersistentTokenCache<T> {
             this.expire = expire;
         }
     }
-
 }

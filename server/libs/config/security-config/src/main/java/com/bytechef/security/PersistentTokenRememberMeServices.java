@@ -148,6 +148,7 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
     @Override
     protected void onLoginSuccess(
         HttpServletRequest request, HttpServletResponse response, Authentication successfulAuthentication) {
+
         String login = successfulAuthentication.getName();
 
         logger.debug("Creating new persistent login for user {}", login);
@@ -191,10 +192,12 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         String rememberMeCookie = extractRememberMeCookie(request);
 
-        if (rememberMeCookie != null && rememberMeCookie.length() != 0) {
+        if (rememberMeCookie != null && !rememberMeCookie.isEmpty()) {
             try {
                 String[] cookieTokens = decodeCookie(rememberMeCookie);
+
                 PersistentToken token = getPersistentToken(cookieTokens);
+
                 persistentTokenService.delete(token.getSeries());
             } catch (InvalidCookieException ice) {
                 logger.info("Invalid cookie, no persistent token could be deleted", ice);
@@ -220,7 +223,7 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
 
         Optional<PersistentToken> optionalToken = persistentTokenService.fetchPersistentToken(presentedSeries);
 
-        if (!optionalToken.isPresent()) {
+        if (optionalToken.isEmpty()) {
             // No series match, so we can't authenticate using this cookie
             throw new RememberMeAuthenticationException("No persistent token found for series id: " + presentedSeries);
         }
@@ -235,7 +238,7 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
             persistentTokenService.delete(token.getSeries());
 
             throw new CookieTheftException(
-                "Invalid remember-me token (Series/token) mismatch. Implies previous " + "cookie theft attack.");
+                "Invalid remember-me token (Series/token) mismatch. Implies previous cookie theft attack.");
         }
 
         LocalDate tokenDate = token.getTokenDate()
@@ -251,9 +254,11 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
     }
 
     private void addCookie(PersistentToken token, HttpServletRequest request, HttpServletResponse response) {
-        setCookie(new String[] {
-            token.getSeries(), token.getTokenValue()
-        }, TOKEN_VALIDITY_SECONDS, request, response);
+        setCookie(
+            new String[] {
+                token.getSeries(), token.getTokenValue()
+            },
+            TOKEN_VALIDITY_SECONDS, request, response);
     }
 
     @Override
