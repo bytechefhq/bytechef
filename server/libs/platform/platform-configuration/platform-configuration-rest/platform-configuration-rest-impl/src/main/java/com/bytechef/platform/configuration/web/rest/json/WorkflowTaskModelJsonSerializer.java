@@ -45,9 +45,13 @@ public class WorkflowTaskModelJsonSerializer extends JsonSerializer<WorkflowTask
 
         jsonGenerator.writeEndArray();
 
-        jsonGenerator.writeStringField("description", value.getDescription());
-        jsonGenerator.writeObjectField("destination", value.getDestination());
-        jsonGenerator.writeObjectField("", value.getFinalize());
+        if (value.getDescription() != null) {
+            jsonGenerator.writeStringField("description", value.getDescription());
+        }
+
+        if (value.getDestination() != null) {
+            jsonGenerator.writeObjectField("destination", value.getDestination());
+        }
 
         jsonGenerator.writeArrayFieldStart("finalize");
 
@@ -78,8 +82,14 @@ public class WorkflowTaskModelJsonSerializer extends JsonSerializer<WorkflowTask
 
         jsonGenerator.writeEndArray();
 
-        jsonGenerator.writeObjectField("source", value.getSource());
-        jsonGenerator.writeStringField("timeout", value.getTimeout());
+        if (value.getSource() != null) {
+            jsonGenerator.writeObjectField("source", value.getSource());
+        }
+
+        if (value.getTimeout() != null) {
+            jsonGenerator.writeStringField("timeout", value.getTimeout());
+        }
+
         jsonGenerator.writeStringField("type", value.getType());
 
         // Include null values in parameters map
