@@ -920,6 +920,7 @@ const Property = ({
                                         {...field}
                                     />
                                 )}
+                                rules={{required}}
                             />
                         </>
                     )}
@@ -944,6 +945,7 @@ const Property = ({
                                     value={selectValue}
                                 />
                             )}
+                            rules={{required}}
                         />
                     )}
 
@@ -969,6 +971,7 @@ const Property = ({
                                     ]}
                                 />
                             )}
+                            rules={{required}}
                         />
                     )}
 
@@ -988,6 +991,7 @@ const Property = ({
                                     {...field}
                                 />
                             )}
+                            rules={{required}}
                         />
                     )}
 
