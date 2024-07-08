@@ -49,6 +49,8 @@ const INPUT_PROPERTY_CONTROL_TYPES = [
     'URL',
 ];
 
+const MENTION_INPUT_PROPERTY_CONTROL_TYPES = ['EMAIL', 'PHONE', 'TEXT', 'TEXT_AREA', 'URL'];
+
 interface PropertyProps {
     arrayIndex?: number;
     arrayName?: string;
@@ -84,7 +86,7 @@ const Property = ({
     const [lookupDependsOnValues, setLookupDependsOnValues] = useState<Array<string> | undefined>();
     const [mentionInputValue, setMentionInputValue] = useState(property.defaultValue || '');
     const [mentionInput, setMentionInput] = useState(
-        !control && ['EMAIL', 'PHONE', 'TEXT', 'TEXT_AREA', 'URL'].includes(property.controlType!)
+        !control && MENTION_INPUT_PROPERTY_CONTROL_TYPES.includes(property.controlType!)
     );
     const [numericValue, setNumericValue] = useState(property.defaultValue || '');
     const [propertyParameterValue, setPropertyParameterValue] = useState(parameterValue || property.defaultValue || '');
