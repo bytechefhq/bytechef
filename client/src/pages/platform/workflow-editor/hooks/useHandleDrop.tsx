@@ -36,7 +36,7 @@ export default function useHandleDrop(): [
 
     const queryClient = useQueryClient();
 
-    function handleDropOnPlaceholderNode(
+    async function handleDropOnPlaceholderNode(
         targetNode: Node,
         droppedNode: ComponentDefinitionBasicModel | TaskDispatcherDefinitionBasicModel
     ) {
@@ -107,6 +107,38 @@ export default function useHandleDrop(): [
 
             return [...edges, newPlaceholderEdge];
         });
+
+        const draggedComponentDefinition = await queryClient.fetchQuery({
+            queryFn: () =>
+                new ComponentDefinitionApi().getComponentDefinition({
+                    componentName: newWorkflowNode.data.componentName,
+                }),
+            queryKey: ComponentDefinitionKeys.componentDefinition({
+                componentName: newWorkflowNode.data.componentName,
+            }),
+        });
+
+        const getActionDefinitionRequest = {
+            actionName: draggedComponentDefinition.actions?.[0].name as string,
+            componentName: newWorkflowNode.data.componentName,
+            componentVersion: draggedComponentDefinition?.version,
+        };
+
+        const draggedComponentActionDefinition = await queryClient.fetchQuery({
+            queryFn: () => new ActionDefinitionApi().getComponentActionDefinition(getActionDefinitionRequest),
+            queryKey: ActionDefinitionKeys.actionDefinition(getActionDefinitionRequest),
+        });
+
+        saveWorkflowDefinition(
+            {
+                ...newWorkflowNode.data,
+                parameters: getParametersWithDefaultValues({
+                    properties: draggedComponentActionDefinition.properties || [],
+                }),
+            },
+            workflow,
+            updateWorkflowMutation
+        );
     }
 
     async function handleDropOnWorkflowEdge(
@@ -123,7 +155,7 @@ export default function useHandleDrop(): [
 
         const targetEdgeIndex = edges.findIndex((edge) => edge.id === targetEdge.id);
 
-        const draggedNode = {
+        const newWorkflowNode = {
             data: {
                 componentName: droppedNode.name,
                 icon: droppedNode?.icon ? (
@@ -146,11 +178,11 @@ export default function useHandleDrop(): [
         setNodes((nodes) => {
             const nextNodeIndex = nodes.findIndex((node) => node.id === nextNode.id);
 
-            nodes.splice(nextNodeIndex, 0, draggedNode);
+            nodes.splice(nextNodeIndex, 0, newWorkflowNode);
 
             const tempComponentNames = [...componentNames];
 
-            tempComponentNames.splice(nextNodeIndex - 1, 0, draggedNode.data.componentName);
+            tempComponentNames.splice(nextNodeIndex - 1, 0, newWorkflowNode.data.componentName);
 
             setWorkflow({
                 ...workflow,
@@ -161,8 +193,8 @@ export default function useHandleDrop(): [
         });
 
         const newWorkflowEdge = {
-            id: `${draggedNode.id}=>${nextNode.id}`,
-            source: draggedNode.id,
+            id: `${newWorkflowNode.id}=>${nextNode.id}`,
+            source: newWorkflowNode.id,
             target: nextNode.id,
             type: 'workflow',
         };
@@ -170,8 +202,8 @@ export default function useHandleDrop(): [
         setEdges((edges) => {
             edges[targetEdgeIndex] = {
                 ...targetEdge,
-                id: `${previousNode.id}=>${draggedNode.id}`,
-                target: draggedNode.id,
+                id: `${previousNode.id}=>${newWorkflowNode.id}`,
+                target: newWorkflowNode.id,
             };
 
             edges.splice(targetEdgeIndex, 0, newWorkflowEdge);
@@ -182,16 +214,16 @@ export default function useHandleDrop(): [
         const draggedComponentDefinition = await queryClient.fetchQuery({
             queryFn: () =>
                 new ComponentDefinitionApi().getComponentDefinition({
-                    componentName: draggedNode.data.componentName,
+                    componentName: newWorkflowNode.data.componentName,
                 }),
             queryKey: ComponentDefinitionKeys.componentDefinition({
-                componentName: draggedNode.data.componentName,
+                componentName: newWorkflowNode.data.componentName,
             }),
         });
 
         const getActionDefinitionRequest = {
             actionName: draggedComponentDefinition.actions?.[0].name as string,
-            componentName: draggedNode.data.componentName,
+            componentName: newWorkflowNode.data.componentName,
             componentVersion: draggedComponentDefinition?.version,
         };
 
@@ -202,7 +234,7 @@ export default function useHandleDrop(): [
 
         saveWorkflowDefinition(
             {
-                ...draggedNode.data,
+                ...newWorkflowNode.data,
                 parameters: getParametersWithDefaultValues({
                     properties: draggedComponentActionDefinition.properties || [],
                 }),
