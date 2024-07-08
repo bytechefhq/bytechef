@@ -154,14 +154,14 @@ class DataMapperReplaceValueActionTest {
     void testPerformWithNotConvertibleType() {
         setupAndAssertTest(
             "1", 1, 2,
-            result -> assertEquals("defaultValue", result,
-                "Result should be default value due to not convertible type"));
+            result -> assertEquals(
+                "defaultValue", result, "Result should be default value due to not convertible type"));
     }
 
     private <T> void setupAndAssertTestForType(T inputMapping, T outputMapping) {
         setupAndAssertTest(
-            inputMapping, inputMapping, outputMapping, result -> assertEquals(outputMapping, result,
-                "Result should match the expected output value for type: " + result.getClass()));
+            inputMapping, inputMapping, outputMapping, result -> assertEquals(
+                outputMapping, result, "Result should match the expected output value for type: " + result.getClass()));
     }
 
     private <T, V> void setupAndAssertTest(

@@ -319,18 +319,20 @@ public class DataMapperReplaceValueAction {
         List<ObjectMapping> mappings = inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of());
 
         for (Mapping<Object, Object> mapping : mappings) {
-            if (ConvertUtils.canConvert(mapping.getFrom(), type)) {
+            Object mappingFrom = mapping.getFrom();
+
+            if (ConvertUtils.canConvert(mappingFrom, type)) {
+                Object mappingTo = mapping.getTo();
+
                 if (type.equals(String.class)) {
-                    return inputParameters.getString(VALUE)
-                        .replace(mapping.getFrom()
-                            .toString(),
-                            mapping.getTo()
-                                .toString());
+                    String value = inputParameters.getString(VALUE);
+
+                    return value.replace(mappingFrom.toString(), mappingTo.toString());
                 } else {
-                    Object from = ConvertUtils.convertValue(mapping.getFrom(), type);
+                    Object from = ConvertUtils.convertValue(mappingFrom, type);
 
                     if (from.equals(inputParameters.get(VALUE, type))) {
-                        return ConvertUtils.convertValue(mapping.getTo(), type);
+                        return ConvertUtils.convertValue(mappingTo, type);
                     }
                 }
             }
