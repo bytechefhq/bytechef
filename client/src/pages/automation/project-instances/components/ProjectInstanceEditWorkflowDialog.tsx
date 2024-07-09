@@ -76,11 +76,18 @@ const ProjectInstanceEditWorkflowDialog = ({
             .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []));
 
         for (const workflowConnection of workflowConnections) {
-            const projectInstanceWorkflowConnection = projectInstanceWorkflow?.connections?.find(
+            let projectInstanceWorkflowConnection = projectInstanceWorkflow?.connections?.find(
                 (projectInstanceWorkflowConnection) =>
                     projectInstanceWorkflowConnection.workflowNodeName === workflowConnection.workflowNodeName &&
                     projectInstanceWorkflowConnection.key === workflowConnection.key
             );
+
+            if (!projectInstanceWorkflowConnection) {
+                projectInstanceWorkflowConnection = {
+                    key: workflowConnection.key,
+                    workflowNodeName: workflowConnection.workflowNodeName,
+                };
+            }
 
             newProjectInstanceWorkflowConnections = [
                 ...newProjectInstanceWorkflowConnections,
