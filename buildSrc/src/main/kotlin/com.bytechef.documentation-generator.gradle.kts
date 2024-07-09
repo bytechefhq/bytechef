@@ -16,11 +16,11 @@ open class FindJsonFilesTask : DefaultTask() {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     class Properties {
-        private var controlType: String? = null
-        private var name: String? = null
-        private var items: Array<Properties>? = null
-        private var label: String? = null
-        private var type: String? = null
+        var controlType: String? = null
+        var name: String? = null
+        var items: Array<Properties>? = null
+        var label: String? = null
+        var type: String? = null
 
         override fun toString(): String {
             return "| $label | $type | $controlType  |"
@@ -29,9 +29,9 @@ open class FindJsonFilesTask : DefaultTask() {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     class OutputSchema {
-        private var controlType: String? = null
-        private var properties: Array<Properties>? = null
-        private var type: String? = null
+        var controlType: String? = null
+        var properties: Array<Properties>? = null
+        var type: String? = null
 
         override fun toString(): String {
             return """
@@ -49,8 +49,8 @@ ${properties?.joinToString("\n")}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     class OutputResponse {
-        private var outputSchema: OutputSchema? = null
-        private var sampleOutput: Any? = null
+        var outputSchema: OutputSchema? = null
+        var sampleOutput: Any? = null
 
         private fun getSampleOutputString(): String {
             if(sampleOutput==null) return ""
@@ -75,11 +75,11 @@ $outputSchema
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     class Action {
-        private var description: String? = null
-        private var name: String? = null
-        private var outputResponse: OutputResponse? = null
-        private var properties: Array<Properties>? = null
-        private var title: String? = null
+        var description: String? = null
+        var name: String? = null
+        var outputResponse: OutputResponse? = null
+        var properties: Array<Properties>? = null
+        var title: String? = null
 
         private fun getOutputResponseString(): String {
             if (outputResponse == null) {
@@ -107,12 +107,12 @@ ${getOutputResponseString()}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     class Trigger {
-        private var description: String? = null
-        private var name: String? = null
-        private var outputResponse: OutputResponse? = null
-        private var properties: Array<Properties>? = null
-        private var title: String? = null
-        private var type: String? = null
+        var description: String? = null
+        var name: String? = null
+        var outputResponse: OutputResponse? = null
+        var properties: Array<Properties>? = null
+        var title: String? = null
+        var type: String? = null
 
         private fun getOutputResponseString(): String {
             if (outputResponse == null) {
@@ -142,10 +142,10 @@ ${getOutputResponseString()}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     class Authorizations {
-        private var name: String? = null
-        private var properties: Array<Properties>? = null
-        private var title: String? = null
-        private var type: String? = null
+        var name: String? = null
+        var properties: Array<Properties>? = null
+        var title: String? = null
+        var type: String? = null
 
         override fun toString(): String {
             return """
@@ -163,8 +163,8 @@ ${properties?.joinToString("\n")}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     class Connection {
-        private var authorizations: Array<Authorizations>? = null
-        private var version: Int? = null
+        var authorizations: Array<Authorizations>? = null
+        var version: Int? = null
 
         override fun toString(): String {
             return """
@@ -180,16 +180,28 @@ ${authorizations?.joinToString("\n")}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     class Component {
-        private var actions: Array<Action>? = null
-        private var categories: Array<String>? = null
-        private var connection: Connection? = null
-        private var description: String? = null
-        private var icon: String? = null
-        private var name: String? = null
-        private var tags: String? = null
-        private var title: String? = null
-        private var triggers: Array<Trigger>? = null
-        private var version: Int? = null
+        var actions: Array<Action>? = null
+        var categories: Array<String>? = null
+        var connection: Connection? = null
+        var description: String? = null
+        var icon: String? = null
+        var name: String? = null
+        var tags: String? = null
+        var title: String? = null
+        var triggers: Array<Trigger>? = null
+        var version: Int? = null
+
+        private fun getConnectionString(): String {
+            if(connection==null) {
+                return ""
+            }
+
+            return """
+$connection
+
+<hr />
+            """
+        }
 
         private fun getTriggerString(): String {
             if(triggers==null) {
@@ -205,21 +217,23 @@ ${triggers?.joinToString("\n")}
             """
         }
 
-        private fun getConnectionString(): String {
-            if(connection==null) {
+        private fun getActionsString(): String {
+            if(actions==null) {
                 return ""
             }
 
             return """
-$connection
+# Actions
 
-<hr />
+${actions?.joinToString("\n")}
             """
         }
 
         override fun toString(): String {
-            return """
-# $title
+            return """---
+title: $title
+description: $description
+---
 ### $description
 Categories: ${categories.contentToString()}
 
@@ -231,9 +245,7 @@ ${getConnectionString()}
 
 ${getTriggerString()}
 
-# Actions
-
-${actions?.joinToString("\n")}
+${getActionsString()}
             """
         }
     }
@@ -260,17 +272,15 @@ ${actions?.joinToString("\n")}
                 val json = jsonObject.toString()
 
                 val mdFileName = it.nameWithoutExtension.substringBefore("_") + ".md"
+                val path = "$rootPath/$docsPath"
 
-                val docsPath = "$rootPath/$docsPath"
-
-                val docsDir = File(docsPath)
+                val docsDir = File(path)
 
                 if (!docsDir.exists()) {
                     docsDir.mkdirs()
                 }
 
-                val mdFile = File(docsPath, mdFileName)
-
+                val mdFile = File(path, mdFileName)
                 mdFile.writeText(json)
             }
         } else {
