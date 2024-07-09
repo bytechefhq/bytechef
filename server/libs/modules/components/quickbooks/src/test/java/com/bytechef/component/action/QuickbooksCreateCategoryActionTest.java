@@ -17,7 +17,6 @@
 package com.bytechef.component.action;
 
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.NAME;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.QUANTITY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -26,13 +25,14 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.quickbooks.action.QuickbooksCreateItemAction;
+import com.bytechef.component.quickbooks.action.QuickbooksCreateCategoryAction;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-class QuickbooksCreateItemActionTest {
+class QuickbooksCreateCategoryActionTest {
+
     private final ArgumentCaptor<Context.Http.Body> bodyArgumentCaptor =
         ArgumentCaptor.forClass(Context.Http.Body.class);
     private final ActionContext mockedContext = mock(ActionContext.class);
@@ -57,13 +57,12 @@ class QuickbooksCreateItemActionTest {
 
         Map<String, Object> propertyStubsMap = createPropertyStubsMap();
 
+        when(mockedParameters.getRequiredString("Type"))
+            .thenReturn((String) propertyStubsMap.get("Type"));
         when(mockedParameters.getRequiredString(NAME))
             .thenReturn((String) propertyStubsMap.get(NAME));
-        when(mockedParameters.getString(QUANTITY))
-            .thenReturn((String) propertyStubsMap.get(QUANTITY));
 
-
-        Object result = QuickbooksCreateItemAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = QuickbooksCreateCategoryAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(responeseMap, result);
 
@@ -75,7 +74,8 @@ class QuickbooksCreateItemActionTest {
     private static Map<String, Object> createPropertyStubsMap() {
         Map<String, Object> propertyStubsMap = new HashMap<>();
 
-        propertyStubsMap.put(NAME, NAME);
+        propertyStubsMap.put("Type", "Category");
+        propertyStubsMap.put(NAME, "Name");
 
         return propertyStubsMap;
     }

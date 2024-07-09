@@ -17,68 +17,59 @@
 package com.bytechef.component.quickbooks.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.BASE_URL;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.COMPANY_ID;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.CREATE_ITEM;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.CREATE_CATEGORY;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.NAME;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.QUANTITY;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 
-/**
- * @author Mario Cvjetojevic
- * @author Luka Ljubić
- */
-public final class QuickbooksCreateItemAction {
+public class QuickbooksCreateCategoryAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_ITEM)
-        .title("Create item")
-        .description("Creates a new item.")
+    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_CATEGORY)
+        .title("Create a category")
+        .description("Creates a new category.")
         .properties(
             string(NAME)
-                .label("Name")
-                .description("Name of the item. This value must be unique. Required for create.")
+                .label("Nane")
+                .description("Name of the category")
                 .maxLength(100)
-                .required(true),
-            number(QUANTITY)
-                .label("Quantity on hand")
-                .description(
-                    "Current quantity of the Inventory items available for sale. Not used for Service or " +
-                        "NonInventory type items.Required for Inventory type items."))
+                .required(true))
+        .description("Has conditionally required parameters.")
         .outputSchema(
             object()
                 .properties(
-                    string("id")
-                        .label("ID")
-                        .required(true),
-                    string("name")
-                        .label("Name"),
-                    string("description")
-                        .label("Description"),
-                    number("unitPrice")
-                        .label("Unit price")))
-        .perform(QuickbooksCreateItemAction::perform);
+                    object("item")
+                        .properties(
+                            string("id"),
+                            string("domain"),
+                            string("Name"),
+                            string("Level"),
+                            string("Subitem"),
+                            string("FullyQualifiedName"))))
+        .perform(QuickbooksCreateCategoryAction::perform);
 
-    private QuickbooksCreateItemAction() {
+    private QuickbooksCreateCategoryAction() {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
         return context
             .http(http -> http.post(BASE_URL + "/v3/company/" +
                 connectionParameters.getRequiredString(COMPANY_ID)
                     .replace(" ", "")
-                + "/item"))
+                +
+                "/item?minorversion=4"))
             .body(
                 Context.Http.Body.of(
-                    NAME, inputParameters.getRequiredString(NAME),
-                    QUANTITY, inputParameters.getRequired(QUANTITY)))
+                    "Type", "Category",
+                    NAME, inputParameters.getRequiredString(NAME)))
             .configuration(responseType(Context.Http.ResponseType.JSON))
             .execute()
             .getBody(new Context.TypeReference<>() {});

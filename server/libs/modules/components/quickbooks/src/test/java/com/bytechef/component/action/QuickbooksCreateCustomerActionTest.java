@@ -23,49 +23,78 @@ import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.MID
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.SUFFIX;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.quickbooks.action.QuickbooksCreateCustomerAction;
-import com.intuit.ipp.data.Customer;
-import com.intuit.ipp.exception.FMSException;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
-/**
- * @author Mario Cvjetojevic
- */
-public class QuickbooksCreateCustomerActionTest extends AbstractQuickbooksActionTest {
+class QuickbooksCreateCustomerActionTest {
+
+    private final ArgumentCaptor<Context.Http.Body> bodyArgumentCaptor =
+        ArgumentCaptor.forClass(Context.Http.Body.class);
+    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final Context.Http.Executor mockedExecutor = mock(Context.Http.Executor.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
+    private final Context.Http.Response mockedResponse = mock(Context.Http.Response.class);
+    private final Map<String, Object> responeseMap = Map.of("key", "value");
 
     @Test
-    public void testPerform() throws FMSException {
+    void testPerform() {
+
+        when(mockedContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(Context.TypeReference.class)))
+            .thenReturn(responeseMap);
+
+        Map<String, Object> propertyStubsMap = createPropertyStubsMap();
+
         when(mockedParameters.getRequiredString(DISPLAY_NAME))
-            .thenReturn("DISPLAY_NAME");
-        when(mockedParameters.getRequiredString(FAMILY_NAME))
-            .thenReturn("FAMILY_NAME");
-        when(mockedParameters.getRequiredString(GIVEN_NAME))
-            .thenReturn("GIVEN_NAME");
-        when(mockedParameters.getRequiredString(MIDDLE_NAME))
-            .thenReturn("MIDDLE_NAME");
-        when(mockedParameters.getRequiredString(SUFFIX))
-            .thenReturn("SUFFIX");
-        when(mockedParameters.getRequiredString(TITLE))
-            .thenReturn("TITLE");
+            .thenReturn((String) propertyStubsMap.get(DISPLAY_NAME));
+        when(mockedParameters.getString(SUFFIX))
+            .thenReturn((String) propertyStubsMap.get(SUFFIX));
+        when(mockedParameters.getString(TITLE))
+            .thenReturn((String) propertyStubsMap.get(TITLE));
+        when(mockedParameters.getString(MIDDLE_NAME))
+            .thenReturn((String) propertyStubsMap.get(MIDDLE_NAME));
+        when(mockedParameters.getString(FAMILY_NAME))
+            .thenReturn((String) propertyStubsMap.get(FAMILY_NAME));
+        when(mockedParameters.getString(GIVEN_NAME))
+            .thenReturn((String) propertyStubsMap.get(GIVEN_NAME));
 
-        QuickbooksCreateCustomerAction.perform(mockedParameters, mockedParameters, mock(ActionContext.class));
 
-        verify(mockedDataService, times(1))
-            .add(entityArgumentCaptor.capture());
+        Object result = QuickbooksCreateCustomerAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        Customer customer = (Customer) entityArgumentCaptor.getValue();
+        assertEquals(responeseMap, result);
 
-        assertEquals("DISPLAY_NAME", customer.getDisplayName());
-        assertEquals("FAMILY_NAME", customer.getFamilyName());
-        assertEquals("GIVEN_NAME", customer.getGivenName());
-        assertEquals("MIDDLE_NAME", customer.getMiddleName());
-        assertEquals("SUFFIX", customer.getSuffix());
-        assertEquals("TITLE", customer.getTitle());
+        Context.Http.Body body = bodyArgumentCaptor.getValue();
+
+        assertEquals(propertyStubsMap, body.getContent());
+    }
+
+    private static Map<String, Object> createPropertyStubsMap() {
+        Map<String, Object> propertyStubsMap = new HashMap<>();
+
+        propertyStubsMap.put(DISPLAY_NAME, DISPLAY_NAME);
+        propertyStubsMap.put(SUFFIX, SUFFIX);
+        propertyStubsMap.put(TITLE, TITLE);
+        propertyStubsMap.put(MIDDLE_NAME, MIDDLE_NAME);
+        propertyStubsMap.put(FAMILY_NAME, FAMILY_NAME);
+        propertyStubsMap.put(GIVEN_NAME, GIVEN_NAME);
+
+        return propertyStubsMap;
     }
 }

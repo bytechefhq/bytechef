@@ -22,14 +22,15 @@ import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.QUI
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.quickbooks.action.QuickbooksCreateCategoryAction;
 import com.bytechef.component.quickbooks.action.QuickbooksCreateCustomerAction;
 import com.bytechef.component.quickbooks.action.QuickbooksCreateItemAction;
-import com.bytechef.component.quickbooks.action.QuickbooksDownloadCustomerPdfAction;
 import com.bytechef.component.quickbooks.connection.QuickbooksConnection;
 import com.google.auto.service.AutoService;
 
 /**
  * @author Mario Cvjetojevic
+ * @author Luka Ljubić
  */
 @AutoService(ComponentHandler.class)
 public class QuickbooksComponentHandler implements ComponentHandler {
@@ -46,7 +47,7 @@ public class QuickbooksComponentHandler implements ComponentHandler {
         .actions(
             QuickbooksCreateCustomerAction.ACTION_DEFINITION,
             QuickbooksCreateItemAction.ACTION_DEFINITION,
-            QuickbooksDownloadCustomerPdfAction.ACTION_DEFINITION);
+            QuickbooksCreateCategoryAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
