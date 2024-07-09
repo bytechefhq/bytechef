@@ -1,8 +1,6 @@
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.ObjectMapper
-//import org.gradle.internal.impldep.com.fasterxml.jackson.annotation.JsonIgnoreProperties
-//import org.gradle.internal.impldep.com.fasterxml.jackson.databind.ObjectMapper
 
 plugins {
     // Apply the common convention plugin for shared build configuration between library and application projects.
@@ -22,11 +20,11 @@ open class FindJsonFilesTask : DefaultTask() {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     class Properties {
-        var name: String? = null
-        var label: String? = null
-        var type: String? = null
-        var controlType: String? = null
-        var items: Array<Properties>? = null
+        private var name: String? = null
+        private var label: String? = null
+        private var type: String? = null
+        private var controlType: String? = null
+        private var items: Array<Properties>? = null
 
         override fun toString(): String {
             return "| $label | $type | $controlType  |"
@@ -35,9 +33,9 @@ open class FindJsonFilesTask : DefaultTask() {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     class OutputSchema {
-        var type: String? = null
-        var controlType: String? = null
-        var properties: Array<Properties>? = null
+        private var type: String? = null
+        private var controlType: String? = null
+        private var properties: Array<Properties>? = null
 
         override fun toString(): String {
             return """
@@ -55,12 +53,13 @@ ${properties?.joinToString("\n")}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     class OutputResponse {
-        var sampleOutput: Any? = null
-        var outputSchema: OutputSchema? = null
+        private var sampleOutput: Any? = null
+        private var outputSchema: OutputSchema? = null
 
-        fun getSampleOutputString(): String {
-            if(sampleOutput==null) return "";
-            else return """
+        private fun getSampleOutputString(): String {
+            if(sampleOutput==null) return ""
+
+            return """
 ___Sample Output:___
 
 ```$sampleOutput```
@@ -80,15 +79,16 @@ $outputSchema
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     class Action {
-        var name: String? = null
-        var description: String? = null
-        var title: String? = null
-        var properties: Array<Properties>? = null
-        var outputResponse: OutputResponse? = null
+        private var name: String? = null
+        private var description: String? = null
+        private var title: String? = null
+        private var properties: Array<Properties>? = null
+        private var outputResponse: OutputResponse? = null
 
-        fun getOutputResponseString(): String {
+        private fun getOutputResponseString(): String {
             if (outputResponse == null) return ""
-            else return "$outputResponse"
+
+            return "$outputResponse"
         }
 
         override fun toString(): String {
@@ -109,16 +109,17 @@ ${getOutputResponseString()}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     class Trigger {
-        var name: String? = null
-        var description: String? = null
-        var title: String? = null
-        var type: String? = null
-        var properties: Array<Properties>? = null
-        var outputResponse: OutputResponse? = null
+        private var name: String? = null
+        private var description: String? = null
+        private var title: String? = null
+        private var type: String? = null
+        private var properties: Array<Properties>? = null
+        private var outputResponse: OutputResponse? = null
 
-        fun getOutputResponseString(): String {
+        private fun getOutputResponseString(): String {
             if (outputResponse == null) return ""
-            else return "$outputResponse"
+
+            return "$outputResponse"
         }
 
         override fun toString(): String {
@@ -141,10 +142,10 @@ ${getOutputResponseString()}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     class Authorizations {
-        var name: String? = null
-        var type: String? = null
-        var title: String? = null
-        var properties: Array<Properties>? = null
+        private var name: String? = null
+        private var type: String? = null
+        private var title: String? = null
+        private var properties: Array<Properties>? = null
 
         override fun toString(): String {
             return """
@@ -162,8 +163,8 @@ ${properties?.joinToString("\n")}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     class Connection {
-        var version: Int? = null
-        var authorizations: Array<Authorizations>? = null
+        private var version: Int? = null
+        private var authorizations: Array<Authorizations>? = null
 
         override fun toString(): String {
             return """
@@ -179,20 +180,21 @@ ${authorizations?.joinToString("\n")}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     class Component {
-        var categories: Array<String>? = null
-        var description: String? = null
-        var icon: String? = null
-        var tags: String? = null
-        var name: String? = null
-        var version: Int? = null
-        var title: String? = null
-        var connection: Connection? = null
-        var actions: Array<Action>? = null
-        var triggers: Array<Trigger>? = null
+        private var categories: Array<String>? = null
+        private var description: String? = null
+        private var icon: String? = null
+        private var tags: String? = null
+        private var name: String? = null
+        private var version: Int? = null
+        private var title: String? = null
+        private var connection: Connection? = null
+        private var actions: Array<Action>? = null
+        private var triggers: Array<Trigger>? = null
 
-        fun getTriggerString(): String {
-            if(triggers==null) return "";
-            else return """
+        private fun getTriggerString(): String {
+            if(triggers==null) return ""
+
+            return """
 # Triggers
 
 ${triggers?.joinToString("\n")}
@@ -201,9 +203,10 @@ ${triggers?.joinToString("\n")}
             """
         }
 
-        fun getConnectionString(): String {
-            if(connection==null) return "";
-            else return """
+        private fun getConnectionString(): String {
+            if(connection==null) return ""
+
+            return """
 $connection
 
 <hr />
