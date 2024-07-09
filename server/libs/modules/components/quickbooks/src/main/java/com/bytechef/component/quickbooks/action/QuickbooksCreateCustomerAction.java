@@ -21,6 +21,9 @@ import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.BASE_URL;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.COMPANY_ID;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.CREATE_CUSTOMER;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.DISPLAY_NAME;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.FAMILY_NAME;
@@ -30,33 +33,15 @@ import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.SUF
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.TITLE;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.quickbooks.util.QuickbooksUtils;
-import com.intuit.ipp.data.Customer;
-import com.intuit.ipp.exception.FMSException;
-import com.intuit.ipp.services.DataService;
 
 /**
  * @author Mario Cvjetojevic
+ * @author Luka Ljubić
  */
 public final class QuickbooksCreateCustomerAction {
-
-    private static final ComponentDSL.ModifiableValueProperty<?, ?>[] PHYSICAL_ADDRESS_PROPERTIES = {
-        string("line1")
-            .label("Line 1"),
-        string("line2")
-            .label("Line 2"),
-        string("city")
-            .label("City"),
-        string("country")
-            .label("Country"),
-        string("countryCode")
-            .label("Country code"),
-        string("postalCode")
-            .label("Postal code")
-    };
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_CUSTOMER)
         .title("Create customer")
@@ -69,7 +54,8 @@ public final class QuickbooksCreateCustomerAction {
                         "Vendor, and Employee objects. Cannot be removed with sparse update. If not supplied, " +
                         "the system generates DisplayName by concatenating customer name components supplied in the " +
                         "request from the following list: Title, GivenName, MiddleName, FamilyName, and Suffix.")
-                .maxLength(500),
+                .maxLength(500)
+                .required(true),
             string(SUFFIX)
                 .label("Suffix")
                 .description(
@@ -109,12 +95,6 @@ public final class QuickbooksCreateCustomerAction {
                     string("id")
                         .label("ID")
                         .required(true),
-                    object("billAddr")
-                        .properties(PHYSICAL_ADDRESS_PROPERTIES)
-                        .label("Billing address"),
-                    object("shipAddr")
-                        .properties(PHYSICAL_ADDRESS_PROPERTIES)
-                        .label("Shipping address"),
                     string("contactName")
                         .label("Contact name"),
                     object("creditChargeInfo")
@@ -145,20 +125,22 @@ public final class QuickbooksCreateCustomerAction {
     private QuickbooksCreateCustomerAction() {
     }
 
-    public static Customer perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws FMSException {
-
-        Customer customer = new Customer();
-
-        customer.setDisplayName(inputParameters.getRequiredString(DISPLAY_NAME));
-        customer.setFamilyName(inputParameters.getRequiredString(FAMILY_NAME));
-        customer.setGivenName(inputParameters.getRequiredString(GIVEN_NAME));
-        customer.setMiddleName(inputParameters.getRequiredString(MIDDLE_NAME));
-        customer.setSuffix(inputParameters.getRequiredString(SUFFIX));
-        customer.setTitle(inputParameters.getRequiredString(TITLE));
-
-        DataService dataService = QuickbooksUtils.getDataService(connectionParameters);
-
-        return dataService.add(customer);
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        return context
+            .http(http -> http.post(BASE_URL + "/v3/company/" +
+                connectionParameters.getRequiredString(COMPANY_ID)
+                    .replace(" ", "")
+                + "/customer"))
+            .body(
+                Context.Http.Body.of(
+                    DISPLAY_NAME, inputParameters.getRequiredString(DISPLAY_NAME),
+                    SUFFIX, inputParameters.getString(SUFFIX),
+                    TITLE, inputParameters.getString(TITLE),
+                    MIDDLE_NAME, inputParameters.getString(MIDDLE_NAME),
+                    FAMILY_NAME, inputParameters.getString(FAMILY_NAME),
+                    GIVEN_NAME, inputParameters.getString(GIVEN_NAME)))
+            .configuration(responseType(Context.Http.ResponseType.JSON))
+            .execute()
+            .getBody(new Context.TypeReference<>() {});
     }
 }

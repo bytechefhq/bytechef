@@ -22,20 +22,16 @@ import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
 import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.connection;
 import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.COMPANY_ID;
 
 import com.bytechef.component.definition.ComponentDSL;
-import com.intuit.ipp.util.Config;
 import java.util.List;
 
 /**
  * @author Mario Cvjetojevic
+ * @author Luka Ljubić
  */
 public class QuickbooksConnection {
-
-    static {
-        Config.setProperty(Config.BASE_URL_QBO, "https://sandbox-quickbooks.api.intuit.com/v3/company");
-    }
-
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .authorizations(
             authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
@@ -46,8 +42,17 @@ public class QuickbooksConnection {
                         .required(true),
                     string(CLIENT_SECRET)
                         .label("Client Secret")
+                        .required(true),
+                    string(COMPANY_ID)
+                        .label("Company Id")
+                        .description("To get the company id, go to your dashboard. On the top right corner " +
+                            "press the gear logo and click Additional information. There you will see your company ID")
                         .required(true))
                 .authorizationUrl((connection, context) -> "https://appcenter.intuit.com/connect/oauth2")
                 .scopes((connection, context) -> List.of("com.intuit.quickbooks.accounting"))
                 .tokenUrl((connection, context) -> "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer"));
+
+    private QuickbooksConnection() {
+    }
+
 }

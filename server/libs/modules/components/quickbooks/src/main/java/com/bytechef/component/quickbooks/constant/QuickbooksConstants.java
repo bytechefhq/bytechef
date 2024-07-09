@@ -18,27 +18,24 @@ package com.bytechef.component.quickbooks.constant;
 
 /**
  * @author Mario Cvjetojevic
+ * @author Luka Ljubić
  */
 public final class QuickbooksConstants {
 
-    public static final String ASSET_ACCOUNT_ID = "assetAccountId";
+    public static final String BASE_URL = "https://quickbooks.api.intuit.com";
+    public static final String COMPANY_ID = "companyId";
+    public static final String CREATE_CATEGORY = "createCategory";
     public static final String CREATE_CUSTOMER = "createCustomer";
     public static final String CREATE_ITEM = "createItem";
-    public static final String CUSTOMER_ID = "customerId";
-    public static final String DISPLAY_NAME = "displayName";
-    public static final String DOWNLOAD_CUSTOMER_PDF = "downloadCustomerPdf";
-    public static final String EXPENSE_ACCOUNT_ID = "expenseAccountId";
-    public static final String FAMILY_NAME = "familyName";
-    public static final String GIVEN_NAME = "givenName";
-    public static final String MIDDLE_NAME = "middleName";
-    public static final String INCOME_ACCOUNT_ID = "incomeAccountId";
-    public static final String INVENTORY_START_DATE = "inventoryStartDate";
-    public static final String ITEM_NAME = "itemName";
-    public static final String QUANTITY_ON_HAND = "quantityOnHand";
+    public static final String DISPLAY_NAME = "DisplayName";
+    public static final String FAMILY_NAME = "FamilyName";
+    public static final String GIVEN_NAME = "GivenName";
+    public static final String MIDDLE_NAME = "MiddleName";
+    public static final String NAME = "Name";
+    public static final String QUANTITY = "QtyOnHand";
     public static final String QUICKBOOKS = "quickbooks";
-    public static final String SUFFIX = "suffix";
-    public static final String TITLE = "title";
-    public static final String TYPE = "type";
+    public static final String SUFFIX = "Suffix";
+    public static final String TITLE = "Title";
 
     private QuickbooksConstants() {
     }
