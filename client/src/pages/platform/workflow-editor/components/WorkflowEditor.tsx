@@ -9,7 +9,7 @@ import {ComponentOperationType} from '@/shared/types';
 import {getRandomId} from '@/shared/util/random-utils';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {usePrevious} from '@uidotdev/usehooks';
-import {DragEventHandler, useEffect, useMemo, useState} from 'react';
+import {DragEventHandler, useCallback, useEffect, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import ReactFlow, {Controls, Edge, MiniMap, Node, useReactFlow, useStore} from 'reactflow';
 
@@ -68,14 +68,35 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
 
     const width = useStore((store) => store.width);
 
+    const onDragOver: DragEventHandler = useCallback((event) => {
+        if (event.target instanceof HTMLButtonElement && event.target.dataset.nodeType === 'workflow') {
+            return;
+        }
+
+        event.preventDefault();
+
+        event.dataTransfer.dropEffect = 'move';
+    }, []);
+
     const onDrop: DragEventHandler = (event) => {
-        const droppedNodeName = event.dataTransfer.getData('application/reactflow');
+        const droppedNodeData = event.dataTransfer.getData('application/reactflow');
+
+        let droppedNodeType = '';
+        let droppedNodeName;
+
+        if (droppedNodeData.includes('--')) {
+            droppedNodeName = droppedNodeData.split('--')[0];
+
+            droppedNodeType = droppedNodeData.split('--')[1];
+        } else {
+            droppedNodeName = droppedNodeData;
+        }
 
         const droppedNode = [...componentDefinitions, ...taskDispatcherDefinitions].find(
             (node) => node.name === droppedNodeName
         );
 
-        if (!droppedNode) {
+        if (!droppedNode || droppedNodeType === 'trigger') {
             return;
         }
 
@@ -374,6 +395,7 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
                 nodes={nodes}
                 nodesConnectable={false}
                 nodesDraggable={false}
+                onDragOver={onDragOver}
                 onDrop={onDrop}
                 panOnDrag
                 panOnScroll
