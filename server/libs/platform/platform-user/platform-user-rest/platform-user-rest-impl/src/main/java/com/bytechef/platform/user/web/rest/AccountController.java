@@ -103,7 +103,7 @@ public class AccountController {
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public void registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
-        if (tempEmailService.isEmailTemp(managedUserVM.getEmail())) {
+        if (tempEmailService.isEmailDomainTemp(managedUserVM.getEmail())) {
             throw new EmailAlreadyUsedException();
         }
 

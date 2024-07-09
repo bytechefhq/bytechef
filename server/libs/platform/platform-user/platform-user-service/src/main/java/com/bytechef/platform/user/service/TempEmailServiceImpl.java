@@ -34,12 +34,12 @@ public class TempEmailServiceImpl implements TempEmailService, InitializingBean 
     private final Resource resource;
     private List<String> tempEmailDomains;
 
-    public TempEmailServiceImpl(@Value("${bytechef.security.email.temp-domains-url:''}") Resource resource) {
+    public TempEmailServiceImpl(@Value("${bytechef.email.temp-domain-list-url:''}") Resource resource) {
         this.resource = resource;
     }
 
     @Override
-    public boolean isEmailTemp(String email) {
+    public boolean isEmailDomainTemp(String email) {
         if (tempEmailDomains.isEmpty()) {
             return false;
         } else {

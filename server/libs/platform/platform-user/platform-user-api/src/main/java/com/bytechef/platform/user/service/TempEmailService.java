@@ -21,5 +21,5 @@ package com.bytechef.platform.user.service;
  */
 public interface TempEmailService {
 
-    boolean isEmailTemp(String email);
+    boolean isEmailDomainTemp(String email);
 }

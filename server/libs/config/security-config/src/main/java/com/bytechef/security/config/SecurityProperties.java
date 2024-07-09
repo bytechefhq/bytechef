@@ -27,15 +27,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class SecurityProperties {
 
     private String contentSecurityPolicy;
-    private Email email;
     private RememberMe rememberMe = new RememberMe();
 
     public String getContentSecurityPolicy() {
         return contentSecurityPolicy;
-    }
-
-    public Email getEmail() {
-        return email;
     }
 
     public RememberMe getRememberMe() {
@@ -46,25 +41,8 @@ public class SecurityProperties {
         this.contentSecurityPolicy = contentSecurityPolicy;
     }
 
-    public void setEmail(Email email) {
-        this.email = email;
-    }
-
     public void setRememberMe(RememberMe rememberMe) {
         this.rememberMe = rememberMe;
-    }
-
-    public static class Email {
-
-        private String tempDomainsUrl;
-
-        public String getTempDomainsUrl() {
-            return tempDomainsUrl;
-        }
-
-        public void setTempDomainsUrl(String tempDomainsUrl) {
-            this.tempDomainsUrl = tempDomainsUrl;
-        }
     }
 
     public static class RememberMe {

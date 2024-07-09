@@ -39,8 +39,9 @@ public class MessageEventListener {
     private final List<MessageEventPreSendProcessor> messageEventPreSendProcessors;
 
     @SuppressFBWarnings("EI")
-    public MessageEventListener(MessageBroker messageBroker,
-        List<MessageEventPreSendProcessor> messageEventPreSendProcessors) {
+    public MessageEventListener(
+        MessageBroker messageBroker, List<MessageEventPreSendProcessor> messageEventPreSendProcessors) {
+
         this.messageBroker = messageBroker;
         this.messageEventPreSendProcessors = messageEventPreSendProcessors;
     }
