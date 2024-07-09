@@ -9,12 +9,22 @@ interface DragEventI<T = Element> extends MouseEvent<T, DragEventInit> {
 
 interface WorkflowNodesTabsItemProps extends HTMLAttributes<HTMLLIElement> {
     handleClick?: () => void;
-    node: ComponentDefinitionBasicModel | TaskDispatcherDefinitionModel;
+    node: (ComponentDefinitionBasicModel | TaskDispatcherDefinitionModel) & {taskDispatcher: boolean; trigger: boolean};
 }
 
 const WorkflowNodesTabsItem = ({draggable, handleClick, node}: WorkflowNodesTabsItemProps) => {
-    const onDragStart = (event: DragEventI, name: string) => {
-        event.dataTransfer.setData('application/reactflow', name);
+    let nodeName = node.name;
+
+    if (node.trigger) {
+        nodeName = `${node.name}--trigger`;
+    }
+
+    if (node.taskDispatcher) {
+        nodeName = `${node.name}--taskDispatcher'`;
+    }
+
+    const onDragStart = (event: DragEventI) => {
+        event.dataTransfer.setData('application/reactflow', nodeName);
         event.dataTransfer.effectAllowed = 'move';
     };
 
@@ -24,7 +34,7 @@ const WorkflowNodesTabsItem = ({draggable, handleClick, node}: WorkflowNodesTabs
             draggable={draggable}
             id={node?.title}
             onClick={handleClick}
-            onDragStart={(event) => onDragStart(event, node.name!)}
+            onDragStart={(event) => onDragStart(event)}
         >
             {node.icon ? (
                 <InlineSVG
