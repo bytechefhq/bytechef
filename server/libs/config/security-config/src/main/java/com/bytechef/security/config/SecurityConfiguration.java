@@ -125,7 +125,8 @@ public class SecurityConfiguration {
             .csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 // See https://stackoverflow.com/q/74447118/65681
-                .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler()));
+                .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
+                .ignoringRequestMatchers("/webhooks/**"));
 
         for (FilterBeforeContributor filterBeforeContributor : filterBeforeContributors) {
             http.addFilterBefore(
