@@ -108,10 +108,9 @@ public class IntegrationInstanceConfigurationServiceImpl implements IntegrationI
     @Override
     @Transactional(readOnly = true)
     public boolean isIntegrationInstanceConfigurationEnabled(long integrationInstanceConfigurationId) {
-        IntegrationInstanceConfiguration integrationInstanceConfiguration =
-            getIntegrationInstanceConfiguration(integrationInstanceConfigurationId);
-
-        return integrationInstanceConfiguration.isEnabled();
+        return integrationInstanceConfigurationRepository.findById(integrationInstanceConfigurationId)
+            .map(integrationInstanceConfiguration -> integrationInstanceConfiguration.isEnabled())
+            .orElse(false);
     }
 
     @Override

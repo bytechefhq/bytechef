@@ -92,9 +92,9 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
     @Override
     @Transactional(readOnly = true)
     public boolean isProjectInstanceEnabled(long projectInstanceId) {
-        ProjectInstance projectInstance = getProjectInstance(projectInstanceId);
-
-        return projectInstance.isEnabled();
+        return projectInstanceRepository.findById(projectInstanceId)
+            .map(projectInstance -> projectInstance.isEnabled())
+            .orElse(false);
     }
 
     @Override
