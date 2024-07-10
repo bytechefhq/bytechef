@@ -43,7 +43,7 @@ Type: $type
 |:--------------:|:------------:|:--------------------:|
 ${properties?.joinToString("\n")}
 
-            """
+"""
         }
     }
 
@@ -69,7 +69,7 @@ ___Sample Output:___
 
 ${getSampleOutputString()}
 $outputSchema
-            """
+"""
         }
     }
 
@@ -101,7 +101,7 @@ $outputSchema
 ${properties?.joinToString("\n")}
 
 ${getOutputResponseString()}
-            """
+"""
         }
     }
 
@@ -136,7 +136,7 @@ ${properties?.joinToString("\n")}
 
 ${getOutputResponseString()}
 
-            """
+"""
         }
     }
 
@@ -157,7 +157,7 @@ ${getOutputResponseString()}
 |:--------------:|:------------:|:--------------------:|
 ${properties?.joinToString("\n")}
 
-            """
+"""
         }
     }
 
@@ -174,7 +174,7 @@ Version: $version
 
 ${authorizations?.joinToString("\n")}
 
-            """
+"""
         }
     }
 
@@ -200,7 +200,7 @@ ${authorizations?.joinToString("\n")}
 $connection
 
 <hr />
-            """
+"""
         }
 
         private fun getTriggerString(): String {
@@ -214,7 +214,7 @@ $connection
 ${triggers?.joinToString("\n")}
 
 <hr />
-            """
+"""
         }
 
         private fun getActionsString(): String {
@@ -226,7 +226,7 @@ ${triggers?.joinToString("\n")}
 # Actions
 
 ${actions?.joinToString("\n")}
-            """
+"""
         }
 
         override fun toString(): String {
@@ -234,6 +234,9 @@ ${actions?.joinToString("\n")}
 title: $title
 description: $description
 ---
+# Reference
+<hr />
+
 ### $description
 Categories: ${categories.contentToString()}
 
@@ -246,24 +249,33 @@ ${getConnectionString()}
 ${getTriggerString()}
 
 ${getActionsString()}
-            """
+"""
         }
     }
 
     @TaskAction
     fun findJsonFiles() {
-        val componentsPath = "server/libs/modules/components"
-        val docsPath = "docs/src/content/docs/reference/components"
+        val modulesPath = "server/libs/modules"
+        val componentsPath = "docs/src/content/docs/reference/components"
+        val taskDispatchersPath = "docs/src/content/docs/reference/task-dispatchers"
         val rootPath = project.rootDir.path
 
-        val componentsDir = File("$rootPath/$componentsPath")
+        val componentsDir = File("$rootPath/$modulesPath")
 
         if (componentsDir.exists()) {
             val jsonFiles = componentsDir.walk().filter {
                 it.isFile && it.extension == "json" && it.name.matches(Regex(".*_v1\\.json")) && !it.absolutePath.contains("/build/")
             }.toList()
 
+            val mdFiles = componentsDir.walk().filter {
+                it.isFile && it.extension == "md" && it.name.matches(Regex("README\\.md")) && it.absolutePath.contains("/resources/") && !it.absolutePath.contains("/build/")
+            }.associate{
+                val name = it.absolutePath.substringBefore("/src/").substringAfter("components/")
+                Pair(name, it)
+            }
+
             println("Found ${jsonFiles.size} JSON files:")
+            println("Found ${mdFiles.size} MD files:")
 
             jsonFiles.forEach {
                 val mapper = ObjectMapper()
@@ -271,8 +283,11 @@ ${getActionsString()}
 
                 val json = jsonObject.toString()
 
-                val mdFileName = it.nameWithoutExtension.substringBefore("_") + ".md"
-                val path = "$rootPath/$docsPath"
+                val mdFileName = it.nameWithoutExtension.substringBefore("_")
+                val path = when(it.absolutePath.contains("components")) {
+                    true -> "$rootPath/$componentsPath"
+                    false -> "$rootPath/$taskDispatchersPath"
+                }
 
                 val docsDir = File(path)
 
@@ -280,8 +295,14 @@ ${getActionsString()}
                     docsDir.mkdirs()
                 }
 
-                val mdFile = File(path, mdFileName)
+                val mdFile = File(path, "$mdFileName.md")
                 mdFile.writeText(json)
+                if(mdFiles.containsKey(mdFileName)){
+                    mdFile.appendText("<hr />\n\n# Additional instructions\n<hr />\n\n")
+                    mdFiles[mdFileName]?.let {
+                        file -> mdFile.appendText(file.readText())
+                    }
+                }
             }
         } else {
             println("Components directory does not exist.")
