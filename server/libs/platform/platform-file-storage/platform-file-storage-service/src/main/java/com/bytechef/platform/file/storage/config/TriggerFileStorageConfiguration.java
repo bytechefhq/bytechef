@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.file.storage.config;
 
+import com.bytechef.ee.file.storage.aws.service.AwsFileStorageService;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.file.storage.base64.service.NoopFileStorageService;
 import com.bytechef.file.storage.filesystem.config.FilesystemFileStorageProperties;
@@ -61,6 +62,7 @@ public class TriggerFileStorageConfiguration {
 
     private FileStorageService getFileStorageService(String workflowOutputStorageProvider) {
         return switch (workflowOutputStorageProvider) {
+            case "aws" -> new AwsFileStorageService();
             case "base64" -> new Base64FileStorageService();
             case "filesystem" -> new FilesystemFileStorageService(filesystemFileStorageProperties.getBasedir());
             case "noop" -> new NoopFileStorageService();
