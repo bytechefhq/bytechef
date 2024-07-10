@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.discovery.redis.config;
+package com.bytechef.ee.discovery.redis.env;
 
 import java.util.HashMap;
 import java.util.Map;
