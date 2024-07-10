@@ -6,6 +6,7 @@ springBoot {
 }
 
 dependencies {
+    implementation("io.awspring.cloud:spring-cloud-aws-starter-secrets-manager")
     implementation(libs.org.springdoc.springdoc.openapi.starter.common)
     implementation("org.springframework.boot:spring-boot-starter-batch")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
@@ -200,6 +201,7 @@ dependencies {
     implementation(project(":server:ee:libs:config:tenant-multi-message-event-config"))
     implementation(project(":server:ee:libs:config:tenant-multi-security-config"))
     implementation(project(":server:ee:libs:core:audit:audit-service"))
+    implementation(project(":server:ee:libs:core:encryption:encryption-aws"))
     implementation(project(":server:ee:libs:core:tenant:tenant-multi-service"))
 
     runtimeOnly("com.h2database:h2")
