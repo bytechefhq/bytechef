@@ -25,7 +25,8 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.platform.user.config.MailProperties;
+import com.bytechef.config.ApplicationProperties;
+import com.bytechef.config.ApplicationProperties.Mail;
 import com.bytechef.platform.user.config.UserIntTestConfiguration;
 import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.platform.user.domain.User;
@@ -73,7 +74,7 @@ class MailServiceIntTest {
     private JavaMailSender javaMailSender;
 
     @Autowired
-    private MailProperties mailProperties;
+    private ApplicationProperties applicationProperties;
 
     @Captor
     private ArgumentCaptor<MimeMessage> messageCaptor;
@@ -98,7 +99,10 @@ class MailServiceIntTest {
 
         assertThat(message.getSubject()).isEqualTo("testSubject");
         assertThat(message.getAllRecipients()[0]).hasToString("john.doe@example.com");
-        assertThat(message.getFrom()[0]).hasToString(mailProperties.getFrom());
+
+        Mail mail = applicationProperties.getMail();
+
+        assertThat(message.getFrom()[0]).hasToString(mail.getFrom());
         assertThat(message.getContent()).isInstanceOf(String.class);
         assertThat(message.getContent()).hasToString("testContent");
 
@@ -117,7 +121,10 @@ class MailServiceIntTest {
 
         assertThat(message.getSubject()).isEqualTo("testSubject");
         assertThat(message.getAllRecipients()[0]).hasToString("john.doe@example.com");
-        assertThat(message.getFrom()[0]).hasToString(mailProperties.getFrom());
+
+        Mail mail = applicationProperties.getMail();
+
+        assertThat(message.getFrom()[0]).hasToString(mail.getFrom());
         assertThat(message.getContent()).isInstanceOf(String.class);
         assertThat(message.getContent()).hasToString("testContent");
 
@@ -145,7 +152,10 @@ class MailServiceIntTest {
 
         assertThat(message.getSubject()).isEqualTo("testSubject");
         assertThat(message.getAllRecipients()[0]).hasToString("john.doe@example.com");
-        assertThat(message.getFrom()[0]).hasToString(mailProperties.getFrom());
+
+        Mail mail = applicationProperties.getMail();
+
+        assertThat(message.getFrom()[0]).hasToString(mail.getFrom());
         assertThat(message.getContent()).isInstanceOf(Multipart.class);
         assertThat(aos).hasToString("\r\ntestContent");
 
@@ -173,7 +183,10 @@ class MailServiceIntTest {
 
         assertThat(message.getSubject()).isEqualTo("testSubject");
         assertThat(message.getAllRecipients()[0]).hasToString("john.doe@example.com");
-        assertThat(message.getFrom()[0]).hasToString(mailProperties.getFrom());
+
+        Mail mail = applicationProperties.getMail();
+
+        assertThat(message.getFrom()[0]).hasToString(mail.getFrom());
         assertThat(message.getContent()).isInstanceOf(Multipart.class);
         assertThat(aos).hasToString("\r\ntestContent");
 
@@ -199,7 +212,10 @@ class MailServiceIntTest {
 
         assertThat(message.getSubject()).isEqualTo("test title");
         assertThat(message.getAllRecipients()[0]).hasToString(user.getEmail());
-        assertThat(message.getFrom()[0]).hasToString(mailProperties.getFrom());
+
+        Mail mail = applicationProperties.getMail();
+
+        assertThat(message.getFrom()[0]).hasToString(mail.getFrom());
 
         Object content = message.getContent();
 
@@ -226,7 +242,10 @@ class MailServiceIntTest {
         MimeMessage message = messageCaptor.getValue();
 
         assertThat(message.getAllRecipients()[0]).hasToString(user.getEmail());
-        assertThat(message.getFrom()[0]).hasToString(mailProperties.getFrom());
+
+        Mail mail = applicationProperties.getMail();
+
+        assertThat(message.getFrom()[0]).hasToString(mail.getFrom());
 
         Object content = message.getContent();
 
@@ -252,7 +271,10 @@ class MailServiceIntTest {
         MimeMessage message = messageCaptor.getValue();
 
         assertThat(message.getAllRecipients()[0]).hasToString(user.getEmail());
-        assertThat(message.getFrom()[0]).hasToString(mailProperties.getFrom());
+
+        Mail mail = applicationProperties.getMail();
+
+        assertThat(message.getFrom()[0]).hasToString(mail.getFrom());
 
         Object content = message.getContent();
 
@@ -278,7 +300,10 @@ class MailServiceIntTest {
         MimeMessage message = messageCaptor.getValue();
 
         assertThat(message.getAllRecipients()[0]).hasToString(user.getEmail());
-        assertThat(message.getFrom()[0]).hasToString(mailProperties.getFrom());
+
+        Mail mail = applicationProperties.getMail();
+
+        assertThat(message.getFrom()[0]).hasToString(mail.getFrom());
 
         Object content = message.getContent();
 

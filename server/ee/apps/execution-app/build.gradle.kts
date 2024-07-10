@@ -46,7 +46,7 @@ dependencies {
     implementation(project(":server:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-service"))
     implementation(project(":server:libs:embedded:embedded-swagger"))
     implementation(project(":server:libs:platform:platform-component:platform-component-rest"))
-    implementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-db:platform-data-storage-db-service"))
+    implementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-jdbc:platform-data-storage-jdbc-service"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-service"))
     implementation(project(":server:libs:platform:platform-rest:platform-rest-impl"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-rest:platform-workflow-execution-rest-impl"))
@@ -60,7 +60,7 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-registry:platform-component-registry-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-remote-client"))
-    implementation(project(":server:ee:libs:platform:platform-data-storage:platform-data-storage-db:platform-data-storage-db-remote-rest"))
+    implementation(project(":server:ee:libs:platform:platform-data-storage:platform-data-storage-jdbc:platform-data-storage-jdbc-remote-rest"))
     implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-rest"))
 

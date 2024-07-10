@@ -20,6 +20,7 @@ import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.atlas.worker.annotation.ConditionalOnWorker;
 import com.bytechef.atlas.worker.event.TaskExecutionEvent;
 import com.bytechef.atlas.worker.message.route.TaskWorkerMessageRoute;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.message.event.MessageEventPostReceiveProcessor;
@@ -47,12 +48,14 @@ public class TaskWorkerMessageBrokerConfigurerConfiguration {
 
     @Bean
     MessageBrokerConfigurer<?> taskWorkerMessageBrokerConfigurer(
-        TaskWorker taskWorker, TaskWorkerProperties taskWorkerProperties) {
+        TaskWorker taskWorker, ApplicationProperties applicationProperties) {
 
         TaskWorkerDelegate taskWorkerDelegate = new TaskWorkerDelegate(messageEventPostReceiveProcessors, taskWorker);
 
         return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
-            Map<String, Object> subscriptions = taskWorkerProperties.getSubscriptions();
+            Map<String, Object> subscriptions = applicationProperties.getWorker()
+                .getTask()
+                .getSubscriptions();
 
             subscriptions.forEach((routeName, concurrency) -> messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar, TaskWorkerMessageRoute.ofTaskMessageRoute(routeName),

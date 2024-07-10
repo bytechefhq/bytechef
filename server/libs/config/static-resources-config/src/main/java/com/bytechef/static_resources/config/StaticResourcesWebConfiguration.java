@@ -16,9 +16,11 @@
 
 package com.bytechef.static_resources.config;
 
+import com.bytechef.config.ApplicationProperties;
+import com.bytechef.config.ApplicationProperties.Resources;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistration;
@@ -29,7 +31,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @author Igor Beslic
  */
 @Configuration
-@EnableConfigurationProperties(StaticResourcesProperties.class)
 @Profile({
     "docker"
 })
@@ -37,20 +38,19 @@ public class StaticResourcesWebConfiguration implements WebMvcConfigurer {
 
     private static final Logger logger = LoggerFactory.getLogger(StaticResourcesWebConfiguration.class);
 
-    private final StaticResourcesProperties staticResourcesProperties;
+    private final Resources resources;
 
-    public StaticResourcesWebConfiguration(StaticResourcesProperties staticResourcesProperties) {
-        this.staticResourcesProperties = new StaticResourcesProperties();
-
-        this.staticResourcesProperties.setWeb(staticResourcesProperties.getWeb());
+    @SuppressFBWarnings("EI")
+    public StaticResourcesWebConfiguration(ApplicationProperties applicationProperties) {
+        this.resources = applicationProperties.getResources();
     }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         ResourceHandlerRegistration resourceHandlerRegistration = registry.addResourceHandler("/**", "*");
 
-        resourceHandlerRegistration.addResourceLocations(staticResourcesProperties.getWeb());
+        resourceHandlerRegistration.addResourceLocations(resources.getWeb());
 
-        logger.info("Serving static web content at {}", staticResourcesProperties.getWeb());
+        logger.info("Serving static web content at {}", resources.getWeb());
     }
 }

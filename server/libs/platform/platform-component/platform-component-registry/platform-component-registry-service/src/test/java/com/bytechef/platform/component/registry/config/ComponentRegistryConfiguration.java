@@ -25,6 +25,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.petstore.PetstoreComponentHandler;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
@@ -45,6 +46,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -57,6 +59,7 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
         "com.bytechef.encryption", "com.bytechef.platform.component", "com.bytechef.platform.connection"
     })
 @EnableAutoConfiguration
+@EnableConfigurationProperties(ApplicationProperties.class)
 @Import(LiquibaseConfiguration.class)
 @Configuration
 public class ComponentRegistryConfiguration {

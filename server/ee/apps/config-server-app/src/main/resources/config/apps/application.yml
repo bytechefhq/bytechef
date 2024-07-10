@@ -103,7 +103,7 @@ bytechef:
     # Cache provider (redis | simple) default: simple
     provider: redis
   data-storage:
-    provider: db
+    provider: jdbc
   discovery-service:
     provider: redis
   edition: ee

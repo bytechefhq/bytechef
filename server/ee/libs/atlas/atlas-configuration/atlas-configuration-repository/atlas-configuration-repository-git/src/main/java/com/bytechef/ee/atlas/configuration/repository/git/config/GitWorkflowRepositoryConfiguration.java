@@ -8,11 +8,11 @@
 package com.bytechef.ee.atlas.configuration.repository.git.config;
 
 import com.bytechef.atlas.configuration.repository.annotation.ConditionalOnWorkflowRepositoryGit;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.edition.annotation.ConditionalOnEEVersion;
 import com.bytechef.ee.atlas.configuration.repository.git.GitWorkflowRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -23,7 +23,6 @@ import org.springframework.core.annotation.Order;
  * @author Ivica Cardic
  */
 @Configuration
-@EnableConfigurationProperties(GitWorkflowRepositoryProperties.class)
 @ConditionalOnEEVersion
 @ConditionalOnWorkflowRepositoryGit
 public class GitWorkflowRepositoryConfiguration {
@@ -38,7 +37,7 @@ public class GitWorkflowRepositoryConfiguration {
 
     @Bean
     @Order(4)
-    GitWorkflowRepository gitWorkflowRepository(GitWorkflowRepositoryProperties gitWorkflowRepositoryProperties) {
-        return new GitWorkflowRepository(gitWorkflowRepositoryProperties);
+    GitWorkflowRepository gitWorkflowRepository(ApplicationProperties applicationProperties) {
+        return new GitWorkflowRepository(applicationProperties);
     }
 }

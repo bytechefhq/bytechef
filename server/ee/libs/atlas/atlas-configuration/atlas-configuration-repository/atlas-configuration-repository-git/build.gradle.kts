@@ -5,6 +5,7 @@ dependencies {
     implementation(libs.org.eclipse.jgit.org.eclipse.jgit)
     implementation("org.springframework:spring-core")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:annotation-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
 

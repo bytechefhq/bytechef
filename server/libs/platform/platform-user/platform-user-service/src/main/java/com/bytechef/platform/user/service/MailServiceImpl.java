@@ -16,7 +16,8 @@
 
 package com.bytechef.platform.user.service;
 
-import com.bytechef.platform.user.config.MailProperties;
+import com.bytechef.config.ApplicationProperties;
+import com.bytechef.config.ApplicationProperties.Mail;
 import com.bytechef.platform.user.domain.User;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.mail.MessagingException;
@@ -50,17 +51,17 @@ public class MailServiceImpl implements MailService {
     private static final String BASE_URL = "baseUrl";
 
     private final JavaMailSender javaMailSender;
-    private final MailProperties mailProperties;
+    private final Mail mail;
     private final MessageSource messageSource;
     private final SpringTemplateEngine templateEngine;
 
     @SuppressFBWarnings("EI")
     public MailServiceImpl(
-        JavaMailSender javaMailSender, MailProperties mailProperties, MessageSource messageSource,
+        JavaMailSender javaMailSender, ApplicationProperties applicationProperties, MessageSource messageSource,
         SpringTemplateEngine templateEngine) {
 
         this.javaMailSender = javaMailSender;
-        this.mailProperties = mailProperties;
+        this.mail = applicationProperties.getMail();
         this.messageSource = messageSource;
         this.templateEngine = templateEngine;
     }
@@ -114,7 +115,7 @@ public class MailServiceImpl implements MailService {
 
         context.setVariable(USER, user);
 
-        context.setVariable(BASE_URL, mailProperties.getBaseUrl());
+        context.setVariable(BASE_URL, mail.getBaseUrl());
 
         String content = templateEngine.process(templateName, context);
         String subject = messageSource.getMessage(titleKey, null, locale);
@@ -135,7 +136,7 @@ public class MailServiceImpl implements MailService {
 
             message.setTo(to);
 
-            message.setFrom(mailProperties.getFrom());
+            message.setFrom(mail.getFrom());
 
             message.setSubject(subject);
             message.setText(content, isHtml);

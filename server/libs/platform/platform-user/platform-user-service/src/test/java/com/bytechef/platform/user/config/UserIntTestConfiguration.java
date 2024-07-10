@@ -16,10 +16,12 @@
 
 package com.bytechef.platform.user.config;
 
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.jdbc.config.AuditingJdbcConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -33,6 +35,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @ComponentScan(basePackages = "com.bytechef.platform.user")
 @EnableAutoConfiguration
 @EnableCaching
+@EnableConfigurationProperties(ApplicationProperties.class)
 @Import({
     AuditingJdbcConfiguration.class, LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class
 })

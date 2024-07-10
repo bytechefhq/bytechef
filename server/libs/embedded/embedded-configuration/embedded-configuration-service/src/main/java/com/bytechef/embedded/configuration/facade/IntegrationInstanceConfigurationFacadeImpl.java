@@ -25,6 +25,7 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.embedded.configuration.domain.Integration;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
@@ -63,7 +64,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,17 +94,16 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     @SuppressFBWarnings("EI")
     public IntegrationInstanceConfigurationFacadeImpl(
-        ConnectionService connectionService, InstanceJobFacade instanceJobFacade, InstanceJobService instanceJobService,
-        JobFacade jobFacade, JobService jobService,
-        IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
+        ApplicationProperties applicationProperties, ConnectionService connectionService,
+        InstanceJobFacade instanceJobFacade, InstanceJobService instanceJobService, JobFacade jobFacade,
+        JobService jobService, IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationService integrationService, IntegrationWorkflowService integrationWorkflowService,
         TagService tagService, TriggerDefinitionService triggerDefinitionService,
         TriggerExecutionService triggerExecutionService, TriggerLifecycleFacade triggerLifecycleFacade,
-        @Value("${bytechef.webhook-url}") String webhookUrl,
         WorkflowConnectionFacade workflowConnectionFacade, WorkflowService workflowService) {
-        this.connectionService = connectionService;
 
+        this.connectionService = connectionService;
         this.instanceJobFacade = instanceJobFacade;
         this.instanceJobService = instanceJobService;
         this.jobFacade = jobFacade;
@@ -117,7 +116,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         this.triggerDefinitionService = triggerDefinitionService;
         this.triggerExecutionService = triggerExecutionService;
         this.triggerLifecycleFacade = triggerLifecycleFacade;
-        this.webhookUrl = webhookUrl;
+        this.webhookUrl = applicationProperties.getWebhookUrl();
         this.workflowConnectionFacade = workflowConnectionFacade;
         this.workflowService = workflowService;
     }

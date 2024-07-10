@@ -20,9 +20,9 @@ import com.bytechef.atlas.configuration.repository.annotation.ConditionalOnWorkf
 import com.bytechef.atlas.configuration.repository.annotation.ConditionalOnWorkflowRepositoryFilesystem;
 import com.bytechef.atlas.configuration.repository.resource.ClassPathResourceWorkflowRepository;
 import com.bytechef.atlas.configuration.repository.resource.FilesystemResourceWorkflowRepository;
+import com.bytechef.config.ApplicationProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -45,12 +45,16 @@ public class ResourceWorkflowRepositoryConfiguration {
     @Bean
     @Order(1)
     @ConditionalOnWorkflowRepositoryClasspath
-    ClassPathResourceWorkflowRepository classpathBasedWorkflowRepository(
-        @Value("${bytechef.workflow.repository.classpath.location-pattern:workflows/**/*.{json,yml,yaml}}") String locationPattern) {
+    ClassPathResourceWorkflowRepository classpathBasedWorkflowRepository(ApplicationProperties applicationProperties) {
 
         if (logger.isInfoEnabled()) {
             logger.info("Workflow repository type enabled: classpath");
         }
+
+        String locationPattern = applicationProperties.getWorkflow()
+            .getRepository()
+            .getClasspath()
+            .getLocationPattern();
 
         return new ClassPathResourceWorkflowRepository(locationPattern, resourcePatternResolver);
     }
@@ -59,11 +63,16 @@ public class ResourceWorkflowRepositoryConfiguration {
     @Order(2)
     @ConditionalOnWorkflowRepositoryFilesystem
     FilesystemResourceWorkflowRepository filesystemResourceWorkflowRepository(
-        @Value("${bytechef.workflow.repository.filesystem.location-pattern:${user.home}/bytechef/data/workflows/**/*.{json,yml,yaml}}") String locationPattern) {
+        ApplicationProperties applicationProperties) {
 
         if (logger.isInfoEnabled()) {
             logger.info("Workflow repository type enabled: filesystem");
         }
+
+        String locationPattern = applicationProperties.getWorkflow()
+            .getRepository()
+            .getFilesystem()
+            .getLocationPattern();
 
         return new FilesystemResourceWorkflowRepository(locationPattern, resourcePatternResolver);
     }

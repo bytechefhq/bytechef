@@ -17,8 +17,8 @@ import com.bytechef.atlas.execution.repository.jdbc.converter.StringToWebhooksCo
 import com.bytechef.atlas.execution.repository.jdbc.converter.WebhooksToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
-import com.bytechef.platform.data.storage.db.repository.converter.DataEntryValueWrapperToStringConverter;
-import com.bytechef.platform.data.storage.db.repository.converter.StringToDataEntryValueWrapperConverter;
+import com.bytechef.platform.data.storage.jdbc.repository.converter.DataEntryValueWrapperToStringConverter;
+import com.bytechef.platform.data.storage.jdbc.repository.converter.StringToDataEntryValueWrapperConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.StringToTriggerStateValueConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.StringToWorkflowExecutionIdConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.StringToWorkflowTriggerConverter;

@@ -31,8 +31,9 @@ import com.bytechef.component.definition.OutputResponse;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.config.ApplicationProperties;
+import com.bytechef.config.ApplicationProperties.Component.Registry;
 import com.bytechef.platform.component.factory.ComponentHandlerListFactory;
-import com.bytechef.platform.component.registry.config.ComponentRegistryProperties;
 import com.bytechef.platform.registry.util.PropertyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
@@ -70,7 +71,7 @@ public class ComponentDefinitionRegistry {
     private final List<ComponentDefinition> componentDefinitions;
 
     public ComponentDefinitionRegistry(
-        ComponentRegistryProperties componentRegistryProperties, List<ComponentHandler> componentHandlers,
+        ApplicationProperties applicationProperties, List<ComponentHandler> componentHandlers,
         @Autowired(required = false) ComponentHandlerListFactory componentHandlerListFactory) {
 
         List<ComponentHandler> mergedComponentHandlers = CollectionUtils.concat(
@@ -85,10 +86,13 @@ public class ComponentDefinitionRegistry {
             CollectionUtils.map(mergedComponentHandlers, ComponentHandler::getDefinition),
             MANUAL_COMPONENT_DEFINITION, MISSING_COMPONENT_DEFINITION);
 
-        if (!CollectionUtils.isEmpty(componentRegistryProperties.getExclude())) {
+        Registry registry = applicationProperties.getComponent()
+            .getRegistry();
+
+        if (!CollectionUtils.isEmpty(registry.getExclude())) {
             componentDefinitions = componentDefinitions.stream()
                 .filter(componentDefinition -> !CollectionUtils.contains(
-                    componentRegistryProperties.getExclude(), componentDefinition.getName()))
+                    registry.getExclude(), componentDefinition.getName()))
                 .toList();
         }
 

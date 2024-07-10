@@ -17,11 +17,12 @@
 package com.bytechef.platform.workflow.coordinator.config;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.config.ApplicationProperties;
+import com.bytechef.config.ApplicationProperties.Coordinator.Trigger.Subscriptions;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.message.event.MessageEventPostReceiveProcessor;
 import com.bytechef.platform.workflow.coordinator.TriggerCoordinator;
-import com.bytechef.platform.workflow.coordinator.config.TriggerCoordinatorProperties.TriggerCoordinatorSubscriptions;
 import com.bytechef.platform.workflow.coordinator.event.ApplicationEvent;
 import com.bytechef.platform.workflow.coordinator.event.ErrorEvent;
 import com.bytechef.platform.workflow.coordinator.event.TriggerExecutionCompleteEvent;
@@ -52,13 +53,15 @@ public class TriggerCoordinatorMessageBrokerConfigurerConfiguration {
 
     @Bean
     MessageBrokerConfigurer<?> triggerCoordinatorMessageBrokerConfigurer(
-        TriggerCoordinator triggerCoordinator, TriggerCoordinatorProperties triggerCoordinatorProperties) {
+        TriggerCoordinator triggerCoordinator, ApplicationProperties applicationProperties) {
 
         TriggerCoordinatorDelegate triggerCoordinatorDelegate = new TriggerCoordinatorDelegate(
             messageEventPostReceiveProcessors, triggerCoordinator);
 
         return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
-            TriggerCoordinatorSubscriptions subscriptions = triggerCoordinatorProperties.getSubscriptions();
+            Subscriptions subscriptions = applicationProperties.getCoordinator()
+                .getTrigger()
+                .getSubscriptions();
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,

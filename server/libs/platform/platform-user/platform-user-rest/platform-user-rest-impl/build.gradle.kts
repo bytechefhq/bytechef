@@ -55,6 +55,7 @@ dependencies {
     testImplementation("org.springframework.data:spring-data-jdbc")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.testcontainers:postgresql")
+    testImplementation(project(":server:libs:config:app-config"))
     testImplementation(project(":server:libs:config:cache-config"))
     testImplementation(project(":server:libs:config:jdbc-config"))
     testImplementation(project(":server:libs:config:liquibase-config"))

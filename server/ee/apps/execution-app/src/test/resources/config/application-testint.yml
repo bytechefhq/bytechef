@@ -10,7 +10,7 @@ openapi:
 
 bytechef:
   data-storage:
-    provider: db
+    provider: jdbc
   file-storage:
     provider: base64
   message-broker:

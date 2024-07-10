@@ -37,6 +37,7 @@ import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.registry.domain.TriggerDefinition;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowConnection;
@@ -63,7 +64,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -99,7 +99,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         ProjectInstanceWorkflowService projectInstanceWorkflowService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService, TagService tagService,
         TriggerDefinitionService triggerDefinitionService, TriggerExecutionService triggerExecutionService,
-        TriggerLifecycleFacade triggerLifecycleFacade, @Value("${bytechef.webhook-url}") String webhookUrl,
+        TriggerLifecycleFacade triggerLifecycleFacade, ApplicationProperties applicationProperties,
         WorkflowConnectionFacade workflowConnectionFacade, WorkflowService workflowService) {
 
         this.connectionService = connectionService;
@@ -115,7 +115,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         this.triggerDefinitionService = triggerDefinitionService;
         this.triggerExecutionService = triggerExecutionService;
         this.triggerLifecycleFacade = triggerLifecycleFacade;
-        this.webhookUrl = webhookUrl;
+        this.webhookUrl = applicationProperties.getWebhookUrl();
         this.workflowConnectionFacade = workflowConnectionFacade;
         this.workflowService = workflowService;
     }

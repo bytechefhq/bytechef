@@ -19,6 +19,9 @@ package com.bytechef.security.config;
 import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
+import com.bytechef.config.ApplicationProperties;
+import com.bytechef.config.ApplicationProperties.Security;
+import com.bytechef.config.ApplicationProperties.Security.RememberMe;
 import com.bytechef.platform.security.web.authentication.AuthenticationProviderContributor;
 import com.bytechef.platform.security.web.filter.FilterAfterContributor;
 import com.bytechef.platform.security.web.filter.FilterBeforeContributor;
@@ -31,7 +34,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.function.Supplier;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -64,7 +66,6 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 /**
  * @author Ivica Cardic
  */
-@EnableConfigurationProperties(SecurityProperties.class)
 @Configuration
 @EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfiguration {
@@ -72,23 +73,22 @@ public class SecurityConfiguration {
     private final AuthenticationFailureHandler authenticationFailureHandler;
     private final AuthenticationSuccessHandler authenticationSuccessHandler;
     private final RememberMeServices rememberMeServices;
-    private final SecurityProperties securityProperties;
+    private final Security security;
     private final List<FilterAfterContributor> filterAfterContributors;
     private final List<FilterBeforeContributor> filterBeforeContributors;
     private final List<AuthenticatedRequestMatcherContributor> authenticatedRequestMatcherContributors;
 
     @SuppressFBWarnings("EI")
     public SecurityConfiguration(
-        AuthenticationFailureHandler authenticationFailureHandler,
+        ApplicationProperties applicationProperties, AuthenticationFailureHandler authenticationFailureHandler,
         AuthenticationSuccessHandler authenticationSuccessHandler, RememberMeServices rememberMeServices,
-        SecurityProperties securityProperties, List<FilterAfterContributor> filterAfterContributors,
-        List<FilterBeforeContributor> filterBeforeContributors,
+        List<FilterAfterContributor> filterAfterContributors, List<FilterBeforeContributor> filterBeforeContributors,
         List<AuthenticatedRequestMatcherContributor> authenticatedRequestMatcherContributors) {
 
         this.authenticationFailureHandler = authenticationFailureHandler;
         this.authenticationSuccessHandler = authenticationSuccessHandler;
         this.rememberMeServices = rememberMeServices;
-        this.securityProperties = securityProperties;
+        this.security = applicationProperties.getSecurity();
         this.filterAfterContributors = filterAfterContributors;
         this.filterBeforeContributors = filterBeforeContributors;
         this.authenticatedRequestMatcherContributors = authenticatedRequestMatcherContributors;
@@ -142,7 +142,7 @@ public class SecurityConfiguration {
 
         http.headers(
             headers -> headers
-                .contentSecurityPolicy(csp -> csp.policyDirectives(securityProperties.getContentSecurityPolicy()))
+                .contentSecurityPolicy(csp -> csp.policyDirectives(security.getContentSecurityPolicy()))
                 .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
                 .referrerPolicy(
                     referrer -> referrer
@@ -232,7 +232,7 @@ public class SecurityConfiguration {
     }
 
     private String getRememberMeKey() {
-        SecurityProperties.RememberMe rememberMe = securityProperties.getRememberMe();
+        RememberMe rememberMe = security.getRememberMe();
 
         return rememberMe.getKey();
     }

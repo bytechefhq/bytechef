@@ -16,10 +16,11 @@
 
 package com.bytechef.platform.file.storage.config;
 
+import com.bytechef.config.ApplicationProperties;
+import com.bytechef.config.ApplicationProperties.Workflow.OutputStorage.Provider;
 import com.bytechef.ee.file.storage.aws.service.AwsFileStorageService;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.file.storage.base64.service.NoopFileStorageService;
-import com.bytechef.file.storage.filesystem.config.FilesystemFileStorageProperties;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
@@ -27,8 +28,6 @@ import com.bytechef.platform.file.storage.TriggerFileStorageImpl;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -36,38 +35,42 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@EnableConfigurationProperties(FilesystemFileStorageProperties.class)
 public class TriggerFileStorageConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(TriggerFileStorageConfiguration.class);
 
-    private final FilesystemFileStorageProperties filesystemFileStorageProperties;
+    private final ApplicationProperties applicationProperties;
 
     @SuppressFBWarnings("EI")
-    public TriggerFileStorageConfiguration(FilesystemFileStorageProperties filesystemFileStorageProperties) {
-        this.filesystemFileStorageProperties = filesystemFileStorageProperties;
+    public TriggerFileStorageConfiguration(ApplicationProperties applicationProperties) {
+        this.applicationProperties = applicationProperties;
     }
 
     @Bean
-    TriggerFileStorage workflowTriggerFileStorageFacade(
-        @Value("${bytechef.workflow.output-storage.provider}") String workflowOutputStorageProvider) {
+    TriggerFileStorage workflowTriggerFileStorageFacade(ApplicationProperties applicationProperties) {
+        Provider provider = applicationProperties.getWorkflow()
+            .getOutputStorage()
+            .getProvider();
 
         if (logger.isInfoEnabled()) {
-            logger.info(
-                "Workflow trigger output storage provider type enabled: %s".formatted(workflowOutputStorageProvider));
+            logger.info("Workflow trigger output storage provider type enabled: %s".formatted(provider));
         }
 
-        return new TriggerFileStorageImpl(getFileStorageService(workflowOutputStorageProvider));
+        return new TriggerFileStorageImpl(getFileStorageService(provider));
     }
 
-    private FileStorageService getFileStorageService(String workflowOutputStorageProvider) {
-        return switch (workflowOutputStorageProvider) {
-            case "aws" -> new AwsFileStorageService();
-            case "base64" -> new Base64FileStorageService();
-            case "filesystem" -> new FilesystemFileStorageService(filesystemFileStorageProperties.getBasedir());
-            case "noop" -> new NoopFileStorageService();
-            default -> throw new IllegalArgumentException(
-                "Output storage %s does not exist".formatted(workflowOutputStorageProvider));
+    private FileStorageService getFileStorageService(Provider provider) {
+        return switch (provider) {
+            case Provider.AWS -> new AwsFileStorageService();
+            case Provider.BASE64 -> new Base64FileStorageService();
+            case Provider.FILESYSTEM -> new FilesystemFileStorageService(getBasedir());
+            case Provider.NOOP -> new NoopFileStorageService();
         };
+    }
+
+    private String getBasedir() {
+        return applicationProperties.getFileStorage()
+            .getFilesystem()
+            .getBasedir();
     }
 }

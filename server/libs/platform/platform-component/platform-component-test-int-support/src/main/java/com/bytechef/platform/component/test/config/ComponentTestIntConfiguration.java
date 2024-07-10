@@ -39,6 +39,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.XmlUtils;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
@@ -61,6 +62,7 @@ import java.util.Map;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.jackson.JsonComponentModule;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
@@ -77,6 +79,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
     exclude = {
         DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class
     })
+@EnableConfigurationProperties(ApplicationProperties.class)
 @Configuration
 @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
 public class ComponentTestIntConfiguration {

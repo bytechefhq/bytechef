@@ -5,7 +5,7 @@ bytechef:
   discovery-service:
     provider: redis
   data-storage:
-    provider: db
+    provider: jdbc
   file-storage:
     provider: base64
   message-broker:

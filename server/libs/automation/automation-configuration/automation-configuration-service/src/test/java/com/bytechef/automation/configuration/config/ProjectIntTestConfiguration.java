@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.config;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
@@ -40,6 +41,7 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -58,6 +60,7 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
     })
 @EnableAutoConfiguration
 @EnableCaching
+@EnableConfigurationProperties(ApplicationProperties.class)
 @Import(LiquibaseConfiguration.class)
 @Configuration
 @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")

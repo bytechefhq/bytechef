@@ -11,6 +11,7 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-service"))
     implementation(project(":server:libs:atlas:atlas-sync-executor"))
     implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-impl"))
+    implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:encryption:encryption-api"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-sync"))

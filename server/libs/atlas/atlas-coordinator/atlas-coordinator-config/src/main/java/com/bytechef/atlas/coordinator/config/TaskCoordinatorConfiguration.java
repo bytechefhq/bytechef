@@ -50,7 +50,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -62,7 +61,6 @@ import org.springframework.context.annotation.Primary;
  */
 @Configuration
 @ConditionalOnCoordinator
-@EnableConfigurationProperties(TaskCoordinatorProperties.class)
 public class TaskCoordinatorConfiguration {
 
     @Autowired

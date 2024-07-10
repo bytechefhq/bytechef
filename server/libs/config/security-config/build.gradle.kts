@@ -8,6 +8,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.security:spring-security-config")
     implementation("org.springframework.security:spring-security-web")
+    implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:annotation-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:tenant:tenant-api"))

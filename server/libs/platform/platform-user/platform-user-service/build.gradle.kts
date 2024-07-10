@@ -9,6 +9,7 @@ dependencies {
     implementation("org.springframework.data:spring-data-jdbc")
     implementation("org.springframework.security:spring-security-crypto")
     implementation("org.thymeleaf:thymeleaf-spring6")
+    implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-security:platform-security-api"))

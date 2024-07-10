@@ -13,7 +13,7 @@ import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.workflow.mapper.WorkflowReader;
 import com.bytechef.atlas.configuration.workflow.mapper.WorkflowResource;
 import com.bytechef.commons.util.EncodingUtils;
-import com.bytechef.ee.atlas.configuration.repository.git.config.GitWorkflowRepositoryProperties;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.atlas.configuration.repository.git.operations.GitWorkflowOperations;
 import com.bytechef.ee.atlas.configuration.repository.git.operations.JGitWorkflowOperations;
 import java.util.Arrays;
@@ -41,11 +41,14 @@ public class GitWorkflowRepository implements WorkflowRepository {
         this.gitWorkflowOperations = gitWorkflowOperations;
     }
 
-    public GitWorkflowRepository(GitWorkflowRepositoryProperties gitWorkflowRepositoryProperties) {
+    public GitWorkflowRepository(ApplicationProperties applicationProperties) {
+        ApplicationProperties.Workflow.Repository.Git git = applicationProperties.getWorkflow()
+            .getRepository()
+            .getGit();
+
         this.gitWorkflowOperations = new JGitWorkflowOperations(
-            gitWorkflowRepositoryProperties.url(), gitWorkflowRepositoryProperties.branch(),
-            List.of("yaml", "yml"), Arrays.asList(gitWorkflowRepositoryProperties.searchPaths()),
-            gitWorkflowRepositoryProperties.username(), gitWorkflowRepositoryProperties.password());
+            git.getUrl(), git.getBranch(), List.of("yaml", "yml"), Arrays.asList(git.getSearchPaths()),
+            git.getUsername(), git.getPassword());
     }
 
     @Override

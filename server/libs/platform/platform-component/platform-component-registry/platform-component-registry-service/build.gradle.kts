@@ -9,6 +9,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))
+    implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-api"))
     implementation(project(":server:libs:core:file-storage:file-storage-api"))

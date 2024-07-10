@@ -142,7 +142,7 @@ bytechef:
       # The list of component names to exclude from runtime
       exclude:
   data-storage:
-    provider: db
+    provider: jdbc
   # Edition (ce - Community Edition | ee - Enterprise Edition) default: ee
   edition: ee
   email:

@@ -16,6 +16,7 @@
 
 package com.bytechef;
 
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.logback.config.CRLFLogConverter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -26,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
@@ -33,6 +35,7 @@ import org.springframework.core.env.Environment;
 /**
  * @author Ivica Cardic
  */
+@EnableConfigurationProperties(ApplicationProperties.class)
 public abstract class AbstractApplication {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractApplication.class);

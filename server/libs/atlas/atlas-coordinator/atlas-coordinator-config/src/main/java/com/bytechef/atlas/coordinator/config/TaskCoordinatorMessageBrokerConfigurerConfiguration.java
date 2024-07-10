@@ -18,7 +18,6 @@ package com.bytechef.atlas.coordinator.config;
 
 import com.bytechef.atlas.coordinator.TaskCoordinator;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.atlas.coordinator.config.TaskCoordinatorProperties.TaskCoordinatorSubscriptions;
 import com.bytechef.atlas.coordinator.event.ApplicationEvent;
 import com.bytechef.atlas.coordinator.event.ErrorEvent;
 import com.bytechef.atlas.coordinator.event.ResumeJobEvent;
@@ -26,6 +25,8 @@ import com.bytechef.atlas.coordinator.event.StartJobEvent;
 import com.bytechef.atlas.coordinator.event.StopJobEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
+import com.bytechef.config.ApplicationProperties;
+import com.bytechef.config.ApplicationProperties.Coordinator.Task.Subscriptions;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.message.event.MessageEventPostReceiveProcessor;
@@ -52,13 +53,16 @@ public class TaskCoordinatorMessageBrokerConfigurerConfiguration {
 
     @Bean
     MessageBrokerConfigurer<?> taskCoordinatorMessageBrokerConfigurer(
-        TaskCoordinator taskCoordinator, TaskCoordinatorProperties taskCoordinatorProperties) {
+        TaskCoordinator taskCoordinator, ApplicationProperties applicationProperties) {
 
         TaskCoordinatorDelegate taskCoordinatorDelegate = new TaskCoordinatorDelegate(
             messageEventPostReceiveProcessors, taskCoordinator);
 
         return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
-            TaskCoordinatorSubscriptions subscriptions = taskCoordinatorProperties.getSubscriptions();
+
+            Subscriptions subscriptions = applicationProperties.getCoordinator()
+                .getTask()
+                .getSubscriptions();
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar, TaskCoordinatorMessageRoute.APPLICATION_EVENTS,

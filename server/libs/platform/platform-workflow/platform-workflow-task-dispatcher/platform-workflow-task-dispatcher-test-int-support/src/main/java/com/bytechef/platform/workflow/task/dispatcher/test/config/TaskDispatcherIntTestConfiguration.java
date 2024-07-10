@@ -36,6 +36,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -50,6 +51,7 @@ import java.util.List;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -64,6 +66,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
     exclude = {
         DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class
     })
+@EnableConfigurationProperties(ApplicationProperties.class)
 @Configuration
 @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
 public class TaskDispatcherIntTestConfiguration {
