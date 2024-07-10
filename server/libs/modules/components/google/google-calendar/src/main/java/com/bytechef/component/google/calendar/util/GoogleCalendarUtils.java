@@ -19,7 +19,7 @@ package com.bytechef.component.google.calendar.util;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ALL_DAY;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.google.commons.GoogleServices;
@@ -65,7 +65,7 @@ public class GoogleCalendarUtils {
 
     public static List<Option<String>> getCalendarIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) throws IOException {
+        String searchText, Context context) throws IOException {
 
         List<Option<String>> options = new ArrayList<>();
 

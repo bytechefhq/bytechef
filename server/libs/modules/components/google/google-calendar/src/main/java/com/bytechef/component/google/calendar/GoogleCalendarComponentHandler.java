@@ -26,6 +26,7 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.google.calendar.action.GoogleCalendarCreateEventAction;
 import com.bytechef.component.google.calendar.action.GoogleCalendarCreateQuickEventAction;
 import com.bytechef.component.google.calendar.action.GoogleCalendarFindEventsAction;
+import com.bytechef.component.google.calendar.trigger.GoogleCalendarEventTrigger;
 import com.google.auto.service.AutoService;
 
 /**
@@ -45,7 +46,8 @@ public class GoogleCalendarComponentHandler implements ComponentHandler {
         .actions(
             GoogleCalendarCreateEventAction.ACTION_DEFINITION,
             GoogleCalendarCreateQuickEventAction.ACTION_DEFINITION,
-            GoogleCalendarFindEventsAction.ACTION_DEFINITION);
+            GoogleCalendarFindEventsAction.ACTION_DEFINITION)
+        .triggers(GoogleCalendarEventTrigger.TRIGGER_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
