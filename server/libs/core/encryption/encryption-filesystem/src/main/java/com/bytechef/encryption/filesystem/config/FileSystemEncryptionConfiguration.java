@@ -18,6 +18,8 @@ package com.bytechef.encryption.filesystem.config;
 
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.encryption.filesystem.FileSystemEncryptionKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +30,14 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef.encryption", name = "provider", havingValue = "filesystem")
 public class FileSystemEncryptionConfiguration {
+
+    private static final Logger log = LoggerFactory.getLogger(FileSystemEncryptionConfiguration.class);
+
+    public FileSystemEncryptionConfiguration() {
+        if (log.isInfoEnabled()) {
+            log.info("Encryption provider type enabled: filesystem");
+        }
+    }
 
     @Bean
     EncryptionKey encryptionKey() {
