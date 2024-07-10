@@ -72,6 +72,7 @@ public class GoogleCalendarConstants {
     public static final String MAX_RESULTS = "maxResults";
     public static final String METHOD = "method";
     public static final String MINUTES = "minutes";
+    public static final String NEW_OR_UPDATED_EVENT = "newOrUpdatedEvent";
     public static final String NEXT_PAGE_TOKEN = "nextPageToken";
     public static final String NEXT_SYNC_TOKEN = "nextSyncToken";
     public static final String ORGANIZER = "organizer";
@@ -79,6 +80,7 @@ public class GoogleCalendarConstants {
     public static final String PARAMETERS = "parameters";
     public static final String Q = "q";
     public static final String REMINDERS = "reminders";
+    public static final String RESOURCE_ID = "resourceId";
     public static final String SEND_UPDATES = "sendUpdates";
     public static final String SELF = "self";
     public static final String STATUS = "status";
@@ -88,7 +90,6 @@ public class GoogleCalendarConstants {
     public static final String TIME_MIN = "timeMin";
     public static final String TIME_ZONE = "timeZone";
     public static final String TITLE = "title";
-    public static final String TIME = "time";
     public static final String TYPE = "type";
     public static final String START = "start";
     public static final String UPDATED = "updated";
