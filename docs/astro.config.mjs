@@ -47,7 +47,18 @@ export default defineConfig({
                 },
 				{
 					label: 'Reference',
-                    autogenerate: { directory: 'reference' },
+                    items: [
+                        {
+                            label: 'Components',
+                            autogenerate: { directory: '/reference/components' },
+                            collapsed: true,
+                        },
+                        {
+                            label: 'Flow Controls',
+                            autogenerate: { directory: '/reference/task-dispatchers' },
+                            collapsed: true,
+                        }
+                    ]
 				},
 			],
 			customCss: ['./src/tailwind.css'],
