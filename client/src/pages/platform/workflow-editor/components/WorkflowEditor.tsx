@@ -46,7 +46,7 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
 
     const {getEdge, getNode, getNodes, setViewport} = useReactFlow();
 
-    const [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge] = useHandleDrop();
+    const [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge, handleDropOnTriggerNode] = useHandleDrop();
 
     const previousComponentNames: Array<string> | undefined = usePrevious(componentNames || []);
 
@@ -96,26 +96,68 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
             (node) => node.name === droppedNodeName
         );
 
-        if (!droppedNode || droppedNodeType === 'trigger') {
+        if (!droppedNode) {
             return;
         }
 
-        if (event.target instanceof HTMLElement) {
-            const targetNodeElement = event.target.closest('.react-flow__node') as HTMLElement;
+        if (droppedNodeType === 'trigger') {
+            const targetChildNode = (event.target as HTMLElement).closest('.react-flow__node > div') as HTMLElement;
 
-            if (targetNodeElement) {
-                const targetNodeId = targetNodeElement.dataset.id!;
+            const targetNodeType = targetChildNode?.dataset.nodetype;
+
+            const targetNodeElement =
+                event.target instanceof HTMLElement
+                    ? targetChildNode?.parentNode
+                    : (event.target as SVGElement).closest('.react-flow__node');
+
+            if (targetNodeType === 'trigger' && targetNodeElement instanceof HTMLElement) {
+                const targetNodeId = targetNodeElement.dataset.id;
+
+                if (!targetNodeId) {
+                    return;
+                }
 
                 const targetNode = getNode(targetNodeId);
 
                 if (targetNode) {
+                    handleDropOnTriggerNode(droppedNode);
+                }
+
+                return;
+            }
+        } else {
+            if (event.target instanceof HTMLElement) {
+                const targetNodeElement = event.target.closest('.react-flow__node') as HTMLElement;
+
+                if (!targetNodeElement) {
+                    return;
+                }
+
+                if (targetNodeElement.dataset.nodetype === 'trigger') {
+                    return;
+                }
+
+                const targetNodeId = targetNodeElement.dataset.id!;
+
+                const targetNode = getNode(targetNodeId);
+
+                if (targetNode && targetNode.type === 'placeholder') {
+                    if (targetNode?.position.x === 0 && targetNode?.position.y === 0) {
+                        return;
+                    }
+
                     handleDropOnPlaceholderNode(targetNode, droppedNode);
                 }
-            }
-        } else if (event.target instanceof SVGElement) {
-            const targetEdgeElement = event.target.closest('.react-flow__edge');
+            } else if (event.target instanceof SVGElement) {
+                const targetEdgeElement = event.target.closest('.react-flow__edge') as HTMLElement;
 
-            if (targetEdgeElement) {
+                if (
+                    !targetEdgeElement ||
+                    (targetEdgeElement.parentNode as HTMLElement).dataset?.nodetype === 'trigger'
+                ) {
+                    return;
+                }
+
                 const targetEdge = getEdge(targetEdgeElement.id);
 
                 if (targetEdge) {
