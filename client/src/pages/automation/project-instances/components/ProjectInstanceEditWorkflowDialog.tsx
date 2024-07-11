@@ -84,6 +84,7 @@ const ProjectInstanceEditWorkflowDialog = ({
 
             if (!projectInstanceWorkflowConnection) {
                 projectInstanceWorkflowConnection = {
+                    connectionId: -1,
                     key: workflowConnection.key,
                     workflowNodeName: workflowConnection.workflowNodeName,
                 };
