@@ -103,6 +103,8 @@ public final class SendgridSendEmailAction {
                 .properties())
         .perform(SendgridSendEmailAction::perform);
 
+    private static final Base64.Encoder ENCODER = Base64.getEncoder();
+
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         List<FileEntry> attachmentFiles = inputParameters.getList(ATTACHMENTS, FileEntry.class);
 
@@ -114,10 +116,13 @@ public final class SendgridSendEmailAction {
         Map<String, List<Map<String, String>>> itemMap = new HashMap<>();
 
         itemMap.put(TO, toList);
+
         List<Map<?, ?>> personalization = new ArrayList<>(List.of(itemMap));
+
         if (!ccList.isEmpty()) {
             itemMap.put(CC, ccList);
         }
+
         context.http(http -> http.post(BASE_URL + "/mail/send"))
             .body(
                 Body.of(
@@ -139,10 +144,10 @@ public final class SendgridSendEmailAction {
         List<Map<String, Object>> allAttachments = new ArrayList<>();
 
         for (FileEntry attachment : attachmentFiles) {
-            String fileContent = context.file(file -> Base64.getEncoder()
-                .encodeToString(file.readAllBytes(attachment)));
+            String fileContent = context.file(file -> ENCODER.encodeToString(file.readAllBytes(attachment)));
 
             Map<String, Object> fileDetails = new HashMap<>();
+
             fileDetails.put("content", fileContent);
             fileDetails.put("filename", attachment.getName());
             fileDetails.put("type", attachment.getMimeType());

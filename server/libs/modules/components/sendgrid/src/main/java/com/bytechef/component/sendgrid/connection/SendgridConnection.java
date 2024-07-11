@@ -28,6 +28,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefini
  * @author Marko Krišković
  */
 public class SendgridConnection {
+
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .authorizations(
             authorization(BEARER_TOKEN)
