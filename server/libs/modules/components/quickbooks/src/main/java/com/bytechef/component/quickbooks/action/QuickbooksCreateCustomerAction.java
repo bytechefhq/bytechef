@@ -127,10 +127,7 @@ public final class QuickbooksCreateCustomerAction {
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return context
-            .http(http -> http.post(BASE_URL + "/v3/company/" +
-                connectionParameters.getRequiredString(COMPANY_ID)
-                    .replace(" ", "")
-                + "/customer"))
+            .http(http -> http.post(BASE_URL + "/v3/company/" + getCompanyId(connectionParameters) + "/customer"))
             .body(
                 Context.Http.Body.of(
                     DISPLAY_NAME, inputParameters.getRequiredString(DISPLAY_NAME),
@@ -142,5 +139,11 @@ public final class QuickbooksCreateCustomerAction {
             .configuration(responseType(Context.Http.ResponseType.JSON))
             .execute()
             .getBody(new Context.TypeReference<>() {});
+    }
+
+    private static String getCompanyId(Parameters connectionParameters) {
+        String companyId = connectionParameters.getRequiredString(COMPANY_ID);
+
+        return companyId.replace(" ", "");
     }
 }

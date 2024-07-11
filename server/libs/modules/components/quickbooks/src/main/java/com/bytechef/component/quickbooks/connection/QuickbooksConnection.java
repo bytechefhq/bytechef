@@ -32,6 +32,7 @@ import java.util.List;
  * @author Luka Ljubić
  */
 public class QuickbooksConnection {
+
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .authorizations(
             authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
@@ -54,5 +55,4 @@ public class QuickbooksConnection {
 
     private QuickbooksConnection() {
     }
-
 }

@@ -38,8 +38,8 @@ import org.mockito.ArgumentCaptor;
 
 class QuickbooksCreateCustomerActionTest {
 
-    private final ArgumentCaptor<Context.Http.Body> bodyArgumentCaptor =
-        ArgumentCaptor.forClass(Context.Http.Body.class);
+    private final ArgumentCaptor<Context.Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(
+        Context.Http.Body.class);
     private final ActionContext mockedContext = mock(ActionContext.class);
     private final Context.Http.Executor mockedExecutor = mock(Context.Http.Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);

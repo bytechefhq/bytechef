@@ -61,17 +61,17 @@ public class QuickbooksCreateCategoryAction {
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         return context
-            .http(http -> http.post(BASE_URL + "/v3/company/" +
-                connectionParameters.getRequiredString(COMPANY_ID)
-                    .replace(" ", "")
-                +
-                "/item?minorversion=4"))
-            .body(
-                Context.Http.Body.of(
-                    "Type", "Category",
-                    NAME, inputParameters.getRequiredString(NAME)))
+            .http(http -> http.post(
+                BASE_URL + "/v3/company/" + getCompanyId(connectionParameters) + "/item?minorversion=4"))
+            .body(Context.Http.Body.of("Type", "Category", NAME, inputParameters.getRequiredString(NAME)))
             .configuration(responseType(Context.Http.ResponseType.JSON))
             .execute()
             .getBody(new Context.TypeReference<>() {});
+    }
+
+    private static String getCompanyId(Parameters connectionParameters) {
+        String companyId = connectionParameters.getRequiredString(COMPANY_ID);
+
+        return companyId.replace(" ", "");
     }
 }
