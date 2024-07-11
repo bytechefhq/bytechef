@@ -13,7 +13,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -31,8 +33,11 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceConfiguration", description = "Contains configurations and connections required for the execution of integration workflows.")
 @JsonTypeName("IntegrationInstanceConfiguration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-08T07:14:48.939090+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-11T19:30:38.071119+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class IntegrationInstanceConfigurationModel {
+
+  @Valid
+  private Map<String, Object> connectionParameters = new HashMap<>();
 
   private String createdBy;
 
@@ -80,6 +85,34 @@ public class IntegrationInstanceConfigurationModel {
    */
   public IntegrationInstanceConfigurationModel(String name) {
     this.name = name;
+  }
+
+  public IntegrationInstanceConfigurationModel connectionParameters(Map<String, Object> connectionParameters) {
+    this.connectionParameters = connectionParameters;
+    return this;
+  }
+
+  public IntegrationInstanceConfigurationModel putConnectionParametersItem(String key, Object connectionParametersItem) {
+    if (this.connectionParameters == null) {
+      this.connectionParameters = new HashMap<>();
+    }
+    this.connectionParameters.put(key, connectionParametersItem);
+    return this;
+  }
+
+  /**
+   * The parameters of an integration connection, usually oauth2 related data.
+   * @return connectionParameters
+  */
+  
+  @Schema(name = "connectionParameters", description = "The parameters of an integration connection, usually oauth2 related data.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("connectionParameters")
+  public Map<String, Object> getConnectionParameters() {
+    return connectionParameters;
+  }
+
+  public void setConnectionParameters(Map<String, Object> connectionParameters) {
+    this.connectionParameters = connectionParameters;
   }
 
   public IntegrationInstanceConfigurationModel createdBy(String createdBy) {
@@ -427,7 +460,8 @@ public class IntegrationInstanceConfigurationModel {
       return false;
     }
     IntegrationInstanceConfigurationModel integrationInstanceConfiguration = (IntegrationInstanceConfigurationModel) o;
-    return Objects.equals(this.createdBy, integrationInstanceConfiguration.createdBy) &&
+    return Objects.equals(this.connectionParameters, integrationInstanceConfiguration.connectionParameters) &&
+        Objects.equals(this.createdBy, integrationInstanceConfiguration.createdBy) &&
         Objects.equals(this.createdDate, integrationInstanceConfiguration.createdDate) &&
         Objects.equals(this.description, integrationInstanceConfiguration.description) &&
         Objects.equals(this.enabled, integrationInstanceConfiguration.enabled) &&
@@ -447,13 +481,14 @@ public class IntegrationInstanceConfigurationModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, enabled, environment, id, integration, integrationId, integrationInstanceConfigurationWorkflows, integrationVersion, lastExecutionDate, lastModifiedBy, lastModifiedDate, name, tags, version);
+    return Objects.hash(connectionParameters, createdBy, createdDate, description, enabled, environment, id, integration, integrationId, integrationInstanceConfigurationWorkflows, integrationVersion, lastExecutionDate, lastModifiedBy, lastModifiedDate, name, tags, version);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class IntegrationInstanceConfigurationModel {\n");
+    sb.append("    connectionParameters: ").append(toIndentedString(connectionParameters)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
