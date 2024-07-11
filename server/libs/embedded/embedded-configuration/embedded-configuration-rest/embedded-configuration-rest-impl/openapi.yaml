@@ -1260,6 +1260,11 @@ components:
       required:
         - "name"
       properties:
+        connectionParameters:
+          description: "The parameters of an integration connection, usually oauth2 related data."
+          type: "object"
+          additionalProperties: true
+          writeOnly: true
         createdBy:
           description: "The created by."
           type: "string"
