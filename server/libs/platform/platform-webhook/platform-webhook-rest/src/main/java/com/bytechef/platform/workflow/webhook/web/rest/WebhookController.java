@@ -139,77 +139,11 @@ public class WebhookController {
             workflowNodeType.componentOperationName());
 
         if (contentType != null) {
-            if (contentType.startsWith(MediaType.MULTIPART_FORM_DATA_VALUE)) {
-                MultiValueMap<String, Object> multipartFormDataMap = new LinkedMultiValueMap<>();
+            BodyAndParameters bodyAndParameters = getBodyAndParameters(
+                httpServletRequest, contentType, parameters, webhookTriggerFlags);
 
-                for (Part part : httpServletRequest.getParts()) {
-                    List<Object> value = multipartFormDataMap.getOrDefault(part.getName(), new ArrayList<>());
-
-                    if (part.getContentType() == null) {
-                        value.add(StreamUtils.copyToString(part.getInputStream(), StandardCharsets.UTF_8));
-                    } else {
-                        value.add(
-                            fileStorageService.storeFileContent(
-                                FileEntryConstants.FILES_DIR, part.getSubmittedFileName(), part.getInputStream()));
-                    }
-
-                    multipartFormDataMap.put(part.getName(), value);
-                }
-
-                body = new WebhookBodyImpl(
-                    multipartFormDataMap, ContentType.FORM_DATA, httpServletRequest.getContentType());
-
-                UriComponents uriComponents = getUriComponents(httpServletRequest);
-
-                parameters = toMap(uriComponents.getQueryParams());
-            } else if (contentType.startsWith(MediaType.APPLICATION_FORM_URLENCODED_VALUE)) {
-                Map<String, String[]> parameterMap = httpServletRequest.getParameterMap();
-
-                UriComponents uriComponents = getUriComponents(httpServletRequest);
-
-                MultiValueMap<String, String> queryParams = uriComponents.getQueryParams();
-
-                for (String queryParam : queryParams.keySet()) {
-                    parameterMap.remove(queryParam);
-                }
-
-                body = new WebhookBodyImpl(
-                    parseFormUrlencodedParams(parameterMap), ContentType.FORM_URL_ENCODED,
-                    httpServletRequest.getContentType());
-                parameters = toMap(queryParams);
-            } else if (contentType.startsWith(MimeTypeUtils.MIME_APPLICATION_JSON)) {
-                Object content;
-
-                if (webhookTriggerFlags.webhookRawBody()) {
-                    content = StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8);
-                } else {
-                    content = JsonUtils.read(
-                        StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8));
-                }
-
-                body = new WebhookBodyImpl(content, ContentType.JSON, httpServletRequest.getContentType());
-            } else if (contentType.startsWith(MimeTypeUtils.MIME_APPLICATION_XML)) {
-                Object content;
-
-                if (webhookTriggerFlags.webhookRawBody()) {
-                    content = StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8);
-                } else {
-                    content = XmlUtils.read(
-                        StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8));
-                }
-
-                body = new WebhookBodyImpl(content, ContentType.XML, httpServletRequest.getContentType());
-            } else if (contentType.startsWith("application/")) {
-                body = new WebhookBodyImpl(
-                    fileStorageService.storeFileContent(
-                        FileEntryConstants.FILES_DIR, getFilename(httpServletRequest.getContentType()),
-                        httpServletRequest.getInputStream()),
-                    ContentType.BINARY, httpServletRequest.getContentType());
-            } else {
-                body = new WebhookBodyImpl(
-                    StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8),
-                    ContentType.RAW, httpServletRequest.getContentType());
-            }
+            body = bodyAndParameters.body;
+            parameters = bodyAndParameters.parameters;
         }
 
         WebhookRequest webhookRequest = new WebhookRequest(
@@ -319,6 +253,87 @@ public class WebhookController {
         return str;
     }
 
+    private BodyAndParameters getBodyAndParameters(
+        HttpServletRequest httpServletRequest, String contentType, Map<String, List<String>> parameters,
+        WebhookTriggerFlags webhookTriggerFlags) throws IOException, ServletException {
+
+        WebhookBodyImpl body;
+
+        if (contentType.startsWith(MediaType.MULTIPART_FORM_DATA_VALUE)) {
+            MultiValueMap<String, Object> multipartFormDataMap = new LinkedMultiValueMap<>();
+
+            for (Part part : httpServletRequest.getParts()) {
+                List<Object> value = multipartFormDataMap.getOrDefault(part.getName(), new ArrayList<>());
+
+                if (part.getContentType() == null) {
+                    value.add(StreamUtils.copyToString(part.getInputStream(), StandardCharsets.UTF_8));
+                } else {
+                    value.add(
+                        fileStorageService.storeFileContent(
+                            FileEntryConstants.FILES_DIR, part.getSubmittedFileName(), part.getInputStream()));
+                }
+
+                multipartFormDataMap.put(part.getName(), value);
+            }
+
+            body = new WebhookBodyImpl(
+                multipartFormDataMap, ContentType.FORM_DATA, httpServletRequest.getContentType());
+
+            UriComponents uriComponents = getUriComponents(httpServletRequest);
+
+            parameters = toMap(uriComponents.getQueryParams());
+        } else if (contentType.startsWith(MediaType.APPLICATION_FORM_URLENCODED_VALUE)) {
+            Map<String, String[]> parameterMap = httpServletRequest.getParameterMap();
+
+            UriComponents uriComponents = getUriComponents(httpServletRequest);
+
+            MultiValueMap<String, String> queryParams = uriComponents.getQueryParams();
+
+            for (String queryParam : queryParams.keySet()) {
+                parameterMap.remove(queryParam);
+            }
+
+            body = new WebhookBodyImpl(
+                parseFormUrlencodedParams(parameterMap), ContentType.FORM_URL_ENCODED,
+                httpServletRequest.getContentType());
+            parameters = toMap(queryParams);
+        } else if (contentType.startsWith(MimeTypeUtils.MIME_APPLICATION_JSON)) {
+            Object content;
+
+            if (webhookTriggerFlags.webhookRawBody()) {
+                content = StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8);
+            } else {
+                content = JsonUtils.read(
+                    StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8));
+            }
+
+            body = new WebhookBodyImpl(content, ContentType.JSON, httpServletRequest.getContentType());
+        } else if (contentType.startsWith(MimeTypeUtils.MIME_APPLICATION_XML)) {
+            Object content;
+
+            if (webhookTriggerFlags.webhookRawBody()) {
+                content = StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8);
+            } else {
+                content = XmlUtils.read(
+                    StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8));
+            }
+
+            body = new WebhookBodyImpl(content, ContentType.XML, httpServletRequest.getContentType());
+        } else if (contentType.startsWith("application/")) {
+            body = new WebhookBodyImpl(
+                fileStorageService.storeFileContent(
+                    FileEntryConstants.FILES_DIR, getFilename(httpServletRequest.getContentType()),
+                    httpServletRequest.getInputStream()),
+                ContentType.BINARY, httpServletRequest.getContentType());
+        } else {
+            body = new WebhookBodyImpl(
+                StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8),
+                ContentType.RAW, httpServletRequest.getContentType());
+        }
+
+        return new BodyAndParameters(body, parameters);
+    }
+
     private WorkflowNodeType getComponentOperation(WorkflowExecutionId workflowExecutionId) {
         Workflow workflow = workflowService.getWorkflow(getWorkflowId(workflowExecutionId));
 
@@ -392,5 +407,8 @@ public class WebhookController {
 
     private static Map<String, List<String>> toMap(MultiValueMap<String, String> multiValueMap) {
         return new HashMap<>(multiValueMap);
+    }
+
+    private record BodyAndParameters(WebhookBodyImpl body, Map<String, List<String>> parameters) {
     }
 }
