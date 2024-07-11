@@ -37,6 +37,7 @@ import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.constants.FileEntryConstants;
 import com.bytechef.platform.workflow.webhook.executor.WebhookExecutor;
+import com.bytechef.tenant.util.TenantUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -102,22 +103,29 @@ public class WebhookController {
             RequestMethod.HEAD, RequestMethod.GET, RequestMethod.POST
         },
         value = "/webhooks/{id}")
-    public ResponseEntity<?> webhooks(@PathVariable String id, HttpServletRequest httpServletRequest)
-        throws Exception {
+    public ResponseEntity<?> webhooks(@PathVariable String id, HttpServletRequest httpServletRequest) {
 
-        ResponseEntity<?> responseEntity;
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
 
-        if (Objects.equals(httpServletRequest.getMethod(), RequestMethod.HEAD.name()) || !isWorkflowEnabled(id)) {
-            responseEntity = ResponseEntity.ok()
-                .build();
-        } else {
-            responseEntity = doProcessTrigger(id, httpServletRequest);
-        }
+        return TenantUtils.callWithTenantId(
+            workflowExecutionId.getTenantId(), () -> {
+                ResponseEntity<?> responseEntity;
 
-        return responseEntity;
+                if (Objects.equals(httpServletRequest.getMethod(), RequestMethod.HEAD.name()) ||
+                    !isWorkflowEnabled(id)) {
+
+                    responseEntity = ResponseEntity.ok()
+                        .build();
+                } else {
+                    responseEntity = doProcessTrigger(workflowExecutionId, httpServletRequest);
+                }
+
+                return responseEntity;
+            });
     }
 
-    private ResponseEntity<?> doProcessTrigger(String id, HttpServletRequest httpServletRequest)
+    private ResponseEntity<?> doProcessTrigger(
+        WorkflowExecutionId workflowExecutionId, HttpServletRequest httpServletRequest)
         throws IOException, ServletException {
 
         WebhookBodyImpl body = null;
@@ -125,8 +133,6 @@ public class WebhookController {
         Map<String, List<String>> headers = getHeaderMap(httpServletRequest);
         Map<String, List<String>> parameters = toMap(httpServletRequest.getParameterMap());
         ResponseEntity<?> responseEntity;
-
-        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
 
         WorkflowNodeType workflowNodeType = getComponentOperation(workflowExecutionId);
 
@@ -213,7 +219,8 @@ public class WebhookController {
 
         if (logger.isDebugEnabled()) {
             logger.debug(
-                "webhooks: id={}, webhookRequest={}, webhookTriggerFlags={}", id, webhookRequest, webhookTriggerFlags);
+                "webhooks: id={}, webhookRequest={}, webhookTriggerFlags={}", workflowExecutionId, webhookRequest,
+                webhookTriggerFlags);
         }
 
         if (webhookTriggerFlags.workflowSyncExecution()) {

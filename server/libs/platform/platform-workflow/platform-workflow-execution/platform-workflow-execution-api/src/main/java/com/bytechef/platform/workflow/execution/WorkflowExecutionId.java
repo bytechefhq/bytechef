@@ -18,6 +18,7 @@ package com.bytechef.platform.workflow.execution;
 
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.platform.constant.AppType;
+import com.bytechef.tenant.TenantContext;
 import java.io.Serializable;
 import org.apache.commons.lang3.Validate;
 
@@ -29,13 +30,17 @@ public class WorkflowExecutionId implements Serializable {
     private long instanceId;
     private AppType type;
     private String workflowReferenceCode;
+    private String tenantId;
     private String triggerName;
 
     private WorkflowExecutionId() {
     }
 
-    private WorkflowExecutionId(AppType type, long instanceId, String workflowReferenceCode, String triggerName) {
+    private WorkflowExecutionId(
+        String tenantId, AppType type, long instanceId, String workflowReferenceCode, String triggerName) {
+
         this.instanceId = instanceId;
+        this.tenantId = tenantId;
         this.triggerName = triggerName;
         this.type = type;
         this.workflowReferenceCode = workflowReferenceCode;
@@ -47,7 +52,8 @@ public class WorkflowExecutionId implements Serializable {
         Validate.notBlank(workflowReferenceCode, "'workflowReferenceCode' must not be null");
         Validate.notBlank(triggerName, "'workflowTriggerName' must not be null");
 
-        return new WorkflowExecutionId(type, instanceId, workflowReferenceCode, triggerName);
+        return new WorkflowExecutionId(
+            TenantContext.getCurrentTenantId(), type, instanceId, workflowReferenceCode, triggerName);
     }
 
     public static WorkflowExecutionId parse(String id) {
@@ -55,7 +61,8 @@ public class WorkflowExecutionId implements Serializable {
 
         String[] items = id.split(":");
 
-        return of(AppType.values()[Integer.parseInt(items[0])], Long.parseLong(items[1]), items[2], items[3]);
+        return new WorkflowExecutionId(
+            items[0], AppType.values()[Integer.parseInt(items[1])], Long.parseLong(items[2]), items[3], items[4]);
     }
 
     public long getInstanceId() {
@@ -70,6 +77,10 @@ public class WorkflowExecutionId implements Serializable {
         return workflowReferenceCode;
     }
 
+    public String getTenantId() {
+        return tenantId;
+    }
+
     public String getTriggerName() {
         return triggerName;
     }
@@ -77,7 +88,9 @@ public class WorkflowExecutionId implements Serializable {
     @Override
     public String toString() {
         return EncodingUtils.encodeBase64ToString(
-            type.ordinal() +
+            tenantId +
+                ":" +
+                type.ordinal() +
                 ":" +
                 instanceId +
                 ":" +
