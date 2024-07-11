@@ -1,4 +1,5 @@
 [versions]
+awssdk = "2.26.16"
 checkstyle = "10.17.0"
 com-google-auto-service = "1.1.1"
 graalvm = "23.1.2"
@@ -15,6 +16,7 @@ spotbugs = "4.8.6"
 spotbugs-gradle-plugin = "6.0.18"
 spotless-plugin-gradle = "6.25.0"
 spring-boot = "3.3.1"
+spring-cloud-aws = "3.1.1"
 spring-shell = "3.3.0"
 
 [libraries]
@@ -46,7 +48,9 @@ org-springdoc-springdoc-openapi-starter-common = { module = "org.springdoc:sprin
 org-springdoc-springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "org-springdoc" }
 org-wiremock-wiremock = "org.wiremock:wiremock-standalone:3.5.4"
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
-software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.25.51"
+software-amazon-awssdk-auth = { module = "software.amazon.awssdk:auth", version.ref = "awssdk" }
+software-amazon-awssdk-regions = { module = "software.amazon.awssdk:regions", version.ref = "awssdk" }
+software-amazon-awssdk-s3 = { module = "software.amazon.awssdk:s3", version.ref = "awssdk" }
 
 [plugins]
 com-github-ben-manes-versions = "com.github.ben-manes.versions:0.51.0"
