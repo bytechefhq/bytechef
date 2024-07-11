@@ -116,10 +116,6 @@ public class IntegrationInstanceConfiguration {
         return getClass().hashCode();
     }
 
-    public Map<String, ?> getParameters() {
-        return Collections.unmodifiableMap(connectionParameters == null ? Map.of() : connectionParameters.getMap());
-    }
-
     public String getCreatedBy() {
         return createdBy;
     }
@@ -161,9 +157,12 @@ public class IntegrationInstanceConfiguration {
         return name;
     }
 
+    public Map<String, ?> getConnectionParameters() {
+        return Collections.unmodifiableMap(connectionParameters == null ? Map.of() : connectionParameters.getMap());
+    }
+
     public List<Long> getTagIds() {
-        return integrationInstanceConfigurationTags
-            .stream()
+        return integrationInstanceConfigurationTags.stream()
             .map(IntegrationInstanceConfigurationTag::getTagId)
             .toList();
     }
