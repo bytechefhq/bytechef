@@ -75,5 +75,4 @@ public class JmsMessageBrokerConfiguration {
     MessageBroker jmsMessageBroker(JmsTemplate jmsTemplate) {
         return new JmsMessageBroker(jmsTemplate);
     }
-
 }

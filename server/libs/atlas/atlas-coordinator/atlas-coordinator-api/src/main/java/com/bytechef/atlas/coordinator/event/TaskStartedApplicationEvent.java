@@ -54,7 +54,7 @@ public class TaskStartedApplicationEvent extends AbstractEvent implements Applic
 
     @Override
     public String toString() {
-        return "TaskStartedEvent{" +
+        return "TaskStartedApplicationEvent{" +
             "jobId=" + jobId +
             ", taskExecutionId=" + taskExecutionId +
             ", createdDate=" + createDate +
