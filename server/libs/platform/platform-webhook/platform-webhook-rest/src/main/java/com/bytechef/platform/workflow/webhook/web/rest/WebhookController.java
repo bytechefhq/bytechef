@@ -356,6 +356,7 @@ public class WebhookController {
 
         while (headerNames.hasMoreElements()) {
             String headerName = headerNames.nextElement();
+
             headerMap.put(headerName, toList(httpServletRequest.getHeaders(headerName)));
         }
 
@@ -398,11 +399,9 @@ public class WebhookController {
     }
 
     private Map<String, List<String>> toMap(Map<String, String[]> map) {
-        return map
-            .entrySet()
+        return map.entrySet()
             .stream()
-            .collect(Collectors.toMap(
-                Map.Entry::getKey, entry -> Arrays.asList(entry.getValue())));
+            .collect(Collectors.toMap(Map.Entry::getKey, entry -> Arrays.asList(entry.getValue())));
     }
 
     private static Map<String, List<String>> toMap(MultiValueMap<String, String> multiValueMap) {
