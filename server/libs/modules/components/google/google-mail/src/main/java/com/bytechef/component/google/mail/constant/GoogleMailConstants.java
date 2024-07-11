@@ -59,10 +59,12 @@ public class GoogleMailConstants {
     public static final String LABEL = "label";
     public static final String LABEL_IDS = "labelIds";
     public static final String MAX_RESULTS = "maxResults";
+    public static final String ME = "me";
     public static final String MESSAGES = "messages";
     public static final String METADATA_HEADERS = "metadataHeaders";
     public static final String MIME_TYPE = "mimeType";
     public static final String NAME = "name";
+    public static final String NEW_EMAIL = "newEmail";
     public static final String NEXT_PAGE_TOKEN = "nextPageToken";
     public static final String PAGE_TOKEN = "pageToken";
     public static final String PARTS = "parts";
@@ -79,6 +81,7 @@ public class GoogleMailConstants {
     public static final String SUBJECT = "subject";
     public static final String THREAD_ID = "threadId";
     public static final String TO = "to";
+    public static final String TOPIC_NAME = "topicName";
     public static final String VALUE = "value";
 
     public static final ModifiableStringProperty EMAIL_PROPERTY = string(EMAIL)
