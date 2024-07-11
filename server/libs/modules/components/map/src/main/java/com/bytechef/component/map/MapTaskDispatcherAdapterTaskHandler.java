@@ -58,6 +58,7 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>> {
 
+    private final CurrentThreadExecutorService currentThreadExecutorService = new CurrentThreadExecutorService();
     private final ObjectMapper objectMapper;
     private final TaskHandlerResolver taskHandlerResolver;
 
@@ -106,7 +107,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
                 Validate.notNull(taskExecution.getId(), "id"), Collections.emptyMap()));
 
         TaskWorker taskWorker = new TaskWorker(
-            getEventPublisher(syncMessageBroker), new CurrentThreadExecutorService(), taskHandlerResolver,
+            getEventPublisher(syncMessageBroker), currentThreadExecutorService::execute, taskHandlerResolver,
             taskFileStorage);
 
         MapTaskDispatcher mapTaskDispatcher = new MapTaskDispatcher(

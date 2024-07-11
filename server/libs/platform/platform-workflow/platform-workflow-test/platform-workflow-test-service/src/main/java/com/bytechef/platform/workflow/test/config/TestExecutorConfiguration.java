@@ -63,9 +63,11 @@ import com.bytechef.task.dispatcher.parallel.ParallelTaskDispatcher;
 import com.bytechef.task.dispatcher.parallel.completion.ParallelTaskCompletionHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
+import java.util.concurrent.Executor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.AsyncTaskExecutor;
 
 /**
  * @author Ivica Cardic
@@ -75,7 +77,7 @@ public class TestExecutorConfiguration {
 
     @Bean
     JobTestExecutor jobTestExecutor(
-        ComponentDefinitionService componentDefinitionService, ObjectMapper objectMapper,
+        ComponentDefinitionService componentDefinitionService, ObjectMapper objectMapper, Executor taskExecutor,
         TaskHandlerRegistry taskHandlerRegistry, WorkflowService workflowService) {
 
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
@@ -100,7 +102,8 @@ public class TestExecutorConfiguration {
                 List.of(new TestTaskDispatcherPreSendProcessor(jobService)),
                 getTaskDispatcherResolverFactories(
                     syncMessageBroker, contextService, counterService, taskExecutionService, taskFileStorage),
-                taskExecutionService, taskHandlerRegistry, taskFileStorage, workflowService),
+                taskExecutionService, (AsyncTaskExecutor) taskExecutor, taskHandlerRegistry, taskFileStorage,
+                workflowService),
             taskExecutionService, taskFileStorage);
     }
 

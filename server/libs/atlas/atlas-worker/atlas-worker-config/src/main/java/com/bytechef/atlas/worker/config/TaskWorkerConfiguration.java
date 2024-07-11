@@ -21,7 +21,6 @@ package com.bytechef.atlas.worker.config;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.atlas.worker.annotation.ConditionalOnWorker;
-import com.bytechef.atlas.worker.executor.TaskWorkerExecutor;
 import com.bytechef.atlas.worker.task.factory.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterTaskHandlerResolver;
@@ -29,19 +28,16 @@ import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Executor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.task.AsyncTaskExecutor;
 
 /**
  * @author Arik Cohen
@@ -60,11 +56,6 @@ public class TaskWorkerConfiguration {
 
         this.taskDispatcherAdapterTaskHandlerFactories = taskDispatcherAdapterTaskHandlerFactories == null
             ? Collections.emptyList() : taskDispatcherAdapterTaskHandlerFactories;
-    }
-
-    @Bean
-    TaskWorkerExecutor taskWorkerExecutor() {
-        return new TaskWorkerExecutor();
     }
 
     @Bean
@@ -93,79 +84,9 @@ public class TaskWorkerConfiguration {
 
     @Bean
     TaskWorker taskWorker(
-        ApplicationEventPublisher eventPublisher, TaskWorkerExecutor taskWorkerExecutor,
-        TaskHandlerResolver taskHandlerResolver, TaskFileStorage taskFileStorage) {
+        ApplicationEventPublisher eventPublisher, Executor taskExecutor, TaskFileStorage taskFileStorage,
+        TaskHandlerResolver taskHandlerResolver) {
 
-        return new TaskWorker(
-            eventPublisher, new ExecutorServiceWrapper(taskWorkerExecutor), taskHandlerResolver,
-            taskFileStorage);
-    }
-
-    private record ExecutorServiceWrapper(TaskWorkerExecutor taskWorkerExecutor) implements ExecutorService {
-
-        @Override
-        public void shutdown() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public List<Runnable> shutdownNow() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public boolean isShutdown() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public boolean isTerminated() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public boolean awaitTermination(long timeout, TimeUnit unit) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public <T> Future<T> submit(Callable<T> task) {
-            return null;
-        }
-
-        @Override
-        public <T> Future<T> submit(Runnable task, T result) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void execute(Runnable command) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Future<?> submit(Runnable task) {
-            return taskWorkerExecutor.submit(task);
-        }
-
-        @Override
-        public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public <T> T invokeAny(Collection<? extends Callable<T>> tasks) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) {
-            throw new UnsupportedOperationException();
-        }
+        return new TaskWorker(eventPublisher, (AsyncTaskExecutor) taskExecutor, taskHandlerResolver, taskFileStorage);
     }
 }

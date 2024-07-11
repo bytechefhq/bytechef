@@ -65,13 +65,16 @@ import org.junit.jupiter.api.Test;
  */
 public class TaskWorkerTest {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper() {
+    private static final ExecutorService NEW_FIXED_THREAD_POOL = Executors.newFixedThreadPool(2);
+    private static final ExecutorService NEW_SINGLE_THREAD_EXECUTOR = Executors.newSingleThreadExecutor();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper() {
         {
             disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
             registerModule(new JavaTimeModule());
             registerModule(new Jdk8Module());
         }
     };
+
     private final TaskFileStorage taskFileStorage = new TaskFileStorageImpl(
         new Base64FileStorageService());
 
@@ -80,7 +83,7 @@ public class TaskWorkerTest {
     public static void beforeAll() {
         class JsonUtilsMock extends JsonUtils {
             static {
-                objectMapper = TaskWorkerTest.objectMapper;
+                objectMapper = OBJECT_MAPPER;
             }
         }
 
@@ -97,7 +100,7 @@ public class TaskWorkerTest {
 
     @Test
     public void test1() {
-        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(OBJECT_MAPPER);
 
         syncMessageBroker.receive(
             TaskCoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
@@ -111,8 +114,7 @@ public class TaskWorkerTest {
         TaskWorker worker =
             new TaskWorker(
                 event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
-                Executors.newSingleThreadExecutor(),
-                task -> taskExecution -> "done", taskFileStorage);
+                NEW_SINGLE_THREAD_EXECUTOR::execute, task -> taskExecution -> "done", taskFileStorage);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
@@ -126,7 +128,7 @@ public class TaskWorkerTest {
 
     @Test
     public void test2() {
-        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(OBJECT_MAPPER);
 
         syncMessageBroker.receive(
             TaskCoordinatorMessageRoute.ERROR_EVENTS,
@@ -138,7 +140,7 @@ public class TaskWorkerTest {
 
         TaskWorker worker = new TaskWorker(
             event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
-            Executors.newSingleThreadExecutor(),
+            NEW_SINGLE_THREAD_EXECUTOR::execute,
             task -> taskExecution -> {
                 throw new IllegalArgumentException("bad input");
             }, taskFileStorage);
@@ -155,7 +157,7 @@ public class TaskWorkerTest {
 
     @Test
     public void test3() {
-        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(OBJECT_MAPPER);
 
         syncMessageBroker.receive(
             TaskCoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
@@ -174,7 +176,7 @@ public class TaskWorkerTest {
 
         TaskWorker worker = new TaskWorker(
             event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
-            Executors.newSingleThreadExecutor(),
+            NEW_SINGLE_THREAD_EXECUTOR::execute,
             task -> {
                 String type = task.getType();
                 if ("var".equals(type)) {
@@ -212,7 +214,7 @@ public class TaskWorkerTest {
 
         String tempDir = tempFile.getAbsolutePath();
 
-        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(OBJECT_MAPPER);
 
         syncMessageBroker.receive(
             TaskCoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
@@ -222,7 +224,7 @@ public class TaskWorkerTest {
 
         TaskWorker worker = new TaskWorker(
             event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
-            Executors.newSingleThreadExecutor(),
+            NEW_SINGLE_THREAD_EXECUTOR::execute,
             task -> {
                 String type = task.getType();
                 if ("var".equals(type)) {
@@ -274,7 +276,7 @@ public class TaskWorkerTest {
 
         String tempDir = tempFile.getAbsolutePath();
 
-        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(OBJECT_MAPPER);
 
         syncMessageBroker.receive(
             TaskCoordinatorMessageRoute.ERROR_EVENTS,
@@ -283,7 +285,7 @@ public class TaskWorkerTest {
 
         TaskWorker worker = new TaskWorker(
             event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
-            Executors.newSingleThreadExecutor(),
+            NEW_SINGLE_THREAD_EXECUTOR::execute,
             task -> {
                 String type = task.getType();
                 if ("var".equals(type)) {
@@ -332,13 +334,13 @@ public class TaskWorkerTest {
     @Test
     public void test6() throws InterruptedException {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
-        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(OBJECT_MAPPER);
 
         syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
 
         TaskWorker worker = new TaskWorker(
             event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
-            Executors.newSingleThreadExecutor(),
+            NEW_SINGLE_THREAD_EXECUTOR::execute,
             task -> taskExecution -> {
                 try {
                     TimeUnit.SECONDS.sleep(5);
@@ -378,13 +380,13 @@ public class TaskWorkerTest {
     @Test
     public void test7() throws InterruptedException {
         ExecutorService executorService = Executors.newFixedThreadPool(2);
-        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(OBJECT_MAPPER);
 
         syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
 
         TaskWorker worker = new TaskWorker(
             event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
-            Executors.newSingleThreadExecutor(),
+            NEW_SINGLE_THREAD_EXECUTOR::execute,
             task -> taskExecution -> {
                 try {
                     TimeUnit.SECONDS.sleep(5);
@@ -434,13 +436,13 @@ public class TaskWorkerTest {
     @Test
     public void test8() throws InterruptedException {
         ExecutorService executorService = Executors.newFixedThreadPool(2);
-        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(OBJECT_MAPPER);
 
         syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
 
         TaskWorker worker = new TaskWorker(
             event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
-            Executors.newFixedThreadPool(2),
+            NEW_FIXED_THREAD_POOL::execute,
             task -> taskExecution -> {
                 try {
                     TimeUnit.SECONDS.sleep(5);

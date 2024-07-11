@@ -60,11 +60,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.data.domain.Page;
 
 /**
@@ -85,12 +85,13 @@ public class JobSyncExecutor {
     public JobSyncExecutor(
         ContextService contextService, JobService jobService, ObjectMapper objectMapper,
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors, TaskExecutionService taskExecutionService,
-        TaskHandlerRegistry taskHandlerRegistry, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
+        AsyncTaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry, TaskFileStorage taskFileStorage,
+        WorkflowService workflowService) {
 
         this(
             contextService, jobService, new SyncMessageBroker(objectMapper), List.of(), List.of(),
-            taskDispatcherPreSendProcessors, List.of(), taskExecutionService, taskHandlerRegistry, taskFileStorage,
-            workflowService);
+            taskDispatcherPreSendProcessors, List.of(), taskExecutionService, taskExecutor, taskHandlerRegistry,
+            taskFileStorage, workflowService);
     }
 
     @SuppressFBWarnings("EI")
@@ -99,9 +100,9 @@ public class JobSyncExecutor {
         List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories,
         List<TaskDispatcherAdapterFactory> taskDispatcherAdapterFactories,
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
-        List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories,
-        TaskExecutionService taskExecutionService, TaskHandlerRegistry taskHandlerRegistry,
-        TaskFileStorage taskFileStorage, WorkflowService workflowService) {
+        List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories, TaskExecutionService taskExecutionService,
+        AsyncTaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry, TaskFileStorage taskFileStorage,
+        WorkflowService workflowService) {
 
         this.contextService = contextService;
         this.eventPublisher = createEventPublisher(syncMessageBroker);
@@ -132,9 +133,7 @@ public class JobSyncExecutor {
                 new TaskDispatcherAdapterTaskHandlerResolver(taskDispatcherAdapterFactories, taskHandlerResolverChain),
                 new DefaultTaskHandlerResolver(taskHandlerRegistry)));
 
-        TaskWorker worker = new TaskWorker(
-            eventPublisher, Executors.newCachedThreadPool(), taskHandlerResolverChain,
-            taskFileStorage);
+        TaskWorker worker = new TaskWorker(eventPublisher, taskExecutor, taskHandlerResolverChain, taskFileStorage);
 
         syncMessageBroker.receive(
             TaskWorkerMessageRoute.TASK_EXECUTION_EVENTS, e -> worker.onTaskExecutionEvent((TaskExecutionEvent) e));
@@ -150,8 +149,7 @@ public class JobSyncExecutor {
             contextService, taskDispatcherChain, taskExecutionService, taskFileStorage, workflowService);
 
         DefaultTaskCompletionHandler defaultTaskCompletionHandler = new DefaultTaskCompletionHandler(
-            contextService, eventPublisher, jobExecutor, jobService, taskExecutionService,
-            taskFileStorage,
+            contextService, eventPublisher, jobExecutor, jobService, taskExecutionService, taskFileStorage,
             workflowService);
 
         TaskCompletionHandlerChain taskCompletionHandlerChain = new TaskCompletionHandlerChain();

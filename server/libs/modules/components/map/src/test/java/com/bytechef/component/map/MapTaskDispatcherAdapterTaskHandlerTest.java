@@ -48,6 +48,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -58,7 +59,8 @@ import org.junit.jupiter.api.Test;
  */
 public class MapTaskDispatcherAdapterTaskHandlerTest {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper() {
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper() {
         {
             disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
             registerModule(new JavaTimeModule());
@@ -74,7 +76,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
     public static void beforeAll() {
         class JsonUtilsMock extends JsonUtils {
             static {
-                objectMapper = MapTaskDispatcherAdapterTaskHandlerTest.objectMapper;
+                objectMapper = OBJECT_MAPPER;
             }
         }
 
@@ -82,7 +84,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
 
         class MapUtilsMock extends MapUtils {
             static {
-                objectMapper = MapTaskDispatcherAdapterTaskHandlerTest.objectMapper;
+                objectMapper = OBJECT_MAPPER;
             }
         }
 
@@ -93,7 +95,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
     public void test1() {
         TaskHandlerResolver resolver = task -> t -> MapUtils.get(t.getParameters(), "value");
         MapTaskDispatcherAdapterTaskHandler taskHandler = new MapTaskDispatcherAdapterTaskHandler(
-            objectMapper, resolver);
+            OBJECT_MAPPER, resolver);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(
@@ -124,7 +126,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
                 throw new IllegalStateException("i'm rogue");
             };
             MapTaskDispatcherAdapterTaskHandler taskHandler = new MapTaskDispatcherAdapterTaskHandler(
-                objectMapper, taskHandlerResolver);
+                OBJECT_MAPPER, taskHandlerResolver);
 
             TaskExecution taskExecution = TaskExecution.builder()
                 .workflowTask(
@@ -142,7 +144,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
 
     @Test
     public void test3() {
-        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(OBJECT_MAPPER);
 
         syncMessageBroker.receive(TaskCoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS, t -> {
             TaskExecution taskExecution = ((TaskExecutionCompleteEvent) t).getTaskExecution();
@@ -180,10 +182,9 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
 
         TaskWorker worker = new TaskWorker(
             event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
-            Executors.newSingleThreadExecutor(),
-            taskHandlerResolver, taskFileStorage);
+            EXECUTOR_SERVICE::execute, taskHandlerResolver, taskFileStorage);
 
-        mapAdapterTaskHandlerRefs[0] = new MapTaskDispatcherAdapterTaskHandler(objectMapper, taskHandlerResolver);
+        mapAdapterTaskHandlerRefs[0] = new MapTaskDispatcherAdapterTaskHandler(OBJECT_MAPPER, taskHandlerResolver);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(

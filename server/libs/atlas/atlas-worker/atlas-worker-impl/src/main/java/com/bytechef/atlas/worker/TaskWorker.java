@@ -45,7 +45,6 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -53,6 +52,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.core.task.AsyncTaskExecutor;
 
 /**
  * The class responsible for executing tasks spawned by the {@link com.bytechef.atlas.coordinator.TaskCoordinator}.
@@ -75,17 +75,17 @@ public class TaskWorker {
     private static final long DEFAULT_TIME_OUT = 24 * 60 * 60 * 1000; // 24 hours
 
     private final ApplicationEventPublisher eventPublisher;
-    private final ExecutorService executorService;
+    private final AsyncTaskExecutor taskExecutor;
     private final TaskHandlerResolver taskHandlerResolver;
     private final Map<Long, TaskExecutionFuture<?>> taskExecutionFutureMap = new ConcurrentHashMap<>();
     private final TaskFileStorage taskFileStorage;
 
     public TaskWorker(
-        ApplicationEventPublisher eventPublisher, ExecutorService executorService,
+        ApplicationEventPublisher eventPublisher, AsyncTaskExecutor taskExecutor,
         TaskHandlerResolver taskHandlerResolver, TaskFileStorage taskFileStorage) {
 
         this.eventPublisher = eventPublisher;
-        this.executorService = executorService;
+        this.taskExecutor = taskExecutor;
         this.taskHandlerResolver = taskHandlerResolver;
         this.taskFileStorage = taskFileStorage;
     }
@@ -101,7 +101,7 @@ public class TaskWorker {
         TaskExecution taskExecution = taskExecutionEvent.getTaskExecution();
         CountDownLatch latch = new CountDownLatch(1);
 
-        Future<?> future = executorService.submit(() -> {
+        Future<?> future = taskExecutor.submit(() -> {
             try {
                 eventPublisher.publishEvent(
                     new TaskStartedApplicationEvent(

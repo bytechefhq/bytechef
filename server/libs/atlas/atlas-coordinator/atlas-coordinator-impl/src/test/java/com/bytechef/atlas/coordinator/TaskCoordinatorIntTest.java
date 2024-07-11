@@ -64,6 +64,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,6 +89,8 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 @Import(PostgreSQLContainerConfiguration.class)
 @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
 public class TaskCoordinatorIntTest {
+
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
 
     @Autowired
     private ContextService contextService;
@@ -123,8 +127,9 @@ public class TaskCoordinatorIntTest {
         taskHandlerMap.put("randomHelper/v1/randomInt", taskExecution -> null);
 
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, jobService, objectMapper, List.of(), taskExecutionService, taskHandlerMap::get,
-            new TaskFileStorageImpl(new Base64FileStorageService()), workflowService);
+            contextService, jobService, objectMapper, List.of(), taskExecutionService,
+            EXECUTOR_SERVICE::execute, taskHandlerMap::get, new TaskFileStorageImpl(new Base64FileStorageService()),
+            workflowService);
 
         return jobSyncExecutor.execute(new JobParameters(workflowId, Collections.singletonMap("yourName", "me")));
     }

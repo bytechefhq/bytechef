@@ -33,11 +33,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @author Ivica Cardic
  */
 public class ComponentJobTestExecutor {
+
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
 
     private final ContextService contextService;
     private final JobService jobService;
@@ -66,13 +70,12 @@ public class ComponentJobTestExecutor {
 
     public Job execute(String workflowId, Map<String, Object> inputs, Map<String, TaskHandler<?>> taskHandlerMap) {
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, jobService, objectMapper,
-            List.of(taskExecution -> {
+            contextService, jobService, objectMapper, List.of(taskExecution -> {
                 taskExecution.putMetadata(MetadataConstants.TYPE, AppType.AUTOMATION);
 
                 return taskExecution;
-            }),
-            taskExecutionService, MapUtils.concat(this.taskHandlerMap, taskHandlerMap)::get,
+            }), taskExecutionService, EXECUTOR_SERVICE::execute,
+            MapUtils.concat(this.taskHandlerMap, taskHandlerMap)::get,
             new TaskFileStorageImpl(new Base64FileStorageService()), workflowService);
 
         return jobSyncExecutor.execute(new JobParameters(workflowId, inputs));

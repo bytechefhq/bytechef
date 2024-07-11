@@ -37,10 +37,14 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import org.springframework.context.ApplicationEventPublisher;
 
 public class TaskDispatcherJobTestExecutor {
+
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
 
     private final ContextService contextService;
     private final CounterService counterService;
@@ -89,7 +93,8 @@ public class TaskDispatcherJobTestExecutor {
             taskDispatcherResolverFactoriesFunction.apply(
                 event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
                 contextService, counterService, taskExecutionService),
-            taskExecutionService, taskHandlerMapSupplier.get()::get, taskFileStorage, workflowService);
+            taskExecutionService, EXECUTOR_SERVICE::execute, taskHandlerMapSupplier.get()::get, taskFileStorage,
+            workflowService);
 
         return jobSyncExecutor.execute(new JobParameters(workflowId, inputs));
     }
