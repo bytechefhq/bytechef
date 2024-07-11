@@ -4,9 +4,11 @@ import {
     ComponentDefinitionApi,
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionBasicModel,
+    TriggerDefinitionApi,
 } from '@/shared/middleware/platform/configuration';
 import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
+import {TriggerDefinitionKeys} from '@/shared/queries/platform/triggerDefinitions.queries';
 import {getRandomId} from '@/shared/util/random-utils';
 import {useQueryClient} from '@tanstack/react-query';
 import {PlayIcon} from 'lucide-react';
@@ -21,6 +23,7 @@ import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 export default function useHandleDrop(): [
     (targetNode: Node, droppedNode: ComponentDefinitionBasicModel | TaskDispatcherDefinitionBasicModel) => void,
     (targetEdge: Edge, droppedNode: ComponentDefinitionBasicModel | TaskDispatcherDefinitionBasicModel) => void,
+    (droppedNode: ComponentDefinitionBasicModel | TaskDispatcherDefinitionBasicModel) => void,
 ] {
     const {setWorkflow, workflow} = useWorkflowDataStore();
 
@@ -245,5 +248,79 @@ export default function useHandleDrop(): [
         );
     }
 
-    return [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge];
+    async function handleDropOnTriggerNode(
+        droppedNode: ComponentDefinitionBasicModel | TaskDispatcherDefinitionBasicModel
+    ) {
+        const newTriggerNode = {
+            data: {
+                componentName: droppedNode.name,
+                icon: droppedNode?.icon ? (
+                    <InlineSVG className="size-9 text-gray-700" src={droppedNode.icon} />
+                ) : (
+                    <PlayIcon className="size-9 text-gray-700" />
+                ),
+                label: droppedNode?.title,
+                name: getFormattedName(droppedNode.name!, nodes),
+                trigger: true,
+            },
+            id: getRandomId(),
+            name: 'trigger_1',
+            position: {
+                x: 0,
+                y: 0,
+            },
+            type: 'workflow',
+        };
+
+        setNodes((nodes) => {
+            nodes[0] = newTriggerNode;
+
+            componentNames[0] = newTriggerNode.data.componentName;
+
+            setWorkflow({
+                ...workflow,
+                componentNames: componentNames,
+            });
+
+            return nodes;
+        });
+
+        const draggedComponentDefinition = await queryClient.fetchQuery({
+            queryFn: () =>
+                new ComponentDefinitionApi().getComponentDefinition({
+                    componentName: newTriggerNode.data.componentName,
+                }),
+            queryKey: ComponentDefinitionKeys.componentDefinition({
+                componentName: newTriggerNode.data.componentName,
+            }),
+        });
+
+        const draggedComponentTriggerDefinition = await queryClient.fetchQuery({
+            queryFn: () =>
+                new TriggerDefinitionApi().getComponentTriggerDefinition({
+                    componentName: newTriggerNode.data.componentName,
+                    componentVersion: draggedComponentDefinition.version,
+                    triggerName: draggedComponentDefinition.triggers?.[0].name as string,
+                }),
+            queryKey: TriggerDefinitionKeys.triggerDefinition({
+                componentName: newTriggerNode.data.componentName,
+                componentVersion: draggedComponentDefinition.version,
+                triggerName: draggedComponentDefinition.triggers?.[0].name as string,
+            }),
+        });
+
+        saveWorkflowDefinition(
+            {
+                ...newTriggerNode.data,
+                operationName: draggedComponentTriggerDefinition.name,
+                parameters: getParametersWithDefaultValues({
+                    properties: draggedComponentTriggerDefinition.properties || [],
+                }),
+            },
+            workflow,
+            updateWorkflowMutation
+        );
+    }
+
+    return [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge, handleDropOnTriggerNode];
 }
