@@ -26,6 +26,14 @@ public class ProviderException extends RuntimeException {
 
     /**
      *
+     * @param exception
+     */
+    public ProviderException(Exception exception) {
+        super(exception);
+    }
+
+    /**
+     *
      * @param message
      */
     public ProviderException(String message) {
