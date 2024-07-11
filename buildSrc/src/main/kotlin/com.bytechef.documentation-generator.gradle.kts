@@ -235,7 +235,7 @@ ${actions?.joinToString("\n")}
 title: "$title"
 description: "$description"
 ---
-# Reference
+## Reference
 <hr />
 
 $description
