@@ -8,6 +8,7 @@ springBoot {
 dependencies {
     implementation("io.awspring.cloud:spring-cloud-aws-starter-s3")
     implementation("io.awspring.cloud:spring-cloud-aws-starter-secrets-manager")
+    implementation("io.awspring.cloud:spring-cloud-aws-starter-sqs")
     implementation(libs.org.springdoc.springdoc.openapi.starter.common)
     implementation("org.springframework.boot:spring-boot-starter-batch")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
@@ -204,6 +205,7 @@ dependencies {
     implementation(project(":server:ee:libs:core:audit:audit-service"))
     implementation(project(":server:ee:libs:core:encryption:encryption-aws"))
     implementation(project(":server:ee:libs:core:file-storage:file-storage-aws"))
+    implementation(project(":server:ee:libs:core:message:message-broker:message-broker-aws"))
     implementation(project(":server:ee:libs:core:tenant:tenant-multi-service"))
 
     runtimeOnly("com.h2database:h2")
