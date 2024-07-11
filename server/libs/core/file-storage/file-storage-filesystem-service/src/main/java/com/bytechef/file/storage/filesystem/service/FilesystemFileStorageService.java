@@ -19,6 +19,7 @@ package com.bytechef.file.storage.filesystem.service;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.exception.FileStorageException;
 import com.bytechef.file.storage.service.FileStorageService;
+import com.bytechef.tenant.TenantContext;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -112,7 +113,7 @@ public class FilesystemFileStorageService implements FileStorageService {
         Validate.notNull(fileName, "fileName is required");
         Validate.notNull(data, "data is required");
 
-        return storeFileContent(directoryPath, fileName, new ByteArrayInputStream(data));
+        return doStoreFileContent(directoryPath, fileName, new ByteArrayInputStream(data));
     }
 
     @Override
@@ -121,7 +122,7 @@ public class FilesystemFileStorageService implements FileStorageService {
         Validate.notNull(fileName, "fileName is required");
         Validate.notNull(data, "data is required");
 
-        return storeFileContent(directoryPath, fileName,
+        return doStoreFileContent(directoryPath, fileName,
             new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)));
     }
 
@@ -155,12 +156,14 @@ public class FilesystemFileStorageService implements FileStorageService {
             throw new FileStorageException("Failed to store empty file " + fileName);
         }
 
-        return new FileEntry(fileName, FILE + path.toString());
+        return new FileEntry(fileName, FILE + path);
     }
 
-    private Path resolveDirectoryPath(String directory) {
+    private Path resolveDirectoryPath(String directoryPath) {
         try {
-            return Files.createDirectories(baseDirPath.resolve(directory));
+            return Files.createDirectories(
+                baseDirPath.resolve(TenantContext.getCurrentTenantId())
+                    .resolve(directoryPath));
         } catch (IOException ioe) {
             throw new FileStorageException("Could not initialize storage", ioe);
         }
