@@ -220,8 +220,7 @@ public final class Integration {
     }
 
     public List<Long> getTagIds() {
-        return integrationTags
-            .stream()
+        return integrationTags.stream()
             .map(IntegrationTag::getTagId)
             .toList();
     }

@@ -211,8 +211,7 @@ public final class Connection {
     }
 
     public List<Long> getTagIds() {
-        return connectionTags
-            .stream()
+        return connectionTags.stream()
             .map(ConnectionTag::getTagId)
             .toList();
     }
