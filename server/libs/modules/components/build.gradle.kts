@@ -1,11 +1,4 @@
-
-plugins {
-    id("com.bytechef.documentation-generator")
-}
-
 subprojects {
-    apply(plugin = "com.bytechef.documentation-generator")
-
     tasks.jar {
         archiveBaseName.set("component-" + project.name)
     }
