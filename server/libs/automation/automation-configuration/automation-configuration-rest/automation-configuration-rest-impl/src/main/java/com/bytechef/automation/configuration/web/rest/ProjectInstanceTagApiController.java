@@ -19,7 +19,6 @@ package com.bytechef.automation.configuration.web.rest;
 import com.bytechef.automation.configuration.facade.ProjectInstanceFacade;
 import com.bytechef.automation.configuration.web.rest.model.TagModel;
 import com.bytechef.automation.configuration.web.rest.model.UpdateTagsRequestModel;
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -33,7 +32,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}/internal")
-@ConditionalOnEndpoint
 public class ProjectInstanceTagApiController implements ProjectInstanceTagApi {
 
     private final ConversionService conversionService;

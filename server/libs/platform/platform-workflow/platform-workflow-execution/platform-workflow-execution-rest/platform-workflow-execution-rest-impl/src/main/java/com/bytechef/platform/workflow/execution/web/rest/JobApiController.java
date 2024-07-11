@@ -22,7 +22,6 @@ import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.workflow.execution.web.rest.model.CreateJob200ResponseModel;
 import com.bytechef.platform.workflow.execution.web.rest.model.JobBasicModel;
 import com.bytechef.platform.workflow.execution.web.rest.model.JobModel;
@@ -40,7 +39,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
-@ConditionalOnEndpoint
 public class JobApiController implements JobApi {
 
     private final ConversionService conversionService;

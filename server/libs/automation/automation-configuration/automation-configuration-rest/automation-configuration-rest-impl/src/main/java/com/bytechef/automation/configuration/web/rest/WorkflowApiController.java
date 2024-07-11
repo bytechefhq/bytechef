@@ -21,7 +21,6 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -43,7 +42,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController("com.bytechef.automation.configuration.web.rest.WorkflowApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}/internal")
-@ConditionalOnEndpoint
 public class WorkflowApiController implements WorkflowApi {
 
     private final ConversionService conversionService;

@@ -18,7 +18,6 @@ package com.bytechef.embedded.configuration.web.rest;
 
 import com.bytechef.embedded.configuration.facade.IntegrationInstanceFacade;
 import com.bytechef.embedded.configuration.web.rest.model.IntegrationInstanceModel;
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/internal")
-@ConditionalOnEndpoint
 public class IntegrationInstanceApiController implements IntegrationInstanceApi {
 
     private final ConversionService conversionService;

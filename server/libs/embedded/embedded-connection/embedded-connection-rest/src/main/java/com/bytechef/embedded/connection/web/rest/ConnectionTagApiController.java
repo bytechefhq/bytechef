@@ -16,7 +16,6 @@
 
 package com.bytechef.embedded.connection.web.rest;
 
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.web.rest.model.TagModel;
 import com.bytechef.platform.connection.web.rest.model.UpdateTagsRequestModel;
@@ -34,7 +33,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController("com.bytechef.embedded.connection.web.rest.ConnectionTagApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/internal")
-@ConditionalOnEndpoint
 public class ConnectionTagApiController implements ConnectionTagApi {
 
     private final ConnectionFacade connectionFacade;

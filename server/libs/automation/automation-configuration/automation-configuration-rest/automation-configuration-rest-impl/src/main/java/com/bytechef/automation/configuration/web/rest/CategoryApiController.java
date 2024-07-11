@@ -18,7 +18,6 @@ package com.bytechef.automation.configuration.web.rest;
 
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.web.rest.model.CategoryModel;
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -31,7 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController("com.bytechef.automation.configuration.web.rest.CategoryApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}/internal")
-@ConditionalOnEndpoint
 public class CategoryApiController implements CategoryApi {
 
     private final ConversionService conversionService;

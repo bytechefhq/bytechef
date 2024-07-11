@@ -20,7 +20,6 @@ package com.bytechef.atlas.worker.config;
 
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.worker.TaskWorker;
-import com.bytechef.atlas.worker.annotation.ConditionalOnWorker;
 import com.bytechef.atlas.worker.task.factory.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterTaskHandlerResolver;
@@ -43,7 +42,6 @@ import org.springframework.core.task.AsyncTaskExecutor;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnWorker
 public class TaskWorkerConfiguration {
 
     private final List<TaskDispatcherAdapterFactory> taskDispatcherAdapterTaskHandlerFactories;

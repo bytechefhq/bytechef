@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.configuration.web.rest;
 
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.web.rest.model.ConnectionDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.ConnectionDefinitionModel;
@@ -31,7 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
-@ConditionalOnEndpoint
 public class ConnectionDefinitionApiController implements ConnectionDefinitionApi {
 
     private final ConnectionDefinitionService connectionDefinitionService;

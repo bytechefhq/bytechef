@@ -18,7 +18,6 @@ package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
@@ -38,7 +37,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
-@ConditionalOnEndpoint
 public class WorkflowTestConfigurationApiController implements WorkflowTestConfigurationApi {
 
     private final WorkflowTestConfigurationFacade workflowTestConfigurationFacade;

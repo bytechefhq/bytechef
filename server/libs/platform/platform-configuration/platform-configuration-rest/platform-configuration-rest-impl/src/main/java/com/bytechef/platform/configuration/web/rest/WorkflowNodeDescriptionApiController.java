@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.configuration.web.rest;
 
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.configuration.facade.WorkflowNodeDescriptionFacade;
 import com.bytechef.platform.configuration.web.rest.model.GetWorkflowNodeDescription200ResponseModel;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
-@ConditionalOnEndpoint
 public class WorkflowNodeDescriptionApiController implements WorkflowNodeDescriptionApi {
 
     private final WorkflowNodeDescriptionFacade workflowNodeDescriptionFacade;

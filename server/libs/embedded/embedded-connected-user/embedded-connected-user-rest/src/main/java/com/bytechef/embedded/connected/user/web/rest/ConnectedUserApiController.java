@@ -20,7 +20,6 @@ import com.bytechef.embedded.connected.user.facade.ConnectedUserFacade;
 import com.bytechef.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.embedded.connected.user.web.rest.model.ConnectedUserModel;
 import com.bytechef.embedded.connected.user.web.rest.model.EnvironmentModel;
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import com.bytechef.platform.connection.web.rest.model.CredentialStatusModel;
 import com.bytechef.platform.constant.Environment;
@@ -37,7 +36,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/internal")
-@ConditionalOnEndpoint
 public class ConnectedUserApiController implements ConnectedUserApi {
 
     private final ConnectedUserFacade connectedUserFacade;

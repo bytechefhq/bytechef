@@ -16,7 +16,6 @@
 
 package com.bytechef.task.dispatcher.subflow.config;
 
-import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
@@ -32,7 +31,6 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnCoordinator
 public class SubflowTaskDispatcherConfiguration {
 
     @Bean("subflowTaskDispatcherResolverFactory_v1")
@@ -41,7 +39,6 @@ public class SubflowTaskDispatcherConfiguration {
     }
 
     @Configuration
-    @ConditionalOnCoordinator
     public static class SubflowJobStatusEventListenerConfiguration {
 
         @Bean

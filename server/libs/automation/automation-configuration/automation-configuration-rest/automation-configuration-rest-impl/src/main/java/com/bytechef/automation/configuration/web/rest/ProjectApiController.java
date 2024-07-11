@@ -24,7 +24,6 @@ import com.bytechef.automation.configuration.web.rest.model.ProjectModel;
 import com.bytechef.automation.configuration.web.rest.model.ProjectStatusModel;
 import com.bytechef.automation.configuration.web.rest.model.ProjectVersionModel;
 import com.bytechef.automation.configuration.web.rest.model.PublishProjectRequestModel;
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
@@ -38,7 +37,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}/internal")
-@ConditionalOnEndpoint
 public class ProjectApiController implements ProjectApi {
 
     private final ConversionService conversionService;

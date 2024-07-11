@@ -17,7 +17,6 @@
 package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowNodeOutputModel;
 import java.util.List;
@@ -31,7 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
-@ConditionalOnEndpoint
 public class WorkflowNodeOutputApiController implements WorkflowNodeOutputApi {
 
     private final ConversionService conversionService;

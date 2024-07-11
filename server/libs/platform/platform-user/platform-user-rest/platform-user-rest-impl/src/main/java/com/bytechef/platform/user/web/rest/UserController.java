@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.user.web.rest;
 
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.user.constant.AuthorityConstants;
 import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.platform.user.domain.Authority;
@@ -83,7 +82,6 @@ import org.springframework.web.server.ResponseStatusException;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
-@ConditionalOnEndpoint
 public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);

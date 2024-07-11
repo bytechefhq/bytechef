@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.configuration.web.rest;
 
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.component.definition.DataStreamComponentDefinition.ComponentType;
 import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionBasicModel;
@@ -33,7 +32,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
-@ConditionalOnEndpoint
 public class ComponentDefinitionApiController implements ComponentDefinitionApi {
 
     private final ConversionService conversionService;

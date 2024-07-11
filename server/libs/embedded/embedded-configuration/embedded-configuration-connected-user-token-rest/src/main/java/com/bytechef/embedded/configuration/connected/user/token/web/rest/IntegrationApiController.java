@@ -19,7 +19,6 @@ package com.bytechef.embedded.configuration.connected.user.token.web.rest;
 import com.bytechef.embedded.configuration.facade.IntegrationFacade;
 import com.bytechef.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.embedded.configuration.public_.web.rest.model.IntegrationModel;
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -33,7 +32,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController("com.bytechef.embedded.configuration.connected.user.token.web.rest.IntegrationApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/by-connected-user-token/v1")
-@ConditionalOnEndpoint
 public class IntegrationApiController implements IntegrationApi {
 
     private final ConversionService conversionService;

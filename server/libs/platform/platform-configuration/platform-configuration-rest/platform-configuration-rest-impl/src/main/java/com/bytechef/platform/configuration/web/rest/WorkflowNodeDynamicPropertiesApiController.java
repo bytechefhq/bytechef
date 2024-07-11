@@ -17,7 +17,6 @@
 package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.configuration.facade.WorkflowNodeDynamicPropertiesFacade;
 import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
 import java.util.List;
@@ -31,7 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
-@ConditionalOnEndpoint
 public class WorkflowNodeDynamicPropertiesApiController implements WorkflowNodeDynamicPropertiesApi {
 
     private final ConversionService conversionService;

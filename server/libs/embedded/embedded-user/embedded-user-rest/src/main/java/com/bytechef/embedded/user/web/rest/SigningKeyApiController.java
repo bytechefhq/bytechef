@@ -18,7 +18,6 @@ package com.bytechef.embedded.user.web.rest;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.embedded.user.web.rest.model.CreateSigningKey200ResponseModel;
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.user.domain.SigningKey;
 import com.bytechef.platform.user.facade.SigningKeyFacade;
@@ -36,7 +35,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/internal")
-@ConditionalOnEndpoint
 public class SigningKeyApiController implements SigningKeyApi {
 
     private final SigningKeyFacade signingKeyFacade;

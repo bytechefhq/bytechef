@@ -19,7 +19,6 @@ package com.bytechef.automation.user.web.rest;
 import com.bytechef.automation.user.web.rest.model.CreateApiKey200ResponseModel;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.StringUtils;
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.user.domain.ApiKey;
 import com.bytechef.platform.user.facade.ApiKeyFacade;
@@ -37,7 +36,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController("com.bytechef.platform.user.web.rest.ApiKeyApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}/internal")
-@ConditionalOnEndpoint
 public class ApiKeyApiController implements ApiKeyApi {
 
     private final ApiKeyFacade apiKeyFacade;

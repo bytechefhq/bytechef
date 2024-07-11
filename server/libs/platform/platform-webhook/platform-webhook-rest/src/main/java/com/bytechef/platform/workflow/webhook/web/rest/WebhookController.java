@@ -25,7 +25,6 @@ import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody.ContentType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.file.storage.service.FileStorageService;
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.component.registry.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.WebhookRequest;
@@ -74,7 +73,6 @@ import org.springframework.web.util.UriComponentsBuilder;
  * @author Ivica Cardic
  */
 @RestController
-@ConditionalOnEndpoint
 public class WebhookController {
 
     private static final Logger logger = LoggerFactory.getLogger(WebhookController.class);

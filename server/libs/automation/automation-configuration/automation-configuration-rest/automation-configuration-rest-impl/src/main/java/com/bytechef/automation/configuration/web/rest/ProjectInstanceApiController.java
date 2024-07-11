@@ -23,7 +23,6 @@ import com.bytechef.automation.configuration.web.rest.model.CreateProjectInstanc
 import com.bytechef.automation.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.automation.configuration.web.rest.model.ProjectInstanceModel;
 import com.bytechef.automation.configuration.web.rest.model.ProjectInstanceWorkflowModel;
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -37,7 +36,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}/internal")
-@ConditionalOnEndpoint
 public class ProjectInstanceApiController implements ProjectInstanceApi {
 
     private final ConversionService conversionService;
