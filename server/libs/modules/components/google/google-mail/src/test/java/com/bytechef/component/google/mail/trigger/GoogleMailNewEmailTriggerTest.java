@@ -122,12 +122,10 @@ class GoogleMailNewEmailTriggerTest {
         DynamicWebhookEnableOutput dynamicWebhookEnableOutput = GoogleMailNewEmailTrigger.dynamicWebhookEnable(
             mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedActionContext);
 
-        Map<String, ?> parameters = dynamicWebhookEnableOutput.parameters();
+        Map<String, BigInteger> expectedParameters = Map.of(HISTORY_ID, new BigInteger("123"));
         LocalDateTime webhookExpirationDate = dynamicWebhookEnableOutput.webhookExpirationDate();
 
-        Map<String, BigInteger> expectedParameters = Map.of(HISTORY_ID, new BigInteger("123"));
-
-        assertEquals(expectedParameters, parameters);
+        assertEquals(expectedParameters, dynamicWebhookEnableOutput.parameters());
         assertNull(webhookExpirationDate);
 
         WatchRequest watchRequestArgumentCaptorValue = watchRequestArgumentCaptor.getValue();
@@ -153,19 +151,16 @@ class GoogleMailNewEmailTriggerTest {
 
     @Test
     void testDynamicWebhookRequest() throws IOException {
-        Optional<Object> optional = Optional.of(123);
-        Map<String, ?> historyMap = Map.of(HISTORY_ID, 123);
         Message message = new Message().setId("2");
 
         ListHistoryResponse listHistoryResponse = new ListHistoryResponse()
-            .setHistory(List.of(
-                new History().setMessagesAdded(
-                    List.of(new HistoryMessageAdded().setMessage(message)))));
+            .setHistory(
+                List.of(new History().setMessagesAdded(List.of(new HistoryMessageAdded().setMessage(message)))));
 
         when(mockedTriggerContext.data(any()))
-            .thenReturn(optional);
+            .thenReturn(Optional.of(123));
         when(mockedDynamicWebhookEnableOutput.parameters())
-            .thenReturn((Map) historyMap);
+            .thenReturn((Map) Map.of(HISTORY_ID, 123));
         when(mockedGmail.users())
             .thenReturn(mockedUsers);
         when(mockedUsers.history())
@@ -183,8 +178,8 @@ class GoogleMailNewEmailTriggerTest {
         when(mockedGet.execute())
             .thenReturn(message);
 
-        List<Message> messages = GoogleMailNewEmailTrigger.dynamicWebhookRequest(mockedParameters, mockedParameters,
-            mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
+        List<Message> messages = GoogleMailNewEmailTrigger.dynamicWebhookRequest(
+            mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
             mockedWebhookMethod, mockedDynamicWebhookEnableOutput, mockedTriggerContext);
 
         assertEquals(List.of(message), messages);
@@ -194,5 +189,4 @@ class GoogleMailNewEmailTriggerTest {
         assertEquals(ME, userIdTwoArgumentCaptor.getValue());
         assertEquals("2", messageIdArgumentCaptor.getValue());
     }
-
 }
