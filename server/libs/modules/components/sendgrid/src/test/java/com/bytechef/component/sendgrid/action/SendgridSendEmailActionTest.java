@@ -16,97 +16,73 @@
 
 package com.bytechef.component.sendgrid.action;
 
-import static com.bytechef.component.definition.Authorization.TOKEN;
-import static com.bytechef.component.sendgrid.constant.SendgridConstants.BCC;
+import static com.bytechef.component.sendgrid.constant.SendgridConstants.ATTACHMENTS;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.CC;
-import static com.bytechef.component.sendgrid.constant.SendgridConstants.CONTENT_VALUE;
-import static com.bytechef.component.sendgrid.constant.SendgridConstants.DYNAMIC_TEMPLATE;
+import static com.bytechef.component.sendgrid.constant.SendgridConstants.CONTENT_TYPE;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.FROM;
-import static com.bytechef.component.sendgrid.constant.SendgridConstants.REPLY_TO;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.SUBJECT;
-import static com.bytechef.component.sendgrid.constant.SendgridConstants.TEMPLATE_ID;
+import static com.bytechef.component.sendgrid.constant.SendgridConstants.TEXT;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.TO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockConstruction;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.sendgrid.util.SendgridUtils;
-import com.sendgrid.Method;
-import com.sendgrid.Request;
-import com.sendgrid.Response;
-import com.sendgrid.SendGrid;
-import com.sendgrid.helpers.mail.objects.Attachments;
-import java.io.IOException;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.FileEntry;
+import com.bytechef.component.definition.Parameters;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.MockedConstruction;
-import org.mockito.MockedStatic;
 
 /**
- * @author Marko Krišković
+ * @author Luka Ljubić
  */
+class SendgridSendEmailActionTest {
 
-public class SendgridSendEmailActionTest extends AbstractSendgridActionTest {
-    private final ArgumentCaptor<Request> requestArgumentCaptor = ArgumentCaptor.forClass(Request.class);
-    private final Response mockedResponse = mock(Response.class);
+    private final ArgumentCaptor<Context.Http.Body> bodyArgumentCaptor =
+        ArgumentCaptor.forClass(Context.Http.Body.class);
+    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final Context.Http.Executor mockedExecutor = mock(Context.Http.Executor.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
+    private final Context.Http.Response mockedResponse = mock(Context.Http.Response.class);
+    private final Map<String, Object> responeseMap = Map.of("key", "value");
 
     @Test
-    public void testPerform() throws IOException {
-        when(mockedParameters.get(TOKEN))
-            .thenReturn("token");
-        when(mockedParameters.getRequiredString(FROM))
-            .thenReturn("from@mail.com");
-        when(mockedParameters.getList(TO, String.class, List.of()))
-            .thenReturn(List.of("to@mail.com"));
-        when(mockedParameters.getString(REPLY_TO))
-            .thenReturn("replyTo@mail.com");
-        when(mockedParameters.getList(CC, String.class, List.of()))
-            .thenReturn(List.of("cc@mail.com"));
-        when(mockedParameters.getList(BCC, String.class, List.of()))
-            .thenReturn(List.of("bcc@mail.com"));
-        when(mockedParameters.getRequiredString(SUBJECT))
-            .thenReturn("Sending with SendGrid is Fun");
-        when(mockedParameters.getRequiredString(CONTENT_VALUE))
-            .thenReturn("and easy to do anywhere, even with Java");
-        when(mockedParameters.getString(TEMPLATE_ID))
-            .thenReturn("template_id");
-        when(mockedParameters.getMap(DYNAMIC_TEMPLATE, Object.class, Map.of()))
-            .thenReturn(Map.of("key1", "value1", "key2", "value2"));
+    void testPerform() {
 
-        try (MockedStatic<SendgridUtils> sendgridUtilsMockedStatic = mockStatic(SendgridUtils.class)) {
-            sendgridUtilsMockedStatic
-                .when(() -> SendgridUtils.getAttachments(mockedParameters, mockedContext))
-                .thenReturn(List.of(new Attachments.Builder("fileName", "fileContent").build()));
+        when(mockedContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(Context.TypeReference.class)))
+            .thenReturn(responeseMap);
 
 
-            try (MockedConstruction<SendGrid> sendgridMockedConstruction = mockConstruction(SendGrid.class,
-                (mock, context) -> when(mock.api(requestArgumentCaptor.capture())).thenReturn(mockedResponse))){
+        List<FileEntry> fileList = new ArrayList<>();
+        List<String> toList = new ArrayList<>();
+        List<String> ccList = new ArrayList<>();
 
-                Response response = SendgridSendEmailAction.perform(mockedParameters, mockedParameters, mockedContext);
+        when(mockedParameters.getList(ATTACHMENTS, FileEntry.class)).thenReturn(fileList);
+        when(mockedParameters.getRequiredList(TO, String.class)).thenReturn(toList);
+        when(mockedParameters.getList(CC, String.class, List.of())).thenReturn(ccList);
+        when(mockedParameters.getRequiredString(FROM)).thenReturn("emailFrom@example.com");
+        when(mockedParameters.getRequiredString(SUBJECT)).thenReturn("testSubject");
+        when(mockedParameters.getRequiredString(CONTENT_TYPE)).thenReturn("text/plain");
+        when(mockedParameters.getRequiredString(TEXT)).thenReturn("testText");
 
-                assertNotNull(response);
+        Object result = SendgridSendEmailAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-                List<SendGrid> requests = sendgridMockedConstruction.constructed();
-                SendGrid mockSendgrid = requests.getFirst();
+        assertEquals(null, result);
 
-                verify(mockSendgrid, times(1)).api(requestArgumentCaptor.capture());
-
-                Request request = requestArgumentCaptor.getValue();
-
-                assertEquals(Method.POST, request.getMethod());
-                assertEquals("mail/send", request.getEndpoint());
-
-                String expected = "{\"from\":{\"email\":\"from@mail.com\"},\"subject\":\"Sending with SendGrid is Fun\",\"personalizations\":[{\"to\":[{\"email\":\"to@mail.com\"}],\"cc\":[{\"email\":\"cc@mail.com\"}],\"bcc\":[{\"email\":\"bcc@mail.com\"}],\"dynamic_template_data\":{\"key1\":\"value1\",\"key2\":\"value2\"}}],\"content\":[{\"type\":\"text/plain\",\"value\":\"and easy to do anywhere, even with Java\"}],\"attachments\":[{\"content\":\"fileContent\",\"filename\":\"fileName\"}],\"template_id\":\"template_id\",\"reply_to\":{\"email\":\"replyTo@mail.com\"}}";
-
-                assertEquals(expected, request.getBody());
-            }
-        }
+        verify(mockedContext).http(any());
     }
 }
