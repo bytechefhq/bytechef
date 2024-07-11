@@ -192,6 +192,16 @@ ${authorizations?.joinToString("\n")}
         var triggers: Array<Trigger>? = null
         var version: Int? = null
 
+        private fun getCategoriesString(): String {
+            if(categories==null) {
+                return ""
+            }
+
+            return """
+Categories: ${categories.contentToString()}
+"""
+        }
+
         private fun getConnectionString(): String {
             if(connection==null) {
                 return ""
@@ -240,7 +250,7 @@ description: "$description"
 
 $description
 
-Categories: ${categories.contentToString()}
+${getCategoriesString()}
 
 Version: $version
 
