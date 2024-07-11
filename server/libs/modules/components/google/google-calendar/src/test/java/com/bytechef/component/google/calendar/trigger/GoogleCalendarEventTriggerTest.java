@@ -55,6 +55,7 @@ import org.mockito.MockedStatic;
  * @author Monika Domiter
  */
 class GoogleCalendarEventTriggerTest {
+
     private final ArgumentCaptor<String> calendarIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<Channel> channelArgumentCaptor = ArgumentCaptor.forClass(Channel.class);
     private final Calendar mockedCalendar = mock(Calendar.class);
@@ -63,8 +64,8 @@ class GoogleCalendarEventTriggerTest {
     private final ActionContext mockedContext = mock(ActionContext.class);
     private final DynamicWebhookEnableOutput mockedDynamicWebhookEnableOutput = mock(DynamicWebhookEnableOutput.class);
     private final Events mockedEvents = mock(Events.class);
-    private final com.google.api.services.calendar.model.Events mockedEvents2 =
-        mock(com.google.api.services.calendar.model.Events.class);
+    private final com.google.api.services.calendar.model.Events mockedEvents2 = mock(
+        com.google.api.services.calendar.model.Events.class);
     protected MockedStatic<GoogleServices> mockedGoogleServices;
     private final HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
     private final HttpParameters mockedHttpParameters = mock(HttpParameters.class);
@@ -141,7 +142,8 @@ class GoogleCalendarEventTriggerTest {
         when(mockedChannels.stop(channelArgumentCaptor.capture()))
             .thenReturn(mockedStop);
 
-        GoogleCalendarEventTrigger.dynamicWebhookDisable(mockedParameters, mockedParameters, mockedParameters, workflowExecutionId, mockedContext);
+        GoogleCalendarEventTrigger.dynamicWebhookDisable(
+            mockedParameters, mockedParameters, mockedParameters, workflowExecutionId, mockedContext);
 
         Channel channelArgumentCaptorValue = channelArgumentCaptor.getValue();
 
@@ -177,5 +179,4 @@ class GoogleCalendarEventTriggerTest {
         assertEquals("calendar_id", calendarIdArgumentCaptor.getValue());
         assertEquals("updated", orderByArgumentCaptor.getValue());
     }
-
 }

@@ -35,6 +35,7 @@ import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.calendar.Calendar;
@@ -74,29 +75,25 @@ public class GoogleCalendarEventTrigger {
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
         String workflowExecutionId, Context context) {
 
-        String calendarID = inputParameters.getRequiredString(CALENDAR_ID);
-        Calendar calendar = GoogleServices.getCalendar(connectionParameters);
-
-        String uuid = String.valueOf(UUID.randomUUID());
-
         Channel channelConfig = new Channel()
             .setAddress(webhookUrl)
-            .setId(uuid)
+            .setId(String.valueOf(UUID.randomUUID()))
             .setPayload(true)
             .setType("web_hook");
 
         Channel channel;
+        Calendar calendar = GoogleServices.getCalendar(connectionParameters);
+        String calendarId = inputParameters.getRequiredString(CALENDAR_ID);
 
         try {
             channel = calendar.events()
-                .watch(calendarID, channelConfig)
+                .watch(calendarId, channelConfig)
                 .execute();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ProviderException(e);
         }
 
-        return new DynamicWebhookEnableOutput(
-            Map.of(ID, channel.getId(), RESOURCE_ID, channel.getResourceId()), null);
+        return new DynamicWebhookEnableOutput(Map.of(ID, channel.getId(), RESOURCE_ID, channel.getResourceId()), null);
     }
 
     protected static void dynamicWebhookDisable(
@@ -114,25 +111,24 @@ public class GoogleCalendarEventTrigger {
                 .stop(channel)
                 .execute();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ProviderException(e);
         }
     }
 
     protected static Event dynamicWebhookRequest(
-        Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
-        HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
-        TriggerContext context) throws IOException {
-        String calendarID = inputParameters.getRequiredString(CALENDAR_ID);
+        Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
+        WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output, TriggerContext context)
+        throws IOException {
 
+        String calendarId = inputParameters.getRequiredString(CALENDAR_ID);
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
 
         List<Event> events = calendar.events()
-            .list(calendarID)
+            .list(calendarId)
             .setOrderBy("updated")
             .execute()
             .getItems();
 
         return events.getLast();
-
     }
 }
