@@ -20,6 +20,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.user.constant.AuthorityConstants;
 import com.bytechef.security.config.SecurityConfiguration;
 import org.junit.jupiter.api.Disabled;
@@ -27,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -41,6 +43,7 @@ import org.springframework.test.web.servlet.MockMvc;
  */
 @AutoConfigureMockMvc
 @EnableAutoConfiguration(exclude = DataSourceAutoConfiguration.class)
+@EnableConfigurationProperties(ApplicationProperties.class)
 @WithMockUser
 @SpringBootTest(classes = SecurityConfiguration.class)
 public class SpaWebFilterIntTest {
@@ -59,8 +62,7 @@ public class SpaWebFilterIntTest {
 
     @Test
     void testFilterForwardsToIndex() throws Exception {
-        mockMvc.perform(
-            get("/"))
+        mockMvc.perform(get("/"))
             .andExpect(status().isOk())
             .andExpect(forwardedUrl("/index.html"));
     }
@@ -68,8 +70,7 @@ public class SpaWebFilterIntTest {
     @Test
     @Disabled
     void testFilterDoesNotForwardToIndexForApi() throws Exception {
-        mockMvc.perform(
-            get("/api/authenticate"))
+        mockMvc.perform(get("/api/authenticate"))
             .andExpect(status().isOk())
             .andExpect(forwardedUrl(null));
     }
@@ -78,62 +79,54 @@ public class SpaWebFilterIntTest {
     @WithMockUser(authorities = AuthorityConstants.ADMIN)
     @Disabled
     void testFilterDoesNotForwardToIndexForV3ApiDocs() throws Exception {
-        mockMvc.perform(
-            get("/v3/api-docs"))
+        mockMvc.perform(get("/v3/api-docs"))
             .andExpect(status().isOk())
             .andExpect(forwardedUrl(null));
     }
 
     @Test
     void testFilterDoesNotForwardToIndexForDotFile() throws Exception {
-        mockMvc.perform(
-            get("/file.js"))
+        mockMvc.perform(get("/file.js"))
             .andExpect(status().isForbidden());
     }
 
     @Test
     void getBackendEndpoint() throws Exception {
-        mockMvc.perform(
-            get("/test"))
+        mockMvc.perform(get("/test"))
             .andExpect(status().isOk())
             .andExpect(forwardedUrl("/index.html"));
     }
 
     @Test
     void forwardUnmappedFirstLevelMapping() throws Exception {
-        mockMvc.perform(
-            get("/first-level"))
+        mockMvc.perform(get("/first-level"))
             .andExpect(status().isOk())
             .andExpect(forwardedUrl("/index.html"));
     }
 
     @Test
     void forwardUnmappedSecondLevelMapping() throws Exception {
-        mockMvc.perform(
-            get("/first-level/second-level"))
+        mockMvc.perform(get("/first-level/second-level"))
             .andExpect(status().isOk())
             .andExpect(forwardedUrl("/index.html"));
     }
 
     @Test
     void forwardUnmappedThirdLevelMapping() throws Exception {
-        mockMvc.perform(
-            get("/first-level/second-level/third-level"))
+        mockMvc.perform(get("/first-level/second-level/third-level"))
             .andExpect(status().isOk())
             .andExpect(forwardedUrl("/index.html"));
     }
 
     @Test
     void forwardUnmappedDeepMapping() throws Exception {
-        mockMvc.perform(
-            get("/1/2/3/4/5/6/7/8/9/10"))
+        mockMvc.perform(get("/1/2/3/4/5/6/7/8/9/10"))
             .andExpect(forwardedUrl("/index.html"));
     }
 
     @Test
     void getUnmappedFirstLevelFile() throws Exception {
-        mockMvc.perform(
-            get("/foo.js"))
+        mockMvc.perform(get("/foo.js"))
             .andExpect(status().isForbidden());
     }
 
@@ -144,15 +137,13 @@ public class SpaWebFilterIntTest {
      */
     @Test
     void getUnmappedSecondLevelFile() throws Exception {
-        mockMvc.perform(
-            get("/foo/bar.js"))
+        mockMvc.perform(get("/foo/bar.js"))
             .andExpect(status().isForbidden());
     }
 
     @Test
     void getUnmappedThirdLevelFile() throws Exception {
-        mockMvc.perform(
-            get("/foo/another/bar.js"))
+        mockMvc.perform(get("/foo/another/bar.js"))
             .andExpect(status().isForbidden());
     }
 }

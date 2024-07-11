@@ -19,6 +19,7 @@ package com.bytechef.security;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.jdbc.config.AuditingJdbcConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.security.exception.UserNotActivatedException;
@@ -34,6 +35,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cache.annotation.EnableCaching;
@@ -53,6 +55,7 @@ import org.springframework.transaction.annotation.Transactional;
     "com.bytechef.platform.user", "com.bytechef.security"
 })
 @EnableAutoConfiguration
+@EnableConfigurationProperties(ApplicationProperties.class)
 @EnableCaching
 @Transactional
 @SpringBootTest(classes = {
