@@ -3125,6 +3125,7 @@ public final class ComponentDSL {
 
         public ModifiableTriggerDefinition webhookValidate(WebhookValidateFunction webhookValidate) {
             this.webhookValidateFunction = webhookValidate;
+            this.workflowSyncValidation = true;
 
             return this;
         }
