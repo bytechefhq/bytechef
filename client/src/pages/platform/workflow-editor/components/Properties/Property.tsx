@@ -56,6 +56,7 @@ interface PropertyProps {
     arrayName?: string;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     control?: Control<any, any>;
+    controlPath?: string;
     customClassName?: string;
     formState?: FormState<FieldValues>;
     deletePropertyButton?: ReactNode;
@@ -71,6 +72,7 @@ const Property = ({
     arrayIndex,
     arrayName,
     control,
+    controlPath = 'parameters',
     customClassName,
     deletePropertyButton,
     formState,
@@ -159,7 +161,7 @@ const Property = ({
     }
 
     if (control) {
-        path = `parameters.${name}`;
+        path = `${controlPath}.${name}`;
     }
 
     if (path === objectName) {
