@@ -1,15 +1,22 @@
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {IntegrationVersionModel} from '@/shared/middleware/embedded/configuration';
+import {IntegrationStatusModel} from '@/shared/middleware/embedded/configuration';
+import {useGetIntegrationVersionsQuery} from '@/shared/queries/embedded/integrationVersions.queries';
 
 const IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect = ({
+    integrationId,
     integrationVersion,
-    integrationVersions,
     onChange,
 }: {
+    integrationId: number;
     integrationVersion?: number;
-    integrationVersions: IntegrationVersionModel[];
     onChange: (value: number) => void;
 }) => {
+    const {data: integrationVersions} = useGetIntegrationVersionsQuery(integrationId!);
+
+    const filteredIntegrationVersions = integrationVersions?.filter(
+        (integrationVersion) => integrationVersion.status === IntegrationStatusModel.Published
+    );
+
     return (
         <Select
             onValueChange={(value) => {
@@ -22,8 +29,8 @@ const IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect =
             </SelectTrigger>
 
             <SelectContent>
-                {integrationVersions &&
-                    integrationVersions.map((integrationVersion) => (
+                {filteredIntegrationVersions &&
+                    filteredIntegrationVersions.map((integrationVersion) => (
                         <SelectItem key={integrationVersion.version} value={integrationVersion.version!.toString()}>
                             V{integrationVersion.version}
                         </SelectItem>

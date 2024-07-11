@@ -12,6 +12,7 @@ import Property from './Property';
 interface PropertiesProps {
     /* eslint-disable @typescript-eslint/no-explicit-any */
     control?: Control<any, any>;
+    controlPath?: string;
     customClassName?: string;
     operationName?: string;
     formState?: FormState<FieldValues>;
@@ -19,7 +20,15 @@ interface PropertiesProps {
     properties: Array<PropertyType>;
 }
 
-const Properties = ({control, customClassName, formState, operationName, path, properties}: PropertiesProps) => {
+const Properties = ({
+    control,
+    controlPath,
+    customClassName,
+    formState,
+    operationName,
+    path,
+    properties,
+}: PropertiesProps) => {
     const {currentComponent} = useWorkflowNodeDetailsPanelStore();
 
     const advancedProperties = properties.filter((property) => property.name && property.advancedOption);
@@ -38,6 +47,7 @@ const Properties = ({control, customClassName, formState, operationName, path, p
                     return (
                         <Property
                             control={control}
+                            controlPath={controlPath}
                             formState={formState}
                             key={`${name}_${currentComponent?.operationName}_${index}`}
                             operationName={operationName}
@@ -68,6 +78,7 @@ const Properties = ({control, customClassName, formState, operationName, path, p
                                 return (
                                     <Property
                                         control={control}
+                                        controlPath={controlPath}
                                         formState={formState}
                                         key={`${name}_${currentComponent?.operationName}_${index}`}
                                         operationName={operationName}

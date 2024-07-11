@@ -1,5 +1,6 @@
 import ComboBox, {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
 import IntegrationInstanceConfigurationDialogBasicStepIntegrationLabel from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationDialogBasicStepIntegrationLabel';
+import {IntegrationStatusModel} from '@/shared/middleware/embedded/configuration';
 import {useGetIntegrationsQuery} from '@/shared/queries/embedded/integrations.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {FocusEventHandler} from 'react';
@@ -17,7 +18,7 @@ const IntegrationInstanceConfigurationDialogBasicStepIntegrationsComboBox = ({
         connectionDefinitions: true,
     });
 
-    const {data: integrations} = useGetIntegrationsQuery();
+    const {data: integrations} = useGetIntegrationsQuery({status: IntegrationStatusModel.Published});
 
     return integrations && componentDefinitions ? (
         <ComboBox

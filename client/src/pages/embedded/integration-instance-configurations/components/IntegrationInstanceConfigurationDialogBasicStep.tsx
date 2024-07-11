@@ -6,40 +6,33 @@ import IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect 
 import IntegrationInstanceConfigurationDialogBasicStepIntegrationsComboBox from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationDialogBasicStepIntegrationsComboBox';
 import IntegrationInstanceConfigurationDialogBasicStepTagsSelect from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationDialogBasicStepTagsSelect';
 import {useWorkflowsEnabledStore} from '@/pages/embedded/integration-instance-configurations/stores/useWorkflowsEnabledStore';
-import {
-    IntegrationInstanceConfigurationModel,
-    IntegrationStatusModel,
-} from '@/shared/middleware/embedded/configuration';
-import {useGetIntegrationVersionsQuery} from '@/shared/queries/embedded/integrationVersions.queries';
-import {useState} from 'react';
+import {IntegrationInstanceConfigurationModel} from '@/shared/middleware/embedded/configuration';
+import {Dispatch, SetStateAction} from 'react';
 import {Control, UseFormGetValues, UseFormSetValue} from 'react-hook-form';
 import {useShallow} from 'zustand/react/shallow';
 
 interface IntegrationInstanceConfigurationDialogBasicStepProps {
     control: Control<IntegrationInstanceConfigurationModel>;
+    curIntegrationId?: number;
+    curIntegrationVersion?: number;
     getValues: UseFormGetValues<IntegrationInstanceConfigurationModel>;
     integrationInstanceConfiguration: IntegrationInstanceConfigurationModel | undefined;
+    setCurIntegrationId: Dispatch<SetStateAction<number | undefined>>;
+    setCurIntegrationVersion: Dispatch<SetStateAction<number | undefined>>;
     setValue: UseFormSetValue<IntegrationInstanceConfigurationModel>;
 }
 
 const IntegrationInstanceConfigurationDialogBasicStep = ({
     control,
+    curIntegrationId,
+    curIntegrationVersion,
     getValues,
     integrationInstanceConfiguration,
+    setCurIntegrationId,
+    setCurIntegrationVersion,
     setValue,
 }: IntegrationInstanceConfigurationDialogBasicStepProps) => {
-    const [curIntegrationId, setCurIntegrationId] = useState(getValues('integrationId'));
-    const [curIntegrationVersion, setCurIntegrationVersion] = useState<number | undefined>(
-        getValues('integrationVersion')
-    );
-
     const [resetWorkflowsEnabledStore] = useWorkflowsEnabledStore(useShallow(({reset}) => [reset]));
-
-    const {data: integrationVersions} = useGetIntegrationVersionsQuery(curIntegrationId!, !!curIntegrationId);
-
-    const filteredIntegrationVersions = integrationVersions?.filter(
-        (integrationVersion) => integrationVersion.status === IntegrationStatusModel.Published
-    );
 
     return (
         <div className="grid gap-4">
@@ -97,34 +90,33 @@ const IntegrationInstanceConfigurationDialogBasicStep = ({
                 rules={{required: true}}
             />
 
-            {!integrationInstanceConfiguration?.id &&
-                filteredIntegrationVersions &&
-                filteredIntegrationVersions.length > 0 && (
-                    <FormField
-                        control={control}
-                        name="integrationVersion"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>Version</FormLabel>
+            {!integrationInstanceConfiguration?.id && curIntegrationId && (
+                <FormField
+                    control={control}
+                    name="integrationVersion"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel>Version</FormLabel>
 
-                                <FormControl>
-                                    <IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect
-                                        integrationVersion={curIntegrationVersion}
-                                        integrationVersions={filteredIntegrationVersions}
-                                        onChange={(value) => {
-                                            field.onChange(value);
-                                            setValue('integrationInstanceConfigurationWorkflows', []);
-                                            setCurIntegrationVersion(value);
-                                        }}
-                                    />
-                                </FormControl>
+                            <FormControl>
+                                <IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect
+                                    integrationId={curIntegrationId}
+                                    integrationVersion={curIntegrationVersion}
+                                    onChange={(value) => {
+                                        field.onChange(value);
+                                        setValue('integrationInstanceConfigurationWorkflows', []);
+                                        setCurIntegrationVersion(value);
+                                    }}
+                                />
+                            </FormControl>
 
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        shouldUnregister={false}
-                    />
-                )}
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                    rules={{required: true}}
+                    shouldUnregister={false}
+                />
+            )}
 
             {!integrationInstanceConfiguration?.id && (
                 <FormField
