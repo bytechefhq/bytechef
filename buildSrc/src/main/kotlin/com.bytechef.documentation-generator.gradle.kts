@@ -23,6 +23,7 @@ open class FindJsonFilesTask : DefaultTask() {
         var type: String? = null
 
         override fun toString(): String {
+            if (label==null) return "| $type | $controlType  |"
             return "| $label | $type | $controlType  |"
         }
     }
@@ -39,8 +40,8 @@ Type: $type
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
 ${properties?.joinToString("\n")}
 
 """
@@ -91,8 +92,8 @@ $outputSchema
 
         override fun toString(): String {
             return """
-## $title
-### $description
+### $title
+$description
 
 #### Properties
 
@@ -124,8 +125,8 @@ ${getOutputResponseString()}
 
         override fun toString(): String {
             return """
-## $title
-### $description
+### $title
+$description
 
 #### Type: $type
 #### Properties
@@ -149,7 +150,7 @@ ${getOutputResponseString()}
 
         override fun toString(): String {
             return """
-## $title
+### $title
 
 #### Properties
 
@@ -168,7 +169,7 @@ ${properties?.joinToString("\n")}
 
         override fun toString(): String {
             return """
-# Connections
+## Connections
 
 Version: $version
 
@@ -209,7 +210,7 @@ $connection
             }
 
             return """
-# Triggers
+## Triggers
 
 ${triggers?.joinToString("\n")}
 
@@ -223,7 +224,7 @@ ${triggers?.joinToString("\n")}
             }
 
             return """
-# Actions
+## Actions
 
 ${actions?.joinToString("\n")}
 """
@@ -237,7 +238,8 @@ description: "$description"
 # Reference
 <hr />
 
-### $description
+$description
+
 Categories: ${categories.contentToString()}
 
 Version: $version
