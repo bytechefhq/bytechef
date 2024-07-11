@@ -16,34 +16,21 @@
 
 package com.bytechef.component.sendgrid.constant;
 
-import static com.bytechef.component.definition.ComponentDSL.string;
-
-import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
-import com.bytechef.component.definition.Property;
-
 /**
  * @author Marko Krišković
  */
 public final class SendgridConstants {
 
-    public static final String SENDGRID = "sendgrid";
-    public static final String EMAIL = "email";
-    public static final String EMAIL_ADDRESS = "Email address";
-    public static final String FROM = "from";
-    public static final String SUBJECT = "subject";
-    public static final String TO = "to";
-    public static final String REPLY_TO = "reply_to";
-    public static final String CC = "cc";
-    public static final String BCC = "bcc";
     public static final String ATTACHMENTS = "attachments";
-    public static final String CONTENT_TYPE = "text/plain";
-    public static final String CONTENT_VALUE = "contentValue";
-    public static final String TEMPLATE_ID = "template_id";
-    public static final String DYNAMIC_TEMPLATE = "dynamicTemplate";
-    public static final String SENDEMAIL = "sendEmail";
-    public static final ModifiableStringProperty EMAIL_PROPERTY = string(EMAIL)
-        .label(EMAIL_ADDRESS)
-        .controlType(Property.ControlType.EMAIL);
+    public static final String BASE_URL = "https://api.sendgrid.com/v3";
+    public static final String CC = "cc";
+    public static final String CONTENT_TYPE = "type";
+    public static final String EMAIL_SEND = "sendEmail";
+    public static final String FROM = "from";
+    public static final String SENDGRID = "sendgrid";
+    public static final String SUBJECT = "subject";
+    public static final String TEXT = "text";
+    public static final String TO = "to";
 
     private SendgridConstants() {
     }
