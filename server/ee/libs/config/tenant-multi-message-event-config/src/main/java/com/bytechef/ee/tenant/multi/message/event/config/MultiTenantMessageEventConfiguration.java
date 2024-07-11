@@ -25,12 +25,12 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnMultiTenant
 public class MultiTenantMessageEventConfiguration {
 
-    private static final String TENANT_ID = "TENANT_ID";
+    private static final String CURRENT_TENANT_ID = "CURRENT_TENANT_ID";
 
     @Bean
     MessageEventPreSendProcessor messagePreSendProcessor() {
         return messageEvent -> {
-            messageEvent.putMetadata(TENANT_ID, TenantContext.getCurrentTenantId());
+            messageEvent.putMetadata(CURRENT_TENANT_ID, TenantContext.getCurrentTenantId());
 
             return messageEvent;
         };
@@ -39,7 +39,7 @@ public class MultiTenantMessageEventConfiguration {
     @Bean
     MessageEventPostReceiveProcessor messagePostReceiveProcessor() {
         return messageEvent -> {
-            TenantContext.setCurrentTenantId((String) messageEvent.getMetadata(TENANT_ID));
+            TenantContext.setCurrentTenantId((String) messageEvent.getMetadata(CURRENT_TENANT_ID));
 
             return messageEvent;
         };
