@@ -45,6 +45,12 @@ import {
  */
 export interface IntegrationInstanceConfigurationModel {
     /**
+     * The parameters of an integration connection, usually oauth2 related data.
+     * @type {{ [key: string]: any; }}
+     * @memberof IntegrationInstanceConfigurationModel
+     */
+    connectionParameters?: { [key: string]: any; };
+    /**
      * The created by.
      * @type {string}
      * @memberof IntegrationInstanceConfigurationModel
@@ -160,6 +166,7 @@ export function IntegrationInstanceConfigurationModelFromJSONTyped(json: any, ig
     }
     return {
         
+        'connectionParameters': json['connectionParameters'] == null ? undefined : json['connectionParameters'],
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'description': json['description'] == null ? undefined : json['description'],
@@ -185,6 +192,7 @@ export function IntegrationInstanceConfigurationModelToJSON(value?: Omit<Integra
     }
     return {
         
+        'connectionParameters': value['connectionParameters'],
         'description': value['description'],
         'enabled': value['enabled'],
         'environment': EnvironmentModelToJSON(value['environment']),
