@@ -41,7 +41,7 @@ components:
           description: "The name of a component that uses this connection."
           type: "string"
         connectionParameters:
-          description: "The authorization parameters of a connection."
+          description: "The connection parameters of a connection."
           type: "object"
           additionalProperties: true
           readOnly: true
