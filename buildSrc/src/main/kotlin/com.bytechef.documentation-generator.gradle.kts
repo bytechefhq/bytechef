@@ -18,13 +18,15 @@ open class FindJsonFilesTask : DefaultTask() {
     class Properties {
         var controlType: String? = null
         var name: String? = null
+        var description: String? = null
         var items: Array<Properties>? = null
         var label: String? = null
         var type: String? = null
 
         override fun toString(): String {
-            if (label==null) return "| $type | $controlType  |"
-            return "| $label | $type | $controlType  |"
+            return if (label==null) "| $type | $controlType  |"
+            else if(description==null) "| $label | $type | $controlType  |  |"
+            else "| $label | $type | $controlType  |  $description  |"
         }
     }
 
@@ -97,8 +99,8 @@ $description
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
 ${properties?.joinToString("\n")}
 
 ${getOutputResponseString()}
@@ -131,8 +133,8 @@ $description
 #### Type: $type
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
 ${properties?.joinToString("\n")}
 
 ${getOutputResponseString()}
@@ -154,8 +156,8 @@ ${getOutputResponseString()}
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
 ${properties?.joinToString("\n")}
 
 """
