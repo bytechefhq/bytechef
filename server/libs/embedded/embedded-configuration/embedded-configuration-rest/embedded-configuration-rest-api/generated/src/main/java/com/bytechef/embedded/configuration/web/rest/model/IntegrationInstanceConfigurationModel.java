@@ -33,8 +33,14 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceConfiguration", description = "Contains configurations and connections required for the execution of integration workflows.")
 @JsonTypeName("IntegrationInstanceConfiguration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-11T19:30:38.071119+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-12T12:46:03.916194+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class IntegrationInstanceConfigurationModel {
+
+  @Valid
+  private Map<String, Object> connectionAuthorizationParameters = new HashMap<>();
+
+  @Valid
+  private Map<String, Object> connectionConnectionParameters = new HashMap<>();
 
   @Valid
   private Map<String, Object> connectionParameters = new HashMap<>();
@@ -85,6 +91,62 @@ public class IntegrationInstanceConfigurationModel {
    */
   public IntegrationInstanceConfigurationModel(String name) {
     this.name = name;
+  }
+
+  public IntegrationInstanceConfigurationModel connectionAuthorizationParameters(Map<String, Object> connectionAuthorizationParameters) {
+    this.connectionAuthorizationParameters = connectionAuthorizationParameters;
+    return this;
+  }
+
+  public IntegrationInstanceConfigurationModel putConnectionAuthorizationParametersItem(String key, Object connectionAuthorizationParametersItem) {
+    if (this.connectionAuthorizationParameters == null) {
+      this.connectionAuthorizationParameters = new HashMap<>();
+    }
+    this.connectionAuthorizationParameters.put(key, connectionAuthorizationParametersItem);
+    return this;
+  }
+
+  /**
+   * The authorization parameters of a connection.
+   * @return connectionAuthorizationParameters
+  */
+  
+  @Schema(name = "connectionAuthorizationParameters", accessMode = Schema.AccessMode.READ_ONLY, description = "The authorization parameters of a connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("connectionAuthorizationParameters")
+  public Map<String, Object> getConnectionAuthorizationParameters() {
+    return connectionAuthorizationParameters;
+  }
+
+  public void setConnectionAuthorizationParameters(Map<String, Object> connectionAuthorizationParameters) {
+    this.connectionAuthorizationParameters = connectionAuthorizationParameters;
+  }
+
+  public IntegrationInstanceConfigurationModel connectionConnectionParameters(Map<String, Object> connectionConnectionParameters) {
+    this.connectionConnectionParameters = connectionConnectionParameters;
+    return this;
+  }
+
+  public IntegrationInstanceConfigurationModel putConnectionConnectionParametersItem(String key, Object connectionConnectionParametersItem) {
+    if (this.connectionConnectionParameters == null) {
+      this.connectionConnectionParameters = new HashMap<>();
+    }
+    this.connectionConnectionParameters.put(key, connectionConnectionParametersItem);
+    return this;
+  }
+
+  /**
+   * The authorization parameters of a connection.
+   * @return connectionConnectionParameters
+  */
+  
+  @Schema(name = "connectionConnectionParameters", accessMode = Schema.AccessMode.READ_ONLY, description = "The authorization parameters of a connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("connectionConnectionParameters")
+  public Map<String, Object> getConnectionConnectionParameters() {
+    return connectionConnectionParameters;
+  }
+
+  public void setConnectionConnectionParameters(Map<String, Object> connectionConnectionParameters) {
+    this.connectionConnectionParameters = connectionConnectionParameters;
   }
 
   public IntegrationInstanceConfigurationModel connectionParameters(Map<String, Object> connectionParameters) {
@@ -460,7 +522,9 @@ public class IntegrationInstanceConfigurationModel {
       return false;
     }
     IntegrationInstanceConfigurationModel integrationInstanceConfiguration = (IntegrationInstanceConfigurationModel) o;
-    return Objects.equals(this.connectionParameters, integrationInstanceConfiguration.connectionParameters) &&
+    return Objects.equals(this.connectionAuthorizationParameters, integrationInstanceConfiguration.connectionAuthorizationParameters) &&
+        Objects.equals(this.connectionConnectionParameters, integrationInstanceConfiguration.connectionConnectionParameters) &&
+        Objects.equals(this.connectionParameters, integrationInstanceConfiguration.connectionParameters) &&
         Objects.equals(this.createdBy, integrationInstanceConfiguration.createdBy) &&
         Objects.equals(this.createdDate, integrationInstanceConfiguration.createdDate) &&
         Objects.equals(this.description, integrationInstanceConfiguration.description) &&
@@ -481,13 +545,15 @@ public class IntegrationInstanceConfigurationModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(connectionParameters, createdBy, createdDate, description, enabled, environment, id, integration, integrationId, integrationInstanceConfigurationWorkflows, integrationVersion, lastExecutionDate, lastModifiedBy, lastModifiedDate, name, tags, version);
+    return Objects.hash(connectionAuthorizationParameters, connectionConnectionParameters, connectionParameters, createdBy, createdDate, description, enabled, environment, id, integration, integrationId, integrationInstanceConfigurationWorkflows, integrationVersion, lastExecutionDate, lastModifiedBy, lastModifiedDate, name, tags, version);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class IntegrationInstanceConfigurationModel {\n");
+    sb.append("    connectionAuthorizationParameters: ").append(toIndentedString(connectionAuthorizationParameters)).append("\n");
+    sb.append("    connectionConnectionParameters: ").append(toIndentedString(connectionConnectionParameters)).append("\n");
     sb.append("    connectionParameters: ").append(toIndentedString(connectionParameters)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
