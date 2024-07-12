@@ -1260,6 +1260,16 @@ components:
       required:
         - "name"
       properties:
+        connectionAuthorizationParameters:
+          description: "The authorization parameters of a connection."
+          type: "object"
+          additionalProperties: true
+          readOnly: true
+        connectionConnectionParameters:
+          description: "The authorization parameters of a connection."
+          type: "object"
+          additionalProperties: true
+          readOnly: true
         connectionParameters:
           description: "The parameters of an integration connection, usually oauth2 related data."
           type: "object"
