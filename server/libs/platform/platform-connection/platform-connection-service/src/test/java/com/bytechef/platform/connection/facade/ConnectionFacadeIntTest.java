@@ -16,8 +16,7 @@
 
 package com.bytechef.platform.connection.facade;
 
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -89,7 +88,7 @@ public class ConnectionFacadeIntTest {
 
     @BeforeEach
     public void beforeEach() {
-        when(connectionDefinitionService.getConnectionDefinition(anyString(), anyInt()))
+        when(connectionDefinitionService.getConnectionConnectionDefinition(eq("componentName"), eq(1)))
             .thenReturn(new ConnectionDefinition(new MockConnectionDefinition(), "componentName", null, null));
     }
 
@@ -97,6 +96,7 @@ public class ConnectionFacadeIntTest {
     public void testCreate() {
         ConnectionDTO connectionDTO = ConnectionDTO.builder()
             .componentName("componentName")
+            .connectionVersion(1)
             .environment(ConnectionEnvironment.TEST)
             .name("name1")
             .tags(List.of(new Tag("tag1")))
@@ -116,6 +116,7 @@ public class ConnectionFacadeIntTest {
     public void testDelete() {
         ConnectionDTO connectionDTO1 = ConnectionDTO.builder()
             .componentName("componentName")
+            .connectionVersion(1)
             .environment(ConnectionEnvironment.TEST)
             .name("name1")
             .tags(List.of(new Tag("tag1")))
@@ -125,6 +126,7 @@ public class ConnectionFacadeIntTest {
 
         ConnectionDTO connectionDTO2 = ConnectionDTO.builder()
             .componentName("componentName")
+            .connectionVersion(1)
             .environment(ConnectionEnvironment.TEST)
             .name("name2")
             .tags(List.of(new Tag("tag1")))
@@ -253,6 +255,7 @@ public class ConnectionFacadeIntTest {
 
         ConnectionDTO connectionDTO = ConnectionDTO.builder()
             .componentName("componentName")
+            .connectionVersion(1)
             .environment(ConnectionEnvironment.TEST)
             .name("name")
             .tags(List.of(tag1, tagRepository.save(new Tag("tag2"))))

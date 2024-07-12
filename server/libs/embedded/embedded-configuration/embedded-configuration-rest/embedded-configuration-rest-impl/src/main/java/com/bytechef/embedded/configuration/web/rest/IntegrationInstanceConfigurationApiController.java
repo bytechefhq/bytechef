@@ -16,6 +16,8 @@
 
 package com.bytechef.embedded.configuration.web.rest;
 
+import com.bytechef.commons.util.MapUtils;
+import com.bytechef.commons.util.StringUtils;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
 import com.bytechef.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
 import com.bytechef.embedded.configuration.facade.IntegrationInstanceConfigurationFacade;
@@ -26,6 +28,8 @@ import com.bytechef.embedded.configuration.web.rest.model.IntegrationInstanceCon
 import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
+import org.apache.commons.lang3.Validate;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,11 +59,10 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
         IntegrationInstanceConfigurationModel integrationInstanceConfigurationModel) {
 
         return ResponseEntity.ok(
-            conversionService.convert(
+            toIntegrationInstanceConfigurationModel(
                 integrationInstanceConfigurationFacade.createIntegrationInstanceConfiguration(
                     conversionService.convert(
-                        integrationInstanceConfigurationModel, IntegrationInstanceConfigurationDTO.class)),
-                IntegrationInstanceConfigurationModel.class));
+                        integrationInstanceConfigurationModel, IntegrationInstanceConfigurationDTO.class))));
     }
 
     @Override
@@ -101,9 +104,8 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
     @Override
     public ResponseEntity<IntegrationInstanceConfigurationModel> getIntegrationInstanceConfiguration(Long id) {
         return ResponseEntity.ok(
-            conversionService.convert(
-                integrationInstanceConfigurationFacade.getIntegrationInstanceConfiguration(id),
-                IntegrationInstanceConfigurationModel.class));
+            toIntegrationInstanceConfigurationModel(
+                integrationInstanceConfigurationFacade.getIntegrationInstanceConfiguration(id)));
     }
 
     @Override
@@ -115,8 +117,7 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
                 .getIntegrationInstanceConfigurations(
                     environment == null ? null : Environment.valueOf(environment.getValue()), integrationId, tagId)
                 .stream()
-                .map(integrationInstanceConfigurationDTO -> conversionService.convert(
-                    integrationInstanceConfigurationDTO, IntegrationInstanceConfigurationModel.class))
+                .map(this::toIntegrationInstanceConfigurationModel)
                 .toList());
     }
 
@@ -124,11 +125,11 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
     public ResponseEntity<IntegrationInstanceConfigurationModel> updateIntegrationInstanceConfiguration(
         Long id, IntegrationInstanceConfigurationModel integrationInstanceConfigurationModel) {
 
-        return ResponseEntity.ok(conversionService.convert(
-            integrationInstanceConfigurationFacade.updateIntegrationInstanceConfiguration(
-                conversionService.convert(
-                    integrationInstanceConfigurationModel.id(id), IntegrationInstanceConfigurationDTO.class)),
-            IntegrationInstanceConfigurationModel.class));
+        return ResponseEntity.ok(
+            toIntegrationInstanceConfigurationModel(
+                integrationInstanceConfigurationFacade.updateIntegrationInstanceConfiguration(
+                    conversionService.convert(
+                        integrationInstanceConfigurationModel.id(id), IntegrationInstanceConfigurationDTO.class))));
     }
 
     @Override
@@ -136,12 +137,30 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
         Long id, Long integrationInstanceConfigurationWorkflowId,
         IntegrationInstanceConfigurationWorkflowModel integrationInstanceConfigurationWorkflowModel) {
 
-        return ResponseEntity.ok(conversionService.convert(
-            integrationInstanceConfigurationFacade.updateIntegrationInstanceConfigurationWorkflow(
-                conversionService.convert(
-                    integrationInstanceConfigurationWorkflowModel.id(integrationInstanceConfigurationWorkflowId)
-                        .integrationInstanceConfigurationId(id),
-                    IntegrationInstanceConfigurationWorkflow.class)),
-            IntegrationInstanceConfigurationWorkflowModel.class));
+        return ResponseEntity.ok(
+            conversionService.convert(
+                integrationInstanceConfigurationFacade.updateIntegrationInstanceConfigurationWorkflow(
+                    conversionService.convert(
+                        integrationInstanceConfigurationWorkflowModel.id(integrationInstanceConfigurationWorkflowId)
+                            .integrationInstanceConfigurationId(id),
+                        IntegrationInstanceConfigurationWorkflow.class)),
+                IntegrationInstanceConfigurationWorkflowModel.class));
+    }
+
+    @SuppressFBWarnings("NP")
+    private IntegrationInstanceConfigurationModel toIntegrationInstanceConfigurationModel(
+        IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO) {
+
+        IntegrationInstanceConfigurationModel integrationInstanceConfigurationModel = conversionService.convert(
+            integrationInstanceConfigurationDTO, IntegrationInstanceConfigurationModel.class);
+
+        integrationInstanceConfigurationModel.connectionAuthorizationParameters(
+            MapUtils.toMap(
+                integrationInstanceConfigurationModel.getConnectionAuthorizationParameters(),
+                Map.Entry::getKey,
+                entry -> StringUtils.obfuscate(StringUtils.toString(entry.getValue()), 28, 8)));
+
+        return Validate.notNull(integrationInstanceConfigurationModel, "integrationInstanceConfigurationModel")
+            .connectionParameters(null);
     }
 }

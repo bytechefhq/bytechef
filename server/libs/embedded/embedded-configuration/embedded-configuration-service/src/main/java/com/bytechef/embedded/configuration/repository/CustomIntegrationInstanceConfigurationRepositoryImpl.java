@@ -16,8 +16,12 @@
 
 package com.bytechef.embedded.configuration.repository;
 
+import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
+import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.encryption.Encryption;
 import com.bytechef.platform.constant.Environment;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,10 +33,14 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 public class CustomIntegrationInstanceConfigurationRepositoryImpl
     implements CustomIntegrationInstanceConfigurationRepository {
 
+    private final EncryptedStringToMapWrapperConverter encryptedStringToMapWrapperConverter;
     private final JdbcClient jdbcClient;
 
     @SuppressFBWarnings("EI")
-    public CustomIntegrationInstanceConfigurationRepositoryImpl(JdbcClient jdbcClient) {
+    public CustomIntegrationInstanceConfigurationRepositoryImpl(
+        Encryption encryption, JdbcClient jdbcClient, ObjectMapper objectMapper) {
+
+        this.encryptedStringToMapWrapperConverter = new EncryptedStringToMapWrapperConverter(encryption, objectMapper);
         this.jdbcClient = jdbcClient;
     }
 
@@ -92,12 +100,17 @@ public class CustomIntegrationInstanceConfigurationRepositoryImpl
                     IntegrationInstanceConfiguration integrationInstanceConfiguration =
                         new IntegrationInstanceConfiguration();
 
+                    EncryptedMapWrapper encryptedMapWrapper = encryptedStringToMapWrapperConverter.convert(
+                        rs.getString("connection_parameters"));
+
+                    integrationInstanceConfiguration.setConnectionParameters(encryptedMapWrapper.getMap());
                     integrationInstanceConfiguration.setDescription(rs.getString("description"));
                     integrationInstanceConfiguration.setEnabled(rs.getBoolean("enabled"));
                     integrationInstanceConfiguration.setEnvironment(Environment.values()[rs.getInt("environment")]);
                     integrationInstanceConfiguration.setId(rs.getLong("id"));
                     integrationInstanceConfiguration.setIntegrationId(rs.getLong("integration_id"));
                     integrationInstanceConfiguration.setIntegrationVersion(rs.getInt("integration_version"));
+                    integrationInstanceConfiguration.setName(rs.getString("name"));
                     integrationInstanceConfiguration.setVersion(rs.getInt("version"));
 
                     return integrationInstanceConfiguration;

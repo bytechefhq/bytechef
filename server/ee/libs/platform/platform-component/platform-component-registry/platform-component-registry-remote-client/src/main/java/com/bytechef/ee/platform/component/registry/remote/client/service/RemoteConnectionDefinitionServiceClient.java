@@ -124,6 +124,12 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
     }
 
     @Override
+    public ConnectionDefinition
+        getConnectionConnectionDefinition(@NonNull String componentName, int connectionVersion) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public ConnectionDefinition getConnectionDefinition(@NonNull String componentName, int componentVersion) {
         return defaultRestClient.get(
             uriBuilder -> toUri(
