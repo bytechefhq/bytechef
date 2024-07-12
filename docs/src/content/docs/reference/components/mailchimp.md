@@ -7,7 +7,9 @@ description: "Mailchimp is a marketing automation and email marketing platform."
 
 Mailchimp is a marketing automation and email marketing platform.
 
+
 Categories: [MARKETING_AUTOMATION]
+
 
 Version: 1
 

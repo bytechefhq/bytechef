@@ -7,7 +7,9 @@ description: "Microsoft Outlook 365 is a comprehensive email and productivity pl
 
 Microsoft Outlook 365 is a comprehensive email and productivity platform that integrates email, calendar, contacts, and tasks to streamline communication and organization.
 
+
 Categories: [COMMUNICATION, CALENDARS_AND_SCHEDULING]
+
 
 Version: 1
 

@@ -7,7 +7,9 @@ description: "Developer platform that allows developers to create, store, manage
 
 Developer platform that allows developers to create, store, manage and share their code
 
+
 Categories: [DEVELOPER_TOOLS]
+
 
 Version: 1
 

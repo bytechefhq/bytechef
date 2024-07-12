@@ -7,7 +7,9 @@ description: "Salesflare is a CRM software designed to help small businesses and
 
 Salesflare is a CRM software designed to help small businesses and startups manage their customer relationships efficiently.
 
+
 Categories: [CRM]
+
 
 Version: 1
 

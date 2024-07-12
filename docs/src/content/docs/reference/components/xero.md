@@ -7,7 +7,9 @@ description: "Xero is an online accounting software platform designed for small 
 
 Xero is an online accounting software platform designed for small businesses and accountants to manage finances efficiently.
 
+
 Categories: [ACCOUNTING]
+
 
 Version: 1
 

@@ -7,7 +7,7 @@ description: "Query, insert and update data from PostgreSQL."
 
 Query, insert and update data from PostgreSQL.
 
-Categories: null
+
 
 Version: 1
 

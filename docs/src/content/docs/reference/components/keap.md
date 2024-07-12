@@ -7,7 +7,9 @@ description: "Keap is a customer comprehensive customer relationship management 
 
 Keap is a customer comprehensive customer relationship management platform designed to help small businesses streamline sales, marketing, and customer management processes in one integrated system.
 
+
 Categories: [CRM]
+
 
 Version: 1
 

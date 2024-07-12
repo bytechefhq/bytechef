@@ -7,7 +7,9 @@ description: "Nifty Project Management tool is a software designed to aid projec
 
 Nifty Project Management tool is a software designed to aid project managers in organizing, planning, and tracking tasks and resources within a project
 
+
 Categories: [PROJECT_MANAGEMENT]
+
 
 Version: 1
 

@@ -7,7 +7,9 @@ description: "Google Sheets is a cloud-based spreadsheet software that allows us
 
 Google Sheets is a cloud-based spreadsheet software that allows users to create, edit, and collaborate on spreadsheets in real-time.
 
+
 Categories: [PRODUCTIVITY_AND_COLLABORATION]
+
 
 Version: 1
 

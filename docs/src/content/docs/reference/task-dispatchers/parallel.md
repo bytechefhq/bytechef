@@ -7,7 +7,7 @@ description: "Run collection of tasks in parallel, without waiting until the pre
 
 Run collection of tasks in parallel, without waiting until the previous function has completed.
 
-Categories: null
+
 
 Version: 1
 

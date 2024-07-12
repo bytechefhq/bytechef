@@ -7,7 +7,9 @@ description: "QuickBooks is an accounting software package developed and markete
 
 QuickBooks is an accounting software package developed and marketed by Intuit. It is geared mainly toward small and medium-sized businesses and offers on-premises accounting applications as well as cloud-based versions that accept business payments, manage and pay bills, and payroll functions.
 
+
 Categories: [ACCOUNTING]
+
 
 Version: 1
 

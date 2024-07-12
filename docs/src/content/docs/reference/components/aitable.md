@@ -7,7 +7,9 @@ description: "AITable is an AI-powered platform that enables users to create int
 
 AITable is an AI-powered platform that enables users to create interactive and dynamic tables for data visualization and analysis without requiring coding skills.
 
+
 Categories: [PRODUCTIVITY_AND_COLLABORATION]
+
 
 Version: 1
 

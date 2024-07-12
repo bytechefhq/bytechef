@@ -7,7 +7,7 @@ description: "Component description."
 
 Component description.
 
-Categories: null
+
 
 Version: 1
 

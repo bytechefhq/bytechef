@@ -7,7 +7,7 @@ description: "Iterates over each item in list, in parallel. Note, that since it 
 
 Iterates over each item in list, in parallel. Note, that since it iterates over each item in parallel, there is no guarantee of completion order.
 
-Categories: null
+
 
 Version: 1
 

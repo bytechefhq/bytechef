@@ -7,7 +7,9 @@ description: "Trusted for reliable email delivery at scale."
 
 Trusted for reliable email delivery at scale.
 
+
 Categories: [COMMUNICATION, MARKETING_AUTOMATION]
+
 
 Version: 1
 

@@ -7,7 +7,7 @@ description: "Executes one and only one branch of execution based on the `expres
 
 Executes one and only one branch of execution based on the `expression` value.
 
-Categories: null
+
 
 Version: 1
 

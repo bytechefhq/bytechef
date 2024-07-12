@@ -7,7 +7,9 @@ description: "Webhook is a method utilized by applications to supply real-time i
 
 Webhook is a method utilized by applications to supply real-time information to other apps. Such a process usually delivers data immediately as and when it occurs. Webhook Trigger enables users to receive callouts whenever a service provides the option of distributing signals to a user-defined URL.
 
+
 Categories: [HELPERS]
+
 
 Version: 1
 

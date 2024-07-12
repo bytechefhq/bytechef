@@ -7,7 +7,9 @@ description: "With the Scheduled trigger, you can initiate customized workflows 
 
 With the Scheduled trigger, you can initiate customized workflows at specific time intervals.
 
+
 Categories: [HELPERS]
+
 
 Version: 1
 

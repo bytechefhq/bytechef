@@ -7,7 +7,9 @@ description: "WhatsApp is a free-to-use messaging app offering end-to-end encryp
 
 WhatsApp is a free-to-use messaging app offering end-to-end encrypted chat, voice, and video communication, along with document and media sharing, available on multiple platforms.
 
+
 Categories: [COMMUNICATION]
+
 
 Version: 1
 

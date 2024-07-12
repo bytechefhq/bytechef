@@ -7,7 +7,9 @@ description: "Resend is the email API for developers."
 
 Resend is the email API for developers.
 
+
 Categories: [MARKETING_AUTOMATION]
+
 
 Version: 1
 

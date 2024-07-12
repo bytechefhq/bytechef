@@ -7,7 +7,9 @@ description: "The Email connector sends emails using an SMTP email server."
 
 The Email connector sends emails using an SMTP email server.
 
+
 Categories: [COMMUNICATION, HELPERS]
+
 
 Version: 1
 

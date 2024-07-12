@@ -7,7 +7,9 @@ description: "Helper component which contains operations to help you work with t
 
 Helper component which contains operations to help you work with text.
 
+
 Categories: [HELPERS]
+
 
 Version: 1
 

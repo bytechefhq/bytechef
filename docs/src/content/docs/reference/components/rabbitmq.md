@@ -7,7 +7,7 @@ description: "RabbitMQ is an open-source message broker software that enables ef
 
 RabbitMQ is an open-source message broker software that enables efficient communication between different systems, applications, and services. It supports multiple messaging protocols and facilitates a reliable and flexible messaging system.
 
-Categories: null
+
 
 Version: 1
 

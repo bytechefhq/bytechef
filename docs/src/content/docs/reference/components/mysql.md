@@ -7,7 +7,7 @@ description: "Query, insert and update data from MySQL."
 
 Query, insert and update data from MySQL.
 
-Categories: null
+
 
 Version: 1
 

@@ -7,7 +7,9 @@ description: "Google Calendar is a web-based application that allows users to sc
 
 Google Calendar is a web-based application that allows users to schedule and organize events, appointments, and reminders, synchronizing across multiple devices.
 
+
 Categories: [CALENDARS_AND_SCHEDULING]
+
 
 Version: 1
 

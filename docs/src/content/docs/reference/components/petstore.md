@@ -7,7 +7,7 @@ description: "This is a sample Pet Store Server based on the OpenAPI 3.0 specifi
 
 This is a sample Pet Store Server based on the OpenAPI 3.0 specification.
 
-Categories: null
+
 
 Version: 1
 

@@ -7,7 +7,7 @@ description: "Allows you to run arbitrary Bash scripts."
 
 Allows you to run arbitrary Bash scripts.
 
-Categories: null
+
 
 Version: 1
 

@@ -7,7 +7,9 @@ description: "Shopify is an e-commerce platform that allows businesses to create
 
 Shopify is an e-commerce platform that allows businesses to create online stores and sell products.
 
+
 Categories: [E_COMMERCE]
+
 
 Version: 1
 
