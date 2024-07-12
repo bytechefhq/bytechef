@@ -50,14 +50,16 @@ public record WebhookRequest(
         private Object content;
         private ContentType contentType;
         private String mimeType;
+        private String rawContent;
 
         private WebhookBodyImpl() {
         }
 
-        public WebhookBodyImpl(Object content, ContentType contentType, String mimeType) {
+        public WebhookBodyImpl(Object content, ContentType contentType, String mimeType, String rawContent) {
             this.content = content;
             this.contentType = contentType;
             this.mimeType = mimeType;
+            this.rawContent = rawContent;
         }
 
         @Override
@@ -83,6 +85,11 @@ public record WebhookRequest(
         @Override
         public String getMimeType() {
             return mimeType;
+        }
+
+        @Override
+        public String getRawContent() {
+            return rawContent;
         }
     }
 }

@@ -277,7 +277,7 @@ public class WebhookController {
             }
 
             body = new WebhookBodyImpl(
-                multipartFormDataMap, ContentType.FORM_DATA, httpServletRequest.getContentType());
+                multipartFormDataMap, ContentType.FORM_DATA, httpServletRequest.getContentType(), null);
 
             UriComponents uriComponents = getUriComponents(httpServletRequest);
 
@@ -295,40 +295,40 @@ public class WebhookController {
 
             body = new WebhookBodyImpl(
                 parseFormUrlencodedParams(parameterMap), ContentType.FORM_URL_ENCODED,
-                httpServletRequest.getContentType());
+                httpServletRequest.getContentType(), null);
             parameters = toMap(queryParams);
         } else if (contentType.startsWith(MimeTypeUtils.MIME_APPLICATION_JSON)) {
             Object content;
+            String rawContent = StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8);
 
             if (webhookTriggerFlags.webhookRawBody()) {
-                content = StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8);
+                content = rawContent;
             } else {
-                content = JsonUtils.read(
-                    StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8));
+                content = JsonUtils.read(rawContent);
             }
 
-            body = new WebhookBodyImpl(content, ContentType.JSON, httpServletRequest.getContentType());
+            body = new WebhookBodyImpl(content, ContentType.JSON, httpServletRequest.getContentType(), rawContent);
         } else if (contentType.startsWith(MimeTypeUtils.MIME_APPLICATION_XML)) {
             Object content;
+            String rawContent = StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8);
 
             if (webhookTriggerFlags.webhookRawBody()) {
-                content = StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8);
+                content = rawContent;
             } else {
-                content = XmlUtils.read(
-                    StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8));
+                content = XmlUtils.read(rawContent);
             }
 
-            body = new WebhookBodyImpl(content, ContentType.XML, httpServletRequest.getContentType());
+            body = new WebhookBodyImpl(content, ContentType.XML, httpServletRequest.getContentType(), rawContent);
         } else if (contentType.startsWith("application/")) {
             body = new WebhookBodyImpl(
                 fileStorageService.storeFileContent(
                     FileEntryConstants.FILES_DIR, getFilename(httpServletRequest.getContentType()),
                     httpServletRequest.getInputStream()),
-                ContentType.BINARY, httpServletRequest.getContentType());
+                ContentType.BINARY, httpServletRequest.getContentType(), null);
         } else {
-            body = new WebhookBodyImpl(
-                StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8),
-                ContentType.RAW, httpServletRequest.getContentType());
+            String rawContent = StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8);
+
+            body = new WebhookBodyImpl(rawContent, ContentType.RAW, httpServletRequest.getContentType(), null);
         }
 
         return new BodyAndParameters(body, parameters);

@@ -42,6 +42,7 @@ public class WebhookRequestDeserializer extends JsonDeserializer<WebhookRequest>
     private static final String BODY = "body";
     private static final String CONTENT = "content";
     private static final String MIME_TYPE = "mimeType";
+    private static final String RAW_CONTENT = "rawContent";
 
     @Override
     @SuppressWarnings("unchecked")
@@ -72,7 +73,8 @@ public class WebhookRequestDeserializer extends JsonDeserializer<WebhookRequest>
                 content = MapUtils.getRequiredString(bodyMap, CONTENT);
             }
 
-            webhookBody = new WebhookBodyImpl(content, contentType, MapUtils.getString(bodyMap, MIME_TYPE));
+            webhookBody = new WebhookBodyImpl(
+                content, contentType, MapUtils.getString(bodyMap, MIME_TYPE), MapUtils.getString(bodyMap, RAW_CONTENT));
         }
 
         return new WebhookRequest(
