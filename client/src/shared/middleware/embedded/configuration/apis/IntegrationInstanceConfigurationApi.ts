@@ -32,7 +32,7 @@ import {
 } from '../models/index';
 
 export interface CreateIntegrationInstanceConfigurationRequest {
-    integrationInstanceConfigurationModel: Omit<IntegrationInstanceConfigurationModel, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'>;
+    integrationInstanceConfigurationModel: Omit<IntegrationInstanceConfigurationModel, 'connectionAuthorizationParameters'|'connectionConnectionParameters'|'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'>;
 }
 
 export interface CreateIntegrationInstanceConfigurationWorkflowJobRequest {
@@ -67,7 +67,7 @@ export interface GetIntegrationInstanceConfigurationsRequest {
 
 export interface UpdateIntegrationInstanceConfigurationRequest {
     id: number;
-    integrationInstanceConfigurationModel: Omit<IntegrationInstanceConfigurationModel, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'>;
+    integrationInstanceConfigurationModel: Omit<IntegrationInstanceConfigurationModel, 'connectionAuthorizationParameters'|'connectionConnectionParameters'|'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'>;
 }
 
 export interface UpdateIntegrationInstanceConfigurationWorkflowRequest {

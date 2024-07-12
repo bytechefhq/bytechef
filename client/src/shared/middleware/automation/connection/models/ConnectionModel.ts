@@ -63,7 +63,7 @@ export interface ConnectionModel {
      */
     componentName: string;
     /**
-     * The authorization parameters of a connection.
+     * The connection parameters of a connection.
      * @type {{ [key: string]: any; }}
      * @memberof ConnectionModel
      */
