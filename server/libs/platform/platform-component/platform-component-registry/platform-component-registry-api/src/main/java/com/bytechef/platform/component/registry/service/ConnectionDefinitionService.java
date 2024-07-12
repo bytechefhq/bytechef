@@ -66,6 +66,8 @@ public interface ConnectionDefinitionService {
     Authorization.AuthorizationType getAuthorizationType(
         @NonNull String componentName, int connectionVersion, @NonNull String authorizationName);
 
+    ConnectionDefinition getConnectionConnectionDefinition(@NonNull String componentName, int connectionVersion);
+
     ConnectionDefinition getConnectionDefinition(@NonNull String componentName, int componentVersion);
 
     List<ConnectionDefinition> getConnectionDefinitions();

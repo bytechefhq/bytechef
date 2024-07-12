@@ -31,6 +31,7 @@ import java.util.Map;
  */
 @SuppressFBWarnings("EI")
 public record IntegrationInstanceConfigurationDTO(
+    Map<String, ?> connectionAuthorizationParameters, Map<String, ?> connectionConnectionParameters,
     Map<String, ?> connectionParameters, String createdBy, LocalDateTime createdDate, String description,
     boolean enabled, Environment environment, Long id, LocalDateTime lastExecutionDate, String lastModifiedBy,
     LocalDateTime lastModifiedDate, Integration integration, long integrationId, Integer integrationVersion,
@@ -38,16 +39,18 @@ public record IntegrationInstanceConfigurationDTO(
     List<Tag> tags, int version) {
 
     public IntegrationInstanceConfigurationDTO(
+        Map<String, ?> connectionAuthorizationParameters, Map<String, ?> connectionConnectionParameters,
         IntegrationInstanceConfiguration integrationInstanceConfiguration,
         List<IntegrationInstanceConfigurationWorkflowDTO> integrationInstanceWorkflows, Integration integration,
         LocalDateTime lastExecutionDate, List<Tag> tags) {
 
         this(
-            Map.of(), integrationInstanceConfiguration.getCreatedBy(),
-            integrationInstanceConfiguration.getCreatedDate(),
-            integrationInstanceConfiguration.getDescription(), integrationInstanceConfiguration.isEnabled(),
-            integrationInstanceConfiguration.getEnvironment(), integrationInstanceConfiguration.getId(),
-            lastExecutionDate, integrationInstanceConfiguration.getLastModifiedBy(),
+            connectionAuthorizationParameters, connectionConnectionParameters,
+            integrationInstanceConfiguration.getConnectionParameters(), integrationInstanceConfiguration.getCreatedBy(),
+            integrationInstanceConfiguration.getCreatedDate(), integrationInstanceConfiguration.getDescription(),
+            integrationInstanceConfiguration.isEnabled(), integrationInstanceConfiguration.getEnvironment(),
+            integrationInstanceConfiguration.getId(), lastExecutionDate,
+            integrationInstanceConfiguration.getLastModifiedBy(),
             integrationInstanceConfiguration.getLastModifiedDate(), integration,
             integrationInstanceConfiguration.getIntegrationId(),
             integrationInstanceConfiguration.getIntegrationVersion(), integrationInstanceConfiguration.getName(),
@@ -203,9 +206,9 @@ public record IntegrationInstanceConfigurationDTO(
 
         public IntegrationInstanceConfigurationDTO build() {
             return new IntegrationInstanceConfigurationDTO(
-                connectionParameters, createdBy, createdDate, description, enabled, environment, id, lastExecutionDate,
-                lastModifiedBy, lastModifiedDate, integration, integrationId, integrationVersion, name,
-                integrationInstanceConfigurationWorkflows, tags, version);
+                Map.of(), Map.of(), connectionParameters, createdBy, createdDate, description, enabled, environment, id,
+                lastExecutionDate, lastModifiedBy, lastModifiedDate, integration, integrationId, integrationVersion,
+                name, integrationInstanceConfigurationWorkflows, tags, version);
         }
     }
 }

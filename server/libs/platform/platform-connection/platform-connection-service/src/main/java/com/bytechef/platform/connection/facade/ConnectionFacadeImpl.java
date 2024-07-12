@@ -230,6 +230,15 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             .toList();
     }
 
+    private static Map<String, ?> getAuthorizationParameters(
+        Map<String, ?> parameters, List<String> authorizationPropertyNames) {
+
+        return parameters.entrySet()
+            .stream()
+            .filter(entry -> authorizationPropertyNames.contains(entry.getKey()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
     private List<ConnectionDTO> getConnections(List<Connection> connections) {
         List<Tag> tags = tagService.getTags(
             connections
@@ -245,11 +254,20 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
                 filterTags(tags, connection)));
     }
 
+    private static Map<String, ?> getConnectionParameters(
+        Map<String, ?> parameters, List<String> connectionPropertyNames) {
+
+        return parameters.entrySet()
+            .stream()
+            .filter(entry -> connectionPropertyNames.contains(entry.getKey()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
     private ConnectionDTO toConnectionDTO(boolean active, Connection connection, List<Tag> tags) {
         Map<String, ?> parameters = connection.getParameters();
 
-        ConnectionDefinition connectionDefinition =
-            connectionDefinitionService.getConnectionDefinition(connection.getComponentName(), 1);
+        ConnectionDefinition connectionDefinition = connectionDefinitionService.getConnectionConnectionDefinition(
+            connection.getComponentName(), connection.getConnectionVersion());
 
         List<String> authorizationPropertyNames = connectionDefinition.getAuthorizations()
             .stream()
@@ -263,28 +281,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             .toList();
 
         return new ConnectionDTO(
-            active,
-            getAuthorizationParameters(parameters, authorizationPropertyNames),
-            connection,
-            getConnectionParameters(parameters, connectionPropertyNames),
-            tags);
-    }
-
-    private static Map<String, ?> getAuthorizationParameters(
-        Map<String, ?> parameters, List<String> authorizationPropertyNames) {
-
-        return parameters.entrySet()
-            .stream()
-            .filter(entry -> authorizationPropertyNames.contains(entry.getKey()))
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-    }
-
-    private static Map<String, ?> getConnectionParameters(
-        Map<String, ?> parameters, List<String> connectionPropertyNames) {
-
-        return parameters.entrySet()
-            .stream()
-            .filter(entry -> connectionPropertyNames.contains(entry.getKey()))
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            active, getAuthorizationParameters(parameters, authorizationPropertyNames), connection,
+            getConnectionParameters(parameters, connectionPropertyNames), tags);
     }
 }

@@ -252,6 +252,24 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
+    public ConnectionDefinition getConnectionConnectionDefinition(
+        @NonNull String componentName, int connectionVersion) {
+
+        return toConnectionDefinition(
+            componentDefinitionRegistry.getComponentDefinitions(componentName)
+                .stream()
+                .filter(componentDefinition -> OptionalUtils.isPresent(componentDefinition.getConnection()))
+                .filter(componentDefinition -> {
+                    com.bytechef.component.definition.ConnectionDefinition connectionDefinition = OptionalUtils.get(
+                        componentDefinition.getConnection());
+
+                    return connectionDefinition.getVersion() == connectionVersion;
+                })
+                .findFirst()
+                .orElseThrow());
+    }
+
+    @Override
     public ConnectionDefinition getConnectionDefinition(@NonNull String componentName, int componentVersion) {
         return toConnectionDefinition(
             componentDefinitionRegistry.getComponentDefinition(componentName, componentVersion));
