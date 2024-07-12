@@ -572,6 +572,12 @@ public interface TriggerDefinition {
 
         /**
          *
+         * @return
+         */
+        String getRawContent();
+
+        /**
+         *
          */
         enum ContentType {
             BINARY,
