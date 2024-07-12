@@ -45,6 +45,18 @@ import {
  */
 export interface IntegrationInstanceConfigurationModel {
     /**
+     * The authorization parameters of a connection.
+     * @type {{ [key: string]: any; }}
+     * @memberof IntegrationInstanceConfigurationModel
+     */
+    readonly connectionAuthorizationParameters?: { [key: string]: any; };
+    /**
+     * The authorization parameters of a connection.
+     * @type {{ [key: string]: any; }}
+     * @memberof IntegrationInstanceConfigurationModel
+     */
+    readonly connectionConnectionParameters?: { [key: string]: any; };
+    /**
      * The parameters of an integration connection, usually oauth2 related data.
      * @type {{ [key: string]: any; }}
      * @memberof IntegrationInstanceConfigurationModel
@@ -166,6 +178,8 @@ export function IntegrationInstanceConfigurationModelFromJSONTyped(json: any, ig
     }
     return {
         
+        'connectionAuthorizationParameters': json['connectionAuthorizationParameters'] == null ? undefined : json['connectionAuthorizationParameters'],
+        'connectionConnectionParameters': json['connectionConnectionParameters'] == null ? undefined : json['connectionConnectionParameters'],
         'connectionParameters': json['connectionParameters'] == null ? undefined : json['connectionParameters'],
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
@@ -186,7 +200,7 @@ export function IntegrationInstanceConfigurationModelFromJSONTyped(json: any, ig
     };
 }
 
-export function IntegrationInstanceConfigurationModelToJSON(value?: Omit<IntegrationInstanceConfigurationModel, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'> | null): any {
+export function IntegrationInstanceConfigurationModelToJSON(value?: Omit<IntegrationInstanceConfigurationModel, 'connectionAuthorizationParameters'|'connectionConnectionParameters'|'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'> | null): any {
     if (value == null) {
         return value;
     }
