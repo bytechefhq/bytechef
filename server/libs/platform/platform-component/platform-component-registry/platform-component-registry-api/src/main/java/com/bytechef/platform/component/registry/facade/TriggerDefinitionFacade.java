@@ -73,7 +73,7 @@ public interface TriggerDefinitionFacade {
         @NonNull Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
         Long connectionId);
 
-    boolean executeWebhookValidate(
+    int executeWebhookValidate(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest, Long connectionId);
 

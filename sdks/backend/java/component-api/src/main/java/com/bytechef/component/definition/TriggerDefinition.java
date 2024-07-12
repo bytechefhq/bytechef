@@ -31,6 +31,23 @@ public interface TriggerDefinition {
     /**
      *
      */
+    enum HttpStatus {
+        OK(200), BAD_REQUEST(400);
+
+        private final int status;
+
+        HttpStatus(int status) {
+            this.status = status;
+        }
+
+        public int getStatus() {
+            return status;
+        }
+    }
+
+    /**
+     *
+     */
     enum TriggerType {
         DYNAMIC_WEBHOOK,
         HYBRID,
@@ -603,9 +620,9 @@ public interface TriggerDefinition {
          * @param body
          * @param method
          * @param context
-         * @return
+         * @return the http status, 200 if validation is ok, 400, 401 or any other required status if validation fails
          */
-        boolean apply(
+        int apply(
             Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
             WebhookMethod method, TriggerContext context);
     }

@@ -31,6 +31,7 @@ import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableF
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookRefreshFunction;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookRequestFunction;
+import com.bytechef.component.definition.TriggerDefinition.HttpStatus;
 import com.bytechef.component.definition.TriggerDefinition.ListenerDisableConsumer;
 import com.bytechef.component.definition.TriggerDefinition.ListenerEnableConsumer;
 import com.bytechef.component.definition.TriggerDefinition.PollFunction;
@@ -257,8 +258,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         TriggerType triggerType = triggerDefinition.getType();
 
         if ((TriggerType.DYNAMIC_WEBHOOK == triggerType || TriggerType.STATIC_WEBHOOK == triggerType) &&
-            !executeWebhookValidate(
-                triggerDefinition, new ParametersImpl(inputParameters), webhookRequest, context)) {
+            executeWebhookValidate(triggerDefinition, new ParametersImpl(inputParameters), webhookRequest,
+                context) != HttpStatus.OK.getStatus()) {
 
             throw new IllegalStateException("Invalid trigger signature.");
         }
@@ -288,7 +289,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public boolean executeWebhookValidate(
+    public int executeWebhookValidate(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest,
         ComponentConnection connection, @NonNull TriggerContext context) {
@@ -422,7 +423,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return new TriggerOutput(webhookOutput, null, OptionalUtils.orElse(triggerDefinition.getBatch(), false));
     }
 
-    private boolean executeWebhookValidate(
+    private int executeWebhookValidate(
         com.bytechef.component.definition.TriggerDefinition triggerDefinition, Parameters inputParameters,
         WebhookRequest webhookRequest, TriggerContext context) {
 
@@ -431,7 +432,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 inputParameters, new HttpHeadersImpl(webhookRequest.headers()),
                 new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(), webhookRequest.method(),
                 context))
-            .orElse(true);
+            .orElse(HTTP_STATUS_OK);
     }
 
     private static String getComponentTitle(ComponentDefinition componentDefinition) {

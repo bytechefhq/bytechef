@@ -21,6 +21,7 @@ import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.component.definition.TriggerDefinition.HttpStatus;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
@@ -102,14 +103,14 @@ public class WebhookExecutorImpl implements WebhookExecutor {
     }
 
     @Override
-    public boolean validateAndExecuteAsync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
-        boolean valid = triggerSyncExecutor.validate(workflowExecutionId, webhookRequest);
+    public int validateAndExecuteAsync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+        int status = triggerSyncExecutor.validate(workflowExecutionId, webhookRequest);
 
-        if (valid) {
+        if (status == HttpStatus.OK.getStatus()) {
             execute(workflowExecutionId, webhookRequest);
         }
 
-        return valid;
+        return status;
     }
 
     @SuppressWarnings("unchecked")

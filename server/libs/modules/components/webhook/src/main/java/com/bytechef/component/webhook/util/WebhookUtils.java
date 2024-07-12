@@ -27,6 +27,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
+import com.bytechef.component.definition.TriggerDefinition.HttpStatus;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateFunction;
@@ -82,8 +83,13 @@ public class WebhookUtils {
     }
 
     public static WebhookValidateFunction getWebhookValidateFunction() {
-        return (inputParameters, headers, parameters, body, method, triggerContext) -> Objects.equals(
-            getCsrfToken(headers), inputParameters.getRequiredString(CSRF_TOKEN));
+        return (inputParameters, headers, parameters, body, method, triggerContext) -> {
+            if (Objects.equals(getCsrfToken(headers), inputParameters.getRequiredString(CSRF_TOKEN))) {
+                return HttpStatus.OK.getStatus(); // OK
+            } else {
+                return HttpStatus.BAD_REQUEST.getStatus(); // Bad Request
+            }
+        };
     }
 
     private static Object checkList(Map.Entry<String, ?> entry) {
