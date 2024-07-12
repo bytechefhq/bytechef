@@ -162,7 +162,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
     }
 
     @Override
-    public boolean executeWebhookValidate(
+    public int executeWebhookValidate(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest, Long connectionId) {
 
@@ -172,7 +172,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
             new WebhookValidateRequest(
                 componentName, componentVersion, triggerName, inputParameters, webhookRequest,
                 connectionId),
-            Boolean.class);
+            Integer.class);
     }
 
     @Override

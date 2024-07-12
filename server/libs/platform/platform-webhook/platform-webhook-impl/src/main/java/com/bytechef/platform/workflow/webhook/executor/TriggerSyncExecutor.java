@@ -117,7 +117,7 @@ public class TriggerSyncExecutor {
         return triggerOutput;
     }
 
-    public boolean validate(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+    public int validate(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
         String workflowId = getWorkflowId(workflowExecutionId);
 
         TriggerExecution triggerExecution = TriggerExecution.builder()

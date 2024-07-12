@@ -28,5 +28,5 @@ public interface WebhookExecutor {
 
     Object executeSync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
 
-    boolean validateAndExecuteAsync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
+    int validateAndExecuteAsync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
 }

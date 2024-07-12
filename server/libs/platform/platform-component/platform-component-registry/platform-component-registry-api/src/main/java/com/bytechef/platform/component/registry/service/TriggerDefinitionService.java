@@ -87,7 +87,7 @@ public interface TriggerDefinitionService {
         @NonNull Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
         @Nullable ComponentConnection connection, @NonNull TriggerContext context);
 
-    boolean executeWebhookValidate(
+    int executeWebhookValidate(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest,
         @Nullable ComponentConnection connection, @NonNull TriggerContext context);

@@ -221,7 +221,7 @@ public class RemoteTriggerDefinitionFacadeController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<Boolean> executeWebhookValidate(
+    public ResponseEntity<Integer> executeWebhookValidate(
         @Valid @RequestBody WebhookValidateRequest webhookValidateRequest) {
 
         return ResponseEntity.ok(
