@@ -108,8 +108,9 @@ public class ConnectionApiController implements ConnectionApi {
 
     @Override
     public ResponseEntity<ConnectionModel> updateConnection(Long id, ConnectionModel connectionModel) {
-        return ResponseEntity.ok(toConnectionModel(
-            connectionFacade.update(conversionService.convert(connectionModel.id(id), ConnectionDTO.class))));
+        return ResponseEntity.ok(
+            toConnectionModel(
+                connectionFacade.update(conversionService.convert(connectionModel.id(id), ConnectionDTO.class))));
     }
 
     @SuppressFBWarnings("NP")
@@ -120,13 +121,9 @@ public class ConnectionApiController implements ConnectionApi {
             MapUtils.toMap(
                 connectionModel.getAuthorizationParameters(),
                 Map.Entry::getKey,
-                entry -> StringUtils.obfuscate(toString(entry.getValue()), 28, 8)));
+                entry -> StringUtils.obfuscate(StringUtils.toString(entry.getValue()), 28, 8)));
 
         return Validate.notNull(connectionModel, "connectionModel")
             .parameters(null);
-    }
-
-    private static String toString(Object object) {
-        return object.toString();
     }
 }
