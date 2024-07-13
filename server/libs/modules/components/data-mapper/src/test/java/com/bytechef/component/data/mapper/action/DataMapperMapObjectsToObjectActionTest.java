@@ -61,7 +61,8 @@ class DataMapperMapObjectsToObjectActionTest {
         inputJson.put("key", "value");
 
         setupAndAssertTest(
-            false, inputJson, List.of(), result -> assertTrue(result.isEmpty(), "Result should be empty."));
+            false, inputJson, List.of(),
+            (Map<String, Object> result) -> assertTrue(result.isEmpty(), "Result should be empty."));
     }
 
     @Test
@@ -71,7 +72,8 @@ class DataMapperMapObjectsToObjectActionTest {
         inputJson.put("key", "value");
 
         setupAndAssertTest(
-            true, inputJson, List.of(), result -> assertTrue(result.isEmpty(), "Result should be empty."));
+            true, inputJson, List.of(),
+            (List<Map<String, Object>> result) -> assertTrue(result.isEmpty(), "Result should be empty."));
     }
 
     @Test
@@ -82,7 +84,7 @@ class DataMapperMapObjectsToObjectActionTest {
 
         setupAndAssertTest(
             false, inputJson, List.of(new RequiredStringMapping("oldKey", "newKey", false)),
-            result -> {
+            (Map<String, Object> result) -> {
                 assertTrue(result.containsKey("newKey"), "Result should contain new key");
                 assertFalse(result.containsKey("oldKey"), "Result should not contain old key");
             });
@@ -96,9 +98,11 @@ class DataMapperMapObjectsToObjectActionTest {
 
         setupAndAssertTest(
             true, inputJson, List.of(new RequiredStringMapping("oldKey", "newKey", false)),
-            result -> {
-                assertTrue(result.containsKey("newKey"), "Result should contain new key");
-                assertFalse(result.containsKey("oldKey"), "Result should not contain old key");
+            (List<Map<String, Object>> result) -> {
+                assertTrue(result.getFirst()
+                    .containsKey("newKey"), "Result should contain new key");
+                assertFalse(result.getFirst()
+                    .containsKey("oldKey"), "Result should not contain old key");
             });
     }
 
@@ -114,7 +118,7 @@ class DataMapperMapObjectsToObjectActionTest {
             List.of(
                 new RequiredStringMapping("oldKey1", "newKey1", false),
                 new RequiredStringMapping("oldKey2", "newKey2", false)),
-            result -> {
+            (Map<String, Object> result) -> {
                 assertTrue(result.containsKey("newKey1"), "Result should contain new key1");
                 assertFalse(result.containsKey("oldKey1"), "Result should not contain old key1");
                 assertTrue(result.containsKey("newKey2"), "Result should contain new key2");
@@ -134,12 +138,71 @@ class DataMapperMapObjectsToObjectActionTest {
             List.of(
                 new RequiredStringMapping("oldKey1", "newKey1", false),
                 new RequiredStringMapping("oldKey2", "newKey2", false)),
-            result -> {
-                assertTrue(result.containsKey("newKey1"), "Result should contain new key1");
-                assertFalse(result.containsKey("oldKey1"), "Result should not contain old key1");
-                assertTrue(result.containsKey("newKey2"), "Result should contain new key2");
-                assertFalse(result.containsKey("oldKey2"), "Result should not contain old key2");
+            (List<Map<String, Object>> result) -> {
+                assertTrue(result.getFirst()
+                    .containsKey("newKey1"), "Result should contain new key1");
+                assertFalse(result.getFirst()
+                    .containsKey("oldKey1"), "Result should not contain old key1");
+                assertTrue(result.getFirst()
+                    .containsKey("newKey2"), "Result should contain new key2");
+                assertFalse(result.getFirst()
+                    .containsKey("oldKey2"), "Result should not contain old key2");
             });
+    }
+
+    @Test
+    void testPerformNestedNullFlagsObject() {
+        Map<String, Object> inner = new LinkedHashMap<>();
+        inner.put("innerKey", "value");
+        Map<String, Object> inputJson = Map.of("outerKey", inner);
+        setupAndAssertTest(
+            false, inputJson, List.of(new RequiredStringMapping("outerKey.innerKey", "newKey", false)),
+            (Map<String, Object> result) -> {
+                assertTrue(result.containsKey("newKey"), "Result should contain new key");
+                assertFalse(result.containsKey("outerKey"), "Result should not contain old key");
+                assertFalse(result.containsKey("innerKey"), "Result should not contain old key");
+            });
+    }
+
+    @Test
+    void testPerformNestedNullFlagsArray() {
+        Map<String, Object> inner = new LinkedHashMap<>();
+        inner.put("innerKey", "value");
+        Map<String, Object> inputJson = Map.of("outerKey", inner);
+
+        setupAndAssertTest(
+            true, inputJson, List.of(new RequiredStringMapping("outerKey.innerKey", "newKey", false)),
+            (List<Map<String, Object>> result) -> {
+                assertTrue(result.getFirst()
+                    .containsKey("newKey"), "Result should contain new key");
+                assertFalse(result.getFirst()
+                    .containsKey("outerKey"), "Result should not contain old key");
+                assertFalse(result.getFirst()
+                    .containsKey("innerKey"), "Result should not contain old key");
+            });
+    }
+
+    @Test
+    void testPerformNestedNullFlagsMultipleObjectsArray() {
+        Map<String, Object> inner = new LinkedHashMap<>();
+        inner.put("innerKey", "value");
+        List<Object> inputValue = List.of(Map.of("outerKey", inner), Map.of("outerKey", inner));
+
+        setupAndAssertTest(inputValue, List.of(new RequiredStringMapping("outerKey.innerKey", "newKey", false)),
+            result -> {
+                assertTrue(result.getFirst()
+                    .containsKey("newKey"), "Result should contain new key");
+                assertFalse(result.getFirst()
+                    .containsKey("outerKey"), "Result should not contain old key");
+                assertFalse(result.getFirst()
+                    .containsKey("innerKey"), "Result should not contain old key");
+                assertTrue(result.get(1)
+                    .containsKey("newKey"), "Result should contain new key");
+                assertFalse(result.get(1)
+                    .containsKey("outerKey"), "Result should not contain old key");
+                assertFalse(result.get(1)
+                    .containsKey("innerKey"), "Result should not contain old key");
+            }, null, null, null);
     }
 
     @Test
@@ -191,13 +254,22 @@ class DataMapperMapObjectsToObjectActionTest {
             new RequiredStringMapping("oldKey", "newKey", isRequired));
 
         if (!includeNulls) {
-            setupAndAssertTest(
-                isArray, inputJson, requiredStringMappings,
-                result -> {
-                    assertFalse(result.containsKey("newKey"), "Result should not contain new key");
-                    assertFalse(result.containsKey("oldKey"), "Result should not contain old key");
-                },
-                null, false, null);
+            if (isArray) {
+                setupAndAssertTest(
+                    List.of(inputJson), requiredStringMappings,
+                    (List<Map<String, Object>> result) -> assertTrue(result.isEmpty(),
+                        "Result should be an empty array"),
+                    null, false, null);
+            } else {
+                setupAndAssertTest(
+                    inputJson, requiredStringMappings,
+                    (Map<String, Object> result) -> {
+                        assertFalse(result.containsKey("newKey"), "Result should not contain new key");
+                        assertFalse(result.containsKey("oldKey"), "Result should not contain old key");
+                        assertTrue(result.isEmpty(), "Result should be an empty map");
+                    },
+                    null, false, null);
+            }
         } else if (isRequired) {
             assertThrows(
                 NullPointerException.class,
@@ -205,13 +277,25 @@ class DataMapperMapObjectsToObjectActionTest {
                     isArray, inputJson, requiredStringMappings, result -> {}, null, true, null),
                 "Required field oldKey cannot be null.");
         } else {
-            setupAndAssertTest(
-                isArray, inputJson, requiredStringMappings,
-                result -> {
-                    assertTrue(result.containsKey("newKey"), "Result should contain new key");
-                    assertFalse(result.containsKey("oldKey"), "Result should not contain old key");
-                },
-                null, true, null);
+            if (isArray) {
+                setupAndAssertTest(
+                    List.of(inputJson), requiredStringMappings,
+                    (List<Map<String, Object>> result) -> {
+                        assertTrue(result.getFirst()
+                            .containsKey("newKey"), "Result should contain new key");
+                        assertFalse(result.getFirst()
+                            .containsKey("oldKey"), "Result should not contain old key");
+                    },
+                    null, true, null);
+            } else {
+                setupAndAssertTest(
+                    inputJson, requiredStringMappings,
+                    (Map<String, Object> result) -> {
+                        assertTrue(result.containsKey("newKey"), "Result should contain new key");
+                        assertFalse(result.containsKey("oldKey"), "Result should not contain old key");
+                    },
+                    null, true, null);
+            }
         }
     }
 
@@ -264,27 +348,49 @@ class DataMapperMapObjectsToObjectActionTest {
             new RequiredStringMapping("oldKey", "newKey", isRequired));
 
         if (!includeEmpty) {
-            setupAndAssertTest(
-                isArray, inputJson, requiredStringMappings,
-                result -> {
-                    assertFalse(result.containsKey("newKey"), "Result should not contain new key");
-                    assertFalse(result.containsKey("oldKey"), "Result should not contain old key");
-                },
-                null, null, false);
+            if (isArray) {
+                setupAndAssertTest(
+                    List.of(inputJson), requiredStringMappings,
+                    (List<Map<String, Object>> result) -> assertTrue(result.isEmpty(),
+                        "Result should be an empty array"),
+                    null, null, false);
+            } else {
+                setupAndAssertTest(
+                    inputJson, requiredStringMappings,
+                    (Map<String, Object> result) -> {
+                        assertFalse(result.containsKey("newKey"), "Result should not contain new key");
+                        assertFalse(result.containsKey("oldKey"), "Result should not contain old key");
+                        assertTrue(result.isEmpty(), "Result should be an empty map");
+                    },
+                    null, null, false);
+            }
         } else if (isRequired) {
             assertThrows(
                 NullPointerException.class,
                 () -> setupAndAssertTest(
-                    isArray, inputJson, requiredStringMappings, result -> {}, null, null, true),
+                    isArray, inputJson, requiredStringMappings,
+                    result -> {}, null, null, true),
                 "Required field oldKey cannot be empty.");
         } else {
-            setupAndAssertTest(
-                isArray, inputJson, requiredStringMappings,
-                result -> {
-                    assertTrue(result.containsKey("newKey"), "Result should contain new key");
-                    assertFalse(result.containsKey("oldKey"), "Result should not contain old key");
-                },
-                null, null, true);
+            if (isArray) {
+                setupAndAssertTest(
+                    List.of(inputJson), requiredStringMappings,
+                    (List<Map<String, Object>> result) -> {
+                        assertTrue(result.getFirst()
+                            .containsKey("newKey"), "Result should contain new key");
+                        assertFalse(result.getFirst()
+                            .containsKey("oldKey"), "Result should not contain old key");
+                    },
+                    null, true, null);
+            } else {
+                setupAndAssertTest(
+                    inputJson, requiredStringMappings,
+                    (Map<String, Object> result) -> {
+                        assertTrue(result.containsKey("newKey"), "Result should contain new key");
+                        assertFalse(result.containsKey("oldKey"), "Result should not contain old key");
+                    },
+                    null, true, null);
+            }
         }
     }
 
@@ -296,7 +402,8 @@ class DataMapperMapObjectsToObjectActionTest {
 
         setupAndAssertTest(
             false, inputJson, List.of(new RequiredStringMapping("oldKey", "newKey", false)),
-            result -> assertTrue(result.containsKey("key"), "Result should contain new key"), true, null, null);
+            (Map<String, Object> result) -> assertTrue(result.containsKey("key"), "Result should contain new key"),
+            true, null, null);
     }
 
     @Test
@@ -307,7 +414,8 @@ class DataMapperMapObjectsToObjectActionTest {
 
         setupAndAssertTest(
             false, inputJson, List.of(new RequiredStringMapping("oldKey", "newKey", false)),
-            result -> assertFalse(result.containsKey("key"), "Result should contain new key"), false, null, null);
+            (Map<String, Object> result) -> assertFalse(result.containsKey("key"), "Result should contain new key"),
+            false, null, null);
     }
 
     @Test
@@ -318,7 +426,9 @@ class DataMapperMapObjectsToObjectActionTest {
 
         setupAndAssertTest(
             true, inputJson, List.of(new RequiredStringMapping("oldKey", "newKey", false)),
-            result -> assertTrue(result.containsKey("key"), "Result should contain new key"), true, null, null);
+            (List<Map<String, Object>> result) -> assertTrue(result.getFirst()
+                .containsKey("key"), "Result should contain new key"),
+            true, null, null);
     }
 
     @Test
@@ -329,35 +439,39 @@ class DataMapperMapObjectsToObjectActionTest {
 
         setupAndAssertTest(
             true, inputJson, List.of(new RequiredStringMapping("oldKey", "newKey", false)),
-            result -> assertFalse(result.containsKey("key"), "Result should contain new key"), false, null, null);
+            (List<Map<String, Object>> result) -> assertTrue(result.isEmpty(), "Result should be an empty array"),
+            false, null, null);
     }
 
     private void setupAndAssertTest(
         boolean isArray, Map<String, Object> inputValue, List<RequiredStringMapping> mappings,
-        Consumer<Map<String, Object>> consumer) {
+        Consumer<?> consumer) {
 
         if (isArray) {
-            setupAndAssertTest(List.of(inputValue), mappings, consumer, null, null, null);
+            setupAndAssertTest(List.of(inputValue), mappings, (Consumer<List<Map<String, Object>>>) consumer, null,
+                null, null);
         } else {
-            setupAndAssertTest(inputValue, mappings, consumer, null, null, null);
+            setupAndAssertTest(inputValue, mappings, (Consumer<Map<String, Object>>) consumer, null, null, null);
         }
     }
 
     private void setupAndAssertTest(
         boolean isArray, Map<String, Object> inputValue, List<RequiredStringMapping> mappings,
-        Consumer<Map<String, Object>> consumer, Boolean includeUnmapped, Boolean includeNulls,
+        Consumer<?> consumer, Boolean includeUnmapped, Boolean includeNulls,
         Boolean includeEmptyStrings) {
 
         if (isArray) {
             setupAndAssertTest(
-                List.of(inputValue), mappings, consumer, includeUnmapped, includeNulls, includeEmptyStrings);
+                List.of(inputValue), mappings, (Consumer<List<Map<String, Object>>>) consumer, includeUnmapped,
+                includeNulls, includeEmptyStrings);
         } else {
-            setupAndAssertTest(inputValue, mappings, consumer, includeUnmapped, includeNulls, includeEmptyStrings);
+            setupAndAssertTest(inputValue, mappings, (Consumer<Map<String, Object>>) consumer, includeUnmapped,
+                includeNulls, includeEmptyStrings);
         }
     }
 
     private void setupAndAssertTest(
-        List<Object> inputValue, List<RequiredStringMapping> mappings, Consumer<Map<String, Object>> consumer,
+        List<Object> inputValue, List<RequiredStringMapping> mappings, Consumer<List<Map<String, Object>>> consumer,
         Boolean includeUnmapped, Boolean includeNulls, Boolean includeEmptyStrings) {
 
         when(inputParameters.getBoolean(INCLUDE_UNMAPPED)).thenReturn(includeUnmapped);
@@ -368,7 +482,7 @@ class DataMapperMapObjectsToObjectActionTest {
         when(inputParameters.getList(INPUT, Object.class, List.of())).thenReturn(inputValue);
         when(inputParameters.getInteger(INPUT_TYPE)).thenReturn(2);
 
-        Map<String, Object> result = DataMapperMapObjectsToObjectAction.perform(
+        List<Map<String, Object>> result = (List<Map<String, Object>>) DataMapperMapObjectsToObjectAction.perform(
             inputParameters, connectionParameters, context);
 
         consumer.accept(result);
@@ -386,7 +500,7 @@ class DataMapperMapObjectsToObjectActionTest {
         when(inputParameters.getMap(INPUT, Object.class, Map.of())).thenReturn(inputValue);
         when(inputParameters.getInteger(INPUT_TYPE)).thenReturn(1);
 
-        Map<String, Object> result = DataMapperMapObjectsToObjectAction.perform(
+        Map<String, Object> result = (Map<String, Object>) DataMapperMapObjectsToObjectAction.perform(
             inputParameters, connectionParameters, context);
 
         consumer.accept(result);
