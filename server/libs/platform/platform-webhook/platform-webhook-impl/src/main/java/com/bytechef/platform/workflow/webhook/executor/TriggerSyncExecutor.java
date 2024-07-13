@@ -21,6 +21,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.trigger.TriggerOutput;
@@ -117,7 +118,7 @@ public class TriggerSyncExecutor {
         return triggerOutput;
     }
 
-    public int validate(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+    public WebhookValidateResponse validate(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
         String workflowId = getWorkflowId(workflowExecutionId);
 
         TriggerExecution triggerExecution = TriggerExecution.builder()

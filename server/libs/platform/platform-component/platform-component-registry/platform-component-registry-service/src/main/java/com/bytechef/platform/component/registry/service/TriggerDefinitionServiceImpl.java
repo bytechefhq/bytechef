@@ -21,6 +21,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.DynamicOptionsProperty;
+import com.bytechef.component.definition.HttpStatus;
 import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.PropertiesDataSource;
@@ -31,13 +32,13 @@ import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableF
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookRefreshFunction;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookRequestFunction;
-import com.bytechef.component.definition.TriggerDefinition.HttpStatus;
 import com.bytechef.component.definition.TriggerDefinition.ListenerDisableConsumer;
 import com.bytechef.component.definition.TriggerDefinition.ListenerEnableConsumer;
 import com.bytechef.component.definition.TriggerDefinition.PollFunction;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.StaticWebhookRequestFunction;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.component.definition.TriggerWorkflowNodeDescriptionFunction;
 import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
@@ -257,11 +258,13 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         TriggerType triggerType = triggerDefinition.getType();
 
-        if ((TriggerType.DYNAMIC_WEBHOOK == triggerType || TriggerType.STATIC_WEBHOOK == triggerType) &&
-            executeWebhookValidate(triggerDefinition, new ParametersImpl(inputParameters), webhookRequest,
-                context) != HttpStatus.OK.getStatus()) {
+        if (TriggerType.DYNAMIC_WEBHOOK == triggerType || TriggerType.STATIC_WEBHOOK == triggerType) {
+            WebhookValidateResponse response = executeWebhookValidate(
+                triggerDefinition, new ParametersImpl(inputParameters), webhookRequest, context);
 
-            throw new IllegalStateException("Invalid trigger signature.");
+            if (response.status() != HttpStatus.OK.getValue()) {
+                throw new IllegalStateException("Invalid trigger signature.");
+            }
         }
 
         if (TriggerType.DYNAMIC_WEBHOOK == triggerType) {
@@ -289,7 +292,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public int executeWebhookValidate(
+    public WebhookValidateResponse executeWebhookValidate(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest,
         ComponentConnection connection, @NonNull TriggerContext context) {
@@ -423,7 +426,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return new TriggerOutput(webhookOutput, null, OptionalUtils.orElse(triggerDefinition.getBatch(), false));
     }
 
-    private int executeWebhookValidate(
+    private WebhookValidateResponse executeWebhookValidate(
         com.bytechef.component.definition.TriggerDefinition triggerDefinition, Parameters inputParameters,
         WebhookRequest webhookRequest, TriggerContext context) {
 
@@ -432,7 +435,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 inputParameters, new HttpHeadersImpl(webhookRequest.headers()),
                 new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(), webhookRequest.method(),
                 context))
-            .orElse(HTTP_STATUS_OK);
+            .orElse(WebhookValidateResponse.ok());
     }
 
     private static String getComponentTitle(ComponentDefinition componentDefinition) {

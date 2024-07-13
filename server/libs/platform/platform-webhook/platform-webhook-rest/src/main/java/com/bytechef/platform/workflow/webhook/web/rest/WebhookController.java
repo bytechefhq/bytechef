@@ -24,6 +24,7 @@ import com.bytechef.commons.util.StreamUtils;
 import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody.ContentType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
+import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.registry.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
@@ -55,12 +56,14 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MimeType;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.MultiValueMapAdapter;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -159,10 +162,15 @@ public class WebhookController {
             responseEntity = ResponseEntity.ok(webhookExecutor.executeSync(workflowExecutionId, webhookRequest));
         } else if (webhookTriggerFlags.workflowSyncValidation()) {
 
-            int status = webhookExecutor.validateAndExecuteAsync(workflowExecutionId, webhookRequest);
+            WebhookValidateResponse response = webhookExecutor.validateAndExecuteAsync(
+                workflowExecutionId, webhookRequest);
 
-            responseEntity = ResponseEntity.status(status)
-                .build();
+            responseEntity = ResponseEntity.status(response.status())
+                .headers(
+                    response.headers() == null
+                        ? null
+                        : HttpHeaders.readOnlyHttpHeaders(new MultiValueMapAdapter<>(response.headers())))
+                .body(response.body());
         } else {
             webhookExecutor.execute(workflowExecutionId, webhookRequest);
 

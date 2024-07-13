@@ -18,6 +18,7 @@ package com.bytechef.platform.component.registry.service;
 
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.component.registry.domain.Output;
@@ -87,7 +88,7 @@ public interface TriggerDefinitionService {
         @NonNull Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
         @Nullable ComponentConnection connection, @NonNull TriggerContext context);
 
-    int executeWebhookValidate(
+    WebhookValidateResponse executeWebhookValidate(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest,
         @Nullable ComponentConnection connection, @NonNull TriggerContext context);

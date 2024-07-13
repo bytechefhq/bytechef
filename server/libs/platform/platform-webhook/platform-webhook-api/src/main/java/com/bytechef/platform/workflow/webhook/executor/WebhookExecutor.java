@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.workflow.webhook.executor;
 
+import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 
@@ -28,5 +29,6 @@ public interface WebhookExecutor {
 
     Object executeSync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
 
-    int validateAndExecuteAsync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
+    WebhookValidateResponse validateAndExecuteAsync(
+        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
 }

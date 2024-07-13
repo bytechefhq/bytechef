@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.component.registry.remote.web.rest.facade;
 
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
@@ -221,7 +222,7 @@ public class RemoteTriggerDefinitionFacadeController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<Integer> executeWebhookValidate(
+    public ResponseEntity<WebhookValidateResponse> executeWebhookValidate(
         @Valid @RequestBody WebhookValidateRequest webhookValidateRequest) {
 
         return ResponseEntity.ok(

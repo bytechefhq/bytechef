@@ -16,6 +16,7 @@
   "actions": null,
   "triggers": [ {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": "The webhook trigger always replies immediately with an HTTP 200 status code in response to any incoming webhook request. This guarantees execution of the webhook trigger, but does not involve any validation of the received request.",
     "help": null,
@@ -27,11 +28,6 @@
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
-    "staticWebhookRequest": { },
     "deduplicate": null,
     "poll": null,
     "output": { },
@@ -39,9 +35,14 @@
     "listenerEnable": null,
     "outputResponse": null,
     "webhookValidate": null,
-    "dynamicOutput": false
+    "dynamicWebhookDisable": null,
+    "dynamicWebhookEnable": null,
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": null,
+    "staticWebhookRequest": { }
   }, {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": "Upon receiving a webhook request, it goes through a validation process. Once validated, the webhook trigger responds to the sender with an appropriate HTTP status code.",
     "help": null,
@@ -73,11 +74,6 @@
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": true,
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
-    "staticWebhookRequest": { },
     "deduplicate": null,
     "poll": null,
     "output": { },
@@ -85,9 +81,14 @@
     "listenerEnable": null,
     "outputResponse": null,
     "webhookValidate": { },
-    "dynamicOutput": false
+    "dynamicWebhookDisable": null,
+    "dynamicWebhookEnable": null,
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": null,
+    "staticWebhookRequest": { }
   }, {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": "You have the flexibility to set up your preferred response. After a webhook request is received, the webhook trigger enters a waiting state for the workflow's response.",
     "help": null,
@@ -137,12 +138,7 @@
     "webhookRawBody": null,
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": true,
-    "workflowSyncValidation": null,
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
-    "staticWebhookRequest": { },
+    "workflowSyncValidation": true,
     "deduplicate": null,
     "poll": null,
     "output": { },
@@ -150,6 +146,10 @@
     "listenerEnable": null,
     "outputResponse": null,
     "webhookValidate": { },
-    "dynamicOutput": false
+    "dynamicWebhookDisable": null,
+    "dynamicWebhookEnable": null,
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": null,
+    "staticWebhookRequest": { }
   } ]
 }
