@@ -92,12 +92,19 @@ export interface IntegrationInstanceConfigurationBasicModel {
      * @memberof IntegrationInstanceConfigurationBasicModel
      */
     readonly lastModifiedDate?: Date;
+    /**
+     * The name of an integration instance configuration.
+     * @type {string}
+     * @memberof IntegrationInstanceConfigurationBasicModel
+     */
+    name: string;
 }
 
 /**
  * Check if a given object implements the IntegrationInstanceConfigurationBasicModel interface.
  */
 export function instanceOfIntegrationInstanceConfigurationBasicModel(value: object): boolean {
+    if (!('name' in value)) return false;
     return true;
 }
 
@@ -122,6 +129,7 @@ export function IntegrationInstanceConfigurationBasicModelFromJSONTyped(json: an
         'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (new Date(json['lastExecutionDate'])),
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'name': json['name'],
     };
 }
 
@@ -136,6 +144,7 @@ export function IntegrationInstanceConfigurationBasicModelToJSON(value?: Omit<In
         'environment': EnvironmentModelToJSON(value['environment']),
         'integrationId': value['integrationId'],
         'integrationVersion': value['integrationVersion'],
+        'name': value['name'],
     };
 }
 
