@@ -56,5 +56,4 @@ public enum ComponentCategory {
     public String toString() {
         return String.valueOf(key);
     }
-
 }

@@ -27,10 +27,10 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
-import com.bytechef.component.definition.TriggerDefinition.HttpStatus;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateFunction;
+import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -85,9 +85,9 @@ public class WebhookUtils {
     public static WebhookValidateFunction getWebhookValidateFunction() {
         return (inputParameters, headers, parameters, body, method, triggerContext) -> {
             if (Objects.equals(getCsrfToken(headers), inputParameters.getRequiredString(CSRF_TOKEN))) {
-                return HttpStatus.OK.getStatus(); // OK
+                return WebhookValidateResponse.ok(); // OK
             } else {
-                return HttpStatus.BAD_REQUEST.getStatus(); // Bad Request
+                return WebhookValidateResponse.badRequest(); // Bad Request
             }
         };
     }

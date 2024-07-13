@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.component.registry.remote.client.facade;
 
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.ee.platform.component.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.ee.remote.client.DefaultRestClient;
 import com.bytechef.platform.component.registry.domain.Option;
@@ -162,7 +163,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
     }
 
     @Override
-    public int executeWebhookValidate(
+    public WebhookValidateResponse executeWebhookValidate(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest, Long connectionId) {
 
@@ -172,7 +173,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
             new WebhookValidateRequest(
                 componentName, componentVersion, triggerName, inputParameters, webhookRequest,
                 connectionId),
-            Integer.class);
+            WebhookValidateResponse.class);
     }
 
     @Override
