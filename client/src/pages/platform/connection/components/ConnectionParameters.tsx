@@ -1,22 +1,24 @@
 import {ConnectionDefinitionModel} from '@/shared/middleware/platform/configuration';
-import {ConnectionModel} from '@/shared/middleware/platform/connection';
 
 const ConnectionParameters = ({
-    connection,
+    authorizationParameters,
     connectionDefinition,
+    connectionParameters,
 }: {
-    connection: ConnectionModel;
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    authorizationParameters?: {[key: string]: any};
     connectionDefinition: ConnectionDefinitionModel;
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    connectionParameters?: {[key: string]: any};
 }) => {
     const {authorizations, properties: connectionProperties} = connectionDefinition;
-    const {authorizationParameters, connectionParameters} = connection;
 
     const existingAuthorizations = authorizations?.filter(
         (authorization) =>
             authorization.properties &&
             authorization.properties.filter((property) => !!authorizationParameters![property.name!]).length > 0
     );
-
+    console.log(authorizationParameters);
     if (
         connectionParameters &&
         Object.values(connectionParameters).every((parameter) => parameter === null || parameter === '') &&

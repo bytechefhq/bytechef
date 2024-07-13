@@ -647,8 +647,9 @@ const ConnectionDialog = ({
                         {connection?.id && connectionDefinition && (
                             <div className="px-6 pb-6">
                                 <ConnectionParameters
-                                    connection={connection}
+                                    authorizationParameters={connection.authorizationParameters}
                                     connectionDefinition={connectionDefinition}
+                                    connectionParameters={connection.connectionParameters}
                                 />
                             </div>
                         )}

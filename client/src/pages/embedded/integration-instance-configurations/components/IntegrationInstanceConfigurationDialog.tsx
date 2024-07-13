@@ -11,6 +11,7 @@ import {
 import {Form} from '@/components/ui/form';
 import IntegrationInstanceConfigurationDialogOauth2Step from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationDialogOauth2Step';
 import {useWorkflowsEnabledStore} from '@/pages/embedded/integration-instance-configurations/stores/useWorkflowsEnabledStore';
+import ConnectionParameters from '@/pages/platform/connection/components/ConnectionParameters';
 import {EnvironmentModel, IntegrationInstanceConfigurationModel} from '@/shared/middleware/embedded/configuration';
 import {AuthorizationTypeModel} from '@/shared/middleware/platform/configuration';
 import {
@@ -295,6 +296,18 @@ const IntegrationInstanceConfigurationDialog = ({
                     >
                         {integrationInstanceConfigurationDialogSteps[activeStepIndex].content}
                     </div>
+
+                    {integrationInstanceConfiguration?.id && connectionDefinition && (
+                        <div className="py-4">
+                            <ConnectionParameters
+                                authorizationParameters={
+                                    integrationInstanceConfiguration.connectionAuthorizationParameters
+                                }
+                                connectionDefinition={connectionDefinition}
+                                connectionParameters={integrationInstanceConfiguration.connectionConnectionParameters}
+                            />
+                        </div>
+                    )}
 
                     <DialogFooter>
                         {activeStepIndex === 0 && (

@@ -166,7 +166,11 @@ const ConnectionTabConnectionSelect = ({
             </div>
 
             {currentConnection && connectionDefinition && (
-                <ConnectionParameters connection={currentConnection} connectionDefinition={connectionDefinition} />
+                <ConnectionParameters
+                    authorizationParameters={currentConnection.authorizationParameters}
+                    connectionDefinition={connectionDefinition}
+                    connectionParameters={currentConnection.connectionParameters}
+                />
             )}
         </div>
     );
