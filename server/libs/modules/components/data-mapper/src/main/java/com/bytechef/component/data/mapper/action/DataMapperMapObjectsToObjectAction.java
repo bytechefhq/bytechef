@@ -38,7 +38,11 @@ import com.bytechef.component.data.mapper.model.RequiredStringMapping;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import java.util.HashMap;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -82,12 +86,13 @@ public class DataMapperMapObjectsToObjectAction {
                     object()
                         .properties(
                             string(FROM)
-                                .label("From")
+                                .label("Path From")
                                 .description(
-                                    "Name of the input property key that you want to put in the newly created object."),
+                                    "Path to the input property key that you want to put in the newly created object, written in dot notation."),
                             string(TO)
                                 .label("To")
-                                .description("Name of the property key in the newly created object."),
+                                .description(
+                                    "Name of the key you want to assign to the input property value in the newly created object."),
                             bool(REQUIRED_FIELD)
                                 .label("Required field")
                                 .description("Does the property require a value?")
@@ -113,10 +118,9 @@ public class DataMapperMapObjectsToObjectAction {
     }
 
     @SuppressWarnings("unchecked")
-    protected static Map<String, Object> perform(
+    protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        Map<String, Object> output = new HashMap<>();
         List<RequiredStringMapping> mappings = inputParameters.getList(
             MAPPINGS, RequiredStringMapping.class, List.of());
 
@@ -128,52 +132,63 @@ public class DataMapperMapObjectsToObjectAction {
         Integer inputType = inputParameters.getInteger(INPUT_TYPE);
 
         if (inputType != null && inputType.equals(1)) {
-            Map<String, Object> input = inputParameters.getMap(INPUT, Object.class, Map.of());
+            DocumentContext input = JsonPath.parse(inputParameters.getMap(INPUT, Object.class, Map.of()));
 
-            fillOutput(inputParameters, input, output, mappingMap);
+            return fillOutput(inputParameters, input, mappingMap, context);
         } else {
             List<Object> input = inputParameters.getList(INPUT, Object.class, List.of());
 
+            List<Object> output = new LinkedList<>();
             for (Object object : input) {
-                fillOutput(inputParameters, (Map<String, Object>) object, output, mappingMap);
+                DocumentContext inputObj = JsonPath.parse(object);
+
+                Map<String, Object> map = fillOutput(inputParameters, inputObj, mappingMap, context);
+                if (!map.isEmpty())
+                    output.add(map);
+            }
+            return output;
+        }
+    }
+
+    private static Map<String, Object> fillOutput(
+        Parameters inputParameters, DocumentContext input, Map<String, Pair<String, Boolean>> mappingMap,
+        ActionContext context) {
+        Map<String, Object> output = new LinkedHashMap<>();
+        if (inputParameters.getBoolean(INCLUDE_UNMAPPED) != null && inputParameters.getBoolean(INCLUDE_UNMAPPED)) {
+            output = input.read("$");
+        }
+
+        for (Map.Entry<String, Pair<String, Boolean>> pair : mappingMap.entrySet()) {
+            Object value = null;
+            try {
+                value = input.read(pair.getKey());
+
+                if (isAllowedToMap(inputParameters, value)) {
+                    if (pair.getValue()
+                        .getRight() != null && pair.getValue()
+                            .getRight()) {
+                        Objects.requireNonNull(value, "Required field " + pair.getKey() + " cannot be null.");
+                        Validate.notBlank(value.toString(), "Required field " + pair.getKey() + " cannot be empty.");
+                    }
+
+                    output.put(pair.getValue()
+                        .getLeft(), value);
+                }
+            } catch (PathNotFoundException exception) {
+                context.logger(logger -> logger.info(exception.getMessage()));
             }
         }
 
         return output;
     }
 
-    private static void fillOutput(
-        Parameters inputParameters, Map<String, Object> input, Map<String, Object> output,
-        Map<String, Pair<String, Boolean>> mappingMap) {
-
-        for (Map.Entry<String, Object> entry : input.entrySet()) {
-            if (isAllowedToMap(inputParameters, entry)) {
-                Object value = entry.getValue();
-
-                if (mappingMap.containsKey(entry.getKey())) {
-                    Pair<String, Boolean> mapping = mappingMap.get(entry.getKey());
-
-                    if (mapping.getRight() != null && mapping.getRight()) {
-                        Objects.requireNonNull(value, "Required field " + entry.getKey() + " cannot be null.");
-                        Validate.notBlank(value.toString(), "Required field " + entry.getKey() + " cannot be empty.");
-                    }
-
-                    output.put(mapping.getLeft(), value);
-                } else if (inputParameters.getBoolean(INCLUDE_UNMAPPED) != null &&
-                    inputParameters.getBoolean(INCLUDE_UNMAPPED))
-
-                    output.put(entry.getKey(), value);
-            }
-        }
-    }
-
-    private static boolean isAllowedToMap(Parameters inputParameters, Map.Entry<String, Object> entry) {
+    private static boolean isAllowedToMap(Parameters inputParameters, Object value) {
         return (inputParameters.getBoolean(INCLUDE_NULLS) == null ||
             (inputParameters.getBoolean(INCLUDE_NULLS) != null && (inputParameters.getBoolean(INCLUDE_NULLS) ||
-                ObjectUtils.anyNotNull(entry.getValue()))))
+                ObjectUtils.anyNotNull(value))))
             &&
             (inputParameters.getBoolean(INCLUDE_EMPTY_STRINGS) == null ||
                 (inputParameters.getBoolean(INCLUDE_EMPTY_STRINGS) != null &&
-                    (inputParameters.getBoolean(INCLUDE_EMPTY_STRINGS) || ObjectUtils.isNotEmpty(entry.getValue()))));
+                    (inputParameters.getBoolean(INCLUDE_EMPTY_STRINGS) || ObjectUtils.isNotEmpty(value))));
     }
 }
