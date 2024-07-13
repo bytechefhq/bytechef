@@ -1389,6 +1389,9 @@ components:
           type: "string"
           format: "date-time"
           readOnly: true
+        name:
+          description: "The name of an integration instance configuration."
+          type: "string"
     IntegrationInstanceConfigurationWorkflow:
       description: "Contains configuration and connections required for the execution\
         \ of a particular integration workflow."
