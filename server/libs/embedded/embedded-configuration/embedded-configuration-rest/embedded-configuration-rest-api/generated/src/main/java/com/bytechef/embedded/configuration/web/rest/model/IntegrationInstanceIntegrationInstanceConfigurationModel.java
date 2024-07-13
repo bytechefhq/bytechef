@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("IntegrationInstance_integrationInstanceConfiguration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-12T12:46:03.916194+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-13T09:30:19.524285+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class IntegrationInstanceIntegrationInstanceConfigurationModel {
 
   private String createdBy;
@@ -51,6 +51,19 @@ public class IntegrationInstanceIntegrationInstanceConfigurationModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
+
+  private String name;
+
+  public IntegrationInstanceIntegrationInstanceConfigurationModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public IntegrationInstanceIntegrationInstanceConfigurationModel(String name) {
+    this.name = name;
+  }
 
   public IntegrationInstanceIntegrationInstanceConfigurationModel createdBy(String createdBy) {
     this.createdBy = createdBy;
@@ -272,6 +285,26 @@ public class IntegrationInstanceIntegrationInstanceConfigurationModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
+  public IntegrationInstanceIntegrationInstanceConfigurationModel name(String name) {
+    this.name = name;
+    return this;
+  }
+
+  /**
+   * The name of an integration instance configuration.
+   * @return name
+  */
+  @NotNull 
+  @Schema(name = "name", description = "The name of an integration instance configuration.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("name")
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -291,12 +324,13 @@ public class IntegrationInstanceIntegrationInstanceConfigurationModel {
         Objects.equals(this.integrationVersion, integrationInstanceIntegrationInstanceConfiguration.integrationVersion) &&
         Objects.equals(this.lastExecutionDate, integrationInstanceIntegrationInstanceConfiguration.lastExecutionDate) &&
         Objects.equals(this.lastModifiedBy, integrationInstanceIntegrationInstanceConfiguration.lastModifiedBy) &&
-        Objects.equals(this.lastModifiedDate, integrationInstanceIntegrationInstanceConfiguration.lastModifiedDate);
+        Objects.equals(this.lastModifiedDate, integrationInstanceIntegrationInstanceConfiguration.lastModifiedDate) &&
+        Objects.equals(this.name, integrationInstanceIntegrationInstanceConfiguration.name);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, enabled, environment, id, integrationId, integrationVersion, lastExecutionDate, lastModifiedBy, lastModifiedDate);
+    return Objects.hash(createdBy, createdDate, description, enabled, environment, id, integrationId, integrationVersion, lastExecutionDate, lastModifiedBy, lastModifiedDate, name);
   }
 
   @Override
@@ -314,6 +348,7 @@ public class IntegrationInstanceIntegrationInstanceConfigurationModel {
     sb.append("    lastExecutionDate: ").append(toIndentedString(lastExecutionDate)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
+    sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("}");
     return sb.toString();
   }

@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-12T12:46:03.916194+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-13T09:30:19.524285+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 @Validated
 @Tag(name = "integration-instance", description = "the integration-instance API")
 public interface IntegrationInstanceApi {
@@ -164,7 +164,7 @@ public interface IntegrationInstanceApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"integrationInstanceConfigurationId\" : 7, \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"integrationInstanceConfiguration\" : { \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"integrationVersion\" : 2, \"description\" : \"description\", \"integrationId\" : 5, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"enabled\" : true }, \"enabled\" : true, \"connectedUserId\" : 6, \"__version\" : 3, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"integrationInstanceWorkflows\" : [ { \"integrationInstanceConfigurationWorkflowId\" : 9, \"inputs\" : { \"key\" : \"\" }, \"enabled\" : true, \"workflowId\" : \"workflowId\" }, { \"integrationInstanceConfigurationWorkflowId\" : 9, \"inputs\" : { \"key\" : \"\" }, \"enabled\" : true, \"workflowId\" : \"workflowId\" } ], \"createdBy\" : \"createdBy\", \"connectionId\" : 0, \"id\" : 1, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\" }";
+                    String exampleString = "{ \"integrationInstanceConfigurationId\" : 7, \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"integrationInstanceConfiguration\" : { \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"integrationVersion\" : 2, \"name\" : \"name\", \"description\" : \"description\", \"integrationId\" : 5, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"enabled\" : true }, \"enabled\" : true, \"connectedUserId\" : 6, \"__version\" : 3, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"integrationInstanceWorkflows\" : [ { \"integrationInstanceConfigurationWorkflowId\" : 9, \"inputs\" : { \"key\" : \"\" }, \"enabled\" : true, \"workflowId\" : \"workflowId\" }, { \"integrationInstanceConfigurationWorkflowId\" : 9, \"inputs\" : { \"key\" : \"\" }, \"enabled\" : true, \"workflowId\" : \"workflowId\" } ], \"createdBy\" : \"createdBy\", \"connectionId\" : 0, \"id\" : 1, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

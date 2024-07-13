@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("publishIntegration_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-12T12:46:03.916194+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-13T09:30:19.524285+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class PublishIntegrationRequestModel {
 
   private String description;
