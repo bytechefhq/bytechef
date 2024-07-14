@@ -11,6 +11,16 @@ export default defineConfig({
             logo: {
                 src: './src/assets/logo.svg',
             },
+            head: [
+                // Plausible.io web analytics script tag.
+                {
+                    tag: 'script',
+                    attrs: {
+                        src: 'https://plausible.io/js/script.js',
+                        'data-domain': 'docs.bytechef.io',
+                    },
+                },
+            ],
 			social: {
                 discord: 'https://discord.gg/JcNSqJ7vK8',
 				github: 'https://github.com/bytechefhq/bytechef',
