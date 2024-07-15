@@ -55,14 +55,14 @@ public class DataMapperRenameKeysAction {
             array(MAPPINGS)
                 .label("Mappings")
                 .description(
-                    "An array of objects that contains properties 'from' and 'to'.")
+                    "An array of objects that contains properties 'From Path' and 'To'.")
                 .items(
                     object()
                         .properties(
                             string(FROM)
                                 .label("From Path")
                                 .description(
-                                    "Defines the path of the input property key you want to change the name of. Dot notation."),
+                                    "Defines the path of the input property key you want to change the name of, using dot notation."),
                             string(TO)
                                 .label("To")
                                 .description("Defines what you want to change the name of the input property key to.")))
