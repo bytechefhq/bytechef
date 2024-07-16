@@ -20,13 +20,53 @@ open class FindJsonFilesTask : DefaultTask() {
         var name: String? = null
         var description: String? = null
         var items: Array<Properties>? = null
+        var properties: Array<Properties>? = null
         var label: String? = null
         var type: String? = null
 
+        private fun getFullTypeObject(): String? {
+            val sb = StringBuilder()
+            sb.append("{")
+            if(properties!=null) {
+                for (proprety: Properties in properties!!) {
+                    sb.append(proprety.getFullType(proprety.type))
+                    if(proprety.name!=null) sb.append("(${proprety.name})")
+                    sb.append(", ")
+                }
+                if(sb.length>2) sb.replace(sb.length-2, sb.length, "")
+            }
+//            if(sb.length>2)
+            return sb.append("}").toString()
+        }
+
+        private fun getFullTypeArray(): String? {
+            val sb = StringBuilder()
+            sb.append("[")
+            if(items!=null) {
+                for (proprety: Properties in items!!) {
+                    sb.append(proprety.getFullType(proprety.type))
+                    if(proprety.name!=null) sb.append("($${proprety.name})")
+                    sb.append(", ")
+                }
+                if(sb.length>2) sb.replace(sb.length-2, sb.length, "")
+            }
+            return sb.append("]").toString()
+        }
+
+        private fun getFullType(type:String?): String? {
+            return if(type.equals("OBJECT")){
+                getFullTypeObject()
+            } else if(type.equals("ARRAY")){
+                getFullTypeArray()
+            } else type;
+        }
+
         override fun toString(): String {
-            return if (label==null) "| $type | $controlType  |"
-            else if(description==null) "| $label | $type | $controlType  |  |"
-            else "| $label | $type | $controlType  |  $description  |"
+            val typeFull = getFullType(type)
+
+            return if (label==null) "| $typeFull | $controlType  |"
+            else if(description==null) "| $label | $typeFull | $controlType  |  |"
+            else "| $label | $typeFull | $controlType  |  $description  |"
         }
     }
 
