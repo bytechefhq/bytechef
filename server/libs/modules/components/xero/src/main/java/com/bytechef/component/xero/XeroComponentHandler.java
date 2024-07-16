@@ -27,6 +27,9 @@ import com.bytechef.component.xero.action.XeroCreateContactAction;
 import com.bytechef.component.xero.action.XeroCreateInvoiceAction;
 import com.bytechef.component.xero.action.XeroCreateQuoteAction;
 import com.bytechef.component.xero.connection.XeroConnection;
+import com.bytechef.component.xero.trigger.XeroNewBillTrigger;
+import com.bytechef.component.xero.trigger.XeroNewContactTrigger;
+import com.bytechef.component.xero.trigger.XeroNewInvoiceTrigger;
 import com.google.auto.service.AutoService;
 
 /**
@@ -48,7 +51,11 @@ public class XeroComponentHandler implements ComponentHandler {
             XeroCreateBillAction.ACTION_DEFINITION,
             XeroCreateContactAction.ACTION_DEFINITION,
             XeroCreateInvoiceAction.ACTION_DEFINITION,
-            XeroCreateQuoteAction.ACTION_DEFINITION);
+            XeroCreateQuoteAction.ACTION_DEFINITION)
+        .triggers(
+            XeroNewBillTrigger.TRIGGER_DEFINITION,
+            XeroNewContactTrigger.TRIGGER_DEFINITION,
+            XeroNewInvoiceTrigger.TRIGGER_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

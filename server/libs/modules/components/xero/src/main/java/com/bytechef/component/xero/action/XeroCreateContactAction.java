@@ -30,7 +30,7 @@ import static com.bytechef.component.xero.constant.XeroConstants.BASE_URL;
 import static com.bytechef.component.xero.constant.XeroConstants.CITY;
 import static com.bytechef.component.xero.constant.XeroConstants.COMPANY_NUMBER;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACTS;
-import static com.bytechef.component.xero.constant.XeroConstants.CONTACT_ID;
+import static com.bytechef.component.xero.constant.XeroConstants.CONTACT_OUTPUT_PROPERTY;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACT_STATUS;
 import static com.bytechef.component.xero.constant.XeroConstants.COUNTRY;
 import static com.bytechef.component.xero.constant.XeroConstants.CREATE_CONTACT;
@@ -175,36 +175,7 @@ public class XeroCreateContactAction {
                                 .required(false)))
                 .maxItems(2)
                 .required(false))
-        .outputSchema(
-            object()
-                .properties(
-                    string(CONTACT_ID),
-                    string(COMPANY_NUMBER),
-                    string(ACCOUNT_NUMBER),
-                    string(CONTACT_STATUS),
-                    string(NAME),
-                    string(FIRST_NAME),
-                    string(LAST_NAME),
-                    string(EMAIL_ADDRESS),
-                    string(BANK_ACCOUNT_DETAILS),
-                    string(TAX_NUMBER),
-                    array(ADDRESSES)
-                        .items(
-                            object()
-                                .properties(
-                                    string(ADDRESS_TYPE),
-                                    string(CITY),
-                                    string(REGION),
-                                    string(POSTAL_CODE),
-                                    string(COUNTRY))),
-                    array(PHONES)
-                        .items(
-                            object()
-                                .properties(
-                                    string(PHONE_TYPE),
-                                    string(PHONE_NUMBER),
-                                    string(PHONE_AREA_CODE),
-                                    string(PHONE_COUNTRY_CODE)))))
+        .outputSchema(CONTACT_OUTPUT_PROPERTY)
         .perform(XeroCreateContactAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_CONTACTS_CONTEXT_FUNCTION =
