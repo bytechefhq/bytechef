@@ -2,7 +2,7 @@
 
 Thanks for taking the time for contribution to ByteChef!
 We're very welcoming community and while it's very much appreciated if you follow these guidelines it's not a requirement.
-![contributing-readme](https://static.scarf.sh/a.png?x-pxid=d4e17b5c-e0a7-4ae4-9941-c96a8ebc0d37)
+![anl-contributing-md](https://static.scarf.sh/a.png?x-pxid=a1e692ba-38cb-4361-a10b-b013c5e691b6)
 
 ## How can I contribute?
 
