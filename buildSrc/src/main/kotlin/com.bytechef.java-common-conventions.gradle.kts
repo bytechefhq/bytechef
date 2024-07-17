@@ -265,9 +265,13 @@ val testIntegration by tasks.registering(Test::class) {
                 println("\n" + "\n" + startItem + output + endItem + "\n")
 
                 if (System.getenv("GITHUB_ACTIONS_BUILD")?.toBoolean() == true) {
-                    delete("build")
+                    delete("build/classes")
+                    delete("build/kotlin")
+                    delete("build/kotlin-dsl")
+                    delete("build/libs")
+                    delete("build/tmp")
 
-                    println("\nBuild directory is deleted")
+                    println("\nBuild directory cleaned")
                 }
                 else {
                     println("\nWARN: generated build and test resources were not deleted")
