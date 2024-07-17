@@ -22,6 +22,7 @@ import static com.bytechef.component.shopify.constant.ShopifyConstants.PRODUCT_I
 import static com.bytechef.component.shopify.constant.ShopifyConstants.SHOP_NAME;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
@@ -99,6 +100,35 @@ public class ShopifyUtils {
         }
 
         return options;
+    }
+
+    public static Long subscribeWebhook(
+        Parameters connectionParameters, String webhookUrl, Context context, String topic) {
+
+        Map<String, ?> body = context.http(http -> http.post(getBaseUrl(connectionParameters) + "/webhooks.json"))
+            .body(Http.Body.of(
+                "webhook", Map.of(
+                    "topic", topic,
+                    "address", webhookUrl,
+                    "format", "json")))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        if (body.get("webhook") instanceof Map<?, ?> map) {
+            return (Long) map.get(ID);
+        }
+
+        return null;
+    }
+
+    public static void unsubscribeWebhook(
+        Parameters connectionParameters, Parameters outputParameters, Context context) {
+
+        context.http(http -> http
+            .delete(getBaseUrl(connectionParameters) + "/webhooks/" + outputParameters.getString(ID) + ".json"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute();
     }
 
 }

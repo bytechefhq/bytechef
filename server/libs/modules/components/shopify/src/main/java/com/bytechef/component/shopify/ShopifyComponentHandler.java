@@ -28,6 +28,7 @@ import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
@@ -36,6 +37,9 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Property.ValueProperty;
+import com.bytechef.component.shopify.trigger.ShopifyNewCancelledOrderTrigger;
+import com.bytechef.component.shopify.trigger.ShopifyNewOrderTrigger;
+import com.bytechef.component.shopify.trigger.ShopifyNewPaidOrderTrigger;
 import com.bytechef.component.shopify.util.ShopifyUtils;
 import com.bytechef.definition.BaseProperty;
 import com.google.auto.service.AutoService;
@@ -48,6 +52,14 @@ import java.util.Optional;
  */
 @AutoService(OpenApiComponentHandler.class)
 public class ShopifyComponentHandler extends AbstractShopifyComponentHandler {
+
+    @Override
+    public List<ComponentDSL.ModifiableTriggerDefinition> getTriggers() {
+        return List.of(
+            ShopifyNewCancelledOrderTrigger.TRIGGER_DEFINITION,
+            ShopifyNewOrderTrigger.TRIGGER_DEFINITION,
+            ShopifyNewPaidOrderTrigger.TRIGGER_DEFINITION);
+    }
 
     @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
@@ -124,4 +136,5 @@ public class ShopifyComponentHandler extends AbstractShopifyComponentHandler {
 
         return modifiableProperty;
     }
+
 }
