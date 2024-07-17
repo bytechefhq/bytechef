@@ -17,13 +17,17 @@
 package com.bytechef.component.shopify.util;
 
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.ID;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.SHOP_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
@@ -33,13 +37,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Domiter
  */
 class ShopifyUtilsTest {
 
-    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Context mockedContext = mock(Context.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
@@ -67,7 +74,7 @@ class ShopifyUtilsTest {
 
         map.put("orders", orders);
 
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -82,7 +89,7 @@ class ShopifyUtilsTest {
 
         assertEquals(
             expectedOptions,
-            ShopifyUtils.getOrderIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+            ShopifyUtils.getOrderIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
     }
 
     @Test
@@ -98,7 +105,7 @@ class ShopifyUtilsTest {
 
         map.put("products", products);
 
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -113,7 +120,7 @@ class ShopifyUtilsTest {
 
         assertEquals(
             expectedOptions,
-            ShopifyUtils.getProductIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+            ShopifyUtils.getProductIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
     }
 
     @Test
@@ -129,7 +136,7 @@ class ShopifyUtilsTest {
 
         map.put("variants", variants);
 
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -144,6 +151,49 @@ class ShopifyUtilsTest {
 
         assertEquals(
             expectedOptions,
-            ShopifyUtils.getVariantIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+            ShopifyUtils.getVariantIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+    }
+
+    @Test
+    void testSubscribeWebhok() {
+        when(mockedContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("webhook", Map.of(ID, 123L)));
+
+        assertEquals(123L,
+            ShopifyUtils.subscribeWebhook(mockedParameters, "webhookUrl", mockedContext, "topic"));
+
+        Http.Body body = bodyArgumentCaptor.getValue();
+
+        Object content = body.getContent();
+
+        assertEquals(Map.of(
+            "webhook", Map.of(
+                "topic", "topic",
+                "address", "webhookUrl",
+                "format", "json")), content);
+    }
+
+    @Test
+    void testUnsubscribeWebhook() {
+        when(mockedContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+
+        ShopifyUtils.unsubscribeWebhook(mockedParameters, mockedParameters, mockedContext);
+
+        verify(mockedContext, times(1)).http(any());
+        verify(mockedExecutor, times(1)).configuration(any());
+        verify(mockedExecutor, times(1)).execute();
     }
 }
