@@ -28,9 +28,9 @@ null
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Filename | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Filename | STRING | TEXT  |  The path of the file to read.  |
 
 
 ### Output
@@ -57,10 +57,10 @@ null
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| File | FILE_ENTRY | FILE_ENTRY  |
-| Filename | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| File | FILE_ENTRY | FILE_ENTRY  |  The object property which contains a reference to the file to be written.  |
+| Filename | STRING | TEXT  |  The path to which the file should be written.  |
 
 
 ### Output
@@ -89,8 +89,8 @@ Creates a temporary directory on the filesystem.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
 null
 
 
@@ -120,9 +120,9 @@ Gets the full path from a full filename, which is the prefix + path, and also ex
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Filename | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Filename | STRING | TEXT  |  The path to full filename.  |
 
 
 ### Output
@@ -151,10 +151,10 @@ Lists a content of directory for the given path.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Path | STRING | TEXT  |
-| Recursive | BOOLEAN | SELECT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Path | STRING | TEXT  |  The path of a directory.  |
+| Recursive | BOOLEAN | SELECT  |  Should subdirectories be included.  |
 
 
 ### Output
@@ -178,9 +178,9 @@ Creates a directory.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Path | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Path | STRING | TEXT  |  The path of a directory.  |
 
 
 ### Output
@@ -209,9 +209,9 @@ Removes the content of a directory.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Path | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Path | STRING | TEXT  |  The path of a directory.  |
 
 
 ### Output

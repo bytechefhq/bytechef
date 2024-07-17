@@ -26,9 +26,9 @@ Executes the script.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Script | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Script | STRING | TEXT  |  Script written in bash.  |
 
 
 ### Output

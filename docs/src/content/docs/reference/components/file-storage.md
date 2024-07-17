@@ -28,9 +28,9 @@ Reads data from the file as string.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| File | FILE_ENTRY | FILE_ENTRY  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| File | FILE_ENTRY | FILE_ENTRY  |  The object property which contains a reference to the file to read from.  |
 
 
 ### Output
@@ -59,10 +59,10 @@ Writes the data to the file.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Content | STRING | TEXT  |
-| Filename | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Content | STRING | TEXT  |  String to write to the file.  |
+| Filename | STRING | TEXT  |  Filename to set for data. By default, "file.txt" will be used.  |
 
 
 ### Output
@@ -89,10 +89,10 @@ Download a file from the URL.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| URL | STRING | TEXT  |
-| Filename | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| URL | STRING | TEXT  |  The URL to download a file from.  |
+| Filename | STRING | TEXT  |  Filename to set for data. By default, "file.txt" will be used.  |
 
 
 ### Output

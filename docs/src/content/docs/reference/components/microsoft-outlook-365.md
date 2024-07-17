@@ -26,11 +26,11 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Client Id | STRING | TEXT  |
-| Client Secret | STRING | TEXT  |
-| Tenant Id | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Client Id | STRING | TEXT  |  |
+| Client Secret | STRING | TEXT  |  |
+| Tenant Id | STRING | TEXT  |  |
 
 
 
@@ -50,9 +50,9 @@ Get a specific message
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Message id | STRING | SELECT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Message id | STRING | SELECT  |  Id of the message  |
 
 
 ### Output
@@ -76,12 +76,12 @@ Get the messages in the signed-in user's mailbox
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| From | STRING | TEXT  |
-| To | STRING | TEXT  |
-| Subject | STRING | TEXT  |
-| Category | STRING | SELECT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| From | STRING | TEXT  |  The address sending the mail  |
+| To | STRING | TEXT  |  The address receiving the new mail  |
+| Subject | STRING | TEXT  |  Words in the subject line  |
+| Category | STRING | SELECT  |  Messages in a certain category  |
 
 
 ### Output
@@ -105,15 +105,15 @@ Send the message.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| From | OBJECT | OBJECT_BUILDER  |
-| To recipients | ARRAY | ARRAY_BUILDER  |
-| Subject | STRING | TEXT  |
-| Bcc recipients | ARRAY | ARRAY_BUILDER  |
-| Cc recipients | ARRAY | ARRAY_BUILDER  |
-| Reply to | ARRAY | ARRAY_BUILDER  |
-| Body | OBJECT | OBJECT_BUILDER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| From | {{{STRING(address), STRING(name)}(emailAddress)}(recipient)} | OBJECT_BUILDER  |  The owner of the mailbox from which the message is sent. In most cases, this value is the same as the sender property, except for sharing or delegation scenarios. The value must correspond to the actual mailbox used.  |
+| To recipients | [{{STRING(address), STRING(name)}(emailAddress)}($recipient)] | ARRAY_BUILDER  |  The To: recipients for the message.  |
+| Subject | STRING | TEXT  |  The subject of the message.  |
+| Bcc recipients | [{{STRING(address), STRING(name)}(emailAddress)}($recipient)] | ARRAY_BUILDER  |  The Bcc recipients for the message.  |
+| Cc recipients | [{{STRING(address), STRING(name)}(emailAddress)}($recipient)] | ARRAY_BUILDER  |  The Cc recipients for the message.  |
+| Reply to | [{{STRING(address), STRING(name)}(emailAddress)}($recipient)] | ARRAY_BUILDER  |  The email addresses to use when replying.  |
+| Body | {STRING(content), STRING(contentType)} | OBJECT_BUILDER  |  The body of the message. It can be in HTML or text format.  |
 
 
 

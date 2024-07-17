@@ -26,9 +26,9 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Token | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Token | STRING | TEXT  |  |
 
 
 
@@ -48,9 +48,9 @@ Creates a new opportunity
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Name | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Name | STRING | TEXT  |  The name of the opportunity.  |
 
 
 ### Output
@@ -75,10 +75,10 @@ Creates a new organization
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Name | STRING | TEXT  |
-| Domain | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Name | STRING | TEXT  |  The name of the organization.  |
+| Domain | STRING | TEXT  |  The domain name of the organization.  |
 
 
 ### Output
@@ -104,11 +104,11 @@ Creates a new person
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| First name | STRING | TEXT  |
-| Last name | STRING | TEXT  |
-| Emails | ARRAY | ARRAY_BUILDER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| First name | STRING | TEXT  |  The first name of the person.  |
+| Last name | STRING | TEXT  |  The last name of the person.  |
+| Emails | [STRING] | ARRAY_BUILDER  |  The email addresses of the person.  |
 
 
 ### Output
@@ -124,7 +124,7 @@ Type: OBJECT
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| ARRAY | ARRAY_BUILDER  |
+| [STRING] | ARRAY_BUILDER  |
 
 
 

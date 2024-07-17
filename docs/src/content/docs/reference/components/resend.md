@@ -26,9 +26,9 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Token | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Token | STRING | TEXT  |  |
 
 
 
@@ -48,20 +48,20 @@ Description
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| From | STRING | EMAIL  |
-| To | ARRAY | ARRAY_BUILDER  |
-| Subject | STRING | TEXT  |
-| Bcc | ARRAY | ARRAY_BUILDER  |
-| Cc | ARRAY | ARRAY_BUILDER  |
-| Reply to | ARRAY | ARRAY_BUILDER  |
-| Content type | INTEGER | SELECT  |
-| HTML | STRING | TEXT  |
-| Text | STRING | TEXT  |
-| Headers | OBJECT | OBJECT_BUILDER  |
-| Attachments | ARRAY | ARRAY_BUILDER  |
-| ARRAY | ARRAY_BUILDER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| From | STRING | EMAIL  |  Sender email address.  |
+| To | [STRING($email)] | ARRAY_BUILDER  |  Recipients email addresses.  |
+| Subject | STRING | TEXT  |  Email subject.  |
+| Bcc | [STRING($email)] | ARRAY_BUILDER  |  Bcc recipients email addresses.  |
+| Cc | [STRING($email)] | ARRAY_BUILDER  |  Cc recipients email addresses.  |
+| Reply to | [STRING($email)] | ARRAY_BUILDER  |  Reply-to email addresses.  |
+| Content type | INTEGER | SELECT  |  |
+| HTML | STRING | TEXT  |  The HTML version of the message.  |
+| Text | STRING | TEXT  |  The plain text version of the message.  |
+| Headers | {} | OBJECT_BUILDER  |  Custom headers to add to the email.  |
+| Attachments | [FILE_ENTRY] | ARRAY_BUILDER  |  A list of attachments to send with the email.  |
+| [{STRING(name), STRING(value)}] | ARRAY_BUILDER  |
 
 
 ### Output

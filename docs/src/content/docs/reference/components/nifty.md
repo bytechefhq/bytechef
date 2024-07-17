@@ -26,10 +26,10 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Client id | STRING | TEXT  |
-| Client secret | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Client id | STRING | TEXT  |  |
+| Client secret | STRING | TEXT  |  |
 
 
 
@@ -49,13 +49,13 @@ Create a new task
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Name | STRING | TEXT  |
-| Description | STRING | TEXT  |
-| Project | STRING | SELECT  |
-| Status | STRING | SELECT  |
-| Due date | DATE_TIME | DATE_TIME  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Name | STRING | TEXT  |  Name of the task  |
+| Description | STRING | TEXT  |  Description of the task.  |
+| Project | STRING | SELECT  |  Project within which the task will be created.  |
+| Status | STRING | SELECT  |  |
+| Due date | DATE_TIME | DATE_TIME  |  Due date for the task.  |
 
 
 ### Output

@@ -28,14 +28,14 @@ Reads data from a JSON file.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| File Type | STRING | SELECT  |
-| File | FILE_ENTRY | FILE_ENTRY  |
-| Is Array | BOOLEAN | SELECT  |
-| Path | STRING | TEXT  |
-| Page Size | INTEGER | INTEGER  |
-| Page Number | INTEGER | INTEGER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| File Type | STRING | SELECT  |  The file type to choose.  |
+| File | FILE_ENTRY | FILE_ENTRY  |  The object property which contains a reference to the JSON file to read from.  |
+| Is Array | BOOLEAN | SELECT  |  The object input is array?  |
+| Path | STRING | TEXT  |  The path where the array is e.g 'data'. Leave blank to use the top level object.  |
+| Page Size | INTEGER | INTEGER  |  The amount of child elements to return in a page.  |
+| Page Number | INTEGER | INTEGER  |  The page number to get.  |
 
 
 
@@ -45,13 +45,13 @@ Writes the data to a JSON file.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| File Type | STRING | SELECT  |
-| Type | INTEGER | SELECT  |
-| Source | OBJECT | OBJECT_BUILDER  |
-| Source | ARRAY | ARRAY_BUILDER  |
-| Filename | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| File Type | STRING | SELECT  |  The file type to choose.  |
+| Type | INTEGER | SELECT  |  The value type.  |
+| Source | {} | OBJECT_BUILDER  |  The object to write to the file.  |
+| Source | [] | ARRAY_BUILDER  |  The array to write to the file.  |
+| Filename | STRING | TEXT  |  Filename to set for binary data. By default, "file.json" will be used.  |
 
 
 ### Output

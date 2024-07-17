@@ -26,10 +26,10 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Key | STRING | TEXT  |
-| Value | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Key | STRING | TEXT  |  |
+| Value | STRING | TEXT  |  |
 
 
 
@@ -55,9 +55,9 @@ Create email template
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Email   Template | OBJECT | OBJECT_BUILDER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Email   Template | {STRING(name), STRING(subject), STRING(fromEmail), STRING(replyEmail)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -70,7 +70,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| OBJECT | OBJECT_BUILDER  |
+| {{INTEGER(id), STRING(name), STRING(subject), STRING(fromEmail), STRING(replyEmail)}(email)} | OBJECT_BUILDER  |
 
 
 
@@ -81,9 +81,9 @@ Creates new People
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| People | ARRAY | ARRAY_BUILDER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| People | [{STRING(email), STRING(firstName), STRING(lastName), STRING(website), STRING(title), STRING(phone)}] | ARRAY_BUILDER  |  |
 
 
 ### Output
@@ -96,7 +96,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| OBJECT | OBJECT_BUILDER  |
+| {[{STRING(email), STRING(firstName), STRING(lastName), STRING(website), STRING(title), STRING(id), STRING(phone)}](users)} | OBJECT_BUILDER  |
 
 
 
@@ -107,10 +107,18 @@ Add tag(s) to an existing user.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Tag | OBJECT | OBJECT_BUILDER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Tag | {STRING(tag), STRING(email)} | OBJECT_BUILDER  |  |
 
 
 
 
+<hr />
+
+# Additional instructions
+<hr />
+
+## CONNECTION
+
+[API Location](https://app.encharge.io/settings/account)

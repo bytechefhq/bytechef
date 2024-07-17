@@ -26,10 +26,10 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| System user access token | STRING | TEXT  |
-| Phone number ID | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| System user access token | STRING | TEXT  |  |
+| Phone number ID | STRING | TEXT  |  |
 
 
 
@@ -48,9 +48,9 @@ Triggers when you get a new message from certain number.
 #### Type: DYNAMIC_WEBHOOK
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Sender number | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Sender number | STRING | TEXT  |  Type in the number from whom you want to trigger  |
 
 
 ### Output
@@ -64,7 +64,7 @@ Type: OBJECT
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | STRING | TEXT  |
-| OBJECT | OBJECT_BUILDER  |
+| {STRING(id), {{STRING(messaging_product), {STRING(display_phone_number), STRING(phone_number_id)}(metadata)}(value), {{STRING(name)}(profile), STRING(wa_id)}(contacts), {STRING(from), STRING(id), STRING(timestamp), {STRING(body)}(text)}(messages)}(changes)} | OBJECT_BUILDER  |
 
 
 
@@ -83,10 +83,10 @@ Send a message via WhatsApp
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Message | STRING | TEXT  |
-| Send message to | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Message | STRING | TEXT  |  Message to send via WhatsApp  |
+| Send message to | STRING | TEXT  |  Phone number to send the message. It must start with "+" sign  |
 
 
 ### Output
@@ -100,8 +100,8 @@ Type: OBJECT
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | STRING | TEXT  |
-| OBJECT | OBJECT_BUILDER  |
-| OBJECT | OBJECT_BUILDER  |
+| {STRING(input), STRING(wa_id)} | OBJECT_BUILDER  |
+| {STRING(id)} | OBJECT_BUILDER  |
 
 
 

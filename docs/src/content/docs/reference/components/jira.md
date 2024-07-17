@@ -26,11 +26,11 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Your domain | STRING | TEXT  |
-| Email | STRING | TEXT  |
-| API token | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Your domain | STRING | TEXT  |  e.g https://{yourDomain}}.atlassian.net  |
+| Email | STRING | TEXT  |  The email used to log in to Jira  |
+| API token | STRING | TEXT  |  |
 
 
 
@@ -50,15 +50,15 @@ Creates a new issue.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Project Name | STRING | SELECT  |
-| Summary | STRING | TEXT  |
-| Issue type | STRING | SELECT  |
-| Parent | STRING | SELECT  |
-| Assignee | STRING | SELECT  |
-| Priority | STRING | SELECT  |
-| Description | STRING | TEXT_AREA  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Project Name | STRING | SELECT  |  The name of the project to create the issue in.  |
+| Summary | STRING | TEXT  |  A brief summary of the issue.  |
+| Issue type | STRING | SELECT  |  The type of issue.  |
+| Parent | STRING | SELECT  |    |
+| Assignee | STRING | SELECT  |  User who will be assigned to the issue.  |
+| Priority | STRING | SELECT  |  Priority of the issue.  |
+| Description | STRING | TEXT_AREA  |  Description of the issue.  |
 
 
 ### Output
@@ -83,10 +83,10 @@ Get issue details in selected project.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Project Name | STRING | SELECT  |
-| Issue name | STRING | SELECT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Project Name | STRING | SELECT  |  Project where the issue is located.  |
+| Issue name | STRING | SELECT  |  |
 
 
 ### Output
@@ -101,7 +101,7 @@ Type: OBJECT
 |:------------:|:--------------------:|
 | STRING | TEXT  |
 | STRING | TEXT  |
-| OBJECT | OBJECT_BUILDER  |
+| {{STRING(id), STRING(name)}(issuetype), {STRING(id), STRING(name)}(project), {STRING(id), STRING(name)}(priority), {STRING(id), STRING(name)}(assignee), {STRING(type), [{[{STRING(text), STRING(type)}](content), STRING(type)}](content)}(description)} | OBJECT_BUILDER  |
 
 
 
@@ -112,10 +112,10 @@ Search for issues using JQL
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| JQL | STRING | TEXT  |
-| Max results | INTEGER | INTEGER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| JQL | STRING | TEXT  |  The JQL that defines the search. If no JQL expression is provided, all issues are returned  |
+| Max results | INTEGER | INTEGER  |  The maximum number of items to return per page.  |
 
 
 ### Output

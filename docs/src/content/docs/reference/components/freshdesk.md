@@ -26,10 +26,10 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Domain | STRING | TEXT  |
-| API key | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Domain | STRING | TEXT  |  Your helpdesk domain name, e.g. https://{your_domain}.freshdesk.com/api/v2  |
+| API key | STRING | TEXT  |  |
 
 
 
@@ -55,9 +55,9 @@ Creates a new company
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Company | OBJECT | OBJECT_BUILDER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Company | {STRING(name), STRING(description), STRING(note)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -70,7 +70,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| OBJECT | OBJECT_BUILDER  |
+| {NUMBER(id), STRING(name), STRING(description), STRING(note)} | OBJECT_BUILDER  |
 
 
 
@@ -81,9 +81,9 @@ Creates a new contact
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Contact | OBJECT | OBJECT_BUILDER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Contact | {STRING(name), STRING(email), STRING(phone), STRING(mobile), STRING(description), STRING(job_title)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -96,7 +96,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| OBJECT | OBJECT_BUILDER  |
+| {STRING(description), STRING(email), NUMBER(id), STRING(job_title)} | OBJECT_BUILDER  |
 
 
 
@@ -107,9 +107,9 @@ Creates a new ticket
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Ticket | OBJECT | OBJECT_BUILDER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Ticket | {STRING(subject), STRING(email), STRING(description), INTEGER(priority), INTEGER(status)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -122,7 +122,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| OBJECT | OBJECT_BUILDER  |
+| {STRING(subject), STRING(email), STRING(description), INTEGER(priority), INTEGER(status)} | OBJECT_BUILDER  |
 
 
 

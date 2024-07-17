@@ -26,9 +26,9 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Token | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Token | STRING | TEXT  |  |
 
 
 
@@ -48,15 +48,15 @@ Creates new contact. A contact may represent a single individual or an organizat
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Is contact represent an organization? | BOOLEAN | SELECT  |
-| Name | STRING | TEXT  |
-| First name | STRING | TEXT  |
-| Last name | STRING | TEXT  |
-| Title | STRING | TEXT  |
-| Website | STRING | TEXT  |
-| Email | STRING | EMAIL  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Is contact represent an organization? | BOOLEAN | SELECT  |  Is contact represent an organization or a single individual?  |
+| Name | STRING | TEXT  |  The name of the organisation.  |
+| First name | STRING | TEXT  |  The first name of the person.  |
+| Last name | STRING | TEXT  |  The last name of the person.  |
+| Title | STRING | TEXT  |  |
+| Website | STRING | TEXT  |  |
+| Email | STRING | EMAIL  |  |
 
 
 ### Output
@@ -69,8 +69,8 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| OBJECT | OBJECT_BUILDER  |
-| OBJECT | OBJECT_BUILDER  |
+| {STRING(id), BOOLEAN(is_organization), STRING(title), STRING(website), STRING(email)} | OBJECT_BUILDER  |
+| {INTEGER(version), STRING(type)} | OBJECT_BUILDER  |
 
 
 
@@ -81,10 +81,10 @@ Creates new Task
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Task name | STRING | TEXT  |
-| Due Date | DATE | DATE  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Task name | STRING | TEXT  |  |
+| Due Date | DATE | DATE  |  |
 
 
 ### Output
@@ -97,8 +97,8 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| OBJECT | OBJECT_BUILDER  |
-| OBJECT | OBJECT_BUILDER  |
+| {INTEGER(id), STRING(content), DATE(due_date)} | OBJECT_BUILDER  |
+| {STRING(type)} | OBJECT_BUILDER  |
 
 
 

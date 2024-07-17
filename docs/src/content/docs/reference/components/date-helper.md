@@ -28,10 +28,10 @@ Converts UNIX timestamp to ISO8601 format.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| UNIX Timestamp. | NUMBER | NUMBER  |
-| Date Format | STRING | SELECT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| UNIX Timestamp. | NUMBER | NUMBER  |  UNIX Timestamp in seconds (10 digits) or milliseconds (13 digits)  |
+| Date Format | STRING | SELECT  |  Formatting that should be applied the text representation of date.  |
 
 
 ### Output

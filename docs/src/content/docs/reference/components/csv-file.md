@@ -28,15 +28,15 @@ Reads data from a csv file.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| File | FILE_ENTRY | FILE_ENTRY  |
-| Delimiter | STRING | TEXT  |
-| Header Row | BOOLEAN | SELECT  |
-| Include Empty Cells | BOOLEAN | SELECT  |
-| Page Size | INTEGER | INTEGER  |
-| Page Number | INTEGER | INTEGER  |
-| Read As String | BOOLEAN | SELECT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| File | FILE_ENTRY | FILE_ENTRY  |  The object property which contains a reference to the csv file to read from.  |
+| Delimiter | STRING | TEXT  |  Delimiter to use when reading a csv file.  |
+| Header Row | BOOLEAN | SELECT  |  The first row of the file contains the header names.  |
+| Include Empty Cells | BOOLEAN | SELECT  |  When reading from file the empty cells will be filled with an empty string.  |
+| Page Size | INTEGER | INTEGER  |  The amount of child elements to return in a page.  |
+| Page Number | INTEGER | INTEGER  |  The page number to get.  |
+| Read As String | BOOLEAN | SELECT  |  In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.  |
 
 
 
@@ -46,10 +46,10 @@ Writes the data to a csv file.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Rows | ARRAY | ARRAY_BUILDER  |
-| Filename | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Rows | [{}] | ARRAY_BUILDER  |  The array of objects to write to the file.  |
+| Filename | STRING | TEXT  |  Filename to set for binary data. By default, "file.csv" will be used.  |
 
 
 ### Output

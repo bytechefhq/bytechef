@@ -26,9 +26,9 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Access Token | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Access Token | STRING | TEXT  |  Access Token that is given to you when you create a API Token in OneSimpleApi  |
 
 
 
@@ -48,11 +48,11 @@ Convert your currency into any other
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| From Currency | STRING | SELECT  |
-| To Currency | STRING | SELECT  |
-| Value | NUMBER | NUMBER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| From Currency | STRING | SELECT  |  Select a currency from which you want to convert  |
+| To Currency | STRING | SELECT  |  Select a currency to which you want to convert  |
+| Value | NUMBER | NUMBER  |  Input the number for conversion  |
 
 
 ### Output
@@ -79,9 +79,9 @@ Shorten your desired URL
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| URL | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| URL | STRING | TEXT  |  Place the URL you want to shorten  |
 
 
 ### Output
@@ -106,9 +106,9 @@ Get information about a certain webpage
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| URL | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| URL | STRING | TEXT  |  Place the web page url you want to get info from  |
 
 
 ### Output
@@ -121,9 +121,9 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| OBJECT | OBJECT_BUILDER  |
-| OBJECT | OBJECT_BUILDER  |
-| OBJECT | OBJECT_BUILDER  |
+| {STRING(title), STRING(description), STRING(canonical)} | OBJECT_BUILDER  |
+| {STRING(site), STRING(title), STRING(description)} | OBJECT_BUILDER  |
+| {STRING(title), STRING(url), STRING(image), STRING(description), STRING(type)} | OBJECT_BUILDER  |
 
 
 

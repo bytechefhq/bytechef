@@ -26,10 +26,10 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Client Id | STRING | TEXT  |
-| Client Secret | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Client Id | STRING | TEXT  |  |
+| Client Secret | STRING | TEXT  |  |
 
 
 
@@ -49,10 +49,10 @@ Uploads a file in your Google Drive
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| File | FILE_ENTRY | FILE_ENTRY  |
-| Parent folder | STRING | SELECT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| File | FILE_ENTRY | FILE_ENTRY  |  The object property which contains a reference to the file to upload.  |
+| Parent folder | STRING | SELECT  |  Folder where the file will be uploaded; if no folder is selected, the file will be uploaded to the root folder.  |
 
 
 ### Output
@@ -83,9 +83,9 @@ Read a selected file from Google Drive file.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| File | STRING | SELECT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| File | STRING | SELECT  |  The id of a file to read.  |
 
 
 ### Output
@@ -112,10 +112,10 @@ Creates a new empty folder in Google Drive.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Folder name | STRING | TEXT  |
-| Parent folder | STRING | SELECT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Folder name | STRING | TEXT  |  The name of the new folder.  |
+| Parent folder | STRING | SELECT  |  Folder where the new folder will be created; if no folder is selected, the folder will be created in the root folder.  |
 
 
 ### Output
@@ -146,12 +146,12 @@ Creates a new text file in Google Drive.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| File name | STRING | TEXT  |
-| Text | STRING | TEXT_AREA  |
-| File type | STRING | SELECT  |
-| Parent folder | STRING | SELECT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| File name | STRING | TEXT  |  The name of the new text file.  |
+| Text | STRING | TEXT_AREA  |  The text content to add to file.  |
+| File type | STRING | SELECT  |  Select file type.  |
+| Parent folder | STRING | SELECT  |  Folder where the file should be created; if no folder is selected, the file will be created in the root folder.  |
 
 
 ### Output
@@ -177,3 +177,16 @@ Type: OBJECT
 
 
 
+<hr />
+
+# Additional instructions
+<hr />
+
+![anl-c-google-drive-md](https://static.scarf.sh/a.png?x-pxid=8a7e290d-47ec-48ca-95f4-7fb515dc3b8a)
+## CONNECTION
+
+[Setting up OAuth2](https://support.google.com/googleapi/answer/6158849?hl=en)
+
+[Guidejar](https://guidejar.com/guides/fec74020-26bb-43dd-814c-f8b907f6f45b) tutorial.
+
+[Turning on Drive API](https://guidejar.com/guides/4e69ce7b-c430-443c-801c-b01ea2781c39)

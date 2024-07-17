@@ -26,12 +26,12 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Access Key ID | STRING | TEXT  |
-| Secret Access Key | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Access Key ID | STRING | TEXT  |  |
+| Secret Access Key | STRING | TEXT  |  |
 | STRING | SELECT  |
-| Bucket | STRING | TEXT  |
+| Bucket | STRING | TEXT  |  |
 
 
 
@@ -51,10 +51,10 @@ Get the AWS S3 object.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Filename | STRING | TEXT  |
-| Key | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Filename | STRING | TEXT  |  Filename to set for binary data.  |
+| Key | STRING | TEXT  |  Key is most likely the name of the file.  |
 
 
 ### Output
@@ -81,9 +81,9 @@ Get the url of an AWS S3 object.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Key or Entity Tag (Etag) | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Key or Entity Tag (Etag) | STRING | TEXT  |  Key is most likely the name of the file.  |
 
 
 ### Output
@@ -107,9 +107,9 @@ Get the list AWS S3 objects. Every object needs to have read permission in order
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Prefix | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Prefix | STRING | TEXT  |  The prefix of an AWS S3 objects.  |
 
 
 ### Output
@@ -133,10 +133,10 @@ You can share an object with a pre-signed URL for up to 12 hours or until your s
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Key | STRING | TEXT  |
-| Signature Duration | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Key | STRING | TEXT  |  Key is most likely the name of the file.  |
+| Signature Duration | STRING | TEXT  |  Time interval until the pre-signed URL expires  |
 
 
 ### Output
@@ -160,11 +160,11 @@ Store an object to AWS S3.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| File | FILE_ENTRY | FILE_ENTRY  |
-| Key | STRING | TEXT  |
-| ACL | STRING | SELECT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| File | FILE_ENTRY | FILE_ENTRY  |  The object property which contains a reference to the file that needs to be written to AWS S3.  |
+| Key | STRING | TEXT  |  Key is most likely the name of the file.  |
+| ACL | STRING | SELECT  |  The canned ACL to apply to the object.  |
 
 
 ### Output

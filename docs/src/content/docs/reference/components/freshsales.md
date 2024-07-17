@@ -26,10 +26,10 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Bundle alias | STRING | TEXT  |
-| API Key | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Bundle alias | STRING | TEXT  |  Your Freshsales bundle alias (e.g. https://<alias>.myfreshworks.com)  |
+| API Key | STRING | TEXT  |  The API Key supplied by Freshsales  |
 
 
 
@@ -49,11 +49,11 @@ Creates a new account
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Name | STRING | TEXT  |
-| Website | STRING | URL  |
-| Phone | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Name | STRING | TEXT  |  Name of the account  |
+| Website | STRING | URL  |  Website of the account  |
+| Phone | STRING | TEXT  |  Phone number of the account  |
 
 
 ### Output
@@ -80,23 +80,23 @@ Add new contact in Freshsales CRM
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| First name | STRING | TEXT  |
-| Last name | STRING | TEXT  |
-| Job title | STRING | TEXT  |
-| Email | STRING | EMAIL  |
-| Work number | STRING | PHONE  |
-| Mobile number | STRING | TEXT  |
-| Address | STRING | TEXT  |
-| City | STRING | TEXT  |
-| State | STRING | TEXT  |
-| Zip code | STRING | TEXT  |
-| Country | STRING | TEXT  |
-| Medium | STRING | TEXT  |
-| Facebook | STRING | TEXT  |
-| Twitter | STRING | TEXT  |
-| LinkedIn | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| First name | STRING | TEXT  |  First name of the contact  |
+| Last name | STRING | TEXT  |  Last name of the contact  |
+| Job title | STRING | TEXT  |  Designation of the contact in the account they belong to  |
+| Email | STRING | EMAIL  |  Primary email address of the contact  |
+| Work number | STRING | PHONE  |  Work phone number of the contact  |
+| Mobile number | STRING | TEXT  |  Mobile phone number of the contact  |
+| Address | STRING | TEXT  |  Address of the contact  |
+| City | STRING | TEXT  |  City that the contact belongs to  |
+| State | STRING | TEXT  |  State that the contact belongs to  |
+| Zip code | STRING | TEXT  |  Zipcode of the region that the contact belongs to  |
+| Country | STRING | TEXT  |  Country that the contact belongs to  |
+| Medium | STRING | TEXT  |  The medium that led your contact to your website/web app  |
+| Facebook | STRING | TEXT  |  Facebook username of the contact  |
+| Twitter | STRING | TEXT  |  Twitter username of the contact  |
+| LinkedIn | STRING | TEXT  |  LinkedIn account of the contact  |
 
 
 ### Output
@@ -135,11 +135,11 @@ Creates a new lead
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| First name | STRING | TEXT  |
-| Last name | STRING | TEXT  |
-| Email | STRING | EMAIL  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| First name | STRING | TEXT  |  First name of the lead  |
+| Last name | STRING | TEXT  |  Last name of the lead  |
+| Email | STRING | EMAIL  |  Primary email address of the lead  |
 
 
 ### Output

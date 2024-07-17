@@ -26,10 +26,10 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Client Id | STRING | TEXT  |
-| Client Secret | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Client Id | STRING | TEXT  |  |
+| Client Secret | STRING | TEXT  |  |
 
 
 
@@ -48,9 +48,9 @@ Triggers when an Audience subscriber is added to the list.
 #### Type: DYNAMIC_WEBHOOK
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| List Id | STRING | SELECT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| List Id | STRING | SELECT  |  The list id of intended audience to which you would like to add the contact.  |
 
 
 ### Output
@@ -63,7 +63,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| OBJECT | OBJECT_BUILDER  |
+| {STRING(email), STRING(email_type), STRING(id), STRING(ip_opt), STRING(ip_signup), STRING(list_id), {STRING(EMAIL), STRING(FNAME), STRING(INTERESTS), STRING(LNAME)}(merges)} | OBJECT_BUILDER  |
 | DATE_TIME | DATE_TIME  |
 | STRING | TEXT  |
 
@@ -84,11 +84,11 @@ Add a new member to the list.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| List Id | STRING | SELECT  |
-| Skip Merge Validation | BOOLEAN | SELECT  |
-| Item | OBJECT | OBJECT_BUILDER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| List Id | STRING | SELECT  |  The unique ID for the list.  |
+| Skip Merge Validation | BOOLEAN | SELECT  |  If skip_merge_validation is true, member data will be accepted without merge field values, even if the merge field is usually required. This defaults to false.  |
+| Item | {STRING(email_address), STRING(status), STRING(email_type), {}(merge_fields), {}(interests), STRING(language), BOOLEAN(vip), {NUMBER(latitude), NUMBER(longitude)}(location), [{STRING(marketing_permission_id), BOOLEAN(enabled)}](marketing_permissions), STRING(ip_signup), STRING(timestamp_signup), STRING(ip_opt), STRING(timestamp_opt), [STRING](tags)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -116,9 +116,9 @@ Type: OBJECT
 | STRING | SELECT  |
 | STRING | TEXT  |
 | BOOLEAN | SELECT  |
-| OBJECT | OBJECT_BUILDER  |
-| OBJECT | OBJECT_BUILDER  |
-| OBJECT | OBJECT_BUILDER  |
+| {} | OBJECT_BUILDER  |
+| {} | OBJECT_BUILDER  |
+| {NUMBER(avg_open_rate), NUMBER(avg_click_rate), {NUMBER(total_revenue), NUMBER(number_of_orders), STRING(currency_code)}(ecommerce_data)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
@@ -128,14 +128,14 @@ Type: OBJECT
 | STRING | TEXT  |
 | BOOLEAN | SELECT  |
 | STRING | TEXT  |
-| OBJECT | OBJECT_BUILDER  |
-| ARRAY | ARRAY_BUILDER  |
-| OBJECT | OBJECT_BUILDER  |
+| {NUMBER(latitude), NUMBER(longitude), INTEGER(gmtoff), INTEGER(dstoff), STRING(country_code), STRING(timezone), STRING(region)} | OBJECT_BUILDER  |
+| [{STRING(marketing_permission_id), STRING(text), BOOLEAN(enabled)}] | ARRAY_BUILDER  |
+| {INTEGER(note_id), STRING(created_at), STRING(created_by), STRING(note)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
 | INTEGER | INTEGER  |
-| OBJECT | OBJECT_BUILDER  |
+| {INTEGER(id), STRING(name)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
-| ARRAY | ARRAY_BUILDER  |
+| [{STRING(rel), STRING(href), STRING(method), STRING(targetSchema), STRING(schema)}] | ARRAY_BUILDER  |
 
 
 
