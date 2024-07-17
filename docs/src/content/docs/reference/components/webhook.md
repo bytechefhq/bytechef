@@ -27,8 +27,8 @@ The webhook trigger always replies immediately with an HTTP 200 status code in r
 #### Type: STATIC_WEBHOOK
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
 null
 
 
@@ -41,9 +41,9 @@ Upon receiving a webhook request, it goes through a validation process. Once val
 #### Type: STATIC_WEBHOOK
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| CSRF Token | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| CSRF Token | STRING | TEXT  |  To trigger the workflow successfully, the security token must match the X-Csrf-Token HTTP header value passed by the client.  |
 
 
 
@@ -55,10 +55,10 @@ You have the flexibility to set up your preferred response. After a webhook requ
 #### Type: STATIC_WEBHOOK
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| CSRF Token | STRING | TEXT  |
-| Timeout (ms) | INTEGER | INTEGER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| CSRF Token | STRING | TEXT  |  To trigger the workflow successfully, the security token must match the X-Csrf-Token HTTP header value passed by the client.  |
+| Timeout (ms) | INTEGER | INTEGER  |  The incoming request will time out after the specified number of milliseconds. The max wait time before a timeout is 5 minutes.  |
 
 
 

@@ -26,9 +26,9 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Token | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Token | STRING | TEXT  |  |
 
 
 
@@ -48,15 +48,15 @@ Sends an email.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| From: | STRING | TEXT  |
-| To: | ARRAY | ARRAY_BUILDER  |
-| CC: | ARRAY | ARRAY_BUILDER  |
-| Subject | STRING | TEXT  |
-| Message Body | STRING | TEXT  |
-| Message type | STRING | SELECT  |
-| Attachments | ARRAY | ARRAY_BUILDER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| From: | STRING | TEXT  |  Email address from which you want to send.  |
+| To: | [STRING] | ARRAY_BUILDER  |  Email addresses which you want to send to.  |
+| CC: | [STRING] | ARRAY_BUILDER  |  Email address which receives a copy.  |
+| Subject | STRING | TEXT  |  Subject of your email  |
+| Message Body | STRING | TEXT  |  This is the message you want to send  |
+| Message type | STRING | SELECT  |  Message type for your content  |
+| Attachments | [FILE_ENTRY] | ARRAY_BUILDER  |  A list of attachments you want to include with the email.  |
 
 
 ### Output

@@ -26,11 +26,11 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Client Id | STRING | TEXT  |
-| Client Secret | STRING | TEXT  |
-| Tenant Id | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Client Id | STRING | TEXT  |  |
+| Client Secret | STRING | TEXT  |  |
+| Tenant Id | STRING | TEXT  |  |
 
 
 
@@ -50,11 +50,11 @@ Creates a new channel within a team.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Team | STRING | SELECT  |
-| Channel name | STRING | TEXT  |
-| Description | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Team | STRING | SELECT  |  Team where the channel will be created.  |
+| Channel name | STRING | TEXT  |  |
+| Description | STRING | TEXT  |  Description for the channel.  |
 
 
 ### Output
@@ -80,12 +80,12 @@ Sends a message to a channel.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Team | STRING | SELECT  |
-| Channel to send message to. | STRING | SELECT  |
-| Message text format | STRING | SELECT  |
-| Message text | STRING | TEXT_AREA  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Team | STRING | SELECT  |  Team where the channel is located.  |
+| Channel to send message to. | STRING | SELECT  |  |
+| Message text format | STRING | SELECT  |  |
+| Message text | STRING | TEXT_AREA  |  |
 
 
 ### Output
@@ -99,8 +99,8 @@ Type: OBJECT
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | STRING | TEXT  |
-| OBJECT | OBJECT_BUILDER  |
-| OBJECT | OBJECT_BUILDER  |
+| {STRING(contentType), STRING(content)} | OBJECT_BUILDER  |
+| {STRING(teamId), STRING(channelId)} | OBJECT_BUILDER  |
 
 
 
@@ -111,11 +111,11 @@ Sends a message in an existing chat.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Chat | STRING | SELECT  |
-| Message text format | STRING | SELECT  |
-| Message text | STRING | TEXT_AREA  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Chat | STRING | SELECT  |  |
+| Message text format | STRING | SELECT  |  |
+| Message text | STRING | TEXT_AREA  |  |
 
 
 ### Output
@@ -130,7 +130,7 @@ Type: OBJECT
 |:------------:|:--------------------:|
 | STRING | TEXT  |
 | STRING | TEXT  |
-| OBJECT | OBJECT_BUILDER  |
+| {STRING(contentType), STRING(content)} | OBJECT_BUILDER  |
 
 
 

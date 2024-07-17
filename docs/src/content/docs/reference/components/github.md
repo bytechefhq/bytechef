@@ -26,10 +26,10 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Client id | STRING | TEXT  |
-| Client secret | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Client id | STRING | TEXT  |  |
+| Client secret | STRING | TEXT  |  |
 
 
 
@@ -49,11 +49,11 @@ Create a new issue
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Repository | STRING | SELECT  |
-| Title | STRING | TEXT  |
-| Body | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Repository | STRING | SELECT  |  Select an repository  |
+| Title | STRING | TEXT  |  Title of the issue  |
+| Body | STRING | TEXT  |  The contents of the issue  |
 
 
 ### Output
@@ -80,10 +80,10 @@ Create a specific issue
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Repository | STRING | SELECT  |
-| Issue | STRING | SELECT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Repository | STRING | SELECT  |  Select an repository  |
+| Issue | STRING | SELECT  |  Select a issue  |
 
 
 ### Output
@@ -111,11 +111,11 @@ Create a comment for the issue
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Repository | STRING | SELECT  |
-| Issue | STRING | SELECT  |
-| Comment | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Repository | STRING | SELECT  |  Select an repository  |
+| Issue | STRING | SELECT  |  Select a issue  |
+| Comment | STRING | TEXT  |  Create a issue comment  |
 
 
 ### Output

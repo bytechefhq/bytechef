@@ -26,10 +26,10 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Pod | STRING | TEXT  |
-| API Key | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Pod | STRING | TEXT  |  Your instances pod can be found under your API URL, e.g. https://api.{pod}.insightly.com/v3.1  |
+| API Key | STRING | TEXT  |  |
 
 
 
@@ -55,9 +55,9 @@ Creates new Contact
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Contact | OBJECT | OBJECT_BUILDER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Contact | {STRING(FIRST_NAME), STRING(LAST_NAME), STRING(EMAIL_ADDRESS), STRING(PHONE), STRING(TITLE)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -86,9 +86,9 @@ Creates new Organization
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Organization | OBJECT | OBJECT_BUILDER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Organization | {STRING(ORGANISATION_NAME), STRING(PHONE), STRING(WEBSITE)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -115,9 +115,9 @@ Creates new Task
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Task | OBJECT | OBJECT_BUILDER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Task | {STRING(TITLE), STRING(STATUS)} | OBJECT_BUILDER  |  |
 
 
 ### Output

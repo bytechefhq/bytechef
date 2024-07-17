@@ -26,11 +26,11 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Client Id | STRING | TEXT  |
-| Client Secret | STRING | TEXT  |
-| Tenant Id | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Client Id | STRING | TEXT  |  |
+| Client Secret | STRING | TEXT  |  |
+| Tenant Id | STRING | TEXT  |  |
 
 
 
@@ -50,11 +50,11 @@ Append a row of values to an existing worksheet
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Workbook | STRING | SELECT  |
-| Worksheet | STRING | SELECT  |
-| Is the first row header? | BOOLEAN | SELECT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Workbook | STRING | SELECT  |  |
+| Worksheet | STRING | SELECT  |  |
+| Is the first row header? | BOOLEAN | SELECT  |  If the first row is header  |
 | DYNAMIC_PROPERTIES | null  |
 
 
@@ -79,11 +79,11 @@ Clear a worksheet of all values.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Workbook | STRING | SELECT  |
-| Worksheet | STRING | SELECT  |
-| Is the first row header? | BOOLEAN | SELECT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Workbook | STRING | SELECT  |  |
+| Worksheet | STRING | SELECT  |  |
+| Is the first row header? | BOOLEAN | SELECT  |  If the first row is header  |
 
 
 
@@ -93,11 +93,11 @@ Delete row on an existing sheet
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Workbook | STRING | SELECT  |
-| Worksheet | STRING | SELECT  |
-| Row number | INTEGER | INTEGER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Workbook | STRING | SELECT  |  |
+| Worksheet | STRING | SELECT  |  |
+| Row number | INTEGER | INTEGER  |  The row number to delete  |
 
 
 
@@ -107,12 +107,12 @@ Get row values from the worksheet by the row number
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Workbook | STRING | SELECT  |
-| Worksheet | STRING | SELECT  |
-| Is the first row header? | BOOLEAN | SELECT  |
-| Row number | INTEGER | INTEGER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Workbook | STRING | SELECT  |  |
+| Worksheet | STRING | SELECT  |  |
+| Is the first row header? | BOOLEAN | SELECT  |  If the first row is header  |
+| Row number | INTEGER | INTEGER  |  The row number to get the values from  |
 
 
 ### Output
@@ -136,12 +136,12 @@ Update a row in a worksheet
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Workbook | STRING | SELECT  |
-| Worksheet | STRING | SELECT  |
-| Row number | INTEGER | INTEGER  |
-| Is the first row header? | BOOLEAN | SELECT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Workbook | STRING | SELECT  |  |
+| Worksheet | STRING | SELECT  |  |
+| Row number | INTEGER | INTEGER  |  The row number to update  |
+| Is the first row header? | BOOLEAN | SELECT  |  If the first row is header  |
 | DYNAMIC_PROPERTIES | null  |
 
 

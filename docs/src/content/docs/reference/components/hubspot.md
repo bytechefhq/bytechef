@@ -26,10 +26,10 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Client Id | STRING | TEXT  |
-| Client Secret | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Client Id | STRING | TEXT  |  |
+| Client Secret | STRING | TEXT  |  |
 
 
 
@@ -48,11 +48,11 @@ Triggers when an event of the subscribed type happens inside HubSpot.
 #### Type: DYNAMIC_WEBHOOK
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| App Id | STRING | TEXT  |
-| Event Type | STRING | SELECT  |
-| Property Name | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| App Id | STRING | TEXT  |  The id of a Hubspot app used to register this trigger to. See the <a href="https://legacydocs.hubspot.com/docs/faq/integration-platform-api-requirements">prerequisites documentation</a> for more details about creating an app  |
+| Event Type | STRING | SELECT  |  The list of available event types for which you want to receive events.  |
+| Property Name | STRING | TEXT  |  The name of property to listen for change events.  |
 
 
 ### Output
@@ -104,9 +104,9 @@ Create a contact with the given properties and return a copy of the object, incl
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Simple Public Object Input For Create | OBJECT | OBJECT_BUILDER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Simple Public Object Input For Create | {{STRING(company), STRING(email), STRING(firstname), STRING(lastname), STRING(phone), STRING(website)}(properties), [{{STRING(id)}(to), [{STRING(associationCategory), INTEGER(associationTypeId)}](types)}](associations)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -119,13 +119,13 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| Id | STRING | TEXT  |
-| Properties | OBJECT | OBJECT_BUILDER  |
-| Properties With History | OBJECT | OBJECT_BUILDER  |
-| Created At | DATE_TIME | DATE_TIME  |
-| Updated At | DATE_TIME | DATE_TIME  |
-| Archived | BOOLEAN | SELECT  |
-| Archived At | DATE_TIME | DATE_TIME  |
+| Id | STRING | TEXT  |  |
+| Properties | {} | OBJECT_BUILDER  |  |
+| Properties With History | {} | OBJECT_BUILDER  |  |
+| Created At | DATE_TIME | DATE_TIME  |  |
+| Updated At | DATE_TIME | DATE_TIME  |  |
+| Archived | BOOLEAN | SELECT  |  |
+| Archived At | DATE_TIME | DATE_TIME  |  |
 
 
 
@@ -136,10 +136,10 @@ Perform a partial update of an Object identified by `{contactId}`. `{contactId}`
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Contact Id | STRING | TEXT  |
-| Simple Public Object Input | OBJECT | OBJECT_BUILDER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Contact Id | STRING | TEXT  |  |
+| Simple Public Object Input | {{STRING(company), STRING(email), STRING(firstname), STRING(lastname), STRING(phone), STRING(website)}(properties)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -152,13 +152,13 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| Id | STRING | TEXT  |
-| Properties | OBJECT | OBJECT_BUILDER  |
-| Properties With History | OBJECT | OBJECT_BUILDER  |
-| Created At | DATE_TIME | DATE_TIME  |
-| Updated At | DATE_TIME | DATE_TIME  |
-| Archived | BOOLEAN | SELECT  |
-| Archived At | DATE_TIME | DATE_TIME  |
+| Id | STRING | TEXT  |  |
+| Properties | {} | OBJECT_BUILDER  |  |
+| Properties With History | {} | OBJECT_BUILDER  |  |
+| Created At | DATE_TIME | DATE_TIME  |  |
+| Updated At | DATE_TIME | DATE_TIME  |  |
+| Archived | BOOLEAN | SELECT  |  |
+| Archived At | DATE_TIME | DATE_TIME  |  |
 
 
 

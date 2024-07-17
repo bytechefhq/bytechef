@@ -26,10 +26,10 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Value | STRING | TEXT  |
-| Add to | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Value | STRING | TEXT  |  |
+| Add to | STRING | TEXT  |  |
 
 
 
@@ -37,10 +37,10 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Client Id | STRING | TEXT  |
-| Client Secret | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Client Id | STRING | TEXT  |  |
+| Client Secret | STRING | TEXT  |  |
 
 
 
@@ -59,8 +59,8 @@ Trigger off whenever a new activity is added.
 #### Type: DYNAMIC_WEBHOOK
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
 null
 
 
@@ -204,7 +204,7 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | INTEGER | INTEGER  |
-| ARRAY | ARRAY_BUILDER  |
+| [] | ARRAY_BUILDER  |
 | STRING | TEXT  |
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
@@ -217,8 +217,8 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| ARRAY | ARRAY_BUILDER  |
-| ARRAY | ARRAY_BUILDER  |
+| [{STRING(email_address), INTEGER(is_organizer), STRING(name), INTEGER(person_id), STRING(status), STRING(user_id)}] | ARRAY_BUILDER  |
+| [{INTEGER(person_id), BOOLEAN(primary_flag)}] | ARRAY_BUILDER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
@@ -226,7 +226,7 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | INTEGER | INTEGER  |
-| OBJECT | OBJECT_BUILDER  |
+| {STRING(id), STRING(clean_name), STRING(url)} | OBJECT_BUILDER  |
 
 
 
@@ -239,8 +239,8 @@ Trigger off whenever a new deal is added.
 #### Type: DYNAMIC_WEBHOOK
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
 null
 
 
@@ -367,10 +367,10 @@ Type: OBJECT
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | INTEGER | INTEGER  |
-| OBJECT | OBJECT_BUILDER  |
-| OBJECT | OBJECT_BUILDER  |
-| OBJECT | OBJECT_BUILDER  |
-| OBJECT | OBJECT_BUILDER  |
+| {INTEGER(id), STRING(name), STRING(email), BOOLEAN(has_pic), STRING(pic_hash), BOOLEAN(active_flag), INTEGER(value)} | OBJECT_BUILDER  |
+| {INTEGER(id), STRING(name), STRING(email), BOOLEAN(has_pic), STRING(pic_hash), BOOLEAN(active_flag), INTEGER(value)} | OBJECT_BUILDER  |
+| {BOOLEAN(active_flag), STRING(name), [{STRING(label), STRING(value), BOOLEAN(primary)}](email), [{STRING(label), STRING(value), BOOLEAN(primary)}](phone), INTEGER(value)} | OBJECT_BUILDER  |
+| {STRING(name), INTEGER(people_count), INTEGER(owner_id), STRING(address), BOOLEAN(active_flag), STRING(cc_email), INTEGER(value)} | OBJECT_BUILDER  |
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
 | INTEGER | INTEGER  |
@@ -435,8 +435,8 @@ Trigger off whenever a new organization is added.
 #### Type: DYNAMIC_WEBHOOK
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
 null
 
 
@@ -528,7 +528,7 @@ Type: OBJECT
 |:------------:|:--------------------:|
 | INTEGER | INTEGER  |
 | INTEGER | INTEGER  |
-| OBJECT | OBJECT_BUILDER  |
+| {INTEGER(id), STRING(name), STRING(email), INTEGER(has_pic), STRING(pic_hash), BOOLEAN(active_flag), INTEGER(value)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
 | INTEGER | INTEGER  |
 | INTEGER | INTEGER  |
@@ -547,7 +547,7 @@ Type: OBJECT
 | INTEGER | INTEGER  |
 | INTEGER | INTEGER  |
 | BOOLEAN | SELECT  |
-| OBJECT | OBJECT_BUILDER  |
+| {STRING(item_type), INTEGER(item_id), BOOLEAN(active_flag), DATE_TIME(add_time), DATE_TIME(update_time), INTEGER(added_by_user_id), {STRING(128), STRING(512)}(pictures), INTEGER(value)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | DATE_TIME | DATE_TIME  |
@@ -584,8 +584,8 @@ Trigger off whenever a new person is added.
 #### Type: DYNAMIC_WEBHOOK
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
 null
 
 
@@ -693,8 +693,8 @@ Type: OBJECT
 |:------------:|:--------------------:|
 | INTEGER | INTEGER  |
 | INTEGER | INTEGER  |
-| OBJECT | OBJECT_BUILDER  |
-| OBJECT | OBJECT_BUILDER  |
+| {INTEGER(id), STRING(name), STRING(email), INTEGER(has_pic), STRING(pic_hash), BOOLEAN(active_flag), INTEGER(value)} | OBJECT_BUILDER  |
+| {INTEGER(id), INTEGER(people_count), INTEGER(owner_id), STRING(address), BOOLEAN(active_flag), STRING(cc_email), INTEGER(value)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
@@ -716,15 +716,15 @@ Type: OBJECT
 | INTEGER | INTEGER  |
 | INTEGER | INTEGER  |
 | BOOLEAN | SELECT  |
-| ARRAY | ARRAY_BUILDER  |
-| ARRAY | ARRAY_BUILDER  |
+| [{STRING(label), STRING(value), BOOLEAN(primary)}] | ARRAY_BUILDER  |
+| [{STRING(label), STRING(value), BOOLEAN(primary)}] | ARRAY_BUILDER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | DATE_TIME | DATE_TIME  |
 | DATE_TIME | DATE_TIME  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| OBJECT | OBJECT_BUILDER  |
+| {STRING(item_type), INTEGER(item_id), BOOLEAN(active_flag), DATE_TIME(add_time), DATE_TIME(update_time), INTEGER(added_by_user_id), {STRING(128), STRING(512)}(pictures), INTEGER(value)} | OBJECT_BUILDER  |
 | DATE | DATE  |
 | TIME | TIME  |
 | INTEGER | INTEGER  |
@@ -748,8 +748,8 @@ Trigger off whenever an existing deal is updated.
 #### Type: DYNAMIC_WEBHOOK
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
 null
 
 
@@ -876,10 +876,10 @@ Type: OBJECT
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | INTEGER | INTEGER  |
-| OBJECT | OBJECT_BUILDER  |
-| OBJECT | OBJECT_BUILDER  |
-| OBJECT | OBJECT_BUILDER  |
-| OBJECT | OBJECT_BUILDER  |
+| {INTEGER(id), STRING(name), STRING(email), BOOLEAN(has_pic), STRING(pic_hash), BOOLEAN(active_flag), INTEGER(value)} | OBJECT_BUILDER  |
+| {INTEGER(id), STRING(name), STRING(email), BOOLEAN(has_pic), STRING(pic_hash), BOOLEAN(active_flag), INTEGER(value)} | OBJECT_BUILDER  |
+| {BOOLEAN(active_flag), STRING(name), [{STRING(label), STRING(value), BOOLEAN(primary)}](email), [{STRING(label), STRING(value), BOOLEAN(primary)}](phone), INTEGER(value)} | OBJECT_BUILDER  |
+| {STRING(name), INTEGER(people_count), INTEGER(owner_id), STRING(address), BOOLEAN(active_flag), STRING(cc_email), INTEGER(value)} | OBJECT_BUILDER  |
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
 | INTEGER | INTEGER  |
@@ -944,8 +944,8 @@ Trigger off whenever an existing organization is updated.
 #### Type: DYNAMIC_WEBHOOK
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
 null
 
 
@@ -1037,7 +1037,7 @@ Type: OBJECT
 |:------------:|:--------------------:|
 | INTEGER | INTEGER  |
 | INTEGER | INTEGER  |
-| OBJECT | OBJECT_BUILDER  |
+| {INTEGER(id), STRING(name), STRING(email), INTEGER(has_pic), STRING(pic_hash), BOOLEAN(active_flag), INTEGER(value)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
 | INTEGER | INTEGER  |
 | INTEGER | INTEGER  |
@@ -1056,7 +1056,7 @@ Type: OBJECT
 | INTEGER | INTEGER  |
 | INTEGER | INTEGER  |
 | BOOLEAN | SELECT  |
-| OBJECT | OBJECT_BUILDER  |
+| {STRING(item_type), INTEGER(item_id), BOOLEAN(active_flag), DATE_TIME(add_time), DATE_TIME(update_time), INTEGER(added_by_user_id), {STRING(128), STRING(512)}(pictures), INTEGER(value)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | DATE_TIME | DATE_TIME  |
@@ -1093,8 +1093,8 @@ Trigger off whenever an existing person is updated.
 #### Type: DYNAMIC_WEBHOOK
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
 null
 
 
@@ -1202,8 +1202,8 @@ Type: OBJECT
 |:------------:|:--------------------:|
 | INTEGER | INTEGER  |
 | INTEGER | INTEGER  |
-| OBJECT | OBJECT_BUILDER  |
-| OBJECT | OBJECT_BUILDER  |
+| {INTEGER(id), STRING(name), STRING(email), INTEGER(has_pic), STRING(pic_hash), BOOLEAN(active_flag), INTEGER(value)} | OBJECT_BUILDER  |
+| {INTEGER(id), INTEGER(people_count), INTEGER(owner_id), STRING(address), BOOLEAN(active_flag), STRING(cc_email), INTEGER(value)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
@@ -1225,15 +1225,15 @@ Type: OBJECT
 | INTEGER | INTEGER  |
 | INTEGER | INTEGER  |
 | BOOLEAN | SELECT  |
-| ARRAY | ARRAY_BUILDER  |
-| ARRAY | ARRAY_BUILDER  |
+| [{STRING(label), STRING(value), BOOLEAN(primary)}] | ARRAY_BUILDER  |
+| [{STRING(label), STRING(value), BOOLEAN(primary)}] | ARRAY_BUILDER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | DATE_TIME | DATE_TIME  |
 | DATE_TIME | DATE_TIME  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| OBJECT | OBJECT_BUILDER  |
+| {STRING(item_type), INTEGER(item_id), BOOLEAN(active_flag), DATE_TIME(add_time), DATE_TIME(update_time), INTEGER(added_by_user_id), {STRING(128), STRING(512)}(pictures), INTEGER(value)} | OBJECT_BUILDER  |
 | DATE | DATE  |
 | TIME | TIME  |
 | INTEGER | INTEGER  |
@@ -1263,16 +1263,16 @@ Returns all deals. For more information, see the tutorial for <a href="https://p
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| User Id | INTEGER | SELECT  |
-| Filter Id | INTEGER | SELECT  |
-| Stage Id | INTEGER | SELECT  |
-| Status | STRING | SELECT  |
-| Start | INTEGER | INTEGER  |
-| Limit | INTEGER | INTEGER  |
-| Sort | STRING | TEXT  |
-| Number Boolean | NUMBER | SELECT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| User Id | INTEGER | SELECT  |  If supplied, only deals matching the given user will be returned. However, `filter_id` and `owned_by_you` takes precedence over `user_id` when supplied.  |
+| Filter Id | INTEGER | SELECT  |  The ID of the filter to use  |
+| Stage Id | INTEGER | SELECT  |  If supplied, only deals within the given stage will be returned  |
+| Status | STRING | SELECT  |  Only fetch deals with a specific status. If omitted, all not deleted deals are returned. If set to deleted, deals that have been deleted up to 30 days ago will be included.  |
+| Start | INTEGER | INTEGER  |  Pagination start  |
+| Limit | INTEGER | INTEGER  |  Items shown per page  |
+| Sort | STRING | TEXT  |  The field names and sorting mode separated by a comma (`field_name_1 ASC`, `field_name_2 DESC`). Only first-level field keys are supported (no nested keys).  |
+| Number Boolean | NUMBER | SELECT  |  When supplied, only deals owned by you are returned. However, `filter_id` takes precedence over `owned_by_you` when both are supplied.  |
 
 
 ### Output
@@ -1291,9 +1291,9 @@ Type: OBJECT
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | BOOLEAN | SELECT  |
-| ARRAY | ARRAY_BUILDER  |
-| OBJECT | OBJECT_BUILDER  |
-| OBJECT | OBJECT_BUILDER  |
+| [{INTEGER(email_messages_count), STRING(cc_email), INTEGER(products_count), STRING(next_activity_date), STRING(next_activity_type), STRING(next_activity_duration), INTEGER(id), STRING(name), BOOLEAN(active_flag), [{STRING(label), STRING(value), BOOLEAN(primary)}](phone), INTEGER(value), [{STRING(label), STRING(value), BOOLEAN(primary)}](email), INTEGER(owner_id), {INTEGER(id), STRING(name), STRING(email), BOOLEAN(has_pic), STRING(pic_hash), BOOLEAN(active_flag), INTEGER(value)}(creator_user_id), DATE(expected_close_date), INTEGER(participants_count), STRING(owner_name), INTEGER(stage_id), NUMBER(probability), INTEGER(undone_activities_count), BOOLEAN(active), STRING(last_activity_date), STRING(person_name), STRING(close_time), INTEGER(next_activity_id), STRING(weighted_value_currency), BOOLEAN(org_hidden), INTEGER(stage_order_nr), STRING(next_activity_subject), STRING(rotten_time), STRING(name), BOOLEAN(has_pic), BOOLEAN(active_flag), INTEGER(id), INTEGER(value), STRING(email), STRING(pic_hash), STRING(visible_to), STRING(address), INTEGER(owner_id), STRING(cc_email), STRING(name), BOOLEAN(active_flag), INTEGER(people_count), INTEGER(value), INTEGER(notes_count), STRING(next_activity_time), STRING(formatted_value), STRING(status), STRING(formatted_weighted_value), STRING(first_won_time), STRING(last_outgoing_mail_time), STRING(title), INTEGER(last_activity_id), STRING(update_time), INTEGER(activities_count), INTEGER(pipeline_id), STRING(lost_time), STRING(currency), NUMBER(weighted_value), STRING(org_name), NUMBER(value), STRING(next_activity_note), BOOLEAN(person_hidden), INTEGER(files_count), STRING(last_incoming_mail_time), INTEGER(label), STRING(lost_reason), BOOLEAN(deleted), STRING(won_time), INTEGER(followers_count), STRING(stage_change_time), STRING(add_time), INTEGER(done_activities_count)}] | ARRAY_BUILDER  |
+| {INTEGER(start), INTEGER(limit), BOOLEAN(more_items_in_collection)} | OBJECT_BUILDER  |
+| {{}(user), {}(organization), {}(person)} | OBJECT_BUILDER  |
 
 
 
@@ -1304,9 +1304,9 @@ Adds a new deal. Note that you can supply additional custom fields along with th
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Add Deal Request | OBJECT | OBJECT_BUILDER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Add Deal Request | {DATE(expected_close_date), INTEGER(stage_id), NUMBER(probability), STRING(title), STRING(lost_reason), INTEGER(user_id), STRING(visible_to), INTEGER(org_id), INTEGER(pipeline_id), STRING(currency), STRING(value), STRING(add_time), INTEGER(person_id), STRING(status)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -1334,11 +1334,11 @@ Type: OBJECT
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
 | BOOLEAN | SELECT  |
-| ARRAY | ARRAY_BUILDER  |
+| [{STRING(label), STRING(value), BOOLEAN(primary)}] | ARRAY_BUILDER  |
 | INTEGER | INTEGER  |
-| ARRAY | ARRAY_BUILDER  |
+| [{STRING(label), STRING(value), BOOLEAN(primary)}] | ARRAY_BUILDER  |
 | INTEGER | INTEGER  |
-| OBJECT | OBJECT_BUILDER  |
+| {INTEGER(id), STRING(name), STRING(email), BOOLEAN(has_pic), STRING(pic_hash), BOOLEAN(active_flag), INTEGER(value)} | OBJECT_BUILDER  |
 | DATE | DATE  |
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
@@ -1399,7 +1399,7 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | INTEGER | INTEGER  |
-| OBJECT | OBJECT_BUILDER  |
+| {{}(user), {}(organization), {}(person)} | OBJECT_BUILDER  |
 
 
 
@@ -1410,17 +1410,17 @@ Searches all deals by title, notes and/or custom fields. This endpoint is a wrap
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Term | STRING | TEXT  |
-| Fields | STRING | SELECT  |
-| Exact Match | BOOLEAN | SELECT  |
-| Person Id | INTEGER | SELECT  |
-| Organization Id | INTEGER | INTEGER  |
-| Status | STRING | SELECT  |
-| Include Fields | STRING | SELECT  |
-| Start | INTEGER | INTEGER  |
-| Limit | INTEGER | INTEGER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Term | STRING | TEXT  |  The search term to look for. Minimum 2 characters (or 1 if using `exact_match`). Please note that the search term has to be URL encoded.  |
+| Fields | STRING | SELECT  |  A comma-separated string array. The fields to perform the search from. Defaults to all of them.  |
+| Exact Match | BOOLEAN | SELECT  |  When enabled, only full exact matches against the given term are returned. It is <b>not</b> case sensitive.  |
+| Person Id | INTEGER | SELECT  |  Will filter deals by the provided person ID. The upper limit of found deals associated with the person is 2000.  |
+| Organization Id | INTEGER | INTEGER  |  Will filter deals by the provided organization ID. The upper limit of found deals associated with the organization is 2000.  |
+| Status | STRING | SELECT  |  Will filter deals by the provided specific status. open = Open, won = Won, lost = Lost. The upper limit of found deals associated with the status is 2000.  |
+| Include Fields | STRING | SELECT  |  Supports including optional fields in the results which are not provided by default  |
+| Start | INTEGER | INTEGER  |  Pagination start. Note that the pagination is based on main results and does not include related items when using `search_for_related_items` parameter.  |
+| Limit | INTEGER | INTEGER  |  Items shown per page  |
 
 
 ### Output
@@ -1438,9 +1438,9 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| OBJECT | OBJECT_BUILDER  |
+| {[{NUMBER(result_score), {INTEGER(id), STRING(type), STRING(title), INTEGER(value), STRING(currency), STRING(status), INTEGER(visible_to), {INTEGER(id)}(owner), {INTEGER(id), STRING(name)}(stage), {INTEGER(id), STRING(name)}(person), {INTEGER(id), STRING(name)}(organization), [STRING](custom_fields), [STRING](notes)}(item)}](items)} | OBJECT_BUILDER  |
 | BOOLEAN | SELECT  |
-| OBJECT | OBJECT_BUILDER  |
+| {{INTEGER(start), INTEGER(limit), BOOLEAN(more_items_in_collection), INTEGER(next_start)}(pagination)} | OBJECT_BUILDER  |
 
 
 
@@ -1451,9 +1451,9 @@ Marks a deal as deleted. After 30 days, the deal will be permanently deleted.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Id | INTEGER | INTEGER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Id | INTEGER | INTEGER  |  The ID of the deal  |
 
 
 ### Output
@@ -1472,7 +1472,7 @@ Type: OBJECT
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | BOOLEAN | SELECT  |
-| OBJECT | OBJECT_BUILDER  |
+| {INTEGER(id)} | OBJECT_BUILDER  |
 
 
 
@@ -1483,9 +1483,9 @@ Returns the details of a specific deal. Note that this also returns some additio
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Id | INTEGER | INTEGER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Id | INTEGER | INTEGER  |  The ID of the deal  |
 
 
 ### Output
@@ -1506,7 +1506,7 @@ Type: OBJECT
 | BOOLEAN | SELECT  |
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
-| OBJECT | OBJECT_BUILDER  |
+| {{}(times_in_stages), [INTEGER](order_of_stages)} | OBJECT_BUILDER  |
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
@@ -1514,11 +1514,11 @@ Type: OBJECT
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
 | BOOLEAN | SELECT  |
-| ARRAY | ARRAY_BUILDER  |
+| [{STRING(label), STRING(value), BOOLEAN(primary)}] | ARRAY_BUILDER  |
 | INTEGER | INTEGER  |
-| ARRAY | ARRAY_BUILDER  |
+| [{STRING(label), STRING(value), BOOLEAN(primary)}] | ARRAY_BUILDER  |
 | INTEGER | INTEGER  |
-| OBJECT | OBJECT_BUILDER  |
+| {INTEGER(id), STRING(name), STRING(email), BOOLEAN(has_pic), STRING(pic_hash), BOOLEAN(active_flag), INTEGER(value)} | OBJECT_BUILDER  |
 | DATE | DATE  |
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
@@ -1558,12 +1558,12 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| OBJECT | OBJECT_BUILDER  |
+| {INTEGER(y), INTEGER(m), INTEGER(d), INTEGER(h), INTEGER(i), INTEGER(s), INTEGER(total_seconds)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
-| OBJECT | OBJECT_BUILDER  |
-| OBJECT | OBJECT_BUILDER  |
+| {} | OBJECT_BUILDER  |
+| {} | OBJECT_BUILDER  |
 | INTEGER | INTEGER  |
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
@@ -1583,9 +1583,9 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | INTEGER | INTEGER  |
-| OBJECT | OBJECT_BUILDER  |
-| OBJECT | OBJECT_BUILDER  |
-| OBJECT | OBJECT_BUILDER  |
+| {INTEGER(y), INTEGER(m), INTEGER(d), INTEGER(h), INTEGER(i), INTEGER(s), INTEGER(total_seconds)} | OBJECT_BUILDER  |
+| {STRING(dropbox_email)} | OBJECT_BUILDER  |
+| {{}(user), {}(person), {}(organization)} | OBJECT_BUILDER  |
 
 
 
@@ -1597,16 +1597,16 @@ Returns multiple leads. Leads are sorted by the time they were created, from old
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Limit | INTEGER | INTEGER  |
-| Start | INTEGER | INTEGER  |
-| Archived Status | STRING | SELECT  |
-| Owner Id | INTEGER | SELECT  |
-| Person Id | INTEGER | SELECT  |
-| Organization Id | INTEGER | INTEGER  |
-| Filter Id | INTEGER | SELECT  |
-| Sort | STRING | SELECT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Limit | INTEGER | INTEGER  |  For pagination, the limit of entries to be returned. If not provided, 100 items will be returned.  |
+| Start | INTEGER | INTEGER  |  For pagination, the position that represents the first result for the page  |
+| Archived Status | STRING | SELECT  |  Filtering based on the archived status of a lead. If not provided, `All` is used.  |
+| Owner Id | INTEGER | SELECT  |  If supplied, only leads matching the given user will be returned. However, `filter_id` takes precedence over `owner_id` when supplied.  |
+| Person Id | INTEGER | SELECT  |  If supplied, only leads matching the given person will be returned. However, `filter_id` takes precedence over `person_id` when supplied.  |
+| Organization Id | INTEGER | INTEGER  |  If supplied, only leads matching the given organization will be returned. However, `filter_id` takes precedence over `organization_id` when supplied.  |
+| Filter Id | INTEGER | SELECT  |  The ID of the filter to use  |
+| Sort | STRING | SELECT  |  The field names and sorting mode separated by a comma (`field_name_1 ASC`, `field_name_2 DESC`). Only first-level field keys are supported (no nested keys).  |
 
 
 ### Output
@@ -1625,8 +1625,8 @@ Type: OBJECT
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | BOOLEAN | SELECT  |
-| ARRAY | ARRAY_BUILDER  |
-| OBJECT | OBJECT_BUILDER  |
+| [{STRING(id), STRING(title), INTEGER(owner_id), INTEGER(creator_id), [STRING](label_ids), INTEGER(person_id), INTEGER(organization_id), STRING(source_name), BOOLEAN(is_archived), BOOLEAN(was_seen), {NUMBER(amount), STRING(currency)}(value), DATE(expected_close_date), INTEGER(next_activity_id), DATE_TIME(add_time), DATE_TIME(update_time), STRING(visible_to), STRING(cc_email)}] | ARRAY_BUILDER  |
+| {INTEGER(start), INTEGER(limit), BOOLEAN(more_items_in_collection)} | OBJECT_BUILDER  |
 
 
 
@@ -1637,9 +1637,9 @@ Creates a lead. A lead always has to be linked to a person or an organization or
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Add Lead Request | OBJECT | OBJECT_BUILDER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Add Lead Request | {STRING(title), INTEGER(owner_id), [STRING](label_ids), INTEGER(person_id), INTEGER(organization_id), {NUMBER(amount), STRING(currency)}(value), DATE(expected_close_date), STRING(visible_to), BOOLEAN(was_seen)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -1658,7 +1658,7 @@ Type: OBJECT
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | BOOLEAN | SELECT  |
-| OBJECT | OBJECT_BUILDER  |
+| {STRING(id), STRING(title), INTEGER(owner_id), INTEGER(creator_id), [STRING](label_ids), INTEGER(person_id), INTEGER(organization_id), STRING(source_name), BOOLEAN(is_archived), BOOLEAN(was_seen), {NUMBER(amount), STRING(currency)}(value), DATE(expected_close_date), INTEGER(next_activity_id), DATE_TIME(add_time), DATE_TIME(update_time), STRING(visible_to), STRING(cc_email)} | OBJECT_BUILDER  |
 
 
 
@@ -1669,9 +1669,9 @@ Deletes a specific lead.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Id | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Id | STRING | TEXT  |  The ID of the lead  |
 
 
 ### Output
@@ -1690,7 +1690,7 @@ Type: OBJECT
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | BOOLEAN | SELECT  |
-| OBJECT | OBJECT_BUILDER  |
+| {STRING(id)} | OBJECT_BUILDER  |
 
 
 
@@ -1701,9 +1701,9 @@ Returns details of a specific lead. If a lead contains custom fields, the fields
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Id | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Id | STRING | TEXT  |  The ID of the lead  |
 
 
 ### Output
@@ -1722,7 +1722,7 @@ Type: OBJECT
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | BOOLEAN | SELECT  |
-| OBJECT | OBJECT_BUILDER  |
+| {STRING(id), STRING(title), INTEGER(owner_id), INTEGER(creator_id), [STRING](label_ids), INTEGER(person_id), INTEGER(organization_id), STRING(source_name), BOOLEAN(is_archived), BOOLEAN(was_seen), {NUMBER(amount), STRING(currency)}(value), DATE(expected_close_date), INTEGER(next_activity_id), DATE_TIME(add_time), DATE_TIME(update_time), STRING(visible_to), STRING(cc_email)} | OBJECT_BUILDER  |
 
 
 
@@ -1733,16 +1733,16 @@ Searches all leads by title, notes and/or custom fields. This endpoint is a wrap
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Term | STRING | TEXT  |
-| Fields | STRING | SELECT  |
-| Exact Match | BOOLEAN | SELECT  |
-| Person Id | INTEGER | SELECT  |
-| Organization Id | INTEGER | INTEGER  |
-| Include Fields | STRING | SELECT  |
-| Start | INTEGER | INTEGER  |
-| Limit | INTEGER | INTEGER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Term | STRING | TEXT  |  The search term to look for. Minimum 2 characters (or 1 if using `exact_match`). Please note that the search term has to be URL encoded.  |
+| Fields | STRING | SELECT  |  A comma-separated string array. The fields to perform the search from. Defaults to all of them.  |
+| Exact Match | BOOLEAN | SELECT  |  When enabled, only full exact matches against the given term are returned. It is <b>not</b> case sensitive.  |
+| Person Id | INTEGER | SELECT  |  Will filter leads by the provided person ID. The upper limit of found leads associated with the person is 2000.  |
+| Organization Id | INTEGER | INTEGER  |  Will filter leads by the provided organization ID. The upper limit of found leads associated with the organization is 2000.  |
+| Include Fields | STRING | SELECT  |  Supports including optional fields in the results which are not provided by default  |
+| Start | INTEGER | INTEGER  |  Pagination start. Note that the pagination is based on main results and does not include related items when using `search_for_related_items` parameter.  |
+| Limit | INTEGER | INTEGER  |  Items shown per page  |
 
 
 ### Output
@@ -1760,9 +1760,9 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| OBJECT | OBJECT_BUILDER  |
+| {[{NUMBER(result_score), {STRING(id), STRING(type), STRING(title), {INTEGER(id)}(owner), {INTEGER(id), STRING(name)}(person), {INTEGER(id), STRING(name)}(organization), [STRING](phones), [STRING](emails), [STRING](custom_fields), [STRING](notes), INTEGER(value), STRING(currency), INTEGER(visible_to), BOOLEAN(is_archived)}(item)}](items)} | OBJECT_BUILDER  |
 | BOOLEAN | SELECT  |
-| OBJECT | OBJECT_BUILDER  |
+| {{INTEGER(start), INTEGER(limit), BOOLEAN(more_items_in_collection), INTEGER(next_start)}(pagination)} | OBJECT_BUILDER  |
 
 
 
@@ -1773,14 +1773,14 @@ Returns all organizations.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| User Id | INTEGER | SELECT  |
-| Filter Id | INTEGER | SELECT  |
-| First Char | STRING | TEXT  |
-| Start | INTEGER | INTEGER  |
-| Limit | INTEGER | INTEGER  |
-| Sort | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| User Id | INTEGER | SELECT  |  If supplied, only organizations owned by the given user will be returned. However, `filter_id` takes precedence over `user_id` when both are supplied.  |
+| Filter Id | INTEGER | SELECT  |  The ID of the filter to use  |
+| First Char | STRING | TEXT  |  If supplied, only organizations whose name starts with the specified letter will be returned (case insensitive)  |
+| Start | INTEGER | INTEGER  |  Pagination start  |
+| Limit | INTEGER | INTEGER  |  Items shown per page  |
+| Sort | STRING | TEXT  |  The field names and sorting mode separated by a comma (`field_name_1 ASC`, `field_name_2 DESC`). Only first-level field keys are supported (no nested keys).  |
 
 
 ### Output
@@ -1798,9 +1798,9 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| OBJECT | OBJECT_BUILDER  |
-| ARRAY | ARRAY_BUILDER  |
-| OBJECT | OBJECT_BUILDER  |
+| {{INTEGER(start), INTEGER(limit), BOOLEAN(more_items_in_collection), INTEGER(next_start)}(pagination)} | OBJECT_BUILDER  |
+| [{STRING(address_route), INTEGER(related_closed_deals_count), INTEGER(email_messages_count), STRING(name), INTEGER(has_pic), BOOLEAN(active_flag), INTEGER(id), INTEGER(value), STRING(email), STRING(pic_hash), STRING(cc_email), INTEGER(open_deals_count), BOOLEAN(active_flag), STRING(update_time), INTEGER(added_by_user_id), INTEGER(item_id), STRING(item_type), BOOLEAN(active_flag), INTEGER(value), STRING(add_time), {STRING(128), STRING(512)}(pictures), INTEGER(people_count), INTEGER(last_activity_id), STRING(next_activity_date), STRING(update_time), INTEGER(activities_count), INTEGER(id), STRING(address_admin_area_level_2), INTEGER(won_deals_count), STRING(address_admin_area_level_1), STRING(address_street_number), STRING(owner_name), INTEGER(files_count), STRING(address), INTEGER(company_id), STRING(address_formatted_address), STRING(address_postal_code), INTEGER(related_won_deals_count), STRING(address_country), STRING(first_char), INTEGER(undone_activities_count), INTEGER(closed_deals_count), STRING(address_subpremise), STRING(last_activity_date), INTEGER(label), INTEGER(related_open_deals_count), INTEGER(related_lost_deals_count), INTEGER(next_activity_id), STRING(country_code), STRING(visible_to), INTEGER(notes_count), INTEGER(followers_count), STRING(name), STRING(address_sublocality), STRING(address_locality), INTEGER(lost_deals_count), STRING(next_activity_time), STRING(add_time), INTEGER(done_activities_count)}] | ARRAY_BUILDER  |
+| {{}(organization), {}(user), {}(picture)} | OBJECT_BUILDER  |
 | BOOLEAN | SELECT  |
 
 
@@ -1812,9 +1812,9 @@ Adds a new organization. Note that you can supply additional custom fields along
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Add Organization Request | OBJECT | OBJECT_BUILDER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Add Organization Request | {STRING(name), STRING(add_time), STRING(visible_to), INTEGER(owner_id)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -1852,7 +1852,7 @@ Type: OBJECT
 | BOOLEAN | SELECT  |
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
-| OBJECT | OBJECT_BUILDER  |
+| {STRING(128), STRING(512)} | OBJECT_BUILDER  |
 | INTEGER | INTEGER  |
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
@@ -1892,7 +1892,7 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | INTEGER | INTEGER  |
-| OBJECT | OBJECT_BUILDER  |
+| {{}(organization), {}(user), {}(picture)} | OBJECT_BUILDER  |
 | BOOLEAN | SELECT  |
 
 
@@ -1904,13 +1904,13 @@ Searches all organizations by name, address, notes and/or custom fields. This en
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Term | STRING | TEXT  |
-| Fields | STRING | SELECT  |
-| Exact Match | BOOLEAN | SELECT  |
-| Start | INTEGER | INTEGER  |
-| Limit | INTEGER | INTEGER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Term | STRING | TEXT  |  The search term to look for. Minimum 2 characters (or 1 if using `exact_match`). Please note that the search term has to be URL encoded.  |
+| Fields | STRING | SELECT  |  A comma-separated string array. The fields to perform the search from. Defaults to all of them.  |
+| Exact Match | BOOLEAN | SELECT  |  When enabled, only full exact matches against the given term are returned. It is <b>not</b> case sensitive.  |
+| Start | INTEGER | INTEGER  |  Pagination start. Note that the pagination is based on main results and does not include related items when using `search_for_related_items` parameter.  |
+| Limit | INTEGER | INTEGER  |  Items shown per page  |
 
 
 ### Output
@@ -1928,9 +1928,9 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| OBJECT | OBJECT_BUILDER  |
+| {[{NUMBER(result_score), {INTEGER(id), STRING(type), STRING(name), STRING(address), INTEGER(visible_to), {INTEGER(id)}(owner), [STRING](custom_fields), [STRING](notes)}(item)}](items)} | OBJECT_BUILDER  |
 | BOOLEAN | SELECT  |
-| OBJECT | OBJECT_BUILDER  |
+| {{INTEGER(start), INTEGER(limit), BOOLEAN(more_items_in_collection), INTEGER(next_start)}(pagination)} | OBJECT_BUILDER  |
 
 
 
@@ -1941,9 +1941,9 @@ Marks an organization as deleted. After 30 days, the organization will be perman
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Id | INTEGER | INTEGER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Id | INTEGER | INTEGER  |  The ID of the organization  |
 
 
 ### Output
@@ -1962,7 +1962,7 @@ Type: OBJECT
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | BOOLEAN | SELECT  |
-| OBJECT | OBJECT_BUILDER  |
+| {INTEGER(id)} | OBJECT_BUILDER  |
 
 
 
@@ -1973,9 +1973,9 @@ Returns the details of an organization. Note that this also returns some additio
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Id | INTEGER | INTEGER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Id | INTEGER | INTEGER  |  The ID of the organization  |
 
 
 ### Output
@@ -1993,7 +1993,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| OBJECT | OBJECT_BUILDER  |
+| {{STRING(name), INTEGER(id), INTEGER(user_id), STRING(email), STRING(pic_hash)}(followers), STRING(dropbox_email)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
 | INTEGER | INTEGER  |
 | INTEGER | INTEGER  |
@@ -2033,11 +2033,11 @@ Type: OBJECT
 | BOOLEAN | SELECT  |
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
-| OBJECT | OBJECT_BUILDER  |
+| {STRING(128), STRING(512)} | OBJECT_BUILDER  |
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
-| OBJECT | OBJECT_BUILDER  |
-| OBJECT | OBJECT_BUILDER  |
+| {} | OBJECT_BUILDER  |
+| {} | OBJECT_BUILDER  |
 | INTEGER | INTEGER  |
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
@@ -2056,7 +2056,7 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | INTEGER | INTEGER  |
-| OBJECT | OBJECT_BUILDER  |
+| {{}(organization), {}(user), {}(picture)} | OBJECT_BUILDER  |
 | BOOLEAN | SELECT  |
 
 
@@ -2068,14 +2068,14 @@ Returns all persons.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| User Id | INTEGER | SELECT  |
-| Filter Id | INTEGER | SELECT  |
-| First Char | STRING | TEXT  |
-| Start | INTEGER | INTEGER  |
-| Limit | INTEGER | INTEGER  |
-| Sort | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| User Id | INTEGER | SELECT  |  If supplied, only persons owned by the given user will be returned. However, `filter_id` takes precedence over `user_id` when both are supplied.  |
+| Filter Id | INTEGER | SELECT  |  The ID of the filter to use  |
+| First Char | STRING | TEXT  |  If supplied, only persons whose name starts with the specified letter will be returned (case insensitive)  |
+| Start | INTEGER | INTEGER  |  Pagination start  |
+| Limit | INTEGER | INTEGER  |  Items shown per page  |
+| Sort | STRING | TEXT  |  The field names and sorting mode separated by a comma (`field_name_1 ASC`, `field_name_2 DESC`). Only first-level field keys are supported (no nested keys).  |
 
 
 ### Output
@@ -2093,9 +2093,9 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| OBJECT | OBJECT_BUILDER  |
-| ARRAY | ARRAY_BUILDER  |
-| OBJECT | OBJECT_BUILDER  |
+| {{INTEGER(start), INTEGER(limit), BOOLEAN(more_items_in_collection), INTEGER(next_start)}(pagination)} | OBJECT_BUILDER  |
+| [{INTEGER(related_closed_deals_count), INTEGER(email_messages_count), STRING(cc_email), STRING(name), INTEGER(has_pic), BOOLEAN(active_flag), INTEGER(id), INTEGER(value), STRING(email), STRING(pic_hash), INTEGER(open_deals_count), STRING(last_outgoing_mail_time), BOOLEAN(active_flag), STRING(update_time), INTEGER(added_by_user_id), INTEGER(item_id), STRING(item_type), BOOLEAN(active_flag), INTEGER(id), STRING(add_time), {STRING(128), STRING(512)}(pictures), INTEGER(last_activity_id), STRING(next_activity_date), STRING(update_time), INTEGER(activities_count), INTEGER(id), STRING(org_name), STRING(first_name), [{STRING(value), BOOLEAN(primary), STRING(label)}](email), INTEGER(won_deals_count), STRING(owner_name), INTEGER(files_count), INTEGER(company_id), INTEGER(related_won_deals_count), STRING(last_incoming_mail_time), STRING(first_char), INTEGER(undone_activities_count), INTEGER(closed_deals_count), STRING(last_name), STRING(last_activity_date), INTEGER(label), INTEGER(related_open_deals_count), INTEGER(related_lost_deals_count), INTEGER(next_activity_id), [{STRING(value), BOOLEAN(primary), STRING(label)}](phone), STRING(visible_to), STRING(address), INTEGER(owner_id), STRING(cc_email), STRING(name), BOOLEAN(active_flag), INTEGER(people_count), INTEGER(value), INTEGER(notes_count), INTEGER(followers_count), STRING(name), INTEGER(lost_deals_count), STRING(next_activity_time), STRING(add_time), INTEGER(done_activities_count)}] | ARRAY_BUILDER  |
+| {{}(organization), {}(user), {}(picture)} | OBJECT_BUILDER  |
 | BOOLEAN | SELECT  |
 
 
@@ -2107,9 +2107,9 @@ Adds a new person. Note that you can supply additional custom fields along with 
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Add Person Request | OBJECT | OBJECT_BUILDER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Add Person Request | {STRING(marketing_status), [{STRING(value), BOOLEAN(primary), STRING(label)}](phone), STRING(visible_to), INTEGER(owner_id), INTEGER(org_id), STRING(name), STRING(add_time), [{STRING(value), BOOLEAN(primary), STRING(label)}](email)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -2147,7 +2147,7 @@ Type: OBJECT
 | BOOLEAN | SELECT  |
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
-| OBJECT | OBJECT_BUILDER  |
+| {STRING(128), STRING(512)} | OBJECT_BUILDER  |
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
@@ -2155,7 +2155,7 @@ Type: OBJECT
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| ARRAY | ARRAY_BUILDER  |
+| [{STRING(value), BOOLEAN(primary), STRING(label)}] | ARRAY_BUILDER  |
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
 | INTEGER | INTEGER  |
@@ -2171,7 +2171,7 @@ Type: OBJECT
 | INTEGER | INTEGER  |
 | INTEGER | INTEGER  |
 | INTEGER | INTEGER  |
-| ARRAY | ARRAY_BUILDER  |
+| [{STRING(value), BOOLEAN(primary), STRING(label)}] | ARRAY_BUILDER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | INTEGER | INTEGER  |
@@ -2187,7 +2187,7 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | INTEGER | INTEGER  |
-| OBJECT | OBJECT_BUILDER  |
+| {{}(user)} | OBJECT_BUILDER  |
 | BOOLEAN | SELECT  |
 
 
@@ -2199,15 +2199,15 @@ Searches all persons by name, email, phone, notes and/or custom fields. This end
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Term | STRING | TEXT  |
-| Fields | STRING | SELECT  |
-| Exact Match | BOOLEAN | SELECT  |
-| Organization Id | INTEGER | INTEGER  |
-| Include Fields | STRING | SELECT  |
-| Start | INTEGER | INTEGER  |
-| Limit | INTEGER | INTEGER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Term | STRING | TEXT  |  The search term to look for. Minimum 2 characters (or 1 if using `exact_match`). Please note that the search term has to be URL encoded.  |
+| Fields | STRING | SELECT  |  A comma-separated string array. The fields to perform the search from. Defaults to all of them.  |
+| Exact Match | BOOLEAN | SELECT  |  When enabled, only full exact matches against the given term are returned. It is <b>not</b> case sensitive.  |
+| Organization Id | INTEGER | INTEGER  |  Will filter persons by the provided organization ID. The upper limit of found persons associated with the organization is 2000.  |
+| Include Fields | STRING | SELECT  |  Supports including optional fields in the results which are not provided by default  |
+| Start | INTEGER | INTEGER  |  Pagination start. Note that the pagination is based on main results and does not include related items when using `search_for_related_items` parameter.  |
+| Limit | INTEGER | INTEGER  |  Items shown per page  |
 
 
 ### Output
@@ -2225,9 +2225,9 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| OBJECT | OBJECT_BUILDER  |
+| {[{NUMBER(result_score), {INTEGER(id), STRING(type), STRING(name), [STRING](phones), [STRING](emails), INTEGER(visible_to), {INTEGER(id)}(owner), {INTEGER(id), STRING(name)}(organization), [STRING](custom_fields), [STRING](notes)}(item)}](items)} | OBJECT_BUILDER  |
 | BOOLEAN | SELECT  |
-| OBJECT | OBJECT_BUILDER  |
+| {{INTEGER(start), INTEGER(limit), BOOLEAN(more_items_in_collection), INTEGER(next_start)}(pagination)} | OBJECT_BUILDER  |
 
 
 
@@ -2238,9 +2238,9 @@ Marks a person as deleted. After 30 days, the person will be permanently deleted
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Id | INTEGER | INTEGER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Id | INTEGER | INTEGER  |  The ID of the person  |
 
 
 ### Output
@@ -2258,7 +2258,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| OBJECT | OBJECT_BUILDER  |
+| {INTEGER(id)} | OBJECT_BUILDER  |
 | BOOLEAN | SELECT  |
 
 
@@ -2270,9 +2270,9 @@ Returns the details of a person. Note that this also returns some additional fie
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Id | INTEGER | INTEGER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Id | INTEGER | INTEGER  |  The ID of the person  |
 
 
 ### Output
@@ -2290,7 +2290,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| OBJECT | OBJECT_BUILDER  |
+| {STRING(dropbox_email)} | OBJECT_BUILDER  |
 | INTEGER | INTEGER  |
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
@@ -2311,7 +2311,7 @@ Type: OBJECT
 | BOOLEAN | SELECT  |
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
-| OBJECT | OBJECT_BUILDER  |
+| {STRING(128), STRING(512)} | OBJECT_BUILDER  |
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
@@ -2319,7 +2319,7 @@ Type: OBJECT
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| ARRAY | ARRAY_BUILDER  |
+| [{STRING(value), BOOLEAN(primary), STRING(label)}] | ARRAY_BUILDER  |
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
 | INTEGER | INTEGER  |
@@ -2335,7 +2335,7 @@ Type: OBJECT
 | INTEGER | INTEGER  |
 | INTEGER | INTEGER  |
 | INTEGER | INTEGER  |
-| ARRAY | ARRAY_BUILDER  |
+| [{STRING(value), BOOLEAN(primary), STRING(label)}] | ARRAY_BUILDER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | INTEGER | INTEGER  |
@@ -2351,7 +2351,7 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | INTEGER | INTEGER  |
-| OBJECT | OBJECT_BUILDER  |
+| {{}(organization), {}(user), {}(picture)} | OBJECT_BUILDER  |
 | BOOLEAN | SELECT  |
 
 

@@ -26,11 +26,11 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Client Id | STRING | TEXT  |
-| Client Secret | STRING | TEXT  |
-| Tenant Id | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Client Id | STRING | TEXT  |  |
+| Client Secret | STRING | TEXT  |  |
+| Tenant Id | STRING | TEXT  |  |
 
 
 
@@ -50,10 +50,10 @@ Download a file from your Microsoft OneDrive
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Parent folder | STRING | SELECT  |
-| File | STRING | SELECT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Parent folder | STRING | SELECT  |  Folder from which you want to download the file.  |
+| File | STRING | SELECT  |  File to download  |
 
 
 ### Output
@@ -80,9 +80,9 @@ List files in a OneDrive folder
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Parent folder | STRING | SELECT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Parent folder | STRING | SELECT  |  Folder from which you want to list files. If no folder is specified, the root folder will be used.  |
 
 
 ### Output
@@ -106,9 +106,9 @@ List folders in a OneDrive folder
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Parent folder | STRING | SELECT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Parent folder | STRING | SELECT  |  Folder from which you want to list folders. If no folder is specified, the root folder will be used.  |
 
 
 ### Output
@@ -132,10 +132,10 @@ Upload a file to your Microsoft OneDrive
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Parent folder | STRING | SELECT  |
-| File | FILE_ENTRY | FILE_ENTRY  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Parent folder | STRING | SELECT  |  Folder where the file should be uploaded; if no folder is selected, the file will be uploaded in the root folder.  |
+| File | FILE_ENTRY | FILE_ENTRY  |  File to upload  |
 
 
 ### Output

@@ -28,9 +28,9 @@ Delay action execution.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Millis | INTEGER | INTEGER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Millis | INTEGER | INTEGER  |  Time in milliseconds.  |
 
 
 

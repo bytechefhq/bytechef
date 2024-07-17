@@ -26,10 +26,10 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Your site name | STRING | TEXT  |
-| API Key | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Your site name | STRING | TEXT  |  e.g. https://{yourSiteName}.teamwork.com  |
+| API Key | STRING | TEXT  |  |
 
 
 
@@ -55,9 +55,9 @@ Create a new company
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Company | OBJECT | OBJECT_BUILDER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Company | {{STRING(name), STRING(emailOne), STRING(phone), STRING(website)}(company)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -70,7 +70,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| OBJECT | OBJECT_BUILDER  |
+| {STRING(name), STRING(emailOne), STRING(phone), STRING(website)} | OBJECT_BUILDER  |
 
 
 
@@ -81,10 +81,10 @@ Create a new task
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Tasklist Id | INTEGER | SELECT  |
-| Task | OBJECT | OBJECT_BUILDER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Tasklist Id | INTEGER | SELECT  |  Task list where new task is added  |
+| Task | {{STRING(name), STRING(description), DATE(dueAt)}(task)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -97,7 +97,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| OBJECT | OBJECT_BUILDER  |
+| {STRING(name), STRING(description), STRING(dueAt)} | OBJECT_BUILDER  |
 
 
 

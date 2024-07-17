@@ -26,10 +26,10 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Username | STRING | TEXT  |
-| Password | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Username | STRING | TEXT  |  |
+| Password | STRING | TEXT  |  |
 
 
 
@@ -49,16 +49,16 @@ Send an email to any address.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| From Email | INTEGER | INTEGER  |
-| To Email | ARRAY | ARRAY_BUILDER  |
-| CC Email | ARRAY | ARRAY_BUILDER  |
-| BCC Email | ARRAY | ARRAY_BUILDER  |
-| Reply To | ARRAY | ARRAY_BUILDER  |
-| Subject | STRING | TEXT  |
-| Content | STRING | TEXT  |
-| Attachments | ARRAY | ARRAY_BUILDER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| From Email | INTEGER | INTEGER  |  From who to send the email.  |
+| To Email | [STRING] | ARRAY_BUILDER  |  Who to send the email to.  |
+| CC Email | [STRING] | ARRAY_BUILDER  |  Who to CC on the email.  |
+| BCC Email | [STRING] | ARRAY_BUILDER  |  Who to BCC on the email.  |
+| Reply To | [STRING] | ARRAY_BUILDER  |  When someone replies to this email, where should it go to?  |
+| Subject | STRING | TEXT  |  Your email subject.  |
+| Content | STRING | TEXT  |  Your email content. Will be sent as a HTML email.  |
+| Attachments | [FILE_ENTRY] | ARRAY_BUILDER  |  A list of attachments to send with the email.  |
 
 
 

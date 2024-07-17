@@ -26,9 +26,9 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Token | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Token | STRING | TEXT  |  |
 
 
 
@@ -48,13 +48,13 @@ Find records in datasheet
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Space | STRING | SELECT  |
-| Datasheet | STRING | SELECT  |
-| Field Names | ARRAY | ARRAY_BUILDER  |
-| Record IDs | ARRAY | ARRAY_BUILDER  |
-| Max records | INTEGER | INTEGER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Space | STRING | SELECT  |  |
+| Datasheet | STRING | SELECT  |  AITable Datasheet  |
+| Field Names | [STRING] | ARRAY_BUILDER  |  The returned record results are limited to the specified fields.  |
+| Record IDs | [STRING] | ARRAY_BUILDER  |  The IDs of the records to find.  |
+| Max records | INTEGER | INTEGER  |  How many records are returned in total  |
 
 
 ### Output
@@ -69,7 +69,7 @@ Type: OBJECT
 |:------------:|:--------------------:|
 | INTEGER | INTEGER  |
 | BOOLEAN | SELECT  |
-| OBJECT | OBJECT_BUILDER  |
+| {[{STRING(recordId), {}(fields)}](records)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
 
 
@@ -81,11 +81,11 @@ Update record in datasheet
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Space | STRING | SELECT  |
-| Datasheet | STRING | SELECT  |
-| Record | STRING | SELECT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Space | STRING | SELECT  |  |
+| Datasheet | STRING | SELECT  |  AITable Datasheet  |
+| Record | STRING | SELECT  |  Record to update  |
 | DYNAMIC_PROPERTIES | null  |
 
 
@@ -101,7 +101,7 @@ Type: OBJECT
 |:------------:|:--------------------:|
 | INTEGER | INTEGER  |
 | BOOLEAN | SELECT  |
-| OBJECT | OBJECT_BUILDER  |
+| {[{STRING(recordId), {}(fields)}](records)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
 
 
@@ -113,10 +113,10 @@ Creates a new record in datasheet.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Space | STRING | SELECT  |
-| Datasheet | STRING | SELECT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Space | STRING | SELECT  |  |
+| Datasheet | STRING | SELECT  |  AITable Datasheet  |
 | DYNAMIC_PROPERTIES | null  |
 
 
@@ -132,10 +132,20 @@ Type: OBJECT
 |:------------:|:--------------------:|
 | INTEGER | INTEGER  |
 | BOOLEAN | SELECT  |
-| OBJECT | OBJECT_BUILDER  |
+| {[{STRING(recordId), {}(fields)}](records)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
 
 
 
 
 
+<hr />
+
+# Additional instructions
+<hr />
+
+## CONNECTION
+
+[Setting up OAuth2](https://developers.aitable.ai/api/quick-start/#:~:text=API%20Token%20is%20the%20user,request%20to%20facilitate%20server%20authentication.)
+
+[Guidejar](https://guidejar.com/guides/51781518-3dd5-4d75-9a37-0cc85a58a66f) tutorial.

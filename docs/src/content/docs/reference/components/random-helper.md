@@ -28,8 +28,8 @@ Generates a random integer value.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
 | INTEGER | INTEGER  |
 | INTEGER | INTEGER  |
 
@@ -55,8 +55,8 @@ Generates a random float value.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
 | INTEGER | INTEGER  |
 | INTEGER | INTEGER  |
 

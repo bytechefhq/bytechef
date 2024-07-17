@@ -26,11 +26,11 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Account name | STRING | TEXT  |
-| Key | STRING | TEXT  |
-| API Key | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Account name | STRING | TEXT  |  Your account name, e.g. https://{youraccountname}.api-us1.com  |
+| Key | STRING | TEXT  |  |
+| API Key | STRING | TEXT  |  |
 
 
 
@@ -56,9 +56,9 @@ Creates a new account
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Account | OBJECT | OBJECT_BUILDER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Account | {{STRING(name), STRING(accountUrl)}(account)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -71,7 +71,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| OBJECT | OBJECT_BUILDER  |
+| {{STRING(name), STRING(accountUrl)}(account)} | OBJECT_BUILDER  |
 
 
 
@@ -82,9 +82,9 @@ Creates a new contact
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Contact | OBJECT | OBJECT_BUILDER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Contact | {{STRING(email), STRING(firstName), STRING(lastName), STRING(phone)}(contact)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -97,7 +97,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| OBJECT | OBJECT_BUILDER  |
+| {{STRING(email), STRING(firstName), STRING(lastName), STRING(phone)}(contact)} | OBJECT_BUILDER  |
 
 
 
@@ -108,9 +108,9 @@ Creates a new task
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Task | OBJECT | OBJECT_BUILDER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Task | {{STRING(title), INTEGER(relid), DATE(duedate), INTEGER(dealTasktype)}(dealTask)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -123,7 +123,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| OBJECT | OBJECT_BUILDER  |
+| {{STRING(id), STRING(title), INTEGER(relid), DATE(duedate), INTEGER(dealTasktype)}(dealTask)} | OBJECT_BUILDER  |
 
 
 

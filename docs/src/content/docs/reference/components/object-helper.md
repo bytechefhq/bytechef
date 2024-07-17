@@ -28,9 +28,9 @@ Converts the JSON string to object/array.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Source | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Source | STRING | TEXT  |  The JSON string to convert to the data.  |
 
 
 
@@ -40,11 +40,11 @@ Writes the object/array to a JSON string.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Type | INTEGER | SELECT  |
-| Source | OBJECT | OBJECT_BUILDER  |
-| Source | ARRAY | ARRAY_BUILDER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Type | INTEGER | SELECT  |  The value type.  |
+| Source | {} | OBJECT_BUILDER  |  The data to convert to JSON string.  |
+| Source | [] | ARRAY_BUILDER  |  The data to convert to JSON string.  |
 
 
 

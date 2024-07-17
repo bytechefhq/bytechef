@@ -36,8 +36,8 @@ Triggers on new RabbitMQ messages.
 #### Type: LISTENER
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
 | STRING | TEXT  |
 
 
@@ -56,10 +56,10 @@ Send a new RabbitMQ message.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
 | STRING | TEXT  |
-| OBJECT | OBJECT_BUILDER  |
+| {} | OBJECT_BUILDER  |
 
 
 

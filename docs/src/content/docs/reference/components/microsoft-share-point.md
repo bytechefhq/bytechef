@@ -26,11 +26,11 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Client Id | STRING | TEXT  |
-| Client Secret | STRING | TEXT  |
-| Tenant Id | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Client Id | STRING | TEXT  |  |
+| Client Secret | STRING | TEXT  |  |
+| Tenant Id | STRING | TEXT  |  |
 
 
 
@@ -50,11 +50,11 @@ Creates a new folder at path you specify.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Site | STRING | SELECT  |
-| Parent folder | STRING | SELECT  |
-| Folder name | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Site | STRING | SELECT  |  |
+| Parent folder | STRING | SELECT  |  If no folder is selected, file will be uploaded to root folder.  |
+| Folder name | STRING | TEXT  |  |
 
 
 ### Output
@@ -79,11 +79,11 @@ Creates a new list
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Site | STRING | SELECT  |
-| List name | STRING | TEXT  |
-| List description | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Site | STRING | SELECT  |  |
+| List name | STRING | TEXT  |  |
+| List description | STRING | TEXT  |  |
 
 
 ### Output
@@ -109,10 +109,10 @@ Creates a new item in a list.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Site | STRING | SELECT  |
-| List | STRING | SELECT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Site | STRING | SELECT  |  |
+| List | STRING | SELECT  |  |
 | DYNAMIC_PROPERTIES | null  |
 
 
@@ -137,11 +137,11 @@ Upload file to Microsoft SharePoint folder.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Site | STRING | SELECT  |
-| Parent folder | STRING | SELECT  |
-| File | FILE_ENTRY | FILE_ENTRY  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Site | STRING | SELECT  |  |
+| Parent folder | STRING | SELECT  |  If no folder is selected, file will be uploaded to root folder  |
+| File | FILE_ENTRY | FILE_ENTRY  |  File to upload.  |
 
 
 ### Output

@@ -28,10 +28,10 @@ Executes custom JavaScript code.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Input | OBJECT | OBJECT_BUILDER  |
-| JavaScript code | STRING | CODE_EDITOR  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Input | {} | OBJECT_BUILDER  |  Initialize parameter values used in the custom code.  |
+| JavaScript code | STRING | CODE_EDITOR  |  Add your JavaScript custom logic here.  |
 
 
 
@@ -41,10 +41,10 @@ Executes custom Python code.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Input | OBJECT | OBJECT_BUILDER  |
-| Python code | STRING | CODE_EDITOR  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Input | {} | OBJECT_BUILDER  |  Initialize parameter values used in the custom code.  |
+| Python code | STRING | CODE_EDITOR  |  Add your Python custom logic here.  |
 
 
 
@@ -54,10 +54,10 @@ Executes custom Ruby code.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Input | OBJECT | OBJECT_BUILDER  |
-| Ruby code | STRING | CODE_EDITOR  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Input | {} | OBJECT_BUILDER  |  Initialize parameter values used in the custom code.  |
+| Ruby code | STRING | CODE_EDITOR  |  Add your Ruby custom logic here.  |
 
 
 

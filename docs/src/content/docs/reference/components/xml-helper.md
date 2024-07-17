@@ -28,9 +28,9 @@ Converts the XML string to object/array.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Source | STRING | TEXT  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Source | STRING | TEXT  |  The XML string to convert to the data.  |
 
 
 ### Output
@@ -54,11 +54,11 @@ Writes the object/array to a XML string.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |
-|:--------------:|:------------:|:--------------------:|
-| Type | INTEGER | SELECT  |
-| Source | OBJECT | OBJECT_BUILDER  |
-| Source | ARRAY | ARRAY_BUILDER  |
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Type | INTEGER | SELECT  |  The value type.  |
+| Source | {} | OBJECT_BUILDER  |  The object to convert to XML string.  |
+| Source | [] | ARRAY_BUILDER  |  The array to convert to XML string.  |
 
 
 ### Output
