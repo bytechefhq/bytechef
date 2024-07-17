@@ -30,7 +30,7 @@ open class FindJsonFilesTask : DefaultTask() {
             if(properties!=null) {
                 for (proprety: Properties in properties!!) {
                     sb.append(proprety.getFullType(proprety.type))
-                    if(proprety.name!=null) sb.append("(${proprety.name})")
+                    if(proprety.name!=null) sb.append("\\").append("(${proprety.name})")
                     sb.append(", ")
                 }
                 if(sb.length>2) sb.replace(sb.length-2, sb.length, "")
@@ -45,7 +45,7 @@ open class FindJsonFilesTask : DefaultTask() {
             if(items!=null) {
                 for (proprety: Properties in items!!) {
                     sb.append(proprety.getFullType(proprety.type))
-                    if(proprety.name!=null) sb.append("($${proprety.name})")
+                    if(proprety.name!=null) sb.append("\\").append("($${proprety.name})")
                     sb.append(", ")
                 }
                 if(sb.length>2) sb.replace(sb.length-2, sb.length, "")
