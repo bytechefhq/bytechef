@@ -131,5 +131,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        GITHUB_ACTIONS_BUILD: true
       working-directory: server
       run: ../gradlew build --scan --stacktrace
