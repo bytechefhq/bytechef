@@ -263,6 +263,15 @@ val testIntegration by tasks.registering(Test::class) {
 //                val repeatLength = startItem.length + output.length + endItem.length
 //                println("\n" + ('-' * repeatLength) + "\n" + startItem + output + endItem + "\n" + ("-" * repeatLength))
                 println("\n" + "\n" + startItem + output + endItem + "\n")
+
+                if (System.getenv("GITHUB_ACTIONS_BUILD")?.toBoolean() == true) {
+                    delete("build")
+
+                    println("\nBuild directory is deleted")
+                }
+                else {
+                    println("\nWARN: generated build and test resources were not deleted")
+                }
             }
         }
     })
