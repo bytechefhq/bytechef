@@ -22,6 +22,9 @@ package com.bytechef.component.shopify.constant;
 public class ShopifyConstants {
 
     public static final String ID = "id";
+    public static final String NEW_CANCELLED_ORDER = "newCancelledOrder";
+    public static final String NEW_ORDER = "newOrder";
+    public static final String NEW_PAID_ORDER = "newPaidOrder";
     public static final String SHOP_NAME = "shopName";
     public static final String PRODUCT_ID = "product_id";
 
