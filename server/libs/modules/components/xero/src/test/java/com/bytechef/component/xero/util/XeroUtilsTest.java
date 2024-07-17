@@ -17,6 +17,7 @@
 package com.bytechef.component.xero.util;
 
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.xero.constant.XeroConstants.ACCPAY;
 import static com.bytechef.component.xero.constant.XeroConstants.ACCREC;
 import static com.bytechef.component.xero.constant.XeroConstants.CODE;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACT;
@@ -26,11 +27,14 @@ import static com.bytechef.component.xero.constant.XeroConstants.CURRENCY_CODE;
 import static com.bytechef.component.xero.constant.XeroConstants.DATE;
 import static com.bytechef.component.xero.constant.XeroConstants.DESCRIPTION;
 import static com.bytechef.component.xero.constant.XeroConstants.DUE_DATE;
+import static com.bytechef.component.xero.constant.XeroConstants.INVOICE;
+import static com.bytechef.component.xero.constant.XeroConstants.INVOICES;
 import static com.bytechef.component.xero.constant.XeroConstants.LINE_AMOUNT_TYPES;
 import static com.bytechef.component.xero.constant.XeroConstants.LINE_ITEMS;
 import static com.bytechef.component.xero.constant.XeroConstants.NAME;
 import static com.bytechef.component.xero.constant.XeroConstants.REFERENCE;
 import static com.bytechef.component.xero.constant.XeroConstants.TYPE;
+import static com.bytechef.component.xero.constant.XeroConstants.WEBHOOK_KEY;
 import static com.bytechef.component.xero.util.XeroUtils.GET_ACCOUNTS_CONTEXT_FUNCTION;
 import static com.bytechef.component.xero.util.XeroUtils.GET_BRANDING_THEME_CONTEXT_FUNCTION;
 import static com.bytechef.component.xero.util.XeroUtils.GET_CONTACTS_CONTEXT_FUNCTION;
@@ -47,6 +51,12 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
+import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
+import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
+import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -65,9 +75,14 @@ class XeroUtilsTest {
     private final ActionContext mockedContext = mock(ActionContext.class);
     private final ContextFunction mockedContextFunction = mock(ContextFunction.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
+    private final HttpParameters mockedHttpParameters = mock(HttpParameters.class);
     private final Object mockedObject = mock(Object.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
+    private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
+    private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
 
     @Test
     void testCreateInvoice() {
@@ -97,7 +112,7 @@ class XeroUtilsTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of("Invoices", List.of(mockedObject)));
+            .thenReturn(Map.of(INVOICES, List.of(mockedObject)));
 
         Object result = XeroUtils.createInvoice(mockedParameters, mockedContext, mockedContextFunction, ACCREC);
 
@@ -190,6 +205,69 @@ class XeroUtilsTest {
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         assertEquals(expectedOptions, resultOptions);
+    }
+
+    @Test
+    void testGetCreatedObjectContact() {
+        Map<String, Object> eventMap = Map.of("eventCategory", "CONTACT",
+            "eventType", "CREATE",
+            "resourceId", "1234");
+        List<Map<String, Object>> events = List.of(eventMap);
+
+        when(mockedWebhookBody.getContent())
+            .thenReturn(Map.of("events", events));
+        when(mockedTriggerContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of(CONTACTS, List.of(mockedObject)));
+
+        Object contact = XeroUtils.getCreatedObject(mockedWebhookBody, mockedTriggerContext, "CONTACT", null);
+
+        assertEquals(mockedObject, contact);
+    }
+
+    @Test
+    void testGetCreatedObjectInvoice() {
+        Map<String, Object> eventMap = Map.of("eventCategory", INVOICE,
+            "eventType", "CREATE",
+            "resourceId", "1234");
+        List<Map<String, Object>> events = List.of(eventMap);
+        Map<String, String> invoiceMap = Map.of(TYPE, ACCPAY);
+
+        when(mockedWebhookBody.getContent())
+            .thenReturn(Map.of("events", events));
+        when(mockedTriggerContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of(INVOICES, List.of(invoiceMap)));
+
+        Object invoice = XeroUtils.getCreatedObject(mockedWebhookBody, mockedTriggerContext, INVOICE, ACCPAY);
+
+        assertEquals(invoiceMap, invoice);
+    }
+
+    @Test
+    void testWebhookValidate() {
+        when(mockedHttpHeaders.toMap())
+            .thenReturn(Map.of("x-xero-signature", List.of("9WaolbfT7PJJ/JctqqqrZqx9N6KEWR/l1iq8snWTe2A=")));
+        when(mockedWebhookBody.getRawContent())
+            .thenReturn("mockedRawContent");
+        when(mockedParameters.getRequiredString(WEBHOOK_KEY))
+            .thenReturn("mockedWebhookKey");
+
+        WebhookValidateResponse webhookValidateResponse = XeroUtils.webhookValidate(
+            mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody, mockedWebhookMethod, mockedTriggerContext);
+
+        assertEquals(200, webhookValidateResponse.status());
+
     }
 
     private Map<String, Object> createPropertyStubsMap() {
