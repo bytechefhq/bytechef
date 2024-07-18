@@ -16,13 +16,16 @@
 
 package com.bytechef.component.box.util;
 
+import static com.bytechef.component.box.constant.BoxConstants.BASE_URL;
 import static com.bytechef.component.box.constant.BoxConstants.FILE;
+import static com.bytechef.component.box.constant.BoxConstants.FOLDER;
 import static com.bytechef.component.box.constant.BoxConstants.ID;
 import static com.bytechef.component.box.constant.BoxConstants.NAME;
 import static com.bytechef.component.box.constant.BoxConstants.TYPE;
 import static com.bytechef.component.definition.ComponentDSL.option;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
@@ -67,7 +70,7 @@ public class BoxUtils {
 
     public static List<Option<String>> getRootFolderOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, Object> body = context.http(http -> http.get("https://api.box.com/2.0/folders/0/items"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
@@ -87,6 +90,29 @@ public class BoxUtils {
         options.add(option("ROOT", "0"));
 
         return options;
+    }
+
+    public static String subscribeWebhook(
+        String webhookUrl, Context context, String type, String triggerEvent, String targetId) {
+
+        Map<String, ?> body = context.http(http -> http.post(BASE_URL + "/webhooks"))
+            .body(Http.Body.of(
+                "address", webhookUrl,
+                "triggers", List.of(triggerEvent),
+                "target", Map.of(
+                    ID, targetId,
+                    TYPE, type)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        return (String) body.get(ID);
+    }
+
+    public static void unsubscribeWebhook(Parameters outputParameters, Context context) {
+        context.http(http -> http.delete(BASE_URL + "/webhooks/" + outputParameters.getString(ID)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute();
     }
 
 }

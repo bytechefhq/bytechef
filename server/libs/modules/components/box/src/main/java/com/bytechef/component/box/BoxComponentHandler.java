@@ -24,6 +24,8 @@ import com.bytechef.component.box.action.BoxCreateFolderAction;
 import com.bytechef.component.box.action.BoxDownloadFileAction;
 import com.bytechef.component.box.action.BoxUploadFileAction;
 import com.bytechef.component.box.connection.BoxConnection;
+import com.bytechef.component.box.trigger.BoxNewFileTrigger;
+import com.bytechef.component.box.trigger.BoxNewFolderTrigger;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
@@ -45,7 +47,10 @@ public class BoxComponentHandler implements ComponentHandler {
         .actions(
             BoxCreateFolderAction.ACTION_DEFINITION,
             BoxDownloadFileAction.ACTION_DEFINITION,
-            BoxUploadFileAction.ACTION_DEFINITION);
+            BoxUploadFileAction.ACTION_DEFINITION)
+        .triggers(
+            BoxNewFileTrigger.TRIGGER_DEFINITION,
+            BoxNewFolderTrigger.TRIGGER_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
