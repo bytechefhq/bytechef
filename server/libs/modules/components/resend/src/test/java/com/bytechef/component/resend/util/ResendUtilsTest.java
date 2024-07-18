@@ -16,15 +16,16 @@
 
 package com.bytechef.component.resend.util;
 
-import static com.bytechef.component.resend.constant.ResendConstants.ATTACHMENTS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Parameters;
-import com.resend.services.emails.model.Attachment;
+import com.bytechef.component.definition.FileEntry;
+import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,15 +34,26 @@ import org.junit.jupiter.api.Test;
 class ResendUtilsTest {
 
     private final ActionContext mockedContext = mock(ActionContext.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
+    private final FileEntry mockedFileEntry = mock(FileEntry.class);
 
     @Test
-    void testGetAttachmentsForNoneFileEntry() {
-        when(mockedParameters.getFileEntries(ATTACHMENTS, List.of())).thenReturn(List.of());
+    void testGetAttachments() {
+        Base64.Encoder encoder = Base64.getEncoder();
+        List<FileEntry> fileEntries = List.of(mockedFileEntry);
+        byte[] bytes = {};
 
-        List<Attachment> attachments = ResendUtils.getAttachments(mockedParameters, mockedContext);
+        when(mockedFileEntry.getName())
+            .thenReturn("fileName");
+        when(mockedContext.file(any()))
+            .thenReturn(bytes);
 
-        assertEquals(0, attachments.size());
-        //TODO write test for getAttachments with file entries
+        List<Map<String, String>> result = ResendUtils.getAttachments(fileEntries, mockedContext);
+
+        assertEquals(1, result.size());
+
+        Map<String, String> fileEntry = result.getFirst();
+
+        assertEquals("fileName", fileEntry.get("filename"));
+        assertEquals(encoder.encodeToString(bytes), fileEntry.get("content"));
     }
 }
