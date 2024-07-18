@@ -43,7 +43,7 @@ import org.mockito.Mockito;
  * @author Ivica Cardic
  */
 @Disabled
-public class CsvFileWriteActionTest {
+class CsvFileWriteActionTest {
 
     private static final ActionContext context = Mockito.mock(ActionContext.class);
 
@@ -51,7 +51,7 @@ public class CsvFileWriteActionTest {
     @SuppressWarnings({
         "rawtypes", "unchecked"
     })
-    public void testPerformWriteCSV() throws IOException {
+    void testPerformWriteCSV() throws IOException {
         String jsonContent = Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8);
 
         Parameters parameters = Mockito.mock(Parameters.class);
