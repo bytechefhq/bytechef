@@ -29,10 +29,10 @@ import org.mockito.Mockito;
 /**
  * @author Ivica Cardic
  */
-public class FilesystemRmActionTest {
+class FilesystemRmActionTest {
 
     @Test
-    public void testDelete() throws IOException {
+    void testDelete() throws IOException {
         Parameters parameters = Mockito.mock(Parameters.class);
         File tempDir = java.nio.file.Files.createTempDirectory("rm_")
             .toFile();
