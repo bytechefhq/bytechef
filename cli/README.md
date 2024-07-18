@@ -9,7 +9,7 @@ It is work in progress. Until the app is published, use ```bytechef.sh``` script
 3. Change working directory to the `BYTECHEF_HOME/cli/cli-app` folder.
 4. Generate YourConnector component/connector by executing the following command:
     ```bash
-    $ ./bytechef.sh component init --open-api-path=../../server/libs/modules/components/yourconnector/openapi.yaml --output-path=../../server/libs/modules/components yourconnector
+    $ ./bytechef.sh component init --open-api-path ../../server/libs/modules/components/yourconnector/openapi.yaml --output-path ../../server/libs/modules/components --name yourconnector
     ```
 ### Setup gradle
 5. In file `bytechef/settings.gradle.kts`, add line: `include("server:libs:modules:components:yourconnector")`
