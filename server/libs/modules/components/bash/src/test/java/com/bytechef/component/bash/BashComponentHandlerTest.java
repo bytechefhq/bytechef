@@ -25,10 +25,10 @@ import org.junit.jupiter.api.Test;
  * @author Arik Cohen
  * @author Ivica Cardic
  */
-public class BashComponentHandlerTest {
+class BashComponentHandlerTest {
 
     @Test
-    public void testGetComponentDefinition() {
+    void testGetComponentDefinition() {
         JsonFileAssert.assertEquals("definition/bash_v1.json", new BashComponentHandler().getDefinition());
     }
 }
