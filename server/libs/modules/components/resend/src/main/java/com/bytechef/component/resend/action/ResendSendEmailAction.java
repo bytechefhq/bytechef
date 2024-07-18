@@ -16,7 +16,6 @@
 
 package com.bytechef.component.resend.action;
 
-import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
@@ -25,6 +24,7 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.resend.constant.ResendConstants.ATTACHMENTS;
+import static com.bytechef.component.resend.constant.ResendConstants.BASE_URL;
 import static com.bytechef.component.resend.constant.ResendConstants.BCC;
 import static com.bytechef.component.resend.constant.ResendConstants.CC;
 import static com.bytechef.component.resend.constant.ResendConstants.CONTENT_TYPE;
@@ -43,18 +43,12 @@ import static com.bytechef.component.resend.constant.ResendConstants.VALUE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.resend.util.ResendUtils;
-import com.resend.Resend;
-import com.resend.core.exception.ResendException;
-import com.resend.services.emails.Emails;
-import com.resend.services.emails.model.Attachment;
-import com.resend.services.emails.model.CreateEmailOptions;
-import com.resend.services.emails.model.CreateEmailResponse;
-import com.resend.services.emails.model.Tag;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -63,7 +57,7 @@ public final class ResendSendEmailAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEND_EMAIL)
         .title("Send Email")
-        .description("Description")
+        .description("Send an email")
         .properties(
             string(FROM)
                 .label("From")
@@ -79,7 +73,7 @@ public final class ResendSendEmailAction {
             string(SUBJECT)
                 .label("Subject")
                 .description("Email subject.")
-                .required(false),
+                .required(true),
             array(BCC)
                 .label("Bcc")
                 .description("Bcc recipients email addresses.")
@@ -146,30 +140,26 @@ public final class ResendSendEmailAction {
     private ResendSendEmailAction() {
     }
 
-    public static CreateEmailResponse perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
-        throws ResendException {
+    public static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        Resend resend = new Resend(connectionParameters.get(TOKEN, String.class));
-
-        List<Attachment> attachments = ResendUtils.getAttachments(inputParameters, actionContext);
-
-        CreateEmailOptions createEmailOptions = CreateEmailOptions.builder()
-            .from(inputParameters.getRequiredString(FROM))
-            .to(inputParameters.getList(TO, String.class, List.of()))
-            .subject(inputParameters.getString(SUBJECT))
-            .bcc(inputParameters.getList(BCC, String.class, List.of()))
-            .cc(inputParameters.getList(CC, String.class, List.of()))
-            .replyTo(inputParameters.getList(REPLY_TO, String.class, List.of()))
-            .html(inputParameters.getString(HTML))
-            .text(inputParameters.getString(TEXT))
-            .attachments(attachments)
-            .headers(inputParameters.getMap(HEADERS, String.class, Map.of()))
-            .tags(inputParameters.getList(TAGS, Tag.class, List.of()))
-            .build();
-
-        Emails emails = resend.emails();
-
-        return emails.send(createEmailOptions);
+        return actionContext.http(http -> http.post(BASE_URL + "/emails"))
+            .body(
+                Http.Body.of(
+                    FROM, inputParameters.getRequiredString(FROM),
+                    TO, inputParameters.getRequiredList(TO, String.class),
+                    SUBJECT, inputParameters.getRequiredString(SUBJECT),
+                    BCC, inputParameters.getList(BCC, String.class),
+                    CC, inputParameters.getList(CC, String.class),
+                    REPLY_TO, inputParameters.getList(REPLY_TO, String.class),
+                    HTML, inputParameters.getString(HTML),
+                    TEXT, inputParameters.getString(TEXT),
+                    HEADERS, inputParameters.getMap(HEADERS, String.class),
+                    ATTACHMENTS,
+                    ResendUtils.getAttachments(inputParameters.getFileEntries(ATTACHMENTS, List.of()), actionContext),
+                    TAGS, inputParameters.getList(TAGS)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
     }
 }
