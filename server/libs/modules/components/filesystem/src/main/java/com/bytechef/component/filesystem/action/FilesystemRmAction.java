@@ -40,7 +40,7 @@ public class FilesystemRmAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(RM)
         .title("Remove")
-        .description("Removes the content of a directory.")
+        .description("Permanently removes the content of a directory.")
         .properties(
             string(PATH)
                 .label("Path")
@@ -49,6 +49,9 @@ public class FilesystemRmAction {
         .outputSchema(bool())
         .sampleOutput(true)
         .perform(FilesystemRmAction::perform);
+
+    private FilesystemRmAction() {
+    }
 
     /**
      * Deletes a file, never throwing an exception. If a file is a directory, delete it and all subdirectories.

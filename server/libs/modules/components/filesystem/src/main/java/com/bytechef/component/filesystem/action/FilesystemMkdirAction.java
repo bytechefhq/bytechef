@@ -45,6 +45,9 @@ public class FilesystemMkdirAction {
         .sampleOutput("/sample_data")
         .perform(FilesystemMkdirAction::perform);
 
+    private FilesystemMkdirAction() {
+    }
+
     /**
      * Creates a directory by creating all nonexistent parent directories first.
      *

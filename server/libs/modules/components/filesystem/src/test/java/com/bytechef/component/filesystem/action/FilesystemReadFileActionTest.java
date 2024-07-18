@@ -34,10 +34,10 @@ import org.mockito.Mockito;
  * @author Ivica Cardic
  */
 @Disabled
-public class FilesystemReadFileActionTest {
+class FilesystemReadFileActionTest {
 
     @Test
-    public void testPerformReadFile() throws IOException {
+    void testPerformReadFile() throws IOException {
         ActionContext context = Mockito.mock(ActionContext.class);
         File file = getSampleFile();
         Parameters parameters = Mockito.mock(Parameters.class);

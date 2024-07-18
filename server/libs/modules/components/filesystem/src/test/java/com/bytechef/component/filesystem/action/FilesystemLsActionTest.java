@@ -34,10 +34,10 @@ import org.mockito.Mockito;
 /**
  * @author Ivica Cardic
  */
-public class FilesystemLsActionTest {
+class FilesystemLsActionTest {
 
     @Test
-    public void testLs1() throws IOException {
+    void testLs1() throws IOException {
         File file = getLsFile();
         Parameters parameters = Mockito.mock(Parameters.class);
 
@@ -57,7 +57,7 @@ public class FilesystemLsActionTest {
     }
 
     @Test
-    public void testLs2() throws IOException {
+    void testLs2() throws IOException {
         File file = getLsFile();
         Parameters parameters = Mockito.mock(Parameters.class);
 
@@ -77,7 +77,7 @@ public class FilesystemLsActionTest {
     }
 
     @Test
-    public void testLs3() throws IOException {
+    void testLs3() throws IOException {
         File file = getLsFile();
         Parameters parameters = Mockito.mock(Parameters.class);
 

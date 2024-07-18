@@ -30,10 +30,10 @@ import org.mockito.Mockito;
 /**
  * @author Ivica Cardic
  */
-public class FilesystemMkdirActionTest {
+class FilesystemMkdirActionTest {
 
     @Test
-    public void testCreateDir1() throws IOException {
+    void testCreateDir1() throws IOException {
         Parameters parameters = Mockito.mock(Parameters.class);
         String tempDir = System.getProperty("java.io.tmpdir") + "/" + UUID.randomUUID()
             .toString()
@@ -48,7 +48,7 @@ public class FilesystemMkdirActionTest {
     }
 
     @Test
-    public void testCreateDir2() {
+    void testCreateDir2() {
         Parameters parameters = Mockito.mock(Parameters.class);
 
         Assertions.assertThrows(IOException.class, () -> {

@@ -19,30 +19,34 @@ package com.bytechef.component.filesystem.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILENAME;
-import static com.bytechef.component.filesystem.constant.FilesystemConstants.GET_FILE_PATH;
+import static com.bytechef.component.filesystem.constant.FilesystemConstants.GET_PARENT_FOLDER;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import java.io.File;
+import java.nio.file.NoSuchFileException;
 
 /**
  * @author Ivica Cardic
  */
-public class FilesystemGetFilePathAction {
+public class FilesystemGetParentFolderAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(GET_FILE_PATH)
-        .title("File Path")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(GET_PARENT_FOLDER)
+        .title("Get parent folder")
         .description(
-            "Gets the full path from a full filename, which is the prefix + path, and also excluding the final directory separator.")
+            "Gets the path of the parent folder of the file. If the file doesn't exist, it throws an error.")
         .properties(string(FILENAME)
-            .label("Filename")
+            .label("File path")
             .description("The path to full filename.")
             .placeholder("/data/your_file.pdf")
             .required(true))
         .outputSchema(string())
         .sampleOutput("/sample_data")
-        .perform(FilesystemGetFilePathAction::perform);
+        .perform(FilesystemGetParentFolderAction::perform);
+
+    private FilesystemGetParentFolderAction() {
+    }
 
     /**
      * Gets the full path from a full filename, which is the prefix + path, and also excluding the final directory
@@ -53,10 +57,14 @@ public class FilesystemGetFilePathAction {
      * the text before the last forward or backslash.
      */
     protected static String perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws NoSuchFileException {
         String filename = inputParameters.getRequiredString(FILENAME);
+        File file = new File(filename);
 
-        return filename.substring(0, filename.lastIndexOf(File.separator));
+        if (file.exists()) {
+            return filename.substring(0, filename.lastIndexOf(File.separator));
+        } else {
+            throw new NoSuchFileException(filename);
+        }
     }
 }

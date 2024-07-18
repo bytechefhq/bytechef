@@ -36,11 +36,11 @@ import org.mockito.Mockito;
  * @author Ivica Cardic
  */
 @Disabled
-public class FilesystemWriteFileActionTest {
+class FilesystemWriteFileActionTest {
 
     @Test
     @SuppressFBWarnings("OBL")
-    public void testPerformWriteFile() throws IOException {
+    void testPerformWriteFile() throws IOException {
         ActionContext context = Mockito.mock(ActionContext.class);
         File file = getSampleFile();
         Parameters parameters = Mockito.mock(Parameters.class);

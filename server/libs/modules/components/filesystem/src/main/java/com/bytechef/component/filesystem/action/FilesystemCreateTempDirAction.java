@@ -35,10 +35,14 @@ public class FilesystemCreateTempDirAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_TEMP_DIR)
         .title("Create Temp Directory")
-        .description("Creates a temporary directory on the filesystem.")
+        .description(
+            "Creates a file in the temporary directory on the filesystem. Returns the created directory's full path.")
         .outputSchema(string())
         .sampleOutput("/sample_tmp_dir")
         .perform(FilesystemCreateTempDirAction::perform);
+
+    private FilesystemCreateTempDirAction() {
+    }
 
     protected static String perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {

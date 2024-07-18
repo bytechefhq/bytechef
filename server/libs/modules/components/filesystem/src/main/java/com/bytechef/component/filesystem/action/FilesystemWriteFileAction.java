@@ -46,16 +46,19 @@ public class FilesystemWriteFileAction {
             fileEntry(FILE_ENTRY)
                 .label("File")
                 .description(
-                    "The object property which contains a reference to the file to be written.")
+                    "File entry object to be written.")
                 .required(true),
             string(FILENAME)
-                .label("Filename")
+                .label("File path")
                 .description("The path to which the file should be written.")
                 .placeholder("/data/your_file.pdf")
                 .required(true))
         .outputSchema(object().properties(integer("bytes")))
         .sampleOutput(Map.of("bytes", 1024))
         .perform(FilesystemWriteFileAction::perform);
+
+    private FilesystemWriteFileAction() {
+    }
 
     protected static Map<String, ?> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {

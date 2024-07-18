@@ -47,7 +47,7 @@ public class FilesystemLsAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(LS)
         .title("List")
-        .description("Lists a content of directory for the given path.")
+        .description("Lists the content of a directory for the given path.")
         .properties(
             string(PATH)
                 .label("Path")
@@ -55,7 +55,7 @@ public class FilesystemLsAction {
                 .required(true),
             bool(RECURSIVE)
                 .label("Recursive")
-                .description("Should subdirectories be included.")
+                .description("Should the subdirectories be included?")
                 .defaultValue(false))
         .outputSchema(
             array()
@@ -66,6 +66,9 @@ public class FilesystemLsAction {
                             string("relativePath"),
                             integer("size"))))
         .perform(FilesystemLsAction::perform);
+
+    private FilesystemLsAction() {
+    }
 
     protected static List<FileInfo> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {

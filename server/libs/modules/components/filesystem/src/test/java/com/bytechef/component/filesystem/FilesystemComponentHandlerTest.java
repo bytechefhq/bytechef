@@ -26,43 +26,43 @@ import org.junit.jupiter.api.Test;
 public class FilesystemComponentHandlerTest {
 
     @Test
-    public void testGetComponentDefinition() {
+    void testGetComponentDefinition() {
         JsonFileAssert.assertEquals("definition/filesystem_v1.json", new FilesystemComponentHandler().getDefinition());
     }
 
     @Disabled
     @Test
-    public void testPerformCreateDir() {
+    void testPerformCreateDir() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testPerformCreateTempDir() {
+    void testPerformCreateTempDir() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testPerformDelete() {
+    void testPerformDelete() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testPerformDownload() {
+    void testPerformDownload() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testPerformGetFilePath() {
+    void testPerformGetFilePath() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testPerformList() {
+    void testPerformList() {
         // TODO
     }
 }
