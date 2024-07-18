@@ -16,13 +16,13 @@
 
 package com.bytechef.component.box.action;
 
+import static com.bytechef.component.box.constant.BoxConstants.BASE_URL;
 import static com.bytechef.component.box.constant.BoxConstants.CREATE_FOLDER;
+import static com.bytechef.component.box.constant.BoxConstants.FILE_OUTPUT_PROPERTY;
 import static com.bytechef.component.box.constant.BoxConstants.ID;
 import static com.bytechef.component.box.constant.BoxConstants.NAME;
 import static com.bytechef.component.box.constant.BoxConstants.PARENT;
-import static com.bytechef.component.box.constant.BoxConstants.TYPE;
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.box.util.BoxUtils;
@@ -57,16 +57,7 @@ public class BoxCreateFolderAction {
                 .options((ActionOptionsFunction<String>) BoxUtils::getRootFolderOptions)
                 .defaultValue("0")
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    string(TYPE),
-                    string(ID),
-                    object(PARENT)
-                        .properties(
-                            string(TYPE),
-                            string(ID),
-                            string(NAME))))
+        .outputSchema(FILE_OUTPUT_PROPERTY)
         .perform(BoxCreateFolderAction::perform);
 
     private BoxCreateFolderAction() {
@@ -76,7 +67,7 @@ public class BoxCreateFolderAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         return context
-            .http(http -> http.post("https://api.box.com/2.0/folders"))
+            .http(http -> http.post(BASE_URL + "/folders"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(
                 Http.Body.of(

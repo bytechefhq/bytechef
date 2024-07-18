@@ -16,6 +16,7 @@
 
 package com.bytechef.component.box.action;
 
+import static com.bytechef.component.box.constant.BoxConstants.BASE_URL;
 import static com.bytechef.component.box.constant.BoxConstants.DOWNLOAD_FILE;
 import static com.bytechef.component.box.constant.BoxConstants.FILE_ID;
 import static com.bytechef.component.box.constant.BoxConstants.ID;
@@ -62,8 +63,7 @@ public class BoxDownloadFileAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         Http.Response response = context
-            .http(http -> http
-                .get("https://api.box.com/2.0/files/" + inputParameters.getRequiredString(FILE_ID) + "/content"))
+            .http(http -> http.get(BASE_URL + "/files/" + inputParameters.getRequiredString(FILE_ID) + "/content"))
             .configuration(Http.responseType(ResponseType.JSON))
             .execute();
 
