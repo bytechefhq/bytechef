@@ -23,9 +23,12 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
@@ -35,13 +38,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Domiter
  */
 class BoxUtilsTest {
 
-    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Context mockedContext = mock(Context.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
@@ -60,7 +66,7 @@ class BoxUtilsTest {
 
         map.put("entries", entries);
 
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -76,7 +82,7 @@ class BoxUtilsTest {
 
         assertEquals(
             expectedOptions,
-            BoxUtils.getRootFolderOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+            BoxUtils.getRootFolderOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
     }
 
     @Test
@@ -93,7 +99,7 @@ class BoxUtilsTest {
 
         map.put("entries", entries);
 
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -108,6 +114,49 @@ class BoxUtilsTest {
 
         assertEquals(
             expectedOptions,
-            BoxUtils.getFileIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+            BoxUtils.getFileIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+    }
+
+    @Test
+    void testSubscribeWebhok() {
+        when(mockedContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of(ID, "123"));
+
+        assertEquals("123",
+            BoxUtils.subscribeWebhook("webhookUrl", mockedContext, "type", "triggerEvent", "id"));
+
+        Http.Body body = bodyArgumentCaptor.getValue();
+
+        Object content = body.getContent();
+
+        assertEquals(Map.of("address", "webhookUrl",
+            "triggers", List.of("triggerEvent"),
+            "target", Map.of(
+                ID, "id",
+                TYPE, "type")), content);
+    }
+
+    @Test
+    void testUnsubscribeWebhook() {
+        when(mockedContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+
+        BoxUtils.unsubscribeWebhook(mockedParameters, mockedContext);
+
+        verify(mockedContext, times(1)).http(any());
+        verify(mockedExecutor, times(1)).configuration(any());
+        verify(mockedExecutor, times(1)).execute();
     }
 }
