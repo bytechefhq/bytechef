@@ -50,42 +50,24 @@ public class BoxUtils {
         String parentFolder = inputParameters.getRequiredString(ID);
 
         Map<String, Object> body =
-            context.http(http -> http.get("https://api.box.com/2.0/folders/" + parentFolder + "/items"))
+            context.http(http -> http.get(BASE_URL + "/folders/" + parentFolder + "/items"))
                 .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute()
                 .getBody(new TypeReference<>() {});
 
-        List<Option<String>> options = new ArrayList<>();
-
-        if (body.get("entries") instanceof List<?> list) {
-            for (Object item : list) {
-                if (item instanceof Map<?, ?> map && Objects.equals(map.get(TYPE), FILE)) {
-                    options.add(option((String) map.get(NAME), (String) map.get(ID)));
-                }
-            }
-        }
-
-        return options;
+        return getOptions(body, FILE);
     }
 
     public static List<Option<String>> getRootFolderOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
-        Map<String, Object> body = context.http(http -> http.get("https://api.box.com/2.0/folders/0/items"))
+        Map<String, Object> body = context.http(http -> http.get(BASE_URL + "/folders/0/items"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> options = new ArrayList<>();
-
-        if (body.get("entries") instanceof List<?> list) {
-            for (Object item : list) {
-                if (item instanceof Map<?, ?> map && Objects.equals(map.get(TYPE), "folder")) {
-                    options.add(option((String) map.get(NAME), (String) map.get(ID)));
-                }
-            }
-        }
+        List<Option<String>> options = getOptions(body, FOLDER);
 
         options.add(option("ROOT", "0"));
 
@@ -113,6 +95,19 @@ public class BoxUtils {
         context.http(http -> http.delete(BASE_URL + "/webhooks/" + outputParameters.getString(ID)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
+    }
+
+    private static List<Option<String>> getOptions(Map<String, Object> body, String type) {
+        List<Option<String>> options = new ArrayList<>();
+
+        if (body.get("entries") instanceof List<?> list) {
+            for (Object item : list) {
+                if (item instanceof Map<?, ?> map && Objects.equals(map.get(TYPE), type)) {
+                    options.add(option((String) map.get(NAME), (String) map.get(ID)));
+                }
+            }
+        }
+        return options;
     }
 
 }
