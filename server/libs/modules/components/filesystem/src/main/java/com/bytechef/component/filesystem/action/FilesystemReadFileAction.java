@@ -36,14 +36,18 @@ import java.io.InputStream;
 public class FilesystemReadFileAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(READ_FILE)
-        .title("Read from file")
+        .title("Read File")
+        .description("Reads all data from a specified file path and outputs it in file entry format.")
         .properties(string(FILENAME)
-            .label("Filename")
+            .label("File path")
             .description("The path of the file to read.")
             .placeholder("/data/your_file.pdf")
             .required(true))
         .outputSchema(fileEntry())
         .perform(FilesystemReadFileAction::perform);
+
+    private FilesystemReadFileAction() {
+    }
 
     protected static FileEntry perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context)

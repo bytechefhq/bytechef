@@ -23,7 +23,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.filesystem.action.FilesystemCreateTempDirAction;
-import com.bytechef.component.filesystem.action.FilesystemGetFilePathAction;
+import com.bytechef.component.filesystem.action.FilesystemGetParentFolderAction;
 import com.bytechef.component.filesystem.action.FilesystemLsAction;
 import com.bytechef.component.filesystem.action.FilesystemMkdirAction;
 import com.bytechef.component.filesystem.action.FilesystemReadFileAction;
@@ -46,7 +46,7 @@ public class FilesystemComponentHandler implements ComponentHandler {
             FilesystemReadFileAction.ACTION_DEFINITION,
             FilesystemWriteFileAction.ACTION_DEFINITION,
             FilesystemCreateTempDirAction.ACTION_DEFINITION,
-            FilesystemGetFilePathAction.ACTION_DEFINITION,
+            FilesystemGetParentFolderAction.ACTION_DEFINITION,
             FilesystemLsAction.ACTION_DEFINITION,
             FilesystemMkdirAction.ACTION_DEFINITION,
             FilesystemRmAction.ACTION_DEFINITION);
