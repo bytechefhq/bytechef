@@ -12,17 +12,17 @@
   "resources": null,
   "version": 1,
   "title": "Bash",
-  "connection": null,
   "actions": [ {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
-    "description": "Executes the script.",
+    "description": "Creates a temporary script that executes bash commands. The script is afterwards deleted.",
     "help": null,
     "metadata": null,
     "name": "execute",
     "properties": [ {
       "advancedOption": null,
-      "description": "Script written in bash.",
+      "description": "Script written in bash. Multiple commands are possible with the ';' separator.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -33,7 +33,7 @@
       "defaultValue": null,
       "exampleValue": null,
       "label": "Script",
-      "placeholder": null,
+      "placeholder": "ls -la",
       "controlType": "TEXT",
       "languageId": null,
       "maxLength": null,
@@ -42,6 +42,7 @@
       "optionsDataSource": null
     } ],
     "title": "Execute",
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -66,11 +67,10 @@
       },
       "sampleOutput": "Sample result"
     },
-    "dynamicOutput": true,
-    "output": null,
+    "workflowNodeDescription": null,
     "perform": { },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "processErrorResponse": null
   } ],
+  "connection": null,
   "triggers": null
 }

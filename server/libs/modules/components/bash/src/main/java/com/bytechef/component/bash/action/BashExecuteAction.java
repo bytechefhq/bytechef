@@ -44,10 +44,11 @@ public class BashExecuteAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(EXECUTE)
         .title("Execute")
-        .description("Executes the script.")
+        .description("Creates a temporary script that executes bash commands. The script is afterwards deleted.")
         .properties(string(SCRIPT)
             .label("Script")
-            .description("Script written in bash.")
+            .description("Script written in bash. Multiple commands are possible with the ';' separator.")
+            .placeholder("ls -la")
             .required(true))
         .outputSchema(string())
         .sampleOutput("Sample result")

@@ -27,7 +27,7 @@ public class CsvFileComponentHandlerTest {
     private static final CsvFileComponentHandler csvFileComponentHandler = new CsvFileComponentHandler();
 
     @Test
-    public void testGetDescription() {
+    void testGetDescription() {
         JsonFileAssert.assertEquals("definition/csv-file_v1.json", csvFileComponentHandler.getDefinition());
     }
 }
