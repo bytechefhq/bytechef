@@ -16,9 +16,11 @@
 
 package com.bytechef.platform.component.registry.service;
 
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.component.registry.domain.Output;
@@ -100,4 +102,6 @@ public interface TriggerDefinitionService {
 
     WebhookTriggerFlags getWebhookTriggerFlags(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName);
+
+    ProviderException executeProcessErrorResponse(String componentName, int componentVersion, String triggerName, int statusCode, Object body, Context triggerContext);
 }

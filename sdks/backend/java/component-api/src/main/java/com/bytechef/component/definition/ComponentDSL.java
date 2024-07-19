@@ -2938,6 +2938,7 @@ public final class ComponentDSL {
         private DynamicWebhookRefreshFunction dynamicWebhookRefreshFunction;
         private DynamicWebhookRequestFunction dynamicWebhookRequestFunction;
         private Help help;
+        private TriggerDefinition.ProcessErrorResponseFunction processErrorResponseFunction;
         private ListenerDisableConsumer listenerDisableConsumer;
         private ListenerEnableConsumer listenerEnableConsumer;
         private String name;
@@ -3089,6 +3090,12 @@ public final class ComponentDSL {
             if (properties != null) {
                 this.properties = List.of(properties);
             }
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition processErrorResponse(TriggerDefinition.ProcessErrorResponseFunction processErrorResponse) {
+            this.processErrorResponseFunction = processErrorResponse;
 
             return this;
         }
@@ -3267,6 +3274,11 @@ public final class ComponentDSL {
         @Override
         public Optional<PollFunction> getPoll() {
             return Optional.ofNullable(pollFunction);
+        }
+
+        @Override
+        public Optional<TriggerDefinition.ProcessErrorResponseFunction> getProcessErrorResponse() {
+            return Optional.ofNullable(processErrorResponseFunction);
         }
 
         @Override

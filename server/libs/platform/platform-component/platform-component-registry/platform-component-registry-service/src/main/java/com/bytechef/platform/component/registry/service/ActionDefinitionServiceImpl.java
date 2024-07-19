@@ -26,6 +26,7 @@ import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerfor
 import com.bytechef.component.definition.ActionWorkflowNodeDescriptionFunction;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.DynamicOptionsProperty;
 import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
@@ -170,7 +171,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     @Override
     public ProviderException executeProcessErrorResponse(
         String componentName, int componentVersion, String actionName, int statusCode, Object body,
-        ActionContext actionContext) {
+        Context actionContext) {
 
         com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);

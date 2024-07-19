@@ -149,7 +149,7 @@ public interface ActionDefinition {
          * @param context
          * @return
          */
-        ProviderException apply(int statusCode, Object body, ActionContext context) throws Exception;
+        ProviderException apply(int statusCode, Object body, Context context) throws Exception;
     }
 
     /**
