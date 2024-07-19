@@ -30,6 +30,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TriggerContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +76,7 @@ public class BoxUtils {
     }
 
     public static String subscribeWebhook(
-        String webhookUrl, Context context, String type, String triggerEvent, String targetId) {
+        String webhookUrl, TriggerContext context, String type, String triggerEvent, String targetId) {
 
         Map<String, ?> body = context.http(http -> http.post(BASE_URL + "/webhooks"))
             .body(Http.Body.of(
