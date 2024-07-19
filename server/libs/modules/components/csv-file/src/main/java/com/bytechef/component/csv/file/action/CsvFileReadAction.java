@@ -16,6 +16,13 @@
 
 package com.bytechef.component.csv.file.action;
 
+import static com.bytechef.component.csv.file.constant.CsvFileConstants.DELIMITER;
+import static com.bytechef.component.csv.file.constant.CsvFileConstants.FILE_ENTRY;
+import static com.bytechef.component.csv.file.constant.CsvFileConstants.HEADER_ROW;
+import static com.bytechef.component.csv.file.constant.CsvFileConstants.INCLUDE_EMPTY_CELLS;
+import static com.bytechef.component.csv.file.constant.CsvFileConstants.PAGE_NUMBER;
+import static com.bytechef.component.csv.file.constant.CsvFileConstants.PAGE_SIZE;
+import static com.bytechef.component.csv.file.constant.CsvFileConstants.READ_AS_STRING;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
@@ -52,36 +59,36 @@ public class CsvFileReadAction {
         .title("Read from file")
         .description("Reads data from a csv file.")
         .properties(
-            fileEntry(CsvFileConstants.FILE_ENTRY)
+            fileEntry(FILE_ENTRY)
                 .label("File")
                 .description(
                     "The object property which contains a reference to the csv file to read from.")
                 .required(true),
-            string(CsvFileConstants.DELIMITER)
+            string(DELIMITER)
                 .label("Delimiter")
                 .description("Delimiter to use when reading a csv file.")
                 .defaultValue(",")
                 .advancedOption(true),
-            bool(CsvFileConstants.HEADER_ROW)
+            bool(HEADER_ROW)
                 .label("Header Row")
                 .description("The first row of the file contains the header names.")
                 .defaultValue(true)
                 .advancedOption(true),
-            bool(CsvFileConstants.INCLUDE_EMPTY_CELLS)
+            bool(INCLUDE_EMPTY_CELLS)
                 .label("Include Empty Cells")
                 .description(
                     "When reading from file the empty cells will be filled with an empty string.")
                 .defaultValue(false)
                 .advancedOption(true),
-            integer(CsvFileConstants.PAGE_SIZE)
+            integer(PAGE_SIZE)
                 .label("Page Size")
                 .description("The amount of child elements to return in a page.")
                 .advancedOption(true),
-            integer(CsvFileConstants.PAGE_NUMBER)
+            integer(PAGE_NUMBER)
                 .label("Page Number")
                 .description("The page number to get.")
                 .advancedOption(true),
-            bool(CsvFileConstants.READ_AS_STRING)
+            bool(READ_AS_STRING)
                 .label("Read As String")
                 .description(
                     "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.")
@@ -93,16 +100,16 @@ public class CsvFileReadAction {
     protected static List<Map<String, Object>> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
-        String delimiter = inputParameters.getString(CsvFileConstants.DELIMITER, ",");
-        boolean headerRow = inputParameters.getBoolean(CsvFileConstants.HEADER_ROW, true);
-        boolean includeEmptyCells = inputParameters.getBoolean(CsvFileConstants.INCLUDE_EMPTY_CELLS, false);
-        Integer pageNumber = inputParameters.getInteger(CsvFileConstants.PAGE_NUMBER);
-        Integer pageSize = inputParameters.getInteger(CsvFileConstants.PAGE_SIZE);
-        boolean readAsString = inputParameters.getBoolean(CsvFileConstants.READ_AS_STRING, false);
+        String delimiter = inputParameters.getString(DELIMITER, ",");
+        boolean headerRow = inputParameters.getBoolean(HEADER_ROW, true);
+        boolean includeEmptyCells = inputParameters.getBoolean(INCLUDE_EMPTY_CELLS, false);
+        Integer pageNumber = inputParameters.getInteger(PAGE_NUMBER);
+        Integer pageSize = inputParameters.getInteger(PAGE_SIZE);
+        boolean readAsString = inputParameters.getBoolean(READ_AS_STRING, false);
 
         try (
             InputStream inputStream = context.file(
-                file -> file.getStream(inputParameters.getRequiredFileEntry(CsvFileConstants.FILE_ENTRY)))) {
+                file -> file.getStream(inputParameters.getRequiredFileEntry(FILE_ENTRY)))) {
             Integer rangeStartRow = null;
             Integer rangeEndRow = null;
 
