@@ -30,7 +30,7 @@ import org.springframework.lang.NonNull;
 /**
  * @author Ivica Cardic
  */
-public interface ActionDefinitionFacade {
+public interface ActionDefinitionFacade extends BaseDefinitionFacade {
 
     List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
@@ -54,10 +54,6 @@ public interface ActionDefinitionFacade {
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection componentConnection,
         @NonNull ActionContext actionContext);
-
-    ProviderException executeProcessErrorResponse(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, int statusCode,
-        Object body);
 
     String executeWorkflowNodeDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
