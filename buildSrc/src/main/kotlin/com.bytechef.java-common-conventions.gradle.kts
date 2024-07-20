@@ -194,8 +194,50 @@ spotless {
 
 val spotlessCheck by tasks.existing
 
-val check by tasks.existing {
+val check by tasks.existing {//mozda ovdje dodati task delete
     dependsOn(spotlessCheck)
+
+    doLast {
+        if (System.getenv("GITHUB_ACTIONS_BUILD")?.toBoolean() == true) {
+            println("\n..............> Last action in check set for...> " + project.name)
+
+
+            if (!project.name.contains("component-api") &&
+                !project.name.contains("definition-api") &&
+                !project.name.contains("evaluator") &&
+                !project.name.contains("commons-data") &&
+                !project.name.contains("commons-util") &&
+                !project.name.contains("atlas-configuration") &&
+                !project.name.contains("atlas-coordinator-api") &&
+                !project.name.contains("atlas-coordinator-impl") && // ovo korisiti CSV integracijski test
+                !project.name.contains("atlas-sync-executor") &&
+                !project.name.contains("atlas-execution") &&
+                !project.name.contains("atlas-worker-api") &&
+                !project.name.contains("atlas-worker-impl") && // ovo korisiti CSV integracijski test
+                !project.name.contains("encryption-") && // ovo korisiti CSV integracijski test
+                !project.name.contains("embedded-configuration-api") &&
+                !project.name.contains("file-storage") && // REFINE: this includes all, probably it can be reduced
+                !project.name.contains("google-commons") && // REFINE: this includes all, probably it can be reduced
+                !project.name.contains("http-client") && // REFINE: this includes all, probably it can be reduced
+                !project.name.contains("message-") && // REFINE: this includes all, probably it can be reduced
+                !project.name.contains("platform-") && // HARD: many uses this
+                !project.name.contains("platform-user-api") &&
+                !project.name.contains("platform-workflow-execution-api") &&
+                !project.name.contains("test-int-support") &&
+                !project.name.contains("tenant-") &&
+                !project.name.contains("test-support") &&
+                !project.name.contains("error-api") &&
+                !project.name.contains("condition") && // ovo koriste loop testovi
+                !project.name.contains("cli-app") &&
+                !project.name.contains("-config") &&
+                !project.name.contains("petstore")) {
+
+                delete("build")
+
+                println("\n..............> DELETED...> " + layout.buildDirectory.get())
+            }
+        }
+    }
 }
 
 val test by tasks.existing(Test::class) {
@@ -263,19 +305,6 @@ val testIntegration by tasks.registering(Test::class) {
 //                val repeatLength = startItem.length + output.length + endItem.length
 //                println("\n" + ('-' * repeatLength) + "\n" + startItem + output + endItem + "\n" + ("-" * repeatLength))
                 println("\n" + "\n" + startItem + output + endItem + "\n")
-
-                if (System.getenv("GITHUB_ACTIONS_BUILD")?.toBoolean() == true) {
-                    delete("build/classes")
-                    delete("build/kotlin")
-                    delete("build/kotlin-dsl")
-                    delete("build/libs")
-                    delete("build/tmp")
-
-                    println("\nBuild directory cleaned")
-                }
-                else {
-                    println("\nWARN: generated build and test resources were not deleted")
-                }
             }
         }
     })
