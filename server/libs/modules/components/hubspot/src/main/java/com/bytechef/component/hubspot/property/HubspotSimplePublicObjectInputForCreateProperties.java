@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableValueProperty;
-
 import java.util.List;
 
 /**

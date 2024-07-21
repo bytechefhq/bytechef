@@ -51,8 +51,7 @@ public class HubspotConnection {
                 "crm.lists.write",
                 "crm.objects.companies.read",
                 "crm.objects.companies.write",
-                "crm.schemas.contacts.read"
-            ))
+                "crm.schemas.contacts.read"))
             .tokenUrl((connectionParameters, context) -> "https://api.hubapi.com/oauth/v1/token"));
 
     private HubspotConnection() {

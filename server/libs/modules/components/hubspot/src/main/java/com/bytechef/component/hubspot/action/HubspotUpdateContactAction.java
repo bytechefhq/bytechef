@@ -23,7 +23,6 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
-import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.hubspot.property.HubspotSimplePublicObjectInputProperties;
 import com.bytechef.component.hubspot.property.HubspotSimplePublicObjectProperties;

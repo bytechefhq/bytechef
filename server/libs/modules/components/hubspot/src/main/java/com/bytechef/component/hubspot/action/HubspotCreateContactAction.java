@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
-import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.hubspot.property.HubspotSimplePublicObjectInputForCreateProperties;
 import com.bytechef.component.hubspot.property.HubspotSimplePublicObjectProperties;
