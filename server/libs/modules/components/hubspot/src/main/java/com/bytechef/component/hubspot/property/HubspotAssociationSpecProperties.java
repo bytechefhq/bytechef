@@ -36,4 +36,7 @@ public class HubspotAssociationSpecProperties {
             .required(true),
         integer("associationTypeId").label("Association Type Id")
             .required(true));
+
+    private HubspotAssociationSpecProperties() {
+    }
 }

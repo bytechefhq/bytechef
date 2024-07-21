@@ -44,7 +44,15 @@ public class HubspotConnection {
                     .label("Client Secret")
                     .required(true))
             .authorizationUrl((connectionParameters, context) -> "https://app.hubspot.com/oauth/authorize")
-            .scopes((connection, context) -> List.of("crm.objects.contacts.write", "crm.objects.contacts.read"))
+            .scopes((connection, context) -> List.of(
+                "crm.objects.contacts.write",
+                "crm.objects.contacts.read",
+                "crm.lists.read",
+                "crm.lists.write",
+                "crm.objects.companies.read",
+                "crm.objects.companies.write",
+                "crm.schemas.contacts.read"
+            ))
             .tokenUrl((connectionParameters, context) -> "https://api.hubapi.com/oauth/v1/token"));
 
     private HubspotConnection() {

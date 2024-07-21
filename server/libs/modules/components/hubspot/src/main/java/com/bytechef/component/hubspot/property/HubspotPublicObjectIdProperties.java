@@ -29,4 +29,7 @@ import java.util.List;
 public class HubspotPublicObjectIdProperties {
     public static final List<ComponentDSL.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(string("id").label("Id")
         .required(true));
+
+    private HubspotPublicObjectIdProperties() {
+    }
 }

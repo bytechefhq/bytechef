@@ -36,4 +36,7 @@ public class HubspotPublicAssociationsForObjectProperties {
             .placeholder("Add to Types")
             .label("Types")
             .required(true));
+
+    private HubspotPublicAssociationsForObjectProperties() {
+    }
 }

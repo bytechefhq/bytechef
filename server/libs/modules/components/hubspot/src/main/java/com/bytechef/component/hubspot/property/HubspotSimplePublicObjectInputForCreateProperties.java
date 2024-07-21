@@ -20,7 +20,8 @@ import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDSL.ModifiableValueProperty;
+
 import java.util.List;
 
 /**
@@ -29,7 +30,7 @@ import java.util.List;
  * @generated
  */
 public class HubspotSimplePublicObjectInputForCreateProperties {
-    public static final List<ComponentDSL.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
+    public static final List<ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
         object("properties").properties(string("company").label("Company")
             .required(false),
             string("email").label("Email")
@@ -40,7 +41,7 @@ public class HubspotSimplePublicObjectInputForCreateProperties {
                 .required(false),
             string("phone").label("Phone")
                 .required(false),
-            string("website").label("Website")
+            string("website_url").label("Website")
                 .required(false))
             .additionalProperties(string())
             .placeholder("Add to Properties")
@@ -50,4 +51,7 @@ public class HubspotSimplePublicObjectInputForCreateProperties {
             .placeholder("Add to Associations")
             .label("Associations")
             .required(true));
+
+    private HubspotSimplePublicObjectInputForCreateProperties() {
+    }
 }

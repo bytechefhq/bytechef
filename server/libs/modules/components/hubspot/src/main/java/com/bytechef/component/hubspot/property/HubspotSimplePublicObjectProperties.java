@@ -49,4 +49,7 @@ public class HubspotSimplePublicObjectProperties {
             .required(false),
         dateTime("archivedAt").label("Archived At")
             .required(false));
+
+    private HubspotSimplePublicObjectProperties() {
+    }
 }

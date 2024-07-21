@@ -489,7 +489,7 @@ components:
               type: "string"
             phone:
               type: "string"
-            website:
+            website_url:
               type: "string"
           additionalProperties:
             type: "string"
@@ -750,7 +750,7 @@ components:
               type: "string"
             phone:
               type: "string"
-            website:
+            website_url:
               type: "string"
           additionalProperties:
             type: "string"

@@ -23,6 +23,7 @@ import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.hubspot.property.HubspotSimplePublicObjectInputForCreateProperties;
 import com.bytechef.component.hubspot.property.HubspotSimplePublicObjectProperties;
 import java.util.Map;
@@ -33,7 +34,7 @@ import java.util.Map;
  * @generated
  */
 public class HubspotCreateContactAction {
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
         .title("Create")
         .description(
             "Create a contact with the given properties and return a copy of the object, including the ID. Documentation and examples for creating standard contacts is provided.")

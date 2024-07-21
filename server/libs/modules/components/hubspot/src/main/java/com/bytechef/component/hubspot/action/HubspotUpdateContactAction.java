@@ -24,6 +24,7 @@ import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.hubspot.property.HubspotSimplePublicObjectInputProperties;
 import com.bytechef.component.hubspot.property.HubspotSimplePublicObjectProperties;
 import java.util.Map;
@@ -34,7 +35,7 @@ import java.util.Map;
  * @generated
  */
 public class HubspotUpdateContactAction {
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("updateContact")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateContact")
         .title("Update")
         .description(
             "Perform a partial update of an Object identified by `{contactId}`. `{contactId}` refers to the internal object ID. Provided property values will be overwritten. Read-only and non-existent properties will be ignored. Properties values can be cleared by passing an empty string.")
