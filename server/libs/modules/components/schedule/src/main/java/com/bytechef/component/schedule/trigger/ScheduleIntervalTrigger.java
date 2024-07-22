@@ -26,8 +26,8 @@ import static com.bytechef.component.schedule.constant.ScheduleConstants.INTERVA
 import static com.bytechef.component.schedule.constant.ScheduleConstants.TIME_UNIT;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.ListenerEmitter;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.platform.scheduler.TriggerScheduler;
@@ -78,14 +78,14 @@ public class ScheduleIntervalTrigger {
 
     protected void listenerDisable(
         Parameters inputParameters, Parameters connectionParameters, String workflowExecutionId,
-        Context context) {
+        TriggerContext context) {
 
         triggerScheduler.cancelScheduleTrigger(workflowExecutionId);
     }
 
     protected void listenerEnable(
         Parameters inputParameters, Parameters connectionParameters, String workflowExecutionId,
-        ListenerEmitter listenerEmitter, Context context) {
+        ListenerEmitter listenerEmitter, TriggerContext context) {
 
         int interval = inputParameters.getInteger(INTERVAL);
         ZoneId zoneId = ZoneId.systemDefault();
