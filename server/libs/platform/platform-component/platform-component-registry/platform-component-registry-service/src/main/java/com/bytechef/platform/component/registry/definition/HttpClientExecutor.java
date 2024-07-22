@@ -20,7 +20,6 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MimeTypeUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.commons.util.XmlUtils;
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
@@ -139,8 +138,10 @@ public class HttpClientExecutor implements ApplicationContextAware {
     }
 
     private BaseDefinitionFacade getDefinitionFacade(boolean isAction) {
-        if(!isAction) definitionFacade = applicationContext.getBean(TriggerDefinitionFacade.class);
-        else definitionFacade = applicationContext.getBean(ActionDefinitionFacade.class);
+        if (!isAction)
+            definitionFacade = applicationContext.getBean(TriggerDefinitionFacade.class);
+        else
+            definitionFacade = applicationContext.getBean(ActionDefinitionFacade.class);
 
         return definitionFacade;
     }
@@ -217,7 +218,8 @@ public class HttpClientExecutor implements ApplicationContextAware {
             builder.interceptor(
                 getInterceptor(
                     componentName, componentVersion, componentOperationName, componentConnection.version(),
-                    componentConnection.authorizationName(), componentConnection.canCredentialsBeRefreshed(), isAction));
+                    componentConnection.authorizationName(), componentConnection.canCredentialsBeRefreshed(),
+                    isAction));
         }
 
         if (configuration.isFollowRedirect()) {

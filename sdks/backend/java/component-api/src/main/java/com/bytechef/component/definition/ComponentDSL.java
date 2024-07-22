@@ -3094,7 +3094,8 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableTriggerDefinition processErrorResponse(TriggerDefinition.ProcessErrorResponseFunction processErrorResponse) {
+        public ModifiableTriggerDefinition
+            processErrorResponse(TriggerDefinition.ProcessErrorResponseFunction processErrorResponse) {
             this.processErrorResponseFunction = processErrorResponse;
 
             return this;
