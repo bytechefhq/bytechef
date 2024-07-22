@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDSL.trigger;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.ID;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.NEW_PAID_ORDER;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
@@ -54,7 +53,7 @@ public class ShopifyNewPaidOrderTrigger {
 
     protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
-        String workflowExecutionId, Context context) {
+        String workflowExecutionId, TriggerContext context) {
 
         return new DynamicWebhookEnableOutput(
             Map.of(ID, ShopifyUtils.subscribeWebhook(connectionParameters, webhookUrl, context, "orders/paid")), null);
@@ -62,7 +61,7 @@ public class ShopifyNewPaidOrderTrigger {
 
     protected static void dynamicWebhookDisable(
         Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
-        String workflowExecutionId, Context context) {
+        String workflowExecutionId, TriggerContext context) {
 
         ShopifyUtils.unsubscribeWebhook(connectionParameters, outputParameters, context);
     }
