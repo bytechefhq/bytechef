@@ -40,7 +40,7 @@ public class HubspotSimplePublicObjectInputForCreateProperties {
                 .required(false),
             string("phone").label("Phone")
                 .required(false),
-            string("website").label("Website")
+            string("website_url").label("Website Url")
                 .required(false))
             .additionalProperties(string())
             .placeholder("Add to Properties")

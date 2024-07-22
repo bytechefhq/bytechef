@@ -46,6 +46,9 @@ paths:
       - oauth2:
         - "crm.objects.contacts.read"
         - "crm.objects.contacts.write"
+        - "crm.lists.read"
+        - "crm.lists.write"
+        - "tickets"
   /crm/v3/objects/contacts/{contactId}:
     patch:
       tags:
@@ -84,6 +87,9 @@ paths:
       - oauth2:
         - "crm.objects.contacts.read"
         - "crm.objects.contacts.write"
+        - "crm.lists.read"
+        - "crm.lists.write"
+        - "tickets"
 components:
   schemas:
     StandardError:
@@ -489,7 +495,7 @@ components:
               type: "string"
             phone:
               type: "string"
-            website:
+            website_url:
               type: "string"
           additionalProperties:
             type: "string"
@@ -750,7 +756,7 @@ components:
               type: "string"
             phone:
               type: "string"
-            website:
+            website_url:
               type: "string"
           additionalProperties:
             type: "string"
@@ -775,3 +781,6 @@ components:
           scopes:
             crm.objects.contacts.read: " "
             crm.objects.contacts.write: " "
+            crm.lists.read: " "
+            crm.lists.write: " "
+            tickets: " "
