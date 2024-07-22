@@ -23,10 +23,11 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ComponentDSL;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
@@ -149,7 +150,7 @@ public class HubspotSubscribeTrigger {
 
     protected static void dynamicWebhookDisable(
         Parameters inputParameters, Parameters connectionParameters, Map<String, ?> outputParameters,
-        String workflowExecutionId, Context context) {
+        String workflowExecutionId, TriggerContext context) {
 
         context
             .http(http -> http.delete("/webhooks/v3/%s/settings".formatted(inputParameters.getString(APP_ID))))
@@ -159,7 +160,7 @@ public class HubspotSubscribeTrigger {
     @SuppressFBWarnings("RV")
     protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl, String workflowExecutionId,
-        Context context) {
+        TriggerContext context) {
 
         context
             .http(http -> http.put("/webhooks/v3/%s/settings".formatted(inputParameters.getString(APP_ID))))
@@ -188,8 +189,8 @@ public class HubspotSubscribeTrigger {
     protected static List<?> dynamicWebhookRequest(
         Map<String, ?> inputParameters, Parameters connectionParameters, HttpHeaders headers,
         HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
-        Context context) {
+        TriggerContext context) {
 
-        return body.getContent(new Context.TypeReference<>() {});
+        return body.getContent(new TypeReference<>() {});
     }
 }
