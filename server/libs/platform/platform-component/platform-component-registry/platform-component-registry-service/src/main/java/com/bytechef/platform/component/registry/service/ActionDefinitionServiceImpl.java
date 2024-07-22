@@ -50,6 +50,8 @@ import com.bytechef.platform.registry.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -177,10 +179,13 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
 
         try {
-            return actionDefinition.getProcessErrorResponse()
-                .orElseGet(() -> (statusCode1, body1, context) -> new ProviderException(
-                    statusCode1, body1 == null ? null : body1.toString()))
-                .apply(statusCode, body, actionContext);
+            Optional<com.bytechef.component.definition.ActionDefinition.ProcessErrorResponseFunction> processErrorResponse = actionDefinition.getProcessErrorResponse();
+            if(processErrorResponse.isPresent()){
+                return processErrorResponse.get().apply(statusCode, body, actionContext);
+            }
+            else {
+                return ProviderException.getProviderException(statusCode, body);
+            }
         } catch (Exception e) {
             throw new ComponentExecutionException(e, ActionDefinitionErrorType.EXECUTE_PROCESS_ERROR_RESPONSE);
         }
