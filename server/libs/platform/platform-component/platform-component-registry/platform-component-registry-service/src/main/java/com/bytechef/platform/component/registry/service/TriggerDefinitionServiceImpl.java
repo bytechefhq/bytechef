@@ -19,7 +19,6 @@ package com.bytechef.platform.component.registry.service;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.DynamicOptionsProperty;
@@ -67,6 +66,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -361,10 +362,13 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         try {
-            return triggerDefinition.getProcessErrorResponse()
-                .orElseGet(() -> (statusCode1, body1, context) -> new ProviderException(
-                    statusCode1, body1 == null ? null : body1.toString()))
-                .apply(statusCode, body, triggerContext);
+            Optional<com.bytechef.component.definition.TriggerDefinition.ProcessErrorResponseFunction> processErrorResponse = triggerDefinition.getProcessErrorResponse();
+            if(processErrorResponse.isPresent()){
+                return processErrorResponse.get().apply(statusCode, body, triggerContext);
+            }
+            else {
+                return ProviderException.getProviderException(statusCode, body);
+            }
         } catch (Exception e) {
             throw new ComponentExecutionException(e, ActionDefinitionErrorType.EXECUTE_PROCESS_ERROR_RESPONSE);
         }

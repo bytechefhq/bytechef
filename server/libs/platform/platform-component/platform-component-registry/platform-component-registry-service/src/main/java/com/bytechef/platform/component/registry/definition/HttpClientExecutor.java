@@ -139,10 +139,8 @@ public class HttpClientExecutor implements ApplicationContextAware {
     }
 
     private BaseDefinitionFacade getDefinitionFacade(boolean isAction) {
-        if (definitionFacade == null) {
-            if(isAction) definitionFacade = applicationContext.getBean(ActionDefinitionFacade.class);
-            else definitionFacade = applicationContext.getBean(TriggerDefinitionFacade.class);
-        }
+        if(!isAction) definitionFacade = applicationContext.getBean(TriggerDefinitionFacade.class);
+        else definitionFacade = applicationContext.getBean(ActionDefinitionFacade.class);
 
         return definitionFacade;
     }
