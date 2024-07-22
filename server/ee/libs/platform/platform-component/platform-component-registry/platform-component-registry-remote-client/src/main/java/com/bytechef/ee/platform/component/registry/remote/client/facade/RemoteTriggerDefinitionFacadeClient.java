@@ -9,6 +9,7 @@ package com.bytechef.ee.platform.component.registry.remote.client.facade;
 
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.ee.platform.component.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.ee.remote.client.DefaultRestClient;
 import com.bytechef.platform.component.registry.domain.Option;
@@ -187,6 +188,12 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
             new NodeDescriptionRequest(
                 componentName, componentVersion, triggerName, inputParameters),
             String.class);
+    }
+
+    @Override
+    public ProviderException executeProcessErrorResponse(
+        String componentName, int componentVersion, String actionName, int statusCode, Object body) {
+        throw new UnsupportedOperationException();
     }
 
     private record NodeDescriptionRequest(
