@@ -28,8 +28,8 @@ import static com.bytechef.component.schedule.constant.ScheduleConstants.MINUTE;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.TIMEZONE;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.ListenerEmitter;
 import com.bytechef.component.schedule.util.ScheduleUtils;
@@ -97,14 +97,14 @@ public class ScheduleEveryWeekTrigger {
 
     protected void listenerDisable(
         Parameters inputParameters, Parameters connectionParameters, String workflowExecutionId,
-        Context context) {
+        TriggerContext context) {
 
         triggerScheduler.cancelScheduleTrigger(workflowExecutionId);
     }
 
     protected void listenerEnable(
         Parameters inputParameters, Parameters connectionParameters, String workflowExecutionId,
-        ListenerEmitter listenerEmitter, Context context) {
+        ListenerEmitter listenerEmitter, TriggerContext context) {
 
         triggerScheduler.scheduleScheduleTrigger(
             "0 %s %s ? * %s".formatted(
