@@ -27,7 +27,6 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.NEW_EMAIL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TOPIC_NAME;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
@@ -77,7 +76,7 @@ public class GoogleMailNewEmailTrigger {
 
     protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
-        String workflowExecutionId, Context context) {
+        String workflowExecutionId, TriggerContext context) {
 
         Gmail gmail = GoogleServices.getMail(connectionParameters);
 
@@ -100,7 +99,7 @@ public class GoogleMailNewEmailTrigger {
 
     protected static void dynamicWebhookDisable(
         Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
-        String workflowExecutionId, Context context) {
+        String workflowExecutionId, TriggerContext context) {
 
         Gmail gmail = GoogleServices.getMail(connectionParameters);
 
