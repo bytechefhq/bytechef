@@ -25,7 +25,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
@@ -61,7 +60,6 @@ class GoogleCalendarEventTriggerTest {
     private final Calendar mockedCalendar = mock(Calendar.class);
     private final Channel mockedChannel = mock(Channel.class);
     private final Channels mockedChannels = mock(Channels.class);
-    private final ActionContext mockedContext = mock(ActionContext.class);
     private final DynamicWebhookEnableOutput mockedDynamicWebhookEnableOutput = mock(DynamicWebhookEnableOutput.class);
     private final Events mockedEvents = mock(Events.class);
     private final com.google.api.services.calendar.model.Events mockedEvents2 = mock(
@@ -111,7 +109,7 @@ class GoogleCalendarEventTriggerTest {
             .thenReturn("resourceId");
 
         DynamicWebhookEnableOutput dynamicWebhookEnableOutput = GoogleCalendarEventTrigger.dynamicWebhookEnable(
-            mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedContext);
+            mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
 
         Map<String, ?> parameters = dynamicWebhookEnableOutput.parameters();
         LocalDateTime webhookExpirationDate = dynamicWebhookEnableOutput.webhookExpirationDate();
@@ -143,7 +141,7 @@ class GoogleCalendarEventTriggerTest {
             .thenReturn(mockedStop);
 
         GoogleCalendarEventTrigger.dynamicWebhookDisable(
-            mockedParameters, mockedParameters, mockedParameters, workflowExecutionId, mockedContext);
+            mockedParameters, mockedParameters, mockedParameters, workflowExecutionId, mockedTriggerContext);
 
         Channel channelArgumentCaptorValue = channelArgumentCaptor.getValue();
 
