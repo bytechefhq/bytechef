@@ -103,5 +103,7 @@ public interface TriggerDefinitionService {
     WebhookTriggerFlags getWebhookTriggerFlags(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName);
 
-    ProviderException executeProcessErrorResponse(String componentName, int componentVersion, String triggerName, int statusCode, Object body, Context triggerContext);
+    ProviderException executeProcessErrorResponse(
+        String componentName, int componentVersion, String triggerName, int statusCode, Object body,
+        Context triggerContext);
 }

@@ -17,7 +17,6 @@
 package com.bytechef.platform.component.registry.facade;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.component.registry.domain.Output;

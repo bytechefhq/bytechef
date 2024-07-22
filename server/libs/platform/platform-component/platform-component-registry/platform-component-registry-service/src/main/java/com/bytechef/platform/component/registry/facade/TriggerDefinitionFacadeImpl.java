@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.component.registry.facade;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;

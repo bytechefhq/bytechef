@@ -67,7 +67,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -362,11 +361,12 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         try {
-            Optional<com.bytechef.component.definition.TriggerDefinition.ProcessErrorResponseFunction> processErrorResponse = triggerDefinition.getProcessErrorResponse();
-            if(processErrorResponse.isPresent()){
-                return processErrorResponse.get().apply(statusCode, body, triggerContext);
-            }
-            else {
+            Optional<com.bytechef.component.definition.TriggerDefinition.ProcessErrorResponseFunction> processErrorResponse =
+                triggerDefinition.getProcessErrorResponse();
+            if (processErrorResponse.isPresent()) {
+                return processErrorResponse.get()
+                    .apply(statusCode, body, triggerContext);
+            } else {
                 return ProviderException.getProviderException(statusCode, body);
             }
         } catch (Exception e) {
