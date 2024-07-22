@@ -27,9 +27,9 @@ import static com.bytechef.component.definition.ComponentDSL.time;
 
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
@@ -225,14 +225,14 @@ public class PipedriveNewPersonTrigger {
 
     protected static void dynamicWebhookDisable(
         Map<String, ?> inputParameters, Parameters connectionParameters, Map<String, ?> outputParameters,
-        String workflowExecutionId, Context context) {
+        String workflowExecutionId, TriggerContext context) {
 
         PipedriveUtils.unsubscribeWebhook((String) outputParameters.get("id"), context);
     }
 
     protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
         Map<String, ?> inputParameters, Parameters connectionParameters, String webhookUrl,
-        String workflowExecutionId, Context context) {
+        String workflowExecutionId, TriggerContext context) {
 
         return new DynamicWebhookEnableOutput(
             Map.of("id", PipedriveUtils.subscribeWebhook("person", "added", webhookUrl, context)), null);
@@ -241,7 +241,7 @@ public class PipedriveNewPersonTrigger {
     @SuppressWarnings("unchecked")
     protected static Map<String, ?> dynamicWebhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
-        WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output, Context context) {
+        WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output, TriggerContext context) {
 
         return (Map<String, ?>) body.getContent(new TypeReference<Map<String, ?>>() {})
             .get("current");
