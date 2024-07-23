@@ -34,9 +34,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.theokanning.openai.audio.CreateSpeechRequest;
-import com.theokanning.openai.service.OpenAiService;
-import okhttp3.ResponseBody;
 
 /**
  * @author Monika Domiter
@@ -97,21 +94,22 @@ public class OpenAICreateSpeechAction {
     public static FileEntry perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        String token = (String) connectionParameters.get(TOKEN);
-
-        OpenAiService openAiService = new OpenAiService(token);
-
-        CreateSpeechRequest createSpeechRequest = new CreateSpeechRequest();
-
-        createSpeechRequest.setModel(inputParameters.getRequiredString(MODEL));
-        createSpeechRequest.setInput(inputParameters.getRequiredString(INPUT));
-        createSpeechRequest.setVoice(inputParameters.getRequiredString(VOICE));
-        createSpeechRequest.setResponseFormat(inputParameters.getString(RESPONSE_FORMAT));
-        createSpeechRequest.setSpeed(inputParameters.getDouble(SPEED));
-
-        try (ResponseBody speech = openAiService.createSpeech(createSpeechRequest)) {
-            return context.file(file -> file.storeContent(
-                "file." + inputParameters.getString(RESPONSE_FORMAT), speech.byteStream()));
-        }
+//        String token = (String) connectionParameters.get(TOKEN);
+//
+//        OpenAiService openAiService = new OpenAiService(token);
+//
+//        CreateSpeechRequest createSpeechRequest = new CreateSpeechRequest();
+//
+//        createSpeechRequest.setModel(inputParameters.getRequiredString(MODEL));
+//        createSpeechRequest.setInput(inputParameters.getRequiredString(INPUT));
+//        createSpeechRequest.setVoice(inputParameters.getRequiredString(VOICE));
+//        createSpeechRequest.setResponseFormat(inputParameters.getString(RESPONSE_FORMAT));
+//        createSpeechRequest.setSpeed(inputParameters.getDouble(SPEED));
+//
+//        try (ResponseBody speech = openAiService.createSpeech(createSpeechRequest)) {
+//            return context.file(file -> file.storeContent(
+//                "file." + inputParameters.getString(RESPONSE_FORMAT), speech.byteStream()));
+//        }
+        return null;
     }
 }
