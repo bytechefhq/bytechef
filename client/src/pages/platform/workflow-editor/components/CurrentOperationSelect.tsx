@@ -106,6 +106,7 @@ const CurrentOperationSelect = ({
                 handleValueChange={handleValueChange}
                 operations={operations}
                 value={value}
+                triggerSelect={triggerSelect}
             />
         )}
     </div>
