@@ -16,7 +16,6 @@
 
 package com.bytechef.component.openai.action;
 
-import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
@@ -36,12 +35,7 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.WHISPER_1;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.theokanning.openai.audio.CreateTranslationRequest;
-import com.theokanning.openai.audio.TranslationResult;
-import com.theokanning.openai.service.OpenAiService;
-import java.io.File;
 
 /**
  * @author Monika Domiter
@@ -119,21 +113,22 @@ public class OpenAICreateTranslationAction {
     private OpenAICreateTranslationAction() {
     }
 
-    public static TranslationResult perform(
+    public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        OpenAiService openAiService = new OpenAiService((String) connectionParameters.get(TOKEN));
-
-        CreateTranslationRequest createTranslationRequest = new CreateTranslationRequest();
-
-        createTranslationRequest.setModel(inputParameters.getRequiredString(MODEL));
-        createTranslationRequest.setPrompt(inputParameters.getString(PROMPT));
-        createTranslationRequest.setResponseFormat(inputParameters.getString(RESPONSE_FORMAT));
-        createTranslationRequest.setTemperature(inputParameters.getDouble(TEMPERATURE));
-
-        FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE);
-
-        return openAiService.createTranslation(
-            createTranslationRequest, (File) context.file(file1 -> file1.toTempFile(fileEntry)));
+//
+//        OpenAiService openAiService = new OpenAiService((String) connectionParameters.get(TOKEN));
+//
+//        CreateTranslationRequest createTranslationRequest = new CreateTranslationRequest();
+//
+//        createTranslationRequest.setModel(inputParameters.getRequiredString(MODEL));
+//        createTranslationRequest.setPrompt(inputParameters.getString(PROMPT));
+//        createTranslationRequest.setResponseFormat(inputParameters.getString(RESPONSE_FORMAT));
+//        createTranslationRequest.setTemperature(inputParameters.getDouble(TEMPERATURE));
+//
+//        FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE);
+//
+//        return openAiService.createTranslation(
+//            createTranslationRequest, (File) context.file(file1 -> file1.toTempFile(fileEntry)));
+        return null;
     }
 }

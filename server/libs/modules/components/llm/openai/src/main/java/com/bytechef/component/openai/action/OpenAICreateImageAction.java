@@ -43,9 +43,6 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.openai.util.OpenAIUtils;
-import com.theokanning.openai.image.CreateImageRequest;
-import com.theokanning.openai.image.ImageResult;
-import com.theokanning.openai.service.OpenAiService;
 
 /**
  * @author Monika Domiter
@@ -122,24 +119,25 @@ public class OpenAICreateImageAction {
     private OpenAICreateImageAction() {
     }
 
-    public static ImageResult perform(
+    public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        String token = (String) connectionParameters.get(TOKEN);
-
-        OpenAiService openAiService = new OpenAiService(token);
-
-        CreateImageRequest createImageRequest = new CreateImageRequest();
-
-        createImageRequest.setPrompt(inputParameters.getRequiredString(PROMPT));
-        createImageRequest.setModel(inputParameters.getRequiredString(MODEL));
-        createImageRequest.setN(inputParameters.getInteger(N));
-        createImageRequest.setQuality(inputParameters.getString(QUALITY));
-        createImageRequest.setResponseFormat(inputParameters.getString(RESPONSE_FORMAT));
-        createImageRequest.setSize(inputParameters.getString(SIZE));
-        createImageRequest.setStyle(inputParameters.getString(STYLE));
-        createImageRequest.setUser(inputParameters.getString(USER));
-
-        return openAiService.createImage(createImageRequest);
+//        String token = (String) connectionParameters.get(TOKEN);
+//
+//        OpenAiService openAiService = new OpenAiService(token);
+//
+//        CreateImageRequest createImageRequest = new CreateImageRequest();
+//
+//        createImageRequest.setPrompt(inputParameters.getRequiredString(PROMPT));
+//        createImageRequest.setModel(inputParameters.getRequiredString(MODEL));
+//        createImageRequest.setN(inputParameters.getInteger(N));
+//        createImageRequest.setQuality(inputParameters.getString(QUALITY));
+//        createImageRequest.setResponseFormat(inputParameters.getString(RESPONSE_FORMAT));
+//        createImageRequest.setSize(inputParameters.getString(SIZE));
+//        createImageRequest.setStyle(inputParameters.getString(STYLE));
+//        createImageRequest.setUser(inputParameters.getString(USER));
+//
+//        return openAiService.createImage(createImageRequest);
+        return null;
     }
 }
