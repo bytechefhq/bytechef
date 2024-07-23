@@ -16,6 +16,10 @@ pluginManagement {
         maven {
             url = uri("https://repo.spring.io/release")
         }
+
+        maven {
+            url = uri("https://repo.spring.io/artifactory/snapshot/")
+        }
     }
 }
 
@@ -250,7 +254,7 @@ include("server:libs:modules:components:nifty")
 include("server:libs:modules:components:object-helper")
 include("server:libs:modules:components:ods-file")
 include("server:libs:modules:components:one-simple-api")
-include("server:libs:modules:components:openai")
+include("server:libs:modules:components:llm:openai")
 include("server:libs:modules:components:petstore")
 include("server:libs:modules:components:pipedrive")
 include("server:libs:modules:components:pipeliner")

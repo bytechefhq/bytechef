@@ -34,7 +34,8 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableValueProperty;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ValueProperty;
-import com.theokanning.openai.service.OpenAiService;
+import org.springframework.ai.openai.api.OpenAiApi;
+
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,20 +78,6 @@ public class OpenAIUtils {
         }
 
         return options;
-    }
-
-    public static List<Option<String>> getModelOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
-
-        OpenAiService openAiService = new OpenAiService((String) connectionParameters.get(TOKEN), Duration.ZERO);
-
-        return openAiService.listModels()
-            .stream()
-            .filter(model -> model.getId()
-                .contains("gpt"))
-            .map(model -> (Option<String>) option(model.getId(), model.getId()))
-            .toList();
     }
 
     public static List<ValueProperty<?>> getModelProperties(

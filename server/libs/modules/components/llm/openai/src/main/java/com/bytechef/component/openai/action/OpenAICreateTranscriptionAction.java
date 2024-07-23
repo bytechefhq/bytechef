@@ -40,9 +40,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.theokanning.openai.audio.CreateTranscriptionRequest;
-import com.theokanning.openai.audio.TranscriptionResult;
-import com.theokanning.openai.service.OpenAiService;
 import java.io.File;
 import java.util.List;
 
@@ -183,22 +180,23 @@ public class OpenAICreateTranscriptionAction {
     private OpenAICreateTranscriptionAction() {
     }
 
-    public static TranscriptionResult perform(
+    public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        OpenAiService openAiService = new OpenAiService((String) connectionParameters.get(TOKEN));
-
-        CreateTranscriptionRequest createTranscriptionRequest = new CreateTranscriptionRequest();
-
-        createTranscriptionRequest.setModel(inputParameters.getRequiredString(MODEL));
-        createTranscriptionRequest.setLanguage(inputParameters.getString(LANGUAGE));
-        createTranscriptionRequest.setPrompt(inputParameters.getString(PROMPT));
-        createTranscriptionRequest.setResponseFormat(inputParameters.getString(RESPONSE_FORMAT));
-        createTranscriptionRequest.setTemperature(inputParameters.getDouble(TEMPERATURE));
-
-        FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE);
-
-        return openAiService.createTranscription(
-            createTranscriptionRequest, (File) context.file(file -> file.toTempFile(fileEntry)));
+//        OpenAiService openAiService = new OpenAiService((String) connectionParameters.get(TOKEN));
+//
+//        CreateTranscriptionRequest createTranscriptionRequest = new CreateTranscriptionRequest();
+//
+//        createTranscriptionRequest.setModel(inputParameters.getRequiredString(MODEL));
+//        createTranscriptionRequest.setLanguage(inputParameters.getString(LANGUAGE));
+//        createTranscriptionRequest.setPrompt(inputParameters.getString(PROMPT));
+//        createTranscriptionRequest.setResponseFormat(inputParameters.getString(RESPONSE_FORMAT));
+//        createTranscriptionRequest.setTemperature(inputParameters.getDouble(TEMPERATURE));
+//
+//        FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE);
+//
+//        return openAiService.createTranscription(
+//            createTranscriptionRequest, (File) context.file(file -> file.toTempFile(fileEntry)));
+        return null;
     }
 }
