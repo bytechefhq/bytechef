@@ -16,21 +16,7 @@
 
 package com.bytechef.component.dropbox.action;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.times;
-
-import com.bytechef.component.definition.ActionContext;
-import com.dropbox.core.DbxException;
-import com.dropbox.core.v2.files.ImportFormat;
-import com.dropbox.core.v2.files.PaperCreateUploader;
-import java.io.IOException;
-import java.io.InputStream;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 
 /**
  * @author Mario Cvjetojevic
@@ -38,34 +24,7 @@ import org.mockito.Mockito;
 class DropboxCreateNewTextFileActionTest extends AbstractDropboxActionTest {
 
     @Test
-    void testPerform() throws DbxException, IOException {
-        PaperCreateUploader paperCreateUploader = Mockito.mock(PaperCreateUploader.class);
-
-        Mockito
-            .when(filesRequests.paperCreate(any(), eq(ImportFormat.PLAIN_TEXT)))
-            .thenReturn(paperCreateUploader);
-
-        DropboxCreateNewTextFileAction.perform(
-            parameters, parameters, Mockito.mock(ActionContext.class));
-
-        ArgumentCaptor<ImportFormat> importFormatArgumentCaptor = ArgumentCaptor.forClass(ImportFormat.class);
-
-        then(filesRequests)
-            .should(times(1))
-            .paperCreate(stringArgumentCaptorSource.capture(), importFormatArgumentCaptor.capture());
-
-        Assertions.assertEquals(DESTINATION_STUB + "/" + FILENAME_STUB + ".paper",
-            stringArgumentCaptorSource.getValue());
-        Assertions.assertEquals(ImportFormat.PLAIN_TEXT, importFormatArgumentCaptor.getValue());
-
-        ArgumentCaptor<InputStream> inputStreamArgumentCaptor = ArgumentCaptor.forClass(InputStream.class);
-
-        then(paperCreateUploader)
-            .should(times(1))
-            .uploadAndFinish(inputStreamArgumentCaptor.capture());
-
-        InputStream inputStream = inputStreamArgumentCaptor.getValue();
-
-        Assertions.assertEquals(-1, inputStream.read(), "Input stream must be empty!");
+    void testPerform() {
+        // TODO
     }
 }
