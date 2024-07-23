@@ -41,9 +41,7 @@ import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.openai.util.OpenAIUtils;
-import com.theokanning.openai.assistants.Assistant;
-import com.theokanning.openai.assistants.AssistantRequest;
-import com.theokanning.openai.service.OpenAiService;
+import org.springframework.ai.openai.api.OpenAiApi;
 
 /**
  * @author Monika Domiter
@@ -58,7 +56,16 @@ public class OpenAICreateAssistantAction {
                 .label("Model")
                 .description("ID of the model to use.")
                 .required(true)
-                .options((OptionsDataSource.ActionOptionsFunction<String>) OpenAIUtils::getModelOptions),
+                .options(
+                    option(OpenAiApi.ChatModel.GPT_3_5_TURBO_1106.value, OpenAiApi.ChatModel.GPT_3_5_TURBO_1106.value),
+                    option(OpenAiApi.ChatModel.GPT_3_5_TURBO_0125.value, OpenAiApi.ChatModel.GPT_3_5_TURBO_0125.value),
+                    option(OpenAiApi.ChatModel.GPT_3_5_TURBO.value, OpenAiApi.ChatModel.GPT_3_5_TURBO.value),
+                    option(OpenAiApi.ChatModel.GPT_4_O.value, OpenAiApi.ChatModel.GPT_4_O.value),
+                    option(OpenAiApi.ChatModel.GPT_4_O_MINI.value, OpenAiApi.ChatModel.GPT_4_O_MINI.value),
+                    option(OpenAiApi.ChatModel.GPT_4_TURBO.value, OpenAiApi.ChatModel.GPT_4_TURBO.value),
+                    option(OpenAiApi.ChatModel.GPT_4_TURBO_2204_04_09.value, OpenAiApi.ChatModel.GPT_4_TURBO_2204_04_09.value),
+                    option(OpenAiApi.ChatModel.GPT_4.value, OpenAiApi.ChatModel.GPT_4.value)
+                ),
             string(NAME)
                 .label("Name")
                 .description("The name of the assistant.")
@@ -152,21 +159,22 @@ public class OpenAICreateAssistantAction {
     private OpenAICreateAssistantAction() {
     }
 
-    public static Assistant perform(
+    public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        OpenAiService openAiService = new OpenAiService((String) connectionParameters.get(TOKEN));
-
-        AssistantRequest assistantRequest = new AssistantRequest();
-
-        assistantRequest.setModel(inputParameters.getRequiredString(MODEL));
-        assistantRequest.setName(inputParameters.getString(NAME));
-        assistantRequest.setDescription(inputParameters.getString(DESCRIPTION));
-        assistantRequest.setInstructions(inputParameters.getString(INSTRUCTIONS));
-        assistantRequest.setTools(inputParameters.getList(TOOLS, new TypeReference<>() {}));
-        assistantRequest.setFileIds(inputParameters.getList(FILE_IDS, new TypeReference<>() {}));
-        assistantRequest.setMetadata(inputParameters.getMap(METADATA, new TypeReference<>() {}));
-
-        return openAiService.createAssistant(assistantRequest);
+//        OpenAiService openAiService = new OpenAiService((String) connectionParameters.get(TOKEN));
+//
+//        AssistantRequest assistantRequest = new AssistantRequest();
+//
+//        assistantRequest.setModel(inputParameters.getRequiredString(MODEL));
+//        assistantRequest.setName(inputParameters.getString(NAME));
+//        assistantRequest.setDescription(inputParameters.getString(DESCRIPTION));
+//        assistantRequest.setInstructions(inputParameters.getString(INSTRUCTIONS));
+//        assistantRequest.setTools(inputParameters.getList(TOOLS, new TypeReference<>() {}));
+//        assistantRequest.setFileIds(inputParameters.getList(FILE_IDS, new TypeReference<>() {}));
+//        assistantRequest.setMetadata(inputParameters.getMap(METADATA, new TypeReference<>() {}));
+//
+//        return openAiService.createAssistant(assistantRequest);
+        return null;
     }
 }

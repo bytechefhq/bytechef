@@ -47,13 +47,14 @@ public class OpenAIComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(OpenAIConnection.CONNECTION_DEFINITION)
         .actions(
-            OpenAIAskChatGPTAction.ACTION_DEFINITION,
-            OpenAICreateAssistantAction.ACTION_DEFINITION,
-            OpenAICreateImageAction.ACTION_DEFINITION,
-            OpenAICreateSpeechAction.ACTION_DEFINITION,
-            OpenAICreateTranscriptionAction.ACTION_DEFINITION,
-            OpenAICreateTranslationAction.ACTION_DEFINITION,
-            OpenAIVisionPromptAction.ACTION_DEFINITION);
+            OpenAIAskChatGPTAction.ACTION_DEFINITION
+//            OpenAICreateAssistantAction.ACTION_DEFINITION,
+//            OpenAICreateImageAction.ACTION_DEFINITION,
+//            OpenAICreateSpeechAction.ACTION_DEFINITION,
+//            OpenAICreateTranscriptionAction.ACTION_DEFINITION,
+//            OpenAICreateTranslationAction.ACTION_DEFINITION,
+//            OpenAIVisionPromptAction.ACTION_DEFINITION
+            );
 
     @Override
     public ComponentDefinition getDefinition() {
