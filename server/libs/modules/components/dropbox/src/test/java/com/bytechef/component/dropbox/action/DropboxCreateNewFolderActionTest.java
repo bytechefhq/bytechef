@@ -16,29 +16,47 @@
 
 package com.bytechef.component.dropbox.action;
 
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.times;
+import static com.bytechef.component.dropbox.action.DropboxCreateNewFolderAction.POST_CREATE_FOLDER_CONTEXT_FUNCTION;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.PATH;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
-import com.dropbox.core.DbxException;
-import org.junit.jupiter.api.Assertions;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 /**
  * @author Mario Cvjetojevic
+ * @author Monika Kušter
  */
-public class DropboxCreateNewFolderActionTest extends AbstractDropboxActionTest {
+class DropboxCreateNewFolderActionTest extends AbstractDropboxActionTest {
 
     @Test
-    public void testPerform() throws DbxException {
-        DropboxCreateNewFolderAction.perform(
-            parameters, parameters, Mockito.mock(ActionContext.class));
+    void testPerform() {
+        when(mockedParameters.getRequired(PATH))
+            .thenReturn("/path/1");
 
-        then(filesRequests)
-            .should(times(1))
-            .createFolderV2(stringArgumentCaptorSource.capture());
+        when(mockedContext.http(POST_CREATE_FOLDER_CONTEXT_FUNCTION))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(mockedObject);
 
-        Assertions.assertEquals(DESTINATION_STUB, stringArgumentCaptorSource.getValue());
+        Object result = DropboxCreateNewFolderAction.perform(mockedParameters, mockedParameters, mockedContext);
+
+        assertEquals(mockedObject, result);
+
+        Http.Body body = bodyArgumentCaptor.getValue();
+
+        Map<String, String> expectedBody = Map.of(PATH, "/path/1");
+
+        assertEquals(expectedBody, body.getContent());
     }
 }
