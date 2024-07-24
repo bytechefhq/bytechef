@@ -17,23 +17,11 @@
 package com.bytechef.component.jira.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.jira.constant.JiraConstants.ASSIGNEE;
-import static com.bytechef.component.jira.constant.JiraConstants.CONTENT;
-import static com.bytechef.component.jira.constant.JiraConstants.DESCRIPTION;
-import static com.bytechef.component.jira.constant.JiraConstants.FIELDS;
 import static com.bytechef.component.jira.constant.JiraConstants.GET_ISSUE;
-import static com.bytechef.component.jira.constant.JiraConstants.ID;
-import static com.bytechef.component.jira.constant.JiraConstants.ISSUETYPE;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_ID;
-import static com.bytechef.component.jira.constant.JiraConstants.KEY;
-import static com.bytechef.component.jira.constant.JiraConstants.NAME;
-import static com.bytechef.component.jira.constant.JiraConstants.PRIORITY;
+import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_OUTPUT_PROPERTY;
 import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
-import static com.bytechef.component.jira.constant.JiraConstants.TEXT;
-import static com.bytechef.component.jira.constant.JiraConstants.TYPE;
 import static com.bytechef.component.jira.util.JiraUtils.getBaseUrl;
 
 import com.bytechef.component.definition.ActionContext;
@@ -63,43 +51,7 @@ public class JiraGetIssueAction {
                 .options((ActionOptionsFunction<String>) JiraOptionsUtils::getIssueIdOptions)
                 .optionsLookupDependsOn(PROJECT)
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    string(ID),
-                    string(KEY),
-                    object(FIELDS)
-                        .properties(
-                            object(ISSUETYPE)
-                                .properties(
-                                    string(ID),
-                                    string(NAME)),
-                            object(PROJECT)
-                                .properties(
-                                    string(ID),
-                                    string(NAME)),
-                            object(PRIORITY)
-                                .properties(
-                                    string(ID),
-                                    string(NAME)),
-                            object(ASSIGNEE)
-                                .properties(
-                                    string(ID),
-                                    string(NAME)),
-                            object(DESCRIPTION)
-                                .properties(
-                                    string(TYPE),
-                                    array(CONTENT)
-                                        .items(
-                                            object()
-                                                .properties(
-                                                    array(CONTENT)
-                                                        .items(
-                                                            object()
-                                                                .properties(
-                                                                    string(TEXT),
-                                                                    string(TYPE))),
-                                                    string(TYPE)))))))
+        .outputSchema(ISSUE_OUTPUT_PROPERTY)
         .perform(JiraGetIssueAction::perform);
 
     private JiraGetIssueAction() {
