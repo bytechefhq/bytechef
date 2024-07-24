@@ -108,7 +108,7 @@ public class JiraCreateIssueAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         Http.Response execute = context
-            .http(http -> http.post(getBaseUrl(connectionParameters) + "/issue"))
+            .http(http -> http.post(getBaseUrl(context) + "/issue"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(FIELDS, getIssueFieldsMap(inputParameters)))
             .execute();

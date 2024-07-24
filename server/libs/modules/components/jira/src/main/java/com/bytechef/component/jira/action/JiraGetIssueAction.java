@@ -110,7 +110,7 @@ public class JiraGetIssueAction {
 
         return context
             .http(http -> http
-                .get(getBaseUrl(connectionParameters) + "/issue/" + inputParameters.getRequiredString(ISSUE_ID)))
+                .get(getBaseUrl(context) + "/issue/" + inputParameters.getRequiredString(ISSUE_ID)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
