@@ -123,7 +123,7 @@ public class JiraSearchForIssuesUsingJqlAction {
                 .append(URLEncoder.encode(jql, StandardCharsets.UTF_8));
         }
 
-        Map<String, Object> body = context.http(http -> http.get(getBaseUrl(connectionParameters) + "/search" + url))
+        Map<String, Object> body = context.http(http -> http.get(getBaseUrl(context) + "/search" + url))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

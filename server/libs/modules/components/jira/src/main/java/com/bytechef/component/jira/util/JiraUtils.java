@@ -16,26 +16,40 @@
 
 package com.bytechef.component.jira.util;
 
+import static com.bytechef.component.jira.constant.JiraConstants.ID;
 import static com.bytechef.component.jira.constant.JiraConstants.NAME;
 import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
-import static com.bytechef.component.jira.constant.JiraConstants.YOUR_DOMAIN;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
+import java.util.List;
 import java.util.Map;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class JiraUtils {
 
     private JiraUtils() {
     }
 
-    public static String getBaseUrl(Parameters connectionParameters) {
-        return "https://" + connectionParameters.getRequiredString(YOUR_DOMAIN) + ".atlassian.net/rest/api/3";
+    public static String getBaseUrl(Context context) {
+        List<?> body = context
+            .http(http -> http.get("https://api.atlassian.com/oauth/token/accessible-resources"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        Object object = body.getFirst();
+
+        if (object instanceof Map<?, ?> map) {
+            return "https://api.atlassian.com/ex/jira/" + map.get(ID) + "/rest/api/3";
+        }
+
+        return null;
     }
 
     public static String getProjectName(
@@ -43,7 +57,7 @@ public class JiraUtils {
 
         Map<String, Object> body = context
             .http(http -> http.get(
-                getBaseUrl(connectionParameters) + "/project/" + inputParameters.getRequiredString(PROJECT)))
+                getBaseUrl(context) + "/project/" + inputParameters.getRequiredString(PROJECT)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
