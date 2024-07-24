@@ -62,4 +62,7 @@ public class ShopifyOrderProperties {
             .placeholder("Add to Line Items")
             .label("Line Items")
             .required(false));
+
+    private ShopifyOrderProperties() {
+    }
 }
