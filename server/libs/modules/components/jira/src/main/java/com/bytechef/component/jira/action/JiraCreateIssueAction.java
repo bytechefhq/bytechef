@@ -17,7 +17,6 @@
 package com.bytechef.component.jira.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.jira.constant.JiraConstants.ASSIGNEE;
 import static com.bytechef.component.jira.constant.JiraConstants.CONTENT;
@@ -26,7 +25,7 @@ import static com.bytechef.component.jira.constant.JiraConstants.DESCRIPTION;
 import static com.bytechef.component.jira.constant.JiraConstants.FIELDS;
 import static com.bytechef.component.jira.constant.JiraConstants.ID;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUETYPE;
-import static com.bytechef.component.jira.constant.JiraConstants.KEY;
+import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_OUTPUT_PROPERTY;
 import static com.bytechef.component.jira.constant.JiraConstants.PARENT;
 import static com.bytechef.component.jira.constant.JiraConstants.PRIORITY;
 import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
@@ -94,11 +93,7 @@ public class JiraCreateIssueAction {
                 .description("Description of the issue.")
                 .controlType(ControlType.TEXT_AREA)
                 .required(false))
-        .outputSchema(
-            object()
-                .properties(
-                    string(ID),
-                    string(KEY)))
+        .outputSchema(ISSUE_OUTPUT_PROPERTY)
         .perform(JiraCreateIssueAction::perform);
 
     private JiraCreateIssueAction() {
