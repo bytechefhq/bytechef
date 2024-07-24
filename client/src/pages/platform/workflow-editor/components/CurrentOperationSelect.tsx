@@ -15,7 +15,13 @@ interface CurrentOperationSelectProps {
     value: string;
 }
 
-const OperationSelect = ({ description, handleValueChange, operations, value, triggerSelect }: CurrentOperationSelectProps) => (
+const OperationSelect = ({
+    description,
+    handleValueChange,
+    operations,
+    triggerSelect,
+    value,
+}: CurrentOperationSelectProps) => (
     <div className="flex w-full flex-col">
         <Label className="flex items-center space-x-1">
             <span className="text-sm font-medium leading-6">{triggerSelect ? 'Triggers' : 'Actions'}</span>
@@ -105,8 +111,8 @@ const CurrentOperationSelect = ({
                 description={description}
                 handleValueChange={handleValueChange}
                 operations={operations}
-                value={value}
                 triggerSelect={triggerSelect}
+                value={value}
             />
         )}
     </div>
