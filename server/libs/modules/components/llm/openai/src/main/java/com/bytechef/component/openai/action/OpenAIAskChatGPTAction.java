@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.openai.constant.OpenAIConstants.ASK_CHAT_GPT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.CONTENT;
@@ -34,7 +33,6 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.MAX_TOKENS_
 import static com.bytechef.component.openai.constant.OpenAIConstants.MESSAGES;
 import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
 import static com.bytechef.component.openai.constant.OpenAIConstants.N;
-import static com.bytechef.component.openai.constant.OpenAIConstants.NAME;
 import static com.bytechef.component.openai.constant.OpenAIConstants.N_PROPERTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.PRESENCE_PENALTY_PROPERTY;
@@ -51,10 +49,22 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.USER_PROPER
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.TypeReference;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.openai.util.OpenAIUtils;
-import java.time.Duration;
+import com.bytechef.component.openai.util.records.MessageRecord;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.ToolResponseMessage;
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.openai.api.OpenAiApi;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -83,19 +93,22 @@ public class OpenAIAskChatGPTAction {
                                 option("user", "user"),
                                 option("assistant", "assistant"),
                                 option("tool", "tool"))
-                            .required(true),
-                        string(NAME)
-                            .label("Name")
-                            .description(
-                                "An optional name for the participant. Provides the model information to " +
-                                    "differentiate between participants of the same role.")
-                            .required(false)))
+                            .required(true)))
                 .required(true),
             string(MODEL)
                 .label("Model")
                 .description("ID of the model to use.")
                 .required(true)
-                .options((ActionOptionsFunction<String>) OpenAIUtils::getModelOptions),
+                .options(
+                    option(OpenAiApi.ChatModel.GPT_3_5_TURBO_1106.value, OpenAiApi.ChatModel.GPT_3_5_TURBO_1106.value),
+                    option(OpenAiApi.ChatModel.GPT_3_5_TURBO_0125.value, OpenAiApi.ChatModel.GPT_3_5_TURBO_0125.value),
+                    option(OpenAiApi.ChatModel.GPT_3_5_TURBO.value, OpenAiApi.ChatModel.GPT_3_5_TURBO.value),
+                    option(OpenAiApi.ChatModel.GPT_4_O.value, OpenAiApi.ChatModel.GPT_4_O.value),
+                    option(OpenAiApi.ChatModel.GPT_4_O_MINI.value, OpenAiApi.ChatModel.GPT_4_O_MINI.value),
+                    option(OpenAiApi.ChatModel.GPT_4_TURBO.value, OpenAiApi.ChatModel.GPT_4_TURBO.value),
+                    option(OpenAiApi.ChatModel.GPT_4_TURBO_2204_04_09.value, OpenAiApi.ChatModel.GPT_4_TURBO_2204_04_09.value),
+                    option(OpenAiApi.ChatModel.GPT_4.value, OpenAiApi.ChatModel.GPT_4.value)
+                ),
             FREQUENCY_PENALTY_PROPERTY,
             LOGIT_BIAS_PROPERTY,
             MAX_TOKENS_PROPERTY,
@@ -105,50 +118,47 @@ public class OpenAIAskChatGPTAction {
             TEMPERATURE_PROPERTY,
             TOP_P_PROPERTY,
             USER_PROPERTY)
-        .output(outputSchema(OpenAIUtils.OUTPUT_SCHEMA_RESPONSE))
+        .outputSchema(string())
         .perform(OpenAIAskChatGPTAction::perform);
 
     private OpenAIAskChatGPTAction() {
     }
 
-    public static Object perform(
+    public static String perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-//        ChatMessage chatMessage = null;
-//
-//        OpenAiService openAiService = new OpenAiService((String) connectionParameters.get(TOKEN), Duration.ZERO);
-//
-//        ChatCompletionRequest chatCompletionRequest = createChatCompletionRequest(inputParameters);
-//
-//        ChatCompletionResult chatCompletionResult = openAiService.createChatCompletion(chatCompletionRequest);
-//
-//        List<ChatCompletionChoice> chatCompletionChoices = chatCompletionResult.getChoices();
-//
-//        if (!chatCompletionChoices.isEmpty()) {
-//            ChatCompletionChoice chatCompletionChoice = chatCompletionChoices.getFirst();
-//
-//            chatMessage = chatCompletionChoice.getMessage();
-//        }
-//
-//        return chatMessage;
-        return null;
+        ChatOptions chatOptions = OpenAiChatOptions.builder()
+            .withModel(inputParameters.getRequiredString(MODEL))
+            .withFrequencyPenalty(inputParameters.getFloat(FREQUENCY_PENALTY))
+            .withLogitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
+            .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
+            .withN(inputParameters.getInteger(N))
+            .withPresencePenalty(inputParameters.getFloat(PRESENCE_PENALTY))
+            .withStop(inputParameters.getList(STOP, new TypeReference<>() {}))
+            .withTemperature(inputParameters.getFloat(TEMPERATURE))
+            .withTopP(inputParameters.getFloat(TOP_P))
+            .withUser(inputParameters.getString(USER))
+            .build();
+        ChatModel chatModel = new OpenAiChatModel(new OpenAiApi(connectionParameters.getString(TOKEN)), (OpenAiChatOptions) chatOptions);
+
+        List<MessageRecord> messageRecordList = inputParameters.getList(MESSAGES, new TypeReference<>() {});
+        List<Message> messages = messageRecordList.stream()
+            .map(messageRecord -> createMessage(messageRecord.getRole(), messageRecord.getContent()))
+            .toList();
+
+        ChatResponse response = chatModel.call(new Prompt(messages));
+        return response.getResult()
+            .getOutput()
+            .getContent();
     }
 
-//    private static ChatCompletionRequest createChatCompletionRequest(Parameters inputParameters) {
-//        ChatCompletionRequest chatCompletionRequest = new ChatCompletionRequest();
-//
-//        chatCompletionRequest.setMessages(inputParameters.getList(MESSAGES, new TypeReference<>() {}));
-//        chatCompletionRequest.setModel(inputParameters.getRequiredString(MODEL));
-//        chatCompletionRequest.setFrequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY));
-//        chatCompletionRequest.setLogitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}));
-//        chatCompletionRequest.setMaxTokens(inputParameters.getInteger(MAX_TOKENS));
-//        chatCompletionRequest.setN(inputParameters.getInteger(N));
-//        chatCompletionRequest.setPresencePenalty(inputParameters.getDouble(PRESENCE_PENALTY));
-//        chatCompletionRequest.setStop(inputParameters.getList(STOP, new TypeReference<>() {}));
-//        chatCompletionRequest.setTemperature(inputParameters.getDouble(TEMPERATURE));
-//        chatCompletionRequest.setTopP(inputParameters.getDouble(TOP_P));
-//        chatCompletionRequest.setUser(inputParameters.getString(USER));
-//
-//        return chatCompletionRequest;
-//    }
+    private static Message createMessage(String role, String content) {
+        return switch (role){
+            case "system" -> new SystemMessage(content);
+            case "user" -> new UserMessage(content);
+            case "assistant" -> new AssistantMessage(content);
+            case "tool" -> new ToolResponseMessage(new ArrayList<>());
+            default -> null;
+        };
+    }
 }

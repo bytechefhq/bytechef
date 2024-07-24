@@ -1,8 +1,8 @@
-package com.bytechef.component.openai.util;
+package com.bytechef.component.openai.util.records;
 
 public class MessageRecord {
-    String content;
-    String role;
+    private String content;
+    private String role;
 
     public MessageRecord(){}
 
