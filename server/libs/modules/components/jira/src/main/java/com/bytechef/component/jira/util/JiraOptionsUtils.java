@@ -27,6 +27,7 @@ import static com.bytechef.component.jira.util.JiraUtils.getBaseUrl;
 import static com.bytechef.component.jira.util.JiraUtils.getProjectName;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
@@ -73,7 +74,7 @@ public class JiraOptionsUtils {
 
     public static List<Option<String>> getIssueTypesIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         List<Object> body = context
             .http(http -> http.get(getBaseUrl(context) + "/issuetype/project?projectId=" +
@@ -100,7 +101,7 @@ public class JiraOptionsUtils {
 
     public static List<Option<String>> getProjectIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, Object> body = context
             .http(http -> http.get(getBaseUrl(context) + "/project/search"))
