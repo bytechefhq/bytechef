@@ -47,15 +47,14 @@ public class ShopifyCreateOrderAction {
 
             ))
         .properties(object("__item")
-            .properties(
-                object("order")
-                    .properties(
-                        array("line_items").items(object().properties(
-                            string("fulfillment_status").label("Fulfillment Status")
-                                .description("How far along an order is in terms line items fulfilled.")
-                                .options(option("Null", "null"), option("Fulfilled", "fulfilled"), option("Partial",
-                                    "partial"), option("Not_eligible", "not_eligible"))
-                                .required(false),
+            .properties(object("order")
+                .properties(
+                    array("line_items")
+                        .items(object().properties(string("fulfillment_status").label("Fulfillment Status")
+                            .description("How far along an order is in terms line items fulfilled.")
+                            .options(option("Null", "null"), option("Fulfilled", "fulfilled"),
+                                option("Partial", "partial"), option("Not_eligible", "not_eligible"))
+                            .required(false),
                             string("grams").label("Grams")
                                 .description("The weight of the item in grams.")
                                 .required(false),
@@ -76,21 +75,21 @@ public class ShopifyCreateOrderAction {
                                 .description("The title of the product.")
                                 .required(false))
                             .description(
-                                "A list of line item objects, each containing information about an item in the order."))
-                            .placeholder("Add to Line Items")
-                            .label("Line Items")
-                            .description(
-                                "A list of line item objects, each containing information about an item in the order.")
-                            .required(false),
-                        string("total_tax").label("Total Tax")
-                            .description(
-                                "The sum of all the taxes applied to the order in the shop currency. Must be positive.")
-                            .required(false),
-                        string("currency").label("Currency")
-                            .description("The three-letter code (ISO 4217 format) for the shop currency")
-                            .required(false))
-                    .label("Order")
-                    .required(false))
+                                "The list of line item objects, each containing information about an item in the order."))
+                        .placeholder("Add to Line Items")
+                        .label("Line Items")
+                        .description(
+                            "The list of line item objects, each containing information about an item in the order.")
+                        .required(false),
+                    string("total_tax").label("Total Tax")
+                        .description(
+                            "The sum of all the taxes applied to the order in the shop currency. Must be positive.")
+                        .required(false),
+                    string("currency").label("Currency")
+                        .description("The three-letter code (ISO 4217 format) for the shop currency")
+                        .required(false))
+                .label("Order")
+                .required(false))
             .label("Order")
             .metadata(
                 Map.of(
