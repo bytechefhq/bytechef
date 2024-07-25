@@ -49,9 +49,9 @@ public class OpenAIComponentHandler implements ComponentHandler {
         .actions(
             OpenAIAskChatGPTAction.ACTION_DEFINITION,
 //            OpenAICreateAssistantAction.ACTION_DEFINITION,
-            OpenAICreateImageAction.ACTION_DEFINITION
-//            OpenAICreateSpeechAction.ACTION_DEFINITION,
-//            OpenAICreateTranscriptionAction.ACTION_DEFINITION,
+            OpenAICreateImageAction.ACTION_DEFINITION,
+//            OpenAICreateSpeechAction.ACTION_DEFINITION
+            OpenAICreateTranscriptionAction.ACTION_DEFINITION
 //            OpenAICreateTranslationAction.ACTION_DEFINITION,
 //            OpenAIVisionPromptAction.ACTION_DEFINITION
             );

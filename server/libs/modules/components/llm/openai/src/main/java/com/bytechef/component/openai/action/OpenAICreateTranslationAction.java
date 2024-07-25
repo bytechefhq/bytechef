@@ -31,7 +31,6 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
 import static com.bytechef.component.openai.constant.OpenAIConstants.PROMPT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TEMPERATURE;
-import static com.bytechef.component.openai.constant.OpenAIConstants.WHISPER_1;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -55,9 +54,7 @@ public class OpenAICreateTranslationAction {
             string(MODEL)
                 .label("Model")
                 .description("ID of the model to use.")
-                .required(true)
-                .options(option(WHISPER_1, WHISPER_1))
-                .defaultValue(WHISPER_1),
+                .required(true),
             string(PROMPT)
                 .label("Prompt")
                 .description(
