@@ -81,8 +81,6 @@ public final class OpenAIConstants {
     public static final String VOICE = "voice";
     public static final String WIDTH = "width";
     public static final String WEIGHT = "weight";
-    public static final String WHISPER_1 = "whisper-1";
-
     public static final String VISION_PROMPT = "visionPrompt";
 
     public static final ModifiableNumberProperty FREQUENCY_PENALTY_PROPERTY = number(FREQUENCY_PENALTY)
