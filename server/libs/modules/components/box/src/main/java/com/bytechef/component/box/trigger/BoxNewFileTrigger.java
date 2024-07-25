@@ -26,7 +26,6 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 
 import com.bytechef.component.box.util.BoxUtils;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
@@ -64,7 +63,7 @@ public class BoxNewFileTrigger {
 
     protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
-        String workflowExecutionId, Context context) {
+        String workflowExecutionId, TriggerContext context) {
 
         return new DynamicWebhookEnableOutput(
             Map.of(ID,
@@ -75,7 +74,7 @@ public class BoxNewFileTrigger {
 
     protected static void dynamicWebhookDisable(
         Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
-        String workflowExecutionId, Context context) {
+        String workflowExecutionId, TriggerContext context) {
 
         BoxUtils.unsubscribeWebhook(outputParameters, context);
     }

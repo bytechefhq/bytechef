@@ -16,6 +16,7 @@
 
 package com.bytechef.component.definition;
 
+import com.bytechef.component.exception.ProviderException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -143,6 +144,12 @@ public interface TriggerDefinition {
      * @return
      */
     Optional<PollFunction> getPoll();
+
+    /**
+     *
+     * @return
+     */
+    Optional<TriggerDefinition.ProcessErrorResponseFunction> getProcessErrorResponse();
 
     /**
      *
@@ -493,6 +500,22 @@ public interface TriggerDefinition {
         OutputResponse apply(Parameters inputParameters, Parameters closureParameters, TriggerContext context)
             throws Exception;
 
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface ProcessErrorResponseFunction {
+
+        /**
+         *
+         * @param statusCode
+         * @param body
+         * @param context
+         * @return
+         */
+        ProviderException apply(int statusCode, Object body, Context context) throws Exception;
     }
 
     /**

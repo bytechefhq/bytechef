@@ -16,8 +16,10 @@
 
 package com.bytechef.platform.component.registry.facade;
 
+import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.registry.definition.factory.ContextFactory;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
@@ -200,6 +202,18 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
             componentName, componentVersion, triggerName, inputParameters,
             contextFactory.createTriggerContext(componentName, componentVersion, triggerName, null, null, null,
                 null));
+    }
+
+    @Override
+    public ProviderException executeProcessErrorResponse(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName, int statusCode,
+        Object body) {
+
+        TriggerContext actionContext = contextFactory.createTriggerContext(
+            componentName, componentVersion, triggerName, null, null, null, null);
+
+        return triggerDefinitionService.executeProcessErrorResponse(
+            componentName, componentVersion, triggerName, statusCode, body, actionContext);
     }
 
     private ComponentConnection getComponentConnection(Long connectionId) {

@@ -29,9 +29,12 @@ import com.bytechef.component.definition.Context.Http.RequestMethod;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
+import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.registry.facade.BaseDefinitionFacade;
+import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.registry.util.RefreshCredentialsUtils;
 import com.bytechef.platform.workflow.execution.constants.FileEntryConstants;
@@ -88,7 +91,7 @@ public class HttpClientExecutor implements ApplicationContextAware {
     private static final Logger logger = LoggerFactory.getLogger(HttpClientExecutor.class);
 
     private ApplicationContext applicationContext;
-    private ActionDefinitionFacade actionDefinitionFacade;
+    private BaseDefinitionFacade definitionFacade;
     private final ConnectionDefinitionService connectionDefinitionService;
     private final FileStorageService fileStorageService;
     private final ObjectMapper objectMapper;
@@ -134,12 +137,13 @@ public class HttpClientExecutor implements ApplicationContextAware {
         this.applicationContext = applicationContext;
     }
 
-    private ActionDefinitionFacade getActionDefinitionFacade() {
-        if (actionDefinitionFacade == null) {
-            actionDefinitionFacade = applicationContext.getBean(ActionDefinitionFacade.class);
-        }
+    private BaseDefinitionFacade getDefinitionFacade(boolean isAction) {
+        if (!isAction)
+            definitionFacade = applicationContext.getBean(TriggerDefinitionFacade.class);
+        else
+            definitionFacade = applicationContext.getBean(ActionDefinitionFacade.class);
 
-        return actionDefinitionFacade;
+        return definitionFacade;
     }
 
     HttpResponse.BodyHandler<?> createBodyHandler(Configuration configuration) {
@@ -209,10 +213,13 @@ public class HttpClientExecutor implements ApplicationContextAware {
         if (!configuration.isDisableAuthorization() && (componentConnection != null)) {
             applyAuthorization(headers, queryParameters, componentName, componentConnection, context);
 
+            boolean isAction = !(context instanceof TriggerContext);
+
             builder.interceptor(
                 getInterceptor(
                     componentName, componentVersion, componentOperationName, componentConnection.version(),
-                    componentConnection.authorizationName(), componentConnection.canCredentialsBeRefreshed()));
+                    componentConnection.authorizationName(), componentConnection.canCredentialsBeRefreshed(),
+                    isAction));
         }
 
         if (configuration.isFollowRedirect()) {
@@ -392,7 +399,7 @@ public class HttpClientExecutor implements ApplicationContextAware {
 
     private Methanol.Interceptor getInterceptor(
         String componentName, int componentVersion, String componentOperationName, int connectionVersion,
-        String authorizationName, boolean credentialsBeRefreshed) {
+        String authorizationName, boolean credentialsBeRefreshed, boolean isAction) {
 
         return new Methanol.Interceptor() {
             @Override
@@ -411,7 +418,7 @@ public class HttpClientExecutor implements ApplicationContextAware {
                         Object body = httpResponse.body();
 
                         if (body != null && RefreshCredentialsUtils.matches(body.toString(), detectOn)) {
-                            throw getActionDefinitionFacade().executeProcessErrorResponse(
+                            throw getDefinitionFacade(isAction).executeProcessErrorResponse(
                                 componentName, componentVersion, componentOperationName, httpResponse.statusCode(),
                                 body);
                         }
@@ -422,7 +429,7 @@ public class HttpClientExecutor implements ApplicationContextAware {
 
                 Object body = httpResponse.body();
 
-                throw getActionDefinitionFacade().executeProcessErrorResponse(
+                throw getDefinitionFacade(isAction).executeProcessErrorResponse(
                     componentName, componentVersion, componentOperationName, httpResponse.statusCode(), body);
             }
 

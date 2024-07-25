@@ -27,19 +27,19 @@ import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.ATTACHMENTS;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.BASE_URL;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.CC;
-import static com.bytechef.component.sendgrid.constant.SendgridConstants.CONTENT_TYPE;
-import static com.bytechef.component.sendgrid.constant.SendgridConstants.EMAIL_SEND;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.FROM;
+import static com.bytechef.component.sendgrid.constant.SendgridConstants.SEND_EMAIL;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.SUBJECT;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.TEXT;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.TO;
+import static com.bytechef.component.sendgrid.constant.SendgridConstants.TYPE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ControlType;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
@@ -53,7 +53,7 @@ import java.util.Map;
  */
 public final class SendgridSendEmailAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(EMAIL_SEND)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEND_EMAIL)
         .title("Send an email")
         .description("Sends an email.")
         .properties(
@@ -64,13 +64,13 @@ public final class SendgridSendEmailAction {
                 .required(true),
             array(TO)
                 .label("To:")
-                .items(string().controlType(Property.ControlType.EMAIL))
+                .items(string().controlType(ControlType.EMAIL))
                 .description("Email addresses which you want to send to.")
                 .required(true),
             array(CC)
                 .label("CC:")
                 .description("Email address which receives a copy.")
-                .items(string().controlType(Property.ControlType.EMAIL))
+                .items(string().controlType(ControlType.EMAIL))
                 .maxItems(1000)
                 .required(false)
                 .advancedOption(true),
@@ -85,7 +85,7 @@ public final class SendgridSendEmailAction {
                 .description("This is the message you want to send")
                 .minLength(1)
                 .required(true),
-            string(CONTENT_TYPE)
+            string(TYPE)
                 .label("Message type")
                 .description("Message type for your content")
                 .options(
@@ -100,7 +100,15 @@ public final class SendgridSendEmailAction {
                 .required(false))
         .outputSchema(
             object()
-                .properties())
+                .properties(
+                    string(TYPE),
+                    string(FROM),
+                    array(TO)
+                        .items(string()),
+                    string(SUBJECT),
+                    string(TEXT),
+                    array(ATTACHMENTS)
+                        .items(fileEntry())))
         .perform(SendgridSendEmailAction::perform);
 
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
@@ -131,7 +139,7 @@ public final class SendgridSendEmailAction {
                     SUBJECT, inputParameters.getRequiredString(SUBJECT),
                     "content", List.of(
                         Map.of(
-                            CONTENT_TYPE, inputParameters.getRequiredString(CONTENT_TYPE),
+                            TYPE, inputParameters.getRequiredString(TYPE),
                             "value", inputParameters.getRequiredString(TEXT))),
                     ATTACHMENTS, allAttachments))
             .configuration(responseType(ResponseType.JSON))

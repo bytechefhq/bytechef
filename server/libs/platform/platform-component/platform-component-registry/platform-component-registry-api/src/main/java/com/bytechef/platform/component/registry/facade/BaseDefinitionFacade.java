@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.dropbox.action;
+package com.bytechef.platform.component.registry.facade;
 
-import org.junit.jupiter.api.Test;
+import com.bytechef.component.exception.ProviderException;
+import org.springframework.lang.NonNull;
 
-/**
- * @author Mario Cvjetojevic
- */
-class DropboxUploadFileActionTest extends AbstractDropboxActionTest {
-
-    @Test
-    void testPerform() {
-        // TODO
-    }
+public interface BaseDefinitionFacade {
+    ProviderException executeProcessErrorResponse(
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, int statusCode,
+        Object body);
 }

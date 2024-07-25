@@ -25,8 +25,8 @@ import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.QUEUE;
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.USERNAME;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.ListenerEmitter;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.rabbitmq.util.RabbitMqUtils;
@@ -60,7 +60,7 @@ public class RabbitMqNewMessageTrigger {
 
     protected static void listenerDisable(
         Parameters inputParameters, Parameters connectionParameters, String workflowExecutionId,
-        Context context) throws IOException {
+        TriggerContext context) throws IOException {
 
         Connection rabbitmqConnection = CONNECTION_MAP.remove(workflowExecutionId);
 
@@ -69,7 +69,7 @@ public class RabbitMqNewMessageTrigger {
 
     protected static void listenerEnable(
         Parameters inputParameters, Parameters connectionParameters, String workflowExecutionId,
-        ListenerEmitter listenerEmitter, Context context) throws IOException, TimeoutException {
+        ListenerEmitter listenerEmitter, TriggerContext context) throws IOException, TimeoutException {
 
         Connection rabbitMqConnection = RabbitMqUtils.getConnection(
             connectionParameters.getString(HOSTNAME), connectionParameters.getInteger(PORT, 5672),

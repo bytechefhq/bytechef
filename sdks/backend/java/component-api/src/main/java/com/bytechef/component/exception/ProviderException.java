@@ -54,7 +54,7 @@ public class ProviderException extends RuntimeException {
      * @param statusCode
      */
     public ProviderException(Integer statusCode) {
-        this.statusCode = statusCode;
+        this(statusCode, null);
     }
 
     /**
@@ -131,5 +131,18 @@ public class ProviderException extends RuntimeException {
         public UnauthorizedException(String message) {
             super(401, message);
         }
+    }
+
+    public static ProviderException getProviderException(int statusCode, Object body) {
+        String message = String.valueOf(statusCode);
+        message += body == null ? "" : ": " + body.toString();
+
+        return switch (statusCode) {
+            case 400 -> new ProviderException.BadRequestException(message);
+            case 401 -> new ProviderException.UnauthorizedException(message);
+            case 403 -> new ProviderException.ForbiddenException(message);
+            case 404 -> new ProviderException.NotFoundException(message);
+            default -> new ProviderException(statusCode, message);
+        };
     }
 }

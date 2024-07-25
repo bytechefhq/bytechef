@@ -12,76 +12,9 @@
   "resources": null,
   "version": 1,
   "title": "Google Sheets",
-  "connection": {
-    "authorizations": [ {
-      "detectOn": null,
-      "description": null,
-      "name": "oauth2_authorization_code",
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "clientId",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Client Id",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "clientSecret",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Client Secret",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      } ],
-      "refreshOn": [ "^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$" ],
-      "title": "OAuth2 Authorization Code",
-      "type": "OAUTH2_AUTHORIZATION_CODE",
-      "acquire": null,
-      "authorizationCallback": null,
-      "authorizationUrl": { },
-      "clientSecret": null,
-      "refreshToken": null,
-      "apply": null,
-      "clientId": null,
-      "pkce": null,
-      "refresh": null,
-      "refreshUrl": { },
-      "scopes": { },
-      "tokenUrl": { }
-    } ],
-    "properties": null,
-    "version": 1,
-    "authorizationRequired": null,
-    "baseUri": null,
-    "test": null
-  },
   "actions": [ {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": "Clear a sheet of all values while preserving formats.",
     "help": null,
@@ -182,14 +115,14 @@
       "controlType": "SELECT"
     } ],
     "title": "Clear sheet",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
-    "outputResponse": null,
-    "dynamicOutput": false,
     "output": null,
-    "perform": { }
+    "outputResponse": null,
+    "workflowNodeDescription": null,
+    "perform": { },
+    "processErrorResponse": null
   }, {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": "Delete row on an existing sheet",
     "help": null,
@@ -285,14 +218,14 @@
       "controlType": "INTEGER"
     } ],
     "title": "Delete row",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
-    "outputResponse": null,
-    "dynamicOutput": false,
     "output": null,
-    "perform": { }
+    "outputResponse": null,
+    "workflowNodeDescription": null,
+    "perform": { },
+    "processErrorResponse": null
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Get a row in a Google Sheet by row number",
     "help": null,
@@ -413,8 +346,7 @@
       "controlType": "INTEGER"
     } ],
     "title": "Find row by number",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -505,11 +437,12 @@
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true,
-    "output": null,
-    "perform": { }
+    "workflowNodeDescription": null,
+    "perform": { },
+    "processErrorResponse": null
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Append a row of values to an existing sheet",
     "help": null,
@@ -654,8 +587,7 @@
       }
     } ],
     "title": "Insert row",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -746,11 +678,12 @@
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true,
-    "output": null,
-    "perform": { }
+    "workflowNodeDescription": null,
+    "perform": { },
+    "processErrorResponse": null
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Overwrite values in an existing row",
     "help": null,
@@ -886,8 +819,7 @@
       }
     } ],
     "title": "Update row",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -978,12 +910,81 @@
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true,
-    "output": null,
-    "perform": { }
+    "workflowNodeDescription": null,
+    "perform": { },
+    "processErrorResponse": null
   } ],
+  "connection": {
+    "authorizations": [ {
+      "detectOn": null,
+      "description": null,
+      "name": "oauth2_authorization_code",
+      "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "clientId",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Client Id",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "clientSecret",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Client Secret",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
+      "refreshOn": [ "^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$" ],
+      "title": "OAuth2 Authorization Code",
+      "type": "OAUTH2_AUTHORIZATION_CODE",
+      "acquire": null,
+      "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": { },
+      "clientId": null,
+      "clientSecret": null,
+      "pkce": null,
+      "refresh": null,
+      "refreshUrl": { },
+      "scopes": { },
+      "refreshToken": null,
+      "tokenUrl": { }
+    } ],
+    "properties": null,
+    "version": 1,
+    "authorizationRequired": null,
+    "baseUri": null,
+    "test": null
+  },
   "triggers": [ {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Triggers when you add a row in google sheets. Refresh the page when you're done putting input.",
     "help": null,
@@ -1065,11 +1066,13 @@
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
+    "output": null,
+    "poll": null,
+    "deduplicate": null,
     "dynamicWebhookDisable": { },
     "dynamicWebhookEnable": { },
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": { },
-    "staticWebhookRequest": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -1176,12 +1179,10 @@
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true,
+    "processErrorResponse": null,
     "listenerDisable": null,
     "listenerEnable": null,
-    "webhookValidate": null,
-    "output": null,
-    "deduplicate": null,
-    "poll": null
+    "staticWebhookRequest": null,
+    "webhookValidate": null
   } ]
 }
