@@ -135,7 +135,8 @@ public class ProviderException extends RuntimeException {
 
     public static ProviderException getProviderException(int statusCode, Object body) {
         String message = String.valueOf(statusCode);
-        message += body == null ? "" : ": " + body.toString();
+
+        message += body == null ? "" : ": " + body;
 
         return switch (statusCode) {
             case 400 -> new ProviderException.BadRequestException(message);
