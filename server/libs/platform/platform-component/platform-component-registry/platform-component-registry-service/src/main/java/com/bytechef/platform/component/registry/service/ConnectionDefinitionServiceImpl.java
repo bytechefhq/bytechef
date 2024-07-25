@@ -18,6 +18,7 @@ package com.bytechef.platform.component.registry.service;
 
 import static com.bytechef.component.definition.Authorization.CODE;
 import static com.bytechef.component.definition.ConnectionDefinition.BaseUriFunction;
+import static com.bytechef.platform.component.registry.domain.Authorization.*;
 
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.JsonUtils;
@@ -236,7 +237,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationName);
 
-        return OptionalUtils.orElse(authorization.getRefreshOn(), List.of());
+        return OptionalUtils.orElse(authorization.getRefreshOn(), DEFAULT_REFRESH_ON);
     }
 
     @Override
