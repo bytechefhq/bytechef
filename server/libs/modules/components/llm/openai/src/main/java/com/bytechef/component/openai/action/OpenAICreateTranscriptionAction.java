@@ -34,13 +34,20 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
 import static com.bytechef.component.openai.constant.OpenAIConstants.PROMPT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TEMPERATURE;
-import static com.bytechef.component.openai.constant.OpenAIConstants.WHISPER_1;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import java.io.File;
+import org.springframework.ai.audio.transcription.AudioTranscriptionOptions;
+import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
+import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
+import org.springframework.ai.openai.OpenAiAudioTranscriptionModel;
+import org.springframework.ai.openai.OpenAiAudioTranscriptionOptions;
+import org.springframework.ai.openai.api.OpenAiAudioApi;
+import org.springframework.core.io.UrlResource;
+
+import java.net.MalformedURLException;
 import java.util.List;
 
 /**
@@ -61,8 +68,7 @@ public class OpenAICreateTranscriptionAction {
                 .label("Model")
                 .description("ID of the model to use.")
                 .required(true)
-                .options(option(WHISPER_1, WHISPER_1))
-                .defaultValue(WHISPER_1),
+                .options(option(OpenAiAudioApi.WhisperModel.WHISPER_1.value, OpenAiAudioApi.WhisperModel.WHISPER_1.value)),
             string(LANGUAGE)
                 .label("Language")
                 .description("The language of the input audio.")
@@ -132,17 +138,16 @@ public class OpenAICreateTranscriptionAction {
                     "An optional text to guide the model's style or continue a previous audio segment. The prompt " +
                         "should match the audio language.")
                 .required(false),
-            string(RESPONSE_FORMAT)
+            object(RESPONSE_FORMAT)
                 .label("Response format")
                 .description("The format of the transcript output")
                 .options(
-                    option("json", "json"),
-                    option("text", "text"),
-                    option("srt", "srt"),
-                    option("verbose_json", "verbose_json"),
-                    option("vtt", "vtt"))
-                .defaultValue("json")
-                .required(false),
+                    option(OpenAiAudioApi.TranscriptResponseFormat.JSON.value, OpenAiAudioApi.TranscriptResponseFormat.JSON),
+                    option(OpenAiAudioApi.TranscriptResponseFormat.TEXT.value, OpenAiAudioApi.TranscriptResponseFormat.TEXT),
+                    option(OpenAiAudioApi.TranscriptResponseFormat.SRT.value, OpenAiAudioApi.TranscriptResponseFormat.SRT),
+                    option(OpenAiAudioApi.TranscriptResponseFormat.VERBOSE_JSON.value, OpenAiAudioApi.TranscriptResponseFormat.VERBOSE_JSON),
+                    option(OpenAiAudioApi.TranscriptResponseFormat.VTT.value, OpenAiAudioApi.TranscriptResponseFormat.VTT))
+                .required(true),
             number(TEMPERATURE)
                 .label("Temperature")
                 .description(
@@ -180,23 +185,21 @@ public class OpenAICreateTranscriptionAction {
     private OpenAICreateTranscriptionAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+    public static String perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws MalformedURLException {
 
-//        OpenAiService openAiService = new OpenAiService((String) connectionParameters.get(TOKEN));
-//
-//        CreateTranscriptionRequest createTranscriptionRequest = new CreateTranscriptionRequest();
-//
-//        createTranscriptionRequest.setModel(inputParameters.getRequiredString(MODEL));
-//        createTranscriptionRequest.setLanguage(inputParameters.getString(LANGUAGE));
-//        createTranscriptionRequest.setPrompt(inputParameters.getString(PROMPT));
-//        createTranscriptionRequest.setResponseFormat(inputParameters.getString(RESPONSE_FORMAT));
-//        createTranscriptionRequest.setTemperature(inputParameters.getDouble(TEMPERATURE));
-//
-//        FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE);
-//
-//        return openAiService.createTranscription(
-//            createTranscriptionRequest, (File) context.file(file -> file.toTempFile(fileEntry)));
-        return null;
+        AudioTranscriptionOptions transcriptionOptions = OpenAiAudioTranscriptionOptions.builder()
+            .withModel(inputParameters.getRequiredString(MODEL))
+            .withPrompt(inputParameters.getString(PROMPT))
+            .withLanguage(inputParameters.getString(LANGUAGE))
+            .withResponseFormat(inputParameters.get(RESPONSE_FORMAT, OpenAiAudioApi.TranscriptResponseFormat.class))
+            .withTemperature(inputParameters.getFloat(TEMPERATURE))
+            .build();
+        OpenAiAudioTranscriptionModel transcriptionModel = new OpenAiAudioTranscriptionModel(new OpenAiAudioApi(connectionParameters.getString(TOKEN)), (OpenAiAudioTranscriptionOptions) transcriptionOptions);
+
+        FileEntry fileEntry = inputParameters.getFileEntry(FILE);
+        AudioTranscriptionPrompt audio = new AudioTranscriptionPrompt(new UrlResource(fileEntry.getUrl()));
+        AudioTranscriptionResponse response = transcriptionModel.call(audio);
+        return response.getResult().getOutput();
     }
 }
