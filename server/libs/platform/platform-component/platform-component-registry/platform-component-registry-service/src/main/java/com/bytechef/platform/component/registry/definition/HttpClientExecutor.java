@@ -33,7 +33,7 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
-import com.bytechef.platform.component.registry.facade.BaseDefinitionFacade;
+import com.bytechef.platform.component.registry.facade.OperationDefinitionFacade;
 import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.registry.util.RefreshCredentialsUtils;
@@ -91,7 +91,6 @@ public class HttpClientExecutor implements ApplicationContextAware {
     private static final Logger logger = LoggerFactory.getLogger(HttpClientExecutor.class);
 
     private ApplicationContext applicationContext;
-    private BaseDefinitionFacade definitionFacade;
     private final ConnectionDefinitionService connectionDefinitionService;
     private final FileStorageService fileStorageService;
     private final ObjectMapper objectMapper;
@@ -135,15 +134,6 @@ public class HttpClientExecutor implements ApplicationContextAware {
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
-    }
-
-    private BaseDefinitionFacade getDefinitionFacade(boolean isAction) {
-        if (!isAction)
-            definitionFacade = applicationContext.getBean(TriggerDefinitionFacade.class);
-        else
-            definitionFacade = applicationContext.getBean(ActionDefinitionFacade.class);
-
-        return definitionFacade;
     }
 
     HttpResponse.BodyHandler<?> createBodyHandler(Configuration configuration) {
@@ -347,6 +337,13 @@ public class HttpClientExecutor implements ApplicationContextAware {
         return uri;
     }
 
+    private BodyPublisher getBinaryBodyPublisher(Body body, FileEntry fileEntry) {
+        return MoreBodyPublishers.ofMediaType(
+            BodyPublishers.ofInputStream(() -> fileStorageService.getFileStream(
+                FileEntryConstants.FILES_DIR, ((FileEntryImpl) fileEntry).getFileEntry())),
+            MediaType.parse(body.getMimeType() == null ? fileEntry.getMimeType() : body.getMimeType()));
+    }
+
     private String getConnectionUrl(
         String urlString, String componentName, ComponentConnection componentConnection, Context context) {
 
@@ -358,13 +355,6 @@ public class HttpClientExecutor implements ApplicationContextAware {
             connectionDefinitionService.executeBaseUri(componentName, componentConnection, context),
             baseUri -> baseUri + urlString);
 
-    }
-
-    private BodyPublisher getBinaryBodyPublisher(Body body, FileEntry fileEntry) {
-        return MoreBodyPublishers.ofMediaType(
-            BodyPublishers.ofInputStream(() -> fileStorageService.getFileStream(
-                FileEntryConstants.FILES_DIR, ((FileEntryImpl) fileEntry).getFileEntry())),
-            MediaType.parse(body.getMimeType() == null ? fileEntry.getMimeType() : body.getMimeType()));
     }
 
     private BodyPublisher getFormDataBodyPublisher(Body body) {
@@ -410,6 +400,8 @@ public class HttpClientExecutor implements ApplicationContextAware {
 
                 HttpResponse<T> httpResponse = chain.forward(httpRequest);
 
+                OperationDefinitionFacade operationDefinitionFacade = getOperationDefinitionFacade(isAction);
+
                 if ((httpResponse.statusCode() > 199) && (httpResponse.statusCode() < 300)) {
                     List<String> detectOn = connectionDefinitionService.getAuthorizationDetectOn(
                         componentName, connectionVersion, authorizationName);
@@ -418,7 +410,7 @@ public class HttpClientExecutor implements ApplicationContextAware {
                         Object body = httpResponse.body();
 
                         if (body != null && RefreshCredentialsUtils.matches(body.toString(), detectOn)) {
-                            throw getDefinitionFacade(isAction).executeProcessErrorResponse(
+                            throw operationDefinitionFacade.executeProcessErrorResponse(
                                 componentName, componentVersion, componentOperationName, httpResponse.statusCode(),
                                 body);
                         }
@@ -429,7 +421,7 @@ public class HttpClientExecutor implements ApplicationContextAware {
 
                 Object body = httpResponse.body();
 
-                throw getDefinitionFacade(isAction).executeProcessErrorResponse(
+                throw operationDefinitionFacade.executeProcessErrorResponse(
                     componentName, componentVersion, componentOperationName, httpResponse.statusCode(), body);
             }
 
@@ -445,6 +437,18 @@ public class HttpClientExecutor implements ApplicationContextAware {
     private BodyPublisher getJsonBodyPublisher(Body body) {
         return MoreBodyPublishers.ofMediaType(
             BodyPublishers.ofString(JsonUtils.write(body.getContent())), MediaType.APPLICATION_JSON);
+    }
+
+    private OperationDefinitionFacade getOperationDefinitionFacade(boolean isAction) {
+        OperationDefinitionFacade operationDefinitionFacade;
+
+        if (isAction) {
+            operationDefinitionFacade = applicationContext.getBean(ActionDefinitionFacade.class);
+        } else {
+            operationDefinitionFacade = applicationContext.getBean(TriggerDefinitionFacade.class);
+        }
+
+        return operationDefinitionFacade;
     }
 
     private BodyPublisher getStringBodyPublisher(Body body) {
