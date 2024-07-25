@@ -41,9 +41,7 @@ public final class OpenAIConstants {
     public static final String CREATE_SPEECH = "createSpeech";
     public static final String CREATE_TRANSCRIPTION = "createTranscription";
     public static final String CREATE_TRANSLATION = "createTranslation";
-    public static final String DALL_E_3 = "dall-e-3";
-    public static final String DALL_E_2 = "dall-e-2";
-    public static final String DEFAULT_SIZE = "1024x1024";
+    public static final Integer DEFAULT_SIZE = 1024;
     public static final String DESCRIPTION = "description";
     public static final String DETAIL = "detail";
     public static final String FILE = "file";
@@ -70,7 +68,7 @@ public final class OpenAIConstants {
     public static final String RESPONSE_READ_TIMEOUT = "responseReadTimeout";
     public static final String RESPONSE_FORMAT = "responseFormat";
     public static final String ROLE = "role";
-    public static final String SIZE = "size";
+    public static final String HEIGHT = "height";
     public static final String SPEED = "speed";
     public static final String STOP = "stop";
     public static final String STYLE = "style";
@@ -81,6 +79,8 @@ public final class OpenAIConstants {
     public static final String URL = "url";
     public static final String USER = "user";
     public static final String VOICE = "voice";
+    public static final String WIDTH = "width";
+    public static final String WEIGHT = "weight";
     public static final String WHISPER_1 = "whisper-1";
 
     public static final String VISION_PROMPT = "visionPrompt";
