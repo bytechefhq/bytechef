@@ -21,6 +21,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.OutputFunction;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
+import com.bytechef.component.definition.ActionDefinition.ProcessErrorResponseFunction;
 import com.bytechef.component.definition.ActionDefinition.SingleConnectionOutputFunction;
 import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
 import com.bytechef.component.definition.ActionWorkflowNodeDescriptionFunction;
@@ -178,8 +179,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
 
         try {
-            Optional<com.bytechef.component.definition.ActionDefinition.ProcessErrorResponseFunction> processErrorResponse =
-                actionDefinition.getProcessErrorResponse();
+            Optional<ProcessErrorResponseFunction> processErrorResponse = actionDefinition.getProcessErrorResponse();
+
             if (processErrorResponse.isPresent()) {
                 return processErrorResponse.get()
                     .apply(statusCode, body, actionContext);
