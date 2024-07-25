@@ -16,26 +16,40 @@
 
 package com.bytechef.component.openai.util;
 
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDSL.option;
 
-import com.bytechef.component.definition.ComponentDSL.ModifiableValueProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableOption;
+
+import java.util.ArrayList;
+import java.util.Map;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.ToolResponseMessage;
+import org.springframework.ai.chat.messages.UserMessage;
 
 /**
  * @author Monika Domiter
  */
 public class OpenAIUtils {
 
-    public static final ModifiableValueProperty<?, ?> OUTPUT_SCHEMA_RESPONSE = object()
-        .properties(
-            string("role"),
-            string("content"),
-            string("name"),
-            object("functionCall")
-                .properties(
-                    string("name"),
-                    object("arguments")));
+    public static Message createMessage(String role, String content) {
+        return switch (role) {
+            case "system" -> new SystemMessage(content);
+            case "user" -> new UserMessage(content);
+            case "assistant" -> new AssistantMessage(content);
+            case "tool" -> new ToolResponseMessage(new ArrayList<>());
+            default -> null;
+        };
+    }
 
     private OpenAIUtils() {
+    }
+
+    public static <R> ModifiableOption[] getEnumOptions(Map<String, R> map) {
+        return map.entrySet()
+            .stream()
+            .map(enrty -> option(enrty.getKey(), enrty.getValue()))
+            .toArray(ModifiableOption[]::new);
     }
 }

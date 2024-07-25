@@ -22,7 +22,7 @@ import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.openai.constant.OpenAIConstants.ASK_CHAT_GPT;
+import static com.bytechef.component.openai.constant.OpenAIConstants.CHAT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.CONTENT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.FREQUENCY_PENALTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.FREQUENCY_PENALTY_PROPERTY;
@@ -45,17 +45,18 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.TOP_P;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.USER;
 import static com.bytechef.component.openai.constant.OpenAIConstants.USER_PROPERTY;
+import static com.bytechef.component.openai.util.OpenAIUtils.createMessage;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.openai.util.OpenAIUtils;
 import com.bytechef.component.openai.util.records.MessageRecord;
-import org.springframework.ai.chat.messages.AssistantMessage;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.ai.chat.messages.Message;
-import org.springframework.ai.chat.messages.SystemMessage;
-import org.springframework.ai.chat.messages.ToolResponseMessage;
-import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.ChatOptions;
@@ -64,17 +65,14 @@ import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author Monika Domiter
  */
-public class OpenAIAskChatGPTAction {
+public class OpenAIChatAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK_CHAT_GPT)
-        .title("Ask ChatGPT")
-        .description("Ask ChatGPT anything you want.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CHAT)
+        .title("Ask")
+        .description("Ask anything you want.")
         .properties(
             array(MESSAGES)
                 .label("Messages")
@@ -99,16 +97,10 @@ public class OpenAIAskChatGPTAction {
                 .label("Model")
                 .description("ID of the model to use.")
                 .required(true)
-                .options(
-                    option(OpenAiApi.ChatModel.GPT_3_5_TURBO_1106.value, OpenAiApi.ChatModel.GPT_3_5_TURBO_1106.value),
-                    option(OpenAiApi.ChatModel.GPT_3_5_TURBO_0125.value, OpenAiApi.ChatModel.GPT_3_5_TURBO_0125.value),
-                    option(OpenAiApi.ChatModel.GPT_3_5_TURBO.value, OpenAiApi.ChatModel.GPT_3_5_TURBO.value),
-                    option(OpenAiApi.ChatModel.GPT_4_O.value, OpenAiApi.ChatModel.GPT_4_O.value),
-                    option(OpenAiApi.ChatModel.GPT_4_O_MINI.value, OpenAiApi.ChatModel.GPT_4_O_MINI.value),
-                    option(OpenAiApi.ChatModel.GPT_4_TURBO.value, OpenAiApi.ChatModel.GPT_4_TURBO.value),
-                    option(OpenAiApi.ChatModel.GPT_4_TURBO_2204_04_09.value, OpenAiApi.ChatModel.GPT_4_TURBO_2204_04_09.value),
-                    option(OpenAiApi.ChatModel.GPT_4.value, OpenAiApi.ChatModel.GPT_4.value)
-                ),
+                .options(OpenAIUtils.getEnumOptions(
+                    Arrays.stream(OpenAiApi.ChatModel.values())
+                        .collect(Collectors.toMap(
+                            OpenAiApi.ChatModel::getValue, OpenAiApi.ChatModel::getValue)))),
             FREQUENCY_PENALTY_PROPERTY,
             LOGIT_BIAS_PROPERTY,
             MAX_TOKENS_PROPERTY,
@@ -119,9 +111,9 @@ public class OpenAIAskChatGPTAction {
             TOP_P_PROPERTY,
             USER_PROPERTY)
         .outputSchema(string())
-        .perform(OpenAIAskChatGPTAction::perform);
+        .perform(OpenAIChatAction::perform);
 
-    private OpenAIAskChatGPTAction() {
+    private OpenAIChatAction() {
     }
 
     public static String perform(
@@ -139,7 +131,8 @@ public class OpenAIAskChatGPTAction {
             .withTopP(inputParameters.getFloat(TOP_P))
             .withUser(inputParameters.getString(USER))
             .build();
-        ChatModel chatModel = new OpenAiChatModel(new OpenAiApi(connectionParameters.getString(TOKEN)), (OpenAiChatOptions) chatOptions);
+        ChatModel chatModel =
+            new OpenAiChatModel(new OpenAiApi(connectionParameters.getString(TOKEN)), (OpenAiChatOptions) chatOptions);
 
         List<MessageRecord> messageRecordList = inputParameters.getList(MESSAGES, new TypeReference<>() {});
         List<Message> messages = messageRecordList.stream()
@@ -150,15 +143,5 @@ public class OpenAIAskChatGPTAction {
         return response.getResult()
             .getOutput()
             .getContent();
-    }
-
-    private static Message createMessage(String role, String content) {
-        return switch (role){
-            case "system" -> new SystemMessage(content);
-            case "user" -> new UserMessage(content);
-            case "assistant" -> new AssistantMessage(content);
-            case "tool" -> new ToolResponseMessage(new ArrayList<>());
-            default -> null;
-        };
     }
 }

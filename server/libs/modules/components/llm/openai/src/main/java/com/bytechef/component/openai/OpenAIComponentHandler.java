@@ -22,13 +22,10 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.OPENAI;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.openai.action.OpenAIAskChatGPTAction;
-import com.bytechef.component.openai.action.OpenAICreateAssistantAction;
+import com.bytechef.component.openai.action.OpenAIChatAction;
 import com.bytechef.component.openai.action.OpenAICreateImageAction;
 import com.bytechef.component.openai.action.OpenAICreateSpeechAction;
 import com.bytechef.component.openai.action.OpenAICreateTranscriptionAction;
-import com.bytechef.component.openai.action.OpenAICreateTranslationAction;
-import com.bytechef.component.openai.action.OpenAIVisionPromptAction;
 import com.bytechef.component.openai.connection.OpenAIConnection;
 import com.google.auto.service.AutoService;
 
@@ -47,14 +44,10 @@ public class OpenAIComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(OpenAIConnection.CONNECTION_DEFINITION)
         .actions(
-            OpenAIAskChatGPTAction.ACTION_DEFINITION,
-//            OpenAICreateAssistantAction.ACTION_DEFINITION,
+            OpenAIChatAction.ACTION_DEFINITION,
             OpenAICreateImageAction.ACTION_DEFINITION,
             OpenAICreateSpeechAction.ACTION_DEFINITION,
-            OpenAICreateTranscriptionAction.ACTION_DEFINITION
-//            OpenAICreateTranslationAction.ACTION_DEFINITION,
-//            OpenAIVisionPromptAction.ACTION_DEFINITION
-            );
+            OpenAICreateTranscriptionAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

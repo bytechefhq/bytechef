@@ -43,8 +43,11 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
+import com.bytechef.component.openai.util.OpenAIUtils;
 import com.bytechef.component.openai.util.records.ImageMessageRecord;
-import org.springframework.ai.chat.messages.Message;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.ai.image.ImageMessage;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImageOptions;
@@ -54,8 +57,6 @@ import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.OpenAiImageOptions;
 import org.springframework.ai.openai.api.OpenAiImageApi;
 import org.springframework.retry.support.RetryTemplate;
-
-import java.util.List;
 
 /**
  * @author Monika Domiter
@@ -91,9 +92,10 @@ public class OpenAICreateImageAction {
                 .description("ID of the model to use.")
                 .required(true)
                 .description("The model to use for image generation.")
-                .options(
-                    option(OpenAiImageApi.ImageModel.DALL_E_2.getValue(), OpenAiImageApi.ImageModel.DALL_E_2.getValue()),
-                    option(OpenAiImageApi.ImageModel.DALL_E_3.getValue(), OpenAiImageApi.ImageModel.DALL_E_3.getValue()))
+                .options(OpenAIUtils.getEnumOptions(
+                    Arrays.stream(OpenAiImageApi.ImageModel.values())
+                        .collect(Collectors.toMap(
+                            OpenAiImageApi.ImageModel::getValue, OpenAiImageApi.ImageModel::getValue))))
                 .required(true),
             string(QUALITY)
                 .label("Quality")
@@ -163,7 +165,8 @@ public class OpenAICreateImageAction {
             .withHeight(inputParameters.getInteger(HEIGHT))
             .withWidth(inputParameters.getInteger(WIDTH))
             .build();
-        ImageModel imageModel = new OpenAiImageModel(new OpenAiImageApi(connectionParameters.getString(TOKEN)), (OpenAiImageOptions) openAiImageOptions, new RetryTemplate());
+        ImageModel imageModel = new OpenAiImageModel(new OpenAiImageApi(connectionParameters.getString(TOKEN)),
+            (OpenAiImageOptions) openAiImageOptions, new RetryTemplate());
 
         List<ImageMessageRecord> imageMessageList = inputParameters.getList(MESSAGES, new Context.TypeReference<>() {});
         List<ImageMessage> imageMessage = imageMessageList.stream()
@@ -171,6 +174,7 @@ public class OpenAICreateImageAction {
             .toList();
 
         ImageResponse response = imageModel.call(new ImagePrompt(imageMessage));
-        return response.getResult().getOutput();
+        return response.getResult()
+            .getOutput();
     }
 }
