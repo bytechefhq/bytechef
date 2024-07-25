@@ -16,30 +16,10 @@
 
 package com.bytechef.component.openai.util;
 
-import static com.bytechef.component.definition.Authorization.TOKEN;
-import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.openai.constant.OpenAIConstants.DALL_E_2;
-import static com.bytechef.component.openai.constant.OpenAIConstants.DEFAULT_SIZE;
-import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
-import static com.bytechef.component.openai.constant.OpenAIConstants.N;
-import static com.bytechef.component.openai.constant.OpenAIConstants.PROMPT;
 
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableIntegerProperty;
-import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableValueProperty;
-import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property.ValueProperty;
-import org.springframework.ai.openai.api.OpenAiApi;
-
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -57,55 +37,5 @@ public class OpenAIUtils {
                     object("arguments")));
 
     private OpenAIUtils() {
-    }
-
-    public static List<Option<String>> getSizeOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
-
-        String model = inputParameters.getRequiredString(MODEL);
-
-        List<Option<String>> options = new ArrayList<>();
-
-        if (model.equals(DALL_E_2)) {
-            options.add(option("256x256", "256x256"));
-            options.add(option("512x512", "512x512"));
-            options.add(option(DEFAULT_SIZE, DEFAULT_SIZE));
-        } else {
-            options.add(option(DEFAULT_SIZE, DEFAULT_SIZE));
-            options.add(option("1792x1024", "1792x1024"));
-            options.add(option("1024x1792", "1024x1792"));
-        }
-
-        return options;
-    }
-
-    public static List<ValueProperty<?>> getModelProperties(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        ActionContext context) {
-
-        String model = inputParameters.getRequiredString(MODEL);
-
-        ModifiableStringProperty string = string(PROMPT)
-            .label("Prompt")
-            .description("A text description of the desired image(s).")
-            .required(true);
-
-        ModifiableIntegerProperty n = integer(N)
-            .label("n")
-            .description(
-                "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported.")
-            .defaultValue(1)
-            .required(false);
-
-        if (model.equals(DALL_E_2)) {
-            string.maxLength(1000);
-            n.minValue(1)
-                .maxValue(10);
-        } else {
-            string.maxLength(4000);
-        }
-
-        return List.of(string, n);
     }
 }
