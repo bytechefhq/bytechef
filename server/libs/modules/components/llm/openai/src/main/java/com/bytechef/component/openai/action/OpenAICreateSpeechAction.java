@@ -25,39 +25,26 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.openai.constant.OpenAIConstants.CREATE_SPEECH;
-import static com.bytechef.component.openai.constant.OpenAIConstants.FILE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.INPUT;
-import static com.bytechef.component.openai.constant.OpenAIConstants.LANGUAGE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
-import static com.bytechef.component.openai.constant.OpenAIConstants.PROMPT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.SPEED;
-import static com.bytechef.component.openai.constant.OpenAIConstants.TEMPERATURE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.VOICE;
 
-import ch.qos.logback.core.rolling.helper.FileStoreUtil;
-import ch.qos.logback.core.util.FileUtil;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import org.springframework.ai.audio.transcription.AudioTranscriptionOptions;
-import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
-import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
+import com.bytechef.component.openai.util.OpenAIUtils;
+import java.io.ByteArrayInputStream;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import org.springframework.ai.openai.OpenAiAudioSpeechModel;
 import org.springframework.ai.openai.OpenAiAudioSpeechOptions;
-import org.springframework.ai.openai.OpenAiAudioTranscriptionModel;
-import org.springframework.ai.openai.OpenAiAudioTranscriptionOptions;
 import org.springframework.ai.openai.api.OpenAiAudioApi;
 import org.springframework.ai.openai.audio.speech.SpeechModel;
 import org.springframework.ai.openai.audio.speech.SpeechPrompt;
 import org.springframework.ai.openai.audio.speech.SpeechResponse;
-import org.springframework.core.io.UrlResource;
-import org.springframework.util.FileSystemUtils;
-
-import java.io.ByteArrayInputStream;
-import java.io.FileOutputStream;
-import java.util.Arrays;
 
 /**
  * @author Monika Domiter
@@ -65,7 +52,7 @@ import java.util.Arrays;
 public class OpenAICreateSpeechAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_SPEECH)
-        .title("Create speech")
+        .title("Text-To-Speech")
         .description("Generate an audio recording from the input text")
         .properties(
             string(MODEL)
@@ -74,8 +61,10 @@ public class OpenAICreateSpeechAction {
                 .required(true)
                 .description("Text-to-Speech model which will generate the audio.")
                 .options(
-                    option(OpenAiAudioApi.TtsModel.TTS_1.value, OpenAiAudioApi.TtsModel.TTS_1.value, "Model optimized for speed."),
-                    option(OpenAiAudioApi.TtsModel.TTS_1_HD.value, OpenAiAudioApi.TtsModel.TTS_1_HD.value, "Model optimized for quality.")),
+                    option(OpenAiAudioApi.TtsModel.TTS_1.value, OpenAiAudioApi.TtsModel.TTS_1.value,
+                        "Model optimized for speed."),
+                    option(OpenAiAudioApi.TtsModel.TTS_1_HD.value, OpenAiAudioApi.TtsModel.TTS_1_HD.value,
+                        "Model optimized for quality.")),
             string(INPUT)
                 .label("Input")
                 .description("The text to generate audio for.")
@@ -84,22 +73,18 @@ public class OpenAICreateSpeechAction {
             object(VOICE)
                 .label("Voice")
                 .description("The voice to use when generating the audio.")
-                .options(
-                    option(OpenAiAudioApi.SpeechRequest.Voice.ALLOY.value, OpenAiAudioApi.SpeechRequest.Voice.ALLOY),
-                    option(OpenAiAudioApi.SpeechRequest.Voice.ECHO.value, OpenAiAudioApi.SpeechRequest.Voice.ECHO),
-                    option(OpenAiAudioApi.SpeechRequest.Voice.FABLE.value, OpenAiAudioApi.SpeechRequest.Voice.FABLE),
-                    option(OpenAiAudioApi.SpeechRequest.Voice.ONYX.value, OpenAiAudioApi.SpeechRequest.Voice.ONYX),
-                    option(OpenAiAudioApi.SpeechRequest.Voice.NOVA.value, OpenAiAudioApi.SpeechRequest.Voice.NOVA),
-                    option(OpenAiAudioApi.SpeechRequest.Voice.SHIMMER.value, OpenAiAudioApi.SpeechRequest.Voice.SHIMMER))
+                .options(OpenAIUtils.getEnumOptions(
+                    Arrays.stream(OpenAiAudioApi.SpeechRequest.Voice.values())
+                        .collect(Collectors.toMap(
+                            OpenAiAudioApi.SpeechRequest.Voice::getValue, clas -> clas))))
                 .required(true),
             object(RESPONSE_FORMAT)
                 .label("Response format")
                 .description("The format to audio in.")
-                .options(
-                    option(OpenAiAudioApi.SpeechRequest.AudioResponseFormat.MP3.value, OpenAiAudioApi.SpeechRequest.AudioResponseFormat.MP3),
-                    option(OpenAiAudioApi.SpeechRequest.AudioResponseFormat.OPUS.value, OpenAiAudioApi.SpeechRequest.AudioResponseFormat.OPUS),
-                    option(OpenAiAudioApi.SpeechRequest.AudioResponseFormat.AAC.value, OpenAiAudioApi.SpeechRequest.AudioResponseFormat.AAC),
-                    option(OpenAiAudioApi.SpeechRequest.AudioResponseFormat.FLAC.value, OpenAiAudioApi.SpeechRequest.AudioResponseFormat.FLAC))
+                .options(OpenAIUtils.getEnumOptions(
+                    Arrays.stream(OpenAiAudioApi.SpeechRequest.AudioResponseFormat.values())
+                        .collect(Collectors.toMap(
+                            OpenAiAudioApi.SpeechRequest.AudioResponseFormat::getValue, clas -> clas))))
                 .required(false),
             number(SPEED)
                 .label("Speed")
@@ -118,7 +103,8 @@ public class OpenAICreateSpeechAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         String input = inputParameters.getRequiredString(INPUT);
-        OpenAiAudioApi.SpeechRequest.AudioResponseFormat audioResponseFormat = inputParameters.get(RESPONSE_FORMAT, OpenAiAudioApi.SpeechRequest.AudioResponseFormat.class);
+        OpenAiAudioApi.SpeechRequest.AudioResponseFormat audioResponseFormat =
+            inputParameters.get(RESPONSE_FORMAT, OpenAiAudioApi.SpeechRequest.AudioResponseFormat.class);
 
         OpenAiAudioSpeechOptions speechOptions = OpenAiAudioSpeechOptions.builder()
             .withModel(inputParameters.getRequiredString(MODEL))
@@ -127,10 +113,13 @@ public class OpenAICreateSpeechAction {
             .withResponseFormat(audioResponseFormat)
             .withSpeed(inputParameters.getFloat(SPEED))
             .build();
-        SpeechModel speechModel = new OpenAiAudioSpeechModel(new OpenAiAudioApi(connectionParameters.getString(TOKEN)),  speechOptions);
+        SpeechModel speechModel =
+            new OpenAiAudioSpeechModel(new OpenAiAudioApi(connectionParameters.getString(TOKEN)), speechOptions);
 
         SpeechResponse response = speechModel.call(new SpeechPrompt(input));
-        byte[] output = response.getResult().getOutput();
-        return context.file(file -> file.storeContent("file." + audioResponseFormat.value, new ByteArrayInputStream(output)));
+        byte[] output = response.getResult()
+            .getOutput();
+        return context
+            .file(file -> file.storeContent("file." + audioResponseFormat.value, new ByteArrayInputStream(output)));
     }
 }
