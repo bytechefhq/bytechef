@@ -298,7 +298,7 @@ public interface Authorization {
      * <b>OAUTH2_AUTHORIZATION_CODE</b> {@link AuthorizationType}s, or the {@link AcquireFunction} function for
      * <b>CUSTOM</b> {@link AuthorizationType}.
      *
-     * Regex expression samples: 401, "Unauthorized", "^.*Unathorized.*$",
+     * Regex expression samples: 401, "Unauthorized", "^.*Unauthorized.*$",
      *
      * @return the list of integers which are matched to HTTP response codes or Regex expressions which are matched on
      *         the response body
