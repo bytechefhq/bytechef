@@ -2,7 +2,7 @@
 awssdk = "2.26.16"
 checkstyle = "10.17.0"
 com-google-auto-service = "1.1.1"
-graalvm = "23.1.2"
+graalvm = "24.0.2"
 gradle-git-properties = "2.4.1"
 jacoco = "0.8.11"
 java = "21"
