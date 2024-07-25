@@ -29,7 +29,7 @@ import org.springframework.lang.NonNull;
 /**
  * @author Ivica Cardic
  */
-public interface ActionDefinitionFacade extends BaseDefinitionFacade {
+public interface ActionDefinitionFacade extends OperationDefinitionFacade {
 
     List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,

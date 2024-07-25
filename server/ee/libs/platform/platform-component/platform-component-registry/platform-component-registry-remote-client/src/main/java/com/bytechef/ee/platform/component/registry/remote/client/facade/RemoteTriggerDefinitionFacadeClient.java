@@ -192,7 +192,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
 
     @Override
     public ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, String actionName, int statusCode, Object body) {
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, int statusCode, Object body) {
         throw new UnsupportedOperationException();
     }
 

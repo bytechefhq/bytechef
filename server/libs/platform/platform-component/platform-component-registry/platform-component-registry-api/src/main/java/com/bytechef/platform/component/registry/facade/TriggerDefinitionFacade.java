@@ -31,7 +31,7 @@ import org.springframework.lang.NonNull;
 /**
  * @author Ivica Cardic
  */
-public interface TriggerDefinitionFacade extends BaseDefinitionFacade {
+public interface TriggerDefinitionFacade extends OperationDefinitionFacade {
 
     List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
