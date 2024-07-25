@@ -21,6 +21,7 @@ import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.component.definition.ComponentDSL.ModifiableValueProperty;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.OutputResponse;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.registry.util.SchemaUtils;
@@ -236,6 +237,10 @@ public class ContextImpl implements Context {
                         url, headers, queryParameters, body, configuration, requestMethod, componentName,
                         componentVersion, componentOperationName, connection, context);
                 } catch (Exception e) {
+                    if (e instanceof ProviderException pe) {
+                        throw pe;
+                    }
+
                     throw new RuntimeException("Unable to execute HTTP request", e);
                 }
             }
