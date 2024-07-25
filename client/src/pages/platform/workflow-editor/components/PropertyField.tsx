@@ -46,13 +46,13 @@ const PropertyField = ({
 
             {label === '[index]' && <span title={property.type}>{TYPE_ICONS.INTEGER}</span>}
 
-            <span className="px-2">{label}</span>
+            <span className="pl-2">{label}</span>
 
             <div className="flex truncate">
                 {sampleValue === null && <span className="flex-1 truncate text-xs text-muted-foreground">null</span>}
 
                 {(sampleValue || sampleValue === 0 || sampleValue === false) && typeof sampleValue !== 'object' && (
-                    <span className="flex-1 truncate text-xs text-muted-foreground">
+                    <span className="flex-1 truncate pl-2 text-xs text-muted-foreground">
                         {sampleValue === true ? 'true' : sampleValue === false ? 'false' : sampleValue}
                     </span>
                 )}
