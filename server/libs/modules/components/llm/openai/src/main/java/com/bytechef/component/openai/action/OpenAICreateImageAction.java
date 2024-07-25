@@ -19,31 +19,44 @@ package com.bytechef.component.openai.action;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.openai.constant.OpenAIConstants.CONTENT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.CREATE_IMAGE;
-import static com.bytechef.component.openai.constant.OpenAIConstants.DALL_E_2;
-import static com.bytechef.component.openai.constant.OpenAIConstants.DALL_E_3;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DEFAULT_SIZE;
+import static com.bytechef.component.openai.constant.OpenAIConstants.HEIGHT;
+import static com.bytechef.component.openai.constant.OpenAIConstants.MESSAGES;
 import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
 import static com.bytechef.component.openai.constant.OpenAIConstants.N;
-import static com.bytechef.component.openai.constant.OpenAIConstants.PROMPT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.QUALITY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.RESPONSE_FORMAT;
-import static com.bytechef.component.openai.constant.OpenAIConstants.SIZE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.STYLE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.USER;
+import static com.bytechef.component.openai.constant.OpenAIConstants.WEIGHT;
+import static com.bytechef.component.openai.constant.OpenAIConstants.WIDTH;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
-import com.bytechef.component.openai.util.OpenAIUtils;
+import com.bytechef.component.openai.util.records.ImageMessageRecord;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.image.ImageMessage;
+import org.springframework.ai.image.ImageModel;
+import org.springframework.ai.image.ImageOptions;
+import org.springframework.ai.image.ImagePrompt;
+import org.springframework.ai.image.ImageResponse;
+import org.springframework.ai.openai.OpenAiImageModel;
+import org.springframework.ai.openai.OpenAiImageOptions;
+import org.springframework.ai.openai.api.OpenAiImageApi;
+import org.springframework.retry.support.RetryTemplate;
+
+import java.util.List;
 
 /**
  * @author Monika Domiter
@@ -54,19 +67,34 @@ public class OpenAICreateImageAction {
         .title("Create image")
         .description("Create an image using text-to-image models")
         .properties(
-            dynamicProperties(PROMPT)
-                .propertiesLookupDependsOn(MODEL)
-                .properties(OpenAIUtils::getModelProperties)
+            array(MESSAGES)
+                .label("Messages")
+                .description("A list of messages comprising the conversation so far.")
+                .items(
+                    object().properties(
+                        string(CONTENT)
+                            .label("Content")
+                            .description("The contents of the message.")
+                            .required(true),
+                        number(WEIGHT)
+                            .label("Weight")
+                            .description("Weight of the prompt")
+                            .required(false)))
                 .required(true),
+            integer(N)
+                .label("n")
+                .description(
+                    "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported.")
+                .defaultValue(1)
+                .required(false),
             string(MODEL)
                 .label("Model")
                 .description("ID of the model to use.")
                 .required(true)
                 .description("The model to use for image generation.")
                 .options(
-                    option(DALL_E_3, DALL_E_3),
-                    option(DALL_E_2, DALL_E_2))
-                .defaultValue(DALL_E_2)
+                    option(OpenAiImageApi.ImageModel.DALL_E_2.getValue(), OpenAiImageApi.ImageModel.DALL_E_2.getValue()),
+                    option(OpenAiImageApi.ImageModel.DALL_E_3.getValue(), OpenAiImageApi.ImageModel.DALL_E_3.getValue()))
                 .required(true),
             string(QUALITY)
                 .label("Quality")
@@ -83,19 +111,22 @@ public class OpenAICreateImageAction {
                     option("b64_json", "b64_json"))
                 .defaultValue("url")
                 .required(false),
-            string(SIZE)
-                .label("Size")
-                .description("The size of the generated images.")
-                .options((ActionOptionsFunction<String>) OpenAIUtils::getSizeOptions)
+            integer(HEIGHT)
+                .label("Height")
+                .description("The height of the generated images.")
                 .defaultValue(DEFAULT_SIZE)
-                .required(false),
+                .required(true),
+            integer(WIDTH)
+                .label("Width")
+                .description("The width of the generated images.")
+                .defaultValue(DEFAULT_SIZE)
+                .required(true),
             string(STYLE)
                 .label("Style")
                 .description("The style of the generated images.")
                 .options(
                     option("vivid", "vivid"),
                     option("natural", "natural"))
-                .displayCondition("%s == '%s'".formatted(MODEL, DALL_E_3))
                 .required(false),
             string(USER)
                 .label("User")
@@ -124,22 +155,24 @@ public class OpenAICreateImageAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-//        String token = (String) connectionParameters.get(TOKEN);
-//
-//        OpenAiService openAiService = new OpenAiService(token);
-//
-//        CreateImageRequest createImageRequest = new CreateImageRequest();
-//
-//        createImageRequest.setPrompt(inputParameters.getRequiredString(PROMPT));
-//        createImageRequest.setModel(inputParameters.getRequiredString(MODEL));
-//        createImageRequest.setN(inputParameters.getInteger(N));
-//        createImageRequest.setQuality(inputParameters.getString(QUALITY));
-//        createImageRequest.setResponseFormat(inputParameters.getString(RESPONSE_FORMAT));
-//        createImageRequest.setSize(inputParameters.getString(SIZE));
-//        createImageRequest.setStyle(inputParameters.getString(STYLE));
-//        createImageRequest.setUser(inputParameters.getString(USER));
-//
-//        return openAiService.createImage(createImageRequest);
-        return null;
+        ImageOptions openAiImageOptions = OpenAiImageOptions.builder()
+            .withModel(inputParameters.getRequiredString(MODEL))
+            .withN(inputParameters.getInteger(N))
+            .withQuality(inputParameters.getString(QUALITY))
+            .withResponseFormat(inputParameters.getString(RESPONSE_FORMAT))
+            .withStyle(inputParameters.getString(STYLE))
+            .withUser(inputParameters.getString(USER))
+            .withHeight(inputParameters.getInteger(HEIGHT))
+            .withWidth(inputParameters.getInteger(WIDTH))
+            .build();
+        ImageModel imageModel = new OpenAiImageModel(new OpenAiImageApi(connectionParameters.getString(TOKEN)), (OpenAiImageOptions) openAiImageOptions, new RetryTemplate());
+
+        List<ImageMessageRecord> imageMessageList = inputParameters.getList(MESSAGES, new Context.TypeReference<>() {});
+        List<ImageMessage> imageMessage = imageMessageList.stream()
+            .map(messageRecord -> new ImageMessage(messageRecord.getContent(), messageRecord.getWeight()))
+            .toList();
+
+        ImageResponse response = imageModel.call(new ImagePrompt(imageMessage));
+        return response.getResult().getOutput();
     }
 }
