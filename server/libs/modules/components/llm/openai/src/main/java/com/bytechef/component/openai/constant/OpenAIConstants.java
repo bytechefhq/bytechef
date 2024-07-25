@@ -34,21 +34,16 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
  */
 public final class OpenAIConstants {
 
-    public static final String ASK_CHAT_GPT = "askChatGPT";
+    public static final String CHAT = "askChatGPT";
     public static final String CONTENT = "content";
-    public static final String CREATE_ASSISTANT = "createAssistant";
     public static final String CREATE_IMAGE = "createImage";
     public static final String CREATE_SPEECH = "createSpeech";
     public static final String CREATE_TRANSCRIPTION = "createTranscription";
-    public static final String CREATE_TRANSLATION = "createTranslation";
     public static final Integer DEFAULT_SIZE = 1024;
     public static final String DESCRIPTION = "description";
-    public static final String DETAIL = "detail";
     public static final String FILE = "file";
     public static final String FILE_IDS = "fileIds";
     public static final String FREQUENCY_PENALTY = "frequencyPenalty";
-    public static final String FUNCTION = "function";
-    public static final String IMAGE_URL = "imageUrl";
     public static final String INSTRUCTIONS = "instructions";
     public static final String INPUT = "input";
     public static final String LANGUAGE = "language";
@@ -61,7 +56,6 @@ public final class OpenAIConstants {
     public static final String N = "n";
     public static final String NAME = "name";
     public static final String OPENAI = "openai";
-    public static final String PARAMETERS = "parameters";
     public static final String PRESENCE_PENALTY = "presencePenalty";
     public static final String PROMPT = "prompt";
     public static final String QUALITY = "quality";
@@ -75,13 +69,10 @@ public final class OpenAIConstants {
     public static final String TEMPERATURE = "temperature";
     public static final String TOOLS = "tools";
     public static final String TOP_P = "topP";
-    public static final String TYPE = "type";
-    public static final String URL = "url";
     public static final String USER = "user";
     public static final String VOICE = "voice";
     public static final String WIDTH = "width";
     public static final String WEIGHT = "weight";
-    public static final String VISION_PROMPT = "visionPrompt";
 
     public static final ModifiableNumberProperty FREQUENCY_PENALTY_PROPERTY = number(FREQUENCY_PENALTY)
         .label("Frequency penalty")
