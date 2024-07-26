@@ -17,7 +17,7 @@
 package com.bytechef.component.pipedrive.util;
 
 import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.pipedrive.constant.PipedriveConstants.BASE_URL;
+import static com.bytechef.component.pipedrive.constant.PipedriveConstants.ID;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
@@ -35,6 +35,44 @@ import java.util.Map;
 public class PipedriveUtils {
 
     private PipedriveUtils() {
+    }
+
+    public static ActionOptionsFunction<String> getOptions(String path, String dependsOn) {
+        return (inputParameters, connectionParameters, arrayIndex, searchText, context) -> {
+            Map<String, ?> response = context
+                .http(http -> http.get(path))
+                .queryParameters(
+                    dependsOn == null
+                        ? Map.of()
+                        : Map.of(dependsOn, List.of(inputParameters.getString(dependsOn, ""))))
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+
+            context.logger(logger -> logger.debug("Response for path='%s': %s".formatted(path, response)));
+
+            List<Option<String>> options = new ArrayList<>();
+
+            if (response.get("data") instanceof List<?> list) {
+                for (Object o : list) {
+                    if (o instanceof Map<?, ?> map) {
+                        String id = map.get(ID)
+                            .toString();
+                        String name = (String) map.get("name");
+
+                        if (path.equals("/deals")) {
+                            options.add(option((String) map.get("title"), id));
+                        } else if (path.equals("/currencies")) {
+                            options.add(option(name, (String) map.get("symbol")));
+                        } else {
+                            options.add(option(name, id));
+                        }
+                    }
+                }
+            }
+
+            return options;
+        };
     }
 
     public static String subscribeWebhook(
@@ -60,43 +98,5 @@ public class PipedriveUtils {
             .http(http -> http.delete("/api/v1/webhooks/%s".formatted(webhookId)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
-    }
-
-    public static ActionOptionsFunction<String> getOptions(String path, String dependsOn) {
-        return (inputParameters, connectionParameters, arrayIndex, searchText, context) -> {
-            Map<String, ?> response = context
-                .http(http -> http.get(path))
-                .queryParameters(
-                    dependsOn == null
-                        ? Map.of()
-                        : Map.of(dependsOn, List.of(inputParameters.getString(dependsOn, ""))))
-                .configuration(Http.responseType(Http.ResponseType.JSON))
-                .execute()
-                .getBody(new TypeReference<>() {});
-
-            context.logger(logger -> logger.debug("Response for path='%s': %s".formatted(path, response)));
-
-            List<Option<String>> options = new ArrayList<>();
-
-            if (response.get("data") instanceof List<?> list) {
-                for (Object o : list) {
-                    if (o instanceof Map<?, ?> map) {
-                        String id = map.get("id")
-                            .toString();
-                        String name = (String) map.get("name");
-
-                        if (path.equals("/deals")) {
-                            options.add(option((String) map.get("title"), id));
-                        } else if (path.equals("/currencies")) {
-                            options.add(option(name, (String) map.get("symbol")));
-                        } else {
-                            options.add(option(name, id));
-                        }
-                    }
-                }
-            }
-
-            return options;
-        };
     }
 }
