@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.openai.util.records;
+package util.records;
 
 public class MessageRecord {
     private String content;

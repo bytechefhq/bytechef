@@ -35,7 +35,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.openai.util.OpenAIUtils;
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -45,6 +44,7 @@ import org.springframework.ai.openai.api.OpenAiAudioApi;
 import org.springframework.ai.openai.audio.speech.SpeechModel;
 import org.springframework.ai.openai.audio.speech.SpeechPrompt;
 import org.springframework.ai.openai.audio.speech.SpeechResponse;
+import util.LLMUtils;
 
 /**
  * @author Monika Domiter
@@ -60,11 +60,10 @@ public class OpenAICreateSpeechAction {
                 .description("ID of the model to use.")
                 .required(true)
                 .description("Text-to-Speech model which will generate the audio.")
-                .options(
-                    option(OpenAiAudioApi.TtsModel.TTS_1.value, OpenAiAudioApi.TtsModel.TTS_1.value,
-                        "Model optimized for speed."),
-                    option(OpenAiAudioApi.TtsModel.TTS_1_HD.value, OpenAiAudioApi.TtsModel.TTS_1_HD.value,
-                        "Model optimized for quality.")),
+                .options(LLMUtils.getEnumOptions(
+                    Arrays.stream(OpenAiAudioApi.TtsModel.values())
+                        .collect(Collectors.toMap(
+                            OpenAiAudioApi.TtsModel::getValue, OpenAiAudioApi.TtsModel::getValue)))),
             string(INPUT)
                 .label("Input")
                 .description("The text to generate audio for.")
@@ -73,7 +72,7 @@ public class OpenAICreateSpeechAction {
             object(VOICE)
                 .label("Voice")
                 .description("The voice to use when generating the audio.")
-                .options(OpenAIUtils.getEnumOptions(
+                .options(LLMUtils.getEnumOptions(
                     Arrays.stream(OpenAiAudioApi.SpeechRequest.Voice.values())
                         .collect(Collectors.toMap(
                             OpenAiAudioApi.SpeechRequest.Voice::getValue, clas -> clas))))
@@ -81,7 +80,7 @@ public class OpenAICreateSpeechAction {
             object(RESPONSE_FORMAT)
                 .label("Response format")
                 .description("The format to audio in.")
-                .options(OpenAIUtils.getEnumOptions(
+                .options(LLMUtils.getEnumOptions(
                     Arrays.stream(OpenAiAudioApi.SpeechRequest.AudioResponseFormat.values())
                         .collect(Collectors.toMap(
                             OpenAiAudioApi.SpeechRequest.AudioResponseFormat::getValue, clas -> clas))))
