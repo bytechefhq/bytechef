@@ -18,7 +18,6 @@ package com.bytechef.component.pipedrive.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
@@ -41,22 +40,19 @@ public class PipedriveDeleteOrganizationAction {
                 "path", "/organizations/{id}"
 
             ))
-        .properties(integer("id").label("Id")
-            .description("The ID of the organization")
+        .properties(integer("id").label("Organization")
+            .description("Organization to delete")
             .required(true)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))
-        .outputSchema(object().properties(bool("success").description("If the request was successful or not")
-            .required(false),
-            object("data").properties(integer("id").description("The ID of the organization that was deleted")
+        .outputSchema(object()
+            .properties(object("body").properties(object("data").properties(integer("id").required(false))
                 .required(false))
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON)))
-        .sampleOutput(Map.<String, Object>ofEntries(Map.entry("success", true),
-            Map.entry("data", Map.<String, Object>ofEntries(Map.entry("id", 123)))));
+                    "responseType", ResponseType.JSON)));
 
     private PipedriveDeleteOrganizationAction() {
     }

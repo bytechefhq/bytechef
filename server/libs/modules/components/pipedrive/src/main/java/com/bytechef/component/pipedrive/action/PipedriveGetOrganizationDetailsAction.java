@@ -18,6 +18,7 @@ package com.bytechef.component.pipedrive.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
@@ -30,30 +31,37 @@ import java.util.Map;
  *
  * @generated
  */
-public class PipedriveDeleteLeadAction {
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("deleteLead")
-        .title("Delete lead")
-        .description("Deletes a specific lead.")
+public class PipedriveGetOrganizationDetailsAction {
+    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("getOrganizationDetails")
+        .title("Get details of an organization")
+        .description("Returns the details of an organization.")
         .metadata(
             Map.of(
-                "method", "DELETE",
-                "path", "/leads/{id}"
+                "method", "GET",
+                "path", "/organizations/{id}"
 
             ))
-        .properties(string("id").label("Lead")
-            .description("The ID of the lead")
+        .properties(integer("id").label("Organizaton")
+            .description("Organization to get details.")
             .required(true)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))
         .outputSchema(object()
-            .properties(object("body").properties(object("data").properties(string("id").required(false))
-                .required(false))
+            .properties(object("body")
+                .properties(object("data")
+                    .properties(integer("id").required(false), integer("company_id").required(false),
+                        object("owner_id")
+                            .properties(integer("id").required(false), string("name").required(false),
+                                string("email").required(false))
+                            .required(false),
+                        string("name").required(false))
+                    .required(false))
                 .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
 
-    private PipedriveDeleteLeadAction() {
+    private PipedriveGetOrganizationDetailsAction() {
     }
 }

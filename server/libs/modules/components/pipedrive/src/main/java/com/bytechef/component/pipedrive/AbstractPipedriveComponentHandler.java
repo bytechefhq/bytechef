@@ -28,13 +28,13 @@ import com.bytechef.component.pipedrive.action.PipedriveDeleteDealAction;
 import com.bytechef.component.pipedrive.action.PipedriveDeleteLeadAction;
 import com.bytechef.component.pipedrive.action.PipedriveDeleteOrganizationAction;
 import com.bytechef.component.pipedrive.action.PipedriveDeletePersonAction;
-import com.bytechef.component.pipedrive.action.PipedriveGetDealAction;
+import com.bytechef.component.pipedrive.action.PipedriveGetDealDetailsAction;
 import com.bytechef.component.pipedrive.action.PipedriveGetDealsAction;
-import com.bytechef.component.pipedrive.action.PipedriveGetLeadAction;
+import com.bytechef.component.pipedrive.action.PipedriveGetLeadDetailsAction;
 import com.bytechef.component.pipedrive.action.PipedriveGetLeadsAction;
-import com.bytechef.component.pipedrive.action.PipedriveGetOrganizationAction;
+import com.bytechef.component.pipedrive.action.PipedriveGetOrganizationDetailsAction;
 import com.bytechef.component.pipedrive.action.PipedriveGetOrganizationsAction;
-import com.bytechef.component.pipedrive.action.PipedriveGetPersonAction;
+import com.bytechef.component.pipedrive.action.PipedriveGetPersonDetailsAction;
 import com.bytechef.component.pipedrive.action.PipedriveGetPersonsAction;
 import com.bytechef.component.pipedrive.action.PipedriveSearchDealsAction;
 import com.bytechef.component.pipedrive.action.PipedriveSearchLeadsAction;
@@ -54,16 +54,17 @@ public abstract class AbstractPipedriveComponentHandler implements OpenApiCompon
             .description(null))
                 .actions(modifyActions(PipedriveGetDealsAction.ACTION_DEFINITION,
                     PipedriveAddDealAction.ACTION_DEFINITION, PipedriveSearchDealsAction.ACTION_DEFINITION,
-                    PipedriveDeleteDealAction.ACTION_DEFINITION, PipedriveGetDealAction.ACTION_DEFINITION,
+                    PipedriveDeleteDealAction.ACTION_DEFINITION, PipedriveGetDealDetailsAction.ACTION_DEFINITION,
                     PipedriveGetLeadsAction.ACTION_DEFINITION, PipedriveAddLeadAction.ACTION_DEFINITION,
-                    PipedriveDeleteLeadAction.ACTION_DEFINITION, PipedriveGetLeadAction.ACTION_DEFINITION,
+                    PipedriveDeleteLeadAction.ACTION_DEFINITION, PipedriveGetLeadDetailsAction.ACTION_DEFINITION,
                     PipedriveSearchLeadsAction.ACTION_DEFINITION, PipedriveGetOrganizationsAction.ACTION_DEFINITION,
                     PipedriveAddOrganizationAction.ACTION_DEFINITION,
                     PipedriveSearchOrganizationAction.ACTION_DEFINITION,
                     PipedriveDeleteOrganizationAction.ACTION_DEFINITION,
-                    PipedriveGetOrganizationAction.ACTION_DEFINITION, PipedriveGetPersonsAction.ACTION_DEFINITION,
-                    PipedriveAddPersonAction.ACTION_DEFINITION, PipedriveSearchPersonsAction.ACTION_DEFINITION,
-                    PipedriveDeletePersonAction.ACTION_DEFINITION, PipedriveGetPersonAction.ACTION_DEFINITION))
+                    PipedriveGetOrganizationDetailsAction.ACTION_DEFINITION,
+                    PipedriveGetPersonsAction.ACTION_DEFINITION, PipedriveAddPersonAction.ACTION_DEFINITION,
+                    PipedriveSearchPersonsAction.ACTION_DEFINITION, PipedriveDeletePersonAction.ACTION_DEFINITION,
+                    PipedriveGetPersonDetailsAction.ACTION_DEFINITION))
                 .connection(modifyConnection(PipedriveConnection.CONNECTION_DEFINITION))
                 .triggers(getTriggers());
 

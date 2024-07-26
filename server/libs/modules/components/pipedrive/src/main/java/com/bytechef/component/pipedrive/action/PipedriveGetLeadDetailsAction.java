@@ -18,13 +18,10 @@ package com.bytechef.component.pipedrive.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.date;
 import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDSL;
@@ -35,48 +32,21 @@ import java.util.Map;
  *
  * @generated
  */
-public class PipedriveAddLeadAction {
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("addLead")
-        .title("Add lead")
-        .description("Creates a lead. A lead always has to be linked to a person or an organization or both.")
+public class PipedriveGetLeadDetailsAction {
+    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("getLeadDetails")
+        .title("Get lead details")
+        .description("Returns details of a specific lead. ")
         .metadata(
             Map.of(
-                "method", "POST",
-                "path", "/leads", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
+                "method", "GET",
+                "path", "/leads/{id}"
 
             ))
-        .properties(object("__item").properties(string("title").label("Title")
-            .description("The name of the lead.")
-            .required(true),
-            integer("owner_id").label("Owner")
-                .description("User which will be the owner of the created lead.")
-                .required(false),
-            array("label_ids").items(string().description("Lead labels which will be associated with the lead."))
-                .placeholder("Add to Label Ids")
-                .label("Lead   Labels")
-                .description("Lead labels which will be associated with the lead.")
-                .required(false),
-            integer("person_id").label("Person")
-                .description("Person which this lead will be linked to.")
-                .required(false),
-            integer("organization_id").label("Organization")
-                .description("Organization which this lead will be linked to.")
-                .required(false),
-            object("value").properties(number("amount").label("Amount")
-                .required(true),
-                string("currency").label("Currency")
-                    .required(true))
-                .label("Value")
-                .description("The potential value of the lead")
-                .required(false),
-            date("expected_close_date").label("Expected Close Date")
-                .description(
-                    "The date of when the deal which will be created from the lead is expected to be closed. In ISO 8601 format: YYYY-MM-DD.")
-                .required(false))
-            .label("Lead")
+        .properties(string("id").label("Lead")
+            .required(true)
             .metadata(
                 Map.of(
-                    "type", PropertyType.BODY)))
+                    "type", PropertyType.PATH)))
         .outputSchema(
             object()
                 .properties(
@@ -96,6 +66,6 @@ public class PipedriveAddLeadAction {
                     Map.of(
                         "responseType", ResponseType.JSON)));
 
-    private PipedriveAddLeadAction() {
+    private PipedriveGetLeadDetailsAction() {
     }
 }

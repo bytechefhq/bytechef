@@ -22,9 +22,7 @@ import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDSL;
@@ -35,59 +33,23 @@ import java.util.Map;
  *
  * @generated
  */
-public class PipedriveAddPersonAction {
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("addPerson")
-        .title("Add person")
-        .description("Adds a new person.")
+public class PipedriveGetPersonDetailsAction {
+    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("getPersonDetails")
+        .title("Get details of a person")
+        .description(
+            "Returns the details of a person. This also returns some additional fields which are not present when asking for all persons.")
         .metadata(
             Map.of(
-                "method", "POST",
-                "path", "/persons", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
+                "method", "GET",
+                "path", "/persons/{id}"
 
             ))
-        .properties(object("__item").properties(string("name").label("Name")
-            .description("Person full name")
-            .required(true),
-            integer("owner_id").label("Owner")
-                .description("User who will be marked as the owner of this person.")
-                .required(false),
-            integer("org_id").label("Organization")
-                .description("Organization this person will belong to.")
-                .required(false),
-            array("email").items(object().properties(string("value").label("Email   Address")
-                .required(true),
-                bool("primary").label("Primary")
-                    .description("If email is primary for the person or not.")
-                    .required(false),
-                string("label").label("Type")
-                    .description("Type of the email")
-                    .options(option("Work", "work"), option("Home", "home"), option("Other", "other"))
-                    .required(false))
-                .description("An email addresses related to the person."))
-                .placeholder("Add to Email")
-                .label("Email")
-                .description("An email addresses related to the person.")
-                .required(false),
-            array("phone").items(object().properties(string("value").label("Phone   Number")
-                .description("The phone number")
-                .required(true),
-                bool("primary").label("Primary")
-                    .description("If phone number is primary for the person or not.")
-                    .required(false),
-                string("label").label("Type")
-                    .description("Type of the phone number.")
-                    .options(option("Work", "work"), option("Home", "home"), option("Mobile", "mobile"),
-                        option("Other", "other"))
-                    .required(false))
-                .description("A phone numbers related to the person."))
-                .placeholder("Add to Phone")
-                .label("Phone")
-                .description("A phone numbers related to the person.")
-                .required(false))
-            .label("Person")
+        .properties(integer("id").label("Person")
+            .description("Person to get details")
+            .required(true)
             .metadata(
                 Map.of(
-                    "type", PropertyType.BODY)))
+                    "type", PropertyType.PATH)))
         .outputSchema(object()
             .properties(object("body")
                 .properties(object("data")
@@ -115,6 +77,6 @@ public class PipedriveAddPersonAction {
                 Map.of(
                     "responseType", ResponseType.JSON)));
 
-    private PipedriveAddPersonAction() {
+    private PipedriveGetPersonDetailsAction() {
     }
 }

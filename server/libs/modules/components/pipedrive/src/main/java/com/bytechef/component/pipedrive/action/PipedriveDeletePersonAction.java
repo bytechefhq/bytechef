@@ -18,7 +18,6 @@ package com.bytechef.component.pipedrive.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
@@ -33,7 +32,7 @@ import java.util.Map;
  */
 public class PipedriveDeletePersonAction {
     public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("deletePerson")
-        .title("Delete a person")
+        .title("Delete person")
         .description("Marks a person as deleted. After 30 days, the person will be permanently deleted.")
         .metadata(
             Map.of(
@@ -41,23 +40,19 @@ public class PipedriveDeletePersonAction {
                 "path", "/persons/{id}"
 
             ))
-        .properties(integer("id").label("Id")
-            .description("The ID of the person")
+        .properties(integer("id").label("Person")
+            .description("Person to delete")
             .required(true)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))
         .outputSchema(object()
-            .properties(object("data").properties(integer("id").description("The ID of the deleted person")
+            .properties(object("body").properties(object("data").properties(integer("id").required(false))
                 .required(false))
-                .required(false),
-                bool("success").description("If the response is successful or not")
-                    .required(false))
+                .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON)))
-        .sampleOutput(Map.<String, Object>ofEntries(Map.entry("success", true),
-            Map.entry("data", Map.<String, Object>ofEntries(Map.entry("id", 12)))));
+                    "responseType", ResponseType.JSON)));
 
     private PipedriveDeletePersonAction() {
     }
