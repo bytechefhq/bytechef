@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.openai.util;
+package util;
 
 import static com.bytechef.component.definition.ComponentDSL.option;
 
@@ -31,7 +31,7 @@ import org.springframework.ai.chat.messages.UserMessage;
 /**
  * @author Monika Domiter
  */
-public class OpenAIUtils {
+public class LLMUtils {
 
     public static Message createMessage(String role, String content) {
         return switch (role) {
@@ -43,7 +43,7 @@ public class OpenAIUtils {
         };
     }
 
-    private OpenAIUtils() {
+    private LLMUtils() {
     }
 
     public static <R> ModifiableOption[] getEnumOptions(Map<String, R> map) {

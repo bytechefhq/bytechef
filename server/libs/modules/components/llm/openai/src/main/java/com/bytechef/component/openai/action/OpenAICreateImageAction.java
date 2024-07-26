@@ -43,8 +43,6 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
-import com.bytechef.component.openai.util.OpenAIUtils;
-import com.bytechef.component.openai.util.records.ImageMessageRecord;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -57,6 +55,8 @@ import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.OpenAiImageOptions;
 import org.springframework.ai.openai.api.OpenAiImageApi;
 import org.springframework.retry.support.RetryTemplate;
+import util.LLMUtils;
+import util.records.ImageMessageRecord;
 
 /**
  * @author Monika Domiter
@@ -92,7 +92,7 @@ public class OpenAICreateImageAction {
                 .description("ID of the model to use.")
                 .required(true)
                 .description("The model to use for image generation.")
-                .options(OpenAIUtils.getEnumOptions(
+                .options(LLMUtils.getEnumOptions(
                     Arrays.stream(OpenAiImageApi.ImageModel.values())
                         .collect(Collectors.toMap(
                             OpenAiImageApi.ImageModel::getValue, OpenAiImageApi.ImageModel::getValue))))
