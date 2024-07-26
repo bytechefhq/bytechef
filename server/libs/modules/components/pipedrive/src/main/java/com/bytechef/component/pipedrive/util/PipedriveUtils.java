@@ -17,9 +17,11 @@
 package com.bytechef.component.pipedrive.util;
 
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.pipedrive.constant.PipedriveConstants.BASE_URL;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import java.util.ArrayList;
@@ -28,6 +30,7 @@ import java.util.Map;
 
 /**
  * @author Ivica Cardic
+ * @author Monika Kušter
  */
 public class PipedriveUtils {
 
@@ -69,7 +72,7 @@ public class PipedriveUtils {
                         : Map.of(dependsOn, List.of(inputParameters.getString(dependsOn, ""))))
                 .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute()
-                .getBody(new Context.TypeReference<>() {});
+                .getBody(new TypeReference<>() {});
 
             context.logger(logger -> logger.debug("Response for path='%s': %s".formatted(path, response)));
 
@@ -78,8 +81,17 @@ public class PipedriveUtils {
             if (response.get("data") instanceof List<?> list) {
                 for (Object o : list) {
                     if (o instanceof Map<?, ?> map) {
-                        options.add(option((String) map.get("name"), map.get("id")
-                            .toString()));
+                        String id = map.get("id")
+                            .toString();
+                        String name = (String) map.get("name");
+
+                        if (path.equals("/deals")) {
+                            options.add(option((String) map.get("title"), id));
+                        } else if (path.equals("/currencies")) {
+                            options.add(option(name, (String) map.get("symbol")));
+                        } else {
+                            options.add(option(name, id));
+                        }
                     }
                 }
             }
