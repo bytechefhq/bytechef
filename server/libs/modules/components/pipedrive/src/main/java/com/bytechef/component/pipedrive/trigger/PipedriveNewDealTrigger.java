@@ -265,7 +265,7 @@ public class PipedriveNewDealTrigger {
         Map<String, ?> inputParameters, Parameters connectionParameters, Map<String, ?> outputParameters,
         String workflowExecutionId, TriggerContext context) {
 
-        PipedriveUtils.unsubscribeWebhook((String) outputParameters.get(ID), context);
+        PipedriveUtils.unsubscribeWebhook((Integer) outputParameters.get(ID), context);
     }
 
     protected static DynamicWebhookEnableOutput dynamicWebhookEnable(

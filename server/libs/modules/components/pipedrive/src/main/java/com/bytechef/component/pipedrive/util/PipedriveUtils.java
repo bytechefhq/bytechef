@@ -19,11 +19,12 @@ package com.bytechef.component.pipedrive.util;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.pipedrive.constant.PipedriveConstants.ID;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.exception.ProviderException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -75,27 +76,30 @@ public class PipedriveUtils {
         };
     }
 
-    public static String subscribeWebhook(
-        String eventObject, String eventAction, String webhookUrl, Context context) {
+    public static Integer subscribeWebhook(
+        String eventObject, String eventAction, String webhookUrl, TriggerContext context) {
 
         Map<?, ?> result = context
-            .http(http -> http.post("/api/v1/webhooks"))
+            .http(http -> http.post("/webhooks"))
             .body(
                 Http.Body.of(
-                    Map.of(
-                        "event_object", eventObject,
-                        "event_action", eventAction,
-                        "subscription_url", webhookUrl)))
+                    "event_object", eventObject,
+                    "event_action", eventAction,
+                    "subscription_url", webhookUrl))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new Context.TypeReference<>() {});
+            .getBody(new TypeReference<>() {});
 
-        return (String) result.get("id");
+        if (result.get("data") instanceof Map<?, ?> map) {
+            return (Integer) map.get(ID);
+        }
+
+        throw new ProviderException("Failed to start Pipedrive webhook.");
     }
 
-    public static void unsubscribeWebhook(String webhookId, Context context) {
+    public static void unsubscribeWebhook(Integer webhookId, TriggerContext context) {
         context
-            .http(http -> http.delete("/api/v1/webhooks/%s".formatted(webhookId)))
+            .http(http -> http.delete("/webhooks/%s".formatted(webhookId)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
     }
