@@ -21,14 +21,12 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDSL;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,8 +37,7 @@ import java.util.Map;
 public class PipedriveSearchDealsAction {
     public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("searchDeals")
         .title("Search deals")
-        .description(
-            "Searches all deals by title, notes and/or custom fields. This endpoint is a wrapper of <a href=\"https://developers.pipedrive.com/docs/api/v1/ItemSearch#searchItem\">/v1/itemSearch</a> with a narrower OAuth scope. Found deals can be filtered by the person ID and the organization ID.")
+        .description("Searches all deals by title, notes and/or custom fields.")
         .metadata(
             Map.of(
                 "method", "GET",
@@ -69,165 +66,55 @@ public class PipedriveSearchDealsAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
-            integer("person_id").label("Person Id")
-                .description(
-                    "Will filter deals by the provided person ID. The upper limit of found deals associated with the person is 2000.")
+            integer("person_id").label("Person")
+                .description("Will filter deals by the provided person.")
                 .required(false)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
-            integer("organization_id").label("Organization Id")
-                .description(
-                    "Will filter deals by the provided organization ID. The upper limit of found deals associated with the organization is 2000.")
+            integer("organization_id").label("Organization")
+                .description("Will filter deals by the provided organization.")
                 .required(false)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
             string("status").label("Status")
-                .description(
-                    "Will filter deals by the provided specific status. open = Open, won = Won, lost = Lost. The upper limit of found deals associated with the status is 2000.")
+                .description("Will filter deals by the provided specific status.")
                 .options(option("Open", "open"), option("Won", "won"), option("Lost", "lost"))
                 .required(false)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
             string("include_fields").label("Include Fields")
-                .description("Supports including optional fields in the results which are not provided by default")
+                .description("Supports including optional fields in the results which are not provided by default.")
                 .options(option("Deal.cc_email", "deal.cc_email"))
                 .required(false)
                 .metadata(
                     Map.of(
-                        "type", PropertyType.QUERY)),
-            integer("start").label("Start")
-                .description(
-                    "Pagination start. Note that the pagination is based on main results and does not include related items when using `search_for_related_items` parameter.")
-                .defaultValue(0)
-                .required(false)
-                .metadata(
-                    Map.of(
-                        "type", PropertyType.QUERY)),
-            integer("limit").label("Limit")
-                .description("Items shown per page")
-                .required(false)
-                .metadata(
-                    Map.of(
                         "type", PropertyType.QUERY)))
-        .outputSchema(
-            object()
-                .properties(
-                    object(
-                        "data")
-                            .properties(
-                                array(
-                                    "items")
-                                        .items(
-                                            object()
-                                                .properties(
-                                                    number("result_score").description("Search result relevancy")
-                                                        .required(false),
-                                                    object("item")
-                                                        .properties(integer("id").description("The ID of the deal")
-                                                            .required(false),
-                                                            string("type").description("The type of the item")
-                                                                .required(false),
-                                                            string("title").description("The title of the deal")
-                                                                .required(false),
-                                                            integer("value").description("The value of the deal")
-                                                                .required(false),
-                                                            string("currency").description("The currency of the deal")
-                                                                .required(false),
-                                                            string("status").description("The status of the deal")
-                                                                .required(false),
-                                                            integer("visible_to")
-                                                                .description("The visibility of the deal")
-                                                                .required(false),
-                                                            object("owner").properties(integer("id")
-                                                                .description("The ID of the owner of the deal")
-                                                                .required(false))
-                                                                .required(false),
-                                                            object("stage")
-                                                                .properties(
-                                                                    integer("id")
-                                                                        .description("The ID of the stage of the deal")
-                                                                        .required(false),
-                                                                    string("name")
-                                                                        .description(
-                                                                            "The name of the stage of the deal")
-                                                                        .required(false))
-                                                                .required(false),
-                                                            object("person").properties(integer(
-                                                                "id").description(
-                                                                    "The ID of the person the deal is associated with")
-                                                                    .required(false),
-                                                                string(
-                                                                    "name").description(
-                                                                        "The name of the person the deal is associated with")
-                                                                        .required(false))
-                                                                .required(false),
-                                                            object("organization").properties(integer("id").description(
-                                                                "The ID of the organization the deal is associated with")
-                                                                .required(false),
-                                                                string("name").description(
-                                                                    "The name of the organization the deal is associated with")
-                                                                    .required(false))
-                                                                .required(false),
-                                                            array("custom_fields")
-                                                                .items(string().description("Custom fields"))
-                                                                .description("Custom fields")
-                                                                .required(false),
-                                                            array("notes")
-                                                                .items(string().description("An array of notes"))
-                                                                .description("An array of notes")
-                                                                .required(false))
-                                                        .required(false))
-                                                .description("The array of deals"))
-                                        .description("The array of deals")
-                                        .required(false))
-                            .required(false),
-                    bool("success").description("If the response is successful or not")
-                        .required(false),
-                    object("additional_data")
-                        .properties(object("pagination").properties(integer("start").description("Pagination start")
-                            .required(false),
-                            integer("limit").description("Items shown per page")
+        .outputSchema(object()
+            .properties(object("body")
+                .properties(object("data")
+                    .properties(array("items")
+                        .items(object().properties(string("id").required(false), string("type").required(false),
+                            object("user_id")
+                                .properties(integer("id").required(false), string("name").required(false),
+                                    string("email").required(false))
                                 .required(false),
-                            bool("more_items_in_collection")
-                                .description("Whether there are more list items in the collection than displayed")
+                            object("person_id").properties(string("name").required(false))
                                 .required(false),
-                            integer("next_start").description("Next pagination start")
-                                .required(false))
-                            .description("Pagination details of the list")
-                            .required(false))
+                            object("org_id")
+                                .properties(string("name").required(false), string("owner_id").required(false))
+                                .required(false),
+                            integer("stage_id").required(false), string("title").required(false),
+                            integer("value").required(false), string("currency").required(false),
+                            string("status").required(false)))
                         .required(false))
-                .metadata(
-                    Map.of(
-                        "responseType", ResponseType.JSON)))
-        .sampleOutput(Map.<String, Object>ofEntries(Map.entry("success", true),
-            Map.entry("data", Map.<String, Object>ofEntries(Map.entry("items", List.of(Map.<String, Object>ofEntries(
-                Map.entry("result_score", 1.22),
-                Map.entry("item", Map.<String, Object>ofEntries(Map.entry("id", 1), Map.entry("type", "deal"),
-                    Map.entry("title", "Jane Doe deal"), Map.entry("value", 100), Map.entry("currency", "USD"),
-                    Map.entry("status", "open"), Map.entry("visible_to", 3),
-                    Map.entry("owner", Map.<String, Object>ofEntries(Map.entry("id", 1))),
-                    Map.entry("stage", Map.<String, Object>ofEntries(Map.entry("id", 1), Map.entry("name", "Lead In"))),
-                    Map.entry("person",
-                        Map.<String, Object>ofEntries(Map.entry("id", 1), Map.entry("name", "Jane Doe"))),
-                    Map.entry("organization", ""), Map.entry("custom_fields", List.of()),
-                    Map.entry("notes", List.of())))))))),
-            Map.entry("additional_data",
-                Map.<String, Object>ofEntries(Map.entry("description", "The additional data of the list"),
-                    Map.entry("type", "object"),
-                    Map.entry("properties",
-                        Map.<String, Object>ofEntries(
-                            Map.entry("start",
-                                Map.<String, Object>ofEntries(Map.entry("type", "integer"),
-                                    Map.entry("description", "Pagination start"))),
-                            Map.entry("limit",
-                                Map.<String, Object>ofEntries(Map.entry("type", "integer"),
-                                    Map.entry("description", "Items shown per page"))),
-                            Map.entry("more_items_in_collection",
-                                Map.<String, Object>ofEntries(Map.entry("type", "boolean"), Map.entry("description",
-                                    "If there are more list items in the collection than displayed or not")))))))));
+                    .required(false))
+                .required(false))
+            .metadata(
+                Map.of(
+                    "responseType", ResponseType.JSON)));
 
     private PipedriveSearchDealsAction() {
     }
