@@ -70,7 +70,7 @@ public class HuggingFaceChatAction {
                                 option("tool", "tool"))
                             .required(true)))
                 .required(true),
-            string(URL)
+            string(URL) //TODO:: mozda navest moguce urlove? il ne
                 .label("URL")
                 .description("Url of the inference endpoint"))
         .outputSchema(string())
