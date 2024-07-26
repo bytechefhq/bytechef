@@ -23,16 +23,19 @@ import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.time;
+import static com.bytechef.component.definition.ComponentDSL.trigger;
+import static com.bytechef.component.pipedrive.constant.PipedriveConstants.ADDED;
+import static com.bytechef.component.pipedrive.constant.PipedriveConstants.CURRENT;
+import static com.bytechef.component.pipedrive.constant.PipedriveConstants.ID;
 
-import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
+import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.pipedrive.util.PipedriveUtils;
@@ -41,13 +44,12 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-@SuppressWarnings("PMD.UnusedFormalParameter")
 public class PipedriveNewOrganizationTrigger {
 
-    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = ComponentDSL.trigger("newOrganization")
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newOrganization")
         .title("New Organization")
         .description("Trigger off whenever a new organization is added.")
-        .type(TriggerDefinition.TriggerType.DYNAMIC_WEBHOOK)
+        .type(TriggerType.DYNAMIC_WEBHOOK)
         .outputSchema(
             object()
                 .properties(
@@ -192,11 +194,14 @@ public class PipedriveNewOrganizationTrigger {
         .dynamicWebhookEnable(PipedriveNewOrganizationTrigger::dynamicWebhookEnable)
         .dynamicWebhookRequest(PipedriveNewOrganizationTrigger::dynamicWebhookRequest);
 
+    private PipedriveNewOrganizationTrigger() {
+    }
+
     protected static void dynamicWebhookDisable(
         Map<String, ?> inputParameters, Parameters connectionParameters, Map<String, ?> outputParameters,
         String workflowExecutionId, TriggerContext context) {
 
-        PipedriveUtils.unsubscribeWebhook((String) outputParameters.get("id"), context);
+        PipedriveUtils.unsubscribeWebhook((String) outputParameters.get(ID), context);
     }
 
     protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
@@ -204,15 +209,14 @@ public class PipedriveNewOrganizationTrigger {
         String workflowExecutionId, TriggerContext context) {
 
         return new DynamicWebhookEnableOutput(
-            Map.of("id", PipedriveUtils.subscribeWebhook("organization", "added", webhookUrl, context)), null);
+            Map.of(ID, PipedriveUtils.subscribeWebhook("organization", ADDED, webhookUrl, context)), null);
     }
 
-    @SuppressWarnings("unchecked")
-    protected static Map<String, ?> dynamicWebhookRequest(
+    protected static Object dynamicWebhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
         WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output, TriggerContext context) {
 
-        return (Map<String, ?>) body.getContent(new TypeReference<Map<String, ?>>() {})
-            .get("current");
+        return body.getContent(new TypeReference<Map<String, ?>>() {})
+            .get(CURRENT);
     }
 }
