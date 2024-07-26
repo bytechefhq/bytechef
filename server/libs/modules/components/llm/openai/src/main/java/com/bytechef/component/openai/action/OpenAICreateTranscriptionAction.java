@@ -35,7 +35,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.openai.util.OpenAIUtils;
 import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.List;
@@ -47,6 +46,7 @@ import org.springframework.ai.openai.OpenAiAudioTranscriptionModel;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionOptions;
 import org.springframework.ai.openai.api.OpenAiAudioApi;
 import org.springframework.core.io.UrlResource;
+import util.LLMUtils;
 
 /**
  * @author Monika Domiter
@@ -140,7 +140,7 @@ public class OpenAICreateTranscriptionAction {
             object(RESPONSE_FORMAT)
                 .label("Response format")
                 .description("The format of the transcript output")
-                .options(OpenAIUtils.getEnumOptions(
+                .options(LLMUtils.getEnumOptions(
                     Arrays.stream(OpenAiAudioApi.TranscriptResponseFormat.values())
                         .collect(Collectors.toMap(
                             OpenAiAudioApi.TranscriptResponseFormat::getValue, clas -> clas))))

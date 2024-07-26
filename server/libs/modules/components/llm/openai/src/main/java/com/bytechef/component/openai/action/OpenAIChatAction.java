@@ -45,14 +45,12 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.TOP_P;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.USER;
 import static com.bytechef.component.openai.constant.OpenAIConstants.USER_PROPERTY;
-import static com.bytechef.component.openai.util.OpenAIUtils.createMessage;
+import static util.LLMUtils.createMessage;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.openai.util.OpenAIUtils;
-import com.bytechef.component.openai.util.records.MessageRecord;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -64,6 +62,8 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
+import util.LLMUtils;
+import util.records.MessageRecord;
 
 /**
  * @author Monika Domiter
@@ -97,7 +97,7 @@ public class OpenAIChatAction {
                 .label("Model")
                 .description("ID of the model to use.")
                 .required(true)
-                .options(OpenAIUtils.getEnumOptions(
+                .options(LLMUtils.getEnumOptions(
                     Arrays.stream(OpenAiApi.ChatModel.values())
                         .collect(Collectors.toMap(
                             OpenAiApi.ChatModel::getValue, OpenAiApi.ChatModel::getValue)))),
