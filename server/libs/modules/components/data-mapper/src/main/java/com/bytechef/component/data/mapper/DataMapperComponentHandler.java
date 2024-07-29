@@ -16,6 +16,7 @@
 
 package com.bytechef.component.data.mapper;
 
+import static com.bytechef.component.data.mapper.constant.DataMapperConstants.DATA_MAPPER;
 import static com.bytechef.component.definition.ComponentDSL.component;
 
 import com.bytechef.component.ComponentHandler;
@@ -36,7 +37,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class DataMapperComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component("dataMapper")
+    private static final ComponentDefinition COMPONENT_DEFINITION = component(DATA_MAPPER)
         .title("Data Mapper")
         .description("The Data Mapper enables you to configure data mappings.")
         .icon("path:assets/data-mapper.svg")
