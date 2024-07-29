@@ -34,6 +34,7 @@ public class DataMapperConstants {
     public static final String INCLUDE_EMPTY_STRINGS = "includeEmptyStrings";
     public static final String REQUIRED_FIELD = "requiredField";
     public static final String VALUE_KEY = "valueKey";
+    public static final String DATA_MAPPER = "dataMapper";
     public static final String DEFAULT_VALUE = "defaultValue";
     public static final String TYPE = "type";
     public static final String INPUT_TYPE = "inputType";
