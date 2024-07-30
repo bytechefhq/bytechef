@@ -45,7 +45,7 @@ const IntegrationHeaderWorkflowDropDownMenu = ({
                 </DropdownMenuItem>
 
                 <DropdownMenuItem
-                    onClick={() => (window.location.href = `/api/embedded/workflows/${workflowId}/export`)}
+                    onClick={() => (window.location.href = `/api/embedded/internal/workflows/${workflowId}/export`)}
                 >
                     Export
                 </DropdownMenuItem>
