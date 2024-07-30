@@ -395,10 +395,29 @@ public final class Workflow implements Persistable<String>, Serializable {
                 if (entry.getValue() instanceof WorkflowTask curWorkflowTask) {
                     allWorkflowTasks.addAll(getAllTasks(List.of(curWorkflowTask)));
                 } else if (entry.getValue() instanceof List<?> curList) {
-                    if (!curList.isEmpty() && curList.getFirst() instanceof WorkflowTask) {
-                        for (Object item : curList) {
-                            allWorkflowTasks.addAll(
-                                getAllTasks(List.of((WorkflowTask) item)));
+                    if (!curList.isEmpty()) {
+                        Object firstItem = curList.getFirst();
+
+                        if (firstItem instanceof WorkflowTask) {
+                            for (Object item : curList) {
+                                allWorkflowTasks.addAll(getAllTasks(List.of((WorkflowTask) item)));
+                            }
+                        }
+
+                        if (firstItem instanceof Map<?, ?> map && map.containsKey(WorkflowConstants.PARAMETERS) &&
+                            map.containsKey(WorkflowConstants.TYPE)) {
+
+                            for (Object item : curList) {
+                                // TODO exclude task dispatchers as we don't need them in 'allWorkflowTasks' list by
+                                // checking if any item of 'parameters' map is again a map or list which contains
+                                // map/s with 'parameters' and 'type' keys.
+                                // If true then drill-down further until extracting WorkflowTasks, if false, the 'item'
+                                // is a WorkflowTask
+
+                                // new WorkflowTask((Map<String, ?>) item) should be added to allWorkflowTasks only
+                                // if it is a real workflow task and not a task dispatcher
+                                allWorkflowTasks.addAll(getAllTasks(List.of(new WorkflowTask((Map<String, ?>) item))));
+                            }
                         }
                     }
                 } else if (entry.getValue() instanceof Map<?, ?> curMap) {
