@@ -103,7 +103,7 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
                                         src={
                                             componentDefinition?.icon
                                                 ? componentDefinition?.icon
-                                                : taskDispatcherDefinition?.icon ?? ''
+                                                : (taskDispatcherDefinition?.icon ?? '')
                                         }
                                     />
                                 </TooltipTrigger>

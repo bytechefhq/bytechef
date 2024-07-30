@@ -289,8 +289,8 @@ const WorkflowNodeDetailsPanel = ({
         () =>
             setCurrentOperationProperties(
                 currentNode?.trigger
-                    ? currentTriggerDefinition?.properties ?? []
-                    : currentActionDefinition?.properties ?? []
+                    ? (currentTriggerDefinition?.properties ?? [])
+                    : (currentActionDefinition?.properties ?? [])
             ),
         [currentActionDefinition?.properties, currentNode?.trigger, currentTriggerDefinition?.properties]
     );
