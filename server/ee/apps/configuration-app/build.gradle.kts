@@ -62,6 +62,7 @@ dependencies {
     implementation(project(":server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-remote-rest"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
+    implementation(project(":server:ee:libs:core:encryption:encryption-aws"))
     implementation(project(":server:ee:libs:core:remote:remote-rest"))
     implementation(project(":server:ee:libs:config:tenant-multi-data-config"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-rest"))

@@ -4,23 +4,24 @@ spring:
       discovery:
         locator:
           enabled: true
-      routes:
-        - id: configuration-service
-          uri: lb://configuration-app
-          predicates:
-          - Path=/api/automation/categories/**,/api/automation/projects/**,/api/automation/project-instances/**,/api/automation/project-instances/tags/**,/api/automation/projects/tags/**,/api/automation/workflows/**,/api/core/oauth2/authorization-parameters,/api/core/oauth2/properties,/api/core/action-definitions/**,/api/core/component-definitions/**,/api/core/connection-definitions/**,/api/core/task-dispatcher-definitions/**,/api/embedded/categories/**,/api/embedded/integrations/tags/**,/api/embedded/integrations/**,/api/embedded/workflows/**
-        - id: connection-service
-          uri: lb://connection-app
-          predicates:
-            - Path=/api/automation/connections/tags/**,/api/automation/connections/**
-        - id: execution-service
-          uri: lb://execution-app
-          predicates:
-            - Path=/api/automation/jobs/**,/api/automation/workflow-executions/**,/api/automation/tests/workflows
-        - id: webhook-service
-          uri: lb://webhook-app
-          predicates:
-            - Path=/webhooks/**
+      mvc:
+        routes:
+          - id: configuration-service
+            uri: lb://configuration-app
+            predicates:
+            - Path=/api/automation/**,/api/embedded/**,/api/platform/**
+          - id: connection-service
+            uri: lb://connection-app
+            predicates:
+              - Path=/api/automation/**,/api/embedded/**
+          - id: execution-service
+            uri: lb://execution-app
+            predicates:
+              - Path=/api/automation/**,/api/embedded/**
+          - id: webhook-service
+            uri: lb://webhook-app
+            predicates:
+              - Path=/webhooks/**
   mail:
     base-url: https://www.bytechef.io
     from: noreply@bytechef.io
