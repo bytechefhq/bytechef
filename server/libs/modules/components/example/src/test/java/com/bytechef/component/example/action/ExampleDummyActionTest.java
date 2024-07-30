@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.googledrive.action;
+package com.bytechef.component.example.action;
+
+import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.example.action.ExampleDummyAction;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 /**
  * @author Mario Cvjetojevic
  */
-public class ExampleDummyActionTest {
+class ExampleDummyActionTest {
 
     @Test
-    public void testPerform() {
-        Parameters parameters = Mockito.mock(Parameters.class);
+    void testPerform() {
+        Parameters parameters = mock(Parameters.class);
 
         Assertions.assertNull(
-            ExampleDummyAction.perform(parameters, parameters, Mockito.mock(ActionContext.class)));
+            ExampleDummyAction.perform(parameters, parameters, mock(ActionContext.class)));
     }
 }
