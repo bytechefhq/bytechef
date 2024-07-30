@@ -20,7 +20,6 @@ import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDSL;
@@ -31,42 +30,21 @@ import java.util.Map;
  *
  * @generated
  */
-public class HubspotUpdateContactAction {
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("updateContact")
-        .title("Update Contact")
-        .description("Update Contact properties.")
+public class HubspotGetContactAction {
+    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("getContact")
+        .title("Get Contact")
+        .description("Get contact details.")
         .metadata(
             Map.of(
-                "method", "PATCH",
-                "path", "/crm/v3/objects/contacts/{contactId}", "bodyContentType", BodyContentType.JSON, "mimeType",
-                "application/json"
+                "method", "GET",
+                "path", "/crm/v3/objects/contacts/{contactId}"
 
             ))
-        .properties(string("contactId").label("Contact   To   Update .")
+        .properties(string("contactId").label("Contact")
             .required(true)
             .metadata(
                 Map.of(
-                    "type", PropertyType.PATH)),
-            object("__item").properties(object("properties").properties(string("firstname").label("First   Name")
-                .required(false),
-                string("lastname").label("Last   Name")
-                    .required(false),
-                string("email").label("Email   Address")
-                    .required(false),
-                string("phone").label("Phone   Number")
-                    .required(false),
-                string("company").label("Company")
-                    .description("Company contact belongs to.")
-                    .required(false),
-                string("website").label("Website")
-                    .description("Website of the contact.")
-                    .required(false))
-                .label("Properties")
-                .required(false))
-                .label("Contact")
-                .metadata(
-                    Map.of(
-                        "type", PropertyType.BODY)))
+                    "type", PropertyType.PATH)))
         .outputSchema(object()
             .properties(object("body")
                 .properties(string("id").required(false),
@@ -80,6 +58,6 @@ public class HubspotUpdateContactAction {
                 Map.of(
                     "responseType", ResponseType.JSON)));
 
-    private HubspotUpdateContactAction() {
+    private HubspotGetContactAction() {
     }
 }

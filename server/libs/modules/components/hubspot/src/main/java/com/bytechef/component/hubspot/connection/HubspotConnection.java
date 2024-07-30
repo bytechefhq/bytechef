@@ -33,7 +33,7 @@ import java.util.List;
  */
 public class HubspotConnection {
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri((connectionParameters, context) -> "https://api.hubapi.com/")
+        .baseUri((connectionParameters, context) -> "https://api.hubapi.com")
         .authorizations(authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
             .title("OAuth2 Authorization Code")
             .properties(
@@ -44,8 +44,11 @@ public class HubspotConnection {
                     .label("Client Secret")
                     .required(true))
             .authorizationUrl((connectionParameters, context) -> "https://app.hubspot.com/oauth/authorize")
-            .scopes((connection, context) -> List.of("crm.objects.contacts.write", "crm.objects.contacts.read"))
-            .tokenUrl((connectionParameters, context) -> "https://api.hubapi.com/oauth/v1/token"));
+            .scopes((connection, context) -> List.of("crm.objects.contacts.read", "crm.objects.contacts.write",
+                "crm.objects.deals.read", "crm.objects.deals.write", "crm.schemas.deals.read",
+                "crm.objects.owners.read"))
+            .tokenUrl((connectionParameters, context) -> "https://api.hubapi.com/oauth/v1/token")
+            .refreshUrl((connectionParameters, context) -> "https://api.hubapi.com/oauth/v1/token"));
 
     private HubspotConnection() {
     }
