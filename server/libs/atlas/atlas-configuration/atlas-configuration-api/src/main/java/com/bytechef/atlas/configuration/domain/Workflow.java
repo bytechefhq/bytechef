@@ -311,7 +311,7 @@ public final class Workflow implements Persistable<String>, Serializable {
     }
 
     public WorkflowTask getTask(String workflowNodeName) {
-        for (WorkflowTask workflowTask : tasks) {
+        for (WorkflowTask workflowTask : getAllTasks(tasks)) {
             if (Objects.equals(workflowTask.getName(), workflowNodeName)) {
                 return workflowTask;
             }
