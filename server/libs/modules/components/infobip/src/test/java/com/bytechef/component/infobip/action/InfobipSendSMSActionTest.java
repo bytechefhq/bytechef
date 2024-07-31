@@ -16,105 +16,40 @@
 
 package com.bytechef.component.infobip.action;
 
-import static com.bytechef.component.definition.Authorization.VALUE;
-import static com.bytechef.component.infobip.constant.InfobipConstants.AMOUNT;
-import static com.bytechef.component.infobip.constant.InfobipConstants.BULK_ID;
-import static com.bytechef.component.infobip.constant.InfobipConstants.INCLUDE_SMS_COUNT_IN_RESPONSE;
-import static com.bytechef.component.infobip.constant.InfobipConstants.TIME_UNIT;
-import static com.bytechef.component.infobip.constant.InfobipConstants.TRACKING;
-import static com.bytechef.component.infobip.constant.InfobipConstants.URL_OPTIONS;
+import static com.bytechef.component.infobip.constant.InfobipConstants.CONTENT;
+import static com.bytechef.component.infobip.constant.InfobipConstants.DESTINATIONS;
+import static com.bytechef.component.infobip.constant.InfobipConstants.MESSAGES;
+import static com.bytechef.component.infobip.constant.InfobipConstants.SENDER;
+import static com.bytechef.component.infobip.constant.InfobipConstants.TEXT;
+import static com.bytechef.component.infobip.constant.InfobipConstants.TO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockConstruction;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.infobip.util.InfobipUtils;
-import com.infobip.ApiException;
-import com.infobip.api.SmsApi;
-import com.infobip.model.SmsAdvancedTextualRequest;
-import com.infobip.model.SmsResponse;
-import com.infobip.model.SmsTextualMessage;
-import com.infobip.model.SmsTracking;
-import com.infobip.model.SmsUrlOptions;
+import com.bytechef.component.definition.Context.Http;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.MockedConstruction;
-import org.mockito.MockedStatic;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 class InfobipSendSMSActionTest extends AbstractInfobipActionTest {
 
-    private final SmsApi.SendSmsMessageRequest mockedSendSmsMessageRequest = mock(SmsApi.SendSmsMessageRequest.class);
-    private final SmsResponse mockedSmsResponse = mock(SmsResponse.class);
-    private final ArgumentCaptor<SmsAdvancedTextualRequest> smsAdvancedTextualRequestArgumentCaptor =
-        ArgumentCaptor.forClass(SmsAdvancedTextualRequest.class);
-
     @Test
-    void testPerform() throws ApiException {
-        SmsUrlOptions smsUrlOptions = new SmsUrlOptions().shortenUrl(true);
-        SmsTracking smsTracking = new SmsTracking().track("track");
-        List<SmsTextualMessage> smsTextualMessages = List.of(new SmsTextualMessage().from("from"));
+    void testPerform() {
+        when(mockedParameters.getRequiredString(SENDER))
+            .thenReturn("123");
+        when(mockedParameters.getRequiredList(TO, String.class))
+            .thenReturn(List.of("abc", "def"));
+        when(mockedParameters.getRequiredString(TEXT))
+            .thenReturn("text");
 
-        when(mockedParameters.getRequiredString(VALUE))
-            .thenReturn("value");
-        when(mockedParameters.getString(BULK_ID))
-            .thenReturn("bulkID");
-        when(mockedParameters.getInteger(AMOUNT))
-            .thenReturn(1);
-        when(mockedParameters.getString(TIME_UNIT))
-            .thenReturn("MINUTE");
-        when(mockedParameters.get(URL_OPTIONS, SmsUrlOptions.class))
-            .thenReturn(smsUrlOptions);
-        when(mockedParameters.get(TRACKING, SmsTracking.class))
-            .thenReturn(smsTracking);
-        when(mockedParameters.getBoolean(INCLUDE_SMS_COUNT_IN_RESPONSE))
-            .thenReturn(true);
+        Map<String, Object> result = InfobipSendSMSAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        try (MockedConstruction<SmsApi> smsApiMockedConstruction = mockConstruction(
-            SmsApi.class,
-            (smsApi, context) -> when(smsApi.sendSmsMessage(any()))
-                .thenReturn(mockedSendSmsMessageRequest))) {
-            when(mockedSendSmsMessageRequest.execute())
-                .thenReturn(mockedSmsResponse);
+        assertEquals(responseMap, result);
 
-            try (MockedStatic<InfobipUtils> infobipUtilsMockedStatic = mockStatic(InfobipUtils.class)) {
-                infobipUtilsMockedStatic.when(() -> InfobipUtils.createSmsTextualMessageList(anyList()))
-                    .thenReturn(smsTextualMessages);
+        Http.Body body = bodyArgumentCaptor.getValue();
 
-                SmsResponse result = InfobipSendSMSAction.perform(mockedParameters, mockedParameters, mockedContext);
-
-                List<SmsApi> smsApis = smsApiMockedConstruction.constructed();
-
-                assertEquals(1, smsApis.size());
-                assertEquals(mockedSmsResponse, result);
-
-                SmsApi smsApi = smsApis.getFirst();
-
-                verify(smsApi, times(1))
-                    .sendSmsMessage(smsAdvancedTextualRequestArgumentCaptor.capture());
-
-                SmsAdvancedTextualRequest smsAdvancedTextualRequest =
-                    smsAdvancedTextualRequestArgumentCaptor.getValue();
-
-                assertEquals("bulkID", smsAdvancedTextualRequest.getBulkId());
-                assertEquals(1, smsAdvancedTextualRequest.getSendingSpeedLimit()
-                    .getAmount());
-                assertEquals("MINUTE", smsAdvancedTextualRequest.getSendingSpeedLimit()
-                    .getTimeUnit()
-                    .toString());
-                assertEquals(smsUrlOptions, smsAdvancedTextualRequest.getUrlOptions());
-                assertEquals(smsTracking, smsAdvancedTextualRequest.getTracking());
-                assertEquals(true, smsAdvancedTextualRequest.getIncludeSmsCountInResponse());
-                assertEquals(smsTextualMessages, smsAdvancedTextualRequest.getMessages());
-            }
-        }
+        assertEquals(Map.of(MESSAGES, List.of(Map.of(SENDER, "123", DESTINATIONS, List.of(Map.of(TO, "abc"), Map.of(TO, "def")), CONTENT, Map.of(TEXT, "text")))), body.getContent());
     }
 }
