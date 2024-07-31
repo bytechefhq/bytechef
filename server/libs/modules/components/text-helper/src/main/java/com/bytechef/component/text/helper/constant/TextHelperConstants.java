@@ -24,7 +24,7 @@ public class TextHelperConstants {
     public static final String ATTRIBUTE = "attribute";
     public static final String CONTENT = "content";
     public static final String EXTRACT_CONTENT_FROM_HTML = "extractContentFromHtml";
-    public static final String HTML_HELPER = "htmlHelper";
+    public static final String TEXT_HELPER = "textHelper";
     public static final String QUERY_SELECTOR = "querySelector";
     public static final String RETURN_VALUE = "returnValue";
     public static final String RETURN_ARRAY = "returnArray";

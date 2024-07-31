@@ -17,12 +17,12 @@
 package com.bytechef.component.text.helper;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT_HELPER;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.text.helper.action.TextHelperExtractContentFromHtmlAction;
-import com.bytechef.component.text.helper.constant.TextHelperConstants;
 import com.google.auto.service.AutoService;
 
 /**
@@ -31,7 +31,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class TextHelperComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(TextHelperConstants.HTML_HELPER)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component(TEXT_HELPER)
         .title("Text Helper")
         .description("Helper component which contains operations to help you work with text.")
         .icon("path:assets/text-helper.svg")

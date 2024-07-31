@@ -16,16 +16,20 @@
 
 package com.bytechef.component.infobip.connection;
 
-import static com.bytechef.component.definition.Authorization.VALUE;
+import static com.bytechef.component.definition.Authorization.KEY;
 import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.connection;
 import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.infobip.constant.InfobipConstants.BASE_URL;
 
+import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
+import java.util.List;
+import java.util.Map;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class InfobipConnection {
 
@@ -37,7 +41,15 @@ public class InfobipConnection {
             authorization(AuthorizationType.API_KEY)
                 .title("API Key")
                 .properties(
-                    string(VALUE)
-                        .label("Token")
-                        .required(true)));
+                    string(KEY)
+                        .label("API Key")
+                        .required(true),
+                    string(BASE_URL)
+                        .label("Base URL")
+                        .description("Personalized base URL for API requests.")
+                        .exampleValue("xxxxx.api.infobip.com")
+                        .required(true))
+                .apply((connectionParameters, context) -> ApplyResponse.ofHeaders(
+                    Map.of("Authorization", List.of("App " + connectionParameters.getRequiredString(KEY))))))
+        .baseUri((connectionParameters, context) -> "https://" + connectionParameters.getRequiredString(BASE_URL));
 }
