@@ -1,4 +1,4 @@
-import { ComboBoxItemType } from './ComboBox';
+import {ComboBoxItemType} from './ComboBox';
 
 const comboBoxItemsMock: ComboBoxItemType[] = [
     {
@@ -19,4 +19,4 @@ const comboBoxItemsMock: ComboBoxItemType[] = [
     },
 ];
 
-export { comboBoxItemsMock };
+export {comboBoxItemsMock};
