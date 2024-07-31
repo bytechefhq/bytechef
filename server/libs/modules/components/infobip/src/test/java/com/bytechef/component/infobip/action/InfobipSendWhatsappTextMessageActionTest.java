@@ -16,103 +16,37 @@
 
 package com.bytechef.component.infobip.action;
 
-import static com.bytechef.component.definition.Authorization.VALUE;
-import static com.bytechef.component.infobip.constant.InfobipConstants.APPLICATION_ID;
-import static com.bytechef.component.infobip.constant.InfobipConstants.CALLBACK_DATA;
 import static com.bytechef.component.infobip.constant.InfobipConstants.CONTENT;
-import static com.bytechef.component.infobip.constant.InfobipConstants.ENTITY_ID;
 import static com.bytechef.component.infobip.constant.InfobipConstants.FROM;
-import static com.bytechef.component.infobip.constant.InfobipConstants.MESSAGE_ID;
-import static com.bytechef.component.infobip.constant.InfobipConstants.NOTIFY_URL;
+import static com.bytechef.component.infobip.constant.InfobipConstants.TEXT;
 import static com.bytechef.component.infobip.constant.InfobipConstants.TO;
-import static com.bytechef.component.infobip.constant.InfobipConstants.URL_OPTIONS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockConstruction;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.infobip.ApiException;
-import com.infobip.api.WhatsAppApi;
-import com.infobip.model.WhatsAppSingleMessageInfo;
-import com.infobip.model.WhatsAppTextContent;
-import com.infobip.model.WhatsAppTextMessage;
-import com.infobip.model.WhatsAppUrlOptions;
-import java.util.List;
+import com.bytechef.component.definition.Context.Http;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.MockedConstruction;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 class InfobipSendWhatsappTextMessageActionTest extends AbstractInfobipActionTest {
 
-    private final ArgumentCaptor<WhatsAppTextMessage> whatsAppTextMessageArgumentCaptor = ArgumentCaptor.forClass(
-        WhatsAppTextMessage.class);
-    private final WhatsAppSingleMessageInfo mockedWhatsAppSingleMessageInfo = mock(WhatsAppSingleMessageInfo.class);
-    private final WhatsAppApi.SendWhatsAppTextMessageRequest mockedSendSmsMessageRequest =
-        mock(WhatsAppApi.SendWhatsAppTextMessageRequest.class);
-
     @Test
-    void testPerform() throws ApiException {
-
-        WhatsAppTextContent whatsAppTextContent = new WhatsAppTextContent().text("text");
-        WhatsAppUrlOptions whatsAppUrlOptions = new WhatsAppUrlOptions().shortenUrl(true);
-
-        when(mockedParameters.getRequiredString(VALUE))
-            .thenReturn("value");
+    void testPerform() {
         when(mockedParameters.getRequiredString(FROM))
-            .thenReturn("from");
+            .thenReturn("123");
         when(mockedParameters.getRequiredString(TO))
-            .thenReturn("to");
-        when(mockedParameters.getString(MESSAGE_ID))
-            .thenReturn("messageId");
-        when(mockedParameters.getRequired(CONTENT, WhatsAppTextContent.class))
-            .thenReturn(whatsAppTextContent);
-        when(mockedParameters.getString(CALLBACK_DATA))
-            .thenReturn("callbackData");
-        when(mockedParameters.getString(NOTIFY_URL))
-            .thenReturn("notifyUrl");
-        when(mockedParameters.get(URL_OPTIONS, WhatsAppUrlOptions.class))
-            .thenReturn(whatsAppUrlOptions);
-        when(mockedParameters.getString(ENTITY_ID))
-            .thenReturn("entityId");
-        when(mockedParameters.getString(APPLICATION_ID))
-            .thenReturn("applicationId");
+            .thenReturn("456");
+        when(mockedParameters.getRequiredString(TEXT))
+            .thenReturn("text");
 
-        try (MockedConstruction<WhatsAppApi> whatsAppApiMockedConstruction = mockConstruction(
-            WhatsAppApi.class,
-            (whatsAppApi, context) -> when(whatsAppApi.sendWhatsAppTextMessage(any()))
-                .thenReturn(mockedSendSmsMessageRequest))) {
-            when(mockedSendSmsMessageRequest.execute())
-                .thenReturn(mockedWhatsAppSingleMessageInfo);
+        Map<String, Object> result = InfobipSendWhatsappTextMesageAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-            WhatsAppSingleMessageInfo messageInfo = InfobipSendWhatsappTextMesageAction.perform(
-                mockedParameters, mockedParameters, mockedContext);
+        assertEquals(responseMap, result);
 
-            List<WhatsAppApi> whatsAppApis = whatsAppApiMockedConstruction.constructed();
+        Http.Body body = bodyArgumentCaptor.getValue();
 
-            assertEquals(1, whatsAppApis.size());
-            assertEquals(mockedWhatsAppSingleMessageInfo, messageInfo);
-
-            WhatsAppApi whatsAppApi = whatsAppApis.getFirst();
-
-            verify(whatsAppApi, times(1)).sendWhatsAppTextMessage(whatsAppTextMessageArgumentCaptor.capture());
-
-            WhatsAppTextMessage whatsAppTextMessage = whatsAppTextMessageArgumentCaptor.getValue();
-
-            assertEquals("from", whatsAppTextMessage.getFrom());
-            assertEquals("to", whatsAppTextMessage.getTo());
-            assertEquals("messageId", whatsAppTextMessage.getMessageId());
-            assertEquals(whatsAppTextContent, whatsAppTextMessage.getContent());
-            assertEquals("callbackData", whatsAppTextMessage.getCallbackData());
-            assertEquals("notifyUrl", whatsAppTextMessage.getNotifyUrl());
-            assertEquals(whatsAppUrlOptions, whatsAppTextMessage.getUrlOptions());
-            assertEquals("entityId", whatsAppTextMessage.getEntityId());
-            assertEquals("applicationId", whatsAppTextMessage.getApplicationId());
-        }
+        assertEquals(Map.of(FROM, "123", TO, "456", CONTENT, Map.of(TEXT, "text")), body.getContent());
     }
 }

@@ -16,43 +16,43 @@
 
 package com.bytechef.component.infobip.action;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
-import com.infobip.ApiClient;
-import com.infobip.ApiKey;
-import org.junit.jupiter.api.AfterEach;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.ArgumentCaptor;
-import org.mockito.MockedStatic;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
-public abstract class AbstractInfobipActionTest {
+abstract class AbstractInfobipActionTest {
 
-    protected ArgumentCaptor<ApiKey> apiKeyArgumentCaptor = ArgumentCaptor.forClass(ApiKey.class);
-    protected ApiClient mockedApiClient = mock(ApiClient.class);
-    protected ApiClient.Builder mockedBuilder = mock(ApiClient.Builder.class);
+    protected ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
     protected ActionContext mockedContext = mock(ActionContext.class);
+    protected Http.Executor mockedExecutor = mock(Http.Executor.class);
     protected Parameters mockedParameters = mock(Parameters.class);
-    protected MockedStatic<ApiClient> apiClientMockedStatic;
+    protected Http.Response mockedResponse = mock(Http.Response.class);
+    protected Map<String, Object> responseMap = Map.of("result", List.of("123", "abc"));
 
     @BeforeEach
-    public void beforeEach() {
-        apiClientMockedStatic = mockStatic(ApiClient.class);
-
-        apiClientMockedStatic.when(() -> ApiClient.forApiKey(apiKeyArgumentCaptor.capture()))
-            .thenReturn(mockedBuilder);
-
-        when(mockedBuilder.build()).thenReturn(mockedApiClient);
+    void beforeEach() {
+        when(mockedContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(responseMap);
     }
 
-    @AfterEach
-    public void afterEach() {
-        apiClientMockedStatic.close();
-    }
 }
