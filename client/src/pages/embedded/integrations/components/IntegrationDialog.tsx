@@ -1,4 +1,4 @@
-import ComboBox from '@/components/ComboBox';
+import ComboBox from '@/components/ComboBox/ComboBox';
 import {Button} from '@/components/ui/button';
 import {
     Dialog,

@@ -1,4 +1,4 @@
-import ComboBox, {ComboBoxItemType} from '@/components/ComboBox';
+import ComboBox, {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
 import DatePicker from '@/components/DatePicker';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
