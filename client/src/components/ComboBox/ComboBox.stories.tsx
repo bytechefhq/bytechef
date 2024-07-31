@@ -1,7 +1,7 @@
-import type {Meta, StoryObj} from '@storybook/react';
-
 import ComboBox from './ComboBox';
 import {comboBoxItemsMock} from './ComboBox.mock';
+
+import type {Meta, StoryObj} from '@storybook/react';
 
 const meta: Meta<typeof ComboBox> = {
     component: ComboBox,
@@ -9,9 +9,9 @@ const meta: Meta<typeof ComboBox> = {
 
 export default meta;
 
-type Story = StoryObj<typeof ComboBox>;
+type StoryType = StoryObj<typeof ComboBox>;
 
-export const Primary: Story = {
+export const Primary: StoryType = {
     args: {
         disabled: false,
         items: comboBoxItemsMock,
