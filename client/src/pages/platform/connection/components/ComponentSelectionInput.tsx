@@ -1,4 +1,4 @@
-import ComboBox, {ComboBoxItemType} from '@/components/ComboBox';
+import ComboBox, {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
 import {FormControl, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {ComponentDefinitionBasicModel, ComponentDefinitionModel} from '@/shared/middleware/platform/configuration';

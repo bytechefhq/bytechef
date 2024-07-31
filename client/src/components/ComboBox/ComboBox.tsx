@@ -26,7 +26,7 @@ export interface ComboBoxProps {
     value?: any;
 }
 
-const ComboBox = ({disabled, items, name, onBlur, onChange, value}: ComboBoxProps) => {
+const ComboBox: React.FC<ComboBoxProps> = ({disabled, items, name, onBlur, onChange, value}: ComboBoxProps) => {
     const [open, setOpen] = useState(false);
 
     const commandItems = items.map((comboBoxItem) => (
