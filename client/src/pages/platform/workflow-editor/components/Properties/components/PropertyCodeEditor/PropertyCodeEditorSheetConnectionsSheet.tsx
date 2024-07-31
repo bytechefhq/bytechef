@@ -1,4 +1,4 @@
-import ComboBox from '@/components/ComboBox';
+import ComboBox from '@/components/ComboBox/ComboBox';
 import RequiredMark from '@/components/RequiredMark';
 import {Button} from '@/components/ui/button';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';

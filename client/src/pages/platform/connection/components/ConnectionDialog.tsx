@@ -1,4 +1,4 @@
-import {ComboBoxItemType} from '@/components/ComboBox';
+import {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {Button} from '@/components/ui/button';
 import {Checkbox} from '@/components/ui/checkbox';

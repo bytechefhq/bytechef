@@ -1,4 +1,4 @@
-import ComboBox from '@/components/ComboBox';
+import ComboBox from '@/components/ComboBox/ComboBox';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import TablePagination from '@/components/TablePagination';

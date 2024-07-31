@@ -1,4 +1,4 @@
-import ComboBox from '@/components/ComboBox';
+import ComboBox from '@/components/ComboBox/ComboBox';
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {GetDataStreamComponentDefinitionsComponentTypeEnum} from '@/shared/middleware/platform/configuration';

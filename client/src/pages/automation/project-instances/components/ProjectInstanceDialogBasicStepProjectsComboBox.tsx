@@ -1,4 +1,4 @@
-import ComboBox, {ComboBoxItemType} from '@/components/ComboBox';
+import ComboBox, {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
 import ProjectInstanceDialogBasicStepProjectLabel from '@/pages/automation/project-instances/components/ProjectInstanceDialogBasicStepProjectLabel';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {ProjectStatusModel} from '@/shared/middleware/automation/configuration';
