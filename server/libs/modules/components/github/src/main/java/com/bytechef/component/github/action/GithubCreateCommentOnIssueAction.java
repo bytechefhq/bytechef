@@ -17,16 +17,16 @@
 package com.bytechef.component.github.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.Body;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.github.constant.GithubConstants.BASE_URL;
 import static com.bytechef.component.github.constant.GithubConstants.BODY;
-import static com.bytechef.component.github.constant.GithubConstants.CREATE_ISSUE_COMMENT;
+import static com.bytechef.component.github.constant.GithubConstants.CREATE_COMMENT_ON_ISSUE;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE;
-import static com.bytechef.component.github.constant.GithubConstants.REPO;
+import static com.bytechef.component.github.constant.GithubConstants.ISSUE_OUTPUT_PROPERTY;
+import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
+import static com.bytechef.component.github.util.GithubUtils.getOwnerName;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -39,44 +39,38 @@ import java.util.Map;
 /**
  * @author Luka Ljubić
  */
-public class GithubCreateIssueCommentAction {
+public class GithubCreateCommentOnIssueAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION =
-        action(CREATE_ISSUE_COMMENT)
-            .title("Create Issue Comment")
-            .description("Create a comment for the issue")
-            .properties(
-                string(REPO)
-                    .options((ActionOptionsFunction<String>) GithubUtils::getRepositoryOptions)
-                    .label("Repository")
-                    .description("Select an repository")
-                    .required(true),
-                string(ISSUE)
-                    .options((ActionOptionsFunction<String>) GithubUtils::getIssueOptions)
-                    .optionsLookupDependsOn(REPO)
-                    .label("Issue")
-                    .description("Select a issue")
-                    .required(true),
-                string(BODY)
-                    .label("Comment")
-                    .description("Create a issue comment")
-                    .required(true))
-            .outputSchema(
-                object()
-                    .properties(
-                        string("id"),
-                        string("url"),
-                        string("created_at"),
-                        string("body")))
-            .perform(GithubCreateIssueCommentAction::perform);
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_COMMENT_ON_ISSUE)
+        .title("Create comment on a issue")
+        .description("Adds a comment to the specified issue.")
+        .properties(
+            string(REPOSITORY)
+                .options((ActionOptionsFunction<String>) GithubUtils::getRepositoryOptions)
+                .label("Repository")
+                .required(true),
+            string(ISSUE)
+                .options((ActionOptionsFunction<String>) GithubUtils::getIssueOptions)
+                .optionsLookupDependsOn(REPOSITORY)
+                .label("Issue")
+                .description("The issue to comment on.")
+                .required(true),
+            string(BODY)
+                .label("Comment")
+                .description("The comment to add to the issue.")
+                .required(true))
+        .outputSchema(ISSUE_OUTPUT_PROPERTY)
+        .perform(GithubCreateCommentOnIssueAction::perform);
 
-    private GithubCreateIssueCommentAction() {
+    private GithubCreateCommentOnIssueAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+    public static Map<String, Object> perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
         return context
             .http(http -> http.post(
-                BASE_URL + "/repos/" + GithubUtils.getOwnerName(context) + "/" + inputParameters.getRequiredString(REPO)
+                "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY)
                     + "/issues/" + inputParameters.getRequiredString(ISSUE) + "/comments"))
             .body(Body.of(Map.of(BODY, inputParameters.getRequiredString(BODY))))
             .configuration(responseType(ResponseType.JSON))

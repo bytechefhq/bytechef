@@ -16,43 +16,33 @@
 
 package com.bytechef.component.github.action;
 
-import static com.bytechef.component.definition.Context.Http.Body;
-import static com.bytechef.component.definition.Context.Http.Executor;
-import static com.bytechef.component.definition.Context.Http.Response;
-import static com.bytechef.component.github.constant.GithubConstants.BODY;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.mockito.ArgumentCaptor;
 
 /**
- * @author Luka Ljubic
+ * @author Monika Kušter
  */
-class GithubCreateIssueCommentActionTest {
+abstract class AbstractGithubActionTest {
 
-    ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
-    ActionContext mockedContext = mock(ActionContext.class);
-    Executor mockedExecutor = mock(Executor.class);
-    Parameters mockedParameters = mock(Parameters.class);
-    Response mockedResponse = mock(Response.class);
-    Map<String, Object> responeseMap = Map.of("key", "value");
+    protected ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    protected ActionContext mockedContext = mock(ActionContext.class);
+    protected Http.Executor mockedExecutor = mock(Http.Executor.class);
+    protected Parameters mockedParameters = mock(Parameters.class);
+    protected Http.Response mockedResponse = mock(Http.Response.class);
+    protected Map<String, Object> responseMap = Map.of("result", List.of("123", "abc"));
 
-    @Test
-    void testPerform() {
-        Map<String, Object> propertyStubsMap = new LinkedHashMap<>();
-        propertyStubsMap.put(BODY, "body");
-
-        when(mockedParameters.getRequiredString(BODY))
-            .thenReturn((String) propertyStubsMap.get(BODY));
-
+    @BeforeEach
+    void beforeEach() {
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
@@ -62,14 +52,6 @@ class GithubCreateIssueCommentActionTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responeseMap);
-
-        Object result = GithubCreateIssueCommentAction.perform(mockedParameters, mockedParameters, mockedContext);
-
-        assertEquals(responeseMap, result);
-
-        Body body = bodyArgumentCaptor.getValue();
-
-        assertEquals(propertyStubsMap, body.getContent());
+            .thenReturn(responseMap);
     }
 }

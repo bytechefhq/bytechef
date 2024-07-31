@@ -23,8 +23,8 @@ import static com.bytechef.component.github.constant.GithubConstants.GITHUB;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.github.action.GithubCreateCommentOnIssueAction;
 import com.bytechef.component.github.action.GithubCreateIssueAction;
-import com.bytechef.component.github.action.GithubCreateIssueCommentAction;
 import com.bytechef.component.github.action.GithubGetIssueAction;
 import com.google.auto.service.AutoService;
 
@@ -36,14 +36,14 @@ public class GithubComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(GITHUB)
         .title("Github")
-        .description("Developer platform that allows developers to create, store, manage and share their code")
+        .description("GitHub is a web-based platform for version control and collaboration using Git.")
         .categories(ComponentCategory.DEVELOPER_TOOLS)
         .connection(CONNECTION_DEFINITION)
         .actions(
             GithubCreateIssueAction.ACTION_DEFINITION,
             GithubGetIssueAction.ACTION_DEFINITION,
-            GithubCreateIssueCommentAction.ACTION_DEFINITION)
-        .icon("path:assets/github_1.svg");
+            GithubCreateCommentOnIssueAction.ACTION_DEFINITION)
+        .icon("path:assets/github.svg");
 
     @Override
     public ComponentDefinition getDefinition() {

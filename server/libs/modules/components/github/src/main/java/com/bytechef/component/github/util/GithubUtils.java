@@ -18,8 +18,7 @@ package com.bytechef.component.github.util;
 
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.Context.Http;
-import static com.bytechef.component.github.constant.GithubConstants.BASE_URL;
-import static com.bytechef.component.github.constant.GithubConstants.REPO;
+import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.TypeReference;
@@ -37,33 +36,13 @@ public class GithubUtils {
     private GithubUtils() {
     }
 
-    public static List<Option<String>> getRepositoryOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        ActionContext context) {
-
-        List<Map<String, Object>> body = context.http(http -> http.get(BASE_URL + "/user" + "/repos"))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        List<Option<String>> options = new ArrayList<>();
-
-        for (Object item : body) {
-            if (item instanceof Map<?, ?> map) {
-                options.add(option((String) map.get("name"), (String) map.get("name")));
-            }
-        }
-
-        return options;
-    }
-
     public static List<Option<String>> getIssueOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
         ActionContext context) {
 
-        List<Map<String, Object>> body = context.http(http -> http.get(
-            BASE_URL + "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPO) +
-                "/issues"))
+        List<Map<String, Object>> body = context
+            .http(http -> http.get(
+                "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY) + "/issues"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -81,11 +60,31 @@ public class GithubUtils {
 
     public static String getOwnerName(ActionContext context) {
         Map<String, Object> body = context
-            .http(http -> http.get(BASE_URL + "/user"))
+            .http(http -> http.get("/user"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
         return (String) body.get("login");
+    }
+
+    public static List<Option<String>> getRepositoryOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
+        ActionContext context) {
+
+        List<Map<String, Object>> body = context.http(http -> http.get("/user/repos"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        List<Option<String>> options = new ArrayList<>();
+
+        for (Object item : body) {
+            if (item instanceof Map<?, ?> map) {
+                options.add(option((String) map.get("name"), (String) map.get("name")));
+            }
+        }
+
+        return options;
     }
 }

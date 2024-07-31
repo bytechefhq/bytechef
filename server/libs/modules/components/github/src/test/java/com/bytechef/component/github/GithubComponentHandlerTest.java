@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 class GithubComponentHandlerTest {
 
     @Test
-    public void testGetComponentDefinition() {
+    void testGetComponentDefinition() {
 
         JsonFileAssert.assertEquals("definition/github_v1.json", new GithubComponentHandler().getDefinition());
     }

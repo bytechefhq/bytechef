@@ -18,20 +18,21 @@ package com.bytechef.component.github.action;
 
 import static com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.github.constant.GithubConstants.BASE_URL;
 import static com.bytechef.component.github.constant.GithubConstants.GET_ISSUE;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE;
-import static com.bytechef.component.github.constant.GithubConstants.REPO;
+import static com.bytechef.component.github.constant.GithubConstants.ISSUE_OUTPUT_PROPERTY;
+import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
+import static com.bytechef.component.github.util.GithubUtils.getOwnerName;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.github.util.GithubUtils;
+import java.util.Map;
 
 /**
  * @author Luka Ljubić
@@ -39,37 +40,32 @@ import com.bytechef.component.github.util.GithubUtils;
 public class GithubGetIssueAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(GET_ISSUE)
-        .title("Get issue")
-        .description("Create a specific issue")
+        .title("Get Issue")
+        .description("Get information from a specific issue")
         .properties(
-            string(REPO)
-                .options((ActionOptionsFunction<String>) GithubUtils::getRepositoryOptions)
+            string(REPOSITORY)
                 .label("Repository")
-                .description("Select an repository")
+                .options((ActionOptionsFunction<String>) GithubUtils::getRepositoryOptions)
                 .required(true),
             string(ISSUE)
-                .options((ActionOptionsFunction<String>) GithubUtils::getIssueOptions)
-                .optionsLookupDependsOn(REPO)
                 .label("Issue")
-                .description("Select a issue")
+                .description("The issue you want to get details from.")
+                .options((ActionOptionsFunction<String>) GithubUtils::getIssueOptions)
+                .optionsLookupDependsOn(REPOSITORY)
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    string("id"),
-                    string("title"),
-                    string("url"),
-                    string("comments_url"),
-                    string("number")))
+        .outputSchema(ISSUE_OUTPUT_PROPERTY)
         .perform(GithubGetIssueAction::perform);
 
     private GithubGetIssueAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+    public static Map<String, Object> perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
         return context
-            .http(http -> http.get(BASE_URL + "/repos/" + GithubUtils.getOwnerName(context) + "/"
-                + inputParameters.getRequiredString(REPO) + "/issues/" + inputParameters.getString(ISSUE)))
+            .http(http -> http.get(
+                "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY) + "/issues/"
+                    + inputParameters.getString(ISSUE)))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
