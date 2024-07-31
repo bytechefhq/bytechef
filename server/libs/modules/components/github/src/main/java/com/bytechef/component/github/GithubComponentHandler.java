@@ -26,6 +26,8 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.github.action.GithubCreateCommentOnIssueAction;
 import com.bytechef.component.github.action.GithubCreateIssueAction;
 import com.bytechef.component.github.action.GithubGetIssueAction;
+import com.bytechef.component.github.trigger.GithubNewIssueTrigger;
+import com.bytechef.component.github.trigger.GithubNewPullRequestTrigger;
 import com.google.auto.service.AutoService;
 
 /**
@@ -43,7 +45,10 @@ public class GithubComponentHandler implements ComponentHandler {
             GithubCreateIssueAction.ACTION_DEFINITION,
             GithubGetIssueAction.ACTION_DEFINITION,
             GithubCreateCommentOnIssueAction.ACTION_DEFINITION)
-        .icon("path:assets/github.svg");
+        .icon("path:assets/github.svg")
+        .triggers(
+            GithubNewIssueTrigger.TRIGGER_DEFINITION,
+            GithubNewPullRequestTrigger.TRIGGER_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
