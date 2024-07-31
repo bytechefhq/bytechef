@@ -1,4 +1,4 @@
-import ComboBox, {ComboBoxItemType} from '@/components/ComboBox';
+import ComboBox, {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
 import IntegrationInstanceConfigurationDialogBasicStepIntegrationLabel from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationDialogBasicStepIntegrationLabel';
 import {useGetIntegrationsQuery} from '@/shared/queries/embedded/integrations.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
