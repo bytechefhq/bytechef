@@ -69,6 +69,8 @@
     "@tanstack/react-query": "^5.50.1",
     "@tanstack/react-query-devtools": "^5.50.1",
     "@tanstack/react-table": "^8.19.2",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/user-event": "^14.5.2",
     "@types/d3": "^7.4.3",
     "@types/quill": "^2.0.14",
     "@uidotdev/usehooks": "^2.4.1",
