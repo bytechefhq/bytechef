@@ -1,10 +1,10 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type {Meta, StoryObj} from '@storybook/react';
 
 import ComboBox from './ComboBox';
-import { comboBoxItemsMock } from './ComboBox.mock';
+import {comboBoxItemsMock} from './ComboBox.mock';
 
 const meta: Meta<typeof ComboBox> = {
-  component: ComboBox,
+    component: ComboBox,
 };
 
 export default meta;
@@ -20,4 +20,4 @@ export const Primary: Story = {
         onChange: () => {},
         value: comboBoxItemsMock[0].value,
     },
-  };
+};
