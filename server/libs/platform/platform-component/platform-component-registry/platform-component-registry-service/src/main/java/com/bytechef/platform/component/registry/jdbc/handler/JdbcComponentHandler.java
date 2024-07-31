@@ -18,6 +18,7 @@ package com.bytechef.platform.component.registry.jdbc.handler;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
+import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.definition.ComponentDSL.connection;
@@ -34,6 +35,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.SingleConnectionOutputFunction;
+import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -53,6 +55,7 @@ import java.util.Map;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 public class JdbcComponentHandler implements ComponentHandler {
 
@@ -64,13 +67,16 @@ public class JdbcComponentHandler implements ComponentHandler {
             integer(JdbcConstants.PORT).label("Port")
                 .required(true),
             string(JdbcConstants.DATABASE).label("Database")
-                .required(true),
-            string(JdbcConstants.USERNAME).label("Username")
-                .required(true),
-            string(JdbcConstants.PASSWORD)
-                .label("Password")
-                .controlType(Property.ControlType.PASSWORD)
-                .required(true));
+                .required(true))
+        .authorizations(
+            authorization(Authorization.AuthorizationType.CUSTOM).properties(
+                string(JdbcConstants.USERNAME)
+                    .label("Username")
+                    .required(true),
+                string(JdbcConstants.PASSWORD)
+                    .label("Password")
+                    .controlType(Property.ControlType.PASSWORD)
+                    .required(true)));
 
     private final List<ModifiableActionDefinition> actionDefinitions = List.of(
         action(JdbcConstants.QUERY)
