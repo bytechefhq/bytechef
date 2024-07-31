@@ -23,8 +23,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import java.util.ArrayList;
@@ -45,11 +45,8 @@ class GithubUtilsTest {
     private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @BeforeEach
-    public void beforeEach() {
-
+    void beforeEach() {
         when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.headers(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -65,7 +62,7 @@ class GithubUtilsTest {
         items.put("id", "123");
         body.add(items);
 
-        when(mockedResponse.getBody(any(Context.TypeReference.class)))
+        when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(body);
 
         List<Option<String>> expectedOptions = new ArrayList<>();
@@ -84,7 +81,7 @@ class GithubUtilsTest {
         items.put("number", 123);
         body.add(items);
 
-        when(mockedResponse.getBody(any(Context.TypeReference.class)))
+        when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(body);
 
         List<Option<String>> expectedOptions = new ArrayList<>();
@@ -100,7 +97,7 @@ class GithubUtilsTest {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("login", "name");
 
-        when(mockedResponse.getBody(any(Context.TypeReference.class)))
+        when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(body);
 
         String actualOwnerName = GithubUtils.getOwnerName(mockedContext);
