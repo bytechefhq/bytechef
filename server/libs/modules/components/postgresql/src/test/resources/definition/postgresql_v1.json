@@ -13,7 +13,67 @@
   "version": 1,
   "title": "PostgreSQL",
   "connection": {
-    "authorizations": null,
+    "authorizations": [ {
+      "detectOn": null,
+      "description": null,
+      "name": "custom",
+      "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "username",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Username",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "password",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Password",
+        "placeholder": null,
+        "controlType": "PASSWORD",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
+      "refreshOn": null,
+      "title": null,
+      "type": "CUSTOM",
+      "acquire": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "refreshToken": null,
+      "apply": null,
+      "clientId": null,
+      "pkce": null,
+      "refresh": null,
+      "refreshUrl": null,
+      "scopes": null,
+      "tokenUrl": null
+    } ],
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -51,8 +111,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -73,46 +133,6 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": null
-    }, {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "metadata": { },
-      "required": true,
-      "name": "username",
-      "type": "STRING",
-      "defaultValue": null,
-      "exampleValue": null,
-      "label": "Username",
-      "placeholder": null,
-      "controlType": "TEXT",
-      "languageId": null,
-      "maxLength": null,
-      "minLength": null,
-      "options": null,
-      "optionsDataSource": null
-    }, {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "metadata": { },
-      "required": true,
-      "name": "password",
-      "type": "STRING",
-      "defaultValue": null,
-      "exampleValue": null,
-      "label": "Password",
-      "placeholder": null,
-      "controlType": "PASSWORD",
-      "languageId": null,
-      "maxLength": null,
-      "minLength": null,
-      "options": null,
-      "optionsDataSource": null
     } ],
     "version": 1,
     "authorizationRequired": null,
@@ -121,6 +141,7 @@
   },
   "actions": [ {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": "Execute an SQL query.",
     "help": null,
@@ -199,8 +220,8 @@
         "label": null,
         "placeholder": null,
         "options": null,
-        "controlType": "DATE_TIME",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "DATE_TIME"
       }, {
         "advancedOption": null,
         "description": null,
@@ -221,8 +242,8 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "controlType": "NUMBER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "NUMBER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -247,18 +268,18 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Query",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "output": { },
-    "perform": { },
     "outputResponse": null,
-    "dynamicOutput": false
+    "output": { },
+    "perform": { }
   }, {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": "Insert rows in database.",
     "help": null,
@@ -306,7 +327,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
-      "description": "The list of the properties which should used as columns for the new rows.",
+      "description": "The list of the table field names where corresponding values would be inserted.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -316,7 +337,7 @@
       "type": "ARRAY",
       "defaultValue": null,
       "exampleValue": null,
-      "label": "Columns",
+      "label": "Fields",
       "placeholder": null,
       "items": [ {
         "advancedOption": null,
@@ -343,11 +364,11 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
-      "description": "List of rows.",
+      "description": "List of field values for corresponding field names",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -357,7 +378,7 @@
       "type": "ARRAY",
       "defaultValue": null,
       "exampleValue": null,
-      "label": "Rows",
+      "label": "Values",
       "placeholder": null,
       "items": [ {
         "advancedOption": null,
@@ -392,8 +413,8 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -433,8 +454,8 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "controlType": "DATE",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE"
         }, {
           "advancedOption": null,
           "description": null,
@@ -450,8 +471,8 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         }, {
           "advancedOption": null,
           "description": null,
@@ -469,8 +490,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -506,8 +527,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -526,8 +547,8 @@
           "multipleValues": null,
           "options": null,
           "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -563,31 +584,31 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "controlType": "TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "TIME"
         } ],
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Insert",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "output": { },
-    "perform": { },
     "outputResponse": null,
-    "dynamicOutput": false
+    "output": { },
+    "perform": { }
   }, {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": "Update rows in database.",
     "help": null,
@@ -635,7 +656,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
-      "description": "The list of the properties which should used as columns for the updated rows.",
+      "description": "The list of the table field names whose values would be updated.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -645,7 +666,7 @@
       "type": "ARRAY",
       "defaultValue": null,
       "exampleValue": null,
-      "label": "Columns",
+      "label": "Fields",
       "placeholder": null,
       "items": [ {
         "advancedOption": null,
@@ -672,11 +693,11 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
-      "description": "The name of the property which decides which rows in the database should be updated.",
+      "description": "The field name used as criteria to decide which rows in the database should be updated.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -696,7 +717,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
-      "description": "List of rows.",
+      "description": "List of field values for corresponding field names.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -706,7 +727,7 @@
       "type": "ARRAY",
       "defaultValue": null,
       "exampleValue": null,
-      "label": "Rows",
+      "label": "Values",
       "placeholder": null,
       "items": [ {
         "advancedOption": null,
@@ -741,8 +762,8 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -782,8 +803,8 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "controlType": "DATE",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE"
         }, {
           "advancedOption": null,
           "description": null,
@@ -799,8 +820,8 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         }, {
           "advancedOption": null,
           "description": null,
@@ -818,8 +839,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -855,8 +876,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -875,8 +896,8 @@
           "multipleValues": null,
           "options": null,
           "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -912,31 +933,31 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "controlType": "TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "TIME"
         } ],
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Update",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "output": { },
-    "perform": { },
     "outputResponse": null,
-    "dynamicOutput": false
+    "output": { },
+    "perform": { }
   }, {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": "Delete rows from database.",
     "help": null,
@@ -984,7 +1005,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
-      "description": "Name of the property which decides which rows in the database should be deleted.",
+      "description": "Name of the field which decides which rows in the database should be deleted.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -994,7 +1015,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "label": "Update Key",
+      "label": "Delete Key",
       "placeholder": "id",
       "controlType": "TEXT",
       "languageId": null,
@@ -1004,7 +1025,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
-      "description": "List of rows.",
+      "description": "List of values that are used to test delete key.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1014,7 +1035,7 @@
       "type": "ARRAY",
       "defaultValue": null,
       "exampleValue": null,
-      "label": "Rows",
+      "label": "Criteria Values",
       "placeholder": null,
       "items": [ {
         "advancedOption": null,
@@ -1049,8 +1070,8 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1090,8 +1111,8 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "controlType": "DATE",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1107,8 +1128,8 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1126,8 +1147,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1163,8 +1184,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1183,8 +1204,8 @@
           "multipleValues": null,
           "options": null,
           "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1220,31 +1241,31 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "controlType": "TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "TIME"
         } ],
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Delete",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "output": { },
-    "perform": { },
     "outputResponse": null,
-    "dynamicOutput": false
+    "output": { },
+    "perform": { }
   }, {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": "Execute an SQL DML or DML statement.",
     "help": null,
@@ -1272,17 +1293,17 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
-      "description": "List of rows.",
+      "description": "List of fields to select from.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
       "required": null,
-      "name": "rows",
+      "name": "columns",
       "type": "ARRAY",
       "defaultValue": null,
       "exampleValue": null,
-      "label": "Rows",
+      "label": "Fields to select",
       "placeholder": null,
       "items": [ {
         "advancedOption": null,
@@ -1317,8 +1338,8 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1358,8 +1379,8 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "controlType": "DATE",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1375,8 +1396,8 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1394,8 +1415,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1431,8 +1452,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1451,8 +1472,8 @@
           "multipleValues": null,
           "options": null,
           "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1488,24 +1509,24 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "controlType": "TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "TIME"
         } ],
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
-      "description": "The list of properties which should be used as parameters.",
+      "description": "The list of values which should be used to replace corresponding criteria parameters.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1556,8 +1577,8 @@
         "label": null,
         "placeholder": null,
         "options": null,
-        "controlType": "DATE_TIME",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "DATE_TIME"
       }, {
         "advancedOption": null,
         "description": null,
@@ -1578,8 +1599,8 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "controlType": "NUMBER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "NUMBER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -1604,16 +1625,15 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Execute",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "output": { },
-    "perform": { },
     "outputResponse": null,
-    "dynamicOutput": false
+    "output": { },
+    "perform": { }
   } ],
   "triggers": null
 }
