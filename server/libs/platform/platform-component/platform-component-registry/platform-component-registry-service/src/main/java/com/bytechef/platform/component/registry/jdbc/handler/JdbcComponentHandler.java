@@ -110,14 +110,14 @@ public class JdbcComponentHandler implements ComponentHandler {
                     .label("Table")
                     .description("Name of the table in which to insert data to.")
                     .required(true),
-                array(JdbcConstants.COLUMNS)
-                    .label("Columns")
+                array(JdbcConstants.FIELDS)
+                    .label("Fields")
                     .description(
-                        "The list of the properties which should used as columns for the new rows.")
+                        "The list of the table field names where corresponding values would be inserted.")
                     .items(string()),
-                array(JdbcConstants.ROWS)
-                    .label("Rows")
-                    .description("List of rows.")
+                array(JdbcConstants.FIELD_VALUES)
+                    .label("Values")
+                    .description("List of field values for corresponding field names")
                     .items(object().additionalProperties(
                         array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
                         string(), time())))
@@ -136,19 +136,19 @@ public class JdbcComponentHandler implements ComponentHandler {
                     .label("Table")
                     .description("Name of the table in which to update data in.")
                     .required(true),
-                array(JdbcConstants.COLUMNS)
-                    .label("Columns")
+                array(JdbcConstants.FIELDS)
+                    .label("Fields")
                     .description(
-                        "The list of the properties which should used as columns for the updated rows.")
+                        "The list of the table field names whose values would be updated.")
                     .items(string()),
                 string(JdbcConstants.UPDATE_KEY)
                     .label("Update Key")
                     .description(
-                        "The name of the property which decides which rows in the database should be updated.")
+                        "The field name used as criteria to decide which rows in the database should be updated.")
                     .placeholder("id"),
-                array(JdbcConstants.ROWS)
-                    .label("Rows")
-                    .description("List of rows.")
+                array(JdbcConstants.FIELD_VALUES)
+                    .label("Values")
+                    .description("List of field values for corresponding field names.")
                     .items(object().additionalProperties(
                         array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
                         string(), time())))
@@ -168,13 +168,13 @@ public class JdbcComponentHandler implements ComponentHandler {
                     .description("Name of the table in which to update data in.")
                     .required(true),
                 string(JdbcConstants.DELETE_KEY)
-                    .label("Update Key")
+                    .label("Delete Key")
                     .description(
-                        "Name of the property which decides which rows in the database should be deleted.")
+                        "Name of the field which decides which rows in the database should be deleted.")
                     .placeholder("id"),
-                array(JdbcConstants.ROWS)
-                    .label("Rows")
-                    .description("List of rows.")
+                array(JdbcConstants.FIELD_VALUES)
+                    .label("Criteria Values")
+                    .description("List of values that are used to test delete key.")
                     .items(object().additionalProperties(
                         array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
                         string(), time())))
@@ -191,15 +191,16 @@ public class JdbcComponentHandler implements ComponentHandler {
                     .placeholder(
                         "UPDATE TABLE product set name = :name WHERE product > :product AND price <= :price")
                     .required(true),
-                array(JdbcConstants.ROWS)
-                    .label("Rows")
-                    .description("List of rows.")
+                array(JdbcConstants.FIELDS)
+                    .label("Fields to select")
+                    .description("List of fields to select from.")
                     .items(object().additionalProperties(
                         array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
                         string(), time())),
                 object(JdbcConstants.PARAMETERS)
                     .label("Parameters")
-                    .description("The list of properties which should be used as parameters.")
+                    .description(
+                        "The list of values which should be used to replace corresponding criteria parameters.")
                     .additionalProperties(bool(), dateTime(), number(), string()))
             .output(getExecuteOutputSchemaFunction())
             .perform(this::performExecute));
