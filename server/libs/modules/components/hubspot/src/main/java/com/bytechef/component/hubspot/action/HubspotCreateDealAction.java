@@ -18,6 +18,8 @@ package com.bytechef.component.hubspot.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.date;
+import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
@@ -31,35 +33,31 @@ import java.util.Map;
  *
  * @generated
  */
-public class HubspotCreateContactAction {
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
-        .title("Create Contact")
-        .description("Create a contact with the given properties.")
+public class HubspotCreateDealAction {
+    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("createDeal")
+        .title("Create Deal")
+        .description("Creates a new deal.")
         .metadata(
             Map.of(
                 "method", "POST",
-                "path", "/crm/v3/objects/contacts", "bodyContentType", BodyContentType.JSON, "mimeType",
-                "application/json"
+                "path", "/crm/v3/objects/deals", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item")
-            .properties(object("properties").properties(string("firstname").label("First   Name")
+        .properties(object("__item").properties(object("properties").properties(string("dealname").label("Deal   Name")
+            .required(false),
+            number("amount").label("Amount")
                 .required(false),
-                string("lastname").label("Last   Name")
-                    .required(false),
-                string("email").label("Email   Address")
-                    .required(false),
-                string("phone").label("Phone   Number")
-                    .required(false),
-                string("company").label("Company")
-                    .description("Company contact belongs to.")
-                    .required(false),
-                string("website").label("Website")
-                    .description("Website of the contact.")
-                    .required(false))
-                .label("Properties")
+            date("closedate").label("Closedate")
+                .required(false),
+            string("pipeline").label("Pipeline")
+                .required(false),
+            string("dealstage").label("Deal   Stage")
+                .required(false),
+            string("hubspot_owner_id").label("Deal   Owner")
                 .required(false))
-            .label("Contact")
+            .label("Properties")
+            .required(false))
+            .label("Deal")
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
@@ -67,15 +65,15 @@ public class HubspotCreateContactAction {
             .properties(object("body")
                 .properties(string("id").required(false),
                     object("properties")
-                        .properties(string("firstname").required(false), string("lastname").required(false),
-                            string("email").required(false), string("phone").required(false),
-                            string("company").required(false), string("website").required(false))
+                        .properties(string("dealname").required(false), number("amount").required(false),
+                            date("closedate").required(false), string("pipeline").required(false),
+                            string("dealstage").required(false), string("hubspot_owner_id").required(false))
                         .required(false))
                 .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
 
-    private HubspotCreateContactAction() {
+    private HubspotCreateDealAction() {
     }
 }

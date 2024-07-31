@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.hubspot.property;
+package com.bytechef.component.example.connection;
 
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDSL.connection;
 
-import com.bytechef.component.definition.ComponentDSL;
-import java.util.List;
+import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 
-/**
- * Provides properties definition built from OpenAPI schema.
- *
- * @generated
- */
-public class HubspotPublicObjectIdProperties {
-    public static final List<ComponentDSL.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(string("id").label("Id")
-        .required(true));
+public class ExampleConnection {
+
+    public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .baseUri((connectionParameters, context) -> "baseUri")
+        .authorizations(
+        // TODO
+        );
+
+    private ExampleConnection() {
+    }
 }

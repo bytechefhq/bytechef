@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.example.constant;
+package com.bytechef.component.hubspot.constant;
 
 /**
- * @author Mario Cvjetojevic
+ * @author Monika Kušter
  */
-public final class ExampleConstants {
+public class HubspotConstants {
 
-    public static final String DUMMY = "dummy";
-    public static final String EXAMPLE = "example";
+    public static final String ID = "id";
+    public static final String LABEL = "label";
+    public static final String RESULTS = "results";
 
-    private ExampleConstants() {
+    private HubspotConstants() {
     }
 }
