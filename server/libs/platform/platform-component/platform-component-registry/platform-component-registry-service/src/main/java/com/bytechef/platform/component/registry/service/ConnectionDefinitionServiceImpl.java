@@ -72,6 +72,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 @Service("connectionDefinitionService")
 public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionService {
@@ -300,13 +301,13 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     public List<ConnectionDefinition> getConnectionDefinitions(
         @NonNull String componentName, @NonNull Integer componentVersion) {
 
-        return getConnectionComponentDefinitions(componentName, componentVersion)
+        return getConnectableComponentDefinitions(componentName, componentVersion)
             .stream()
             .map(ConnectionDefinitionServiceImpl::toConnectionDefinition)
             .toList();
     }
 
-    private List<ComponentDefinition> getConnectionComponentDefinitions(
+    private List<ComponentDefinition> getConnectableComponentDefinitions(
         String componentName, int componentVersion) {
 
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
