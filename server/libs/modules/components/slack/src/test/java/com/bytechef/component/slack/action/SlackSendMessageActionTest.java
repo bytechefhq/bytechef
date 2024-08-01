@@ -16,32 +16,21 @@
 
 package com.bytechef.component.slack.action;
 
-import static com.bytechef.component.slack.constant.SlackConstants.CHANNEL_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import com.slack.api.methods.SlackApiException;
-import java.io.IOException;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Mario Cvjetojevic
+ * @author Monika Kušter
  */
 class SlackSendMessageActionTest extends AbstractSlackActionTest {
 
     @Test
-     void testPerform() throws SlackApiException, IOException {
-        when(mockedParameters.getRequiredString(CHANNEL_ID))
-            .thenReturn(CHANNEL_ID);
+    void testPerform() {
+        Object result = SlackSendMessageAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        SlackSendMessageAction.perform(mockedParameters, mockedParameters, mockedContext);
-
-        verify(mockedMethodsClient, times(1))
-            .chatPostMessage(chatPostMessageRequestArgumentCaptor.capture());
-        assertEquals(CHANNEL_ID, chatPostMessageRequestArgumentCaptor.getValue()
-            .getChannel());
+        assertEquals(mockedObject, result);
     }
 
 }
