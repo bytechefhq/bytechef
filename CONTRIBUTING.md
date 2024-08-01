@@ -43,27 +43,41 @@ By participating, you are expected to uphold this code. Please report unacceptab
 #### We Use [GitHub Flow](https://guides.github.com/introduction/flow/index.html), So All Code Changes Happen Through Pull Requests
 Pull requests are the best way to propose changes to the codebase (we use [Git-Flow](https://nvie.com/posts/a-successful-git-branching-model/)). We actively welcome your pull requests:
 
-1. Fork the repo and create a new branch from the `develop` branch.
+1. Fork the repo and create a new branch from the `develop` branch (currently, temporarily, it's the `master` branch).
 2. Branches are named as `bug/fix-name` or `feature/feature-name`
-3. To work on the client codebase, go through [Client Side](#client-side) and [Setup with Docker](#setup-with-docker)
-4. To work on the server codebase, go through [Server Side](#server-side) and [Local Setup](#local-setup)
-4. Please add tests for your changes. Client-side changes require Vitest/Playwright tests while server-side changes require JUnit/Integration tests.
-5. When you finish adding your changes, run the following commands inside the `client` directory if you worked on the client codebase:
+3. To work on the client codebase, go through [Client Side](#client-side). To work on the server codebase, go through [Server Side](#server-side). 
+4. Once you are confident in your code changes, create a pull request in your fork to the `develop` branch (currently, temporarily, it's the `master` branch) in the bytechefhq/bytechef base repository.
+5. If you've changed any APIs, please mention it in the pull request and ensure backward compatibility.
+6. Link the issue of the base repository in your Pull request description. [Guide](https://docs.github.com/en/free-pro-team@latest/github/managing-your-work-on-github/linking-a-pull-request-to-an-issue)
+7. When you raise a pull request, we automatically run tests on our CI. Please ensure that all the tests are passing for your code change. We will not be able to accept your change if the test suite doesn't pass. 
+
+[//]: # (8. Documentation: When new features are added or there are changes to existing features that require updates to documentation, we encourage you to add/update any missing documentation in the [`/docs` folder]&#40;https://github.com/bytechefhq/bytechef/tree/master/docs&#41;. To update an existing documentation page, you can simply click on the `Edit this page` button on the bottom left corner of the documentation page.)
+
+
+### Client Side
+
+1. Run the client successfully: [Setup with Docker](#setup-with-docker).
+2. Add your changes.
+3. Please add tests for your changes. Client-side changes require Vitest/Playwright tests.
+4. When you finish adding your changes, run the following commands inside the `client` directory:
     ```bash
     ./npm run format
     ./npm run check
     ```
-   and/or inside the `server` directory if you worked on the server codebase:
+   If there are no errors, you can continue through the steps.
+
+### Server Side
+
+1. Run the server successfully: [Local Setup](#local-setup).
+2. Add your changes. 
+3. Please add tests for your changes. Server-side changes require JUnit/Integration tests. 
+4. If you are working on a component, you need to (re)generate the .json file. The .json file is located in `./src/test/resources/definition/.json`. If such file exists, you have to delete it. Open a file located in `./src/test/java/com/bytechef/component/...` that ends with the postfix `ComponentHandlerTest`. By running all tests if that file, the new .json file will be automatically generated.
+4. When you finish adding your changes, run the following commands inside `server` directory or in the root directory of your component if you worked on a component:
     ```bash
     ./gradlew spotlessApply
     ./gradlew check
     ```
-6. Once you are confident in your code changes, create a pull request in your fork to the `develop` branch in the bytechefhq/bytechef base repository.
-7. If you've changed any APIs, please call this out in the pull request and ensure backward compatibility.
-8. Link the issue of the base repository in your Pull request description. [Guide](https://docs.github.com/en/free-pro-team@latest/github/managing-your-work-on-github/linking-a-pull-request-to-an-issue)
-9. When you raise a pull request, we automatically run tests on our CI. Please ensure that all the tests are passing for your code change. We will not be able to accept your change if the test suite doesn't pass.
-10. Documentation: When new features are added or there are changes to existing features that require updates to documentation, we encourage you to add/update any missing documentation in the [`/docs` folder](https://github.com/bytechefhq/bytechef/tree/master/docs). To update an existing documentation page, you can simply click on the `Edit this page` button on the bottom left corner of the documentation page.
-
+   If there are no errors, you can continue through the steps.
 
 # Setup ByteChef platform for local development and testing
 ByteChef platform consists of three major parts. User interface is implemented with Node, ReactJS and TypeScript. Backend microservices are implemented in Java programming language and Spring framework. Dependent infrastructure PostgreSQL, RabbitMQ, Redis. Each part could be encapsulated in Docker container to reduce efforts.
@@ -183,6 +197,12 @@ docker compose -f docker-compose.dev.server.yml down --rmi local
 docker compose -f docker-compose.dev.server.yml up -d
 ```
 
+#### Initial users available:
+- username: admin@localhost.com
+  - password: admin
+- username: user@localhost.com
+  - password: user
+
 
 ## Local Setup
 
@@ -193,7 +213,7 @@ This section doesn't provide instructions to install Java and Gradle because the
 
 #### Setting up local development infrastructure using Docker
 
-3. Use `docker-compose.dev.infra.yml` for running required infrastructure (PostgreSQL, Redis):
+Use `docker-compose.dev.infra.yml` for running required infrastructure (PostgreSQL, Redis):
 
     ```bash
     docker compose -f docker-compose.dev.infra.yml up -d
@@ -210,7 +230,7 @@ This section doesn't provide instructions to install Java and Gradle because the
 ./gradlew check
 ```
 
-#### Running Tests
+### Running Tests
 
 ```bash
 ./gradlew test && ./gradlew testIntegration
@@ -230,6 +250,19 @@ For server local setup:
 ```bash
 docker compose -f server/docker-compose.dev.infra.yml down -v
 ```
+
+#### spotlessApply generates unwanted files
+If you ran our source formatting for java code (`./gradlew spotlessApply`) and a bunch of files were generated, it might be your git configuration.
+
+Run `git config --list --local` in your command line. If `core.filemode` is true, set it to false:
+```bash
+git config core.filemode false 
+```
+If you are using windows, you need to switch LF endings to CRLF endings:
+```bash
+git config core.autocrlf true
+```
+
 
 ## Questions?
 Contact us on [Discord](https://discord.gg/VKvNxHjpYx) or mail us at [support@bytechef.io](mailto:support@bytechef.io).
