@@ -91,6 +91,6 @@ public class CsvFileWriteActionTest {
 
     private List<Map<String, Object>> read(InputStream inputStream, Context context) throws IOException {
         return CsvFileReadAction.read(
-            inputStream, new ReadConfiguration(",", true, true, 0, Integer.MAX_VALUE, false), context);
+            inputStream, new ReadConfiguration(",", null, true, true, 0, Integer.MAX_VALUE, false), context);
     }
 }
