@@ -15,6 +15,7 @@
   "connection": null,
   "actions": [ {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Reads data from a csv file.",
     "help": null,
@@ -118,7 +119,7 @@
       "controlType": "FILE_ENTRY"
     }, {
       "advancedOption": true,
-      "description": "Delimiter to use when reading a csv file.",
+      "description": "Character used to separate values within the line red from the CSV file.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -130,6 +131,26 @@
       "exampleValue": null,
       "label": "Delimiter",
       "placeholder": null,
+      "controlType": "TEXT",
+      "languageId": null,
+      "maxLength": null,
+      "minLength": null,
+      "options": null,
+      "optionsDataSource": null
+    }, {
+      "advancedOption": true,
+      "description": "    Character used to wrap/enclose values. It is usually applied to complex CSV files where\n    values may include delimiter characters.\n",
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": null,
+      "name": "enclosingCharacter",
+      "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
+      "label": "Enclosing character",
+      "placeholder": "\" ' / ",
       "controlType": "TEXT",
       "languageId": null,
       "maxLength": null,
@@ -201,8 +222,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": true,
       "description": "The page number to get.",
@@ -220,8 +241,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": true,
       "description": "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.",
@@ -248,14 +269,14 @@
       "controlType": "SELECT"
     } ],
     "title": "Read from file",
-    "perform": { },
-    "output": null,
     "outputResponse": null,
-    "dynamicOutput": true,
+    "output": null,
+    "perform": { },
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Writes the data to a csv file.",
     "help": null,
@@ -328,8 +349,8 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         }, {
           "advancedOption": null,
           "description": null,
@@ -350,8 +371,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -376,15 +397,15 @@
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": true,
       "description": "Filename to set for binary data. By default, \"file.csv\" will be used.",
@@ -407,8 +428,6 @@
       "optionsDataSource": null
     } ],
     "title": "Write to file",
-    "perform": { },
-    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -509,7 +528,8 @@
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true,
+    "output": null,
+    "perform": { },
     "processErrorResponse": null,
     "workflowNodeDescription": null
   } ],
