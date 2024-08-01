@@ -43,6 +43,7 @@ import org.apache.commons.lang3.BooleanUtils;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 public class CsvFileReadAction {
 
@@ -57,8 +58,17 @@ public class CsvFileReadAction {
                 .required(true),
             string(CsvFileConstants.DELIMITER)
                 .label("Delimiter")
-                .description("Delimiter to use when reading a csv file.")
+                .description("Character used to separate values within the line red from the CSV file.")
                 .defaultValue(",")
+                .advancedOption(true),
+            string(CsvFileConstants.ENCLOSING_CHARACTER)
+                .label("Enclosing character")
+                .description(
+                    """
+                            Character used to wrap/enclose values. It is usually applied to complex CSV files where
+                            values may include delimiter characters.
+                        """)
+                .placeholder("\" ' / ")
                 .advancedOption(true),
             bool(CsvFileConstants.HEADER_ROW)
                 .label("Header Row")

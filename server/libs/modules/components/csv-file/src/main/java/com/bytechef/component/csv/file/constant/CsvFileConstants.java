@@ -20,11 +20,13 @@ import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 public class CsvFileConstants {
 
     public static final String ROWS = "rows";
     public static final String DELIMITER = "delimiter";
+    public static final String ENCLOSING_CHARACTER = "enclosingCharacter";
     public static final String HEADER_ROW = "headerRow";
     public static final String PAGE_SIZE = "pageSize";
     public static final String PAGE_NUMBER = "pageNumber";
