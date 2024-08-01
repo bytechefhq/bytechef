@@ -16,105 +16,85 @@
 
 package com.bytechef.component.slack.util;
 
-import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.slack.constant.SlackConstants.AS_USER;
-import static com.bytechef.component.slack.constant.SlackConstants.ATTACHMENTS;
-import static com.bytechef.component.slack.constant.SlackConstants.BLOCKS;
-import static com.bytechef.component.slack.constant.SlackConstants.ICON_EMOJI;
-import static com.bytechef.component.slack.constant.SlackConstants.ICON_URL;
-import static com.bytechef.component.slack.constant.SlackConstants.LINK_NAMES;
-import static com.bytechef.component.slack.constant.SlackConstants.METADATA;
-import static com.bytechef.component.slack.constant.SlackConstants.MRKDWN;
-import static com.bytechef.component.slack.constant.SlackConstants.PARSE;
-import static com.bytechef.component.slack.constant.SlackConstants.REPLY_BROADCAST;
+import static com.bytechef.component.slack.constant.SlackConstants.CHANNEL;
+import static com.bytechef.component.slack.constant.SlackConstants.ID;
+import static com.bytechef.component.slack.constant.SlackConstants.NAME;
 import static com.bytechef.component.slack.constant.SlackConstants.TEXT;
-import static com.bytechef.component.slack.constant.SlackConstants.THREAD_TS;
-import static com.bytechef.component.slack.constant.SlackConstants.UNFURL_LINKS;
-import static com.bytechef.component.slack.constant.SlackConstants.UNFURL_MEDIA;
-import static com.bytechef.component.slack.constant.SlackConstants.USERNAME;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import com.slack.api.bolt.App;
-import com.slack.api.methods.SlackApiException;
-import com.slack.api.methods.request.chat.ChatPostMessageRequest;
-import com.slack.api.methods.request.conversations.ConversationsListRequest;
-import com.slack.api.methods.request.users.UsersListRequest;
-import com.slack.api.methods.response.chat.ChatPostMessageResponse;
-import com.slack.api.methods.response.conversations.ConversationsListResponse;
-import com.slack.api.methods.response.users.UsersListResponse;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
  * @author Ivica Cardic
+ * @author Monika Kušter
  */
 public class SlackUtils {
 
-    public static ChatPostMessageResponse chatPostMessage(
-        Parameters inputParameters, Parameters connectionParameters, String channelParameter)
-        throws SlackApiException, IOException {
+    private SlackUtils() {
+    }
 
-        return new App()
-            .client()
-            .chatPostMessage(ChatPostMessageRequest
-                .builder()
-                .token(connectionParameters.getRequiredString(ACCESS_TOKEN))
-                .channel(inputParameters.getRequiredString(channelParameter))
-                .attachmentsAsString(inputParameters.getString(ATTACHMENTS))
-                .blocksAsString(inputParameters.getString(BLOCKS))
-                .text(inputParameters.getString(TEXT))
-                .asUser(inputParameters.getBoolean(AS_USER))
-                .iconEmoji(inputParameters.getString(ICON_EMOJI))
-                .iconUrl(inputParameters.getString(ICON_URL))
-                .linkNames(inputParameters.getBoolean(LINK_NAMES))
-                .metadataAsString(inputParameters.getString(METADATA))
-                .mrkdwn(inputParameters.getBoolean(MRKDWN))
-                .parse(inputParameters.getString(PARSE))
-                .replyBroadcast(inputParameters.getBoolean(REPLY_BROADCAST))
-                .threadTs(inputParameters.getString(THREAD_TS))
-                .unfurlLinks(inputParameters.getBoolean(UNFURL_LINKS))
-                .unfurlMedia(inputParameters.getBoolean(UNFURL_MEDIA))
-                .username(inputParameters.getString(USERNAME))
-                .build());
+    public static Object sendMessage(Parameters inputParameters, ActionContext actionContext) {
+        return actionContext
+            .http(http -> http.post("/chat.postMessage"))
+            .body(
+                Http.Body.of(
+                    CHANNEL, inputParameters.getRequiredString(CHANNEL),
+                    TEXT, inputParameters.getRequiredString(TEXT)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
     }
 
     public static List<Option<String>> getChannelOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context)
-        throws IOException, SlackApiException {
+        String searchText, ActionContext context) {
 
-        ConversationsListResponse response = new App()
-            .client()
-            .conversationsList(
-                ConversationsListRequest
-                    .builder()
-                    .token(connectionParameters.getRequiredString(ACCESS_TOKEN))
-                    .build());
+        Map<String, Object> body = context
+            .http(http -> http.get("/conversations.list"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
 
-        return response.getChannels()
-            .stream()
-            .map(channel -> (Option<String>) option(channel.getName(), channel.getId()))
-            .toList();
+        List<Option<String>> options = new ArrayList<>();
+
+        if (body.get("channels") instanceof List<?> list) {
+            for (Object o : list) {
+                if (o instanceof Map<?, ?> map) {
+                    options.add(option((String) map.get(NAME), (String) map.get(ID)));
+                }
+            }
+        }
+
+        return options;
     }
 
     public static List<Option<String>> getUserOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) throws IOException, SlackApiException {
+        String searchText, ActionContext context) {
 
-        UsersListResponse response = new App()
-            .client()
-            .usersList(
-                UsersListRequest.builder()
-                    .token(connectionParameters.getRequiredString(ACCESS_TOKEN))
-                    .build());
+        Map<String, Object> body = context
+            .http(http -> http.get("/users.list"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
 
-        return response.getMembers()
-            .stream()
-            .map(user -> (Option<String>) option(user.getName(), user.getId()))
-            .toList();
+        List<Option<String>> options = new ArrayList<>();
+
+        if (body.get("members") instanceof List<?> list) {
+            for (Object o : list) {
+                if (o instanceof Map<?, ?> map) {
+                    options.add(option((String) map.get(NAME), (String) map.get(ID)));
+                }
+            }
+        }
+
+        return options;
     }
 }

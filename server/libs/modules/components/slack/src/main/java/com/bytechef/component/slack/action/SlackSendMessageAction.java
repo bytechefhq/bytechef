@@ -19,76 +19,43 @@ package com.bytechef.component.slack.action;
 import static com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.slack.constant.SlackConstants.AS_USER_PROPERTY;
-import static com.bytechef.component.slack.constant.SlackConstants.ATTACHMENTS_PROPERTY;
-import static com.bytechef.component.slack.constant.SlackConstants.BLOCKS_PROPERTY;
-import static com.bytechef.component.slack.constant.SlackConstants.CHANNEL_ID;
+import static com.bytechef.component.slack.constant.SlackConstants.CHANNEL;
 import static com.bytechef.component.slack.constant.SlackConstants.CHAT_POST_MESSAGE_RESPONSE_PROPERTY;
-import static com.bytechef.component.slack.constant.SlackConstants.CONTENT_TYPE_PROPERTY;
-import static com.bytechef.component.slack.constant.SlackConstants.ICON_EMOJI_PROPERTY;
-import static com.bytechef.component.slack.constant.SlackConstants.ICON_URL_PROPERTY;
-import static com.bytechef.component.slack.constant.SlackConstants.LINK_NAMES_PROPERTY;
-import static com.bytechef.component.slack.constant.SlackConstants.METADATA_PROPERTY;
-import static com.bytechef.component.slack.constant.SlackConstants.MRKDWN_PROPERTY;
-import static com.bytechef.component.slack.constant.SlackConstants.PARSE_PROPERTY;
-import static com.bytechef.component.slack.constant.SlackConstants.REPLY_BROADCAST_PROPERTY;
 import static com.bytechef.component.slack.constant.SlackConstants.SEND_MESSAGE;
 import static com.bytechef.component.slack.constant.SlackConstants.TEXT_PROPERTY;
-import static com.bytechef.component.slack.constant.SlackConstants.THREAD_TS_PROPERTY;
-import static com.bytechef.component.slack.constant.SlackConstants.UNFURL_LINKS_PROPERTY;
-import static com.bytechef.component.slack.constant.SlackConstants.UNFURL_MEDIA_PROPERTY;
-import static com.bytechef.component.slack.constant.SlackConstants.USERNAME_PROPERTY;
+import static com.bytechef.component.slack.util.SlackUtils.sendMessage;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.slack.util.SlackUtils;
-import com.slack.api.methods.SlackApiException;
-import com.slack.api.methods.response.chat.ChatPostMessageResponse;
-import java.io.IOException;
 
 /**
  * @author Mario Cvjetojevic
+ * @author Monika Kušter
  */
-public final class SlackSendMessageAction {
+public class SlackSendMessageAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEND_MESSAGE)
         .title("Send message")
-        .description(
-            "Posts a message to a public channel, private channel, or existing direct message conversation.")
+        .description("Sends a message to a public channel, private channel, or existing direct message conversation.")
         .properties(
-            string(CHANNEL_ID)
+            string(CHANNEL)
                 .label("Channel")
-                .description("The id of a channel where the message will be sent.")
+                .description("Channel, private group, or IM channel to send message to.")
                 .options((ActionOptionsFunction<String>) SlackUtils::getChannelOptions)
                 .required(true),
-            CONTENT_TYPE_PROPERTY,
-            ATTACHMENTS_PROPERTY,
-            BLOCKS_PROPERTY,
-            TEXT_PROPERTY,
-            AS_USER_PROPERTY,
-            ICON_EMOJI_PROPERTY,
-            ICON_URL_PROPERTY,
-            LINK_NAMES_PROPERTY,
-            METADATA_PROPERTY,
-            MRKDWN_PROPERTY,
-            PARSE_PROPERTY,
-            REPLY_BROADCAST_PROPERTY,
-            THREAD_TS_PROPERTY,
-            UNFURL_LINKS_PROPERTY,
-            UNFURL_MEDIA_PROPERTY,
-            USERNAME_PROPERTY)
+            TEXT_PROPERTY)
         .outputSchema(CHAT_POST_MESSAGE_RESPONSE_PROPERTY)
         .perform(SlackSendMessageAction::perform);
 
     private SlackSendMessageAction() {
     }
 
-    public static ChatPostMessageResponse perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
-        throws IOException, SlackApiException {
+    public static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return SlackUtils.chatPostMessage(inputParameters, connectionParameters, CHANNEL_ID);
+        return sendMessage(inputParameters, actionContext);
     }
 
 }
