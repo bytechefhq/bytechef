@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
  * @author Arik Cohen
  * @author Ivica Cardic
  */
-class BashComponentHandlerTest {
+public class BashComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
