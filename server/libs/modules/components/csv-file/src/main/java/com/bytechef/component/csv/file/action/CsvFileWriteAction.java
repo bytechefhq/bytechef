@@ -35,7 +35,6 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -45,7 +44,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -70,21 +68,23 @@ public class CsvFileWriteAction {
         .outputSchema(fileEntry())
         .perform(CsvFileWriteAction::perform);
 
-    private CsvFileWriteAction() {}
+    private CsvFileWriteAction() {
+    }
 
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
         List<Map<String, ?>> rows =
             inputParameters.getList(ROWS, new TypeReference<>() {}, List.of());
-        FileEntry requiredFileEntry = inputParameters.getRequiredFileEntry(CsvFileConstants.FILE_ENTRY);
+        FileEntry requiredFileEntry = inputParameters.getRequiredFileEntry(FILE_ENTRY);
 
         write(rows, requiredFileEntry, context);
 
         return requiredFileEntry;
     }
 
-    private static void write(List<Map<String, ?>> rows, FileEntry requiredFileEntry, ActionContext context) throws IOException {
+    private static void write(List<Map<String, ?>> rows, FileEntry requiredFileEntry, ActionContext context)
+        throws IOException {
         InputStream inputStream = context.file(file -> file.getStream(requiredFileEntry));
         Set<String> keys = null;
         try (BufferedReader bufferedReader = new BufferedReader(
@@ -99,20 +99,25 @@ public class CsvFileWriteAction {
                 .with(headerSchema)
                 .readValues(bufferedReader);
 
-            keys = iterator.next().keySet();
+            keys = iterator.next()
+                .keySet();
         }
 
-        FileOutputStream outputStream = new FileOutputStream(requiredFileEntry.getUrl());
-        if(keys!=null) {
-            for (Map<String, ?> row : rows) {
-                Map<String, String> tempMap = keys.stream()
-                    .collect(Collectors.toMap(key->key, key->""));
-                for (Map.Entry<String, ?> enrty: row.entrySet()){
-                    if(keys.contains(enrty.getKey())) tempMap.put(enrty.getKey(), enrty.getValue().toString());
-                }
+        try (FileOutputStream outputStream = new FileOutputStream(requiredFileEntry.getUrl())) {
+            if (keys != null) {
+                for (Map<String, ?> row : rows) {
+                    Map<String, String> tempMap = keys.stream()
+                        .collect(Collectors.toMap(key -> key, key -> ""));
+                    for (Map.Entry<String, ?> enrty : row.entrySet()) {
+                        if (keys.contains(enrty.getKey()))
+                            tempMap.put(enrty.getKey(), enrty.getValue()
+                                .toString());
+                    }
 
-                for(Map.Entry<String, String> entry : tempMap.entrySet()) {
-                    outputStream.write(entry.getValue().getBytes(StandardCharsets.UTF_8));
+                    for (Map.Entry<String, String> entry : tempMap.entrySet()) {
+                        outputStream.write(entry.getValue()
+                            .getBytes(StandardCharsets.UTF_8));
+                    }
                 }
             }
         }
