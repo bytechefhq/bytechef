@@ -39,7 +39,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,7 +51,6 @@ import org.junit.jupiter.api.Test;
 class CsvFileReadActionTest {
     private static final ActionContext context = mock(ActionContext.class);
     private final Parameters parameters = mock(Parameters.class);
-
 
     @Test
     void testPerformReadCSVHeaderRow() throws Exception {
@@ -94,13 +92,17 @@ class CsvFileReadActionTest {
         testPerformReadCSV(false, true, true);
     }
 
-    private void testPerformReadCSV(boolean headerRow, boolean includeEmptyCells, boolean readAsString) throws IOException {
+    private void testPerformReadCSV(boolean headerRow, boolean includeEmptyCells, boolean readAsString)
+        throws IOException {
         List<JSONObject> jsonObjects = null;
-        if(headerRow) jsonObjects = getJSONObjectsWithNamedColumns(includeEmptyCells, readAsString);
-        else jsonObjects = getJSONArrayWithoutNamedColumns(includeEmptyCells, readAsString);
+        if (headerRow)
+            jsonObjects = getJSONObjectsWithNamedColumns(includeEmptyCells, readAsString);
+        else
+            jsonObjects = getJSONArrayWithoutNamedColumns(includeEmptyCells, readAsString);
         JSONArray expected = new JSONArray(jsonObjects);
 
-        Parameters mockedParameters = getReadParameters(headerRow, includeEmptyCells, null, null, readAsString, getFile("sample_header.csv"), parameters);
+        Parameters mockedParameters = getReadParameters(headerRow, includeEmptyCells, null, null, readAsString,
+            getFile("sample_header.csv"), parameters);
 
         JSONArray result = new JSONArray(CsvFileReadAction.perform(mockedParameters, parameters, context));
 
@@ -111,13 +113,13 @@ class CsvFileReadActionTest {
     void testPerformReadCSVPaging() throws Exception {
         JSONArray expected = new JSONArray(getJSONObjectsWithNamedColumns(false, false).subList(0, 3));
 
-        Parameters mockedParameters = getReadParameters(true, false, 1, 3, false, getFile("sample_header.csv"), parameters);
+        Parameters mockedParameters =
+            getReadParameters(true, false, 1, 3, false, getFile("sample_header.csv"), parameters);
 
         JSONArray result = new JSONArray(CsvFileReadAction.perform(mockedParameters, parameters, context));
 
         assertEquals(expected, result, true);
     }
-
 
     @SuppressWarnings("PMD.SimplifiedTernary")
     private List<JSONObject> getJSONObjectsWithNamedColumns(boolean includeEmptyCells, boolean readAsString)
@@ -294,8 +296,8 @@ class CsvFileReadActionTest {
 
     private File getFile(String fileName) {
         return new File(Objects.requireNonNull(CsvFileComponentHandlerTest.class
-                        .getClassLoader()
-                        .getResource("dependencies/csv-file/" + fileName))
+            .getClassLoader()
+            .getResource("dependencies/csv-file/" + fileName))
             .getFile());
     }
 }

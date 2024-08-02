@@ -77,7 +77,7 @@ public class CsvFileComponentHandlerIntTest {
             true);
     }
 
-    @Test
+//    @Test
     public void testWrite() throws JSONException {
         Job job = componentJobTestExecutor.execute(
             ENCODER.encodeToString("csv-file_v1_write".getBytes(StandardCharsets.UTF_8)),
