@@ -45,11 +45,11 @@ Pull requests are the best way to propose changes to the codebase (we use [Git-F
 
 1. Fork the repo and create a new branch from the `develop` branch (currently, temporarily, it's the `master` branch).
 2. Branches are named as `bug/fix-name` or `feature/feature-name`
-3. To work on the client codebase, go through [Client Side](#client-side). To work on the server codebase, go through [Server Side](#server-side). 
+3. To work on the client codebase, go through [Client Side](#client-side). To work on the server codebase, go through [Server Side](#server-side).
 4. Once you are confident in your code changes, create a pull request in your fork to the `develop` branch (currently, temporarily, it's the `master` branch) in the bytechefhq/bytechef base repository.
 5. If you've changed any APIs, please mention it in the pull request and ensure backward compatibility.
 6. Link the issue of the base repository in your Pull request description. [Guide](https://docs.github.com/en/free-pro-team@latest/github/managing-your-work-on-github/linking-a-pull-request-to-an-issue)
-7. When you raise a pull request, we automatically run tests on our CI. Please ensure that all the tests are passing for your code change. We will not be able to accept your change if the test suite doesn't pass. 
+7. When you raise a pull request, we automatically run tests on our CI. Please ensure that all the tests are passing for your code change. We will not be able to accept your change if the test suite doesn't pass.
 
 [//]: # (8. Documentation: When new features are added or there are changes to existing features that require updates to documentation, we encourage you to add/update any missing documentation in the [`/docs` folder]&#40;https://github.com/bytechefhq/bytechef/tree/master/docs&#41;. To update an existing documentation page, you can simply click on the `Edit this page` button on the bottom left corner of the documentation page.)
 
@@ -69,8 +69,8 @@ Pull requests are the best way to propose changes to the codebase (we use [Git-F
 ### Server Side
 
 1. Run the server successfully: [Local Setup](#local-setup).
-2. Add your changes. 
-3. Please add tests for your changes. Server-side changes require JUnit/Integration tests. 
+2. Add your changes.
+3. Please add tests for your changes. Server-side changes require JUnit/Integration tests.
 4. If you are working on a component, you need to (re)generate the .json file. The .json file is located in `./src/test/resources/definition/.json`. If such file exists, you have to delete it. Open a file located in `./src/test/java/com/bytechef/component/...` that ends with the postfix `ComponentHandlerTest`. By running all tests if that file, the new .json file will be automatically generated.
 4. When you finish adding your changes, run the following commands inside `server` directory or in the root directory of your component if you worked on a component:
     ```bash
@@ -256,7 +256,7 @@ If you ran our source formatting for java code (`./gradlew spotlessApply`) and a
 
 Run `git config --list --local` in your command line. If `core.filemode` is true, set it to false:
 ```bash
-git config core.filemode false 
+git config core.filemode false
 ```
 If you are using windows, you need to switch LF endings to CRLF endings:
 ```bash
