@@ -91,8 +91,9 @@ public class ConnectionDefinition extends ConnectionDefinitionBasic {
             "} ";
     }
 
-    private static List<Authorization>
-        toAuthorizationDTOs(List<? extends com.bytechef.component.definition.Authorization> authorizations) {
+    private static List<Authorization> toAuthorizationDTOs(
+        List<? extends com.bytechef.component.definition.Authorization> authorizations) {
+
         return authorizations.stream()
             .map(Authorization::new)
             .toList();

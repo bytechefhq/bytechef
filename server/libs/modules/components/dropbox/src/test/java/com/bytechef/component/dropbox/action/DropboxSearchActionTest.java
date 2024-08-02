@@ -16,33 +16,47 @@
 
 package com.bytechef.component.dropbox.action;
 
-import static com.bytechef.component.dropbox.constant.DropboxConstants.SEARCH_STRING;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.times;
+import static com.bytechef.component.dropbox.action.DropboxSearchAction.POST_SEARCH_CONTEXT_FUNCTION;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.QUERY;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
-import com.dropbox.core.DbxException;
-import org.junit.jupiter.api.Assertions;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 /**
  * @author Mario Cvjetojevic
+ * @author Monika Kušter
  */
-public class DropboxSearchActionTest extends AbstractDropboxActionTest {
+class DropboxSearchActionTest extends AbstractDropboxActionTest {
 
     @Test
-    public void testPerform() throws DbxException {
-        Mockito
-            .when(parameters.getRequiredString(SEARCH_STRING))
-            .thenReturn(SOURCE_STUB);
+    void testPerform() {
+        when(mockedParameters.getRequired(QUERY))
+            .thenReturn("query");
 
-        DropboxSearchAction.perform(parameters, parameters, Mockito.mock(ActionContext.class));
+        when(mockedContext.http(POST_SEARCH_CONTEXT_FUNCTION))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(mockedObject);
 
-        then(filesRequests)
-            .should(times(1))
-            .searchV2(stringArgumentCaptorSource.capture());
+        Object result = DropboxSearchAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        Assertions.assertEquals(SOURCE_STUB, stringArgumentCaptorSource.getValue());
+        assertEquals(mockedObject, result);
+
+        Http.Body body = bodyArgumentCaptor.getValue();
+
+        Map<String, String> expectedBody = Map.of(QUERY, "query");
+
+        assertEquals(expectedBody, body.getContent());
     }
 }

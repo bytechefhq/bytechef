@@ -25,7 +25,6 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.NEW_OR_UPDATED_EVENT;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.RESOURCE_ID;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
@@ -73,7 +72,7 @@ public class GoogleCalendarEventTrigger {
 
     protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
-        String workflowExecutionId, Context context) {
+        String workflowExecutionId, TriggerContext context) {
 
         Channel channelConfig = new Channel()
             .setAddress(webhookUrl)
@@ -98,7 +97,7 @@ public class GoogleCalendarEventTrigger {
 
     protected static void dynamicWebhookDisable(
         Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
-        String workflowExecutionId, Context context) {
+        String workflowExecutionId, TriggerContext context) {
 
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
 

@@ -16,6 +16,7 @@
   "title": "Schedule",
   "triggers": [ {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Trigger off at a specific time either on a daily basis or selected days of the week.",
     "help": null,
@@ -381,15 +382,14 @@
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
+    "output": null,
+    "deduplicate": null,
     "dynamicWebhookDisable": null,
     "dynamicWebhookEnable": null,
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": null,
-    "staticWebhookRequest": null,
-    "deduplicate": null,
-    "poll": null,
-    "output": null,
     "listenerDisable": { },
+    "poll": null,
     "listenerEnable": { },
     "outputResponse": {
       "outputSchema": {
@@ -681,10 +681,12 @@
       },
       "sampleOutput": null
     },
-    "webhookValidate": null,
-    "dynamicOutput": true
+    "processErrorResponse": null,
+    "staticWebhookRequest": null,
+    "webhookValidate": null
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Trigger off at a specific day of the week.",
     "help": null,
@@ -909,15 +911,14 @@
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
+    "output": null,
+    "deduplicate": null,
     "dynamicWebhookDisable": null,
     "dynamicWebhookEnable": null,
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": null,
-    "staticWebhookRequest": null,
-    "deduplicate": null,
-    "poll": null,
-    "output": null,
     "listenerDisable": { },
+    "poll": null,
     "listenerEnable": { },
     "outputResponse": {
       "outputSchema": {
@@ -1040,10 +1041,12 @@
       },
       "sampleOutput": null
     },
-    "webhookValidate": null,
-    "dynamicOutput": true
+    "processErrorResponse": null,
+    "staticWebhookRequest": null,
+    "webhookValidate": null
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Trigger off at a specific time in month.",
     "help": null,
@@ -1240,15 +1243,14 @@
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
+    "output": null,
+    "deduplicate": null,
     "dynamicWebhookDisable": null,
     "dynamicWebhookEnable": null,
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": null,
-    "staticWebhookRequest": null,
-    "deduplicate": null,
-    "poll": null,
-    "output": null,
     "listenerDisable": { },
+    "poll": null,
     "listenerEnable": { },
     "outputResponse": {
       "outputSchema": {
@@ -1371,10 +1373,12 @@
       },
       "sampleOutput": null
     },
-    "webhookValidate": null,
-    "dynamicOutput": true
+    "processErrorResponse": null,
+    "staticWebhookRequest": null,
+    "webhookValidate": null
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Trigger off periodically, for example every minute or day, based on a set interval.",
     "help": null,
@@ -1440,15 +1444,14 @@
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
+    "output": null,
+    "deduplicate": null,
     "dynamicWebhookDisable": null,
     "dynamicWebhookEnable": null,
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": null,
-    "staticWebhookRequest": null,
-    "deduplicate": null,
-    "poll": null,
-    "output": null,
     "listenerDisable": { },
+    "poll": null,
     "listenerEnable": { },
     "outputResponse": {
       "outputSchema": {
@@ -1532,10 +1535,12 @@
       },
       "sampleOutput": null
     },
-    "webhookValidate": null,
-    "dynamicOutput": true
+    "processErrorResponse": null,
+    "staticWebhookRequest": null,
+    "webhookValidate": null
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Trigger off based on a custom schedule.",
     "help": null,
@@ -1695,15 +1700,14 @@
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
+    "output": null,
+    "deduplicate": null,
     "dynamicWebhookDisable": null,
     "dynamicWebhookEnable": null,
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": null,
-    "staticWebhookRequest": null,
-    "deduplicate": null,
-    "poll": null,
-    "output": null,
     "listenerDisable": { },
+    "poll": null,
     "listenerEnable": { },
     "outputResponse": {
       "outputSchema": {
@@ -1789,7 +1793,8 @@
       },
       "sampleOutput": null
     },
-    "webhookValidate": null,
-    "dynamicOutput": true
+    "processErrorResponse": null,
+    "staticWebhookRequest": null,
+    "webhookValidate": null
   } ]
 }

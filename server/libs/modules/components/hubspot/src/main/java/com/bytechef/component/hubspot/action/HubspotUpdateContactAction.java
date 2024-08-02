@@ -24,8 +24,6 @@ import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDSL;
-import com.bytechef.component.hubspot.property.HubspotSimplePublicObjectInputProperties;
-import com.bytechef.component.hubspot.property.HubspotSimplePublicObjectProperties;
 import java.util.Map;
 
 /**
@@ -35,9 +33,8 @@ import java.util.Map;
  */
 public class HubspotUpdateContactAction {
     public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("updateContact")
-        .title("Update")
-        .description(
-            "Perform a partial update of an Object identified by `{contactId}`. `{contactId}` refers to the internal object ID. Provided property values will be overwritten. Read-only and non-existent properties will be ignored. Properties values can be cleared by passing an empty string.")
+        .title("Update Contact")
+        .description("Update Contact properties.")
         .metadata(
             Map.of(
                 "method", "PATCH",
@@ -45,18 +42,40 @@ public class HubspotUpdateContactAction {
                 "application/json"
 
             ))
-        .properties(string("contactId").label("Contact Id")
+        .properties(string("contactId").label("Contact   To   Update .")
             .required(true)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
-            object("simplePublicObjectInput").properties(HubspotSimplePublicObjectInputProperties.PROPERTIES)
-                .label("Simple Public Object Input")
-                .required(true)
+            object("__item").properties(object("properties").properties(string("firstname").label("First   Name")
+                .required(false),
+                string("lastname").label("Last   Name")
+                    .required(false),
+                string("email").label("Email   Address")
+                    .required(false),
+                string("phone").label("Phone   Number")
+                    .required(false),
+                string("company").label("Company")
+                    .description("Company contact belongs to.")
+                    .required(false),
+                string("website").label("Website")
+                    .description("Website of the contact.")
+                    .required(false))
+                .label("Properties")
+                .required(false))
+                .label("Contact")
                 .metadata(
                     Map.of(
                         "type", PropertyType.BODY)))
-        .outputSchema(object().properties(HubspotSimplePublicObjectProperties.PROPERTIES)
+        .outputSchema(object()
+            .properties(object("body")
+                .properties(string("id").required(false),
+                    object("properties")
+                        .properties(string("firstname").required(false), string("lastname").required(false),
+                            string("email").required(false), string("phone").required(false),
+                            string("company").required(false), string("website").required(false))
+                        .required(false))
+                .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));

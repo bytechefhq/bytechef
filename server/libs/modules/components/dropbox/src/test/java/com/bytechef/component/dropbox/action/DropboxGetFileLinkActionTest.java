@@ -16,36 +16,59 @@
 
 package com.bytechef.component.dropbox.action;
 
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.times;
+import static com.bytechef.component.dropbox.action.DropboxGetFileLinkAction.POST_TEMPORARY_LINK_CONTEXT_FUNCTION;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.PATH;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
-import com.dropbox.core.DbxException;
-import com.dropbox.core.v2.files.GetTemporaryLinkResult;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.junit.jupiter.api.Assertions;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.dropbox.util.DropboxUtils;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 /**
  * @author Mario Cvjetojevic
+ * @author Monika Kušter
  */
-public class DropboxGetFileLinkActionTest extends AbstractDropboxActionTest {
+class DropboxGetFileLinkActionTest extends AbstractDropboxActionTest {
 
     @Test
-    @SuppressFBWarnings
-    public void testPerform() throws DbxException {
-        Mockito
-            .when(filesRequests.getTemporaryLink(SOURCE_STUB))
-            .thenReturn(Mockito.mock(GetTemporaryLinkResult.class));
+    void testPerform() {
+        String fullPath = "fullPath";
 
-        DropboxGetFileLinkAction.perform(
-            parameters, parameters, Mockito.mock(ActionContext.class));
+        when(mockedParameters.getRequiredString(FILENAME))
+            .thenReturn("filename.txt");
+        when(mockedParameters.getRequiredString(PATH))
+            .thenReturn("/path/1/2");
 
-        then(filesRequests)
-            .should(times(1))
-            .getTemporaryLink(stringArgumentCaptorSource.capture());
+        dropboxUtilsMockedStatic
+            .when(() -> DropboxUtils.getFullPath(pathArgumentCaptor.capture(), fileNameArgumentCaptor.capture()))
+            .thenReturn(fullPath);
 
-        Assertions.assertEquals(SOURCE_STUB + "/" + FILENAME_STUB, stringArgumentCaptorSource.getValue());
+        when(mockedContext.http(POST_TEMPORARY_LINK_CONTEXT_FUNCTION))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(mockedObject);
+
+        Object result = DropboxGetFileLinkAction.perform(mockedParameters, mockedParameters, mockedContext);
+
+        assertEquals(mockedObject, result);
+
+        Http.Body body = bodyArgumentCaptor.getValue();
+
+        Map<String, String> expectedBody = Map.of(PATH, fullPath);
+
+        assertEquals(expectedBody, body.getContent());
+        assertEquals("filename.txt", fileNameArgumentCaptor.getValue());
+        assertEquals("/path/1/2", pathArgumentCaptor.getValue());
     }
 }

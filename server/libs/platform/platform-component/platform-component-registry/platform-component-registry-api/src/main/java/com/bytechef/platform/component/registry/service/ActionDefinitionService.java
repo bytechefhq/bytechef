@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.registry.service;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.registry.domain.ActionDefinition;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
@@ -93,7 +94,7 @@ public interface ActionDefinitionService {
 
     ProviderException executeProcessErrorResponse(
         String componentName, int componentVersion, String actionName, int statusCode, Object body,
-        ActionContext actionContext);
+        Context actionContext);
 
     Output executeSingleConnectionOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,

@@ -20,6 +20,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.DynamicOptionsProperty;
 import com.bytechef.component.definition.HttpStatus;
 import com.bytechef.component.definition.OptionsDataSource;
@@ -40,6 +41,7 @@ import com.bytechef.component.definition.TriggerDefinition.StaticWebhookRequestF
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.component.definition.TriggerWorkflowNodeDescriptionFunction;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.registry.definition.HttpHeadersImpl;
@@ -52,6 +54,7 @@ import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.domain.TriggerDefinition;
 import com.bytechef.platform.component.registry.domain.ValueProperty;
 import com.bytechef.platform.component.registry.domain.WebhookTriggerFlags;
+import com.bytechef.platform.component.registry.exception.ActionDefinitionErrorType;
 import com.bytechef.platform.component.registry.exception.TriggerDefinitionErrorType;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
@@ -63,6 +66,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -346,6 +350,28 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return new WebhookTriggerFlags(
             triggerDefinition.isWebhookRawBody(), triggerDefinition.isWorkflowSyncExecution(),
             triggerDefinition.isWorkflowSyncValidation());
+    }
+
+    @Override
+    public ProviderException executeProcessErrorResponse(
+        String componentName, int componentVersion, String triggerName, int statusCode, Object body,
+        Context triggerContext) {
+
+        com.bytechef.component.definition.TriggerDefinition triggerDefinition =
+            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
+
+        try {
+            Optional<com.bytechef.component.definition.TriggerDefinition.ProcessErrorResponseFunction> processErrorResponse =
+                triggerDefinition.getProcessErrorResponse();
+            if (processErrorResponse.isPresent()) {
+                return processErrorResponse.get()
+                    .apply(statusCode, body, triggerContext);
+            } else {
+                return ProviderException.getProviderException(statusCode, body);
+            }
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e, ActionDefinitionErrorType.EXECUTE_PROCESS_ERROR_RESPONSE);
+        }
     }
 
     private static TriggerOutput executeDynamicWebhookTrigger(

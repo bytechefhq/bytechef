@@ -26,7 +26,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
@@ -65,7 +64,6 @@ import org.mockito.MockedStatic;
 
 class GoogleMailNewEmailTriggerTest {
 
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final DynamicWebhookEnableOutput mockedDynamicWebhookEnableOutput = mock(DynamicWebhookEnableOutput.class);
     private final Get mockedGet = mock(Get.class);
     protected MockedStatic<GoogleServices> mockedGoogleServices;
@@ -120,7 +118,7 @@ class GoogleMailNewEmailTriggerTest {
             .thenReturn(new BigInteger("123"));
 
         DynamicWebhookEnableOutput dynamicWebhookEnableOutput = GoogleMailNewEmailTrigger.dynamicWebhookEnable(
-            mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedActionContext);
+            mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
 
         Map<String, BigInteger> expectedParameters = Map.of(HISTORY_ID, new BigInteger("123"));
         LocalDateTime webhookExpirationDate = dynamicWebhookEnableOutput.webhookExpirationDate();
@@ -144,7 +142,7 @@ class GoogleMailNewEmailTriggerTest {
             .thenReturn(mockedStop);
 
         GoogleMailNewEmailTrigger.dynamicWebhookDisable(
-            mockedParameters, mockedParameters, mockedParameters, workflowExecutionId, mockedActionContext);
+            mockedParameters, mockedParameters, mockedParameters, workflowExecutionId, mockedTriggerContext);
 
         assertEquals(ME, userIdArgumentCaptor.getValue());
     }

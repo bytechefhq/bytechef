@@ -16,27 +16,25 @@
 
 package com.bytechef.component.dropbox.action;
 
-import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.QUERY;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.SEARCH;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.SEARCH_STRING;
-import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
-import com.dropbox.core.DbxException;
-import com.dropbox.core.v2.files.DbxUserFilesRequests;
-import com.dropbox.core.v2.files.SearchV2Result;
 
 /**
  * @author Mario Cvjetojevic
+ * @author Monika Kušter
  */
-public final class DropboxSearchAction {
+public class DropboxSearchAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEARCH)
         .title("Search")
@@ -45,11 +43,12 @@ public final class DropboxSearchAction {
                 "changes may not immediately be reflected in search results due to a short delay in indexing. " +
                 "Duplicate results may be returned across pages. Some results may not be returned.")
         .properties(
-            string(SEARCH_STRING)
+            string(QUERY)
                 .label("Search string")
                 .description(
-                    "The string to search for. May match across multiple fields based on the request arguments."
-                        + "Must have length of at most 1000 and not be null.")
+                    "The string to search for. May match across multiple fields based on the request arguments.")
+                .minLength(3)
+                .maxLength(1000)
                 .required(true))
         .outputSchema(
             object()
@@ -58,32 +57,31 @@ public final class DropboxSearchAction {
                         .items(
                             object()
                                 .properties(
-                                    array("highlightSpans")
-                                        .items(
-                                            object()
-                                                .properties(
-                                                    string("highlightStr")
-                                                        .required(true),
-                                                    bool("isHighlighted")
-                                                        .required(true)))
-                                        .label("Highlight spans")))
-                        .label("Matches"),
-                    bool("hasMore")
-                        .required(true),
-                    string("cursor")
-                        .required(true)))
+                                    object("match_type")
+                                        .properties(
+                                            string(".tag")),
+                                    object("metadata")
+                                        .properties(
+                                            string(".tag"),
+                                            string("id"),
+                                            string("name"),
+                                            string("path_display"),
+                                            string("path_lower"))))))
         .perform(DropboxSearchAction::perform);
+
+    protected static final ContextFunction<Http, Http.Executor> POST_SEARCH_CONTEXT_FUNCTION =
+        http -> http.post("https://api.dropboxapi.com/2/files/search_v2");
 
     private DropboxSearchAction() {
     }
 
-    public static SearchV2Result perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
-        throws DbxException {
+    public static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
-            connectionParameters.getRequiredString(ACCESS_TOKEN));
-
-        return dbxUserFilesRequests.searchV2(inputParameters.getRequiredString(SEARCH_STRING));
+        return actionContext.http(POST_SEARCH_CONTEXT_FUNCTION)
+            .body(Http.Body.of(QUERY, inputParameters.getRequired(QUERY)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
     }
 }

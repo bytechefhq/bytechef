@@ -38,9 +38,9 @@ public class UpdateJdbcOperation implements JdbcOperation<Map<String, Integer>> 
 
     @Override
     public Map<String, Integer> execute(Map<String, ?> inputParameters, Map<String, ?> connectionParameters) {
-        List<String> columns = MapUtils.getList(inputParameters, JdbcConstants.COLUMNS, String.class, List.of());
+        List<String> columns = MapUtils.getList(inputParameters, JdbcConstants.FIELDS, String.class, List.of());
         List<Map<String, ?>> rows = MapUtils.getList(
-            inputParameters, JdbcConstants.ROWS, new TypeReference<>() {}, List.of());
+            inputParameters, JdbcConstants.FIELD_VALUES, new TypeReference<>() {}, List.of());
         String schema = MapUtils.getString(inputParameters, JdbcConstants.SCHEMA, "public");
         String table = MapUtils.getRequiredString(inputParameters, JdbcConstants.TABLE);
         String updateKey = MapUtils.getString(inputParameters, JdbcConstants.UPDATE_KEY, "id");

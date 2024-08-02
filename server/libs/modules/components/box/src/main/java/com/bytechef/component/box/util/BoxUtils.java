@@ -16,17 +16,21 @@
 
 package com.bytechef.component.box.util;
 
+import static com.bytechef.component.box.constant.BoxConstants.BASE_URL;
 import static com.bytechef.component.box.constant.BoxConstants.FILE;
+import static com.bytechef.component.box.constant.BoxConstants.FOLDER;
 import static com.bytechef.component.box.constant.BoxConstants.ID;
 import static com.bytechef.component.box.constant.BoxConstants.NAME;
 import static com.bytechef.component.box.constant.BoxConstants.TYPE;
 import static com.bytechef.component.definition.ComponentDSL.option;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TriggerContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,45 +51,63 @@ public class BoxUtils {
         String parentFolder = inputParameters.getRequiredString(ID);
 
         Map<String, Object> body =
-            context.http(http -> http.get("https://api.box.com/2.0/folders/" + parentFolder + "/items"))
+            context.http(http -> http.get(BASE_URL + "/folders/" + parentFolder + "/items"))
                 .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute()
                 .getBody(new TypeReference<>() {});
 
-        List<Option<String>> options = new ArrayList<>();
-
-        if (body.get("entries") instanceof List<?> list) {
-            for (Object item : list) {
-                if (item instanceof Map<?, ?> map && Objects.equals(map.get(TYPE), FILE)) {
-                    options.add(option((String) map.get(NAME), (String) map.get(ID)));
-                }
-            }
-        }
-
-        return options;
+        return getOptions(body, FILE);
     }
 
     public static List<Option<String>> getRootFolderOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
-        Map<String, Object> body = context.http(http -> http.get("https://api.box.com/2.0/folders/0/items"))
+        Map<String, Object> body = context.http(http -> http.get(BASE_URL + "/folders/0/items"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
+        List<Option<String>> options = getOptions(body, FOLDER);
+
+        options.add(option("ROOT", "0"));
+
+        return options;
+    }
+
+    public static String subscribeWebhook(
+        String webhookUrl, TriggerContext context, String type, String triggerEvent, String targetId) {
+
+        Map<String, ?> body = context.http(http -> http.post(BASE_URL + "/webhooks"))
+            .body(Http.Body.of(
+                "address", webhookUrl,
+                "triggers", List.of(triggerEvent),
+                "target", Map.of(
+                    ID, targetId,
+                    TYPE, type)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        return (String) body.get(ID);
+    }
+
+    public static void unsubscribeWebhook(Parameters outputParameters, Context context) {
+        context.http(http -> http.delete(BASE_URL + "/webhooks/" + outputParameters.getString(ID)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute();
+    }
+
+    private static List<Option<String>> getOptions(Map<String, Object> body, String type) {
         List<Option<String>> options = new ArrayList<>();
 
         if (body.get("entries") instanceof List<?> list) {
             for (Object item : list) {
-                if (item instanceof Map<?, ?> map && Objects.equals(map.get(TYPE), "folder")) {
+                if (item instanceof Map<?, ?> map && Objects.equals(map.get(TYPE), type)) {
                     options.add(option((String) map.get(NAME), (String) map.get(ID)));
                 }
             }
         }
-
-        options.add(option("ROOT", "0"));
-
         return options;
     }
 

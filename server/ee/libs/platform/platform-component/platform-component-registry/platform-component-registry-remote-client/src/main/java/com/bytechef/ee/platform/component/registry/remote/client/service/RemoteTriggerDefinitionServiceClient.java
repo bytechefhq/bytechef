@@ -7,9 +7,11 @@
 
 package com.bytechef.ee.platform.component.registry.remote.client.service;
 
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.ee.platform.component.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.ee.remote.client.DefaultRestClient;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
@@ -177,5 +179,12 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
                     "/{triggerName}",
                 componentName, componentVersion, triggerName),
             WebhookTriggerFlags.class);
+    }
+
+    @Override
+    public ProviderException executeProcessErrorResponse(
+        String componentName, int componentVersion, String triggerName, int statusCode, Object body,
+        Context triggerContext) {
+        throw new UnsupportedOperationException();
     }
 }

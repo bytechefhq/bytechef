@@ -16,69 +16,41 @@
 
 package com.bytechef.component.dropbox.action;
 
-import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.DESTINATION;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.dropbox.util.DropboxUtils;
-import com.dropbox.core.v2.files.DbxUserFilesRequests;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 
 /**
  * @author Mario Cvjetojevic
+ * @author Monika Kušter
  */
 public abstract class AbstractDropboxActionTest {
-    static final String DESTINATION_STUB = "destinationPathStub";
-    static final String SOURCE_STUB = "sourcePathStub";
-    static final String FILENAME_STUB = "filenameStub";
 
-    protected MockedStatic<DropboxUtils> dropboxUtils;
-    protected DbxUserFilesRequests filesRequests;
-    protected Parameters parameters;
-    protected ArgumentCaptor<String> stringArgumentCaptorSource;
-    protected ArgumentCaptor<String> stringArgumentCaptorDestination;
-    // protected ArgumentCaptor<String> stringArgumentCaptorFilename;
+    protected ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    protected MockedStatic<DropboxUtils> dropboxUtilsMockedStatic;
+    protected ArgumentCaptor<String> fileNameArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    protected ActionContext mockedContext = mock(ActionContext.class);
+    protected Http.Executor mockedExecutor = mock(Http.Executor.class);
+    protected Object mockedObject = mock(Object.class);
+    protected Parameters mockedParameters = mock(Parameters.class);
+    protected Http.Response mockedResponse = mock(Http.Response.class);
+    protected ArgumentCaptor<String> pathArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @BeforeEach
     public void beforeEach() {
-        dropboxUtils = Mockito.mockStatic(DropboxUtils.class);
-
-        filesRequests = Mockito.mock(DbxUserFilesRequests.class);
-
-        dropboxUtils
-            .when(() -> DropboxUtils.getDbxUserFilesRequests(""))
-            .thenReturn(filesRequests);
-
-        parameters = Mockito.mock(Parameters.class);
-        stringArgumentCaptorSource = ArgumentCaptor.forClass(String.class);
-        stringArgumentCaptorDestination = ArgumentCaptor.forClass(String.class);
-        // stringArgumentCaptorFilename = ArgumentCaptor.forClass(String.class);
-
-        Mockito
-            .when(parameters.getRequiredString(ACCESS_TOKEN))
-            .thenReturn("");
-
-        Mockito
-            .when(parameters.getRequiredString(FILENAME))
-            .thenReturn(FILENAME_STUB);
-
-        Mockito
-            .when(parameters.getRequiredString(SOURCE))
-            .thenReturn(SOURCE_STUB);
-
-        Mockito
-            .when(parameters.getRequiredString(DESTINATION))
-            .thenReturn(DESTINATION_STUB);
+        dropboxUtilsMockedStatic = mockStatic(DropboxUtils.class);
     }
 
     @AfterEach
     public void afterEach() {
-        dropboxUtils.close();
+        dropboxUtilsMockedStatic.close();
     }
 }

@@ -24,13 +24,13 @@ public final class SendgridConstants {
     public static final String ATTACHMENTS = "attachments";
     public static final String BASE_URL = "https://api.sendgrid.com/v3";
     public static final String CC = "cc";
-    public static final String CONTENT_TYPE = "type";
-    public static final String EMAIL_SEND = "sendEmail";
     public static final String FROM = "from";
+    public static final String SEND_EMAIL = "sendEmail";
     public static final String SENDGRID = "sendgrid";
     public static final String SUBJECT = "subject";
     public static final String TEXT = "text";
     public static final String TO = "to";
+    public static final String TYPE = "type";
 
     private SendgridConstants() {
     }

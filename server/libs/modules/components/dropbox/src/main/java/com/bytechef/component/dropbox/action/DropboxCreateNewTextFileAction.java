@@ -16,37 +16,32 @@
 
 package com.bytechef.component.dropbox.action;
 
-import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.CREATE_TEXT_FILE;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.DESTINATION;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
-import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.TO_PATH;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
-import com.dropbox.core.DbxException;
-import com.dropbox.core.v2.files.DbxUserFilesRequests;
-import com.dropbox.core.v2.files.ImportFormat;
-import com.dropbox.core.v2.files.PaperCreateResult;
-import com.dropbox.core.v2.files.PaperCreateUploader;
-import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * @author Mario Cvjetojevic
+ * @author Monika Kušter
  */
-public final class DropboxCreateNewTextFileAction {
+public class DropboxCreateNewTextFileAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_TEXT_FILE)
         .title("Create a new paper file")
         .description("Create a new .paper file on which you can write at a given path")
         .properties(
-            string(DESTINATION)
+            string(TO_PATH)
                 .label("Paper path/name")
                 .description("The path of the new paper file. Starts with / as root.")
                 .placeholder("/directory/")
@@ -59,38 +54,28 @@ public final class DropboxCreateNewTextFileAction {
         .outputSchema(
             object()
                 .properties(
-                    string("url")
-                        .required(true),
-                    string("resultPath")
-                        .required(true),
-                    string("fileId")
-                        .required(true),
-                    integer("paperRevision")
-                        .required(true)))
+                    string("url"),
+                    string("resultPath"),
+                    string("fileId"),
+                    integer("paperRevision")))
         .perform(DropboxCreateNewTextFileAction::perform);
+
+    protected static final ContextFunction<Http, Http.Executor> POST_FILES_UPLOAD_CONTEXT_FUNCTION =
+        http -> http.post("https://api.dropboxapi.com/2/files/upload");
 
     private DropboxCreateNewTextFileAction() {
     }
 
-    public static PaperCreateResult perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
-        throws DbxException, IOException {
+    public static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
-            connectionParameters.getRequiredString(ACCESS_TOKEN));
-
-        String fileName = inputParameters.getRequiredString(FILENAME);
-
-        fileName = fileName.endsWith(".paper") ? fileName : fileName + ".paper";
-
-        String destination = inputParameters.getRequiredString(DESTINATION);
-
-        destination = destination.endsWith("/") ? destination : destination + "/";
-
-        try (PaperCreateUploader paperCreateUploader = dbxUserFilesRequests.paperCreate(
-            destination + fileName, ImportFormat.PLAIN_TEXT)) {
-
-            return paperCreateUploader.uploadAndFinish(InputStream.nullInputStream());
-        }
+        return actionContext.http(POST_FILES_UPLOAD_CONTEXT_FUNCTION)
+            .body(
+                Http.Body.of(
+                // TODO
+                ))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
     }
 }

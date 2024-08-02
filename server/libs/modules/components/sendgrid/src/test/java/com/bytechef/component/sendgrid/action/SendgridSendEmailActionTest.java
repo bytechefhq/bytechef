@@ -18,11 +18,11 @@ package com.bytechef.component.sendgrid.action;
 
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.ATTACHMENTS;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.CC;
-import static com.bytechef.component.sendgrid.constant.SendgridConstants.CONTENT_TYPE;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.FROM;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.SUBJECT;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.TEXT;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.TO;
+import static com.bytechef.component.sendgrid.constant.SendgridConstants.TYPE;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -76,7 +76,7 @@ class SendgridSendEmailActionTest {
         when(mockedParameters.getList(CC, String.class, List.of())).thenReturn(ccList);
         when(mockedParameters.getRequiredString(FROM)).thenReturn("emailFrom@example.com");
         when(mockedParameters.getRequiredString(SUBJECT)).thenReturn("testSubject");
-        when(mockedParameters.getRequiredString(CONTENT_TYPE)).thenReturn("text/plain");
+        when(mockedParameters.getRequiredString(TYPE)).thenReturn("text/plain");
         when(mockedParameters.getRequiredString(TEXT)).thenReturn("testText");
 
         Object result = SendgridSendEmailAction.perform(mockedParameters, mockedParameters, mockedContext);

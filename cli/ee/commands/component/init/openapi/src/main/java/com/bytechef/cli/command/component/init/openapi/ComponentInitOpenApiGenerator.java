@@ -2010,6 +2010,10 @@ public class ComponentInitOpenApiGenerator {
 
                         @generated
                         """)
+                    .addMethod(
+                        MethodSpec.constructorBuilder()
+                            .addModifiers(Modifier.PRIVATE)
+                            .build())
                     .addModifiers(Modifier.PUBLIC)
                     .addField(FieldSpec.builder(
                         ParameterizedTypeName.get(

@@ -16,15 +16,11 @@
 
 package com.bytechef.component.resend.util;
 
-import static com.bytechef.component.resend.constant.ResendConstants.ATTACHMENTS;
-
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.FileEntry;
-import com.bytechef.component.definition.Parameters;
-import com.resend.services.emails.model.Attachment;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -36,18 +32,12 @@ public class ResendUtils {
     private ResendUtils() {
     }
 
-    public static List<Attachment> getAttachments(Parameters inputParameters, ActionContext actionContext) {
-        List<Attachment> attachments = new ArrayList<>();
-
-        for (FileEntry fileEntry : inputParameters.getFileEntries(ATTACHMENTS, List.of())) {
-            Attachment attachment = new Attachment.Builder()
-                .fileName(fileEntry.getName())
-                .content(ENCODER.encodeToString(actionContext.file(file -> file.readAllBytes(fileEntry))))
-                .build();
-
-            attachments.add(attachment);
-        }
-
-        return attachments;
+    public static List<Map<String, String>> getAttachments(List<FileEntry> fileEntries, ActionContext actionContext) {
+        return fileEntries.stream()
+            .map(fileEntry -> {
+                byte[] fileBytes = actionContext.file(file -> file.readAllBytes(fileEntry));
+                return Map.of("filename", fileEntry.getName(), "content", ENCODER.encodeToString(fileBytes));
+            })
+            .toList();
     }
 }

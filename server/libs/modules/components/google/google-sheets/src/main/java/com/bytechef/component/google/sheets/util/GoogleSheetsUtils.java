@@ -232,6 +232,12 @@ public class GoogleSheetsUtils {
             .getValues();
     }
 
+    /**
+     * Returns column name in <code>A,B,C,..,AA,AB</code> naming convention.
+     *
+     * @param columnNumber column order number in column sequence
+     * @return column name in <code>column_A</code> format
+     */
     private static String columnToLabel(int columnNumber) {
         StringBuilder columnName = new StringBuilder();
 

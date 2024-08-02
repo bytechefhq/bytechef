@@ -8,6 +8,7 @@ dependencies {
 
     compileOnly("jakarta.servlet:jakarta.servlet-api")
 
+    implementation("org.apache.commons:commons-lang3")
     implementation(libs.io.swagger.core.v3.swagger.annotations)
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("jakarta.validation:jakarta.validation-api")

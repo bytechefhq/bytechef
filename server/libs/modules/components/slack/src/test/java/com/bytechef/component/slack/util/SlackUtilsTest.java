@@ -16,36 +16,27 @@
 
 package com.bytechef.component.slack.util;
 
-import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
+import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.slack.constant.SlackConstants.CHANNEL;
+import static com.bytechef.component.slack.constant.SlackConstants.ID;
+import static com.bytechef.component.slack.constant.SlackConstants.NAME;
+import static com.bytechef.component.slack.constant.SlackConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockConstruction;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import com.slack.api.bolt.App;
-import com.slack.api.methods.MethodsClient;
-import com.slack.api.methods.SlackApiException;
-import com.slack.api.methods.request.conversations.ConversationsListRequest;
-import com.slack.api.methods.request.users.UsersListRequest;
-import com.slack.api.methods.response.conversations.ConversationsListResponse;
-import com.slack.api.methods.response.users.UsersListResponse;
-import com.slack.api.model.Conversation;
-import com.slack.api.model.User;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedConstruction;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Mario Cvjetojevic
@@ -53,72 +44,68 @@ import org.mockito.MockedConstruction;
  */
 class SlackUtilsTest {
 
-    private MockedConstruction<App> mockedApp;
-    private final ActionContext mockedContext = mock(ActionContext.class);
-    private final MethodsClient mockedMethodsClient = mock(MethodsClient.class);
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Object mockedObject = mock(Object.class);
     private final Parameters mockedParameters = mock(Parameters.class);
-    private final ConversationsListResponse mockedConversationsListResponse = mock(ConversationsListResponse.class);
-    private final UsersListResponse usersListResponse = mock(UsersListResponse.class);
+    private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @BeforeEach
     void beforeEach() {
-        mockedApp = mockConstruction(App.class, (mock, context) -> when(mock.client()).thenReturn(mockedMethodsClient));
-    }
-
-    @AfterEach
-    void afterEach() {
-        mockedApp.close();
-    }
-
-    @Test
-    void testGetChannelOptions() throws IOException, SlackApiException {
-        Conversation conversation = new Conversation();
-
-        conversation.setName("New channel");
-        conversation.setId("id");
-
-        when(mockedParameters.getRequiredString(ACCESS_TOKEN))
-            .thenReturn(ACCESS_TOKEN);
-        when(mockedMethodsClient.conversationsList(any(ConversationsListRequest.class)))
-            .thenReturn(mockedConversationsListResponse);
-        when(mockedConversationsListResponse.getChannels())
-            .thenReturn(List.of(conversation));
-
-        List<Option<String>> options = SlackUtils.getChannelOptions(
-            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
-
-        verify(mockedMethodsClient, times(1))
-            .conversationsList(any(ConversationsListRequest.class));
-        assertEquals(1, options.size());
-
-        Option<String> option = options.getFirst();
-
-        assertTrue(StringUtils.equals(option.getLabel(), "New channel"));
-        assertTrue(StringUtils.equals(option.getValue(), "id"));
+        when(mockedActionContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
     }
 
     @Test
-    void testGetUserOptions() throws IOException, SlackApiException {
-        User user = new User();
+    void testSendMessage() {
+        when(mockedParameters.getRequiredString(CHANNEL))
+            .thenReturn("general");
+        when(mockedParameters.getRequiredString(TEXT))
+            .thenReturn("hello");
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(mockedObject);
 
-        user.setName("User name");
-        user.setId("id");
+        Object result = SlackUtils.sendMessage(mockedParameters, mockedActionContext);
 
-        when(mockedMethodsClient.usersList(any(UsersListRequest.class)))
-            .thenReturn(usersListResponse);
-        when(usersListResponse.getMembers())
-            .thenReturn(List.of(user));
+        assertEquals(mockedObject, result);
 
-        List<Option<String>> options = SlackUtils.getUserOptions(
-            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
+        Http.Body body = bodyArgumentCaptor.getValue();
 
-        verify(mockedMethodsClient, times(1))
-            .usersList(any(UsersListRequest.class));
-        assertEquals(1, options.size());
+        assertEquals(Map.of(CHANNEL, "general", TEXT, "hello"), body.getContent());
+    }
 
-        Option<String> option = options.getFirst();
+    @Test
+    void testGetChannelOptions() {
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("channels", List.of(Map.of(NAME, "abc", ID, "123"))));
 
-        assertTrue(StringUtils.equals(option.getLabel(), "User name"));
-        assertTrue(StringUtils.equals(option.getValue(), "id"));
+        List<Option<String>> expectedOptions = new ArrayList<>();
+
+        expectedOptions.add(option("abc", "123"));
+
+        assertEquals(
+            expectedOptions,
+            SlackUtils.getChannelOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+    }
+
+    @Test
+    void testGetUserOptions() {
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("members", List.of(Map.of(NAME, "abc", ID, "123"))));
+
+        List<Option<String>> expectedOptions = new ArrayList<>();
+
+        expectedOptions.add(option("abc", "123"));
+
+        assertEquals(
+            expectedOptions,
+            SlackUtils.getUserOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
     }
 }

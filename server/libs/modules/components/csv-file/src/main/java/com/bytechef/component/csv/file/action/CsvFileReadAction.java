@@ -49,9 +49,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 public class CsvFileReadAction {
 
@@ -66,8 +68,17 @@ public class CsvFileReadAction {
                 .required(true),
             string(DELIMITER)
                 .label("Delimiter")
-                .description("Delimiter to use when reading a csv file.")
+                .description("Character used to separate values within the line red from the CSV file.")
                 .defaultValue(",")
+                .advancedOption(true),
+            string(CsvFileConstants.ENCLOSING_CHARACTER)
+                .label("Enclosing character")
+                .description(
+                    """
+                            Character used to wrap/enclose values. It is usually applied to complex CSV files where
+                            values may include delimiter characters.
+                        """)
+                .placeholder("\" ' / ")
                 .advancedOption(true),
             bool(HEADER_ROW)
                 .label("Header Row")
@@ -122,7 +133,8 @@ public class CsvFileReadAction {
             return read(
                 inputStream,
                 new ReadConfiguration(
-                    delimiter, headerRow, includeEmptyCells, rangeStartRow == null ? 0 : rangeStartRow,
+                    delimiter, enclosingCharacter, headerRow, includeEmptyCells,
+                    rangeStartRow == null ? 0 : rangeStartRow,
                     rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow, readAsString),
                 context);
         }
@@ -137,6 +149,12 @@ public class CsvFileReadAction {
 
         try (BufferedReader bufferedReader = new BufferedReader(
             new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+
+            char enclosingCharacter = (char) -1;
+
+            if (!StringUtils.isEmpty(configuration.enclosingCharacter)) {
+                enclosingCharacter = configuration.enclosingCharacter.charAt(0);
+            }
 
             if (configuration.headerRow()) {
                 CsvSchema headerSchema = CsvSchema
@@ -159,9 +177,10 @@ public class CsvFileReadAction {
 
                         for (Map.Entry<String, String> entry : row.entrySet()) {
                             map.put(
-                                entry.getKey(),
+                                strip(entry.getKey(), enclosingCharacter),
                                 processValue(
-                                    entry.getValue(), configuration.includeEmptyCells(), configuration.readAsString(),
+                                    entry.getValue(), enclosingCharacter, configuration.includeEmptyCells(),
+                                    configuration.readAsString(),
                                     context));
                         }
 
@@ -192,7 +211,8 @@ public class CsvFileReadAction {
                             map.put(
                                 "column_" + (i + 1),
                                 processValue(
-                                    row.get(i), configuration.includeEmptyCells(), configuration.readAsString(),
+                                    row.get(i), enclosingCharacter, configuration.includeEmptyCells(),
+                                    configuration.readAsString(),
                                     context));
                         }
 
@@ -212,7 +232,7 @@ public class CsvFileReadAction {
     }
 
     private static Object processValue(
-        String valueString, boolean includeEmptyCells, boolean readAsString, Context context) {
+        String valueString, char enclosingCharacter, boolean includeEmptyCells, boolean readAsString, Context context) {
 
         Object value = null;
 
@@ -221,6 +241,10 @@ public class CsvFileReadAction {
                 value = "";
             }
         } else {
+            if (enclosingCharacter != (char) -1) {
+                valueString = strip(valueString, enclosingCharacter);
+            }
+
             if (readAsString) {
                 value = valueString;
             } else {
@@ -229,6 +253,12 @@ public class CsvFileReadAction {
         }
 
         return value;
+    }
+
+    private static String strip(String valueString, char enclosingCharacter) {
+        valueString = valueString.strip();
+        valueString = StringUtils.removeStart(valueString, enclosingCharacter);
+        return StringUtils.removeEnd(valueString, String.valueOf(enclosingCharacter));
     }
 
     private static Object valueOF(String string, Context context) {
@@ -268,7 +298,8 @@ public class CsvFileReadAction {
     }
 
     protected record ReadConfiguration(
-        String delimiter, boolean headerRow, boolean includeEmptyCells, long rangeStartRow, long rangeEndRow,
+        String delimiter, String enclosingCharacter, boolean headerRow, boolean includeEmptyCells, long rangeStartRow,
+        long rangeEndRow,
         boolean readAsString) {
     }
 }

@@ -16,33 +16,34 @@
 
 package com.bytechef.component.dropbox.action;
 
-import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.DELETE;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE;
-import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.PATH;
+import static com.bytechef.component.dropbox.util.DropboxUtils.getFullPath;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
-import com.dropbox.core.DbxException;
-import com.dropbox.core.v2.files.DbxUserFilesRequests;
-import com.dropbox.core.v2.files.DeleteResult;
+import java.util.Map;
 
 /**
  * @author Mario Cvjetojevic
+ * @author Monika Kušter
  */
-public final class DropboxDeleteAction {
+public class DropboxDeleteAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(DELETE)
         .title("Delete")
         .description(
             "Delete the file or folder at a given path. If the path is a folder, all its contents will be deleted too.")
         .properties(
-            string(SOURCE)
+            string(PATH)
                 .label("Path")
                 .description("Path of the file or folder. Root is /.")
                 .required(true),
@@ -55,32 +56,31 @@ public final class DropboxDeleteAction {
                 .properties(
                     object("metadata")
                         .properties(
-                            string("name")
-                                .required(true),
-                            string("pathLower")
-                                .required(true),
-                            string("pathDisplay")
-                                .required(true),
-                            string("parentSharedFolderId")
-                                .required(true),
-                            string("previewUrl")
-                                .required(true))
-                        .label("Metadata")))
+                            string(".tag"),
+                            string("name"),
+                            string("path_lower"),
+                            string("path_display"),
+                            string("id"))))
         .perform(DropboxDeleteAction::perform);
+
+    protected static final ContextFunction<Http, Http.Executor> POST_DELETE_CONTEXT_FUNCTION =
+        http -> http.post("https://api.dropboxapi.com/2/files/delete_v2");
 
     private DropboxDeleteAction() {
     }
 
-    public static DeleteResult perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
-        throws DbxException {
+    public static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
-            connectionParameters.getRequiredString(ACCESS_TOKEN));
-
-        String source = inputParameters.getRequiredString(SOURCE);
-
-        return dbxUserFilesRequests.deleteV2(
-            (source.endsWith("/") ? source : source + "/") + inputParameters.getRequiredString(FILENAME));
+        return actionContext.http(POST_DELETE_CONTEXT_FUNCTION)
+            .body(
+                Http.Body.of(
+                    Map.of(
+                        PATH,
+                        getFullPath(
+                            inputParameters.getRequiredString(PATH), inputParameters.getRequiredString(FILENAME)))))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
     }
 }

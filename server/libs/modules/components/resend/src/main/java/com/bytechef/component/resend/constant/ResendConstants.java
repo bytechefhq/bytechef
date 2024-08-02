@@ -30,6 +30,7 @@ public final class ResendConstants {
     }
 
     public static final String ATTACHMENTS = "attachments";
+    public static final String BASE_URL = "https://api.resend.com";
     public static final String BCC = "bcc";
     public static final String CC = "cc";
     public static final String CONTENT_TYPE = "contentType";

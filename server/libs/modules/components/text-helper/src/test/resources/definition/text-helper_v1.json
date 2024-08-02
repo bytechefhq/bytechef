@@ -8,13 +8,14 @@
   "icon": "path:assets/text-helper.svg",
   "tags": null,
   "metadata": null,
-  "name": "htmlHelper",
+  "name": "textHelper",
   "resources": null,
   "version": 1,
   "title": "Text Helper",
   "connection": null,
   "actions": [ {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Extract content from the HTML content.",
     "help": null,
@@ -138,12 +139,11 @@
       "controlType": "SELECT"
     } ],
     "title": "Extract Content from HTML",
-    "processErrorResponse": null,
     "workflowNodeDescription": null,
+    "processErrorResponse": null,
     "output": null,
     "perform": { },
-    "outputResponse": null,
-    "dynamicOutput": true
+    "outputResponse": null
   } ],
   "triggers": null
 }

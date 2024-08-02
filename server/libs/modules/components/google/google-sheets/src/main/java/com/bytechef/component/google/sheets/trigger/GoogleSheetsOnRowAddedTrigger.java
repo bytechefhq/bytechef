@@ -28,7 +28,6 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.getMapOfValuesForRowAndColumn;
 
 import com.bytechef.component.definition.ComponentDSL;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
@@ -78,7 +77,7 @@ public class GoogleSheetsOnRowAddedTrigger {
 
     protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
-        String workflowExecutionId, Context context) {
+        String workflowExecutionId, TriggerContext context) {
 
         Drive drive = GoogleServices.getDrive(connectionParameters);
         String fileId = inputParameters.getRequiredString(SPREADSHEET_ID);
@@ -107,7 +106,7 @@ public class GoogleSheetsOnRowAddedTrigger {
 
     protected static void dynamicWebhookDisable(
         Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
-        String workflowExecutionId, Context context) {
+        String workflowExecutionId, TriggerContext context) {
 
         Drive drive = GoogleServices.getDrive(connectionParameters);
 

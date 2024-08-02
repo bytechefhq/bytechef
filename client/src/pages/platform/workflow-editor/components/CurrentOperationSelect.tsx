@@ -15,10 +15,16 @@ interface CurrentOperationSelectProps {
     value: string;
 }
 
-const OperationSelect = ({description, handleValueChange, operations, value}: CurrentOperationSelectProps) => (
+const OperationSelect = ({
+    description,
+    handleValueChange,
+    operations,
+    triggerSelect,
+    value,
+}: CurrentOperationSelectProps) => (
     <div className="flex w-full flex-col">
         <Label className="flex items-center space-x-1">
-            <span className="text-sm font-medium leading-6">Actions</span>
+            <span className="text-sm font-medium leading-6">{triggerSelect ? 'Triggers' : 'Actions'}</span>
 
             {description && (
                 <Tooltip>
@@ -105,6 +111,7 @@ const CurrentOperationSelect = ({
                 description={description}
                 handleValueChange={handleValueChange}
                 operations={operations}
+                triggerSelect={triggerSelect}
                 value={value}
             />
         )}

@@ -169,7 +169,9 @@ const ProjectWorkflowListItem = ({
                         )}
 
                         <DropdownMenuItem
-                            onClick={() => (window.location.href = `/api/automation/workflows/${workflow.id}/export`)}
+                            onClick={() =>
+                                (window.location.href = `/api/automation/internal/workflows/${workflow.id}/export`)
+                            }
                         >
                             Export
                         </DropdownMenuItem>

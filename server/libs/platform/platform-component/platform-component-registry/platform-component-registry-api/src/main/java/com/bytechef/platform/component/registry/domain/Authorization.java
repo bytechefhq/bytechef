@@ -30,6 +30,8 @@ import java.util.Objects;
 @SuppressFBWarnings("EI")
 public class Authorization {
 
+    public static final List<Object> DEFAULT_REFRESH_ON = List.of(401);
+
     private String description;
     private List<String> detectOn;
     private String name;
@@ -54,7 +56,7 @@ public class Authorization {
 
         this.title = OptionalUtils.orElse(authorization.getTitle(), name);
 
-        this.refreshOn = OptionalUtils.orElse(authorization.getRefreshOn(), List.of(401));
+        this.refreshOn = OptionalUtils.orElse(authorization.getRefreshOn(), DEFAULT_REFRESH_ON);
     }
 
     @Nullable

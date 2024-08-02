@@ -16,7 +16,6 @@
 
 package com.bytechef.component.dropbox.action;
 
-import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
@@ -25,26 +24,28 @@ import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.DESTINATION;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.AUTORENAME;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FILE_ENTRY;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.MUTE;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.PATH;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.STRICT_CONFLICT;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.UPLOAD_FILE;
-import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
-import com.dropbox.core.DbxException;
-import com.dropbox.core.v2.files.DbxUserFilesRequests;
-import com.dropbox.core.v2.files.FileMetadata;
-import com.dropbox.core.v2.files.UploadBuilder;
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.Base64;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Mario Cvjetojevic
+ * @author Monika Kušter
  */
-public final class DropboxUploadFileAction {
+public class DropboxUploadFileAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(UPLOAD_FILE)
         .title("Upload file")
@@ -54,7 +55,7 @@ public final class DropboxUploadFileAction {
                 .label("File")
                 .description("The object property which contains a reference to the file to be written.")
                 .required(true),
-            string(DESTINATION)
+            string(PATH)
                 .label("Destination path")
                 .description("The path to which the file should be written.")
                 .placeholder("/directory/")
@@ -63,93 +64,105 @@ public final class DropboxUploadFileAction {
                 .label("Filename")
                 .description("Name of the file. Needs to have the appropriate extension.")
                 .placeholder("your_file.pdf")
-                .required(true))
+                .required(true),
+            bool(AUTORENAME)
+                .label("Auto Rename")
+                .description(
+                    "If there's a conflict, as determined by mode, have the Dropbox server try to autorename the " +
+                        "file to avoid conflict.")
+                .defaultValue(false)
+                .required(false),
+            bool(MUTE)
+                .label("Mute")
+                .description(
+                    "Normally, users are made aware of any file modifications in their Dropbox account via " +
+                        "notifications in the client software. If true, this tells the clients that this " +
+                        "modification shouldn't result in a user notification.")
+                .defaultValue(false)
+                .required(false),
+            bool(STRICT_CONFLICT)
+                .label("Strict conflict")
+                .description(
+                    "Be more strict about how each WriteMode detects conflict. For example, always return a " +
+                        "conflict error when mode = WriteMode.update and the given \"rev\" doesn't match the " +
+                        "existing file's \"rev\", even if the existing file has been deleted.")
+                .defaultValue(false)
+                .required(false))
         .outputSchema(
             object()
                 .properties(
-                    string("id")
-                        .required(true),
-                    date("clientModified")
-                        .required(true),
-                    date("serverModified")
-                        .required(true),
-                    string("rev")
-                        .required(true),
-                    integer("size")
-                        .required(true),
+                    string("id"),
+                    date("clientModified"),
+                    date("serverModified"),
+                    string("rev"),
+                    integer("size"),
                     object("symlinkInfo")
                         .properties(
-                            string("target")
-                                .required(true))
-                        .label("Sym link info"),
+                            string("target")),
                     object("sharingInfo")
                         .properties(
-                            string("parentSharedFolderId")
-                                .required(true),
-                            string("modifiedBy")
-                                .required(true))
-                        .label("Sharing info"),
-                    bool("isDownloadable")
-                        .required(true),
+                            string("parentSharedFolderId"),
+                            string("modifiedBy")),
+                    bool("isDownloadable"),
                     object("exportInfo")
                         .properties(
-                            string("exportAs")
-                                .required(true),
+                            string("exportAs"),
                             array("exportOptions")
-                                .items(string()))
-                        .label("Export info"),
+                                .items(string())),
                     array("propertyGroups")
                         .items(
                             object()
                                 .properties(
-                                    string("templateId")
-                                        .required(true),
+                                    string("templateId"),
                                     array("fields")
                                         .items(
                                             object()
                                                 .properties(
-                                                    string("name")
-                                                        .required(true),
-                                                    string("value")
-                                                        .required(true))
-                                                .label("Fields")))
-                                .required(true)),
-                    bool("hasExplicitSharedMembers")
-                        .required(true),
-                    string("contentHash")
-                        .required(true),
+                                                    string("name"),
+                                                    string("value"))))),
+                    bool("hasExplicitSharedMembers"),
+                    string("contentHash"),
                     object("fileLockInfo")
                         .properties(
-                            bool("isLockholder")
-                                .required(true),
-                            string("lockholderName")
-                                .required(true),
-                            string("lockholderAccountId")
-                                .required(true),
-                            date("created")
-                                .required(true))))
+                            bool("isLockholder"),
+                            string("lockholderName"),
+                            string("lockholderAccountId"),
+                            date("created"))))
         .perform(DropboxUploadFileAction::perform);
 
     private DropboxUploadFileAction() {
     }
 
-    public static FileMetadata perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
-        throws DbxException, IOException {
+    public static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        String destination = inputParameters.getRequiredString(DESTINATION);
-        String filePath =
-            (destination.endsWith("/") ? destination : destination + "/") + inputParameters.getRequiredString(FILENAME);
+        // TODO
 
-        try (InputStream inputStream = actionContext.file(
-            file -> file.getStream(inputParameters.getRequiredFileEntry(FILE_ENTRY)))) {
+        String destination = inputParameters.getRequiredString(PATH);
 
-            DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
-                connectionParameters.getRequiredString(ACCESS_TOKEN));
+        String headerJson = actionContext.json(json -> {
+            Map<String, Object> ime = Map.of(
+                AUTORENAME, inputParameters.getBoolean(AUTORENAME),
+                "mode", "add",
+                MUTE, inputParameters.getBoolean(MUTE),
+                PATH,
+                (destination.endsWith("/") ? destination : destination + "/")
+                    + inputParameters.getRequiredString(FILENAME),
+                STRICT_CONFLICT, inputParameters.getBoolean(STRICT_CONFLICT));
+            return json.write(ime);
+        });
 
-            UploadBuilder uploadBuilder = dbxUserFilesRequests.uploadBuilder(filePath);
+        String fileContent = actionContext.file(file -> Base64.getEncoder()
+            .encodeToString(file.readAllBytes(inputParameters.getRequiredFileEntry(FILE_ENTRY))));
 
-            return uploadBuilder.uploadAndFinish(inputStream);
-        }
+        return actionContext.http(http -> http.post("https://content.dropboxapi.com/2/files/upload"))
+            .headers(
+                Map.of(
+                    "Dropbox-API-Arg", List.of(headerJson),
+                    "Content-Type", List.of("application/octet-stream")))
+            .body(Http.Body.of(fileContent))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
     }
 }

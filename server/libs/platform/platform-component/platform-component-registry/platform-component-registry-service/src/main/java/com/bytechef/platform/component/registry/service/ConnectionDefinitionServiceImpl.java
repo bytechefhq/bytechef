@@ -18,6 +18,7 @@ package com.bytechef.platform.component.registry.service;
 
 import static com.bytechef.component.definition.Authorization.CODE;
 import static com.bytechef.component.definition.ConnectionDefinition.BaseUriFunction;
+import static com.bytechef.platform.component.registry.domain.Authorization.DEFAULT_REFRESH_ON;
 
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.JsonUtils;
@@ -71,6 +72,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 @Service("connectionDefinitionService")
 public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionService {
@@ -236,7 +238,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationName);
 
-        return OptionalUtils.orElse(authorization.getRefreshOn(), List.of());
+        return OptionalUtils.orElse(authorization.getRefreshOn(), DEFAULT_REFRESH_ON);
     }
 
     @Override
@@ -299,13 +301,13 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     public List<ConnectionDefinition> getConnectionDefinitions(
         @NonNull String componentName, @NonNull Integer componentVersion) {
 
-        return getConnectionComponentDefinitions(componentName, componentVersion)
+        return getConnectableComponentDefinitions(componentName, componentVersion)
             .stream()
             .map(ConnectionDefinitionServiceImpl::toConnectionDefinition)
             .toList();
     }
 
-    private List<ComponentDefinition> getConnectionComponentDefinitions(
+    private List<ComponentDefinition> getConnectableComponentDefinitions(
         String componentName, int componentVersion) {
 
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(

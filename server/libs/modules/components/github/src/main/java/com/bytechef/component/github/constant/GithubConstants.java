@@ -16,20 +16,39 @@
 
 package com.bytechef.component.github.constant;
 
+import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.number;
+import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.string;
+
+import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
+
 /**
  * @author Luka Ljubić
  */
 public class GithubConstants {
 
-    public static final String BASE_URL = "https://api.github.com";
     public static final String BODY = "body";
     public static final String CREATE_ISSUE = "createIssue";
-    public static final String CREATE_ISSUE_COMMENT = "createIssueComment";
+    public static final String CREATE_COMMENT_ON_ISSUE = "createCommentOnIssue";
     public static final String GITHUB = "github";
     public static final String GET_ISSUE = "getIssue";
+    public static final String ID = "id";
     public static final String ISSUE = "issue";
-    public static final String REPO = "repo";
+    public static final String NEW_ISSUE = "newIssue";
+    public static final String NEW_PULL_REQUEST = "newPullRequest";
+    public static final String REPOSITORY = "repository";
     public static final String TITLE = "title";
+
+    public static final ModifiableObjectProperty ISSUE_OUTPUT_PROPERTY = object()
+        .properties(
+            string("url"),
+            string("repository_url"),
+            number(ID),
+            integer("number"),
+            string(TITLE),
+            string("state"),
+            string(BODY));
 
     private GithubConstants() {
     }

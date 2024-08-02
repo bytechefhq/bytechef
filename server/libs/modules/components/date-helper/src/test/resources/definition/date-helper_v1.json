@@ -15,6 +15,7 @@
   "connection": null,
   "actions": [ {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Converts UNIX timestamp to ISO8601 format.",
     "help": null,
@@ -72,7 +73,6 @@
       "optionsDataSource": null
     } ],
     "title": "Convert Date Timestamp",
-    "perform": { },
     "output": null,
     "outputResponse": {
       "outputSchema": {
@@ -98,7 +98,7 @@
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true,
+    "perform": { },
     "processErrorResponse": null,
     "workflowNodeDescription": null
   } ],

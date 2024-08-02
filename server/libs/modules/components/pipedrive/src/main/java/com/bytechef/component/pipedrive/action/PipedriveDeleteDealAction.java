@@ -18,7 +18,6 @@ package com.bytechef.component.pipedrive.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
@@ -33,7 +32,7 @@ import java.util.Map;
  */
 public class PipedriveDeleteDealAction {
     public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("deleteDeal")
-        .title("Delete a deal")
+        .title("Delete deal")
         .description("Marks a deal as deleted. After 30 days, the deal will be permanently deleted.")
         .metadata(
             Map.of(
@@ -41,22 +40,19 @@ public class PipedriveDeleteDealAction {
                 "path", "/deals/{id}"
 
             ))
-        .properties(integer("id").label("Id")
-            .description("The ID of the deal")
+        .properties(integer("id").label("Deal")
+            .description("Deal to delete")
             .required(true)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))
-        .outputSchema(object().properties(bool("success").description("If the request was successful or not")
-            .required(false),
-            object("data").properties(integer("id").description("The ID of the deal that was deleted")
+        .outputSchema(object()
+            .properties(object("body").properties(object("data").properties(integer("id").required(false))
                 .required(false))
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON)))
-        .sampleOutput(Map.<String, Object>ofEntries(Map.entry("success", true),
-            Map.entry("data", Map.<String, Object>ofEntries(Map.entry("id", 123)))));
+                    "responseType", ResponseType.JSON)));
 
     private PipedriveDeleteDealAction() {
     }

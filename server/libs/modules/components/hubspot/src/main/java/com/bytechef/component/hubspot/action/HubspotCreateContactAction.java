@@ -19,12 +19,11 @@ package com.bytechef.component.hubspot.action;
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDSL;
-import com.bytechef.component.hubspot.property.HubspotSimplePublicObjectInputForCreateProperties;
-import com.bytechef.component.hubspot.property.HubspotSimplePublicObjectProperties;
 import java.util.Map;
 
 /**
@@ -34,9 +33,8 @@ import java.util.Map;
  */
 public class HubspotCreateContactAction {
     public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
-        .title("Create")
-        .description(
-            "Create a contact with the given properties and return a copy of the object, including the ID. Documentation and examples for creating standard contacts is provided.")
+        .title("Create Contact")
+        .description("Create a contact with the given properties.")
         .metadata(
             Map.of(
                 "method", "POST",
@@ -44,14 +42,36 @@ public class HubspotCreateContactAction {
                 "application/json"
 
             ))
-        .properties(object("simplePublicObjectInputForCreate")
-            .properties(HubspotSimplePublicObjectInputForCreateProperties.PROPERTIES)
-            .label("Simple Public Object Input For Create")
-            .required(true)
+        .properties(object("__item")
+            .properties(object("properties").properties(string("firstname").label("First   Name")
+                .required(false),
+                string("lastname").label("Last   Name")
+                    .required(false),
+                string("email").label("Email   Address")
+                    .required(false),
+                string("phone").label("Phone   Number")
+                    .required(false),
+                string("company").label("Company")
+                    .description("Company contact belongs to.")
+                    .required(false),
+                string("website").label("Website")
+                    .description("Website of the contact.")
+                    .required(false))
+                .label("Properties")
+                .required(false))
+            .label("Contact")
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .outputSchema(object().properties(HubspotSimplePublicObjectProperties.PROPERTIES)
+        .outputSchema(object()
+            .properties(object("body")
+                .properties(string("id").required(false),
+                    object("properties")
+                        .properties(string("firstname").required(false), string("lastname").required(false),
+                            string("email").required(false), string("phone").required(false),
+                            string("company").required(false), string("website").required(false))
+                        .required(false))
+                .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));

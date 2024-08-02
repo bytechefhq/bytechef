@@ -28,7 +28,6 @@ import static com.bytechef.component.schedule.constant.ScheduleConstants.MINUTE;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.TIMEZONE;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.ListenerEmitter;
@@ -113,7 +112,7 @@ public class ScheduleEveryDayTrigger {
 
     protected void listenerDisable(
         Parameters inputParameters, Parameters connectionParameters, String workflowExecutionId,
-        Context context) {
+        TriggerContext context) {
 
         triggerScheduler.cancelScheduleTrigger(workflowExecutionId);
     }

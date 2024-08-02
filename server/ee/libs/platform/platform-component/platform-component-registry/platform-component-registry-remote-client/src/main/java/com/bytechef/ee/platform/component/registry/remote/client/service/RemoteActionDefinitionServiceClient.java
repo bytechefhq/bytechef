@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.component.registry.remote.client.service;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.ee.platform.component.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.ee.remote.client.DefaultRestClient;
@@ -71,8 +72,7 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     @Override
     public ProviderException executeProcessErrorResponse(
         String componentName, int componentVersion, String actionName, int statusCode, Object body,
-        ActionContext actionContext) {
-
+        Context actionContext) {
         throw new UnsupportedOperationException();
     }
 

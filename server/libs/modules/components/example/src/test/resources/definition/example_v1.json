@@ -1,5 +1,5 @@
 {
-  "categories": null,
+  "categories": [ "HELPERS" ],
   "customAction": null,
   "customActionHelp": null,
   "dataStreamItemReader": null,
@@ -12,9 +12,9 @@
   "resources": null,
   "version": 1,
   "title": "Example",
-  "connection": null,
   "actions": [ {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Description",
     "help": null,
@@ -22,8 +22,9 @@
     "name": "dummy",
     "properties": [ ],
     "title": "Title",
+    "output": null,
+    "perform": { },
     "processErrorResponse": null,
-    "workflowNodeDescription": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -48,9 +49,15 @@
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true,
-    "output": null,
-    "perform": { }
+    "workflowNodeDescription": null
   } ],
-  "triggers": null
+  "triggers": null,
+  "connection": {
+    "authorizations": [ ],
+    "properties": null,
+    "version": 1,
+    "authorizationRequired": null,
+    "baseUri": { },
+    "test": null
+  }
 }

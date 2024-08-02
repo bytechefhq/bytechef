@@ -17,10 +17,10 @@
 package com.bytechef.component.box.action;
 
 import static com.bytechef.component.box.constant.BoxConstants.FILE;
+import static com.bytechef.component.box.constant.BoxConstants.FILE_OUTPUT_PROPERTY;
 import static com.bytechef.component.box.constant.BoxConstants.ID;
 import static com.bytechef.component.box.constant.BoxConstants.NAME;
 import static com.bytechef.component.box.constant.BoxConstants.PARENT;
-import static com.bytechef.component.box.constant.BoxConstants.TYPE;
 import static com.bytechef.component.box.constant.BoxConstants.UPLOAD_FILE;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
@@ -64,17 +64,7 @@ public class BoxUploadFileAction {
             object()
                 .properties(
                     array("entries")
-                        .items(
-                            object()
-                                .properties(
-                                    string(TYPE),
-                                    string(ID),
-                                    string(NAME),
-                                    object(PARENT)
-                                        .properties(
-                                            string(TYPE),
-                                            string(ID),
-                                            string(NAME))))))
+                        .items(FILE_OUTPUT_PROPERTY)))
         .perform(BoxUploadFileAction::perform);
 
     private BoxUploadFileAction() {

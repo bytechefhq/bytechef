@@ -17,49 +17,19 @@
 package com.bytechef.component.github.action;
 
 import static com.bytechef.component.definition.Context.Http.Body;
-import static com.bytechef.component.definition.Context.Http.Executor;
-import static com.bytechef.component.definition.Context.Http.Response;
-import static com.bytechef.component.definition.Context.TypeReference;
 import static com.bytechef.component.github.constant.GithubConstants.BODY;
 import static com.bytechef.component.github.constant.GithubConstants.TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Parameters;
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 /**
  * @author Luka Ljubić
  */
-class GithubCreateIssueActionTest {
-
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
-    private final ActionContext mockedContext = mock(ActionContext.class);
-    private final Executor mockedExecutor = mock(Executor.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
-    private final Response mockedResponse = mock(Response.class);
-    private final Map<String, Object> responeseMap = Map.of("key", "value");
-
-    @BeforeEach
-    public void beforeEach() {
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responeseMap);
-    }
+class GithubCreateIssueActionTest extends AbstractGithubActionTest {
 
     @Test
     void testPerform() {
@@ -70,9 +40,9 @@ class GithubCreateIssueActionTest {
         when(mockedParameters.getString(BODY))
             .thenReturn((String) propertyStubsMap.get(BODY));
 
-        Object result = GithubCreateIssueAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Map<String, Object> result = GithubCreateIssueAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(responeseMap, result);
+        assertEquals(responseMap, result);
 
         Body body = bodyArgumentCaptor.getValue();
 

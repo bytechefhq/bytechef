@@ -27,7 +27,7 @@ public class OneSimpleAPIConstants {
     public static final String DESC = "description";
     public static final String FROM_CURRENCY = "from_currency";
     public static final String FROM_VALUE = "from_value";
-    public static final String ONE_SIMPLE_API = "OneSimpleAPI";
+    public static final String ONE_SIMPLE_API = "oneSimpleAPI";
     public static final String TITLE = "title";
     public static final String TO_CURRENCY = "to_currency";
     public static final String URL = "url";

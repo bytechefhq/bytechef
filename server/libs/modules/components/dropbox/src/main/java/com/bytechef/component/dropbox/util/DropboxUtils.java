@@ -16,22 +16,14 @@
 
 package com.bytechef.component.dropbox.util;
 
-import static com.bytechef.component.dropbox.constant.DropboxConstants.CLIENT_IDENTIFIER;
-
-import com.dropbox.core.DbxRequestConfig;
-import com.dropbox.core.v2.DbxClientV2;
-import com.dropbox.core.v2.files.DbxUserFilesRequests;
-
 /**
  * @author Mario Cvjetojevic
+ * @author Monika Kušter
  */
-public final class DropboxUtils {
+public class DropboxUtils {
 
-    public static DbxUserFilesRequests getDbxUserFilesRequests(String accessToken) {
-        DbxRequestConfig config = DbxRequestConfig.newBuilder(CLIENT_IDENTIFIER)
-            .build();
-
-        return new DbxClientV2(config, accessToken).files();
+    public static String getFullPath(String path, String filename) {
+        return (path.endsWith("/") ? path : path + "/") + filename;
     }
 
     private DropboxUtils() {

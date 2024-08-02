@@ -16,6 +16,7 @@
 
 package com.bytechef.component.box.connection;
 
+import static com.bytechef.component.box.constant.BoxConstants.BASE_URL;
 import static com.bytechef.component.definition.Authorization.AuthorizationType;
 import static com.bytechef.component.definition.Authorization.CLIENT_ID;
 import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
@@ -32,7 +33,7 @@ import java.util.List;
 public class BoxConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri((connectionParameters, context) -> "https://api.box.com/2.0")
+        .baseUri((connectionParameters, context) -> BASE_URL)
         .authorizations(
             authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                 .title("OAuth2 Authorization Code")

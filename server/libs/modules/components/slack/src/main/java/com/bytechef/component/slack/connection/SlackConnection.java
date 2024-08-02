@@ -28,10 +28,12 @@ import java.util.List;
 
 /**
  * @author Mario Cvjetojevic
+ * @author Monika Kušter
  */
-public final class SlackConnection {
+public class SlackConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .baseUri((connectionParameters, context) -> "https://slack.com/api")
         .authorizations(
             authorization(OAUTH2_AUTHORIZATION_CODE)
                 .title("OAuth2 Authorization Code")

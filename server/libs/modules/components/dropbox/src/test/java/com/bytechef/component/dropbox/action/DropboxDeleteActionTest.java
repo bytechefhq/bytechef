@@ -16,28 +16,59 @@
 
 package com.bytechef.component.dropbox.action;
 
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.times;
+import static com.bytechef.component.dropbox.action.DropboxDeleteAction.POST_DELETE_CONTEXT_FUNCTION;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.PATH;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
-import com.dropbox.core.DbxException;
-import org.junit.jupiter.api.Assertions;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.dropbox.util.DropboxUtils;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 /**
  * @author Mario Cvjetojevic
+ * @author Monika Kušter
  */
-public class DropboxDeleteActionTest extends AbstractDropboxActionTest {
+class DropboxDeleteActionTest extends AbstractDropboxActionTest {
 
     @Test
-    public void testPerform() throws DbxException {
-        DropboxDeleteAction.perform(parameters, parameters, Mockito.mock(ActionContext.class));
+    void testPerform() {
+        String fullPath = "fullPath";
 
-        then(filesRequests)
-            .should(times(1))
-            .deleteV2(stringArgumentCaptorSource.capture());
+        when(mockedParameters.getRequiredString(FILENAME))
+            .thenReturn("filename.txt");
+        when(mockedParameters.getRequiredString(PATH))
+            .thenReturn("/path/1/2");
 
-        Assertions.assertEquals(SOURCE_STUB + "/" + FILENAME_STUB, stringArgumentCaptorSource.getValue());
+        dropboxUtilsMockedStatic
+            .when(() -> DropboxUtils.getFullPath(pathArgumentCaptor.capture(), fileNameArgumentCaptor.capture()))
+            .thenReturn(fullPath);
+
+        when(mockedContext.http(POST_DELETE_CONTEXT_FUNCTION))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(mockedObject);
+
+        Object result = DropboxDeleteAction.perform(mockedParameters, mockedParameters, mockedContext);
+
+        assertEquals(mockedObject, result);
+
+        Http.Body body = bodyArgumentCaptor.getValue();
+
+        Map<String, String> expectedBody = Map.of(PATH, fullPath);
+
+        assertEquals(expectedBody, body.getContent());
+        assertEquals("filename.txt", fileNameArgumentCaptor.getValue());
+        assertEquals("/path/1/2", pathArgumentCaptor.getValue());
     }
 }

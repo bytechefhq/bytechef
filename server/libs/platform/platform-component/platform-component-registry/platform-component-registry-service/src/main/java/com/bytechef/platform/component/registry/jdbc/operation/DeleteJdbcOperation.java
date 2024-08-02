@@ -43,7 +43,7 @@ public class DeleteJdbcOperation implements JdbcOperation<Map<String, Integer>> 
 
         String deleteKey = MapUtils.getString(inputParameters, JdbcConstants.DELETE_KEY, "id");
         List<Map<String, ?>> rows = MapUtils.getList(
-            inputParameters, JdbcConstants.ROWS, new TypeReference<>() {}, Collections.emptyList());
+            inputParameters, JdbcConstants.FIELD_VALUES, new TypeReference<>() {}, Collections.emptyList());
         String schema = MapUtils.getString(inputParameters, JdbcConstants.SCHEMA, "public");
         String table = MapUtils.getRequiredString(inputParameters, JdbcConstants.TABLE);
 

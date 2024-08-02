@@ -16,67 +16,19 @@
 
 package com.bytechef.component.github.action;
 
-import static com.bytechef.component.github.constant.GithubConstants.ISSUE;
-import static com.bytechef.component.github.constant.GithubConstants.REPO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Parameters;
-import java.util.HashMap;
-import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Luka Ljubic
  */
-class GithubGetIssueActionTest {
-
-    private final ActionContext mockedContext = mock(ActionContext.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final Map<String, Object> responeseMap = Map.of("key", "value");
-
-    @BeforeEach
-    public void beforeEach() {
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.headers(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(Context.TypeReference.class)))
-            .thenReturn(responeseMap);
-    }
+class GithubGetIssueActionTest extends AbstractGithubActionTest {
 
     @Test
     void testPerform() {
-        Map<String, Object> propertyStubsMap = createPropertyStubsMap();
-
-        when(mockedParameters.getRequiredString(REPO))
-            .thenReturn((String) propertyStubsMap.get(REPO));
-        when(mockedParameters.getRequiredString(ISSUE))
-            .thenReturn((String) propertyStubsMap.get(ISSUE));
-
         Object result = GithubGetIssueAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(responeseMap, result);
-    }
-
-    private static Map<String, Object> createPropertyStubsMap() {
-        Map<String, Object> propertyStubsMap = new HashMap<>();
-
-        propertyStubsMap.put(REPO, "repo");
-        propertyStubsMap.put(ISSUE, "issue");
-
-        return propertyStubsMap;
+        assertEquals(responseMap, result);
     }
 }

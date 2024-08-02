@@ -20,8 +20,10 @@ import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.example.constant.ExampleConstants.EXAMPLE;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.example.action.ExampleDummyAction;
+import com.bytechef.component.example.connection.ExampleConnection;
 import com.google.auto.service.AutoService;
 
 /**
@@ -34,6 +36,8 @@ public class ExampleComponentHandler implements ComponentHandler {
         .title("Example")
         .description("Component description.")
         .icon("path:assets/example.svg")
+        .categories(ComponentCategory.HELPERS)
+        .connection(ExampleConnection.CONNECTION_DEFINITION)
         .actions(ExampleDummyAction.ACTION_DEFINITION);
 
     @Override

@@ -13,8 +13,10 @@
   "version": 1,
   "title": "Data Storage",
   "connection": null,
+  "triggers": null,
   "actions": [ {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": "Append value to the end of a list. If the list does not exist, it will be created.",
     "help": null,
@@ -129,8 +131,8 @@
         "label": "Time",
         "value": 10
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
@@ -150,8 +152,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
@@ -191,8 +193,8 @@
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE"
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
@@ -208,8 +210,8 @@
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE_TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE_TIME"
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
@@ -227,8 +229,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
@@ -264,8 +266,8 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "controlType": "NUMBER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "NUMBER"
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
@@ -284,8 +286,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
@@ -321,8 +323,8 @@
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "TIME"
     }, {
       "advancedOption": null,
       "description": "When set to true, and the value is a list, it will be added as a single value rather than concatenating the lists.",
@@ -349,14 +351,14 @@
       "controlType": "SELECT"
     } ],
     "title": "Append Value to List",
+    "outputResponse": null,
+    "output": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "perform": { },
-    "output": null,
-    "outputResponse": null,
-    "dynamicOutput": false
+    "perform": { }
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "The numeric value can be incremented atomically, and the action can be used concurrently from multiple executions.",
     "help": null,
@@ -431,14 +433,10 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "Atomic Increment",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
-    "perform": { },
-    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -457,14 +455,18 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true
+    "output": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": { }
   }, {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": "Wait for a value under a specified key, until it's available.",
     "help": null,
@@ -579,8 +581,8 @@
         "label": "Time",
         "value": 10
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -600,8 +602,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -641,8 +643,8 @@
       "label": "Default value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE"
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -658,8 +660,8 @@
       "label": "Default value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE_TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE_TIME"
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -677,8 +679,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -714,8 +716,8 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "controlType": "NUMBER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "NUMBER"
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -734,8 +736,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -771,8 +773,8 @@
       "label": "Default value",
       "placeholder": null,
       "options": null,
-      "controlType": "TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "TIME"
     }, {
       "advancedOption": null,
       "description": "If a value is not found within the specified time, the action returns a null value. Therefore, the maximum wait time should be set accordingly.",
@@ -790,18 +792,18 @@
       "maxValue": 300,
       "minValue": 1,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "Await Get Value",
+    "outputResponse": null,
+    "output": { },
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "perform": { },
-    "output": { },
-    "outputResponse": null,
-    "dynamicOutput": false
+    "perform": { }
   }, {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": "Remove a value associated with a key in the specified scope.",
     "help": null,
@@ -861,14 +863,14 @@
       "optionsDataSource": null
     } ],
     "title": "Delete Value",
+    "outputResponse": null,
+    "output": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "perform": { },
-    "output": null,
-    "outputResponse": null,
-    "dynamicOutput": false
+    "perform": { }
   }, {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": "Delete a value from the given index in a list.",
     "help": null,
@@ -943,18 +945,18 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "Delete Value from List",
+    "outputResponse": null,
+    "output": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "perform": { },
-    "output": null,
-    "outputResponse": null,
-    "dynamicOutput": false
+    "perform": { }
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Retrieve all the currently existing keys from storage, along with their values within the provided scope.",
     "help": null,
@@ -994,10 +996,6 @@
       "optionsDataSource": null
     } ],
     "title": "Get All Entries(Keys and Values)",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
-    "perform": { },
-    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -1031,21 +1029,25 @@
           "multipleValues": null,
           "options": null,
           "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
         "maxItems": null,
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "controlType": "ARRAY_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "ARRAY_BUILDER"
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true
+    "output": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": { }
   }, {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": "Retrieve a previously assigned value within the specified scope using its corresponding key.",
     "help": null,
@@ -1160,8 +1162,8 @@
         "label": "Time",
         "value": 10
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -1181,8 +1183,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -1222,8 +1224,8 @@
       "label": "Default value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE"
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -1239,8 +1241,8 @@
       "label": "Default value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE_TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE_TIME"
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -1258,8 +1260,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -1295,8 +1297,8 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "controlType": "NUMBER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "NUMBER"
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -1315,8 +1317,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -1352,18 +1354,18 @@
       "label": "Default value",
       "placeholder": null,
       "options": null,
-      "controlType": "TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "TIME"
     } ],
     "title": "Get Value",
+    "outputResponse": null,
+    "output": { },
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "perform": { },
-    "output": { },
-    "outputResponse": null,
-    "dynamicOutput": false
+    "perform": { }
   }, {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": "Set a value under a key, in the specified scope.",
     "help": null,
@@ -1478,8 +1480,8 @@
         "label": "Time",
         "value": 10
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
@@ -1499,8 +1501,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
@@ -1540,8 +1542,8 @@
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
@@ -1557,8 +1559,8 @@
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE_TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE_TIME"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
@@ -1576,8 +1578,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
@@ -1613,8 +1615,8 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "controlType": "NUMBER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "NUMBER"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
@@ -1633,8 +1635,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
@@ -1670,18 +1672,18 @@
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "TIME"
     } ],
     "title": "Set Value",
+    "outputResponse": null,
+    "output": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "perform": { },
-    "output": null,
-    "outputResponse": null,
-    "dynamicOutput": false
+    "perform": { }
   }, {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": "Set value under a specified index in a list.",
     "help": null,
@@ -1756,8 +1758,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "The value type.",
@@ -1815,8 +1817,8 @@
         "label": "Time",
         "value": 10
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified list's key.",
@@ -1836,8 +1838,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified list's key.",
@@ -1877,8 +1879,8 @@
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified list's key.",
@@ -1894,8 +1896,8 @@
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE_TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE_TIME"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
@@ -1913,8 +1915,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
@@ -1950,8 +1952,8 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "controlType": "NUMBER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "NUMBER"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified list's key.",
@@ -1970,8 +1972,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified list's key.",
@@ -2007,16 +2009,14 @@
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "TIME"
     } ],
     "title": "Set Value in List",
+    "outputResponse": null,
+    "output": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "perform": { },
-    "output": null,
-    "outputResponse": null,
-    "dynamicOutput": false
-  } ],
-  "triggers": null
+    "perform": { }
+  } ]
 }

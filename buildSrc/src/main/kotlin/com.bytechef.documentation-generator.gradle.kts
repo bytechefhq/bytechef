@@ -74,17 +74,34 @@ open class FindJsonFilesTask : DefaultTask() {
     class OutputSchema {
         var controlType: String? = null
         var properties: Array<Properties>? = null
+        var items: Array<Properties>? = null
         var type: String? = null
 
-        override fun toString(): String {
-            return """
-Type: $type
-
+        private fun getPropertiesString(): String {
+            return if (properties != null) {
+                """
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 ${properties?.joinToString("\n")}
+"""
+            } else if(items != null){
+                """
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+${items?.joinToString("\n")}
+"""
+            } else ""
+        }
+
+        override fun toString(): String {
+            return """
+Type: $type
+
+${getPropertiesString()}
 
 """
         }

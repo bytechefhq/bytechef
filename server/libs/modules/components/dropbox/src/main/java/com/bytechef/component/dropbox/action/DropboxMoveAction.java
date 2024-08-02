@@ -16,27 +16,27 @@
 
 package com.bytechef.component.dropbox.action;
 
-import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.DESTINATION;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.FROM_PATH;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.MOVE;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE;
-import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.TO_PATH;
+import static com.bytechef.component.dropbox.util.DropboxUtils.getFullPath;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
-import com.dropbox.core.DbxException;
-import com.dropbox.core.v2.files.DbxUserFilesRequests;
-import com.dropbox.core.v2.files.RelocationResult;
 
 /**
  * @author Mario Cvjetojevic
+ * @author Monika Kušter
  */
-public final class DropboxMoveAction {
+public class DropboxMoveAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(MOVE)
         .title("Move")
@@ -48,11 +48,11 @@ public final class DropboxMoveAction {
                 .label("Filename")
                 .description("Name of the file with the extension. Don't fill in if you want a folder.")
                 .required(false),
-            string(SOURCE)
+            string(FROM_PATH)
                 .label("Source path")
                 .description("Path in the user's Dropbox to be moved.  Root is /.")
                 .required(true),
-            string(DESTINATION)
+            string(TO_PATH)
                 .label("Destination path")
                 .description("Path in the user's Dropbox that is the destination. Root is /.")
                 .required(true))
@@ -61,38 +61,31 @@ public final class DropboxMoveAction {
                 .properties(
                     object("metadata")
                         .properties(
-                            string("name")
-                                .required(true),
-                            string("pathLower")
-                                .required(true),
-                            string("pathDisplay")
-                                .required(true),
-                            string("parentSharedFolderId")
-                                .required(true),
-                            string("previewUrl")
-                                .required(true))
-                        .label("Metadata")))
+                            string(".tag"),
+                            string("name"),
+                            string("path_lower"),
+                            string("path_display"),
+                            string("id"))))
         .perform(DropboxMoveAction::perform);
+
+    protected static final ContextFunction<Http, Http.Executor> POST_MOVE_CONTEXT_FUNCTION =
+        http -> http.post("https://api.dropboxapi.com/2/files/move_v2");
 
     private DropboxMoveAction() {
     }
 
-    public static RelocationResult perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
-        throws DbxException {
-
-        DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
-            connectionParameters.getRequiredString(ACCESS_TOKEN));
+    public static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         String filename = inputParameters.getRequiredString(FILENAME);
-        String source = inputParameters.getRequiredString(SOURCE);
 
-        source = source.endsWith("/") ? source : source + "/";
-
-        String destination = inputParameters.getRequiredString(DESTINATION);
-
-        destination = destination.endsWith("/") ? destination : destination + "/";
-
-        return dbxUserFilesRequests.moveV2(source + filename, destination + filename);
+        return actionContext.http(POST_MOVE_CONTEXT_FUNCTION)
+            .body(
+                Http.Body.of(
+                    FROM_PATH, getFullPath(inputParameters.getRequiredString(FROM_PATH), filename),
+                    TO_PATH, getFullPath(inputParameters.getRequiredString(TO_PATH), filename)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
     }
 }

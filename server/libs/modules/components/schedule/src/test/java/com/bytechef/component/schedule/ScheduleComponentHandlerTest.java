@@ -26,41 +26,41 @@ import org.junit.jupiter.api.Test;
  * @author Arik Cohen
  * @author Ivica Cardic
  */
-public class ScheduleComponentHandlerTest {
+class ScheduleComponentHandlerTest {
 
     @Test
-    public void testGetComponentDefinition() {
+    void testGetComponentDefinition() {
         JsonFileAssert.assertEquals("definition/schedule_v1.json",
             new ScheduleComponentHandler(null).getDefinition());
     }
 
     @Test
     @Disabled
-    public void testCronTrigger() {
+    void testCronTrigger() {
         // TODO
     }
 
     @Test
     @Disabled
-    public void testEveryDayTrigger() {
+    void testEveryDayTrigger() {
         // TODO
     }
 
     @Test
     @Disabled
-    public void testEveryMonthTrigger() {
+    void testEveryMonthTrigger() {
         // TODO
     }
 
     @Test
     @Disabled
-    public void testEveryWeekTrigger() {
+    void testEveryWeekTrigger() {
         // TODO
     }
 
     @Test
     @Disabled
-    public void testIntervalTrigger() {
+    void testIntervalTrigger() {
         // TODO
     }
 }

@@ -21,11 +21,13 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.OutputFunction;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
+import com.bytechef.component.definition.ActionDefinition.ProcessErrorResponseFunction;
 import com.bytechef.component.definition.ActionDefinition.SingleConnectionOutputFunction;
 import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
 import com.bytechef.component.definition.ActionWorkflowNodeDescriptionFunction;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.DynamicOptionsProperty;
 import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
@@ -49,6 +51,7 @@ import com.bytechef.platform.registry.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -170,16 +173,20 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     @Override
     public ProviderException executeProcessErrorResponse(
         String componentName, int componentVersion, String actionName, int statusCode, Object body,
-        ActionContext actionContext) {
+        Context actionContext) {
 
         com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
 
         try {
-            return actionDefinition.getProcessErrorResponse()
-                .orElseGet(() -> (statusCode1, body1, context) -> new ProviderException(
-                    statusCode1, body1 == null ? null : body1.toString()))
-                .apply(statusCode, body, actionContext);
+            Optional<ProcessErrorResponseFunction> processErrorResponse = actionDefinition.getProcessErrorResponse();
+
+            if (processErrorResponse.isPresent()) {
+                return processErrorResponse.get()
+                    .apply(statusCode, body, actionContext);
+            } else {
+                return ProviderException.getProviderException(statusCode, body);
+            }
         } catch (Exception e) {
             throw new ComponentExecutionException(e, ActionDefinitionErrorType.EXECUTE_PROCESS_ERROR_RESPONSE);
         }

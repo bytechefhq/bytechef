@@ -16,65 +16,27 @@
 
 package com.bytechef.component.dropbox.util;
 
-import static com.bytechef.component.dropbox.constant.DropboxConstants.CLIENT_IDENTIFIER;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.atLeast;
+import static com.bytechef.component.dropbox.util.DropboxUtils.getFullPath;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.dropbox.core.DbxRequestConfig;
-import com.dropbox.core.v2.DbxClientV2;
-import com.dropbox.core.v2.files.DbxUserFilesRequests;
-import java.util.List;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedConstruction;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 
 /**
  * @author Mario Cvjetojevic
+ * @author Monika Kušter
  */
 class DropboxUtilsTest {
 
-    static final String ACCESS_TOKEN_STUB = "accessTokenStub";
-
     @Test
-    void testGetDropboxRequestObject() {
-        try (MockedStatic<DbxRequestConfig> dbxRequestConfigMockedStatic = Mockito.mockStatic(DbxRequestConfig.class)) {
-            DbxRequestConfig.Builder builder = Mockito.mock(DbxRequestConfig.Builder.class);
-            DbxRequestConfig dbxRequestConfig = Mockito.mock(DbxRequestConfig.class);
-            DbxUserFilesRequests dbxUserFilesRequests = Mockito.mock(DbxUserFilesRequests.class);
+    void testGetFullPath() {
+        String path1 = "folder1/";
+        String filename1 = "file1.txt";
 
-            dbxRequestConfigMockedStatic
-                .when(() -> DbxRequestConfig.newBuilder(CLIENT_IDENTIFIER))
-                .thenReturn(builder);
-            Mockito
-                .when(builder.build())
-                .thenReturn(dbxRequestConfig);
+        assertEquals("folder1/file1.txt", getFullPath(path1, filename1));
 
-            try (MockedConstruction<DbxClientV2> dbxClientV2MockedConstruction =
-                Mockito.mockConstruction(DbxClientV2.class, (dbxClientV2, context) -> {
-                    Mockito
-                        .when(dbxClientV2.files())
-                        .thenReturn(dbxUserFilesRequests);
+        String path2 = "folder2";
+        String filename2 = "file2.txt";
 
-                    List<?> arguments = context.arguments();
-
-                    Assertions.assertEquals(
-                        ACCESS_TOKEN_STUB, arguments.get(1),
-                        "Access token used does not match getDropboxRequestObject() method argument!");
-                })) {
-
-                DropboxUtils.getDbxUserFilesRequests(ACCESS_TOKEN_STUB);
-
-                List<DbxClientV2> dbxClientV2s = dbxClientV2MockedConstruction.constructed();
-
-                then(dbxClientV2s.getFirst())
-                    .should(atLeast(1))
-                    .files();
-
-                Assertions.assertEquals(
-                    1, dbxClientV2s.size(), "One instance of DbxClientV2 is enough!");
-            }
-        }
+        assertEquals("folder2/file2.txt", getFullPath(path2, filename2));
     }
 }

@@ -23,9 +23,9 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
@@ -85,7 +85,7 @@ public class MailchimpSubscribeTrigger {
 
     protected static void dynamicWebhookDisable(
         Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
-        String workflowExecutionId, Context context) {
+        String workflowExecutionId, TriggerContext context) {
 
         String server = MailchimpUtils.getMailChimpServer(
             connectionParameters.getRequiredString(ACCESS_TOKEN), context);
@@ -98,7 +98,7 @@ public class MailchimpSubscribeTrigger {
 
     protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
-        String workflowExecutionId, Context context) {
+        String workflowExecutionId, TriggerContext context) {
 
         String server = MailchimpUtils.getMailChimpServer(
             connectionParameters.getRequiredString(ACCESS_TOKEN), context);
@@ -118,7 +118,7 @@ public class MailchimpSubscribeTrigger {
                             "api", true))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new Context.TypeReference<>() {});
+            .getBody(new TypeReference<>() {});
 
         if (response.containsKey("errors")) {
             List<?> errors = (List<?>) response.get("errors");
