@@ -49,7 +49,9 @@ export default function saveProperty({
         },
         {
             onSuccess: (response) => {
-                successCallback && successCallback();
+                if (successCallback) {
+                    successCallback();
+                }
 
                 setCurrentComponent({
                     ...currentComponent,
