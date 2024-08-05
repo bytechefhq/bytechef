@@ -34,6 +34,7 @@ const getNestedObject = (jsonObject: any, selector: string) => {
             } else {
                 return finalKey ? object[finalKey] : undefined;
             }
+            /* eslint-disable @typescript-eslint/no-unused-vars */
         } catch (error) {
             return undefined;
         }

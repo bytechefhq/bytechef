@@ -812,8 +812,8 @@ const Property = ({
                         leadingIcon={typeIcon}
                         onChange={handleMentionsInputChange}
                         onKeyPress={(event: KeyboardEvent) => {
-                            if (type !== 'STRING') {
-                                event.key !== '{' && event.preventDefault();
+                            if (type !== 'STRING' && event.key !== '{') {
+                                event.preventDefault();
                             }
                         }}
                         placeholder={placeholder}
