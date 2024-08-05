@@ -75,6 +75,7 @@ const WorkflowCodeEditorSheet = ({
                         onSuccess: () => setDirty(false),
                     }
                 );
+                /* eslint-disable @typescript-eslint/no-unused-vars */
             } catch (e) {
                 //ignore
             }
