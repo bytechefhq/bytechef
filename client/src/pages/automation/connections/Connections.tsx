@@ -169,7 +169,7 @@ export const Connections = () => {
                                             });
                                         },
                                     }}
-                                    toLink={`?environment=${environment}`}
+                                    toLink={`?environment=${environment ?? ''}`}
                                 />
 
                                 {!componentsLoading &&
