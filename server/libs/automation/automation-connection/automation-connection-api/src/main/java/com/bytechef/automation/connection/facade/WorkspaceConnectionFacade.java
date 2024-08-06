@@ -30,6 +30,6 @@ public interface WorkspaceConnectionFacade {
     void delete(long connectionId);
 
     List<ConnectionDTO> getConnections(
-        long workspaceId, String componentName, Integer connectionVersion,
-        ConnectionEnvironment connectionEnvironment, Long tagId);
+        long workspaceId, String componentName, Integer connectionVersion, ConnectionEnvironment connectionEnvironment,
+        Long tagId);
 }
