@@ -40,7 +40,6 @@ public final class XeroConstants {
     public static final String ADDRESSES = "Addresses";
     public static final String ADDRESS_TYPE = "AddressType";
     public static final String BANK_ACCOUNT_DETAILS = "BankAccountDetails";
-    public static final String BASE_URL = "https://api.xero.com/api.xro/2.0";
     public static final String BRANDING_THEME_ID = "BrandingThemeID";
     public static final String CITY = "City";
     public static final String CODE = "Code";

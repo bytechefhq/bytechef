@@ -26,7 +26,6 @@ import static com.bytechef.component.xero.constant.XeroConstants.ACCOUNT_NUMBER;
 import static com.bytechef.component.xero.constant.XeroConstants.ADDRESSES;
 import static com.bytechef.component.xero.constant.XeroConstants.ADDRESS_TYPE;
 import static com.bytechef.component.xero.constant.XeroConstants.BANK_ACCOUNT_DETAILS;
-import static com.bytechef.component.xero.constant.XeroConstants.BASE_URL;
 import static com.bytechef.component.xero.constant.XeroConstants.CITY;
 import static com.bytechef.component.xero.constant.XeroConstants.COMPANY_NUMBER;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACTS;
@@ -179,7 +178,7 @@ public class XeroCreateContactAction {
         .perform(XeroCreateContactAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_CONTACTS_CONTEXT_FUNCTION =
-        http -> http.post(BASE_URL + "/" + CONTACTS);
+        http -> http.post("/" + CONTACTS);
 
     private XeroCreateContactAction() {
     }
