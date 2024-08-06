@@ -12,55 +12,6 @@
   "resources": null,
   "version": 1,
   "title": "One Simple API",
-  "triggers": null,
-  "connection": {
-    "authorizations": [ {
-      "detectOn": null,
-      "description": null,
-      "name": "custom",
-      "properties": [ {
-        "advancedOption": null,
-        "description": "Access Token that is given to you when you create a API Token in OneSimpleApi",
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "token",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Access Token",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      } ],
-      "refreshOn": null,
-      "title": "One Simple API Connection",
-      "type": "CUSTOM",
-      "apply": null,
-      "pkce": null,
-      "scopes": { },
-      "refresh": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientId": null,
-      "clientSecret": null,
-      "refreshToken": null,
-      "tokenUrl": null,
-      "refreshUrl": null,
-      "acquire": null
-    } ],
-    "properties": null,
-    "version": 1,
-    "authorizationRequired": null,
-    "baseUri": null,
-    "test": null
-  },
   "actions": [ {
     "batch": null,
     "dynamicOutput": true,
@@ -139,6 +90,9 @@
       "controlType": "NUMBER"
     } ],
     "title": "Currency Converter",
+    "output": null,
+    "perform": { },
+    "processErrorResponse": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -243,10 +197,7 @@
       },
       "sampleOutput": null
     },
-    "workflowNodeDescription": null,
-    "processErrorResponse": null,
-    "perform": { },
-    "output": null
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -277,6 +228,9 @@
       "optionsDataSource": null
     } ],
     "title": "URL Shortener",
+    "output": null,
+    "perform": { },
+    "processErrorResponse": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -341,10 +295,7 @@
       },
       "sampleOutput": null
     },
-    "workflowNodeDescription": null,
-    "processErrorResponse": null,
-    "perform": { },
-    "output": null
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -375,6 +326,9 @@
       "optionsDataSource": null
     } ],
     "title": "Web Page Information",
+    "output": null,
+    "perform": { },
+    "processErrorResponse": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -679,9 +633,55 @@
       },
       "sampleOutput": null
     },
-    "workflowNodeDescription": null,
-    "processErrorResponse": null,
-    "perform": { },
-    "output": null
-  } ]
+    "workflowNodeDescription": null
+  } ],
+  "connection": {
+    "authorizations": [ {
+      "detectOn": null,
+      "description": null,
+      "name": "custom",
+      "properties": [ {
+        "advancedOption": null,
+        "description": "Access Token that is given to you when you create a API Token in OneSimpleApi",
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "token",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Access Token",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
+      "refreshOn": null,
+      "title": "One Simple API Connection",
+      "type": "CUSTOM",
+      "acquire": null,
+      "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null,
+      "clientId": null,
+      "clientSecret": null,
+      "pkce": null,
+      "refresh": null,
+      "refreshUrl": null,
+      "scopes": { },
+      "refreshToken": null,
+      "tokenUrl": null
+    } ],
+    "properties": null,
+    "version": 1,
+    "authorizationRequired": null,
+    "baseUri": { },
+    "test": null
+  },
+  "triggers": null
 }
