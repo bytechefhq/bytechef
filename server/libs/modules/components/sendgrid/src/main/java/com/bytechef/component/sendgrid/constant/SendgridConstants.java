@@ -22,7 +22,6 @@ package com.bytechef.component.sendgrid.constant;
 public final class SendgridConstants {
 
     public static final String ATTACHMENTS = "attachments";
-    public static final String BASE_URL = "https://api.sendgrid.com/v3";
     public static final String CC = "cc";
     public static final String FROM = "from";
     public static final String SEND_EMAIL = "sendEmail";
