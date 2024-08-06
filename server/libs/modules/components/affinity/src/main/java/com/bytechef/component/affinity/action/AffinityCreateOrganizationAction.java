@@ -16,7 +16,6 @@
 
 package com.bytechef.component.affinity.action;
 
-import static com.bytechef.component.affinity.constant.AffinityConstants.BASE_URL;
 import static com.bytechef.component.affinity.constant.AffinityConstants.CREATE_ORGANIZATION;
 import static com.bytechef.component.affinity.constant.AffinityConstants.DOMAIN;
 import static com.bytechef.component.affinity.constant.AffinityConstants.NAME;
@@ -58,7 +57,7 @@ public class AffinityCreateOrganizationAction {
         .perform(AffinityCreateOrganizationAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_ORGANIZATIONS_CONTEXT_FUNCTION =
-        http -> http.post(BASE_URL + "organizations");
+        http -> http.post("/organizations");
 
     private AffinityCreateOrganizationAction() {
     }

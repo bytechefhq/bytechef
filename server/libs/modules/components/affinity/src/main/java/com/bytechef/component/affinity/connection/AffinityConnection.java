@@ -16,7 +16,6 @@
 
 package com.bytechef.component.affinity.connection;
 
-import static com.bytechef.component.affinity.constant.AffinityConstants.BASE_URL;
 import static com.bytechef.component.definition.Authorization.AuthorizationType.BEARER_TOKEN;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.authorization;
@@ -31,7 +30,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefini
 public class AffinityConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri((connectionParameters, context) -> BASE_URL)
+        .baseUri((connectionParameters, context) -> "https://api.affinity.co")
         .authorizations(
             authorization(BEARER_TOKEN)
                 .title("Bearer Token")

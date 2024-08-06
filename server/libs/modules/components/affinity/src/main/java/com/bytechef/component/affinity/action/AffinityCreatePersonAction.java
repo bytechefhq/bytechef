@@ -16,7 +16,6 @@
 
 package com.bytechef.component.affinity.action;
 
-import static com.bytechef.component.affinity.constant.AffinityConstants.BASE_URL;
 import static com.bytechef.component.affinity.constant.AffinityConstants.CREATE_PERSON;
 import static com.bytechef.component.affinity.constant.AffinityConstants.EMAILS;
 import static com.bytechef.component.affinity.constant.AffinityConstants.FIRST_NAME;
@@ -67,7 +66,7 @@ public class AffinityCreatePersonAction {
         .perform(AffinityCreatePersonAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_PERSONS_CONTEXT_FUNCTION =
-        http -> http.post(BASE_URL + "persons");
+        http -> http.post("/persons");
 
     private AffinityCreatePersonAction() {
     }

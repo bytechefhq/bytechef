@@ -22,7 +22,6 @@ package com.bytechef.component.affinity.constant;
 public class AffinityConstants {
 
     public static final String AFFINITY = "affinity";
-    public static final String BASE_URL = "https://api.affinity.co/";
     public static final String CREATE_ORGANIZATION = "createOrganization";
     public static final String CREATE_PERSON = "createPerson";
     public static final String CREATE_OPPORTUNITY = "createNote";
