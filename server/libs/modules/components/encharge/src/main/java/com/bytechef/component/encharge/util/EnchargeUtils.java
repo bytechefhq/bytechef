@@ -38,7 +38,7 @@ public class EnchargeUtils {
     }
 
     protected static final ContextFunction<Http, Http.Executor> GET_PEOPLE_CONTEXT_FUNCTION =
-        http -> http.get("https://api.encharge.io/v1/people/all");
+        http -> http.get("/people/all");
 
     public static List<Option<String>> getUserEmailOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
