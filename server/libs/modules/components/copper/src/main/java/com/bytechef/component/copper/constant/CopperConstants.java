@@ -24,7 +24,6 @@ public class CopperConstants {
     public static final String ADDRESS = "address";
     public static final String ASSIGNEE_ID = "assignee_id";
     public static final String ACTIVITY_TYPE = "activity_type";
-    public static final String BASE_URL = "https://api.copper.com/developer_api/v1";
     public static final String CATEGORY = "category";
     public static final String CATEGORY_LABEL = "Category";
     public static final String CITY = "city";

@@ -34,6 +34,7 @@ import java.util.Map;
 public class CopperConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .baseUri((connectionParameters, context) -> "https://api.copper.com/developer_api/v1")
         .authorizations(
             authorization(AuthorizationType.API_KEY)
                 .title("API Key")
