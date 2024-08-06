@@ -42,6 +42,7 @@ import java.util.Map;
 public class XeroConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .baseUri((connectionParameters, context) -> "https://api.xero.com/api.xro/2.0")
         .authorizations(
             authorization(OAUTH2_AUTHORIZATION_CODE)
                 .title("OAuth2 Authorization Code")

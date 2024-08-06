@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.date;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.xero.constant.XeroConstants.ACCREC;
-import static com.bytechef.component.xero.constant.XeroConstants.BASE_URL;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACT_ID;
 import static com.bytechef.component.xero.constant.XeroConstants.CREATE_SALES_INVOICE;
 import static com.bytechef.component.xero.constant.XeroConstants.CURRENCY_CODE;
@@ -81,7 +80,7 @@ public class XeroCreateInvoiceAction {
         .perform(XeroCreateInvoiceAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_INVOICES_CONTEXT_FUNCTION =
-        http -> http.post(BASE_URL + "/" + INVOICES);
+        http -> http.post("/" + INVOICES);
 
     private XeroCreateInvoiceAction() {
     }

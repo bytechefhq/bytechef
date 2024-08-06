@@ -17,7 +17,6 @@
 package com.bytechef.component.xero.util;
 
 import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.xero.constant.XeroConstants.BASE_URL;
 import static com.bytechef.component.xero.constant.XeroConstants.CODE;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACT;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACTS;
@@ -66,16 +65,16 @@ import javax.crypto.spec.SecretKeySpec;
 public class XeroUtils {
 
     protected static final ContextFunction<Http, Http.Executor> GET_ACCOUNTS_CONTEXT_FUNCTION =
-        http -> http.get(BASE_URL + "/Accounts");
+        http -> http.get("/Accounts");
 
     protected static final ContextFunction<Http, Http.Executor> GET_BRANDING_THEME_CONTEXT_FUNCTION =
-        http -> http.get(BASE_URL + "/BrandingTheme");
+        http -> http.get("/BrandingTheme");
 
     protected static final ContextFunction<Http, Http.Executor> GET_CONTACTS_CONTEXT_FUNCTION =
-        http -> http.get(BASE_URL + "/" + CONTACTS);
+        http -> http.get("/" + CONTACTS);
 
     protected static final ContextFunction<Http, Http.Executor> GET_CURRENCIES_CONTEXT_FUNCTION =
-        http -> http.get(BASE_URL + "/Currencies");
+        http -> http.get("/Currencies");
 
     private XeroUtils() {
     }
@@ -213,7 +212,7 @@ public class XeroUtils {
                     String urlPart = category.equals(INVOICE) ? INVOICES : CONTACTS;
 
                     Map<String, Object> objectsBody = context
-                        .http(http -> http.get(BASE_URL + "/" + urlPart + "/" + resourceId))
+                        .http(http -> http.get("/" + urlPart + "/" + resourceId))
                         .configuration(Http.responseType(Http.ResponseType.JSON))
                         .execute()
                         .getBody(new TypeReference<>() {});

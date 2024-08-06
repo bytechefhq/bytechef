@@ -24,7 +24,6 @@ import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.xero.constant.XeroConstants.BASE_URL;
 import static com.bytechef.component.xero.constant.XeroConstants.BRANDING_THEME_ID;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACT;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACT_ID;
@@ -151,7 +150,7 @@ public class XeroCreateQuoteAction {
         .perform(XeroCreateQuoteAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_QUOTES_CONTEXT_FUNCTION =
-        http -> http.post(BASE_URL + "/Quotes");
+        http -> http.post("/Quotes");
 
     private XeroCreateQuoteAction() {
     }
