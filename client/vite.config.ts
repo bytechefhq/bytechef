@@ -8,7 +8,12 @@ import basicSsl from '@vitejs/plugin-basic-ssl';
 export default ({mode}) => {
     // Make Vite env vars available.
     // https://stackoverflow.com/a/66389044
-    process.env = {...process.env, ...loadEnv(mode, process.cwd())};
+    process.env = {...process.env, ...loadEnv(mode, process.cwd(), '')};
+    
+    const proxyActuatorURL = process.env.PROXY_ACTUATOR_URL || 'http://localhost:9555';
+    const proxyApiURL = process.env.PROXY_API_URL || 'http://localhost:9555';
+    const hostURL = process.env.HOST || '127.0.0.1';
+    
 
     const isHttps = () => process.env.VITE_HTTPS === 'true';
 
@@ -24,18 +29,18 @@ export default ({mode}) => {
         },
         plugins: [react(), tsconfigPaths(), svgr(), isHttps() && basicSsl()],
         server: {
-            host: '127.0.0.1',
+            host: hostURL,
             proxy: {
                 '/actuator': {
                     changeOrigin: true,
                     secure: false,
-                    target: 'http://localhost:9555',
+                    target: proxyActuatorURL,
                     // rewrite: (path) => path.replace(/^\/api/, ""),
                 },
                 '/api': {
                     changeOrigin: true,
                     secure: false,
-                    target: 'http://localhost:9555',
+                    target: proxyApiURL
                     // rewrite: (path) => path.replace(/^\/api/, ""),
                 },
             },
