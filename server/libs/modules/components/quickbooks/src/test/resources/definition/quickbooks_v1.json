@@ -143,6 +143,7 @@
     } ],
     "title": "Create customer",
     "output": null,
+    "perform": { },
     "processErrorResponse": null,
     "outputResponse": {
       "outputSchema": {
@@ -430,8 +431,7 @@
       },
       "sampleOutput": null
     },
-    "workflowNodeDescription": null,
-    "perform": { }
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -485,6 +485,7 @@
     } ],
     "title": "Create item",
     "output": null,
+    "perform": { },
     "processErrorResponse": null,
     "outputResponse": {
       "outputSchema": {
@@ -592,8 +593,7 @@
       },
       "sampleOutput": null
     },
-    "workflowNodeDescription": null,
-    "perform": { }
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -625,6 +625,7 @@
     } ],
     "title": "Create a category",
     "output": null,
+    "perform": { },
     "processErrorResponse": null,
     "outputResponse": {
       "outputSchema": {
@@ -790,8 +791,7 @@
       },
       "sampleOutput": null
     },
-    "workflowNodeDescription": null,
-    "perform": { }
+    "workflowNodeDescription": null
   } ],
   "triggers": null,
   "connection": {
@@ -879,7 +879,7 @@
     "properties": null,
     "version": 1,
     "authorizationRequired": null,
-    "baseUri": null,
+    "baseUri": { },
     "test": null
   }
 }
