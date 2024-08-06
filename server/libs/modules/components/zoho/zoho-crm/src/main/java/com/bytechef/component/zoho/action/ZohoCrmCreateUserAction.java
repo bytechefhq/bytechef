@@ -28,7 +28,7 @@ import static com.bytechef.component.zoho.constant.ZohoCrmConstants.USER_PROFILE
 import static com.bytechef.component.zoho.constant.ZohoCrmConstants.USER_ROLE;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Context.TypeReference;
@@ -41,7 +41,7 @@ import com.bytechef.component.zoho.util.ZohoCrmUtils;
  */
 public class ZohoCrmCreateUserAction {
 
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_USER)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_USER)
         .title("Create a user")
         .description("Create a user for your CRM team")
         .properties(

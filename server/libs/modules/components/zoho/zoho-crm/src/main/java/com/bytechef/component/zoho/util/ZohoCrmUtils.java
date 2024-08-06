@@ -19,7 +19,8 @@ package com.bytechef.component.zoho.util;
 import static com.bytechef.component.definition.ComponentDSL.option;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import java.util.ArrayList;
@@ -40,9 +41,9 @@ public class ZohoCrmUtils {
 
         List<Map<String, Object>> body = context
             .http(http -> http.get("/settings/roles"))
-            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new Context.TypeReference<>() {});
+            .getBody(new TypeReference<>() {});
 
         return getOptions(body);
     }
@@ -53,9 +54,9 @@ public class ZohoCrmUtils {
 
         List<Map<String, Object>> body = context
             .http(http -> http.get("/settings/profiles"))
-            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new Context.TypeReference<>() {});
+            .getBody(new TypeReference<>() {});
 
         return getOptions(body);
     }
@@ -65,7 +66,9 @@ public class ZohoCrmUtils {
 
         for (Object item : body) {
             if (item instanceof Map<?, ?> map) {
-                options.add(option((String) map.get("name"), (String) map.get("name")));
+                String name = (String) map.get("name");
+
+                options.add(option(name, name));
             }
         }
 

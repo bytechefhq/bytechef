@@ -23,7 +23,7 @@ import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.zoho.constant.ZohoCrmConstants.GET_ORG_DATA;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
@@ -33,7 +33,7 @@ import com.bytechef.component.definition.Parameters;
  */
 public class ZohoCrmGetOrganizationData {
 
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action(GET_ORG_DATA)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(GET_ORG_DATA)
         .title("Get Organization data")
         .description("Get info about your organization")
         .outputSchema(

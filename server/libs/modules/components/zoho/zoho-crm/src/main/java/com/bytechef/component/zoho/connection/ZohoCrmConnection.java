@@ -24,8 +24,8 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.zoho.constant.ZohoCrmConstants.REGION;
 
-import com.bytechef.component.definition.Authorization;
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import java.util.List;
 
 /**
@@ -33,10 +33,10 @@ import java.util.List;
  */
 public class ZohoCrmConnection {
 
-    public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+    public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> connectionParameters.getRequiredString(REGION) + "/crm/v4")
         .authorizations(
-            authorization(Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+            authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                 .title("OAuth2 Authorization Code")
                 .properties(
                     string(CLIENT_ID)

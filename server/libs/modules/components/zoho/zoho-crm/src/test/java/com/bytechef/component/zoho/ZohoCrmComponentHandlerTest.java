@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Luka Ljubić
  */
-public class ZohoCrmComponentHandlerTest {
+class ZohoCrmComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
