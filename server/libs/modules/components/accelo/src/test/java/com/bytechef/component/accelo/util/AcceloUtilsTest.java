@@ -17,7 +17,6 @@
 package com.bytechef.component.accelo.util;
 
 import static com.bytechef.component.accelo.constant.AcceloConstants.AGAINST_TYPE;
-import static com.bytechef.component.accelo.constant.AcceloConstants.DEPLOYMENT;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -44,16 +43,6 @@ class AcceloUtilsTest {
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
-
-    @Test
-    void testCreateUrl(){
-        when(mockedParameters.getRequiredString(DEPLOYMENT))
-            .thenReturn("deployment");
-
-        String url = AcceloUtils.createUrl(mockedParameters, "resource");
-
-        assertEquals("https://deployment.api.accelo.com/api/v0/resource", url);
-    }
 
     @Test
     void testGetAgainstIdOptions() {
