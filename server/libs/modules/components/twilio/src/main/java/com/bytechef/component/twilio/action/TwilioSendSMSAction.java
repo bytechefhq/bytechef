@@ -31,7 +31,6 @@ import static com.bytechef.component.twilio.constant.TwilioConstants.ADDRESS_RET
 import static com.bytechef.component.twilio.constant.TwilioConstants.APPLICATION_SID;
 import static com.bytechef.component.twilio.constant.TwilioConstants.ATTEMPT;
 import static com.bytechef.component.twilio.constant.TwilioConstants.AUTH_TOKEN;
-import static com.bytechef.component.twilio.constant.TwilioConstants.BASE_URL;
 import static com.bytechef.component.twilio.constant.TwilioConstants.BODY;
 import static com.bytechef.component.twilio.constant.TwilioConstants.CONTENT;
 import static com.bytechef.component.twilio.constant.TwilioConstants.CONTENT_RETENTION;
@@ -349,8 +348,7 @@ public class TwilioSendSMSAction {
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         return context
-            .http(http -> http.post(BASE_URL + connectionParameters.getRequiredString(ACCOUNT_SID)
-                + "/Messages.json"))
+            .http(http -> http.post(connectionParameters.getRequiredString(ACCOUNT_SID) + "/Messages.json"))
             .headers(
                 Map.of("username", List.of(connectionParameters.getRequiredString(ACCOUNT_SID)),
                     "password", List.of(connectionParameters.getRequiredString(AUTH_TOKEN))))
