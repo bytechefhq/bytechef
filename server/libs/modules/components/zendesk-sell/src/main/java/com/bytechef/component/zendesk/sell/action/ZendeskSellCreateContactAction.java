@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.BASE_URL;
 import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.CREATE_CONTACT;
 import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.DATA;
 import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.EMAIL;

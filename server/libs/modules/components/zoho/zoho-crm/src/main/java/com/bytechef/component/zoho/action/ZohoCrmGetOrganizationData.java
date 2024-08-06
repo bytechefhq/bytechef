@@ -20,9 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.zoho.constant.ZohoCrmConstants.BASE_URL;
 import static com.bytechef.component.zoho.constant.ZohoCrmConstants.GET_ORG_DATA;
-import static com.bytechef.component.zoho.constant.ZohoCrmConstants.REGION;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL;
@@ -59,7 +57,7 @@ public class ZohoCrmGetOrganizationData {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return context.http(http -> http.get(connectionParameters.getRequiredString(REGION) + BASE_URL + "/org"))
+        return context.http(http -> http.get("/org"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
