@@ -1,0 +1,67 @@
+name: bytechef
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:14-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=bytechef
+#  rabbitmq:
+#    image: rabbitmq:3.11-management-alpine
+#    ports:
+#      # AMQP protocol port
+#      - '5672:5672'
+#      # HTTP management UI
+#      - '15672:15672'
+  redis:
+    image: redis:7-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - cache:/data
+  server-app:
+    build:
+      context: ../../
+      dockerfile: server/apps/server-app/Dockerfile
+    container_name: bytechef-server
+    depends_on:
+      - postgres
+#      - rabbitmq
+      - redis
+    environment:
+      - SERVER_PORT=9555
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/bytechef
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+#      - SPRING_RABBITMQ_HOST=rabbitmq
+#      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_DATA_REDIS_HOST=redis
+#      - WORKFLOW_MESSAGE_BROKER_PROVIDER=amqp
+    ports:
+      - '9555:9555'
+  client-app:
+    build:
+      context: ../../client
+      dockerfile: Dockerfile
+    container_name: bytechef-client
+    depends_on:
+      - server-app
+    environment:
+      - PROXY_ACTUATOR_URL=http://server-app:9555
+      - PROXY_API_URL=http://server-app:9555
+      - HOST=0.0.0.0
+    ports:
+      - '4173:4173'
+volumes:
+  cache:
+    driver: local
+  db:
+    driver: local
