@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.vtiger.constant.VTigerConstants.CREATE_PRODUCT;
-import static com.bytechef.component.vtiger.constant.VTigerConstants.INSTANCE_URL;
 import static com.bytechef.component.vtiger.constant.VTigerConstants.PRODUCT_NAME;
 import static com.bytechef.component.vtiger.constant.VTigerConstants.PRODUCT_TYPE;
 
@@ -75,8 +74,7 @@ public class VTigerCreateProductAction {
         Map<String, String> paramMap = paramMapFill(inputParameters);
 
         return context
-            .http(http -> http.post(
-                connectionParameters.getRequiredString(INSTANCE_URL) + "/restapi/v1/vtiger/default/create"))
+            .http(http -> http.post("/create"))
             .body(
                 Body.of(
                     "elementType", "Products",

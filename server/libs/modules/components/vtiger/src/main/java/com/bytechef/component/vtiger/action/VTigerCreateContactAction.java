@@ -24,7 +24,6 @@ import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.vtiger.constant.VTigerConstants.CREATE_CONTACT;
 import static com.bytechef.component.vtiger.constant.VTigerConstants.EMAIL;
 import static com.bytechef.component.vtiger.constant.VTigerConstants.FIRSTNAME;
-import static com.bytechef.component.vtiger.constant.VTigerConstants.INSTANCE_URL;
 import static com.bytechef.component.vtiger.constant.VTigerConstants.LASTNAME;
 
 import com.bytechef.component.definition.ActionContext;
@@ -77,8 +76,7 @@ public class VTigerCreateContactAction {
         paramMap.put(EMAIL, inputParameters.getRequiredString(EMAIL));
 
         return context
-            .http(http -> http.post(
-                connectionParameters.getRequiredString(INSTANCE_URL) + "/restapi/v1/vtiger/default/create"))
+            .http(http -> http.post("/create"))
             .body(
                 Body.of(
                     "elementType", "Contacts",

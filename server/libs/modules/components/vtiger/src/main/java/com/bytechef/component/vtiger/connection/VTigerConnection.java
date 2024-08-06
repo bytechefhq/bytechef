@@ -32,6 +32,8 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefini
 public class VTigerConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .baseUri((connectionParameters, context) -> connectionParameters.getRequiredString(INSTANCE_URL)
+            + "/restapi/v1/vtiger/default")
         .authorizations(
             authorization(AuthorizationType.BASIC_AUTH)
                 .title("Basic Auth")
