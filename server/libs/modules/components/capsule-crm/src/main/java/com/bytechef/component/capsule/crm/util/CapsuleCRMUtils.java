@@ -16,7 +16,6 @@
 
 package com.bytechef.component.capsule.crm.util;
 
-import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.BASE_URL;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.NAME;
 import static com.bytechef.component.definition.ComponentDSL.option;
 
@@ -39,7 +38,7 @@ public class CapsuleCRMUtils {
     }
 
     protected static final ContextFunction<Http, Http.Executor> GET_COUNTRIES_CONTEXT_FUNCTION =
-        http -> http.get(BASE_URL + "/countries");
+        http -> http.get("/countries");
 
     public static List<Option<String>> getCountryOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,

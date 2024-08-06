@@ -24,7 +24,6 @@ public class CapsuleCRMConstants {
     public static final String ABOUT = "about";
     public static final String ADDRESS = "address";
     public static final String ADDRESSES = "addresses";
-    public static final String BASE_URL = "https://api.capsulecrm.com/api/v2";
     public static final String CAPSULE_CRM = "capsuleCRM";
     public static final String CATEGORY = "category";
     public static final String CITY = "city";
