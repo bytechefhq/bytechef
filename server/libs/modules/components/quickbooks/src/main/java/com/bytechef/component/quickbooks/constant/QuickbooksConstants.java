@@ -22,7 +22,6 @@ package com.bytechef.component.quickbooks.constant;
  */
 public final class QuickbooksConstants {
 
-    public static final String BASE_URL = "https://quickbooks.api.intuit.com";
     public static final String COMPANY_ID = "companyId";
     public static final String CREATE_CATEGORY = "createCategory";
     public static final String CREATE_CUSTOMER = "createCustomer";

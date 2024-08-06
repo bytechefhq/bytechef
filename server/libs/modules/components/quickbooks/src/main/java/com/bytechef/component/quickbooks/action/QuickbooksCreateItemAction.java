@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.BASE_URL;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.COMPANY_ID;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.CREATE_ITEM;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.NAME;
@@ -71,7 +70,7 @@ public final class QuickbooksCreateItemAction {
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return context
-            .http(http -> http.post(BASE_URL + "/v3/company/" + getCompanyId(connectionParameters) + "/item"))
+            .http(http -> http.post("/v3/company/" + getCompanyId(connectionParameters) + "/item"))
             .body(
                 Context.Http.Body.of(
                     NAME, inputParameters.getRequiredString(NAME),

@@ -34,6 +34,7 @@ import java.util.List;
 public class QuickbooksConnection {
 
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .baseUri((connectionParameters, context) -> "https://quickbooks.api.intuit.com")
         .authorizations(
             authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                 .title("OAuth2 Authorization Code")
