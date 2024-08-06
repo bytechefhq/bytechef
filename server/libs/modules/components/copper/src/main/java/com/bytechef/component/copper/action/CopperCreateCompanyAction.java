@@ -18,7 +18,6 @@ package com.bytechef.component.copper.action;
 
 import static com.bytechef.component.copper.constant.CopperConstants.ADDRESS;
 import static com.bytechef.component.copper.constant.CopperConstants.ASSIGNEE_ID;
-import static com.bytechef.component.copper.constant.CopperConstants.BASE_URL;
 import static com.bytechef.component.copper.constant.CopperConstants.CATEGORY;
 import static com.bytechef.component.copper.constant.CopperConstants.CATEGORY_LABEL;
 import static com.bytechef.component.copper.constant.CopperConstants.CITY;
@@ -214,7 +213,7 @@ public class CopperCreateCompanyAction {
         .perform(CopperCreateCompanyAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_COMPANIES_CONTEXT_FUNCTION =
-        http -> http.post(BASE_URL + "/companies");
+        http -> http.post("/companies");
 
     private CopperCreateCompanyAction() {
     }

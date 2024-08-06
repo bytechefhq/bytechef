@@ -17,7 +17,6 @@
 package com.bytechef.component.copper.action;
 
 import static com.bytechef.component.copper.constant.CopperConstants.ACTIVITY_TYPE;
-import static com.bytechef.component.copper.constant.CopperConstants.BASE_URL;
 import static com.bytechef.component.copper.constant.CopperConstants.CATEGORY;
 import static com.bytechef.component.copper.constant.CopperConstants.COMPANY;
 import static com.bytechef.component.copper.constant.CopperConstants.CREATE_ACTIVITY;
@@ -93,7 +92,7 @@ public class CopperCreateActivityAction {
         .perform(CopperCreateActivityAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_ACTIVITIES_CONTEXT_FUNCTION =
-        http -> http.post(BASE_URL + "/activities");
+        http -> http.post("/activities");
 
     private CopperCreateActivityAction() {
     }
