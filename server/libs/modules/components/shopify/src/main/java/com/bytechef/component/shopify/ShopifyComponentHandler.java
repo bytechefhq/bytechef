@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.PRODUCT_ID;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.SHOP_NAME;
-import static com.bytechef.component.shopify.util.ShopifyUtils.getBaseUrl;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
@@ -89,7 +88,8 @@ public class ShopifyComponentHandler extends AbstractShopifyComponentHandler {
                         string(VALUE)
                             .label("Access Token")
                             .required(true)))
-            .baseUri((connectionParameters, context) -> getBaseUrl(connectionParameters));
+            .baseUri((connectionParameters, context) -> "https://" + connectionParameters.getRequiredString(SHOP_NAME)
+                + ".myshopify.com/admin/api/2024-04");
     }
 
     @Override

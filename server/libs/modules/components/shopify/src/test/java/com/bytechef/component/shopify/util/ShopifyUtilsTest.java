@@ -18,7 +18,6 @@ package com.bytechef.component.shopify.util;
 
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.ID;
-import static com.bytechef.component.shopify.constant.ShopifyConstants.SHOP_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -50,16 +49,6 @@ class ShopifyUtilsTest {
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
-
-    @Test
-    void testGetBaseUrl() {
-        when(mockedParameters.getRequiredString(SHOP_NAME))
-            .thenReturn("shopName");
-
-        String expectedUrl = "https://shopName.myshopify.com/admin/api/2024-04";
-
-        assertEquals(expectedUrl, ShopifyUtils.getBaseUrl(mockedParameters));
-    }
 
     @Test
     void testGetOrderIdOptions() {
@@ -168,7 +157,7 @@ class ShopifyUtilsTest {
             .thenReturn(Map.of("webhook", Map.of(ID, 123L)));
 
         assertEquals(123L,
-            ShopifyUtils.subscribeWebhook(mockedParameters, "webhookUrl", mockedContext, "topic"));
+            ShopifyUtils.subscribeWebhook("webhookUrl", mockedContext, "topic"));
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
@@ -190,7 +179,7 @@ class ShopifyUtilsTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
 
-        ShopifyUtils.unsubscribeWebhook(mockedParameters, mockedParameters, mockedContext);
+        ShopifyUtils.unsubscribeWebhook(mockedParameters, mockedContext);
 
         verify(mockedContext, times(1)).http(any());
         verify(mockedExecutor, times(1)).configuration(any());

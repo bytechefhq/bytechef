@@ -37,7 +37,7 @@ class ShopifyNewOrderTriggerTest extends AbstractShopifyTriggerTest {
         String webhookUrl = "testWebhookUrl";
 
         shopifyUtilsMockedStatic.when(
-            () -> ShopifyUtils.subscribeWebhook(mockedParameters, webhookUrl, mockedTriggerContext, "orders/create"))
+            () -> ShopifyUtils.subscribeWebhook(webhookUrl, mockedTriggerContext, "orders/create"))
             .thenReturn(123L);
         DynamicWebhookEnableOutput dynamicWebhookEnableOutput = ShopifyNewOrderTrigger.dynamicWebhookEnable(
             mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
@@ -58,7 +58,7 @@ class ShopifyNewOrderTriggerTest extends AbstractShopifyTriggerTest {
             mockedParameters, mockedParameters, mockedParameters, workflowExecutionId, mockedTriggerContext);
 
         shopifyUtilsMockedStatic
-            .verify(() -> ShopifyUtils.unsubscribeWebhook(mockedParameters, mockedParameters, mockedTriggerContext));
+            .verify(() -> ShopifyUtils.unsubscribeWebhook(mockedParameters, mockedTriggerContext));
 
     }
 

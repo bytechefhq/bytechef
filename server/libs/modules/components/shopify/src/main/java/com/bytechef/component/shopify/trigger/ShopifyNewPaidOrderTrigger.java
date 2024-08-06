@@ -56,14 +56,14 @@ public class ShopifyNewPaidOrderTrigger {
         String workflowExecutionId, TriggerContext context) {
 
         return new DynamicWebhookEnableOutput(
-            Map.of(ID, ShopifyUtils.subscribeWebhook(connectionParameters, webhookUrl, context, "orders/paid")), null);
+            Map.of(ID, ShopifyUtils.subscribeWebhook(webhookUrl, context, "orders/paid")), null);
     }
 
     protected static void dynamicWebhookDisable(
         Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
         String workflowExecutionId, TriggerContext context) {
 
-        ShopifyUtils.unsubscribeWebhook(connectionParameters, outputParameters, context);
+        ShopifyUtils.unsubscribeWebhook(outputParameters, context);
     }
 
     protected static Object dynamicWebhookRequest(
