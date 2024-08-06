@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.discord.constant.DiscordConstants.BASE_URL;
 import static com.bytechef.component.discord.constant.DiscordConstants.CHANNEL_ID;
 import static com.bytechef.component.discord.constant.DiscordConstants.GUILD_ID;
 import static com.bytechef.component.discord.constant.DiscordConstants.GUILD_ID_PROPERTY;
@@ -103,7 +102,7 @@ public class DiscordComponentHandler extends AbstractDiscordComponentHandler {
                             .required(true))
                     .apply((connectionParameters, context) -> ofHeaders(
                         Map.of(AUTHORIZATION, List.of("Bot " + connectionParameters.getRequiredString(TOKEN))))))
-            .baseUri((connectionParameters, context) -> BASE_URL);
+            .baseUri((connectionParameters, context) -> " https://discord.com/api/v10");
     }
 
     @Override

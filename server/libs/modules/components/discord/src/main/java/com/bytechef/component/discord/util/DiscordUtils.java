@@ -17,7 +17,6 @@
 package com.bytechef.component.discord.util;
 
 import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.discord.constant.DiscordConstants.BASE_URL;
 import static com.bytechef.component.discord.constant.DiscordConstants.GUILD_ID;
 import static com.bytechef.component.discord.constant.DiscordConstants.RECIPIENT_ID;
 
@@ -43,7 +42,7 @@ public class DiscordUtils {
         String searchText, ActionContext context) {
 
         List<Map<String, Object>> body = context.http(http -> http
-            .get(BASE_URL + "/guilds/" + inputParameters.getRequiredString(GUILD_ID) + "/channels"))
+            .get("/guilds/" + inputParameters.getRequiredString(GUILD_ID) + "/channels"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -52,7 +51,7 @@ public class DiscordUtils {
     }
 
     public static Map<String, Object> getDMChannel(Parameters inputParameters, ActionContext actionContext) {
-        return actionContext.http(http -> http.post(BASE_URL + "/users/@me/channels"))
+        return actionContext.http(http -> http.post("/users/@me/channels"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(RECIPIENT_ID, inputParameters.getRequired(RECIPIENT_ID)))
             .execute()
@@ -63,7 +62,7 @@ public class DiscordUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 
-        List<Map<String, Object>> body = context.http(http -> http.get(BASE_URL + "/users/@me/guilds"))
+        List<Map<String, Object>> body = context.http(http -> http.get("/users/@me/guilds"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -76,7 +75,7 @@ public class DiscordUtils {
         String searchText, ActionContext context) {
 
         List<Map<String, ?>> body = context.http(http -> http
-            .get(BASE_URL + "/guilds/" + inputParameters.getRequiredString(GUILD_ID) + "/members"))
+            .get("/guilds/" + inputParameters.getRequiredString(GUILD_ID) + "/members"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .queryParameter("limit", "1000")
             .execute()
