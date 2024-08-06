@@ -19,7 +19,6 @@ package com.bytechef.component.shopify.util;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.ID;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.PRODUCT_ID;
-import static com.bytechef.component.shopify.constant.ShopifyConstants.SHOP_NAME;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
@@ -39,16 +38,12 @@ public class ShopifyUtils {
     private ShopifyUtils() {
     }
 
-    public static String getBaseUrl(Parameters connectionParameters) {
-        return "https://" + connectionParameters.getRequiredString(SHOP_NAME) + ".myshopify.com/admin/api/2024-04";
-    }
-
     public static List<Option<Long>> getOrderIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 
         Map<String, List<Map<String, Object>>> body = context
-            .http(http -> http.get(getBaseUrl(connectionParameters) + "/orders.json?status=any"))
+            .http(http -> http.get("/orders.json?status=any"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -67,7 +62,7 @@ public class ShopifyUtils {
         String searchText, ActionContext context) {
 
         Map<String, List<Map<String, Object>>> body = context
-            .http(http -> http.get(getBaseUrl(connectionParameters) + "/products.json"))
+            .http(http -> http.get("/products.json"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -87,8 +82,7 @@ public class ShopifyUtils {
 
         Map<String, List<Map<String, Object>>> body = context.http(
             http -> http.get(
-                getBaseUrl(connectionParameters) + "/products/" +
-                    inputParameters.getRequiredFromPath(dependencyPaths.get(PRODUCT_ID)) + "/variants.json"))
+                "/products/" + inputParameters.getRequiredFromPath(dependencyPaths.get(PRODUCT_ID)) + "/variants.json"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -102,10 +96,9 @@ public class ShopifyUtils {
         return options;
     }
 
-    public static Long subscribeWebhook(
-        Parameters connectionParameters, String webhookUrl, Context context, String topic) {
+    public static Long subscribeWebhook(String webhookUrl, Context context, String topic) {
 
-        Map<String, ?> body = context.http(http -> http.post(getBaseUrl(connectionParameters) + "/webhooks.json"))
+        Map<String, ?> body = context.http(http -> http.post("/webhooks.json"))
             .body(Http.Body.of(
                 "webhook", Map.of(
                     "topic", topic,
@@ -122,11 +115,9 @@ public class ShopifyUtils {
         return null;
     }
 
-    public static void unsubscribeWebhook(
-        Parameters connectionParameters, Parameters outputParameters, Context context) {
-
+    public static void unsubscribeWebhook(Parameters outputParameters, Context context) {
         context.http(http -> http
-            .delete(getBaseUrl(connectionParameters) + "/webhooks/" + outputParameters.getString(ID) + ".json"))
+            .delete("/webhooks/" + outputParameters.getString(ID) + ".json"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
     }

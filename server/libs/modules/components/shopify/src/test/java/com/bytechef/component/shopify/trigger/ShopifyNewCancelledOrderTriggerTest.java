@@ -37,7 +37,7 @@ class ShopifyNewCancelledOrderTriggerTest extends AbstractShopifyTriggerTest {
         String webhookUrl = "testWebhookUrl";
 
         shopifyUtilsMockedStatic.when(
-            () -> ShopifyUtils.subscribeWebhook(mockedParameters, webhookUrl, mockedTriggerContext, "orders/cancelled"))
+            () -> ShopifyUtils.subscribeWebhook(webhookUrl, mockedTriggerContext, "orders/cancelled"))
             .thenReturn(123L);
         DynamicWebhookEnableOutput dynamicWebhookEnableOutput = ShopifyNewCancelledOrderTrigger.dynamicWebhookEnable(
             mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
