@@ -99,7 +99,7 @@ public class ZendeskSellCreateContactAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext.http(http -> http.post(BASE_URL + "/contacts"))
+        return actionContext.http(http -> http.post("/contacts"))
             .body(
                 Http.Body.of(
                     DATA,

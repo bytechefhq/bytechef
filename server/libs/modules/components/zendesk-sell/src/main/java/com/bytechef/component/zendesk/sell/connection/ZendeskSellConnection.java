@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.connection;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.BASE_URL;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 
@@ -31,7 +30,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefini
 public class ZendeskSellConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri((connectionParameters, context) -> BASE_URL)
+        .baseUri((connectionParameters, context) -> "https://api.getbase.com/v2")
         .authorizations(
             authorization(AuthorizationType.BEARER_TOKEN)
                 .title("Bearer Token")

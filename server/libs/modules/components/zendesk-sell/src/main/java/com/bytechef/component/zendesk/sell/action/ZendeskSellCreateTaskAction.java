@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDSL.date;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.BASE_URL;
 import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.CONTENT;
 import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.CREATE_TASK;
 import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.DATA;
@@ -67,7 +66,7 @@ public class ZendeskSellCreateTaskAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext.http(http -> http.post(BASE_URL + "/tasks"))
+        return actionContext.http(http -> http.post( "/tasks"))
             .body(
                 Http.Body.of(
                     "data",

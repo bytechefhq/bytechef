@@ -21,7 +21,6 @@ package com.bytechef.component.zendesk.sell.constant;
  */
 public class ZendeskSellConstants {
 
-    public static final String BASE_URL = "https://api.getbase.com/v2";
     public static final String CONTENT = "content";
     public static final String CREATE_CONTACT = "createContact";
     public static final String CREATE_TASK = "createTask";
