@@ -21,7 +21,6 @@ package com.bytechef.component.whatsapp.constant;
  */
 public class WhatsAppConstants {
 
-    public static final String BASE_URL = "https://graph.facebook.com/v17.0";
     public static final String BODY = "body";
     public static final String CONTACTS = "contacts";
     public static final String GET_MESSAGE = "getMessage";

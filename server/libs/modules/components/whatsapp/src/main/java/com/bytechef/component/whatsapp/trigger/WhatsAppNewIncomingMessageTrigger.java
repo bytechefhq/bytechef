@@ -24,7 +24,6 @@ import static com.bytechef.component.definition.TriggerDefinition.HttpParameters
 import static com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import static com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import static com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
-import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.BASE_URL;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.GET_MESSAGE;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.MESSAGE_RECEIVED;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.RECEIVE_USER;
@@ -109,7 +108,7 @@ public class WhatsAppNewIncomingMessageTrigger {
         TriggerContext context) {
 
         String server = WhatsAppUtils.getWhatsappServer(connectionParameters.getRequiredString(ACCESS_TOKEN), context);
-        String url = BASE_URL + "/webhooks";
+        String url = "/webhooks";
 
         Map<?, ?> response = context
             .http(http -> http.post(url.formatted(server, inputParameters.getRequiredString(RECEIVE_USER))))
@@ -138,7 +137,7 @@ public class WhatsAppNewIncomingMessageTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters, String s,
         TriggerContext context) {
 
-        String url = BASE_URL + "/webhooks";
+        String url = "/webhooks";
 
         String server = WhatsAppUtils.getWhatsappServer(connectionParameters.getRequiredString(ACCESS_TOKEN), context);
 

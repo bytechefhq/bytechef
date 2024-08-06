@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.BASE_URL;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.BODY;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.CONTACTS;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.ID;
@@ -80,7 +79,7 @@ public class WhatsAppSendMessageAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         return actionContext
-            .http(http -> http.post(BASE_URL + "/" + connectionParameters.getString(PHONE_NUMBER_ID) + "/messages"))
+            .http(http -> http.post("/" + connectionParameters.getString(PHONE_NUMBER_ID) + "/messages"))
             .body(
                 Body.of(
                     MESSAGING_PRODUCT, "whatsapp",

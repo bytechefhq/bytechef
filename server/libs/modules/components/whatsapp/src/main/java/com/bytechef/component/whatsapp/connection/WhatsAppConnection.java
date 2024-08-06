@@ -36,6 +36,7 @@ import java.util.Map;
 public class WhatsAppConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .baseUri((connectionParameters, context) -> "https://graph.facebook.com/v17.0")
         .authorizations(
             authorization(AuthorizationType.CUSTOM)
                 .title("WhatsApp Custom Authorization")
