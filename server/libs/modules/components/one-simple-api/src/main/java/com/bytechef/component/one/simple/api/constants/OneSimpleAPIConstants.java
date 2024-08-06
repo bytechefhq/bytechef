@@ -22,7 +22,6 @@ package com.bytechef.component.one.simple.api.constants;
 public class OneSimpleAPIConstants {
 
     public static final String ACCESS_TOKEN = "token";
-    public static final String BASE_URL = "https://onesimpleapi.com/api";
     public static final String CURRENCY_CONVERTER = "currencyConverter";
     public static final String DESC = "description";
     public static final String FROM_CURRENCY = "from_currency";
