@@ -17,7 +17,6 @@
 package com.bytechef.component.accelo.util;
 
 import static com.bytechef.component.accelo.constant.AcceloConstants.AGAINST_TYPE;
-import static com.bytechef.component.accelo.constant.AcceloConstants.DEPLOYMENT;
 import static com.bytechef.component.definition.ComponentDSL.option;
 
 import com.bytechef.component.definition.ActionContext;
@@ -38,10 +37,6 @@ public class AcceloUtils {
     private AcceloUtils() {
     }
 
-    public static String createUrl(Parameters connectionParameters, String resource) {
-        return "https://" + connectionParameters.getRequiredString(DEPLOYMENT) + ".api.accelo.com/api/v0/" + resource;
-    }
-
     public static List<Option<String>> getAgainstIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
@@ -52,7 +47,7 @@ public class AcceloUtils {
             return getCompanyIdOptions(inputParameters, connectionParameters, dependencyPaths, searchText, context);
         } else {
             Map<String, ?> body = context
-                .http(http -> http.get(createUrl(connectionParameters, againstType + "s")))
+                .http(http -> http.get(againstType + "s"))
                 .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute()
                 .getBody(new TypeReference<>() {});
@@ -76,7 +71,7 @@ public class AcceloUtils {
         String searchText, ActionContext context) {
 
         Map<String, ?> body = context
-            .http(http -> http.get(createUrl(connectionParameters, "companies")))
+            .http(http -> http.get("companies"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

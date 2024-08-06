@@ -23,7 +23,6 @@ import static com.bytechef.component.accelo.constant.AcceloConstants.FIRST_NAME;
 import static com.bytechef.component.accelo.constant.AcceloConstants.LAST_NAME;
 import static com.bytechef.component.accelo.constant.AcceloConstants.PHONE;
 import static com.bytechef.component.accelo.constant.AcceloConstants.POSITION;
-import static com.bytechef.component.accelo.util.AcceloUtils.createUrl;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
@@ -94,7 +93,7 @@ public class AcceloCreateContactAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext.http(http -> http.post(createUrl(connectionParameters, "contacts")))
+        return actionContext.http(http -> http.post("/contacts"))
             .body(
                 Http.Body.of(
                     FIRST_NAME, inputParameters.getString(FIRST_NAME),
