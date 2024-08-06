@@ -35,6 +35,8 @@ import java.util.Map;
 public class FreshsalesConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .baseUri((connectionParameters, context) -> "https://" + connectionParameters.getRequiredString(USERNAME)
+            + ".myfreshworks.com/crm/sales/api")
         .authorizations(
             authorization(AuthorizationType.API_KEY)
                 .title("API Key")

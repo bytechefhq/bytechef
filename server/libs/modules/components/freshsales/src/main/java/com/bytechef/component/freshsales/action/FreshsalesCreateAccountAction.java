@@ -24,7 +24,6 @@ import static com.bytechef.component.freshsales.constant.FreshsalesConstants.CRE
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.NAME;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.PHONE;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.WEBSITE;
-import static com.bytechef.component.freshsales.util.FreshsalesUtils.getUrl;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -70,7 +69,7 @@ public class FreshsalesCreateAccountAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext.http(http -> http.post(getUrl(connectionParameters, "sales_accounts")))
+        return actionContext.http(http -> http.post("/sales_accounts"))
             .body(
                 Http.Body.of(
                     NAME, inputParameters.getRequiredString(NAME),
