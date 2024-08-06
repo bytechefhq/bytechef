@@ -16,8 +16,10 @@
 
 package com.bytechef.component.intercom.util;
 
+import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.intercom.constant.IntercomConstants.ID;
 import static com.bytechef.component.intercom.constant.IntercomConstants.TYPE;
+import static com.bytechef.component.intercom.util.IntercomUtils.GET_CONTACTS_CONTEXT_FUNCTION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -27,7 +29,11 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.Parameters;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,6 +43,7 @@ class IntercomUtilsTest {
 
     private final ActionContext mockedContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @BeforeEach
@@ -47,24 +54,6 @@ class IntercomUtilsTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-    }
-
-    @Test
-    void testGetContactRole() {
-        String id = "exampleId";
-        String role = "exampleRole";
-        Map<String, Object> body = new HashMap<>();
-
-        body.put("role", role);
-
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(body);
-
-        Map<String, String> result = IntercomUtils.getContactRole(id, mockedContext);
-
-        assertEquals(2, result.size());
-        assertEquals(role, result.get(TYPE));
-        assertEquals(id, result.get(ID));
     }
 
     @Test
@@ -85,6 +74,51 @@ class IntercomUtilsTest {
         assertNotNull(result);
         assertEquals(2, result.size());
         assertEquals("admin", result.get(TYPE));
+        assertEquals(id, result.get(ID));
+    }
+
+    @Test
+    void testGetContactIdOptions() {
+        Map<String, Object> body = new HashMap<>();
+        Map<String, String> task = new LinkedHashMap<>();
+
+        task.put("name", "contactId");
+        task.put("id", "123");
+        body.put("data", List.of(task));
+
+        when(mockedContext.http(GET_CONTACTS_CONTEXT_FUNCTION))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(body);
+
+        List<Option<String>> expectedOptions = new ArrayList<>();
+
+        expectedOptions.add(option("contactId", "123"));
+
+        assertEquals(
+            expectedOptions,
+            IntercomUtils.getContactIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+    }
+
+    @Test
+    void testGetContactRole() {
+        String id = "exampleId";
+        String role = "exampleRole";
+        Map<String, Object> body = new HashMap<>();
+
+        body.put("role", role);
+
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(body);
+
+        Map<String, String> result = IntercomUtils.getContactRole(id, mockedContext);
+
+        assertEquals(2, result.size());
+        assertEquals(role, result.get(TYPE));
         assertEquals(id, result.get(ID));
     }
 }
