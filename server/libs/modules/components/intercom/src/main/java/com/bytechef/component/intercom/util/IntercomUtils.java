@@ -18,7 +18,6 @@ package com.bytechef.component.intercom.util;
 
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.intercom.constant.IntercomConstants.BASE_URL;
 import static com.bytechef.component.intercom.constant.IntercomConstants.ID;
 import static com.bytechef.component.intercom.constant.IntercomConstants.TYPE;
 
@@ -35,7 +34,7 @@ public class IntercomUtils {
     }
 
     public static Map<String, String> getContactRole(String id, ActionContext context) {
-        Map<String, Object> body = context.http(http -> http.get(BASE_URL + "/contacts/" + id))
+        Map<String, Object> body = context.http(http -> http.get("/contacts/" + id))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -52,7 +51,7 @@ public class IntercomUtils {
 
     public static Map<String, String> getAdminId(ActionContext context) {
 
-        Map<String, Object> body = context.http(http -> http.get(BASE_URL + "/admins"))
+        Map<String, Object> body = context.http(http -> http.get("/admins"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

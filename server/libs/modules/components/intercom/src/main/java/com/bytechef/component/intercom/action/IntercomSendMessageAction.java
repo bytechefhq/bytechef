@@ -23,7 +23,6 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.Body;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.intercom.constant.IntercomConstants.BASE_URL;
 import static com.bytechef.component.intercom.constant.IntercomConstants.BODY;
 import static com.bytechef.component.intercom.constant.IntercomConstants.FROM;
 import static com.bytechef.component.intercom.constant.IntercomConstants.MESSAGE_TYPE;
@@ -80,7 +79,7 @@ public class IntercomSendMessageAction {
         .perform(IntercomSendMessageAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_MESSAGES_CONTEXT_FUNCTION =
-        http -> http.post(BASE_URL + "/messages");
+        http -> http.post("/messages");
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {

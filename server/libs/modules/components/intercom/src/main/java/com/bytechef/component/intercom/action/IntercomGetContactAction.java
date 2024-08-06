@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http;
-import static com.bytechef.component.intercom.constant.IntercomConstants.BASE_URL;
 import static com.bytechef.component.intercom.constant.IntercomConstants.CONTACT_NAME;
 import static com.bytechef.component.intercom.constant.IntercomConstants.EMAIL;
 import static com.bytechef.component.intercom.constant.IntercomConstants.NAME;
@@ -62,7 +61,7 @@ public class IntercomGetContactAction {
         perform(Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         return actionContext
-            .http(http -> http.get(BASE_URL + "/contacts/" + inputParameters.getRequiredString(CONTACT_NAME)))
+            .http(http -> http.get("/contacts/" + inputParameters.getRequiredString(CONTACT_NAME)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new Context.TypeReference<>() {});
