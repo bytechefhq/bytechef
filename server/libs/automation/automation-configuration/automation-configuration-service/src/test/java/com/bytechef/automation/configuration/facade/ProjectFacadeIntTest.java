@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.configuration.facade;
 
+import static com.bytechef.automation.configuration.ProjectInstanceFacadeHelper.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -23,6 +24,7 @@ import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
+import com.bytechef.automation.configuration.ProjectInstanceFacadeHelper;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
@@ -32,7 +34,7 @@ import com.bytechef.automation.configuration.dto.WorkflowDTO;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
-import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.automation.configuration.service.ProjectWorkflowServiceImpl;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
@@ -40,13 +42,16 @@ import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -56,6 +61,7 @@ import org.springframework.context.annotation.Import;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 @SpringBootTest(
     classes = ProjectIntTestConfiguration.class,
@@ -75,6 +81,9 @@ public class ProjectFacadeIntTest {
     private ProjectRepository projectRepository;
 
     @Autowired
+    private ProjectInstanceFacade projectInstanceFacade;
+
+    @Autowired
     private ProjectWorkflowRepository projectWorkflowRepository;
 
     @Autowired
@@ -91,6 +100,10 @@ public class ProjectFacadeIntTest {
     @Autowired
     private WorkspaceRepository workspaceRepository;
 
+    ProjectInstanceFacadeHelper projectFacadeInstanceHelper;
+    @Autowired
+    private ProjectWorkflowServiceImpl projectWorkflowServiceImpl;
+
     @AfterEach
     public void afterEach() {
         projectWorkflowRepository.deleteAll();
@@ -105,79 +118,54 @@ public class ProjectFacadeIntTest {
     @BeforeEach
     public void beforeEach() {
         workspace = workspaceRepository.save(new Workspace("test"));
+        projectFacadeInstanceHelper = new ProjectInstanceFacadeHelper(
+            categoryRepository, projectFacade, projectRepository, projectInstanceFacade, projectWorkflowRepository,
+            tagRepository,
+            workflowFacade, workflowRepository, workspace, workspaceRepository);
     }
 
     @Test
     public void testAddWorkflow() {
-        Project project = new Project();
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
 
-        project.setWorkspaceId(workspace.getId());
+        WorkflowDTO workflowDTO = projectFacadeInstanceHelper.addTestWorkflow(projectDTO);
 
-        project.setName("name");
+        ProjectWorkflow projectWorkflow =
+            projectWorkflowServiceImpl.getProjectWorkflow(workflowDTO.projectWorkflowId());
 
-        project = projectRepository.save(project);
+        Optional<Workflow> workflowOptional = workflowRepository.findById(projectWorkflow.getWorkflowId());
 
-        // TODO remove
-        Mockito.when(workflowFacade.getWorkflow(Mockito.anyString()))
-            .thenReturn(
-                new com.bytechef.platform.configuration.dto.WorkflowDTO(
-                    new Workflow(
-                        "{\"label\": \"New Workflow\", \"description\": \"Description\", \"tasks\": []}",
-                        Workflow.Format.JSON),
-                    List.of(), List.of()));
+        Assertions.assertTrue(workflowOptional.isPresent(), "Workflow not found");
 
-        WorkflowDTO workflowDTO = projectFacade.addWorkflow(
-            Validate.notNull(project.getId(), "id"),
-            "{\"label\": \"New Workflow\", \"description\": \"Description\", \"tasks\": []}");
+        Workflow workflow = workflowOptional.get();
 
-        assertThat(workflowDTO.description()).isEqualTo("Description");
-        assertThat(workflowDTO.label()).isEqualTo("New Workflow");
+        assertThat(workflowDTO.description()).isEqualTo(workflow.getDescription());
+        assertThat(workflowDTO.label()).isEqualTo(workflow.getLabel());
     }
 
     @Test
     public void testCreate() {
-        Category category = categoryRepository.save(new Category("name"));
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
 
-        ProjectDTO projectDTO = ProjectDTO.builder()
-            .category(category)
-            .description("description")
-            .name("name1")
-            .tags(List.of(new Tag("tag1")))
-            .workspaceId(workspace.getId())
-            .build();
-
-        projectDTO = projectFacade.createProject(projectDTO);
-
-        assertThat(projectDTO.category()).isEqualTo(category);
-        assertThat(projectDTO.description()).isEqualTo("description");
-        assertThat(projectDTO.name()).isEqualTo("name1");
+        assertThat(projectDTO.category()
+            .getName()).startsWith(PREFIX_CATEGORY);
+        assertThat(projectDTO.description()).startsWith(PREFIX_PROJECT_DESCRIPTION);
+        assertThat(projectDTO.name()).startsWith(PREFIX_PROJECT_NAME);
         assertThat(projectDTO.id()).isNotNull();
-        assertThat(projectDTO.tags()).hasSize(1);
+        assertThat(projectDTO.tags()).hasSize(3);
         assertThat(projectDTO.projectWorkflowIds()).hasSize(1);
         assertThat(categoryRepository.count()).isEqualTo(1);
-        assertThat(tagRepository.count()).isEqualTo(1);
+        assertThat(tagRepository.count()).isEqualTo(3);
     }
 
     @Test
     public void testDelete() {
-        ProjectDTO projectDTO1 = ProjectDTO.builder()
-            .name("name1")
-            .tags(List.of(new Tag("tag1")))
-            .workspaceId(workspace.getId())
-            .build();
+        ProjectDTO projectDTO1 = projectFacadeInstanceHelper.createProject(workspace.getId());
 
-        projectDTO1 = projectFacade.createProject(projectDTO1);
-
-        ProjectDTO projectDTO2 = ProjectDTO.builder()
-            .name("name2")
-            .tags(List.of(new Tag("tag1")))
-            .workspaceId(workspace.getId())
-            .build();
-
-        projectDTO2 = projectFacade.createProject(projectDTO2);
+        ProjectDTO projectDTO2 = projectFacadeInstanceHelper.createProject(workspace.getId());
 
         assertThat(projectRepository.count()).isEqualTo(2);
-        assertThat(tagRepository.count()).isEqualTo(1);
+        assertThat(tagRepository.count()).isEqualTo(6);
 
         projectFacade.deleteProject(projectDTO1.id());
 
@@ -186,7 +174,7 @@ public class ProjectFacadeIntTest {
         projectFacade.deleteProject(projectDTO2.id());
 
         assertThat(projectRepository.count()).isEqualTo(0);
-        assertThat(tagRepository.count()).isEqualTo(1);
+        assertThat(tagRepository.count()).isEqualTo(6);
     }
 
     @Test
@@ -216,33 +204,31 @@ public class ProjectFacadeIntTest {
 
     @Test
     public void testGetProjects() {
-        Project project = new Project();
+        List<ProjectDTO> testProjectDTOs = new ArrayList<>();
 
-        project.setWorkspaceId(workspace.getId());
-
-        Category category = categoryRepository.save(new Category("category1"));
-
-        project.setCategory(category);
-        project.setName("name");
-
-        Tag tag1 = tagRepository.save(new Tag("tag1"));
-        Tag tag2 = tagRepository.save(new Tag("tag2"));
-
-        project.setTags(List.of(tag1, tag2));
-
-        project = projectRepository.save(project);
+        testProjectDTOs.add(projectFacadeInstanceHelper.createProject(workspace.getId()));
+        testProjectDTOs.add(projectFacadeInstanceHelper.createProject(workspace.getId()));
+        testProjectDTOs.add(projectFacadeInstanceHelper.createProject(workspace.getId()));
+        testProjectDTOs.add(projectFacadeInstanceHelper.createProject(workspace.getId()));
 
         List<ProjectDTO> projectsDTOs = projectFacade.getProjects(null, false, null, null);
 
-        assertThat(CollectionUtils.map(projectsDTOs, ProjectDTO::toProject))
-            .isEqualTo(List.of(project));
+        assertThat(projectsDTOs).hasSize(testProjectDTOs.size());
 
-        ProjectDTO projectDTO = projectsDTOs.get(0);
+        ProjectDTO projectDTO = projectsDTOs.get(new Random().nextInt(testProjectDTOs.size()));
+
+        Project project = projectDTO.toProject();
+
+        Category category = projectDTO.category();
+
+        projectsDTOs = projectFacade.getProjects(category.getId(), false, null, null);
+
+        assertThat(projectsDTOs).hasSize(1);
 
         assertThat(projectFacade.getProject(Validate.notNull(project.getId(), "id")))
             .isEqualTo(projectDTO)
             .hasFieldOrPropertyWithValue("category", category)
-            .hasFieldOrPropertyWithValue("tags", List.of(tag1, tag2));
+            .hasFieldOrPropertyWithValue("tags", projectDTO.tags());
     }
 
     @Test
@@ -308,10 +294,6 @@ public class ProjectFacadeIntTest {
                 project.getId(), project.getLastVersion(), Validate.notNull(workflow.getId(), "id"),
                 "workflowReferenceCode"));
 
-        // TODO remove
-        Mockito.when(workflowFacade.getWorkflow(Mockito.anyString()))
-            .thenReturn(new com.bytechef.platform.configuration.dto.WorkflowDTO(workflow, List.of(), List.of()));
-
         List<WorkflowDTO> workflows = projectFacade.getProjectWorkflows(Validate.notNull(project.getId(), "id"));
 
         List<String> ids = workflows.stream()
@@ -323,29 +305,27 @@ public class ProjectFacadeIntTest {
 
     @Test
     public void testUpdate() {
-        ProjectDTO projectDTO = ProjectDTO.builder()
-            .name("name")
-            .tags(List.of(new Tag("tag1"), tagRepository.save(new Tag("tag2"))))
+        ProjectDTO project = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        projectFacadeInstanceHelper.addTestWorkflow(project);
+
+        assertThat(project.tags()).hasSize(3);
+
+        assertThat(project.projectWorkflowIds()).hasSize(1);
+
+        project = ProjectDTO.builder()
+            .id(project.id())
+            .name("Updated Name")
+            .tags(List.of(new Tag("TAG_UPDATE")))
+            .projectWorkflowIds(project.projectWorkflowIds())
+            .version(project.version())
             .workspaceId(workspace.getId())
             .build();
 
-        projectDTO = projectFacade.createProject(projectDTO);
+        project = projectFacade.updateProject(project);
 
-        assertThat(projectDTO.tags()).hasSize(2);
-        assertThat(projectDTO.projectWorkflowIds()).hasSize(1);
-
-        projectDTO = ProjectDTO.builder()
-            .id(projectDTO.id())
-            .name("name")
-            .tags(List.of(new Tag("tag1")))
-            .projectWorkflowIds(projectDTO.projectWorkflowIds())
-            .version(projectDTO.version())
-            .workspaceId(workspace.getId())
-            .build();
-
-        projectDTO = projectFacade.updateProject(projectDTO);
-
-        assertThat(projectDTO.tags()).hasSize(1);
+        assertThat(project.tags()).hasSize(1);
+        assertThat(project.name()).isEqualTo("Updated Name");
     }
 
     @TestConfiguration
