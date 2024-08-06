@@ -17,8 +17,6 @@
 package com.bytechef.component.zoho.util;
 
 import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.zoho.constant.ZohoCrmConstants.BASE_URL;
-import static com.bytechef.component.zoho.constant.ZohoCrmConstants.REGION;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
@@ -41,7 +39,7 @@ public class ZohoCrmUtils {
         ActionContext context) {
 
         List<Map<String, Object>> body = context
-            .http(http -> http.get(connectionParameters.getRequiredString(REGION) + BASE_URL + "/settings/roles"))
+            .http(http -> http.get("/settings/roles"))
             .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
             .execute()
             .getBody(new Context.TypeReference<>() {});
@@ -54,7 +52,7 @@ public class ZohoCrmUtils {
         ActionContext context) {
 
         List<Map<String, Object>> body = context
-            .http(http -> http.get(connectionParameters.getRequiredString(REGION) + BASE_URL + "/settings/profiles"))
+            .http(http -> http.get("/settings/profiles"))
             .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
             .execute()
             .getBody(new Context.TypeReference<>() {});

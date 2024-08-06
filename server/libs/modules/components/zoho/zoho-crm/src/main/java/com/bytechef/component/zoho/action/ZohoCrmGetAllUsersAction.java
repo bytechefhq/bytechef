@@ -21,9 +21,7 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.zoho.constant.ZohoCrmConstants.BASE_URL;
 import static com.bytechef.component.zoho.constant.ZohoCrmConstants.GET_ALL_USERS;
-import static com.bytechef.component.zoho.constant.ZohoCrmConstants.REGION;
 import static com.bytechef.component.zoho.constant.ZohoCrmConstants.USER_TYPE;
 
 import com.bytechef.component.definition.ActionContext;
@@ -88,7 +86,7 @@ public class ZohoCrmGetAllUsersAction {
     }
 
     protected static Object perform(Parameters inputParameters, Parameters conectionParameters, ActionContext context) {
-        return context.http(http -> http.get(conectionParameters.getRequiredString(REGION) + BASE_URL + "/users"))
+        return context.http(http -> http.get("/users"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new Context.TypeReference<>() {});

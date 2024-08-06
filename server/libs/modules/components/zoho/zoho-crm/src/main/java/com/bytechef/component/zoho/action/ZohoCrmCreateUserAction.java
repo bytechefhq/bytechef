@@ -20,12 +20,10 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.zoho.constant.ZohoCrmConstants.BASE_URL;
 import static com.bytechef.component.zoho.constant.ZohoCrmConstants.CREATE_USER;
 import static com.bytechef.component.zoho.constant.ZohoCrmConstants.EMAIL;
 import static com.bytechef.component.zoho.constant.ZohoCrmConstants.FIRST_NAME;
 import static com.bytechef.component.zoho.constant.ZohoCrmConstants.LAST_NAME;
-import static com.bytechef.component.zoho.constant.ZohoCrmConstants.REGION;
 import static com.bytechef.component.zoho.constant.ZohoCrmConstants.USER_PROFILE;
 import static com.bytechef.component.zoho.constant.ZohoCrmConstants.USER_ROLE;
 
@@ -86,7 +84,7 @@ public class ZohoCrmCreateUserAction {
     }
 
     protected static Object perform(Parameters inputParameters, Parameters conectionParameters, ActionContext context) {
-        return context.http(http -> http.post(conectionParameters.getRequiredString(REGION) + BASE_URL + "/users"))
+        return context.http(http -> http.post("/users"))
             .body(
                 Body.of(
                     USER_ROLE, inputParameters.getRequiredString(USER_ROLE),

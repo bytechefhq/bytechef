@@ -66,7 +66,7 @@ public class ZendeskSellCreateTaskAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext.http(http -> http.post( "/tasks"))
+        return actionContext.http(http -> http.post("/tasks"))
             .body(
                 Http.Body.of(
                     "data",
