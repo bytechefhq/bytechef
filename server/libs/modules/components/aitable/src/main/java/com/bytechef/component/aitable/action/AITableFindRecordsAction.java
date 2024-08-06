@@ -16,7 +16,6 @@
 
 package com.bytechef.component.aitable.action;
 
-import static com.bytechef.component.aitable.constant.AITableConstants.BASE_URL;
 import static com.bytechef.component.aitable.constant.AITableConstants.DATASHEET_ID;
 import static com.bytechef.component.aitable.constant.AITableConstants.DATASHEET_ID_PROPERTY;
 import static com.bytechef.component.aitable.constant.AITableConstants.FIELDS;
@@ -79,8 +78,8 @@ public class AITableFindRecordsAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext.http(http -> http.get(
-            BASE_URL + "/datasheets/" + inputParameters.getRequiredString(DATASHEET_ID) + "/records?"
+        return actionContext
+            .http(http -> http.get("/datasheets/" + inputParameters.getRequiredString(DATASHEET_ID) + "/records?"
                 + createQuery(inputParameters)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()

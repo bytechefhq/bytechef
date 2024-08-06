@@ -40,7 +40,6 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 public class AITableConstants {
 
     public static final String AI_TABLE = "aitable";
-    public static final String BASE_URL = "https://aitable.ai/fusion/v1";
     public static final String CREATE_RECORD = "createRecord";
     public static final String DATA = "data";
     public static final String DATASHEET_ID = "datasheetId";

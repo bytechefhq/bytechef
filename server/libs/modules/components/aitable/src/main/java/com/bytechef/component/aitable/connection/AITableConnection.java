@@ -16,7 +16,6 @@
 
 package com.bytechef.component.aitable.connection;
 
-import static com.bytechef.component.aitable.constant.AITableConstants.BASE_URL;
 import static com.bytechef.component.definition.Authorization.AuthorizationType;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.authorization;
@@ -31,7 +30,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefini
 public class AITableConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri((connectionParameters, context) -> BASE_URL)
+        .baseUri((connectionParameters, context) -> "https://aitable.ai/fusion/v1")
         .authorizations(
             authorization(AuthorizationType.BEARER_TOKEN)
                 .title("Bearer Token")
