@@ -5,127 +5,16 @@
   "dataStreamItemReader": null,
   "dataStreamItemWriter": null,
   "description": "Zoho CRM acts as a single repository to bring your sales, marketing, and customer support activities together, and streamline your process, policy, and people ...",
-  "icon": "path:assets/zoho.svg",
+  "icon": "path:assets/zoho-crm.svg",
   "tags": null,
   "metadata": null,
   "name": "zohoCrm",
   "resources": null,
   "version": 1,
   "title": "Zoho CRM",
-  "connection": {
-    "authorizations": [ {
-      "detectOn": null,
-      "description": null,
-      "name": "oauth2_authorization_code",
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "clientId",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Client id",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "clientSecret",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Client secret",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "region",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Region",
-        "placeholder": null,
-        "controlType": "SELECT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": [ {
-          "description": null,
-          "label": "zoho.eu (Europe)",
-          "value": "zoho.eu"
-        }, {
-          "description": null,
-          "label": "zoho.com (United States)",
-          "value": "zoho.com"
-        }, {
-          "description": null,
-          "label": "zoho.com.au (Australia)",
-          "value": "zoho.com.au"
-        }, {
-          "description": null,
-          "label": "zoho.jp (Japan)",
-          "value": "zoho.jp"
-        }, {
-          "description": null,
-          "label": "zoho.in (India)",
-          "value": "zoho.in"
-        }, {
-          "description": null,
-          "label": "zohocloud.ca (Canada)",
-          "value": "zohocloud.ca"
-        } ],
-        "optionsDataSource": null
-      } ],
-      "refreshOn": null,
-      "title": "OAuth2 Authorization Code",
-      "type": "OAUTH2_AUTHORIZATION_CODE",
-      "acquire": null,
-      "apply": null,
-      "clientId": null,
-      "pkce": null,
-      "refresh": null,
-      "refreshUrl": null,
-      "scopes": { },
-      "tokenUrl": { },
-      "authorizationUrl": { },
-      "clientSecret": null,
-      "refreshToken": null,
-      "authorizationCallback": null
-    } ],
-    "properties": null,
-    "version": 1,
-    "authorizationRequired": null,
-    "baseUri": { },
-    "test": null
-  },
   "actions": [ {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Get all users in your Zoho CRM team",
     "help": null,
@@ -193,7 +82,6 @@
       "optionsDataSource": null
     } ],
     "title": "Get All Users",
-    "perform": { },
     "output": null,
     "outputResponse": {
       "outputSchema": {
@@ -599,11 +487,12 @@
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true,
+    "perform": { },
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Create a user for your CRM team",
     "help": null,
@@ -717,7 +606,6 @@
       }
     } ],
     "title": "Create a user",
-    "perform": { },
     "output": null,
     "outputResponse": {
       "outputSchema": {
@@ -863,11 +751,12 @@
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true,
+    "perform": { },
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Get info about your organization",
     "help": null,
@@ -875,7 +764,6 @@
     "name": "getOrganizationData",
     "properties": null,
     "title": "Get Organization data",
-    "perform": { },
     "output": null,
     "outputResponse": {
       "outputSchema": {
@@ -1081,9 +969,121 @@
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true,
+    "perform": { },
     "processErrorResponse": null,
     "workflowNodeDescription": null
   } ],
+  "connection": {
+    "authorizations": [ {
+      "detectOn": null,
+      "description": null,
+      "name": "oauth2_authorization_code",
+      "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "clientId",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Client id",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "clientSecret",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Client secret",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "region",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Region",
+        "placeholder": null,
+        "controlType": "SELECT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": [ {
+          "description": null,
+          "label": "zoho.eu (Europe)",
+          "value": "zoho.eu"
+        }, {
+          "description": null,
+          "label": "zoho.com (United States)",
+          "value": "zoho.com"
+        }, {
+          "description": null,
+          "label": "zoho.com.au (Australia)",
+          "value": "zoho.com.au"
+        }, {
+          "description": null,
+          "label": "zoho.jp (Japan)",
+          "value": "zoho.jp"
+        }, {
+          "description": null,
+          "label": "zoho.in (India)",
+          "value": "zoho.in"
+        }, {
+          "description": null,
+          "label": "zohocloud.ca (Canada)",
+          "value": "zohocloud.ca"
+        } ],
+        "optionsDataSource": null
+      } ],
+      "refreshOn": null,
+      "title": "OAuth2 Authorization Code",
+      "type": "OAUTH2_AUTHORIZATION_CODE",
+      "acquire": null,
+      "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": { },
+      "clientId": null,
+      "clientSecret": null,
+      "pkce": null,
+      "refresh": null,
+      "refreshUrl": null,
+      "scopes": { },
+      "refreshToken": null,
+      "tokenUrl": { }
+    } ],
+    "properties": null,
+    "version": 1,
+    "authorizationRequired": null,
+    "baseUri": { },
+    "test": null
+  },
   "triggers": null
 }
