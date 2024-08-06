@@ -17,8 +17,6 @@
 package com.bytechef.component.pipeliner.util;
 
 import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.pipeliner.constant.PipelinerConstants.SERVER_URL;
-import static com.bytechef.component.pipeliner.constant.PipelinerConstants.SPACE_ID;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
@@ -42,7 +40,7 @@ public class PipelinerUtils {
         String searchText, ActionContext context) {
 
         Map<String, ?> body = context
-            .http(http -> http.get(getUrl(connectionParameters, "TaskTypes")))
+            .http(http -> http.get("/entities/TaskTypes"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -59,7 +57,7 @@ public class PipelinerUtils {
         String searchText, ActionContext context) {
 
         Map<String, ?> body = context
-            .http(http -> http.get(getUrl(connectionParameters, "Clients")))
+            .http(http -> http.get("/entities/Clients"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -82,7 +80,7 @@ public class PipelinerUtils {
         String searchText, ActionContext context) {
 
         Map<String, ?> body = context
-            .http(http -> http.get(getUrl(connectionParameters, "SalesUnits")))
+            .http(http -> http.get("/entities/SalesUnits"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -104,10 +102,5 @@ public class PipelinerUtils {
         }
 
         return options;
-    }
-
-    private static String getUrl(Parameters connectionParameters, String resource) {
-        return connectionParameters.getRequiredString(SERVER_URL) + connectionParameters.getRequiredString(SPACE_ID) +
-            "/entities/" + resource;
     }
 }
