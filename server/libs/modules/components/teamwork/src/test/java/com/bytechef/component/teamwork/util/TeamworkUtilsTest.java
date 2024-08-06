@@ -17,7 +17,6 @@
 package com.bytechef.component.teamwork.util;
 
 import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.teamwork.constant.TeamworkConstants.SITE_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -43,16 +42,6 @@ class TeamworkUtilsTest {
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
-
-    @Test
-    void testGetBaseUrl() {
-        when(mockedParameters.getRequiredString(SITE_NAME))
-            .thenReturn("site");
-
-        String expectedUrl = "https://site.teamwork.com/projects/api/v3";
-
-        assertEquals(expectedUrl, TeamworkUtils.getBaseUrl(mockedParameters));
-    }
 
     @Test
     void testGetTaskListIdOptions() {
