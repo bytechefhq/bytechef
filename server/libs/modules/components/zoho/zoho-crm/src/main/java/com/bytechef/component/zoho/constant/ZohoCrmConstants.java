@@ -32,4 +32,7 @@ public class ZohoCrmConstants {
     public static final String USER_PROFILE = "profile";
     public static final String CREATE_USER = "createUser";
     public static final String GET_ORG_DATA = "getOrganizationData";
+
+    private ZohoCrmConstants() {
+    }
 }

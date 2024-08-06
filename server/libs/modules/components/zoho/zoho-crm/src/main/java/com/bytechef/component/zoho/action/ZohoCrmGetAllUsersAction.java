@@ -26,8 +26,8 @@ import static com.bytechef.component.zoho.constant.ZohoCrmConstants.USER_TYPE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.ResponseType;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
 
 /**
@@ -89,7 +89,7 @@ public class ZohoCrmGetAllUsersAction {
         return context.http(http -> http.get("/users"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
-            .getBody(new Context.TypeReference<>() {});
+            .getBody(new TypeReference<>() {});
     }
 
 }

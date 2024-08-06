@@ -44,7 +44,7 @@ public class ZohoCrmComponentHandler implements ComponentHandler {
             ZohoCrmGetAllUsersAction.ACTION_DEFINITION,
             ZohoCrmCreateUserAction.ACTION_DEFINITION,
             ZohoCrmGetOrganizationData.ACTION_DEFINITION)
-        .icon("path:assets/zoho.svg");
+        .icon("path:assets/zoho-crm.svg");
 
     @Override
     public ComponentDefinition getDefinition() {
