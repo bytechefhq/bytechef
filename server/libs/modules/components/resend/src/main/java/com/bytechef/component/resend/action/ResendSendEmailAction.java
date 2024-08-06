@@ -24,7 +24,6 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.resend.constant.ResendConstants.ATTACHMENTS;
-import static com.bytechef.component.resend.constant.ResendConstants.BASE_URL;
 import static com.bytechef.component.resend.constant.ResendConstants.BCC;
 import static com.bytechef.component.resend.constant.ResendConstants.CC;
 import static com.bytechef.component.resend.constant.ResendConstants.CONTENT_TYPE;
@@ -143,7 +142,7 @@ public final class ResendSendEmailAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext.http(http -> http.post(BASE_URL + "/emails"))
+        return actionContext.http(http -> http.post("/emails"))
             .body(
                 Http.Body.of(
                     FROM, inputParameters.getRequiredString(FROM),
