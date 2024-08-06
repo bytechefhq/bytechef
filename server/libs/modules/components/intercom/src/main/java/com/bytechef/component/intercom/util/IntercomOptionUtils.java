@@ -19,7 +19,6 @@ package com.bytechef.component.intercom.util;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.intercom.constant.IntercomConstants.BASE_URL;
 import static com.bytechef.component.intercom.constant.IntercomConstants.ID;
 
 import com.bytechef.component.definition.ActionContext;
@@ -35,7 +34,7 @@ import java.util.Map;
 public class IntercomOptionUtils {
 
     protected static final ContextFunction<Http, Http.Executor> GET_CONTACTS_CONTEXT_FUNCTION =
-        http -> http.get(BASE_URL + "/contacts");
+        http -> http.get("/contacts");
 
     public static List<Option<String>> getContactIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,

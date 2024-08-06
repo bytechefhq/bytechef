@@ -26,7 +26,6 @@ import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.definition.Context.TypeReference;
 import static com.bytechef.component.intercom.constant.IntercomConstants.AVATAR;
-import static com.bytechef.component.intercom.constant.IntercomConstants.BASE_URL;
 import static com.bytechef.component.intercom.constant.IntercomConstants.EMAIL;
 import static com.bytechef.component.intercom.constant.IntercomConstants.ID;
 import static com.bytechef.component.intercom.constant.IntercomConstants.LEAD;
@@ -85,7 +84,7 @@ public class IntercomCreateContactAction {
         .perform(IntercomCreateContactAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_CONTACTS_CONTEXT_FUNCTION =
-        http -> http.post(BASE_URL + "/contacts");
+        http -> http.post("/contacts");
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {

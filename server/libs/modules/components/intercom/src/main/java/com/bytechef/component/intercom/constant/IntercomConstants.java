@@ -22,7 +22,6 @@ package com.bytechef.component.intercom.constant;
 public class IntercomConstants {
 
     public static final String AVATAR = "avatar";
-    public static final String BASE_URL = "https://api.intercom.io";
     public static final String BODY = "body";
     public static final String CONTACT_NAME = "id";
     public static final String CREATE_CONTACT = "createContact";

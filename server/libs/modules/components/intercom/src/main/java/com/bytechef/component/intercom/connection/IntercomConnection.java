@@ -31,10 +31,12 @@ import java.util.Map;
 
 /**
  * @author Luka Ljubić
+ * @author Monika Kušter
  */
 public class IntercomConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .baseUri((connectionParameters, context) -> "https://api.intercom.io")
         .authorizations(
             authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                 .title("OAuth2 Authorization Code")
