@@ -21,7 +21,6 @@ import static com.bytechef.component.accelo.constant.AcceloConstants.AGAINST_TYP
 import static com.bytechef.component.accelo.constant.AcceloConstants.CREATE_TASK;
 import static com.bytechef.component.accelo.constant.AcceloConstants.DATE_STARTED;
 import static com.bytechef.component.accelo.constant.AcceloConstants.TITLE;
-import static com.bytechef.component.accelo.util.AcceloUtils.createUrl;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.date;
 import static com.bytechef.component.definition.ComponentDSL.object;
@@ -85,7 +84,7 @@ public class AcceloCreateTaskAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext.http(http -> http.post(createUrl(connectionParameters, "tasks")))
+        return actionContext.http(http -> http.post("/tasks"))
             .body(
                 Http.Body.of(
                     TITLE, inputParameters.getRequiredString(TITLE),

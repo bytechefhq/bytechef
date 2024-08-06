@@ -21,7 +21,6 @@ import static com.bytechef.component.accelo.constant.AcceloConstants.CREATE_COMP
 import static com.bytechef.component.accelo.constant.AcceloConstants.NAME;
 import static com.bytechef.component.accelo.constant.AcceloConstants.PHONE;
 import static com.bytechef.component.accelo.constant.AcceloConstants.WEBSITE;
-import static com.bytechef.component.accelo.util.AcceloUtils.createUrl;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
@@ -77,7 +76,7 @@ public class AcceloCreateCompanyAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext.http(http -> http.post(createUrl(connectionParameters, "companies")))
+        return actionContext.http(http -> http.post("/companies"))
             .body(
                 Http.Body.of(
                     NAME, inputParameters.getRequiredString(NAME),
