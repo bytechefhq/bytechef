@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 @Transactional
 public class TaskExecutionServiceImpl implements TaskExecutionService {
@@ -54,7 +55,7 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
 
     @Override
     public void deleteJobTaskExecutions(long jobId) {
-        List<TaskExecution> taskExecutions = getJobTaskExecutions(jobId);
+        List<TaskExecution> taskExecutions = taskExecutionRepository.findAllByJobIdOrderByIdDesc(jobId);
 
         for (TaskExecution taskExecution : taskExecutions) {
             taskExecutionRepository.deleteById(Validate.notNull(taskExecution.getId(), "id"));
