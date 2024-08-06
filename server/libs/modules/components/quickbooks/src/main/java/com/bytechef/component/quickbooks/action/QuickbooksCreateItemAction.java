@@ -21,14 +21,15 @@ import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.COMPANY_ID;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.CREATE_ITEM;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.NAME;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.QUANTITY;
+import static com.bytechef.component.quickbooks.util.QuickbooksUtils.getCompanyId;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
 
 /**
@@ -72,17 +73,11 @@ public final class QuickbooksCreateItemAction {
         return context
             .http(http -> http.post("/v3/company/" + getCompanyId(connectionParameters) + "/item"))
             .body(
-                Context.Http.Body.of(
+                Http.Body.of(
                     NAME, inputParameters.getRequiredString(NAME),
                     QUANTITY, inputParameters.getRequired(QUANTITY)))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
+            .configuration(responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new Context.TypeReference<>() {});
-    }
-
-    private static String getCompanyId(Parameters connectionParameters) {
-        String companyId = connectionParameters.getRequiredString(COMPANY_ID);
-
-        return companyId.replace(" ", "");
+            .getBody(new TypeReference<>() {});
     }
 }

@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.COMPANY_ID;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.CREATE_CUSTOMER;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.DISPLAY_NAME;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.FAMILY_NAME;
@@ -30,10 +29,12 @@ import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.GIV
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.MIDDLE_NAME;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.SUFFIX;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.TITLE;
+import static com.bytechef.component.quickbooks.util.QuickbooksUtils.getCompanyId;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
 
 /**
@@ -128,21 +129,15 @@ public final class QuickbooksCreateCustomerAction {
         return context
             .http(http -> http.post("/v3/company/" + getCompanyId(connectionParameters) + "/customer"))
             .body(
-                Context.Http.Body.of(
+                Http.Body.of(
                     DISPLAY_NAME, inputParameters.getRequiredString(DISPLAY_NAME),
                     SUFFIX, inputParameters.getString(SUFFIX),
                     TITLE, inputParameters.getString(TITLE),
                     MIDDLE_NAME, inputParameters.getString(MIDDLE_NAME),
                     FAMILY_NAME, inputParameters.getString(FAMILY_NAME),
                     GIVEN_NAME, inputParameters.getString(GIVEN_NAME)))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
+            .configuration(responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new Context.TypeReference<>() {});
-    }
-
-    private static String getCompanyId(Parameters connectionParameters) {
-        String companyId = connectionParameters.getRequiredString(COMPANY_ID);
-
-        return companyId.replace(" ", "");
+            .getBody(new TypeReference<>() {});
     }
 }
