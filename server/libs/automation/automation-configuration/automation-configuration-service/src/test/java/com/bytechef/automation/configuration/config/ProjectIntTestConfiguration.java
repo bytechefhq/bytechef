@@ -16,14 +16,19 @@
 
 package com.bytechef.automation.configuration.config;
 
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
+import com.bytechef.platform.configuration.facade.WorkflowFacadeImpl;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
@@ -40,6 +45,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -85,6 +92,9 @@ public class ProjectIntTestConfiguration {
     private JobService jobService;
 
     @MockBean
+    TaskExecutionService taskExecutionService;
+
+    @MockBean
     private TriggerDefinitionService triggerDefinitionService;
 
     @MockBean
@@ -108,8 +118,10 @@ public class ProjectIntTestConfiguration {
     @MockBean
     private WorkflowTestConfigurationService workflowTestConfigurationService;
 
-    @MockBean
-    private WorkflowFacade workflowFacade;
+    @Bean
+    WorkflowFacade workflowFacade(WorkflowService workflowService) {
+        return new WorkflowFacadeImpl(workflowConnectionFacade, workflowService);
+    }
 
     @Bean
     MapUtils mapUtils() {
@@ -134,5 +146,19 @@ public class ProjectIntTestConfiguration {
             "com.bytechef.automation.configuration.repository", "com.bytechef.platform.tag.repository"
         })
     public static class ProjectIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
+
+        private final ObjectMapper objectMapper;
+
+        @SuppressFBWarnings("EI2")
+        public ProjectIntTestJdbcConfiguration(ObjectMapper objectMapper) {
+            this.objectMapper = objectMapper;
+        }
+
+        @Override
+        protected List<?> userConverters() {
+            return Arrays.asList(
+                new MapWrapperToStringConverter(objectMapper),
+                new StringToMapWrapperConverter(objectMapper));
+        }
     }
 }
