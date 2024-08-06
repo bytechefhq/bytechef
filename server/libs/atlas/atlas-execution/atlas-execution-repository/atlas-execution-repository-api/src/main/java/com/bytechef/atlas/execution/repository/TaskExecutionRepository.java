@@ -24,6 +24,7 @@ import java.util.Optional;
 
 /**
  * @author Arik Cohen
+ * @author Igor Beslic
  */
 public interface TaskExecutionRepository {
 
@@ -36,6 +37,14 @@ public interface TaskExecutionRepository {
      * @return List<TaskExecution>
      */
     List<TaskExecution> findAllByJobIdOrderByCreatedDate(Long jobId);
+
+    /**
+     * Returns the execution steps of the given job ordered by id in descending order
+     *
+     * @param jobId
+     * @return List<TaskExecution>
+     */
+    List<TaskExecution> findAllByJobIdOrderByIdDesc(Long jobId);
 
     /**
      * Returns a collection of {@link TaskExecution} instances which belong to the job of the given id.

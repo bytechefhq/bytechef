@@ -30,6 +30,7 @@ import org.springframework.util.comparator.Comparators;
 
 /**
  * @author Arik Cohen
+ * @author Igor Beslic
  * @since Feb, 21 2020
  */
 public class InMemoryTaskExecutionRepository implements TaskExecutionRepository {
@@ -63,6 +64,19 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
         return taskExecutions.values()
             .stream()
             .filter(taskExecution -> Objects.equals(taskExecution.getJobId(), jobId))
+            .toList();
+    }
+
+    @Override
+    public List<TaskExecution> findAllByJobIdOrderByIdDesc(Long jobId) {
+        return taskExecutions.values()
+            .stream()
+            .filter(taskExecution -> Objects.equals(taskExecution.getJobId(), jobId))
+            .sorted((taskExecution1, taskExecution2) -> {
+                long diff = taskExecution1.getId() - taskExecution2.getId();
+
+                return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+            })
             .toList();
     }
 
