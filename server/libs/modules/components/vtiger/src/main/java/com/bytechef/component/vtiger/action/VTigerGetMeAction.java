@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.vtiger.constant.VTigerConstants.GET_ME;
-import static com.bytechef.component.vtiger.constant.VTigerConstants.INSTANCE_URL;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -66,8 +65,7 @@ public class VTigerGetMeAction {
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return context
-            .http(http -> http.get(
-                connectionParameters.getRequiredString(INSTANCE_URL) + "/restapi/v1/vtiger/default/me"))
+            .http(http -> http.get("/me"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
