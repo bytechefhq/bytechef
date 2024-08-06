@@ -16,7 +16,6 @@
 
 package com.bytechef.component.asana.util;
 
-import static com.bytechef.component.asana.constant.AsanaConstants.BASE_URL;
 import static com.bytechef.component.asana.constant.AsanaConstants.WORKSPACE;
 import static com.bytechef.component.definition.ComponentDSL.option;
 
@@ -42,7 +41,7 @@ public class AsanaUtils {
         String searchText, ActionContext context) {
 
         Map<String, List<Map<String, String>>> body = context
-            .http(http -> http.get(BASE_URL + "/users?workspace=" + inputParameters.getRequiredString(WORKSPACE)))
+            .http(http -> http.get("/users?workspace=" + inputParameters.getRequiredString(WORKSPACE)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -55,7 +54,7 @@ public class AsanaUtils {
         String searchText, ActionContext context) {
 
         Map<String, List<Map<String, String>>> body = context
-            .http(http -> http.get(BASE_URL + "/projects?workspace=" + inputParameters.getRequiredString(WORKSPACE)))
+            .http(http -> http.get("/projects?workspace=" + inputParameters.getRequiredString(WORKSPACE)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -67,7 +66,7 @@ public class AsanaUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 
-        Map<String, List<Map<String, String>>> body = context.http(http -> http.get(BASE_URL + "/tags"))
+        Map<String, List<Map<String, String>>> body = context.http(http -> http.get("/tags"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -81,8 +80,7 @@ public class AsanaUtils {
 
         Map<String, List<Map<String, String>>> body = context
             .http(http -> http.get(
-                BASE_URL + "/workspaces/" + inputParameters.getRequiredFromPath("__item.data." + WORKSPACE) +
-                    "/teams"))
+                "/workspaces/" + inputParameters.getRequiredFromPath("__item.data." + WORKSPACE) + "/teams"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -94,7 +92,7 @@ public class AsanaUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 
-        Map<String, List<Map<String, String>>> body = context.http(http -> http.get(BASE_URL + "/workspaces"))
+        Map<String, List<Map<String, String>>> body = context.http(http -> http.get("/workspaces"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
