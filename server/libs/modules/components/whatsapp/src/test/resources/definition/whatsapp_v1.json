@@ -64,7 +64,6 @@
     "title": "Send Message",
     "output": null,
     "perform": { },
-    "processErrorResponse": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -209,7 +208,8 @@
       },
       "sampleOutput": null
     },
-    "workflowNodeDescription": null
+    "workflowNodeDescription": null,
+    "processErrorResponse": null
   } ],
   "triggers": [ {
     "batch": null,
@@ -253,7 +253,6 @@
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": { },
     "listenerDisable": null,
-    "processErrorResponse": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -658,6 +657,7 @@
       },
       "sampleOutput": null
     },
+    "processErrorResponse": null,
     "listenerEnable": null,
     "staticWebhookRequest": null,
     "webhookValidate": null
@@ -727,7 +727,7 @@
     "properties": null,
     "version": 1,
     "authorizationRequired": null,
-    "baseUri": null,
+    "baseUri": { },
     "test": null
   }
 }
