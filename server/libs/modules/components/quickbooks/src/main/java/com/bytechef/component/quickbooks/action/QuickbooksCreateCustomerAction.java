@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.BASE_URL;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.COMPANY_ID;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.CREATE_CUSTOMER;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.DISPLAY_NAME;
@@ -127,7 +126,7 @@ public final class QuickbooksCreateCustomerAction {
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return context
-            .http(http -> http.post(BASE_URL + "/v3/company/" + getCompanyId(connectionParameters) + "/customer"))
+            .http(http -> http.post("/v3/company/" + getCompanyId(connectionParameters) + "/customer"))
             .body(
                 Context.Http.Body.of(
                     DISPLAY_NAME, inputParameters.getRequiredString(DISPLAY_NAME),
