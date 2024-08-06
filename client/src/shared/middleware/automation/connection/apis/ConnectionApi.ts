@@ -38,13 +38,6 @@ export interface GetConnectionRequest {
     id: number;
 }
 
-export interface GetConnectionsRequest {
-    componentName?: string;
-    connectionVersion?: number;
-    environment?: ConnectionEnvironmentModel;
-    tagId?: number;
-}
-
 export interface GetWorkspaceConnectionsRequest {
     id: number;
     componentName?: string;
@@ -174,50 +167,6 @@ export class ConnectionApi extends runtime.BaseAPI {
      */
     async getConnection(requestParameters: GetConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConnectionModel> {
         const response = await this.getConnectionRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Get all connections.
-     * Get all connections
-     */
-    async getConnectionsRaw(requestParameters: GetConnectionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ConnectionModel>>> {
-        const queryParameters: any = {};
-
-        if (requestParameters['componentName'] != null) {
-            queryParameters['componentName'] = requestParameters['componentName'];
-        }
-
-        if (requestParameters['connectionVersion'] != null) {
-            queryParameters['connectionVersion'] = requestParameters['connectionVersion'];
-        }
-
-        if (requestParameters['environment'] != null) {
-            queryParameters['environment'] = requestParameters['environment'];
-        }
-
-        if (requestParameters['tagId'] != null) {
-            queryParameters['tagId'] = requestParameters['tagId'];
-        }
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/connections`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ConnectionModelFromJSON));
-    }
-
-    /**
-     * Get all connections.
-     * Get all connections
-     */
-    async getConnections(requestParameters: GetConnectionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ConnectionModel>> {
-        const response = await this.getConnectionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
