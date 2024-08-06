@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http;
 import static com.bytechef.component.intercom.constant.IntercomConstants.CONTACT_NAME;
 import static com.bytechef.component.intercom.constant.IntercomConstants.EMAIL;
+import static com.bytechef.component.intercom.constant.IntercomConstants.GET_CONTACT;
 import static com.bytechef.component.intercom.constant.IntercomConstants.NAME;
 import static com.bytechef.component.intercom.constant.IntercomConstants.PHONE;
 import static com.bytechef.component.intercom.constant.IntercomConstants.ROLE;
@@ -32,30 +33,28 @@ import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.intercom.constant.IntercomConstants;
-import com.bytechef.component.intercom.util.IntercomOptionUtils;
+import com.bytechef.component.intercom.util.IntercomUtils;
 
 public class IntercomGetContactAction {
 
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION =
-        action(IntercomConstants.GET_CONTACT)
-            .title("Get Contact")
-            .description("Get a single Contact")
-            .properties(
-                string(CONTACT_NAME)
-                    .label("Contact Name")
-                    .required(true)
-                    .options((ActionOptionsFunction<String>) IntercomOptionUtils::getContactIdOptions))
-            .outputSchema(
-                object()
-                    .properties(
-                        string(TYPE),
-                        string(CONTACT_NAME),
-                        string(ROLE),
-                        string(EMAIL),
-                        string(PHONE),
-                        string(NAME)))
-            .perform(IntercomGetContactAction::perform);
+    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action(GET_CONTACT)
+        .title("Get Contact")
+        .description("Get a single Contact")
+        .properties(
+            string(CONTACT_NAME)
+                .label("Contact Name")
+                .required(true)
+                .options((ActionOptionsFunction<String>) IntercomUtils::getContactIdOptions))
+        .outputSchema(
+            object()
+                .properties(
+                    string(TYPE),
+                    string(CONTACT_NAME),
+                    string(ROLE),
+                    string(EMAIL),
+                    string(PHONE),
+                    string(NAME)))
+        .perform(IntercomGetContactAction::perform);
 
     public static Object
         perform(Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
