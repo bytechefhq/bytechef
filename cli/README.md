@@ -33,4 +33,4 @@ Similarly, if some parameters should have dynamic options then in `YourConnector
 For example, look at `ShopifyComponentHandler.class`.
 
 ### Dynamic properties
-TODO
+To mark some object as `dynamic properties` type, set `x-property-type: "dynamicProperties"` extension as part of the object definition.
