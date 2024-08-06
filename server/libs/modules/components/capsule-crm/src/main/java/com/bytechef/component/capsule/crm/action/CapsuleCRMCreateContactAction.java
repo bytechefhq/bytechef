@@ -19,7 +19,6 @@ package com.bytechef.component.capsule.crm.action;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.ABOUT;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.ADDRESS;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.ADDRESSES;
-import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.BASE_URL;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.CITY;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.COUNTRY;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.CREATE_CONTACT;
@@ -176,7 +175,7 @@ public class CapsuleCRMCreateContactAction {
         .perform(CapsuleCRMCreateContactAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_PARTIES_CONTEXT_FUNCTION =
-        http -> http.post(BASE_URL + "/parties");
+        http -> http.post("/parties");
 
     private CapsuleCRMCreateContactAction() {
     }

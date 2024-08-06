@@ -16,7 +16,6 @@
 
 package com.bytechef.component.capsule.crm.action;
 
-import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.BASE_URL;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.CATEGORY;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.COLOUR;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.CREATE_TASK;
@@ -87,7 +86,7 @@ public class CapsuleCRMCreateTaskAction {
         .perform(CapsuleCRMCreateTaskAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_TASKS_CONTEXT_FUNCTION =
-        http -> http.post(BASE_URL + "/tasks");
+        http -> http.post("/tasks");
 
     private CapsuleCRMCreateTaskAction() {
     }

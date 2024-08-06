@@ -30,6 +30,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefini
 public class CapsuleCRMConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .baseUri((connectionParameters, context) -> "https://api.capsulecrm.com/api/v2")
         .authorizations(
             authorization(BEARER_TOKEN)
                 .title("Bearer Token")
