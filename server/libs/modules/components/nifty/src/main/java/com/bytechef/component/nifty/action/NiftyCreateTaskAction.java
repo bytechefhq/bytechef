@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.dateTime;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.nifty.constant.NiftyConstants.BASE_URL;
 import static com.bytechef.component.nifty.constant.NiftyConstants.CREATE_TASK;
 import static com.bytechef.component.nifty.constant.NiftyConstants.DESCRIPTION;
 import static com.bytechef.component.nifty.constant.NiftyConstants.DUE_DATE;
@@ -86,7 +85,7 @@ public class NiftyCreateTaskAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext.http(http -> http.post(BASE_URL + "/tasks"))
+        return actionContext.http(http -> http.post("/tasks"))
             .body(
                 Http.Body.of(
                     NAME, inputParameters.getRequiredString(NAME),

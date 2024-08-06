@@ -21,7 +21,6 @@ package com.bytechef.component.nifty.constant;
  */
 public final class NiftyConstants {
 
-    public static final String BASE_URL = "https://openapi.niftypm.com/api/v1.0";
     public static final String CREATE_TASK = "createTask";
     public static final String DESCRIPTION = "description";
     public static final String DUE_DATE = "due_date";
