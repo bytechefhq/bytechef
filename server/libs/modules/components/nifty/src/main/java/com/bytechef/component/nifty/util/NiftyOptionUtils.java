@@ -17,7 +17,7 @@
 package com.bytechef.component.nifty.util;
 
 import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.nifty.constant.NiftyConstants.BASE_URL;
+import static com.bytechef.component.nifty.constant.NiftyConstants.NAME;
 import static com.bytechef.component.nifty.constant.NiftyConstants.PROJECT;
 
 import com.bytechef.component.definition.ActionContext;
@@ -43,7 +43,7 @@ public class NiftyOptionUtils {
 
         Map<String, Object> body = context
             .http(http -> http.get(
-                BASE_URL + "/taskgroups?project_id=" + inputParameters.getRequiredString(PROJECT) + "&archived=false"))
+                "/taskgroups?project_id=" + inputParameters.getRequiredString(PROJECT) + "&archived=false"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -53,7 +53,7 @@ public class NiftyOptionUtils {
         if (body != null && body.get("items") instanceof List<?> list) {
             for (Object item : list) {
                 if (item instanceof Map<?, ?> map) {
-                    options.add(option((String) map.get("name"), (String) map.get("id")));
+                    options.add(option((String) map.get(NAME), (String) map.get("id")));
                 }
             }
         }
@@ -65,7 +65,7 @@ public class NiftyOptionUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 
-        Map<String, Object> body = context.http(http -> http.get(BASE_URL + "/projects"))
+        Map<String, Object> body = context.http(http -> http.get("/projects"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -75,7 +75,7 @@ public class NiftyOptionUtils {
         if (body != null && body.get("projects") instanceof List<?> list) {
             for (Object item : list) {
                 if (item instanceof Map<?, ?> map) {
-                    options.add(option((String) map.get("name"), (String) map.get("id")));
+                    options.add(option((String) map.get(NAME), (String) map.get("id")));
                 }
             }
         }
