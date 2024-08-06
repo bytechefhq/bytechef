@@ -622,7 +622,7 @@
     "properties": null,
     "version": 1,
     "authorizationRequired": null,
-    "baseUri": null,
+    "baseUri": { },
     "test": null
   }
 }
