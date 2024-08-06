@@ -17,7 +17,6 @@
 package com.bytechef.component.teamwork.util;
 
 import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.teamwork.constant.TeamworkConstants.SITE_NAME;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
@@ -36,15 +35,11 @@ public class TeamworkUtils {
     private TeamworkUtils() {
     }
 
-    public static String getBaseUrl(Parameters connectionParameters) {
-        return "https://" + connectionParameters.getRequiredString(SITE_NAME) + ".teamwork.com/projects/api/v3";
-    }
-
     public static List<Option<String>> getTaskListIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 
-        Map<String, ?> body = context.http(http -> http.get(getBaseUrl(connectionParameters) + "/tasklists"))
+        Map<String, ?> body = context.http(http -> http.get("/tasklists"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

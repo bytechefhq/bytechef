@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.Authorization.USERNAME;
 import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.teamwork.constant.TeamworkConstants.SITE_NAME;
-import static com.bytechef.component.teamwork.util.TeamworkUtils.getBaseUrl;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
@@ -65,7 +64,8 @@ public class TeamworkComponentHandler extends AbstractTeamworkComponentHandler {
                         string(USERNAME)
                             .label("API Key")
                             .required(true)))
-            .baseUri((connectionParameters, context) -> getBaseUrl(connectionParameters));
+            .baseUri((connectionParameters, context) -> "https://" + connectionParameters.getRequiredString(SITE_NAME)
+                + ".teamwork.com/projects/api/v3");
     }
 
     @Override
