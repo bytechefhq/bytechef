@@ -20,18 +20,19 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.COMPANY_ID;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.CREATE_CATEGORY;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.NAME;
+import static com.bytechef.component.quickbooks.util.QuickbooksUtils.getCompanyId;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
 
 public class QuickbooksCreateCategoryAction {
 
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_CATEGORY)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_CATEGORY)
         .title("Create a category")
         .description("Creates a new category.")
         .properties(
@@ -58,18 +59,12 @@ public class QuickbooksCreateCategoryAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
         return context
             .http(http -> http.post("/v3/company/" + getCompanyId(connectionParameters) + "/item?minorversion=4"))
-            .body(Context.Http.Body.of("Type", "Category", NAME, inputParameters.getRequiredString(NAME)))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
+            .body(Http.Body.of("Type", "Category", NAME, inputParameters.getRequiredString(NAME)))
+            .configuration(responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new Context.TypeReference<>() {});
+            .getBody(new TypeReference<>() {});
     }
 
-    private static String getCompanyId(Parameters connectionParameters) {
-        String companyId = connectionParameters.getRequiredString(COMPANY_ID);
-
-        return companyId.replace(" ", "");
-    }
 }
