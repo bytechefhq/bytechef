@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.ACCESS_TOKEN;
-import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.BASE_URL;
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.DESC;
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.TITLE;
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.URL;
@@ -73,7 +72,7 @@ public class OneSimpleAPIWebPageInformationAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return context.http(http -> http.get(BASE_URL + "/page_info"))
+        return context.http(http -> http.get("/page_info"))
             .body(
                 Context.Http.Body.of(
                     ACCESS_TOKEN, connectionParameters.getRequiredString(ACCESS_TOKEN),

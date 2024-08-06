@@ -23,7 +23,6 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.ACCESS_TOKEN;
-import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.BASE_URL;
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.CURRENCY_CONVERTER;
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.FROM_CURRENCY;
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.FROM_VALUE;
@@ -74,7 +73,7 @@ public class OneSimpleAPICurrencyConverterAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return context.http(http -> http.get(BASE_URL + "/exchange_rate"))
+        return context.http(http -> http.get("/exchange_rate"))
             .body(
                 Body.of(
                     ACCESS_TOKEN, connectionParameters.getRequiredString(ACCESS_TOKEN),

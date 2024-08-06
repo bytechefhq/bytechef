@@ -31,6 +31,7 @@ import java.util.List;
 public class OneSimpleAPIConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .baseUri((connectionParameters, context) -> "https://onesimpleapi.com/api")
         .authorizations(
             authorization(CUSTOM)
                 .title("One Simple API Connection")
