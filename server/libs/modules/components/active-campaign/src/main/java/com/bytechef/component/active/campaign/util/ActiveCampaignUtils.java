@@ -16,7 +16,6 @@
 
 package com.bytechef.component.active.campaign.util;
 
-import static com.bytechef.component.definition.Authorization.USERNAME;
 import static com.bytechef.component.definition.ComponentDSL.option;
 
 import com.bytechef.component.definition.ActionContext;
@@ -40,7 +39,7 @@ public class ActiveCampaignUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 
-        Map<String, ?> body = context.http(http -> http.get(getUrl(connectionParameters, "contacts")))
+        Map<String, ?> body = context.http(http -> http.get("/contacts"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -62,7 +61,7 @@ public class ActiveCampaignUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 
-        Map<String, ?> body = context.http(http -> http.get(getUrl(connectionParameters, "dealTasktypes")))
+        Map<String, ?> body = context.http(http -> http.get("/dealTasktypes"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -80,7 +79,4 @@ public class ActiveCampaignUtils {
         return options;
     }
 
-    private static String getUrl(Parameters connectionParameters, String resource) {
-        return "https://" + connectionParameters.getRequiredString(USERNAME) + ".api-us1.com/api/3/" + resource;
-    }
 }
