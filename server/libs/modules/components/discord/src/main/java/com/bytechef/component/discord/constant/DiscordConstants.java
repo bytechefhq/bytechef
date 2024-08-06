@@ -27,7 +27,6 @@ import com.bytechef.component.discord.util.DiscordUtils;
  */
 public class DiscordConstants {
 
-    public static final String BASE_URL = "https://discord.com/api/v10";
     public static final String CHANNEL_ID = "channelId";
     public static final String CONTENT = "content";
     public static final String GUILD_ID = "guildId";

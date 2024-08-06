@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.discord.constant.DiscordConstants.BASE_URL;
 import static com.bytechef.component.discord.constant.DiscordConstants.CONTENT;
 import static com.bytechef.component.discord.constant.DiscordConstants.GUILD_ID;
 import static com.bytechef.component.discord.constant.DiscordConstants.GUILD_ID_PROPERTY;
@@ -78,7 +77,7 @@ public class DiscordSendDirectMessageAction {
 
         Map<String, Object> body = getDMChannel(inputParameters, actionContext);
 
-        return actionContext.http(http -> http.post(BASE_URL + "/channels/" + body.get("id") + "/messages"))
+        return actionContext.http(http -> http.post("/channels/" + body.get("id") + "/messages"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(
                 Http.Body.of(
