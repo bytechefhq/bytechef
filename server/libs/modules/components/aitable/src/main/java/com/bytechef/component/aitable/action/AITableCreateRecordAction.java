@@ -16,7 +16,6 @@
 
 package com.bytechef.component.aitable.action;
 
-import static com.bytechef.component.aitable.constant.AITableConstants.BASE_URL;
 import static com.bytechef.component.aitable.constant.AITableConstants.CREATE_RECORD;
 import static com.bytechef.component.aitable.constant.AITableConstants.DATASHEET_ID;
 import static com.bytechef.component.aitable.constant.AITableConstants.DATASHEET_ID_PROPERTY;
@@ -56,8 +55,8 @@ public class AITableCreateRecordAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext.http(http -> http.post(
-            BASE_URL + "/datasheets/" + inputParameters.getRequiredString(DATASHEET_ID) + "/records"))
+        return actionContext
+            .http(http -> http.post("/datasheets/" + inputParameters.getRequiredString(DATASHEET_ID) + "/records"))
             .body(
                 Http.Body.of(
                     RECORDS, List.of(Map.of(FIELDS, inputParameters.get(FIELDS)))))

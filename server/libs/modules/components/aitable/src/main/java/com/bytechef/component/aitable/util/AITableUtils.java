@@ -16,7 +16,6 @@
 
 package com.bytechef.component.aitable.util;
 
-import static com.bytechef.component.aitable.constant.AITableConstants.BASE_URL;
 import static com.bytechef.component.aitable.constant.AITableConstants.DATA;
 import static com.bytechef.component.aitable.constant.AITableConstants.DATASHEET_ID;
 import static com.bytechef.component.aitable.constant.AITableConstants.FIELDS;
@@ -178,7 +177,7 @@ public class AITableUtils {
 
         String spaceId = inputParameters.getRequiredString(SPACE_ID);
 
-        Map<String, Object> body = context.http(http -> http.get(BASE_URL + "/spaces/" + spaceId + "/nodes"))
+        Map<String, Object> body = context.http(http -> http.get("/spaces/" + spaceId + "/nodes"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -203,7 +202,7 @@ public class AITableUtils {
 
         String datasheetId = inputParameters.getRequiredString(DATASHEET_ID);
 
-        Map<String, Object> body = context.http(http -> http.get(BASE_URL + "/datasheets/" + datasheetId + "/records"))
+        Map<String, Object> body = context.http(http -> http.get("/datasheets/" + datasheetId + "/records"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -248,7 +247,7 @@ public class AITableUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 
-        Map<String, Object> body = context.http(http -> http.get(BASE_URL + "/spaces"))
+        Map<String, Object> body = context.http(http -> http.get("/spaces"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -267,7 +266,7 @@ public class AITableUtils {
     }
 
     private static Map<String, Object> getDatasheetFields(ActionContext context, String datasheetId) {
-        return context.http(http -> http.get(BASE_URL + "/datasheets/" + datasheetId + "/fields"))
+        return context.http(http -> http.get("/datasheets/" + datasheetId + "/fields"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
