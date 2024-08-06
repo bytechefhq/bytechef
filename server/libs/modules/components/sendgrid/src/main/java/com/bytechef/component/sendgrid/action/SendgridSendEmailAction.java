@@ -25,7 +25,6 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.ATTACHMENTS;
-import static com.bytechef.component.sendgrid.constant.SendgridConstants.BASE_URL;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.CC;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.FROM;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.SEND_EMAIL;
@@ -131,7 +130,7 @@ public final class SendgridSendEmailAction {
             itemMap.put(CC, ccList);
         }
 
-        context.http(http -> http.post(BASE_URL + "/mail/send"))
+        context.http(http -> http.post("/mail/send"))
             .body(
                 Body.of(
                     "personalizations", personalization,

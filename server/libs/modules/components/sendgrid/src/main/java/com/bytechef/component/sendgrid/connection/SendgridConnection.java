@@ -26,10 +26,12 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefini
 
 /**
  * @author Marko Krišković
+ * @author Monika Kušter
  */
 public class SendgridConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .baseUri((connectionParameters, context) -> "https://api.sendgrid.com/v3")
         .authorizations(
             authorization(BEARER_TOKEN)
                 .title("Bearer Token")
