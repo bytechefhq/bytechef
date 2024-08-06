@@ -20,20 +20,6 @@ export const ConnectionKeys = {
     }) => [...ConnectionKeys.connections, filters],
 };
 
-export const useGetConnectionsQuery = (
-    request: {
-        componentName?: string;
-        connectionVersion?: number;
-        tagId?: number;
-    },
-    enabled?: boolean
-) =>
-    useQuery<ConnectionModel[], Error>({
-        queryKey: ConnectionKeys.filteredConnections(request),
-        queryFn: () => new ConnectionApi().getConnections(request),
-        enabled: enabled === undefined ? true : enabled,
-    });
-
 export const useGetConnectionTagsQuery = () =>
     useQuery<TagModel[], Error>({
         queryKey: ConnectionKeys.connectionTags,
