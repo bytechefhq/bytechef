@@ -36,7 +36,6 @@ import static com.bytechef.component.freshsales.constant.FreshsalesConstants.STA
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.TWITTER;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.WORK_NUMBER;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.ZIPCODE;
-import static com.bytechef.component.freshsales.util.FreshsalesUtils.getUrl;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -143,7 +142,7 @@ public class FreshsalesCreateContactAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext.http(http -> http.post(getUrl(connectionParameters, "contacts")))
+        return actionContext.http(http -> http.post("/contacts"))
             .body(
                 Http.Body.of(
                     FIRST_NAME, inputParameters.getString(FIRST_NAME),

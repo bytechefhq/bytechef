@@ -24,7 +24,6 @@ import static com.bytechef.component.freshsales.constant.FreshsalesConstants.CRE
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.EMAIL;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.FIRST_NAME;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.LAST_NAME;
-import static com.bytechef.component.freshsales.util.FreshsalesUtils.getUrl;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -70,7 +69,7 @@ public class FreshsalesCreateLeadAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext.http(http -> http.post(getUrl(connectionParameters, "leads")))
+        return actionContext.http(http -> http.post("/leads"))
             .body(
                 Http.Body.of(
                     FIRST_NAME, inputParameters.getString(FIRST_NAME),
