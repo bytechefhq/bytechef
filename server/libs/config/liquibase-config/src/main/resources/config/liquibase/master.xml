@@ -9,7 +9,6 @@
 
     <!-- user -->
     <includeAll path="classpath:config/liquibase/changelog/platform/user/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or user or multitenant" />
-    <includeAll path="classpath:config/liquibase/changelog/embedded/user/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or user or multitenant" />
     <includeAll path="classpath:config/liquibase/changelog/embedded/connected_user/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or user or multitenant" />
 
     <!-- connection -->
