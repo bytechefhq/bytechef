@@ -29,7 +29,6 @@ public class BoxConstants {
     private BoxConstants() {
     }
 
-    public static final String BASE_URL = "https://api.box.com/2.0";
     public static final String BOX = "box";
     public static final String CREATE_FOLDER = "createFolder";
     public static final String DOWNLOAD_FILE = "downloadFile";

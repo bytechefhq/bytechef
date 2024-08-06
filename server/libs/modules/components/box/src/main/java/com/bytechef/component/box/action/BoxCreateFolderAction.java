@@ -16,7 +16,6 @@
 
 package com.bytechef.component.box.action;
 
-import static com.bytechef.component.box.constant.BoxConstants.BASE_URL;
 import static com.bytechef.component.box.constant.BoxConstants.CREATE_FOLDER;
 import static com.bytechef.component.box.constant.BoxConstants.FILE_OUTPUT_PROPERTY;
 import static com.bytechef.component.box.constant.BoxConstants.ID;
@@ -67,7 +66,7 @@ public class BoxCreateFolderAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         return context
-            .http(http -> http.post(BASE_URL + "/folders"))
+            .http(http -> http.post("/folders"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(
                 Http.Body.of(

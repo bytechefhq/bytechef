@@ -16,7 +16,6 @@
 
 package com.bytechef.component.box.util;
 
-import static com.bytechef.component.box.constant.BoxConstants.BASE_URL;
 import static com.bytechef.component.box.constant.BoxConstants.FILE;
 import static com.bytechef.component.box.constant.BoxConstants.FOLDER;
 import static com.bytechef.component.box.constant.BoxConstants.ID;
@@ -51,7 +50,7 @@ public class BoxUtils {
         String parentFolder = inputParameters.getRequiredString(ID);
 
         Map<String, Object> body =
-            context.http(http -> http.get(BASE_URL + "/folders/" + parentFolder + "/items"))
+            context.http(http -> http.get("/folders/" + parentFolder + "/items"))
                 .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute()
                 .getBody(new TypeReference<>() {});
@@ -63,7 +62,7 @@ public class BoxUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
-        Map<String, Object> body = context.http(http -> http.get(BASE_URL + "/folders/0/items"))
+        Map<String, Object> body = context.http(http -> http.get("/folders/0/items"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -78,7 +77,7 @@ public class BoxUtils {
     public static String subscribeWebhook(
         String webhookUrl, TriggerContext context, String type, String triggerEvent, String targetId) {
 
-        Map<String, ?> body = context.http(http -> http.post(BASE_URL + "/webhooks"))
+        Map<String, ?> body = context.http(http -> http.post("/webhooks"))
             .body(Http.Body.of(
                 "address", webhookUrl,
                 "triggers", List.of(triggerEvent),
@@ -93,7 +92,7 @@ public class BoxUtils {
     }
 
     public static void unsubscribeWebhook(Parameters outputParameters, Context context) {
-        context.http(http -> http.delete(BASE_URL + "/webhooks/" + outputParameters.getString(ID)))
+        context.http(http -> http.delete("/webhooks/" + outputParameters.getString(ID)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
     }
