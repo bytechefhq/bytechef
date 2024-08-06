@@ -17,7 +17,6 @@
 package com.bytechef.component.whatsapp.util;
 
 import static com.bytechef.component.definition.Authorization.AUTHORIZATION;
-import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.BASE_URL;
 
 import com.bytechef.component.definition.Context;
 import java.util.Map;
@@ -25,7 +24,7 @@ import java.util.Map;
 public class WhatsAppUtils {
 
     public static String getWhatsappServer(String accessToken, Context context) {
-        Map<?, ?> response = context.http(http -> http.get(BASE_URL + "/metadata")
+        Map<?, ?> response = context.http(http -> http.get("/metadata")
             .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
             .header(AUTHORIZATION, "OAuth " + accessToken)
             .execute()
