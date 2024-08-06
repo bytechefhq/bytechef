@@ -16,7 +16,6 @@
 
 package com.bytechef.component.affinity.action;
 
-import static com.bytechef.component.affinity.constant.AffinityConstants.BASE_URL;
 import static com.bytechef.component.affinity.constant.AffinityConstants.CREATE_OPPORTUNITY;
 import static com.bytechef.component.affinity.constant.AffinityConstants.NAME;
 import static com.bytechef.component.definition.ComponentDSL.action;
@@ -53,7 +52,7 @@ public class AffinityCreateOpportunityAction {
         .perform(AffinityCreateOpportunityAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_OPPORTUNITIES_CONTEXT_FUNCTION =
-        http -> http.post(BASE_URL + "opportunities");
+        http -> http.post("/opportunities");
 
     private AffinityCreateOpportunityAction() {
     }
