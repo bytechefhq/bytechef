@@ -52,7 +52,7 @@ class CsvFileWriteActionTest {
         "rawtypes", "unchecked"
     })
     void testPerformWriteCSV() throws IOException {
-        String jsonContent = Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8);
+        String jsonContent = Files.contentOf(getFile("expected_output.json"), StandardCharsets.UTF_8);
 
         Parameters parameters = Mockito.mock(Parameters.class);
 
