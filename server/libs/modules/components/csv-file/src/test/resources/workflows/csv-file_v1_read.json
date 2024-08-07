@@ -5,6 +5,26 @@
     "label": "File property",
     "type": "FILE_ENTRY",
     "required": true
+  }, {
+    "name": "includeEmptyCells",
+    "label": "Include Empty Cells",
+    "type": "boolean",
+    "required": true
+  }, {
+    "name": "enclosingCharacter",
+    "label": "Enclosing Character",
+    "type": "string",
+    "required": false
+  }, {
+    "name": "delimiter",
+    "label": "Delimiter Character",
+    "type": "string",
+    "required": false
+  }, {
+    "name": "headerRow",
+    "label": "First Row is Header",
+    "type": "boolean",
+    "required": false
   } ],
   "outputs": [ {
     "name": "readCsvFile",
@@ -16,7 +36,10 @@
     "type": "csvFile/v1/read",
     "parameters": {
       "fileEntry": "${fileEntry}",
-      "includeEmptyCells": true
+      "delimiter": "${delimiter}",
+      "headerRow": "${headerRow}",
+      "includeEmptyCells": "${includeEmptyCells}",
+      "enclosingCharacter": "${enclosingCharacter}"
     }
   } ]
 }

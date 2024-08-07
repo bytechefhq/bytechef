@@ -1,0 +1,5 @@
+id|name|city|description|active|date|sum
+77|A|B|C|true|2021-12-07|11.2
+4|name1|city1|description1|false||12
+2|A|city2||true|2021-12-09|
+5678|ABCD|city3|EFGH|false|2021-12-10|13.23
