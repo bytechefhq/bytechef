@@ -16,7 +16,9 @@
 
 package com.bytechef.automation.configuration.facade;
 
-import static com.bytechef.automation.configuration.ProjectInstanceFacadeHelper.*;
+import static com.bytechef.automation.configuration.ProjectInstanceFacadeHelper.PREFIX_CATEGORY;
+import static com.bytechef.automation.configuration.ProjectInstanceFacadeHelper.PREFIX_PROJECT_DESCRIPTION;
+import static com.bytechef.automation.configuration.ProjectInstanceFacadeHelper.PREFIX_PROJECT_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
