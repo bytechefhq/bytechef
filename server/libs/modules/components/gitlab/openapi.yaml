@@ -1,0 +1,109 @@
+---
+openapi: "3.0.1"
+info:
+  title: "GitLab"
+  description: "GitLab is a web-based DevOps lifecycle tool that provides a Git repository manager, CI/CD pipelines, issue tracking, and more in a single application."
+  version: "v1"
+servers:
+  - url: "https://gitlab.com/api/v4"
+paths:
+  /projects/{projectId}/issues:
+    post:
+      summary: "Create Issue"
+      description: "Creates a new project issue."
+      operationId: "createIssue"
+      parameters:
+        - name: "projectId"
+          description: "Project where new issue will be created"
+          in: "path"
+          required: true
+          schema:
+            title: "Project"
+            type: "string"
+        - name: "title"
+          description: "The title of an issue."
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+        - name: "description"
+          description: "The description of an issue."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            maxLength: 1048576
+      responses:
+        201:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "integer"
+                      iid:
+                        type: "integer"
+                      project_id:
+                        type: "integer"
+                      title:
+                        type: "string"
+                      description:
+                        type: "string"
+                      web_url:
+                        type: "string"
+  /projects/{projectId}/issues/{issueId}/notes:
+    post:
+      summary: "Create Comment on Issue"
+      description: "Adds a comment to the specified issue."
+      operationId: "createCommentOnIssue"
+      parameters:
+        - name: "projectId"
+          in: "path"
+          required: true
+          schema:
+            title: "Project"
+            type: "string"
+        - name: "issueId"
+          description: "The issue to comment on."
+          in: "path"
+          required: true
+          schema:
+            title: "Issue"
+            type: "integer"
+        - name: "body"
+          description: "The comment to add to the issue."
+          in: "query"
+          required: true
+          schema:
+            title: "Comment"
+            type: "string"
+            maxLength: 1000000
+      responses:
+        201:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "integer"
+                      body:
+                        type: "string"
+components:
+  securitySchemes:
+    oauth2:
+      type: "oauth2"
+      flows:
+        authorizationCode:
+          authorizationUrl: "https://gitlab.com/oauth/authorize"
+          tokenUrl: "https://gitlab.com/oauth/token"
+          refreshUrl: "https://gitlab.com/oauth/token"
