@@ -122,8 +122,7 @@ public class ProjectFacadeIntTest {
         workspace = workspaceRepository.save(new Workspace("test"));
         projectFacadeInstanceHelper = new ProjectInstanceFacadeHelper(
             categoryRepository, projectFacade, projectRepository, projectInstanceFacade, projectWorkflowRepository,
-            tagRepository,
-            workflowFacade, workflowRepository, workspace, workspaceRepository);
+            tagRepository);
     }
 
     @Test
