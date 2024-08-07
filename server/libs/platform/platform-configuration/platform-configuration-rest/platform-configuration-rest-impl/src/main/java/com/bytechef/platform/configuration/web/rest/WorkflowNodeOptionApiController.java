@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.configuration.web.rest;
 
+import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOptionFacade;
 import com.bytechef.platform.configuration.web.rest.model.OptionModel;
 import java.util.List;
@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
-@ConditionalOnEndpoint
+@ConditionalOnCoordinator
 public class WorkflowNodeOptionApiController implements WorkflowNodeOptionApi {
 
     private final ConversionService conversionService;

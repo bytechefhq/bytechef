@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.workflow.test.web.rest;
 
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
+import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.workflow.test.facade.WorkflowTestFacade;
 import com.bytechef.platform.workflow.test.web.rest.model.WorkflowTestExecutionModel;
 import org.springframework.core.convert.ConversionService;
@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
-@ConditionalOnEndpoint
+@ConditionalOnCoordinator
 public class WorkflowTestApiController implements WorkflowTestApi {
 
     private final ConversionService conversionService;

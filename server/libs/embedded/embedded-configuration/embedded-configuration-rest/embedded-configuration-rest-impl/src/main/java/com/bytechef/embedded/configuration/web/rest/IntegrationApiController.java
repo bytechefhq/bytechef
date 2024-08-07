@@ -16,6 +16,7 @@
 
 package com.bytechef.embedded.configuration.web.rest;
 
+import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.embedded.configuration.dto.IntegrationDTO;
 import com.bytechef.embedded.configuration.facade.IntegrationFacade;
@@ -25,7 +26,6 @@ import com.bytechef.embedded.configuration.web.rest.model.IntegrationStatusModel
 import com.bytechef.embedded.configuration.web.rest.model.IntegrationVersionModel;
 import com.bytechef.embedded.configuration.web.rest.model.PublishIntegrationRequestModel;
 import com.bytechef.embedded.configuration.web.rest.model.WorkflowModel;
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController("com.bytechef.embedded.configuration.web.rest.IntegrationApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/internal")
-@ConditionalOnEndpoint
+@ConditionalOnCoordinator
 public class IntegrationApiController implements IntegrationApi {
 
     private final ConversionService conversionService;

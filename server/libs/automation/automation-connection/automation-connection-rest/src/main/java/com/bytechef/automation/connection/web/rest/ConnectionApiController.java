@@ -16,10 +16,10 @@
 
 package com.bytechef.automation.connection.web.rest;
 
+import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.connection.facade.WorkspaceConnectionFacade;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.StringUtils;
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController("com.bytechef.automation.connection.web.rest.ConnectionApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}/internal")
-@ConditionalOnEndpoint
+@ConditionalOnCoordinator
 public class ConnectionApiController implements ConnectionApi {
 
     private final ConnectionFacade connectionFacade;

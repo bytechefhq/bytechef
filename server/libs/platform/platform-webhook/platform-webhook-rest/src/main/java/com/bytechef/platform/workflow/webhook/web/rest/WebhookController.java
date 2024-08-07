@@ -18,6 +18,7 @@ package com.bytechef.platform.workflow.webhook.web.rest;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MimeTypeUtils;
 import com.bytechef.commons.util.StreamUtils;
@@ -26,7 +27,6 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookBody.ContentTy
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.file.storage.service.FileStorageService;
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.component.registry.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.WebhookRequest;
@@ -77,7 +77,7 @@ import org.springframework.web.util.UriComponentsBuilder;
  * @author Ivica Cardic
  */
 @RestController
-@ConditionalOnEndpoint
+@ConditionalOnCoordinator
 public class WebhookController {
 
     private static final Logger logger = LoggerFactory.getLogger(WebhookController.class);
