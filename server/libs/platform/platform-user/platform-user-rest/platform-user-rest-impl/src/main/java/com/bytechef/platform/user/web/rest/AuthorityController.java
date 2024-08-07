@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.user.web.rest;
 
+import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.exception.AuthorityAlreadyUsedException;
 import com.bytechef.platform.user.service.AuthorityService;
@@ -50,7 +50,7 @@ import org.springframework.web.server.ResponseStatusException;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
-@ConditionalOnEndpoint
+@ConditionalOnCoordinator
 public class AuthorityController implements AuthorityApi {
 
     private static final Logger log = LoggerFactory.getLogger(AuthorityController.class);

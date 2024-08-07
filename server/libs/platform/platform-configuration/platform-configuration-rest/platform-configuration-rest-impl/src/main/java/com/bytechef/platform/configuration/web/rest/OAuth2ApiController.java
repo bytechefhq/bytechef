@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.configuration.web.rest;
 
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
+import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.configuration.facade.OAuth2ParametersFacade;
 import com.bytechef.platform.configuration.web.rest.model.GetOAuth2AuthorizationParametersRequestModel;
 import com.bytechef.platform.configuration.web.rest.model.OAuth2AuthorizationParametersModel;
@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
-@ConditionalOnEndpoint
+@ConditionalOnCoordinator
 public class OAuth2ApiController implements Oauth2Api {
 
     private final ConversionService conversionService;

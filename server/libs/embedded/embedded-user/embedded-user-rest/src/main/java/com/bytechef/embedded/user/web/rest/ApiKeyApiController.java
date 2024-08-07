@@ -16,10 +16,10 @@
 
 package com.bytechef.embedded.user.web.rest;
 
+import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.embedded.user.web.rest.model.CreateApiKey200ResponseModel;
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.user.domain.ApiKey;
 import com.bytechef.platform.user.facade.ApiKeyFacade;
@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController("com.bytechef.embedded.user.web.rest.ApiKeyApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/internal")
-@ConditionalOnEndpoint
+@ConditionalOnCoordinator
 public class ApiKeyApiController implements ApiKeyApi {
 
     private final ApiKeyFacade apiKeyFacade;

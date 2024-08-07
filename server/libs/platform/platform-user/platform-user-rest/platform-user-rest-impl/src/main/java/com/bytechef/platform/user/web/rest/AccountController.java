@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.user.web.rest;
 
+import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.PersistentToken;
@@ -67,7 +67,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api")
-@ConditionalOnEndpoint
+@ConditionalOnCoordinator
 public class AccountController {
 
     private static final Logger log = LoggerFactory.getLogger(AccountController.class);
