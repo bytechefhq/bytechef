@@ -119,7 +119,7 @@ function App() {
     }, [authenticated, sessionHasBeenFetched, navigate]);
 
     if (!authenticated) {
-        return <></>;
+        return <div></div>;
     }
 
     return (
