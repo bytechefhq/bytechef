@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.workflow.worker.config;
 
+import com.bytechef.atlas.worker.annotation.ConditionalOnWorker;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.worker.TriggerWorker;
@@ -34,6 +35,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
+@ConditionalOnWorker
 public class TriggerWorkerConfiguration {
 
     @Bean

@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.configuration.web.rest;
 
+import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.configuration.dto.UpdateParameterResultDTO;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
 import com.bytechef.platform.configuration.web.rest.model.DeleteWorkflowNodeParameter200ResponseModel;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
+@ConditionalOnEndpoint
 public class WorkflowNodeParameterApiController implements WorkflowNodeParameterApi {
 
     private final ConversionService conversionService;

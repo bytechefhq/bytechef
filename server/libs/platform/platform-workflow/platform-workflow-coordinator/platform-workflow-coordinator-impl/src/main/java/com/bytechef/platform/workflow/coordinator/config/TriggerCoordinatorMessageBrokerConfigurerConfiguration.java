@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.workflow.coordinator.config;
 
+import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Coordinator.Trigger.Subscriptions;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
@@ -38,6 +39,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
+@ConditionalOnCoordinator
 public class TriggerCoordinatorMessageBrokerConfigurerConfiguration {
 
     private final List<MessageEventPostReceiveProcessor> messageEventPostReceiveProcessors;

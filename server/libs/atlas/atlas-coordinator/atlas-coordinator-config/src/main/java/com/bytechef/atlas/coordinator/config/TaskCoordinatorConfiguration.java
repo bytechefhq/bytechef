@@ -21,6 +21,7 @@ package com.bytechef.atlas.coordinator.config;
 import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.TaskCoordinator;
+import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.atlas.coordinator.event.listener.ErrorEventListener;
 import com.bytechef.atlas.coordinator.event.listener.LogTaskApplicationEventListener;
@@ -59,6 +60,7 @@ import org.springframework.context.annotation.Primary;
  * @author Ivica Cardic
  */
 @Configuration
+@ConditionalOnCoordinator
 public class TaskCoordinatorConfiguration {
 
     @Autowired

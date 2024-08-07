@@ -17,6 +17,7 @@
 package com.bytechef.atlas.worker.config;
 
 import com.bytechef.atlas.worker.TaskWorker;
+import com.bytechef.atlas.worker.annotation.ConditionalOnWorker;
 import com.bytechef.atlas.worker.event.TaskExecutionEvent;
 import com.bytechef.atlas.worker.message.route.TaskWorkerMessageRoute;
 import com.bytechef.config.ApplicationProperties;
@@ -33,6 +34,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
+@ConditionalOnWorker
 public class TaskWorkerMessageBrokerConfigurerConfiguration {
 
     private final List<MessageEventPostReceiveProcessor> messageEventPostReceiveProcessors;
