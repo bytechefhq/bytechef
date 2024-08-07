@@ -18,7 +18,6 @@ package com.bytechef.automation.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.automation.configuration.ProjectInstanceFacadeHelper;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.domain.Workspace;
@@ -28,7 +27,6 @@ import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.platform.category.repository.CategoryRepository;
-import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -70,18 +68,12 @@ public class ProjectInstanceFacadeIntTest {
     @Autowired
     TagRepository tagRepository;
 
-    @Autowired
-    private WorkflowFacade workflowFacade;
-
-    @Autowired
-    private WorkflowCrudRepository workflowRepository;
-
     private Workspace workspace;
 
     @Autowired
     private WorkspaceRepository workspaceRepository;
 
-    ProjectInstanceFacadeHelper projectFacadeInstanceHelper;
+    private ProjectInstanceFacadeHelper projectFacadeInstanceHelper;
 
     @AfterEach
     public void afterEach() {
@@ -99,8 +91,7 @@ public class ProjectInstanceFacadeIntTest {
         workspace = workspaceRepository.save(new Workspace("test"));
 
         projectFacadeInstanceHelper = new ProjectInstanceFacadeHelper(
-            categoryRepository, projectFacade, projectRepository, projectInstanceFacade, projectWorkflowRepository,
-            tagRepository);
+            categoryRepository, projectFacade, projectRepository, projectInstanceFacade, projectWorkflowRepository);
     }
 
     @Disabled
