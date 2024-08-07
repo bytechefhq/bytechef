@@ -325,8 +325,13 @@ public class ApplicationProperties {
 
     public static class Coordinator {
 
+        private boolean enabled = true;
         private Task task = new Task();
         private Trigger trigger = new Trigger();
+
+        public boolean isEnabled() {
+            return enabled;
+        }
 
         public Task getTask() {
             return task;
@@ -334,6 +339,10 @@ public class ApplicationProperties {
 
         public Trigger getTrigger() {
             return trigger;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
         }
 
         public void setTask(Task task) {
@@ -779,10 +788,19 @@ public class ApplicationProperties {
 
     public static class Worker {
 
+        private boolean enabled = true;
         private Task task = new Task();
+
+        public boolean isEnabled() {
+            return enabled;
+        }
 
         public Task getTask() {
             return task;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
         }
 
         public void setTask(Task task) {
