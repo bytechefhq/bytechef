@@ -44,6 +44,7 @@ import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -102,9 +103,11 @@ public class ProjectFacadeIntTest {
     @Autowired
     private WorkspaceRepository workspaceRepository;
 
-    ProjectInstanceFacadeHelper projectFacadeInstanceHelper;
+    private ProjectInstanceFacadeHelper projectFacadeInstanceHelper;
     @Autowired
     private ProjectWorkflowServiceImpl projectWorkflowServiceImpl;
+
+    private static final Random random = new SecureRandom();
 
     @AfterEach
     public void afterEach() {
@@ -121,8 +124,7 @@ public class ProjectFacadeIntTest {
     public void beforeEach() {
         workspace = workspaceRepository.save(new Workspace("test"));
         projectFacadeInstanceHelper = new ProjectInstanceFacadeHelper(
-            categoryRepository, projectFacade, projectRepository, projectInstanceFacade, projectWorkflowRepository,
-            tagRepository);
+            categoryRepository, projectFacade, projectRepository, projectInstanceFacade, projectWorkflowRepository);
     }
 
     @Test
@@ -216,7 +218,7 @@ public class ProjectFacadeIntTest {
 
         assertThat(projectsDTOs).hasSize(testProjectDTOs.size());
 
-        ProjectDTO projectDTO = projectsDTOs.get(new Random().nextInt(testProjectDTOs.size()));
+        ProjectDTO projectDTO = projectsDTOs.get(random.nextInt(testProjectDTOs.size()));
 
         Project project = projectDTO.toProject();
 

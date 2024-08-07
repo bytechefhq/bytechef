@@ -32,7 +32,7 @@ import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.tag.domain.Tag;
-import com.bytechef.platform.tag.repository.TagRepository;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
@@ -49,29 +49,26 @@ public class ProjectInstanceFacadeHelper {
     public static final String PREFIX_TAG = "TAG_";
     public static final String PREFIX_CATEGORY = "CATEGORY_";
 
-    private CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
 
-    private ProjectFacade projectFacade;
+    private final ProjectFacade projectFacade;
 
-    private ProjectRepository projectRepository;
+    private final ProjectRepository projectRepository;
 
-    private ProjectInstanceFacade projectInstanceFacade;
+    private final ProjectInstanceFacade projectInstanceFacade;
 
-    private ProjectWorkflowRepository projectWorkflowRepository;
+    private final ProjectWorkflowRepository projectWorkflowRepository;
 
-    TagRepository tagRepository;
-
+    @SuppressFBWarnings("EI")
     public ProjectInstanceFacadeHelper(CategoryRepository categoryRepository, ProjectFacade projectFacade,
         ProjectRepository projectRepository, ProjectInstanceFacade projectInstanceFacade,
-        ProjectWorkflowRepository projectWorkflowRepository,
-        TagRepository tagRepository) {
+        ProjectWorkflowRepository projectWorkflowRepository) {
 
         this.categoryRepository = categoryRepository;
         this.projectFacade = projectFacade;
         this.projectInstanceFacade = projectInstanceFacade;
         this.projectRepository = projectRepository;
         this.projectWorkflowRepository = projectWorkflowRepository;
-        this.tagRepository = tagRepository;
     }
 
     public ProjectDTO createProject(long workspaceId) {
