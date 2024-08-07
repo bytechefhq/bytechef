@@ -24,6 +24,8 @@ import static com.bytechef.component.clickup.constant.ClickupConstants.WORKSPACE
 import static com.bytechef.component.clickup.constant.ClickupConstants.WORKSPACE_ID_PROPERTY;
 
 import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.clickup.trigger.ClickupNewListTrigger;
+import com.bytechef.component.clickup.trigger.ClickupNewTaskTrigger;
 import com.bytechef.component.clickup.util.ClickupUtils;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
@@ -31,6 +33,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableNumberProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Property;
 import com.google.auto.service.AutoService;
@@ -45,6 +48,13 @@ import java.util.Optional;
  */
 @AutoService(OpenApiComponentHandler.class)
 public class ClickupComponentHandler extends AbstractClickupComponentHandler {
+
+    @Override
+    public List<ModifiableTriggerDefinition> getTriggers() {
+        return List.of(
+            ClickupNewListTrigger.TRIGGER_DEFINITION,
+            ClickupNewTaskTrigger.TRIGGER_DEFINITION);
+    }
 
     @Override
     public List<? extends ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {

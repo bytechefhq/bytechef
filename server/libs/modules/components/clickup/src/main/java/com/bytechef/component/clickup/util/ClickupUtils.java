@@ -29,6 +29,8 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -103,6 +105,39 @@ public class ClickupUtils {
     private static Map<String, List<Map<String, Object>>> fetchDataFromHttpEndpoint(Context context, String path) {
         return context
             .http(http -> http.get(path))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+    }
+
+    public static String subscribeWebhook(
+        String webhookUrl, TriggerContext context, String workspaceId, String eventType) {
+
+        Map<String, Object> body = context.http(http -> http.post("/team/" + workspaceId + "/webhook"))
+            .body(
+                Http.Body.of(
+                    "endpoint", webhookUrl,
+                    "events", List.of(eventType)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        return (String) body.get(ID);
+    }
+
+    public static void unsubscribeWebhook(TriggerContext context, String webhookId) {
+        context.http(http -> http.delete("/webhook/" + webhookId))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute();
+    }
+
+    public static Map<String, Object> getCreatedObject(
+        WebhookBody body, TriggerContext context, String id, String path) {
+
+        Map<String, Object> content = body.getContent(new TypeReference<>() {});
+
+        return context
+            .http(http -> http.get(path + content.get(id)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
