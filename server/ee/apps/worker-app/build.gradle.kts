@@ -53,6 +53,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:bash"))
     implementation(project(":server:libs:modules:components:box"))
     implementation(project(":server:libs:modules:components:capsule-crm"))
+    implementation(project(":server:libs:modules:components:clickup"))
     implementation(project(":server:libs:modules:components:copper"))
     implementation(project(":server:libs:modules:components:csv-file"))
     implementation(project(":server:libs:modules:components:data-mapper"))
