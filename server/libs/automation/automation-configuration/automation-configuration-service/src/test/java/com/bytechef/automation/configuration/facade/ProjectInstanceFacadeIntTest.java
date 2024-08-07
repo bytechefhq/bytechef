@@ -100,8 +100,7 @@ public class ProjectInstanceFacadeIntTest {
 
         projectFacadeInstanceHelper = new ProjectInstanceFacadeHelper(
             categoryRepository, projectFacade, projectRepository, projectInstanceFacade, projectWorkflowRepository,
-            tagRepository,
-            workflowFacade, workflowRepository, workspace, workspaceRepository);
+            tagRepository);
     }
 
     @Disabled

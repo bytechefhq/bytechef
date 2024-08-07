@@ -16,11 +16,9 @@
 
 package com.bytechef.automation.configuration;
 
-import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
-import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectInstanceDTO;
 import com.bytechef.automation.configuration.dto.ProjectInstanceWorkflowDTO;
@@ -29,11 +27,9 @@ import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectInstanceFacade;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
-import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
-import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
@@ -65,19 +61,10 @@ public class ProjectInstanceFacadeHelper {
 
     TagRepository tagRepository;
 
-    private WorkflowFacade workflowFacade;
-
-    private WorkflowCrudRepository workflowRepository;
-
-    private Workspace workspace;
-
-    private WorkspaceRepository workspaceRepository;
-
     public ProjectInstanceFacadeHelper(CategoryRepository categoryRepository, ProjectFacade projectFacade,
         ProjectRepository projectRepository, ProjectInstanceFacade projectInstanceFacade,
         ProjectWorkflowRepository projectWorkflowRepository,
-        TagRepository tagRepository, WorkflowFacade workflowFacade, WorkflowCrudRepository workflowRepository,
-        Workspace workspace, WorkspaceRepository workspaceRepository) {
+        TagRepository tagRepository) {
 
         this.categoryRepository = categoryRepository;
         this.projectFacade = projectFacade;
@@ -85,10 +72,6 @@ public class ProjectInstanceFacadeHelper {
         this.projectRepository = projectRepository;
         this.projectWorkflowRepository = projectWorkflowRepository;
         this.tagRepository = tagRepository;
-        this.workflowFacade = workflowFacade;
-        this.workflowRepository = workflowRepository;
-        this.workspace = workspace;
-        this.workspaceRepository = workspaceRepository;
     }
 
     public ProjectDTO createProject(long workspaceId) {
