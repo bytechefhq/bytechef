@@ -19,6 +19,7 @@ package com.bytechef.embedded.connectivity.web.rest;
 import com.bytechef.embedded.connectivity.facade.ActionFacade;
 import com.bytechef.embedded.connectivity.web.rest.model.ExecuteAction200ResponseModel;
 import com.bytechef.embedded.connectivity.web.rest.model.ExecuteActionRequestModel;
+import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/v1")
+@ConditionalOnEndpoint
 public class ActionApiController implements ActionApi {
 
     private final ActionFacade actionFacade;
