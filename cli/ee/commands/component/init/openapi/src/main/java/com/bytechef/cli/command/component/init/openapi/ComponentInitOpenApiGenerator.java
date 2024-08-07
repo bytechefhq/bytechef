@@ -1067,11 +1067,11 @@ public class ComponentInitOpenApiGenerator {
     }
 
     private List<CodeBlock> getEnumOptionsCodeBlocks(Schema<?> schema) {
+        List<CodeBlock> codeBlocks = new ArrayList<>();
         List<?> enums = schema.getEnum()
             .stream()
             .filter(Objects::nonNull)
             .toList();
-        List<CodeBlock> codeBlocks = new ArrayList<>();
 
         for (Object item : enums) {
             if (item instanceof String) {
@@ -1088,6 +1088,7 @@ public class ComponentInitOpenApiGenerator {
                         }));
             }
         }
+
         return codeBlocks;
     }
 
@@ -1882,7 +1883,6 @@ public class ComponentInitOpenApiGenerator {
                     "ACTION_DEFINITION")
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
                     .initializer(actionsCodeBlock)
-
                     .build())
                 .build()))
                     .build();
