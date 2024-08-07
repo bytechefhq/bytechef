@@ -1,0 +1,184 @@
+---
+openapi: "3.0.1"
+info:
+  title: "ClickUp"
+  description: "ClickUp is a cloud-based collaboration tool that offers task management, document sharing, goal tracking, and other productivity features for teams."
+  version: "v1"
+servers:
+  - url: "https://api.clickup.com/api/v2"
+paths:
+  /folder/{folderId}/list:
+    post:
+      summary: "Create List"
+      description: "Creates a new List in specified Folder."
+      operationId: "createList"
+      parameters:
+        - name: "folderId"
+          description: "Folder where new list will be created."
+          in: "path"
+          required: true
+          schema:
+            title: "Folder"
+            type: "number"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "List"
+              required:
+                - "name"
+              properties:
+                name:
+                  type: "string"
+                  description: "The name of the list."
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                      name:
+                        type: "string"
+                      folder:
+                        type: "object"
+                        properties:
+                          id:
+                            type: "string"
+                          name:
+                            type: "string"
+                      space:
+                        type: "object"
+                        properties:
+                          id:
+                            type: "string"
+                          name:
+                            type: "string"
+  /list/{listId}/task:
+    post:
+      summary: "Create Task"
+      description: "Create a new task in a ClickUp workspace and list."
+      operationId: "createTask"
+      parameters:
+        - name: "listId"
+          description: "List where new task will be created."
+          in: "path"
+          required: true
+          schema:
+            title: "List"
+            type: "number"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "Task"
+              required:
+                - "name"
+              properties:
+                name:
+                  type: "string"
+                  description: "The name of the task."
+                description:
+                  type: "string"
+                  description: "The description of task."
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                      name:
+                        type: "string"
+                      description:
+                        type: "string"
+                      url:
+                        type: "string"
+                      list:
+                        type: "object"
+                        properties:
+                          id:
+                            type: "string"
+                          name:
+                            type: "string"
+                      folder:
+                        type: "object"
+                        properties:
+                          id:
+                            type: "string"
+                          name:
+                            type: "string"
+                      space:
+                        type: "object"
+                        properties:
+                          id:
+                            type: "string"
+  /space/{spaceId}/folder:
+    post:
+      summary: "Create Folder"
+      description: "Creates a new folder in a ClickUp workspace."
+      operationId: "createFolder"
+      parameters:
+        - name: "spaceId"
+          description: "Space where new folder will be created."
+          in: "path"
+          required: true
+          schema:
+            title: "Space"
+            type: "number"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "Folder"
+              required:
+                - "name"
+              properties:
+                name:
+                  type: "string"
+                  description: "The name of the folder."
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                      name:
+                        type: "string"
+                      space:
+                        type: "object"
+                        properties:
+                          id:
+                            type: "string"
+                          name:
+                            type: "string"
+components:
+  securitySchemes:
+    oauth2:
+      type: "oauth2"
+      flows:
+        authorizationCode:
+          authorizationUrl: "https://app.clickup.com/api"
+          tokenUrl: "https://app.clickup.com/api/v2/oauth/token"
