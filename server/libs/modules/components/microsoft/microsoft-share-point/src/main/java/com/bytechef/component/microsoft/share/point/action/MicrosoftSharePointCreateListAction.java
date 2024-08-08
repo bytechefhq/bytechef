@@ -19,7 +19,6 @@ package com.bytechef.component.microsoft.share.point.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.BASE_URL;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.CREATE_LIST;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.DESCRIPTION;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.DISPLAY_NAME;
@@ -63,7 +62,7 @@ public class MicrosoftSharePointCreateListAction {
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         return context
-            .http(http -> http.post(BASE_URL + "/" + inputParameters.getRequiredString(SITE_ID) + "/lists"))
+            .http(http -> http.post("/" + inputParameters.getRequiredString(SITE_ID) + "/lists"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(
                 Http.Body.of(

@@ -27,7 +27,8 @@ import java.util.List;
 public class MicrosoftSharePointConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = MicrosoftConnection.createConnection(
-        "", (connection, context) -> List.of("Sites.Manage.All", "Sites.ReadWrite.All"));
+        "https://graph.microsoft.com/v1.0/sites",
+        (connection, context) -> List.of("Sites.Manage.All", "Sites.ReadWrite.All"));
 
     private MicrosoftSharePointConnection() {
     }

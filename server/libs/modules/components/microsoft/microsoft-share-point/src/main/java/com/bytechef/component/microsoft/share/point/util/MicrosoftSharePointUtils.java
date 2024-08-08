@@ -28,7 +28,6 @@ import static com.bytechef.component.microsoft.share.point.constant.ColumnType.C
 import static com.bytechef.component.microsoft.share.point.constant.ColumnType.DATE_TIME;
 import static com.bytechef.component.microsoft.share.point.constant.ColumnType.NUMBER;
 import static com.bytechef.component.microsoft.share.point.constant.ColumnType.TEXT;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.BASE_URL;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.DESCRIPTION;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.DISPLAY_NAME;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.ID;
@@ -70,7 +69,7 @@ public class MicrosoftSharePointUtils {
         ActionContext context) {
 
         Map<String, Object> body = context
-            .http(http -> http.get(BASE_URL + "/" + inputParameters.getRequiredString(SITE_ID) + "/lists/" +
+            .http(http -> http.get("/" + inputParameters.getRequiredString(SITE_ID) + "/lists/" +
                 inputParameters.getRequiredString(LIST_ID) + "/columns"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
@@ -206,7 +205,7 @@ public class MicrosoftSharePointUtils {
         String encode = URLEncoder.encode("folder ne null", StandardCharsets.UTF_8);
 
         Map<String, ?> body = context
-            .http(http -> http.get(BASE_URL + "/" + inputParameters.getRequiredString(SITE_ID) +
+            .http(http -> http.get("/" + inputParameters.getRequiredString(SITE_ID) +
                 "/drive/items/root/children?$filter=" + encode))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
@@ -230,7 +229,7 @@ public class MicrosoftSharePointUtils {
         String searchText, ActionContext context) {
 
         Map<String, ?> body =
-            context.http(http -> http.get(BASE_URL + "/" + inputParameters.getRequiredString(SITE_ID) + "/lists"))
+            context.http(http -> http.get("/" + inputParameters.getRequiredString(SITE_ID) + "/lists"))
                 .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute()
                 .getBody(new TypeReference<>() {});
@@ -242,7 +241,7 @@ public class MicrosoftSharePointUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 
-        Map<String, ?> body = context.http(http -> http.get(BASE_URL + "?search=*&select=displayName,id,name"))
+        Map<String, ?> body = context.http(http -> http.get("?search=*&select=displayName,id,name"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

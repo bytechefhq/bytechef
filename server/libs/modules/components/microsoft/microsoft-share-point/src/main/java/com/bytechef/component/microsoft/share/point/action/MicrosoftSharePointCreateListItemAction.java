@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.BASE_URL;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.COLUMNS;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.CREATE_LIST_ITEM;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.FIELDS;
@@ -80,7 +79,7 @@ public class MicrosoftSharePointCreateListItemAction {
 
         return context
             .http(http -> http.post(
-                BASE_URL + "/" + inputParameters.getRequiredString(SITE_ID) + "/lists/" +
+                "/" + inputParameters.getRequiredString(SITE_ID) + "/lists/" +
                     inputParameters.getRequiredString(LIST_ID) + "/items"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(FIELDS, objects.toArray()))

@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.BASE_URL;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.FILE;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.PARENT_FOLDER;
@@ -72,8 +71,8 @@ public class MicrosoftSharePointUploadFileAction {
 
         return context
             .http(http -> http.put(
-                BASE_URL + "/" + inputParameters.getRequiredString(SITE_ID) + "/drive/items/" +
-                    getFolderId(inputParameters) + ":/" + fileEntry.getName() + ":/content"))
+                "/" + inputParameters.getRequiredString(SITE_ID) + "/drive/items/" + getFolderId(inputParameters) +
+                    ":/" + fileEntry.getName() + ":/content"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(fileEntry))
             .execute()

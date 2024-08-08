@@ -27,7 +27,6 @@ import com.bytechef.component.microsoft.share.point.util.MicrosoftSharePointUtil
  */
 public class MicrosoftSharePointConstants {
 
-    public static final String BASE_URL = "https://graph.microsoft.com/v1.0/sites";
     public static final String COLUMNS = "columns";
     public static final String CREATE_FOLDER = "createFolder";
     public static final String CREATE_LIST = "createList";
