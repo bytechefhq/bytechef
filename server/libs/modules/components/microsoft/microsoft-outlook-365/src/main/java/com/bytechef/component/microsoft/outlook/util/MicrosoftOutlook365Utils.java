@@ -40,7 +40,7 @@ public class MicrosoftOutlook365Utils {
         String searchText, ActionContext context) {
 
         Map<String, Object> body = context
-            .http(http -> http.get("https://graph.microsoft.com/v1.0/me/outlook/masterCategories"))
+            .http(http -> http.get("/outlook/masterCategories"))
             .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
             .execute()
             .getBody(new Context.TypeReference<>() {});
@@ -64,7 +64,7 @@ public class MicrosoftOutlook365Utils {
         String searchText, ActionContext context) {
 
         Map<String, Object> body = context
-            .http(http -> http.get("https://graph.microsoft.com/v1.0/me/messages"))
+            .http(http -> http.get("/messages"))
             .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
             .execute()
             .getBody(new Context.TypeReference<>() {});

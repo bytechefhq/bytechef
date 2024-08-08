@@ -29,7 +29,6 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
 public class MicrosoftOutlook365Constants {
 
     public static final String ADDRESS = "address";
-    public static final String BASE_URL = "https://graph.microsoft.com/v1.0/me";
     public static final String BCC_RECIPIENTS = "bccRecipients";
     public static final String BODY = "body";
     public static final String CATEGORY = "category";
