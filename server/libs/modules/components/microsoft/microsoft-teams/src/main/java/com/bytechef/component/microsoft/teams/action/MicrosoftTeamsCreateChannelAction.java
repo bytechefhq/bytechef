@@ -19,7 +19,6 @@ package com.bytechef.component.microsoft.teams.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.BASE_URL;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CREATE_CHANNEL;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.DESCRIPTION;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.DISPLAY_NAME;
@@ -71,7 +70,7 @@ public class MicrosoftTeamsCreateChannelAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         return context
-            .http(http -> http.post(BASE_URL + "/teams/" + inputParameters.getRequiredString(TEAM_ID) + "/channels"))
+            .http(http -> http.post("/teams/" + inputParameters.getRequiredString(TEAM_ID) + "/channels"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(
                 Http.Body.of(

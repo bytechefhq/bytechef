@@ -16,7 +16,6 @@
 
 package com.bytechef.component.microsoft.teams.util;
 
-import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.BASE_URL;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.DISPLAY_NAME;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.ID;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.VALUE;
@@ -39,7 +38,7 @@ public class MicrosoftTeamsUtils {
     public static List<String> getChatMembers(ActionContext context, Map<?, ?> map) {
         List<String> members = new ArrayList<>();
 
-        Map<String, Object> body = context.http(http -> http.get(BASE_URL + "/chats/" + map.get(ID) + "/members"))
+        Map<String, Object> body = context.http(http -> http.get("/chats/" + map.get(ID) + "/members"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

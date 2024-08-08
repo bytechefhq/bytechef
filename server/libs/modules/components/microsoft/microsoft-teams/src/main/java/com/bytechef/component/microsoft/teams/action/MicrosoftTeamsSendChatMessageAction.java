@@ -19,7 +19,6 @@ package com.bytechef.component.microsoft.teams.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.BASE_URL;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.BODY;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CHAT_ID;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CONTENT;
@@ -70,7 +69,7 @@ public class MicrosoftTeamsSendChatMessageAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         return context
-            .http(http -> http.post(BASE_URL + "/chats/" + inputParameters.getRequiredString(CHAT_ID) + "/messages"))
+            .http(http -> http.post("/chats/" + inputParameters.getRequiredString(CHAT_ID) + "/messages"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(
                 Http.Body.of(

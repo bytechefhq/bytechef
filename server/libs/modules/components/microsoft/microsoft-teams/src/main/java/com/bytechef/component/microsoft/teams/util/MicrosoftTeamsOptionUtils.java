@@ -17,7 +17,6 @@
 package com.bytechef.component.microsoft.teams.util;
 
 import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.BASE_URL;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.DISPLAY_NAME;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.ID;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.TEAM_ID;
@@ -45,7 +44,7 @@ public class MicrosoftTeamsOptionUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 
-        Map<String, Object> body = context.http(http -> http.get(BASE_URL + "/chats"))
+        Map<String, Object> body = context.http(http -> http.get("/chats"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -78,7 +77,7 @@ public class MicrosoftTeamsOptionUtils {
         String searchText, ActionContext context) {
 
         Map<String, Object> body = context.http(http -> http.get(
-            BASE_URL + "/teams/" + inputParameters.getRequiredString(TEAM_ID) + "/channels"))
+            "/teams/" + inputParameters.getRequiredString(TEAM_ID) + "/channels"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -90,7 +89,7 @@ public class MicrosoftTeamsOptionUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 
-        Map<String, Object> body = context.http(http -> http.get(BASE_URL + "/me/joinedTeams"))
+        Map<String, Object> body = context.http(http -> http.get("/me/joinedTeams"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
