@@ -30,12 +30,10 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-13T09:30:19.524285+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-08T08:31:46.450713+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class IntegrationModel {
 
   private Boolean allowMultipleInstances = false;
-
-  private CategoryModel category;
 
   private String componentName;
 
@@ -50,20 +48,22 @@ public class IntegrationModel {
 
   private Long id;
 
-  private Integer integrationVersion;
-
-  @Valid
-  private List<String> integrationWorkflowIds = new ArrayList<>();
-
   private String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime publishedDate;
+  private LocalDateTime lastPublishedDate;
 
-  private IntegrationStatusModel status;
+  private IntegrationStatusModel lastStatus;
+
+  private Integer lastVersion;
+
+  private CategoryModel category;
+
+  @Valid
+  private List<String> integrationWorkflowIds = new ArrayList<>();
 
   @Valid
   private List<@Valid TagModel> tags = new ArrayList<>();
@@ -101,26 +101,6 @@ public class IntegrationModel {
 
   public void setAllowMultipleInstances(Boolean allowMultipleInstances) {
     this.allowMultipleInstances = allowMultipleInstances;
-  }
-
-  public IntegrationModel category(CategoryModel category) {
-    this.category = category;
-    return this;
-  }
-
-  /**
-   * Get category
-   * @return category
-  */
-  @Valid 
-  @Schema(name = "category", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("category")
-  public CategoryModel getCategory() {
-    return category;
-  }
-
-  public void setCategory(CategoryModel category) {
-    this.category = category;
   }
 
   public IntegrationModel componentName(String componentName) {
@@ -243,54 +223,6 @@ public class IntegrationModel {
     this.id = id;
   }
 
-  public IntegrationModel integrationVersion(Integer integrationVersion) {
-    this.integrationVersion = integrationVersion;
-    return this;
-  }
-
-  /**
-   * The version of an integration.
-   * @return integrationVersion
-  */
-  
-  @Schema(name = "integrationVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The version of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("integrationVersion")
-  public Integer getIntegrationVersion() {
-    return integrationVersion;
-  }
-
-  public void setIntegrationVersion(Integer integrationVersion) {
-    this.integrationVersion = integrationVersion;
-  }
-
-  public IntegrationModel integrationWorkflowIds(List<String> integrationWorkflowIds) {
-    this.integrationWorkflowIds = integrationWorkflowIds;
-    return this;
-  }
-
-  public IntegrationModel addIntegrationWorkflowIdsItem(String integrationWorkflowIdsItem) {
-    if (this.integrationWorkflowIds == null) {
-      this.integrationWorkflowIds = new ArrayList<>();
-    }
-    this.integrationWorkflowIds.add(integrationWorkflowIdsItem);
-    return this;
-  }
-
-  /**
-   * The integration workflow ids belonging to this integration.
-   * @return integrationWorkflowIds
-  */
-  
-  @Schema(name = "integrationWorkflowIds", description = "The integration workflow ids belonging to this integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("integrationWorkflowIds")
-  public List<String> getIntegrationWorkflowIds() {
-    return integrationWorkflowIds;
-  }
-
-  public void setIntegrationWorkflowIds(List<String> integrationWorkflowIds) {
-    this.integrationWorkflowIds = integrationWorkflowIds;
-  }
-
   public IntegrationModel lastModifiedBy(String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
@@ -331,44 +263,112 @@ public class IntegrationModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public IntegrationModel publishedDate(LocalDateTime publishedDate) {
-    this.publishedDate = publishedDate;
+  public IntegrationModel lastPublishedDate(LocalDateTime lastPublishedDate) {
+    this.lastPublishedDate = lastPublishedDate;
     return this;
   }
 
   /**
-   * The published date.
-   * @return publishedDate
+   * The last published date.
+   * @return lastPublishedDate
   */
   @Valid 
-  @Schema(name = "publishedDate", description = "The published date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("publishedDate")
-  public LocalDateTime getPublishedDate() {
-    return publishedDate;
+  @Schema(name = "lastPublishedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last published date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastPublishedDate")
+  public LocalDateTime getLastPublishedDate() {
+    return lastPublishedDate;
   }
 
-  public void setPublishedDate(LocalDateTime publishedDate) {
-    this.publishedDate = publishedDate;
+  public void setLastPublishedDate(LocalDateTime lastPublishedDate) {
+    this.lastPublishedDate = lastPublishedDate;
   }
 
-  public IntegrationModel status(IntegrationStatusModel status) {
-    this.status = status;
+  public IntegrationModel lastStatus(IntegrationStatusModel lastStatus) {
+    this.lastStatus = lastStatus;
     return this;
   }
 
   /**
-   * Get status
-   * @return status
+   * Get lastStatus
+   * @return lastStatus
   */
   @Valid 
-  @Schema(name = "status", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("status")
-  public IntegrationStatusModel getStatus() {
-    return status;
+  @Schema(name = "lastStatus", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastStatus")
+  public IntegrationStatusModel getLastStatus() {
+    return lastStatus;
   }
 
-  public void setStatus(IntegrationStatusModel status) {
-    this.status = status;
+  public void setLastStatus(IntegrationStatusModel lastStatus) {
+    this.lastStatus = lastStatus;
+  }
+
+  public IntegrationModel lastVersion(Integer lastVersion) {
+    this.lastVersion = lastVersion;
+    return this;
+  }
+
+  /**
+   * The last version of an integration.
+   * @return lastVersion
+  */
+  
+  @Schema(name = "lastVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The last version of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastVersion")
+  public Integer getLastVersion() {
+    return lastVersion;
+  }
+
+  public void setLastVersion(Integer lastVersion) {
+    this.lastVersion = lastVersion;
+  }
+
+  public IntegrationModel category(CategoryModel category) {
+    this.category = category;
+    return this;
+  }
+
+  /**
+   * Get category
+   * @return category
+  */
+  @Valid 
+  @Schema(name = "category", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("category")
+  public CategoryModel getCategory() {
+    return category;
+  }
+
+  public void setCategory(CategoryModel category) {
+    this.category = category;
+  }
+
+  public IntegrationModel integrationWorkflowIds(List<String> integrationWorkflowIds) {
+    this.integrationWorkflowIds = integrationWorkflowIds;
+    return this;
+  }
+
+  public IntegrationModel addIntegrationWorkflowIdsItem(String integrationWorkflowIdsItem) {
+    if (this.integrationWorkflowIds == null) {
+      this.integrationWorkflowIds = new ArrayList<>();
+    }
+    this.integrationWorkflowIds.add(integrationWorkflowIdsItem);
+    return this;
+  }
+
+  /**
+   * The integration workflow ids belonging to this integration.
+   * @return integrationWorkflowIds
+  */
+  
+  @Schema(name = "integrationWorkflowIds", description = "The integration workflow ids belonging to this integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("integrationWorkflowIds")
+  public List<String> getIntegrationWorkflowIds() {
+    return integrationWorkflowIds;
+  }
+
+  public void setIntegrationWorkflowIds(List<String> integrationWorkflowIds) {
+    this.integrationWorkflowIds = integrationWorkflowIds;
   }
 
   public IntegrationModel tags(List<@Valid TagModel> tags) {
@@ -429,26 +429,26 @@ public class IntegrationModel {
     }
     IntegrationModel integration = (IntegrationModel) o;
     return Objects.equals(this.allowMultipleInstances, integration.allowMultipleInstances) &&
-        Objects.equals(this.category, integration.category) &&
         Objects.equals(this.componentName, integration.componentName) &&
         Objects.equals(this.componentVersion, integration.componentVersion) &&
         Objects.equals(this.createdBy, integration.createdBy) &&
         Objects.equals(this.createdDate, integration.createdDate) &&
         Objects.equals(this.description, integration.description) &&
         Objects.equals(this.id, integration.id) &&
-        Objects.equals(this.integrationVersion, integration.integrationVersion) &&
-        Objects.equals(this.integrationWorkflowIds, integration.integrationWorkflowIds) &&
         Objects.equals(this.lastModifiedBy, integration.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, integration.lastModifiedDate) &&
-        Objects.equals(this.publishedDate, integration.publishedDate) &&
-        Objects.equals(this.status, integration.status) &&
+        Objects.equals(this.lastPublishedDate, integration.lastPublishedDate) &&
+        Objects.equals(this.lastStatus, integration.lastStatus) &&
+        Objects.equals(this.lastVersion, integration.lastVersion) &&
+        Objects.equals(this.category, integration.category) &&
+        Objects.equals(this.integrationWorkflowIds, integration.integrationWorkflowIds) &&
         Objects.equals(this.tags, integration.tags) &&
         Objects.equals(this.version, integration.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(allowMultipleInstances, category, componentName, componentVersion, createdBy, createdDate, description, id, integrationVersion, integrationWorkflowIds, lastModifiedBy, lastModifiedDate, publishedDate, status, tags, version);
+    return Objects.hash(allowMultipleInstances, componentName, componentVersion, createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, lastPublishedDate, lastStatus, lastVersion, category, integrationWorkflowIds, tags, version);
   }
 
   @Override
@@ -456,19 +456,19 @@ public class IntegrationModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class IntegrationModel {\n");
     sb.append("    allowMultipleInstances: ").append(toIndentedString(allowMultipleInstances)).append("\n");
-    sb.append("    category: ").append(toIndentedString(category)).append("\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
     sb.append("    componentVersion: ").append(toIndentedString(componentVersion)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    integrationVersion: ").append(toIndentedString(integrationVersion)).append("\n");
-    sb.append("    integrationWorkflowIds: ").append(toIndentedString(integrationWorkflowIds)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
-    sb.append("    publishedDate: ").append(toIndentedString(publishedDate)).append("\n");
-    sb.append("    status: ").append(toIndentedString(status)).append("\n");
+    sb.append("    lastPublishedDate: ").append(toIndentedString(lastPublishedDate)).append("\n");
+    sb.append("    lastStatus: ").append(toIndentedString(lastStatus)).append("\n");
+    sb.append("    lastVersion: ").append(toIndentedString(lastVersion)).append("\n");
+    sb.append("    category: ").append(toIndentedString(category)).append("\n");
+    sb.append("    integrationWorkflowIds: ").append(toIndentedString(integrationWorkflowIds)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");

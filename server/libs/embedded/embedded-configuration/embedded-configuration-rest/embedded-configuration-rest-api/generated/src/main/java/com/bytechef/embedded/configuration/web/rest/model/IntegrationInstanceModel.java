@@ -2,11 +2,12 @@ package com.bytechef.embedded.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.embedded.configuration.web.rest.model.IntegrationInstanceIntegrationInstanceConfigurationModel;
+import com.bytechef.embedded.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.embedded.configuration.web.rest.model.IntegrationInstanceWorkflowModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstance", description = "Contains configurations and connections required for the execution of integration workflows for a connected user.")
 @JsonTypeName("IntegrationInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-13T09:30:19.524285+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-08T08:31:46.450713+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class IntegrationInstanceModel {
 
   private Long connectionId;
@@ -42,14 +43,9 @@ public class IntegrationInstanceModel {
 
   private Boolean enabled;
 
+  private EnvironmentModel environment;
+
   private Long id;
-
-  private IntegrationInstanceIntegrationInstanceConfigurationModel integrationInstanceConfiguration;
-
-  private Long integrationInstanceConfigurationId;
-
-  @Valid
-  private List<@Valid IntegrationInstanceWorkflowModel> integrationInstanceWorkflows = new ArrayList<>();
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastExecutionDate;
@@ -58,6 +54,13 @@ public class IntegrationInstanceModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
+
+  private Long integrationInstanceConfigurationId;
+
+  private Object integrationInstanceConfiguration;
+
+  @Valid
+  private List<@Valid IntegrationInstanceWorkflowModel> integrationInstanceWorkflows = new ArrayList<>();
 
   private Integer version;
 
@@ -172,6 +175,26 @@ public class IntegrationInstanceModel {
     this.enabled = enabled;
   }
 
+  public IntegrationInstanceModel environment(EnvironmentModel environment) {
+    this.environment = environment;
+    return this;
+  }
+
+  /**
+   * Get environment
+   * @return environment
+  */
+  @Valid 
+  @Schema(name = "environment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("environment")
+  public EnvironmentModel getEnvironment() {
+    return environment;
+  }
+
+  public void setEnvironment(EnvironmentModel environment) {
+    this.environment = environment;
+  }
+
   public IntegrationInstanceModel id(Long id) {
     this.id = id;
     return this;
@@ -190,74 +213,6 @@ public class IntegrationInstanceModel {
 
   public void setId(Long id) {
     this.id = id;
-  }
-
-  public IntegrationInstanceModel integrationInstanceConfiguration(IntegrationInstanceIntegrationInstanceConfigurationModel integrationInstanceConfiguration) {
-    this.integrationInstanceConfiguration = integrationInstanceConfiguration;
-    return this;
-  }
-
-  /**
-   * Get integrationInstanceConfiguration
-   * @return integrationInstanceConfiguration
-  */
-  @Valid 
-  @Schema(name = "integrationInstanceConfiguration", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("integrationInstanceConfiguration")
-  public IntegrationInstanceIntegrationInstanceConfigurationModel getIntegrationInstanceConfiguration() {
-    return integrationInstanceConfiguration;
-  }
-
-  public void setIntegrationInstanceConfiguration(IntegrationInstanceIntegrationInstanceConfigurationModel integrationInstanceConfiguration) {
-    this.integrationInstanceConfiguration = integrationInstanceConfiguration;
-  }
-
-  public IntegrationInstanceModel integrationInstanceConfigurationId(Long integrationInstanceConfigurationId) {
-    this.integrationInstanceConfigurationId = integrationInstanceConfigurationId;
-    return this;
-  }
-
-  /**
-   * Th id of an integration instance configuration.
-   * @return integrationInstanceConfigurationId
-  */
-  
-  @Schema(name = "integrationInstanceConfigurationId", description = "Th id of an integration instance configuration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("integrationInstanceConfigurationId")
-  public Long getIntegrationInstanceConfigurationId() {
-    return integrationInstanceConfigurationId;
-  }
-
-  public void setIntegrationInstanceConfigurationId(Long integrationInstanceConfigurationId) {
-    this.integrationInstanceConfigurationId = integrationInstanceConfigurationId;
-  }
-
-  public IntegrationInstanceModel integrationInstanceWorkflows(List<@Valid IntegrationInstanceWorkflowModel> integrationInstanceWorkflows) {
-    this.integrationInstanceWorkflows = integrationInstanceWorkflows;
-    return this;
-  }
-
-  public IntegrationInstanceModel addIntegrationInstanceWorkflowsItem(IntegrationInstanceWorkflowModel integrationInstanceWorkflowsItem) {
-    if (this.integrationInstanceWorkflows == null) {
-      this.integrationInstanceWorkflows = new ArrayList<>();
-    }
-    this.integrationInstanceWorkflows.add(integrationInstanceWorkflowsItem);
-    return this;
-  }
-
-  /**
-   * The array of integration instance workflows.
-   * @return integrationInstanceWorkflows
-  */
-  @Valid 
-  @Schema(name = "integrationInstanceWorkflows", accessMode = Schema.AccessMode.READ_ONLY, description = "The array of integration instance workflows.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("integrationInstanceWorkflows")
-  public List<@Valid IntegrationInstanceWorkflowModel> getIntegrationInstanceWorkflows() {
-    return integrationInstanceWorkflows;
-  }
-
-  public void setIntegrationInstanceWorkflows(List<@Valid IntegrationInstanceWorkflowModel> integrationInstanceWorkflows) {
-    this.integrationInstanceWorkflows = integrationInstanceWorkflows;
   }
 
   public IntegrationInstanceModel lastExecutionDate(LocalDateTime lastExecutionDate) {
@@ -320,6 +275,74 @@ public class IntegrationInstanceModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
+  public IntegrationInstanceModel integrationInstanceConfigurationId(Long integrationInstanceConfigurationId) {
+    this.integrationInstanceConfigurationId = integrationInstanceConfigurationId;
+    return this;
+  }
+
+  /**
+   * Th id of an integration instance configuration.
+   * @return integrationInstanceConfigurationId
+  */
+  
+  @Schema(name = "integrationInstanceConfigurationId", description = "Th id of an integration instance configuration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("integrationInstanceConfigurationId")
+  public Long getIntegrationInstanceConfigurationId() {
+    return integrationInstanceConfigurationId;
+  }
+
+  public void setIntegrationInstanceConfigurationId(Long integrationInstanceConfigurationId) {
+    this.integrationInstanceConfigurationId = integrationInstanceConfigurationId;
+  }
+
+  public IntegrationInstanceModel integrationInstanceConfiguration(Object integrationInstanceConfiguration) {
+    this.integrationInstanceConfiguration = integrationInstanceConfiguration;
+    return this;
+  }
+
+  /**
+   * Get integrationInstanceConfiguration
+   * @return integrationInstanceConfiguration
+  */
+  
+  @Schema(name = "integrationInstanceConfiguration", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("integrationInstanceConfiguration")
+  public Object getIntegrationInstanceConfiguration() {
+    return integrationInstanceConfiguration;
+  }
+
+  public void setIntegrationInstanceConfiguration(Object integrationInstanceConfiguration) {
+    this.integrationInstanceConfiguration = integrationInstanceConfiguration;
+  }
+
+  public IntegrationInstanceModel integrationInstanceWorkflows(List<@Valid IntegrationInstanceWorkflowModel> integrationInstanceWorkflows) {
+    this.integrationInstanceWorkflows = integrationInstanceWorkflows;
+    return this;
+  }
+
+  public IntegrationInstanceModel addIntegrationInstanceWorkflowsItem(IntegrationInstanceWorkflowModel integrationInstanceWorkflowsItem) {
+    if (this.integrationInstanceWorkflows == null) {
+      this.integrationInstanceWorkflows = new ArrayList<>();
+    }
+    this.integrationInstanceWorkflows.add(integrationInstanceWorkflowsItem);
+    return this;
+  }
+
+  /**
+   * The array of integration instance workflows.
+   * @return integrationInstanceWorkflows
+  */
+  @Valid 
+  @Schema(name = "integrationInstanceWorkflows", accessMode = Schema.AccessMode.READ_ONLY, description = "The array of integration instance workflows.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("integrationInstanceWorkflows")
+  public List<@Valid IntegrationInstanceWorkflowModel> getIntegrationInstanceWorkflows() {
+    return integrationInstanceWorkflows;
+  }
+
+  public void setIntegrationInstanceWorkflows(List<@Valid IntegrationInstanceWorkflowModel> integrationInstanceWorkflows) {
+    this.integrationInstanceWorkflows = integrationInstanceWorkflows;
+  }
+
   public IntegrationInstanceModel version(Integer version) {
     this.version = version;
     return this;
@@ -354,19 +377,20 @@ public class IntegrationInstanceModel {
         Objects.equals(this.createdBy, integrationInstance.createdBy) &&
         Objects.equals(this.createdDate, integrationInstance.createdDate) &&
         Objects.equals(this.enabled, integrationInstance.enabled) &&
+        Objects.equals(this.environment, integrationInstance.environment) &&
         Objects.equals(this.id, integrationInstance.id) &&
-        Objects.equals(this.integrationInstanceConfiguration, integrationInstance.integrationInstanceConfiguration) &&
-        Objects.equals(this.integrationInstanceConfigurationId, integrationInstance.integrationInstanceConfigurationId) &&
-        Objects.equals(this.integrationInstanceWorkflows, integrationInstance.integrationInstanceWorkflows) &&
         Objects.equals(this.lastExecutionDate, integrationInstance.lastExecutionDate) &&
         Objects.equals(this.lastModifiedBy, integrationInstance.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, integrationInstance.lastModifiedDate) &&
+        Objects.equals(this.integrationInstanceConfigurationId, integrationInstance.integrationInstanceConfigurationId) &&
+        Objects.equals(this.integrationInstanceConfiguration, integrationInstance.integrationInstanceConfiguration) &&
+        Objects.equals(this.integrationInstanceWorkflows, integrationInstance.integrationInstanceWorkflows) &&
         Objects.equals(this.version, integrationInstance.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(connectionId, connectedUserId, createdBy, createdDate, enabled, id, integrationInstanceConfiguration, integrationInstanceConfigurationId, integrationInstanceWorkflows, lastExecutionDate, lastModifiedBy, lastModifiedDate, version);
+    return Objects.hash(connectionId, connectedUserId, createdBy, createdDate, enabled, environment, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, integrationInstanceConfigurationId, integrationInstanceConfiguration, integrationInstanceWorkflows, version);
   }
 
   @Override
@@ -378,13 +402,14 @@ public class IntegrationInstanceModel {
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
+    sb.append("    environment: ").append(toIndentedString(environment)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    integrationInstanceConfiguration: ").append(toIndentedString(integrationInstanceConfiguration)).append("\n");
-    sb.append("    integrationInstanceConfigurationId: ").append(toIndentedString(integrationInstanceConfigurationId)).append("\n");
-    sb.append("    integrationInstanceWorkflows: ").append(toIndentedString(integrationInstanceWorkflows)).append("\n");
     sb.append("    lastExecutionDate: ").append(toIndentedString(lastExecutionDate)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
+    sb.append("    integrationInstanceConfigurationId: ").append(toIndentedString(integrationInstanceConfigurationId)).append("\n");
+    sb.append("    integrationInstanceConfiguration: ").append(toIndentedString(integrationInstanceConfiguration)).append("\n");
+    sb.append("    integrationInstanceWorkflows: ").append(toIndentedString(integrationInstanceWorkflows)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();
