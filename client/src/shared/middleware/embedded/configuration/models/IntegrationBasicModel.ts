@@ -69,12 +69,6 @@ export interface IntegrationBasicModel {
      */
     readonly id?: number;
     /**
-     * The version of an integration.
-     * @type {number}
-     * @memberof IntegrationBasicModel
-     */
-    readonly integrationVersion?: number;
-    /**
      * The last modified by.
      * @type {string}
      * @memberof IntegrationBasicModel
@@ -87,17 +81,23 @@ export interface IntegrationBasicModel {
      */
     readonly lastModifiedDate?: Date;
     /**
-     * The published date.
+     * The last published date.
      * @type {Date}
      * @memberof IntegrationBasicModel
      */
-    publishedDate?: Date;
+    readonly lastPublishedDate?: Date;
     /**
      * 
      * @type {IntegrationStatusModel}
      * @memberof IntegrationBasicModel
      */
-    status?: IntegrationStatusModel;
+    lastStatus?: IntegrationStatusModel;
+    /**
+     * The last version of an integration.
+     * @type {number}
+     * @memberof IntegrationBasicModel
+     */
+    readonly lastVersion?: number;
 }
 
 /**
@@ -127,15 +127,15 @@ export function IntegrationBasicModelFromJSONTyped(json: any, ignoreDiscriminato
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'description': json['description'] == null ? undefined : json['description'],
         'id': json['id'] == null ? undefined : json['id'],
-        'integrationVersion': json['integrationVersion'] == null ? undefined : json['integrationVersion'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
-        'publishedDate': json['publishedDate'] == null ? undefined : (new Date(json['publishedDate'])),
-        'status': json['status'] == null ? undefined : IntegrationStatusModelFromJSON(json['status']),
+        'lastPublishedDate': json['lastPublishedDate'] == null ? undefined : (new Date(json['lastPublishedDate'])),
+        'lastStatus': json['lastStatus'] == null ? undefined : IntegrationStatusModelFromJSON(json['lastStatus']),
+        'lastVersion': json['lastVersion'] == null ? undefined : json['lastVersion'],
     };
 }
 
-export function IntegrationBasicModelToJSON(value?: Omit<IntegrationBasicModel, 'createdBy'|'createdDate'|'id'|'integrationVersion'|'lastModifiedBy'|'lastModifiedDate'> | null): any {
+export function IntegrationBasicModelToJSON(value?: Omit<IntegrationBasicModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastVersion'> | null): any {
     if (value == null) {
         return value;
     }
@@ -145,8 +145,7 @@ export function IntegrationBasicModelToJSON(value?: Omit<IntegrationBasicModel, 
         'componentName': value['componentName'],
         'componentVersion': value['componentVersion'],
         'description': value['description'],
-        'publishedDate': value['publishedDate'] == null ? undefined : ((value['publishedDate']).toISOString()),
-        'status': IntegrationStatusModelToJSON(value['status']),
+        'lastStatus': IntegrationStatusModelToJSON(value['lastStatus']),
     };
 }
 

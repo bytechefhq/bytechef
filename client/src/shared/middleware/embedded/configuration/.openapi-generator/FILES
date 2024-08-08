@@ -16,11 +16,9 @@ models/EnvironmentModel.ts
 models/IntegrationBasicModel.ts
 models/IntegrationInstanceBasicModel.ts
 models/IntegrationInstanceConfigurationBasicModel.ts
-models/IntegrationInstanceConfigurationIntegrationModel.ts
 models/IntegrationInstanceConfigurationModel.ts
 models/IntegrationInstanceConfigurationWorkflowConnectionModel.ts
 models/IntegrationInstanceConfigurationWorkflowModel.ts
-models/IntegrationInstanceIntegrationInstanceConfigurationModel.ts
 models/IntegrationInstanceModel.ts
 models/IntegrationInstanceWorkflowModel.ts
 models/IntegrationModel.ts
