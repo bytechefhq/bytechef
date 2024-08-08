@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.BASE_URL;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.LIST_FOLDERS;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
@@ -71,7 +70,7 @@ public class MicrosoftOneDriveListFoldersAction {
         String encode = URLEncoder.encode("folder ne null", StandardCharsets.UTF_8);
 
         Map<String, ?> body = context
-            .http(http -> http.get(BASE_URL + "/items/" + getFolderId(inputParameters) + "/children?$filter=" + encode))
+            .http(http -> http.get("/items/" + getFolderId(inputParameters) + "/children?$filter=" + encode))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
