@@ -32,7 +32,6 @@ import com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils;
 public class MicrosoftExcelConstants {
 
     public static final String APPEND_ROW = "appendRow";
-    public static final String BASE_URL = "https://graph.microsoft.com/v1.0/me/drive/items";
     public static final String CLEAR_WORKSHEET = "clearWorksheet";
     public static final String DELETE_ROW = "deleteRow";
     public static final String ID = "id";

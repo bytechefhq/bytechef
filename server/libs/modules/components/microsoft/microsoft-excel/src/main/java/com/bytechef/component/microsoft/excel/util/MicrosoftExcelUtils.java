@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.BASE_URL;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.ID;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.IS_THE_FIRST_ROW_HEADER;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.NAME;
@@ -64,7 +63,7 @@ public class MicrosoftExcelUtils {
         if (inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER)) {
             Map<String, Object> body = context
                 .http(http -> http
-                    .get(BASE_URL + "/" + inputParameters.getRequiredString(WORKBOOK_ID) + WORKBOOK_WORKSHEETS_PATH
+                    .get("/" + inputParameters.getRequiredString(WORKBOOK_ID) + WORKBOOK_WORKSHEETS_PATH
                         + inputParameters.getRequiredString(WORKSHEET_NAME) + "/usedRange(valuesOnly=true)"))
                 .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute()
@@ -98,7 +97,7 @@ public class MicrosoftExcelUtils {
 
     public static String getLastUsedColumnLabel(Parameters inputParameters, ActionContext context) {
         Map<String, Object> body = context
-            .http(http -> http.get(BASE_URL + "/" + inputParameters.getRequiredString(WORKBOOK_ID)
+            .http(http -> http.get("/" + inputParameters.getRequiredString(WORKBOOK_ID)
                 + WORKBOOK_WORKSHEETS_PATH + inputParameters.getRequiredString(WORKSHEET_NAME) + "/usedRange"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
@@ -113,7 +112,7 @@ public class MicrosoftExcelUtils {
 
     public static Integer getLastUsedRowIndex(Parameters inputParameters, ActionContext context) {
         Map<String, Object> body = context
-            .http(http -> http.get(BASE_URL + "/" + inputParameters.getRequiredString(WORKBOOK_ID)
+            .http(http -> http.get("/" + inputParameters.getRequiredString(WORKBOOK_ID)
                 + WORKBOOK_WORKSHEETS_PATH + inputParameters.getRequiredString(WORKSHEET_NAME) + "/usedRange"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
@@ -180,7 +179,7 @@ public class MicrosoftExcelUtils {
         String searchText, ActionContext context) {
 
         Map<String, Object> body = context
-            .http(http -> http.get(BASE_URL + "/root/search(q='.xlsx')"))
+            .http(http -> http.get("/root/search(q='.xlsx')"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -194,7 +193,7 @@ public class MicrosoftExcelUtils {
 
         Map<String, Object> body = context
             .http(http -> http
-                .get(BASE_URL + "/" + inputParameters.getRequiredString(WORKBOOK_ID) + WORKBOOK_WORKSHEETS_PATH))
+                .get("/" + inputParameters.getRequiredString(WORKBOOK_ID) + WORKBOOK_WORKSHEETS_PATH))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

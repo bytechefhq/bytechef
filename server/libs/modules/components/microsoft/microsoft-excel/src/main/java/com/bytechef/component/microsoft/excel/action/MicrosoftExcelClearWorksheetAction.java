@@ -17,7 +17,6 @@
 package com.bytechef.component.microsoft.excel.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.BASE_URL;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.CLEAR_WORKSHEET;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.IS_THE_FIRST_ROW_HEADER;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
@@ -62,9 +61,8 @@ public class MicrosoftExcelClearWorksheetAction {
 
         context.http(http -> http
             .post(
-                BASE_URL + "/" + inputParameters.getRequiredString(WORKBOOK_ID) +
-                    WORKBOOK_WORKSHEETS_PATH + inputParameters.getRequiredString(WORKSHEET_NAME) + "/" + range +
-                    "/clear"))
+                "/" + inputParameters.getRequiredString(WORKBOOK_ID) + WORKBOOK_WORKSHEETS_PATH +
+                    inputParameters.getRequiredString(WORKSHEET_NAME) + "/" + range + "/clear"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(
                 List.of("applyTo", "Contents")

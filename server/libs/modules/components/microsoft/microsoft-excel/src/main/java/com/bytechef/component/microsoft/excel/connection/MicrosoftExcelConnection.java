@@ -27,7 +27,8 @@ import java.util.List;
 public class MicrosoftExcelConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = MicrosoftConnection.createConnection(
-        "", (connection, context) -> List.of("Files.ReadWrite", "offline_access"));
+        "https://graph.microsoft.com/v1.0/me/drive/items",
+        (connection, context) -> List.of("Files.ReadWrite", "offline_access"));
 
     private MicrosoftExcelConnection() {
     }
