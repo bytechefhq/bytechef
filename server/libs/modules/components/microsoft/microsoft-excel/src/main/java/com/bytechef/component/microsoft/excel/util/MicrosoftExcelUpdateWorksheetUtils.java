@@ -16,7 +16,6 @@
 
 package com.bytechef.component.microsoft.excel.util;
 
-import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.BASE_URL;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.VALUES;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_WORKSHEETS_PATH;
@@ -44,9 +43,9 @@ public class MicrosoftExcelUpdateWorksheetUtils {
         String range = "A" + rowNumber + ":" + columnToLabel(rowValues.size(), false) + rowNumber;
 
         context
-            .http(http -> http.patch(BASE_URL + "/" + inputParameters.getRequiredString(WORKBOOK_ID) +
-                WORKBOOK_WORKSHEETS_PATH + inputParameters.getRequiredString(WORKSHEET_NAME) +
-                "/range(address='" + range + "')"))
+            .http(http -> http.patch(
+                "/" + inputParameters.getRequiredString(WORKBOOK_ID) + WORKBOOK_WORKSHEETS_PATH +
+                    inputParameters.getRequiredString(WORKSHEET_NAME) + "/range(address='" + range + "')"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(VALUES, List.of(rowValues)))
             .execute();

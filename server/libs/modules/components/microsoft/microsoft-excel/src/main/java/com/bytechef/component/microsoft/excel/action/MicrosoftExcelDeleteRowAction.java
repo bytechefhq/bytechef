@@ -18,7 +18,6 @@ package com.bytechef.component.microsoft.excel.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.BASE_URL;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.DELETE_ROW;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.ROW_NUMBER;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID;
@@ -63,7 +62,7 @@ public class MicrosoftExcelDeleteRowAction {
 
         context.http(http -> http
             .post(
-                BASE_URL + "/" + inputParameters.getRequiredString(WORKBOOK_ID) + WORKBOOK_WORKSHEETS_PATH +
+                "/" + inputParameters.getRequiredString(WORKBOOK_ID) + WORKBOOK_WORKSHEETS_PATH +
                     inputParameters.getRequiredString(WORKSHEET_NAME) + "/range(address='" + range + "')/delete"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(List.of("shift", "Up")

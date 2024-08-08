@@ -16,7 +16,6 @@
 
 package com.bytechef.component.microsoft.excel.util;
 
-import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.BASE_URL;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.VALUES;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_WORKSHEETS_PATH;
@@ -44,9 +43,9 @@ public class MicrosoftExcelRowUtils {
             "A" + rowNumber + ":" + MicrosoftExcelUtils.getLastUsedColumnLabel(inputParameters, context) + rowNumber;
 
         Map<String, Object> body = context
-            .http(http -> http.get(BASE_URL + "/" +
-                inputParameters.getRequiredString(WORKBOOK_ID) + WORKBOOK_WORKSHEETS_PATH +
-                inputParameters.getRequiredString(WORKSHEET_NAME) + "/range(address='" + range + "')"))
+            .http(http -> http.get(
+                "/" + inputParameters.getRequiredString(WORKBOOK_ID) + WORKBOOK_WORKSHEETS_PATH +
+                    inputParameters.getRequiredString(WORKSHEET_NAME) + "/range(address='" + range + "')"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
