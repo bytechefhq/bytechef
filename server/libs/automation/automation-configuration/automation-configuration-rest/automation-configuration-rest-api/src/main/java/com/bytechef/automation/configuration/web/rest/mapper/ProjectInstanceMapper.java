@@ -56,9 +56,6 @@ public class ProjectInstanceMapper {
         extends Converter<ProjectInstanceDTO, ProjectInstanceModel> {
 
         @Override
-        @Mapping(target = "project.projectVersion", source = "project.lastVersion")
-        @Mapping(target = "project.publishedDate", source = "project.lastPublishedDate")
-        @Mapping(target = "project.status", source = "project.lastStatus")
         ProjectInstanceModel convert(ProjectInstanceDTO projectInstanceDTO);
     }
 }
