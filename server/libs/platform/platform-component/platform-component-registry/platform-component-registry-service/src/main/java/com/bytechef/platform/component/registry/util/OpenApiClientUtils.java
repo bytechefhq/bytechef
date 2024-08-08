@@ -34,6 +34,8 @@ import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.registry.exception.ActionDefinitionErrorType;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -149,7 +151,7 @@ public class OpenApiClientUtils {
         return null;
     }
 
-    private static Map<String, List<String>> getValuesMap(
+    protected static Map<String, List<String>> getValuesMap(
         Map<String, ?> inputParameters, List<? extends Property> properties, PropertyType propertyType) {
 
         Map<String, List<String>> valuesMap = new HashMap<>();
@@ -174,7 +176,7 @@ public class OpenApiClientUtils {
                             }
 
                             if (!curValues.contains(value)) {
-                                curValues.add(value);
+                                curValues.add(URLEncoder.encode(value, StandardCharsets.UTF_8));
                             }
                         }
                     }
