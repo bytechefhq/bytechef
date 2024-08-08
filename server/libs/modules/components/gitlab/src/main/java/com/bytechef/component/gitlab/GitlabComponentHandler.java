@@ -16,10 +16,19 @@
 
 package com.bytechef.component.gitlab;
 
+import static com.bytechef.component.gitlab.constant.GitlabConstants.PROJECT_ID;
+
 import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDSL.ModifiableIntegerProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.gitlab.util.GitlabUtils;
 import com.google.auto.service.AutoService;
+import java.util.Objects;
 
 /**
  * @author Monika Kušter
@@ -35,4 +44,19 @@ public class GitlabComponentHandler extends AbstractGitlabComponentHandler {
             .categories(ComponentCategory.DEVELOPER_TOOLS);
     }
 
+    @Override
+    public ModifiableProperty<?> modifyProperty(
+        ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
+
+        if (Objects.equals(modifiableProperty.getName(), PROJECT_ID)) {
+            ((ModifiableStringProperty) modifiableProperty)
+                .options((ActionOptionsFunction<String>) GitlabUtils::getProjectOptions);
+        } else if (Objects.equals(modifiableProperty.getName(), "issueId")) {
+            ((ModifiableIntegerProperty) modifiableProperty)
+                .options((ActionOptionsFunction<String>) GitlabUtils::getIssueOptions)
+                .optionsLookupDependsOn(PROJECT_ID);
+        }
+
+        return modifiableProperty;
+    }
 }
