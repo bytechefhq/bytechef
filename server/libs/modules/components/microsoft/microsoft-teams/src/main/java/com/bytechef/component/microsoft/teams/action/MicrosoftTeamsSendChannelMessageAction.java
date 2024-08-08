@@ -19,7 +19,6 @@ package com.bytechef.component.microsoft.teams.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.BASE_URL;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.BODY;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CHANNEL_ID;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CONTENT;
@@ -81,7 +80,7 @@ public class MicrosoftTeamsSendChannelMessageAction {
 
         return context
             .http(http -> http.post(
-                BASE_URL + "/teams/" + inputParameters.getRequiredString(TEAM_ID) + "/channels/"
+                "/teams/" + inputParameters.getRequiredString(TEAM_ID) + "/channels/"
                     + inputParameters.getRequiredString(CHANNEL_ID) + "/messages"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(

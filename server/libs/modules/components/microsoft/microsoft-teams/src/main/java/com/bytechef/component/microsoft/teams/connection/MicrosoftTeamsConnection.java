@@ -27,7 +27,7 @@ import java.util.List;
 public class MicrosoftTeamsConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = MicrosoftConnection.createConnection(
-        "", (connection, context) -> List.of(
+        "https://graph.microsoft.com/v1.0", (connection, context) -> List.of(
             "Channel.Create", "Channel.ReadBasic.All", "ChannelMessage.Send", "Chat.ReadWrite", "Team.ReadBasic.All"));
 
     private MicrosoftTeamsConnection() {

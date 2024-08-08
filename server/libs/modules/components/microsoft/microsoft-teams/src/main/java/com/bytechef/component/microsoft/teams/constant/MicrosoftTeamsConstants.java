@@ -27,7 +27,6 @@ import com.bytechef.component.definition.Property.ControlType;
  */
 public class MicrosoftTeamsConstants {
 
-    public static final String BASE_URL = "https://graph.microsoft.com/v1.0";
     public static final String BODY = "body";
     public static final String CHAT_ID = "chatId";
     public static final String CHANNEL_ID = "channelId";
