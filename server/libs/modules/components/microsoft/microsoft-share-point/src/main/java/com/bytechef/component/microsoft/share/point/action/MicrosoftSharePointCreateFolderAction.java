@@ -19,7 +19,6 @@ package com.bytechef.component.microsoft.share.point.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.BASE_URL;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.CREATE_FOLDER;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.FOLDER;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.ID;
@@ -71,8 +70,8 @@ public class MicrosoftSharePointCreateFolderAction {
 
         return context
             .http(http -> http.post(
-                BASE_URL + "/" + inputParameters.getRequiredString(SITE_ID) + "/drive/items/" +
-                    getFolderId(inputParameters) + "/children"))
+                "/" + inputParameters.getRequiredString(SITE_ID) + "/drive/items/" + getFolderId(inputParameters) +
+                    "/children"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(
                 Http.Body.of(
