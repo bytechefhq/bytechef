@@ -106,6 +106,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:quickbooks"))
     implementation(project(":server:libs:modules:components:rabbitmq"))
     implementation(project(":server:libs:modules:components:random-helper"))
+    implementation(project(":server:libs:modules:components:reckon"))
     implementation(project(":server:libs:modules:components:resend"))
     implementation(project(":server:libs:modules:components:salesflare"))
     implementation(project(":server:libs:modules:components:schedule"))

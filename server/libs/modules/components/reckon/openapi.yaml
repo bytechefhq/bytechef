@@ -1,0 +1,167 @@
+---
+openapi: "3.0.1"
+info:
+  title: "Reckon"
+  description: "Reckon is an accounting software used for financial management and bookkeeping tasks."
+  version: "v1"
+servers:
+  - url: "https://api-v2.reckonone.com"
+paths:
+  /{bookId}/contacts:
+    post:
+      summary: "Create Contact"
+      description: "Creates a new Contact."
+      operationId: "createContact"
+      parameters:
+        - name: "bookId"
+          description: "Book where new contact will be created."
+          in: "path"
+          required: true
+          schema:
+            title: "Book"
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "Contact"
+              required:
+                - "name"
+              properties:
+                name:
+                  type: "string"
+                  description: "The name of the contact."
+                  maxLength: 100
+      responses:
+        201:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+  /{bookId}/invoices:
+    post:
+      summary: "Create Invoice"
+      description: "Create a new Invoice."
+      operationId: "createInvoice"
+      parameters:
+        - name: "bookId"
+          description: "Book where new invoice will be created."
+          in: "path"
+          required: true
+          schema:
+            title: "Book"
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "Invoice"
+              required:
+                - "customer"
+                - "invoiceDate"
+                - "amountTaxStatus"
+                - "lineItems"
+              properties:
+                customer:
+                  type: "string"
+                  description: "The customer that is being invoiced."
+                invoiceDate:
+                  type: "string"
+                  title: "Invoice Date"
+                  format: "date"
+                  description: "The date of the invoice."
+                amountTaxStatus:
+                  type: "string"
+                  enum:
+                    - NonTaxed
+                    - Inclusive
+                    - Exclusive
+                  title: "Amount Tax Status"
+                  description: "The amount tax status of the amounts in the invoice."
+                lineItems:
+                  type: "array"
+                  title: "Line Items"
+                  description: "The individual items that make up the invoice."
+                  items:
+                    type: "object"
+                    properties:
+                      lineNumber:
+                        type: "integer"
+      responses:
+        201:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+  /{bookId}/payments:
+    post:
+      summary: "Create Payment"
+      description: "Creates a new payment."
+      operationId: "createPayment"
+      parameters:
+        - name: "bookId"
+          description: "Book where new payment will be created."
+          in: "path"
+          required: true
+          schema:
+            title: "Book"
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "Payment"
+              required:
+                - "supplier"
+                - "paymentDate"
+                - "totalAmount"
+              properties:
+                supplier:
+                  type: "string"
+                  description: "The supplier that is being paid."
+                paymentDate:
+                  type: "string"
+                  format: "date"
+                  description: "The date of the payment."
+                totalAmount:
+                  type: "number"
+                  description: "The total amount of the payment applied."
+      responses:
+        201:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+components:
+  securitySchemes:
+    oauth2:
+      type: "oauth2"
+      flows:
+        authorizationCode:
+          authorizationUrl: "https://identity.reckon.com/connect/authorize"
+          tokenUrl: "https://identity.reckon.com/connect/token"
+          refreshUrl: "https://identity.reckon.com/connect/token"
