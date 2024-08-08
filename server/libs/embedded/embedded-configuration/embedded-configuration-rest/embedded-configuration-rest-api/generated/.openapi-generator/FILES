@@ -16,11 +16,9 @@ src/main/java/com/bytechef/embedded/configuration/web/rest/model/EnvironmentMode
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/IntegrationBasicModel.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/IntegrationInstanceBasicModel.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/IntegrationInstanceConfigurationBasicModel.java
-src/main/java/com/bytechef/embedded/configuration/web/rest/model/IntegrationInstanceConfigurationIntegrationModel.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/IntegrationInstanceConfigurationModel.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/IntegrationInstanceConfigurationWorkflowConnectionModel.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/IntegrationInstanceConfigurationWorkflowModel.java
-src/main/java/com/bytechef/embedded/configuration/web/rest/model/IntegrationInstanceIntegrationInstanceConfigurationModel.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/IntegrationInstanceModel.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/IntegrationInstanceWorkflowModel.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/IntegrationModel.java

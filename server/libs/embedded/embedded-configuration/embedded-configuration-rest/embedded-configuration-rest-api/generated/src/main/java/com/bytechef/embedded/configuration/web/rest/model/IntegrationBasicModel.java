@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationBasic", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("IntegrationBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-13T09:30:19.524285+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-08T08:31:46.450713+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class IntegrationBasicModel {
 
   private Boolean allowMultipleInstances = false;
@@ -43,17 +43,17 @@ public class IntegrationBasicModel {
 
   private Long id;
 
-  private Integer integrationVersion;
-
   private String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime publishedDate;
+  private LocalDateTime lastPublishedDate;
 
-  private IntegrationStatusModel status;
+  private IntegrationStatusModel lastStatus;
+
+  private Integer lastVersion;
 
   public IntegrationBasicModel() {
     super();
@@ -208,26 +208,6 @@ public class IntegrationBasicModel {
     this.id = id;
   }
 
-  public IntegrationBasicModel integrationVersion(Integer integrationVersion) {
-    this.integrationVersion = integrationVersion;
-    return this;
-  }
-
-  /**
-   * The version of an integration.
-   * @return integrationVersion
-  */
-  
-  @Schema(name = "integrationVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The version of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("integrationVersion")
-  public Integer getIntegrationVersion() {
-    return integrationVersion;
-  }
-
-  public void setIntegrationVersion(Integer integrationVersion) {
-    this.integrationVersion = integrationVersion;
-  }
-
   public IntegrationBasicModel lastModifiedBy(String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
@@ -268,44 +248,64 @@ public class IntegrationBasicModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public IntegrationBasicModel publishedDate(LocalDateTime publishedDate) {
-    this.publishedDate = publishedDate;
+  public IntegrationBasicModel lastPublishedDate(LocalDateTime lastPublishedDate) {
+    this.lastPublishedDate = lastPublishedDate;
     return this;
   }
 
   /**
-   * The published date.
-   * @return publishedDate
+   * The last published date.
+   * @return lastPublishedDate
   */
   @Valid 
-  @Schema(name = "publishedDate", description = "The published date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("publishedDate")
-  public LocalDateTime getPublishedDate() {
-    return publishedDate;
+  @Schema(name = "lastPublishedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last published date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastPublishedDate")
+  public LocalDateTime getLastPublishedDate() {
+    return lastPublishedDate;
   }
 
-  public void setPublishedDate(LocalDateTime publishedDate) {
-    this.publishedDate = publishedDate;
+  public void setLastPublishedDate(LocalDateTime lastPublishedDate) {
+    this.lastPublishedDate = lastPublishedDate;
   }
 
-  public IntegrationBasicModel status(IntegrationStatusModel status) {
-    this.status = status;
+  public IntegrationBasicModel lastStatus(IntegrationStatusModel lastStatus) {
+    this.lastStatus = lastStatus;
     return this;
   }
 
   /**
-   * Get status
-   * @return status
+   * Get lastStatus
+   * @return lastStatus
   */
   @Valid 
-  @Schema(name = "status", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("status")
-  public IntegrationStatusModel getStatus() {
-    return status;
+  @Schema(name = "lastStatus", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastStatus")
+  public IntegrationStatusModel getLastStatus() {
+    return lastStatus;
   }
 
-  public void setStatus(IntegrationStatusModel status) {
-    this.status = status;
+  public void setLastStatus(IntegrationStatusModel lastStatus) {
+    this.lastStatus = lastStatus;
+  }
+
+  public IntegrationBasicModel lastVersion(Integer lastVersion) {
+    this.lastVersion = lastVersion;
+    return this;
+  }
+
+  /**
+   * The last version of an integration.
+   * @return lastVersion
+  */
+  
+  @Schema(name = "lastVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The last version of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastVersion")
+  public Integer getLastVersion() {
+    return lastVersion;
+  }
+
+  public void setLastVersion(Integer lastVersion) {
+    this.lastVersion = lastVersion;
   }
 
   @Override
@@ -324,16 +324,16 @@ public class IntegrationBasicModel {
         Objects.equals(this.createdDate, integrationBasic.createdDate) &&
         Objects.equals(this.description, integrationBasic.description) &&
         Objects.equals(this.id, integrationBasic.id) &&
-        Objects.equals(this.integrationVersion, integrationBasic.integrationVersion) &&
         Objects.equals(this.lastModifiedBy, integrationBasic.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, integrationBasic.lastModifiedDate) &&
-        Objects.equals(this.publishedDate, integrationBasic.publishedDate) &&
-        Objects.equals(this.status, integrationBasic.status);
+        Objects.equals(this.lastPublishedDate, integrationBasic.lastPublishedDate) &&
+        Objects.equals(this.lastStatus, integrationBasic.lastStatus) &&
+        Objects.equals(this.lastVersion, integrationBasic.lastVersion);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(allowMultipleInstances, componentName, componentVersion, createdBy, createdDate, description, id, integrationVersion, lastModifiedBy, lastModifiedDate, publishedDate, status);
+    return Objects.hash(allowMultipleInstances, componentName, componentVersion, createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, lastPublishedDate, lastStatus, lastVersion);
   }
 
   @Override
@@ -347,11 +347,11 @@ public class IntegrationBasicModel {
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    integrationVersion: ").append(toIndentedString(integrationVersion)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
-    sb.append("    publishedDate: ").append(toIndentedString(publishedDate)).append("\n");
-    sb.append("    status: ").append(toIndentedString(status)).append("\n");
+    sb.append("    lastPublishedDate: ").append(toIndentedString(lastPublishedDate)).append("\n");
+    sb.append("    lastStatus: ").append(toIndentedString(lastStatus)).append("\n");
+    sb.append("    lastVersion: ").append(toIndentedString(lastVersion)).append("\n");
     sb.append("}");
     return sb.toString();
   }
