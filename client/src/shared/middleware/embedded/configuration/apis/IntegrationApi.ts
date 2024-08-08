@@ -35,7 +35,7 @@ import {
 } from '../models/index';
 
 export interface CreateIntegrationRequest {
-    integrationModel: Omit<IntegrationModel, 'createdBy'|'createdDate'|'id'|'integrationVersion'|'lastModifiedBy'|'lastModifiedDate'>;
+    integrationModel: IntegrationModel;
 }
 
 export interface CreateIntegrationWorkflowRequest {
@@ -69,7 +69,7 @@ export interface PublishIntegrationRequest {
 
 export interface UpdateIntegrationRequest {
     id: number;
-    integrationModel: Omit<IntegrationModel, 'createdBy'|'createdDate'|'id'|'integrationVersion'|'lastModifiedBy'|'lastModifiedDate'>;
+    integrationModel: IntegrationModel;
 }
 
 /**

@@ -45,12 +45,6 @@ export interface IntegrationModel {
      */
     allowMultipleInstances: boolean;
     /**
-     * 
-     * @type {CategoryModel}
-     * @memberof IntegrationModel
-     */
-    category?: CategoryModel;
-    /**
      * The name of the integration's component.
      * @type {string}
      * @memberof IntegrationModel
@@ -87,18 +81,6 @@ export interface IntegrationModel {
      */
     readonly id?: number;
     /**
-     * The version of an integration.
-     * @type {number}
-     * @memberof IntegrationModel
-     */
-    readonly integrationVersion?: number;
-    /**
-     * The integration workflow ids belonging to this integration.
-     * @type {Array<string>}
-     * @memberof IntegrationModel
-     */
-    integrationWorkflowIds?: Array<string>;
-    /**
      * The last modified by.
      * @type {string}
      * @memberof IntegrationModel
@@ -111,17 +93,35 @@ export interface IntegrationModel {
      */
     readonly lastModifiedDate?: Date;
     /**
-     * The published date.
+     * The last published date.
      * @type {Date}
      * @memberof IntegrationModel
      */
-    publishedDate?: Date;
+    readonly lastPublishedDate?: Date;
     /**
      * 
      * @type {IntegrationStatusModel}
      * @memberof IntegrationModel
      */
-    status?: IntegrationStatusModel;
+    lastStatus?: IntegrationStatusModel;
+    /**
+     * The last version of an integration.
+     * @type {number}
+     * @memberof IntegrationModel
+     */
+    readonly lastVersion?: number;
+    /**
+     * 
+     * @type {CategoryModel}
+     * @memberof IntegrationModel
+     */
+    category?: CategoryModel;
+    /**
+     * The integration workflow ids belonging to this integration.
+     * @type {Array<string>}
+     * @memberof IntegrationModel
+     */
+    integrationWorkflowIds?: Array<string>;
     /**
      * 
      * @type {Array<TagModel>}
@@ -157,38 +157,37 @@ export function IntegrationModelFromJSONTyped(json: any, ignoreDiscriminator: bo
     return {
         
         'allowMultipleInstances': json['allowMultipleInstances'],
-        'category': json['category'] == null ? undefined : CategoryModelFromJSON(json['category']),
         'componentName': json['componentName'],
         'componentVersion': json['componentVersion'],
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'description': json['description'] == null ? undefined : json['description'],
         'id': json['id'] == null ? undefined : json['id'],
-        'integrationVersion': json['integrationVersion'] == null ? undefined : json['integrationVersion'],
-        'integrationWorkflowIds': json['integrationWorkflowIds'] == null ? undefined : json['integrationWorkflowIds'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
-        'publishedDate': json['publishedDate'] == null ? undefined : (new Date(json['publishedDate'])),
-        'status': json['status'] == null ? undefined : IntegrationStatusModelFromJSON(json['status']),
+        'lastPublishedDate': json['lastPublishedDate'] == null ? undefined : (new Date(json['lastPublishedDate'])),
+        'lastStatus': json['lastStatus'] == null ? undefined : IntegrationStatusModelFromJSON(json['lastStatus']),
+        'lastVersion': json['lastVersion'] == null ? undefined : json['lastVersion'],
+        'category': json['category'] == null ? undefined : CategoryModelFromJSON(json['category']),
+        'integrationWorkflowIds': json['integrationWorkflowIds'] == null ? undefined : json['integrationWorkflowIds'],
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
         'version': json['__version'] == null ? undefined : json['__version'],
     };
 }
 
-export function IntegrationModelToJSON(value?: Omit<IntegrationModel, 'createdBy'|'createdDate'|'id'|'integrationVersion'|'lastModifiedBy'|'lastModifiedDate'> | null): any {
+export function IntegrationModelToJSON(value?: Omit<IntegrationModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastVersion'> | null): any {
     if (value == null) {
         return value;
     }
     return {
         
         'allowMultipleInstances': value['allowMultipleInstances'],
-        'category': CategoryModelToJSON(value['category']),
         'componentName': value['componentName'],
         'componentVersion': value['componentVersion'],
         'description': value['description'],
+        'lastStatus': IntegrationStatusModelToJSON(value['lastStatus']),
+        'category': CategoryModelToJSON(value['category']),
         'integrationWorkflowIds': value['integrationWorkflowIds'],
-        'publishedDate': value['publishedDate'] == null ? undefined : ((value['publishedDate']).toISOString()),
-        'status': IntegrationStatusModelToJSON(value['status']),
         'tags': value['tags'] == null ? undefined : ((value['tags'] as Array<any>).map(TagModelToJSON)),
         '__version': value['version'],
     };
