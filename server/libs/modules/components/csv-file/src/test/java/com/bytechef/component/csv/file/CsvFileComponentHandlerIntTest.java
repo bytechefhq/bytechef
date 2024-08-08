@@ -42,7 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Ivica Cardic
  */
 @ComponentIntTest
-public class CsvFileComponentHandlerIntTest {
+class CsvFileComponentHandlerIntTest {
 
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
@@ -56,7 +56,7 @@ public class CsvFileComponentHandlerIntTest {
     private TaskFileStorage taskFileStorage;
 
     @Test
-    public void testRead() throws JSONException {
+    void testRead() throws JSONException {
         File sampleFile = getFile("sample.csv");
 
         Job job = componentJobTestExecutor.execute(
@@ -83,7 +83,7 @@ public class CsvFileComponentHandlerIntTest {
     }
 
     @Test
-    public void testRead_Header() throws JSONException {
+    void testReadHeader() throws JSONException {
         File sampleFile = getFile("sample_header.csv");
 
         Job job = componentJobTestExecutor.execute(
@@ -108,7 +108,7 @@ public class CsvFileComponentHandlerIntTest {
     }
 
     @Test
-    public void testRead_HeaderAndQuoted() throws JSONException {
+    void testReadHeaderAndQuoted() throws JSONException {
         File sampleFile = getFile("sample_header_quoted.csv");
 
         Job job = componentJobTestExecutor.execute(
@@ -134,7 +134,7 @@ public class CsvFileComponentHandlerIntTest {
     }
 
     @Test
-    public void testRead_HeaderAndDelimiter() throws JSONException {
+    void testReadHeaderAndDelimiter() throws JSONException {
         File sampleFile = getFile("sample_header_pipe_delimiter.csv");
 
         Job job = componentJobTestExecutor.execute(
