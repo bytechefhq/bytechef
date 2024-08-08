@@ -25,9 +25,12 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinit
 import com.bytechef.component.definition.ComponentDSL.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.gitlab.trigger.GitlabNewIssueTrigger;
 import com.bytechef.component.gitlab.util.GitlabUtils;
 import com.google.auto.service.AutoService;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -35,6 +38,11 @@ import java.util.Objects;
  */
 @AutoService(OpenApiComponentHandler.class)
 public class GitlabComponentHandler extends AbstractGitlabComponentHandler {
+
+    @Override
+    public List<ModifiableTriggerDefinition> getTriggers() {
+        return List.of(GitlabNewIssueTrigger.TRIGGER_DEFINITION);
+    }
 
     @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
