@@ -46,7 +46,7 @@ const IntegrationInstanceConfigurationDialog = ({
     updateIntegrationVersion = false,
 }: IntegrationInstanceConfigurationDialogProps) => {
     const [activeStepIndex, setActiveStepIndex] = useState(0);
-    const [curIntegrationId, setCurIntegrationId] = useState(integrationInstanceConfiguration?.integration?.id);
+    const [curIntegrationId, setCurIntegrationId] = useState(integrationInstanceConfiguration?.integrationId);
     const [curIntegrationVersion, setCurIntegrationVersion] = useState<number | undefined>(
         integrationInstanceConfiguration?.integrationVersion
     );
@@ -60,7 +60,7 @@ const IntegrationInstanceConfigurationDialog = ({
             description: integrationInstanceConfiguration?.description || undefined,
             enabled: integrationInstanceConfiguration?.enabled || false,
             environment: integrationInstanceConfiguration?.environment || EnvironmentModel.Test,
-            integrationId: integrationInstanceConfiguration?.integration?.id || undefined,
+            integrationId: integrationInstanceConfiguration?.integrationId || undefined,
             integrationInstanceConfigurationWorkflows: [],
             integrationVersion: integrationInstanceConfiguration?.integrationVersion || undefined,
             name: integrationInstanceConfiguration?.name || undefined,

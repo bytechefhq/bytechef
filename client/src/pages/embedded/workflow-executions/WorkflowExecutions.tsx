@@ -381,7 +381,11 @@ export const WorkflowExecutions = () => {
                                           label: (
                                               <span className="flex items-center">
                                                   <span className="mr-1 ">
-                                                      {integrationInstanceConfiguration.integration?.componentName}
+                                                      {
+                                                          (
+                                                              integrationInstanceConfiguration.integration as IntegrationModel
+                                                          )?.componentName
+                                                      }
                                                   </span>
 
                                                   <span className="text-xs text-gray-500">

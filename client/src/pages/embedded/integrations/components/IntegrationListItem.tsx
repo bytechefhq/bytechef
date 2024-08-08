@@ -23,7 +23,7 @@ import {useToast} from '@/components/ui/use-toast';
 import IntegrationDialog from '@/pages/embedded/integrations/components/IntegrationDialog';
 import IntegrationPublishDialog from '@/pages/embedded/integrations/components/IntegrationPublishDialog';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
-import {IntegrationModel, IntegrationStatusModel, TagModel} from '@/shared/middleware/embedded/configuration';
+import {IntegrationModel, TagModel} from '@/shared/middleware/embedded/configuration';
 import {
     useCreateIntegrationWorkflowMutation,
     useDeleteIntegrationMutation,
@@ -200,31 +200,20 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                     </div>
 
                     <div className="flex items-center justify-end gap-x-6">
-                        {integration.integrationVersion && (
+                        {integration.lastVersion && (
                             <div className="flex flex-col items-end gap-y-4">
-                                <Badge
-                                    className="flex space-x-1"
-                                    variant={
-                                        integration.status === IntegrationStatusModel.Published
-                                            ? 'success'
-                                            : 'secondary'
-                                    }
-                                >
-                                    <span>V{integration.integrationVersion}</span>
+                                <Badge className="flex space-x-1" variant="secondary">
+                                    <span>V{integration.lastVersion}</span>
 
-                                    <span>
-                                        {integration.status === IntegrationStatusModel.Published
-                                            ? 'Published'
-                                            : 'Draft'}
-                                    </span>
+                                    <span>{integration.lastStatus}</span>
                                 </Badge>
 
                                 <Tooltip>
                                     <TooltipTrigger>
                                         <div className="flex items-center text-sm text-gray-500 sm:mt-0">
-                                            {integration.status === IntegrationStatusModel.Published ? (
+                                            {integration.lastPublishedDate ? (
                                                 <span>
-                                                    {`Published at ${integration.publishedDate?.toLocaleDateString()} ${integration.publishedDate?.toLocaleTimeString()}`}
+                                                    {`Published at ${integration.lastPublishedDate?.toLocaleDateString()} ${integration.lastPublishedDate?.toLocaleTimeString()}`}
                                                 </span>
                                             ) : (
                                                 '-'
@@ -264,10 +253,7 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                                     New Workflow
                                 </DropdownMenuItem>
 
-                                <DropdownMenuItem
-                                    disabled={integration.status === IntegrationStatusModel.Published}
-                                    onClick={() => setShowPublishIntegrationDialog(true)}
-                                >
+                                <DropdownMenuItem onClick={() => setShowPublishIntegrationDialog(true)}>
                                     Publish
                                 </DropdownMenuItem>
 

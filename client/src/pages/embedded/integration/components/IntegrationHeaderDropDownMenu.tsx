@@ -1,7 +1,7 @@
 import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
-import {IntegrationModel, IntegrationStatusModel} from '@/shared/middleware/embedded/configuration';
+import {IntegrationModel} from '@/shared/middleware/embedded/configuration';
 import {useGetIntegrationsQuery} from '@/shared/queries/embedded/integrations.queries';
 import {CaretDownIcon} from '@radix-ui/react-icons';
 import * as React from 'react';
@@ -20,15 +20,10 @@ const IntegrationHeaderDropDownMenu = ({integration}: {integration: IntegrationM
                     <h1>{integration?.componentName}</h1>
 
                     {integration && (
-                        <Badge
-                            className="flex space-x-1"
-                            variant={integration.status === IntegrationStatusModel.Published ? 'success' : 'outline'}
-                        >
-                            <span>V{integration.integrationVersion}</span>
+                        <Badge className="flex space-x-1" variant="secondary">
+                            <span>V{integration.lastVersion}</span>
 
-                            <span>
-                                {integration.status === IntegrationStatusModel.Published ? `Published` : 'Draft'}
-                            </span>
+                            <span>{integration.lastStatus}</span>
                         </Badge>
                     )}
 
@@ -72,9 +67,9 @@ const IntegrationHeaderDropDownMenu = ({integration}: {integration: IntegrationM
                             </div>
 
                             <Badge className="flex space-x-1" variant="secondary">
-                                <span>V{curIntegration.integrationVersion}</span>
+                                <span>V{curIntegration.lastVersion}</span>
 
-                                <span>Draft</span>
+                                <span>{curIntegration.lastStatus}</span>
                             </Badge>
                         </DropdownMenuItem>
                     ))}

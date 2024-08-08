@@ -57,7 +57,6 @@ const IntegrationPublishDialog = ({integration, onClose}: {integration: Integrat
 
                     <div className="flex justify-end">
                         <Button
-                            disabled={!!integration?.publishedDate}
                             onClick={() =>
                                 publishIntegrationMutation.mutate({
                                     id: integration.id!,
