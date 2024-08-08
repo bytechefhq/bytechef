@@ -27,7 +27,6 @@ import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.time;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.BASE_URL;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CATEGORY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SEARCH_EMAIL;
@@ -91,7 +90,7 @@ public class MicrosoftOutlook365SearchEmailAction {
 
         String encode = URLEncoder.encode(stringBuilder.toString(), StandardCharsets.UTF_8);
 
-        return context.http(http -> http.get(BASE_URL + "/messages?$search=" + encode))
+        return context.http(http -> http.get("/messages?$search=" + encode))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
