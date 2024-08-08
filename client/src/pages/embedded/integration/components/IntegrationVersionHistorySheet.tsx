@@ -50,9 +50,7 @@ const IntegrationVersionHistorySheet = ({integrationId, onClose}: IntegrationVer
                                                             : 'secondary'
                                                     }
                                                 >
-                                                    {integrationVersion.status === IntegrationStatusModel.Published
-                                                        ? `Published`
-                                                        : 'Draft'}
+                                                    {integrationVersion.status}
                                                 </Badge>
                                             </div>
                                         </div>

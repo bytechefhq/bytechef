@@ -31,7 +31,7 @@ const ProjectHeaderDropdownMenu = ({project}: {project: ProjectModel}) => {
                         >
                             <span>V{project.lastVersion}</span>
 
-                            <span>{project.lastVersion}</span>
+                            <span>{project.lastStatus}</span>
                         </Badge>
                     )}
 

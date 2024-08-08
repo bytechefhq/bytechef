@@ -36,20 +36,13 @@ const IntegrationPublishPopover = ({integration}: {integration: IntegrationModel
     return (
         <Popover onOpenChange={setOpen} open={open}>
             <PopoverTrigger asChild>
-                <Button
-                    className="hover:bg-gray-200"
-                    disabled={!!integration?.publishedDate}
-                    size="icon"
-                    variant="ghost"
-                >
+                <Button className="hover:bg-gray-200" size="icon" variant="ghost">
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <CircleDotIcon className="h-5" />
                         </TooltipTrigger>
 
-                        <TooltipContent>
-                            {integration?.publishedDate ? `The integration is published` : `Publish the integration`}
-                        </TooltipContent>
+                        <TooltipContent>Publish the integration</TooltipContent>
                     </Tooltip>
                 </Button>
             </PopoverTrigger>
@@ -65,7 +58,6 @@ const IntegrationPublishPopover = ({integration}: {integration: IntegrationModel
 
                 <div className="flex justify-end">
                     <Button
-                        disabled={!!integration?.publishedDate}
                         onClick={() =>
                             publishIntegrationMutation.mutate({
                                 id: integration.id!,

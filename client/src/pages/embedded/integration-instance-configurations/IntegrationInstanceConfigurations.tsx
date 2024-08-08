@@ -65,9 +65,9 @@ const IntegrationInstanceConfigurations = () => {
             let currentIntegrationInstanceConfigurations: IntegrationInstanceConfigurationModel[];
 
             if (integrationInstanceConfiguration.integration) {
-                if (integrationInstanceConfigurationMap.has(integrationInstanceConfiguration.integration.id!)) {
+                if (integrationInstanceConfigurationMap.has(integrationInstanceConfiguration.integrationId!)) {
                     currentIntegrationInstanceConfigurations = integrationInstanceConfigurationMap.get(
-                        integrationInstanceConfiguration.integration.id!
+                        integrationInstanceConfiguration.integrationId!
                     )!;
                 } else {
                     currentIntegrationInstanceConfigurations = [];
@@ -76,7 +76,7 @@ const IntegrationInstanceConfigurations = () => {
                 currentIntegrationInstanceConfigurations.push(integrationInstanceConfiguration);
 
                 integrationInstanceConfigurationMap.set(
-                    integrationInstanceConfiguration.integration.id!,
+                    integrationInstanceConfiguration.integrationId!,
                     currentIntegrationInstanceConfigurations
                 );
             }
