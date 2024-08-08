@@ -45,7 +45,6 @@ public class MicrosoftSharePointConstants {
     public static final String READ_ONLY = "readOnly";
     public static final String REQUIRED = "required";
     public static final String SITE_ID = "siteId";
-    public static final String TENANT_ID = "tenantId";
     public static final String UPLOAD_FILE = "uploadFile";
     public static final String VALUE = "value";
 

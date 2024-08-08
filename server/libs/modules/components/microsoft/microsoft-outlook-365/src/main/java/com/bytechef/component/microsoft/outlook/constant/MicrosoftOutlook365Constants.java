@@ -47,7 +47,6 @@ public class MicrosoftOutlook365Constants {
     public static final String SEARCH_EMAIL = "searchEmail";
     public static final String SEND_EMAIL = "sendEmail";
     public static final String SUBJECT = "subject";
-    public static final String TENANT_ID = "tenantId";
     public static final String TO = "to";
     public static final String TO_RECIPIENTS = "toRecipients";
     public static final ModifiableStringProperty CONTENT_PROPERTY = string(CONTENT)
