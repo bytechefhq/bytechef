@@ -22,7 +22,6 @@ import com.bytechef.automation.configuration.web.rest.mapper.config.AutomationCo
 import com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel;
 import com.bytechef.automation.configuration.web.rest.model.ProjectModel;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -34,9 +33,6 @@ public class ProjectMapper {
     public interface ProjectToProjectBasicModelMapper extends Converter<Project, ProjectBasicModel> {
 
         @Override
-        @Mapping(target = "projectVersion", source = "lastVersion")
-        @Mapping(target = "publishedDate", source = "lastPublishedDate")
-        @Mapping(target = "status", source = "lastStatus")
         ProjectBasicModel convert(Project project);
     }
 

@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.dto;
 
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.tag.domain.Tag;
@@ -30,15 +31,16 @@ import java.util.List;
 @SuppressFBWarnings("EI")
 public record ProjectDTO(
     Category category, String createdBy, LocalDateTime createdDate, String description, Long id, String name,
-    String lastModifiedBy, LocalDateTime lastModifiedDate, int projectVersion, LocalDateTime publishedDate,
-    Status status, List<Tag> tags, int version, List<Long> projectWorkflowIds, Long workspaceId) {
+    String lastModifiedBy, LocalDateTime lastModifiedDate, LocalDateTime lastPublishedDate, Status lastStatus,
+    int lastVersion, List<ProjectVersion> projectVersions, List<Tag> tags, int version, List<Long> projectWorkflowIds,
+    Long workspaceId) {
 
     public ProjectDTO(Category category, Project project, List<Tag> tags, List<Long> projectWorkflowIds) {
         this(
             category, project.getCreatedBy(), project.getCreatedDate(), project.getDescription(), project.getId(),
-            project.getName(), project.getLastModifiedBy(), project.getLastModifiedDate(), project.getLastVersion(),
-            project.getLastPublishedDate(), project.getLastStatus(), tags, project.getVersion(), projectWorkflowIds,
-            project.getWorkspaceId());
+            project.getName(), project.getLastModifiedBy(), project.getLastModifiedDate(),
+            project.getLastPublishedDate(), project.getLastStatus(), project.getLastVersion(),
+            project.getProjectVersions(), tags, project.getVersion(), projectWorkflowIds, project.getWorkspaceId());
     }
 
     public static Builder builder() {
@@ -52,7 +54,9 @@ public record ProjectDTO(
         project.setDescription(description);
         project.setId(id);
         project.setName(name);
+        project.setProjectVersions(projectVersions == null ? List.of() : projectVersions);
         project.setVersion(version);
+        project.setTags(tags);
         project.setWorkspaceId(workspaceId);
 
         return project;
@@ -68,11 +72,12 @@ public record ProjectDTO(
         private String name;
         private String lastModifiedBy;
         private LocalDateTime lastModifiedDate;
-        private int projectVersion;
-        private LocalDateTime publishedDate;
-        private Status status = Status.DRAFT;
+        private LocalDateTime lastPublishedDate;
+        private Status lastStatus = Status.DRAFT;
+        private int lastVersion;
         private List<Tag> tags;
         private int version;
+        private List<ProjectVersion> projectVersions;
         private List<Long> projectWorkflowIds;
         private Long workspaceId;
 
@@ -127,26 +132,32 @@ public record ProjectDTO(
             return this;
         }
 
-        public Builder projectVersion(int projectVersion) {
-            this.projectVersion = projectVersion;
+        public Builder lastVersion(int lastVersion) {
+            this.lastVersion = lastVersion;
+
+            return this;
+        }
+
+        public Builder lastPublishedDate(LocalDateTime lastPublishedDate) {
+            this.lastPublishedDate = lastPublishedDate;
+
+            return this;
+        }
+
+        public Builder lastStatus(Status lastStatus) {
+            this.lastStatus = lastStatus;
+
+            return this;
+        }
+
+        public Builder projectVersions(List<ProjectVersion> projectVersions) {
+            this.projectVersions = projectVersions;
 
             return this;
         }
 
         public Builder projectWorkflowIds(List<Long> projectWorkflowIds) {
             this.projectWorkflowIds = projectWorkflowIds;
-
-            return this;
-        }
-
-        public Builder publishedDate(LocalDateTime publishedDate) {
-            this.publishedDate = publishedDate;
-
-            return this;
-        }
-
-        public Builder status(Status status) {
-            this.status = status;
 
             return this;
         }
@@ -172,7 +183,8 @@ public record ProjectDTO(
         public ProjectDTO build() {
             return new ProjectDTO(
                 category, createdBy, createdDate, description, id, name, lastModifiedBy, lastModifiedDate,
-                projectVersion, publishedDate, status, tags, version, projectWorkflowIds, workspaceId);
+                lastPublishedDate, lastStatus, lastVersion, projectVersions, tags, version, projectWorkflowIds,
+                workspaceId);
         }
     }
 }

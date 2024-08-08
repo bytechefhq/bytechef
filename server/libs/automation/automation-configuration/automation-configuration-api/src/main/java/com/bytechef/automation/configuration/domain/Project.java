@@ -20,6 +20,7 @@ import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.tag.domain.Tag;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -177,8 +178,14 @@ public final class Project {
             .orElseThrow();
     }
 
+    @Nullable
     public LocalDateTime getLastPublishedDate() {
-        return getLastProjectVersion().getPublishedDate();
+        return projectVersions.stream()
+            .sorted((o1, o2) -> Integer.compare(o2.getVersion(), o1.getVersion()))
+            .filter(projectVersion -> projectVersion.getStatus() == Status.PUBLISHED)
+            .findFirst()
+            .map(ProjectVersion::getPublishedDate)
+            .orElse(null);
     }
 
     public Status getLastStatus() {
@@ -244,7 +251,9 @@ public final class Project {
     }
 
     public void setProjectVersions(List<ProjectVersion> projectVersions) {
-        this.projectVersions = new HashSet<>(projectVersions);
+        if (!CollectionUtils.isEmpty(projectVersions)) {
+            this.projectVersions = new HashSet<>(projectVersions);
+        }
     }
 
     public void setTagIds(List<Long> tagIds) {

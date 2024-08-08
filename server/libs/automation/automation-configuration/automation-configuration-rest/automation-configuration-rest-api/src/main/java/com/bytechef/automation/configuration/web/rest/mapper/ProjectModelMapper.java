@@ -20,6 +20,7 @@ import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.web.rest.mapper.config.AutomationConfigurationMapperSpringConfig;
 import com.bytechef.automation.configuration.web.rest.model.ProjectModel;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -29,5 +30,7 @@ import org.springframework.core.convert.converter.Converter;
 public interface ProjectModelMapper extends Converter<ProjectModel, ProjectDTO> {
 
     @Override
+    @Mapping(target = "projectVersions", ignore = true)
     ProjectDTO convert(ProjectModel projectModel);
+
 }
