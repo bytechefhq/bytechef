@@ -20,9 +20,12 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.FILE;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.LIST_FILES;
+import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.NAME;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
+import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.VALUE;
 import static com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils.getFolderId;
 
 import com.bytechef.component.definition.ActionContext;
@@ -58,7 +61,7 @@ public class MicrosoftOneDriveListFilesAction {
                     object()
                         .properties(
                             string(ID),
-                            string("name"))))
+                            string(NAME))))
         .perform(MicrosoftOneDriveListFilesAction::perform);
 
     private MicrosoftOneDriveListFilesAction() {
@@ -75,9 +78,9 @@ public class MicrosoftOneDriveListFilesAction {
 
         List<Map<?, ?>> files = new ArrayList<>();
 
-        if (body.get("value") instanceof List<?> list) {
+        if (body.get(VALUE) instanceof List<?> list) {
             for (Object item : list) {
-                if (item instanceof Map<?, ?> map && map.containsKey("file")) {
+                if (item instanceof Map<?, ?> map && map.containsKey(FILE)) {
                     files.add(map);
                 }
             }

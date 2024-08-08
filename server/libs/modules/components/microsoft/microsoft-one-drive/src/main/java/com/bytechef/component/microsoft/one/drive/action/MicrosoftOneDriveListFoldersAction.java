@@ -22,7 +22,9 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.LIST_FOLDERS;
+import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.NAME;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
+import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.VALUE;
 import static com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils.getFolderId;
 
 import com.bytechef.component.definition.ActionContext;
@@ -58,7 +60,7 @@ public class MicrosoftOneDriveListFoldersAction {
                     object()
                         .properties(
                             string(ID),
-                            string("name"))))
+                            string(NAME))))
         .perform(MicrosoftOneDriveListFoldersAction::perform);
 
     private MicrosoftOneDriveListFoldersAction() {
@@ -75,6 +77,6 @@ public class MicrosoftOneDriveListFoldersAction {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return body.get("value");
+        return body.get(VALUE);
     }
 }
