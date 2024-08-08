@@ -58,7 +58,6 @@ const ProjectPublishDialog = ({onClose, project}: {onClose: () => void; project:
 
                     <div className="flex justify-end">
                         <Button
-                            disabled={!!project?.publishedDate}
                             onClick={() =>
                                 publishProjectMutation.mutate({
                                     id: project.id!,

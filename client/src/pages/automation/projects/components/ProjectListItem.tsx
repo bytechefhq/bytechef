@@ -22,7 +22,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/components/ui/use-toast';
 import ProjectPublishDialog from '@/pages/automation/projects/components/ProjectPublishDialog';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
-import {ProjectModel, ProjectStatusModel, TagModel} from '@/shared/middleware/automation/configuration';
+import {ProjectModel, TagModel} from '@/shared/middleware/automation/configuration';
 import {useUpdateProjectTagsMutation} from '@/shared/mutations/automation/projectTags.mutations';
 import {useDeleteProjectMutation, useDuplicateProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {useCreateProjectWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
@@ -185,17 +185,21 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                     <div className="flex items-center justify-end gap-x-6">
                         <div className="flex flex-col items-end gap-y-4">
                             <Badge className="flex space-x-1" variant="secondary">
-                                <span>V{project.projectVersion}</span>
+                                <span>V{project.lastVersion}</span>
 
-                                <span>Draft</span>
+                                <span>{project.lastStatus}</span>
                             </Badge>
 
                             <Tooltip>
                                 <TooltipTrigger>
                                     <div className="flex items-center text-sm text-gray-500 sm:mt-0">
-                                        <span>
-                                            {`Modified at ${project.lastModifiedDate?.toLocaleDateString()} ${project.lastModifiedDate?.toLocaleTimeString()}`}
-                                        </span>
+                                        {project.lastPublishedDate ? (
+                                            <span>
+                                                {`Published at ${project.lastPublishedDate?.toLocaleDateString()} ${project.lastPublishedDate?.toLocaleTimeString()}`}
+                                            </span>
+                                        ) : (
+                                            '-'
+                                        )}
                                     </div>
                                 </TooltipTrigger>
 
@@ -231,10 +235,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                                     New Workflow
                                 </DropdownMenuItem>
 
-                                <DropdownMenuItem
-                                    disabled={project.status === ProjectStatusModel.Published}
-                                    onClick={() => setShowPublishProjectDialog(true)}
-                                >
+                                <DropdownMenuItem onClick={() => setShowPublishProjectDialog(true)}>
                                     Publish
                                 </DropdownMenuItem>
 

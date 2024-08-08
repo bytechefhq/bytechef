@@ -36,15 +36,13 @@ const ProjectPublishPopover = ({project}: {project: ProjectModel}) => {
     return (
         <Popover onOpenChange={setOpen} open={open}>
             <PopoverTrigger asChild>
-                <Button className="hover:bg-gray-200" disabled={!!project?.publishedDate} size="icon" variant="ghost">
+                <Button className="hover:bg-gray-200" size="icon" variant="ghost">
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <CircleDotIcon className="h-5" />
                         </TooltipTrigger>
 
-                        <TooltipContent>
-                            {project?.publishedDate ? `The project is published` : `Publish the project`}
-                        </TooltipContent>
+                        <TooltipContent>Publish the project</TooltipContent>
                     </Tooltip>
                 </Button>
             </PopoverTrigger>
@@ -60,7 +58,6 @@ const ProjectPublishPopover = ({project}: {project: ProjectModel}) => {
 
                 <div className="flex justify-end">
                     <Button
-                        disabled={!!project?.publishedDate}
                         onClick={() =>
                             publishProjectMutation.mutate({
                                 id: project.id!,
