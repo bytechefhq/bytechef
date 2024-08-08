@@ -17,7 +17,10 @@
 package com.bytechef.component.microsoft.one.drive.util;
 
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
+import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.NAME;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
+import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.VALUE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
@@ -50,10 +53,10 @@ public class MicrosoftOneDriveUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        if (body.get("value") instanceof List<?> list) {
+        if (body.get(VALUE) instanceof List<?> list) {
             for (Object item : list) {
                 if (item instanceof Map<?, ?> map && map.containsKey("file")) {
-                    options.add(option((String) map.get("name"), (String) map.get("id")));
+                    options.add(option((String) map.get(NAME), (String) map.get(ID)));
                 }
             }
         }
@@ -80,10 +83,10 @@ public class MicrosoftOneDriveUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        if (body.get("value") instanceof List<?> list) {
+        if (body.get(VALUE) instanceof List<?> list) {
             for (Object item : list) {
                 if (item instanceof Map<?, ?> map) {
-                    options.add(option((String) map.get("name"), (String) map.get("id")));
+                    options.add(option((String) map.get(NAME), (String) map.get(ID)));
                 }
             }
         }

@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.FILE;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
+import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.NAME;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.UPLOAD_FILE;
 import static com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils.getFolderId;
@@ -59,7 +60,7 @@ public class MicrosoftOneDriveUploadFileAction {
             object()
                 .properties(
                     string(ID),
-                    string("name")))
+                    string(NAME)))
         .perform(MicrosoftOneDriveUploadFileAction::perform);
 
     private MicrosoftOneDriveUploadFileAction() {
