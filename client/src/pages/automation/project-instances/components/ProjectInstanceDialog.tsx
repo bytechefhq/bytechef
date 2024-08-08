@@ -60,7 +60,7 @@ const ProjectInstanceDialog = ({
             enabled: projectInstance?.enabled || false,
             environment: projectInstance?.environment || EnvironmentModel.Test,
             name: projectInstance?.name || undefined,
-            projectId: projectInstance?.project?.id || undefined,
+            projectId: projectInstance?.projectId || undefined,
             projectInstanceWorkflows: [],
             projectVersion: projectInstance?.projectVersion || undefined,
             tags:

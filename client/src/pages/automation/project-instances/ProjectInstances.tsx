@@ -59,15 +59,15 @@ const ProjectInstances = () => {
             let currentProjectInstances: ProjectInstanceModel[];
 
             if (projectInstance.project) {
-                if (projectInstanceMap.has(projectInstance.project.id!)) {
-                    currentProjectInstances = projectInstanceMap.get(projectInstance.project.id!)!;
+                if (projectInstanceMap.has(projectInstance.projectId!)) {
+                    currentProjectInstances = projectInstanceMap.get(projectInstance.projectId!)!;
                 } else {
                     currentProjectInstances = [];
                 }
 
                 currentProjectInstances.push(projectInstance);
 
-                projectInstanceMap.set(projectInstance.project.id!, currentProjectInstances);
+                projectInstanceMap.set(projectInstance.projectId!, currentProjectInstances);
             }
         }
     }

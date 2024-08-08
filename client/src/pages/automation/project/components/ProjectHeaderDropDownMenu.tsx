@@ -27,11 +27,11 @@ const ProjectHeaderDropdownMenu = ({project}: {project: ProjectModel}) => {
                     {project && (
                         <Badge
                             className="flex space-x-1"
-                            variant={project.status === ProjectStatusModel.Published ? 'success' : 'outline'}
+                            variant={project.lastStatus === ProjectStatusModel.Published ? 'success' : 'outline'}
                         >
-                            <span>V{project.projectVersion}</span>
+                            <span>V{project.lastVersion}</span>
 
-                            <span>{project.status === ProjectStatusModel.Published ? `Published` : 'Draft'}</span>
+                            <span>{project.lastVersion}</span>
                         </Badge>
                     )}
 
@@ -75,9 +75,9 @@ const ProjectHeaderDropdownMenu = ({project}: {project: ProjectModel}) => {
                             </div>
 
                             <Badge className="flex space-x-1" variant="secondary">
-                                <span>V{curProject.projectVersion}</span>
+                                <span>V{curProject.lastVersion}</span>
 
-                                <span>Draft</span>
+                                <span>{curProject.lastStatus}</span>
                             </Badge>
                         </DropdownMenuItem>
                     ))}
