@@ -42,7 +42,6 @@ public class MicrosoftExcelConstants {
     public static final String NAME = "name";
     public static final String ROW = "row";
     public static final String ROW_NUMBER = "rowNumber";
-    public static final String TENANT_ID = "tenantId";
     public static final String UPDATE_ROW = "updateRow";
     public static final String VALUE = "value";
     public static final String VALUES = "values";

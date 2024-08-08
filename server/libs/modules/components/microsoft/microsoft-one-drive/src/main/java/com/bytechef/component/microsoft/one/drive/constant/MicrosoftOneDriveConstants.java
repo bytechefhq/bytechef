@@ -16,12 +16,6 @@
 
 package com.bytechef.component.microsoft.one.drive.constant;
 
-import static com.bytechef.component.definition.ComponentDSL.string;
-
-import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
-import com.bytechef.component.definition.OptionsDataSource;
-import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
-
 /**
  * @author Monika Domiter
  */
@@ -35,13 +29,7 @@ public class MicrosoftOneDriveConstants {
     public static final String LIST_FOLDERS = "listFolders";
     public static final String MICROSOFT_ONEDRIVE = "microsoftOneDrive";
     public static final String PARENT_ID = "parentId";
-    public static final String TENANT_ID = "tenantId";
     public static final String UPLOAD_FILE = "uploadFile";
-
-    public static final ModifiableStringProperty PARENT_ID_PROPERTY = string(PARENT_ID)
-        .label("Parent folder")
-        .options((OptionsDataSource.ActionOptionsFunction<String>) MicrosoftOneDriveUtils::getFolderIdOptions)
-        .required(false);
 
     private MicrosoftOneDriveConstants() {
     }

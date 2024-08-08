@@ -40,7 +40,6 @@ public class MicrosoftTeamsConstants {
     public static final String MICROSOFT_TEAMS = "microsoftTeams";
     public static final String SEND_CHANNEL_MESSAGE = "sendChannelMessage";
     public static final String SEND_CHAT_MESSAGE = "sendChatMessage";
-    public static final String TENANT_ID = "tenantId";
     public static final String TEAM_ID = "teamId";
     public static final String VALUE = "value";
 
