@@ -30,6 +30,7 @@ public class MicrosoftOneDriveConnection {
     }
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = MicrosoftConnection.createConnection(
-        "", (connection, context) -> List.of("Files.ReadWrite", "offline_access"));
+        "https://graph.microsoft.com/v1.0/me/drive",
+        (connection, context) -> List.of("Files.ReadWrite", "offline_access"));
 
 }

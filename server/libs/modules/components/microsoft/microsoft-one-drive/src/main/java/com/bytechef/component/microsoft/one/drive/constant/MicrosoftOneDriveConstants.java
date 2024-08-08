@@ -21,7 +21,6 @@ package com.bytechef.component.microsoft.one.drive.constant;
  */
 public class MicrosoftOneDriveConstants {
 
-    public static final String BASE_URL = "https://graph.microsoft.com/v1.0/me/drive";
     public static final String DOWNLOAD_FILE = "downloadFile";
     public static final String FILE = "file";
     public static final String ID = "id";

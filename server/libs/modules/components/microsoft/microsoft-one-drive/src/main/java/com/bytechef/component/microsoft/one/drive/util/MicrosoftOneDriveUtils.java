@@ -17,7 +17,6 @@
 package com.bytechef.component.microsoft.one.drive.util;
 
 import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.BASE_URL;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
 
 import com.bytechef.component.definition.ActionContext;
@@ -44,7 +43,7 @@ public class MicrosoftOneDriveUtils {
         String searchText, ActionContext context) {
 
         Map<String, ?> body = context
-            .http(http -> http.get(BASE_URL + "/items/" + getFolderId(inputParameters) + "/children"))
+            .http(http -> http.get("/items/" + getFolderId(inputParameters) + "/children"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -74,7 +73,7 @@ public class MicrosoftOneDriveUtils {
 
         String encode = URLEncoder.encode("folder ne null", StandardCharsets.UTF_8);
 
-        Map<String, ?> body = context.http(http -> http.get(BASE_URL + "/items/root/children?$filter=" + encode))
+        Map<String, ?> body = context.http(http -> http.get("/items/root/children?$filter=" + encode))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

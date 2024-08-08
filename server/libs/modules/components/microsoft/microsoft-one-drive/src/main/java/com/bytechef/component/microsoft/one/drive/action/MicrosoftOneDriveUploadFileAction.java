@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.BASE_URL;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.FILE;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
@@ -72,8 +71,7 @@ public class MicrosoftOneDriveUploadFileAction {
         FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE);
 
         return context
-            .http(http -> http.put(
-                BASE_URL + "/items/" + getFolderId(inputParameters) + ":/" + fileEntry.getName() + ":/content"))
+            .http(http -> http.put("/items/" + getFolderId(inputParameters) + ":/" + fileEntry.getName() + ":/content"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(fileEntry))
             .execute()

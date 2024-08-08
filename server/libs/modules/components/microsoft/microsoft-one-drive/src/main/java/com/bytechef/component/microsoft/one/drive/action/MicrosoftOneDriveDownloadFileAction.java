@@ -19,7 +19,6 @@ package com.bytechef.component.microsoft.one.drive.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.BASE_URL;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.DOWNLOAD_FILE;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
@@ -61,7 +60,7 @@ public class MicrosoftOneDriveDownloadFileAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         Http.Response response = context
-            .http(http -> http.get(BASE_URL + "/items/" + inputParameters.getRequiredString(ID) + "/content"))
+            .http(http -> http.get("/items/" + inputParameters.getRequiredString(ID) + "/content"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
 
