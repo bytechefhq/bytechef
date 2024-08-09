@@ -1012,71 +1012,27 @@ components:
         - "PRODUCTION"
     Integration:
       description: "A group of workflows that make one logical integration."
-      type: "object"
-      required:
-        - "allowMultipleInstances"
-        - "componentName"
-        - "componentVersion"
-      properties:
-        allowMultipleInstances:
-          description: "If multiple instances of an integration are allowed or not."
-          type: "boolean"
-          default: false
-        category:
-          $ref: "#/components/schemas/Category"
-        componentName:
-          description: "The name of the integration's component."
-          type: "string"
-        componentVersion:
-          description: "The version of the integration's component."
-          type: "integer"
-        createdBy:
-          description: "The created by."
-          type: "string"
-          readOnly: true
-        createdDate:
-          description: "The created date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        description:
-          description: "The description of an integration."
-          type: "string"
-        id:
-          description: "The id of an integration."
-          type: "integer"
-          format: "int64"
-          readOnly: true
-        integrationVersion:
-          description: "The version of an integration."
-          type: "integer"
-          readOnly: true
-        integrationWorkflowIds:
-          description: "The integration workflow ids belonging to this integration."
-          type: "array"
-          items:
-            type: "string"
-        lastModifiedBy:
-          description: "The last modified by."
-          type: "string"
-          readOnly: true
-        lastModifiedDate:
-          description: "The last modified date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        publishedDate:
-          description: "The published date."
-          type: "string"
-          format: "date-time"
-        status:
-          $ref: '#/components/schemas/IntegrationStatus'
-        tags:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/Tag"
-        __version:
-          type: "integer"
+      allOf:
+        - $ref: "#/components/schemas/IntegrationBasic"
+        - type: "object"
+          required:
+            - "allowMultipleInstances"
+            - "componentName"
+            - "componentVersion"
+          properties:
+            category:
+              $ref: "#/components/schemas/Category"
+            integrationWorkflowIds:
+              description: "The integration workflow ids belonging to this integration."
+              type: "array"
+              items:
+                type: "string"
+            tags:
+              type: "array"
+              items:
+                $ref: "#/components/schemas/Tag"
+            __version:
+              type: "integer"
     IntegrationBasic:
       description: "A group of workflows that make one logical integration."
       type: "object"
@@ -1112,10 +1068,6 @@ components:
           type: "integer"
           format: "int64"
           readOnly: true
-        integrationVersion:
-          description: "The version of an integration."
-          type: "integer"
-          readOnly: true
         lastModifiedBy:
           description: "The last modified by."
           type: "string"
@@ -1139,70 +1091,26 @@ components:
     IntegrationInstance:
       description: "Contains configurations and connections required for the execution\
         \ of integration workflows for a connected user."
-      type: "object"
-      required:
-        - "connectionId"
-        - "name"
-      properties:
-        connectionId:
-          description: "The id of a connection."
-          type: "integer"
-          format: "int64"
-          readOnly: true
-        connectedUserId:
-          description: "The id of a connected user."
-          type: "integer"
-          format: "int64"
-          readOnly: true
-        createdBy:
-          description: "The created by."
-          type: "string"
-          readOnly: true
-        createdDate:
-          description: "The created date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        enabled:
-          description: "If an integration instance is enabled or not."
-          type: "boolean"
-        id:
-          description: "The id of an integration instance."
-          type: "integer"
-          format: "int64"
-          readOnly: true
-        integrationInstanceConfiguration:
-          type: "object"
-          allOf:
-            - $ref: "#/components/schemas/IntegrationInstanceConfigurationBasic"
-          readOnly: true
-        integrationInstanceConfigurationId:
-          description: "Th id of an integration instance configuration."
-          type: "integer"
-          format: "int64"
-          writeOnly: true
-        integrationInstanceWorkflows:
-          description: "The array of integration instance workflows."
-          type: "array"
-          items:
-            $ref: "#/components/schemas/IntegrationInstanceWorkflow"
-          readOnly: true
-        lastExecutionDate:
-          description: "The last execution date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        lastModifiedBy:
-          description: "The last modified by."
-          type: "string"
-          readOnly: true
-        lastModifiedDate:
-          description: "The last modified date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        __version:
-          type: "integer"
+      allOf:
+        - $ref: "#/components/schemas/IntegrationInstanceBasic"
+        - type: "object"
+          required:
+            - "connectionId"
+            - "name"
+          properties:
+            integrationInstanceConfiguration:
+              type: "object"
+              allOf:
+                - $ref: "#/components/schemas/IntegrationInstanceConfigurationBasic"
+              readOnly: true
+            integrationInstanceWorkflows:
+              description: "The array of integration instance workflows."
+              type: "array"
+              items:
+                $ref: "#/components/schemas/IntegrationInstanceWorkflow"
+              readOnly: true
+            __version:
+              type: "integer"
     IntegrationInstanceBasic:
       description: "Contains configurations and connections required for the execution\
         \ of integration workflows for a connected user."
@@ -1261,89 +1169,44 @@ components:
     IntegrationInstanceConfiguration:
       description: "Contains configurations and connections required for the execution\
         \ of integration workflows."
-      type: "object"
-      required:
-        - "name"
-      properties:
-        connectionAuthorizationParameters:
-          description: "The authorization parameters of a connection."
-          type: "object"
-          additionalProperties: true
-          readOnly: true
-        connectionConnectionParameters:
-          description: "The authorization parameters of a connection."
-          type: "object"
-          additionalProperties: true
-          readOnly: true
-        connectionParameters:
-          description: "The parameters of an integration connection, usually oauth2 related data."
-          type: "object"
-          additionalProperties: true
-          writeOnly: true
-        createdBy:
-          description: "The created by."
-          type: "string"
-          readOnly: true
-        createdDate:
-          description: "The created date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        description:
-          description: "The description of an integration instance configuration."
-          type: "string"
-        enabled:
-          description: "If an integration instance configuration is enabled or not."
-          type: "boolean"
-        environment:
-          $ref: '#/components/schemas/Environment'
-        id:
-          description: "The id of an integration instance configuration."
-          type: "integer"
-          format: "int64"
-          readOnly: true
-        integration:
-          type: "object"
-          allOf:
-            - $ref: "#/components/schemas/IntegrationBasic"
-          readOnly: true
-        integrationId:
-          description: "Th id of an integration."
-          type: "integer"
-          format: "int64"
-          writeOnly: true
-        integrationInstanceConfigurationWorkflows:
-          description: "The array of integration instance configuration workflows."
-          type: "array"
-          items:
-            $ref: "#/components/schemas/IntegrationInstanceConfigurationWorkflow"
-        integrationVersion:
-          description: "The version of an integration."
-          type: "integer"
-        lastExecutionDate:
-          description: "The last execution date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        lastModifiedBy:
-          description: "The last modified by."
-          type: "string"
-          readOnly: true
-        lastModifiedDate:
-          description: "The last modified date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        name:
-          description: "The name of an integration instance configuration."
-          type: "string"
-        tags:
-          description: "The array of tags."
-          type: "array"
-          items:
-            $ref: "#/components/schemas/Tag"
-        __version:
-          type: "integer"
+      allOf:
+        - $ref: "#/components/schemas/IntegrationInstanceConfigurationBasic"
+        - type: "object"
+          required:
+            - "name"
+          properties:
+            connectionAuthorizationParameters:
+              description: "The authorization parameters of a connection."
+              type: "object"
+              additionalProperties: true
+              readOnly: true
+            connectionConnectionParameters:
+              description: "The authorization parameters of a connection."
+              type: "object"
+              additionalProperties: true
+              readOnly: true
+            connectionParameters:
+              description: "The parameters of an integration connection, usually oauth2 related data."
+              type: "object"
+              additionalProperties: true
+              writeOnly: true
+            integration:
+              type: "object"
+              allOf:
+                - $ref: "#/components/schemas/IntegrationBasic"
+              readOnly: true
+            integrationInstanceConfigurationWorkflows:
+              description: "The array of integration instance configuration workflows."
+              type: "array"
+              items:
+                $ref: "#/components/schemas/IntegrationInstanceConfigurationWorkflow"
+            tags:
+              description: "The array of tags."
+              type: "array"
+              items:
+                $ref: "#/components/schemas/Tag"
+            __version:
+              type: "integer"
     IntegrationInstanceConfigurationBasic:
       description: "Contains configurations and connections required for the execution\
         \ of integration workflows."
