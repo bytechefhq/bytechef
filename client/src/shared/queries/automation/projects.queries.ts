@@ -27,17 +27,6 @@ export const useGetProjectQuery = (id: number, initialData?: ProjectModel, enabl
         enabled: enabled === undefined ? true : enabled,
     });
 
-export const useGetProjectsQuery = (filters?: {
-    categoryId?: number;
-    projectInstances?: boolean;
-    tagId?: number;
-    status?: ProjectStatusModel;
-}) =>
-    useQuery<ProjectModel[], Error>({
-        queryKey: ProjectKeys.filteredProjects(filters),
-        queryFn: () => new ProjectApi().getProjects(filters),
-    });
-
 export const useGetWorkspaceProjectsQuery = (filters: {
     id: number;
     categoryId?: number;
