@@ -25,8 +25,7 @@ import {
     ConnectionModelToJSON,
 } from '../models/index';
 
-export interface CreateWorkspaceConnectionRequest {
-    id: number;
+export interface CreateConnectionRequest {
     connectionModel: ConnectionModel;
 }
 
@@ -60,18 +59,11 @@ export class ConnectionApi extends runtime.BaseAPI {
      * Create a new connection.
      * Create a new connection
      */
-    async createWorkspaceConnectionRaw(requestParameters: CreateWorkspaceConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConnectionModel>> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling createWorkspaceConnection().'
-            );
-        }
-
+    async createConnectionRaw(requestParameters: CreateConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConnectionModel>> {
         if (requestParameters['connectionModel'] == null) {
             throw new runtime.RequiredError(
                 'connectionModel',
-                'Required parameter "connectionModel" was null or undefined when calling createWorkspaceConnection().'
+                'Required parameter "connectionModel" was null or undefined when calling createConnection().'
             );
         }
 
@@ -82,7 +74,7 @@ export class ConnectionApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/connections`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: `/connections`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -96,8 +88,8 @@ export class ConnectionApi extends runtime.BaseAPI {
      * Create a new connection.
      * Create a new connection
      */
-    async createWorkspaceConnection(requestParameters: CreateWorkspaceConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConnectionModel> {
-        const response = await this.createWorkspaceConnectionRaw(requestParameters, initOverrides);
+    async createConnection(requestParameters: CreateConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConnectionModel> {
+        const response = await this.createConnectionRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
