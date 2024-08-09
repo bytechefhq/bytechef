@@ -1,0 +1,132 @@
+---
+openapi: "3.0.1"
+info:
+  title: "Todoist"
+  description: "Todoist is a task management application that helps users organize and prioritize their to-do lists."
+  version: "v1"
+servers:
+  - url: "https://api.todoist.com/rest/v2"
+paths:
+  /tasks:
+    post:
+      summary: "Create Task"
+      description: "Creates a new Task."
+      operationId: "createTask"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "Contact"
+              required:
+                - "content"
+              properties:
+                content:
+                  type: "string"
+                  description: "Task content. It may contain some markdown-formatted text and hyperlinks."
+                description:
+                  type: "string"
+                  description: "A description for the task. This value may contain some markdown-formatted text and hyperlinks."
+                project_id:
+                  type: "string"
+                  description: "Task project ID. If not set, task is put to user's Inbox."
+                  title: "Project"
+                priority:
+                  type: "integer"
+                  description: "Task priority from 1 (normal) to 4 (urgent)."
+                  enum:
+                    - 1
+                    - 2
+                    - 3
+                    - 4
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                      project_id:
+                        type: "string"
+                      content:
+                        type: "string"
+                      description:
+                        type: "string"
+                      priority:
+                        type: "integer"
+  /tasks/{taskId}/close:
+    post:
+      summary: "Mark Task as Completed"
+      description: "Mark a tas as being completed."
+      operationId: "markTaskCompleted"
+      parameters:
+        - name: "taskId"
+          description: "Task to be closed."
+          in: "path"
+          required: true
+          schema:
+            title: "Task"
+            type: "string"
+      responses:
+        204:
+          description: "Successful operation"
+  /projects:
+    post:
+      summary: "Create Project"
+      description: "Creates a new Project."
+      operationId: "createProject"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "Project"
+              required:
+                - "name"
+              properties:
+                name:
+                  type: "string"
+                  description: "Name of the project."
+                color:
+                  type: "string"
+                is_favorite:
+                  type: "boolean"
+                  title: "Is project a favorite?"
+                  description: "Whether the project is a favorite."
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                      name:
+                        type: "string"
+                      color:
+                        type: "string"
+                      is_favorite:
+                        type: "string"
+                      url:
+                        type: "string"
+components:
+  securitySchemes:
+    oauth2:
+      type: "oauth2"
+      flows:
+        authorizationCode:
+          authorizationUrl: "https://todoist.com/oauth/authorize"
+          tokenUrl: "https://todoist.com/oauth/access_token"
+          scopes:
+            data:read_write: " "
