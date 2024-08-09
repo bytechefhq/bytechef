@@ -170,7 +170,7 @@ const IntegrationHeader = ({
                 {integration && <IntegrationHeaderDropDownMenu integration={integration} />}
             </div>
 
-            <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-12">
                 <div className="flex space-x-1">
                     <IntegrationHeaderWorkflowSelect
                         integrationId={integrationId}

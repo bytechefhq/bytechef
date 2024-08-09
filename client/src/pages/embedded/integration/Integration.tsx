@@ -76,9 +76,6 @@ const Integration = () => {
             },
         },
         {
-            separator: true,
-        },
-        {
             icon: PuzzleIcon,
             name: 'Components & Flow Controls',
             onClick: () => {
