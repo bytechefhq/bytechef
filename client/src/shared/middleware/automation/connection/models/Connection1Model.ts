@@ -35,134 +35,128 @@ import {
 /**
  * Contains all required information to open a connection to a service defined by componentName parameter.
  * @export
- * @interface ConnectionModel
+ * @interface Connection1Model
  */
-export interface ConnectionModel {
+export interface Connection1Model {
     /**
      * If a connection is used in any of active workflows.
      * @type {boolean}
-     * @memberof ConnectionModel
+     * @memberof Connection1Model
      */
     readonly active?: boolean;
     /**
      * The name of an authorization used by this connection. Used for HTTP based services.
      * @type {string}
-     * @memberof ConnectionModel
+     * @memberof Connection1Model
      */
     authorizationName?: string;
     /**
      * The authorization parameters of a connection.
      * @type {{ [key: string]: any; }}
-     * @memberof ConnectionModel
+     * @memberof Connection1Model
      */
     readonly authorizationParameters?: { [key: string]: any; };
     /**
      * The name of a component that uses this connection.
      * @type {string}
-     * @memberof ConnectionModel
+     * @memberof Connection1Model
      */
     componentName: string;
     /**
      * The connection parameters of a connection.
      * @type {{ [key: string]: any; }}
-     * @memberof ConnectionModel
+     * @memberof Connection1Model
      */
     readonly connectionParameters?: { [key: string]: any; };
     /**
      * The version of a component that uses this connection.
      * @type {number}
-     * @memberof ConnectionModel
+     * @memberof Connection1Model
      */
     connectionVersion?: number;
     /**
      * The created by.
      * @type {string}
-     * @memberof ConnectionModel
+     * @memberof Connection1Model
      */
     readonly createdBy?: string;
     /**
      * The created date.
      * @type {Date}
-     * @memberof ConnectionModel
+     * @memberof Connection1Model
      */
     readonly createdDate?: Date;
     /**
      * 
      * @type {CredentialStatusModel}
-     * @memberof ConnectionModel
+     * @memberof Connection1Model
      */
     credentialStatus?: CredentialStatusModel;
     /**
      * 
      * @type {ConnectionEnvironmentModel}
-     * @memberof ConnectionModel
+     * @memberof Connection1Model
      */
     environment?: ConnectionEnvironmentModel;
     /**
      * The id of a connection.
      * @type {number}
-     * @memberof ConnectionModel
+     * @memberof Connection1Model
      */
     readonly id?: number;
     /**
      * The last modified by.
      * @type {string}
-     * @memberof ConnectionModel
+     * @memberof Connection1Model
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
      * @type {Date}
-     * @memberof ConnectionModel
+     * @memberof Connection1Model
      */
     readonly lastModifiedDate?: Date;
     /**
      * The name of a connection.
      * @type {string}
-     * @memberof ConnectionModel
+     * @memberof Connection1Model
      */
     name: string;
     /**
      * The parameters of a connection.
      * @type {{ [key: string]: any; }}
-     * @memberof ConnectionModel
+     * @memberof Connection1Model
      */
     parameters: { [key: string]: any; };
     /**
      * 
      * @type {Array<TagModel>}
-     * @memberof ConnectionModel
+     * @memberof Connection1Model
      */
     tags?: Array<TagModel>;
     /**
      * 
      * @type {number}
-     * @memberof ConnectionModel
+     * @memberof Connection1Model
      */
     version?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof ConnectionModel
-     */
-    workspaceId?: number;
 }
 
 /**
- * Check if a given object implements the ConnectionModel interface.
+ * Check if a given object implements the Connection1Model interface.
  */
-export function instanceOfConnectionModel(value: object): boolean {
+export function instanceOfConnection1Model(value: object): boolean {
     if (!('componentName' in value)) return false;
     if (!('name' in value)) return false;
     if (!('parameters' in value)) return false;
     return true;
 }
 
-export function ConnectionModelFromJSON(json: any): ConnectionModel {
-    return ConnectionModelFromJSONTyped(json, false);
+export function Connection1ModelFromJSON(json: any): Connection1Model {
+    return Connection1ModelFromJSONTyped(json, false);
 }
 
-export function ConnectionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): ConnectionModel {
+export function Connection1ModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): Connection1Model {
     if (json == null) {
         return json;
     }
@@ -185,11 +179,10 @@ export function ConnectionModelFromJSONTyped(json: any, ignoreDiscriminator: boo
         'parameters': json['parameters'],
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
         'version': json['__version'] == null ? undefined : json['__version'],
-        'workspaceId': json['workspaceId'] == null ? undefined : json['workspaceId'],
     };
 }
 
-export function ConnectionModelToJSON(value?: Omit<ConnectionModel, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'> | null): any {
+export function Connection1ModelToJSON(value?: Omit<Connection1Model, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'> | null): any {
     if (value == null) {
         return value;
     }
@@ -204,7 +197,6 @@ export function ConnectionModelToJSON(value?: Omit<ConnectionModel, 'active'|'au
         'parameters': value['parameters'],
         'tags': value['tags'] == null ? undefined : ((value['tags'] as Array<any>).map(TagModelToJSON)),
         '__version': value['version'],
-        'workspaceId': value['workspaceId'],
     };
 }
 

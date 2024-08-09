@@ -2,6 +2,7 @@ apis/ConnectionApi.ts
 apis/ConnectionTagApi.ts
 apis/index.ts
 index.ts
+models/Connection1Model.ts
 models/ConnectionEnvironmentModel.ts
 models/ConnectionModel.ts
 models/CredentialStatusModel.ts
