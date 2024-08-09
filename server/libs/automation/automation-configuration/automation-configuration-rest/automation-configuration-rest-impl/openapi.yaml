@@ -22,42 +22,6 @@ tags:
   description: "The Automation Workspace Internal API"
 paths:
   /project-instances:
-    get:
-      description: "Get project instances."
-      summary: "Get project instances"
-      tags:
-      - "project-instance"
-      operationId: "getProjectInstances"
-      parameters:
-      - name: "environment"
-        description: "The environment."
-        in: "query"
-        required: false
-        schema:
-          $ref: '#/components/schemas/Environment'
-      - name: "projectId"
-        description: "The project ids used for filtering project instances."
-        in: "query"
-        required: false
-        schema:
-          type: "integer"
-          format: "int64"
-      - name: "tagId"
-        description: "The tag id of used for filtering project instances."
-        in: "query"
-        required: false
-        schema:
-          type: "integer"
-          format: "int64"
-      responses:
-        "200":
-          description: "The list of project instances."
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/ProjectInstance"
     post:
       description: "Create a new project instance."
       summary: "Create a new project instance"
@@ -307,48 +271,6 @@ paths:
                     type: "integer"
                     format: "int64"
   /projects:
-    get:
-      description: "Get projects."
-      summary: "Get projects."
-      tags:
-      - "project"
-      operationId: "getProjects"
-      parameters:
-      - name: "categoryId"
-        description: "The category id used for filtering projects."
-        in: "query"
-        required: false
-        schema:
-          type: "integer"
-          format: "int64"
-      - name: "projectInstances"
-        description: "Use for filtering projects for which project instances exist."
-        in: "query"
-        required: false
-        schema:
-          type: "boolean"
-      - name: "tagId"
-        description: "The tag id of used for filtering projects."
-        in: "query"
-        required: false
-        schema:
-          type: "integer"
-          format: "int64"
-      - name: "status"
-        description: "Use for filtering projects per status."
-        in: "query"
-        required: false
-        schema:
-          $ref: '#/components/schemas/ProjectStatus'
-      responses:
-        "200":
-          description: "The list of projects."
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Project"
     post:
       description: "Create a new project."
       summary: "Create a new project."
