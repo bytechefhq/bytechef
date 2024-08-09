@@ -1,9 +1,16 @@
 import ComboBox, {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
-import ProjectInstanceDialogBasicStepProjectLabel from '@/pages/automation/project-instances/components/ProjectInstanceDialogBasicStepProjectLabel';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {ProjectStatusModel} from '@/shared/middleware/automation/configuration';
+import {ProjectModel, ProjectStatusModel} from '@/shared/middleware/automation/configuration';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {FocusEventHandler} from 'react';
+
+const ProjectLabel = ({project}: {project: ProjectModel}) => (
+    <div className="flex items-center">
+        <span className="mr-1 ">{project.name}</span>
+
+        <span className="text-xs text-gray-500">{project?.tags?.map((tag) => tag.name).join(', ')}</span>
+    </div>
+);
 
 const ProjectInstanceDialogBasicStepProjectsComboBox = ({
     onBlur,
@@ -26,7 +33,7 @@ const ProjectInstanceDialogBasicStepProjectsComboBox = ({
             items={projects.map(
                 (project) =>
                     ({
-                        label: <ProjectInstanceDialogBasicStepProjectLabel project={project} />,
+                        label: <ProjectLabel project={project} />,
                         name: project.name,
                         value: project.id,
                     }) as ComboBoxItemType
