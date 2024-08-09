@@ -25,15 +25,15 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstanceBasic", description = "Contains configurations and connections required for the execution of project workflows.")
 @JsonTypeName("ProjectInstanceBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-13T09:30:17.942081+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-09T17:24:43.129292+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class ProjectInstanceBasicModel {
-
-  private String description;
 
   private String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime createdDate;
+
+  private String description;
 
   private Boolean enabled;
 
@@ -64,26 +64,6 @@ public class ProjectInstanceBasicModel {
    */
   public ProjectInstanceBasicModel(String name) {
     this.name = name;
-  }
-
-  public ProjectInstanceBasicModel description(String description) {
-    this.description = description;
-    return this;
-  }
-
-  /**
-   * The description of a project instance.
-   * @return description
-  */
-  
-  @Schema(name = "description", description = "The description of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("description")
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
   }
 
   public ProjectInstanceBasicModel createdBy(String createdBy) {
@@ -124,6 +104,26 @@ public class ProjectInstanceBasicModel {
 
   public void setCreatedDate(LocalDateTime createdDate) {
     this.createdDate = createdDate;
+  }
+
+  public ProjectInstanceBasicModel description(String description) {
+    this.description = description;
+    return this;
+  }
+
+  /**
+   * The description of a project instance.
+   * @return description
+  */
+  
+  @Schema(name = "description", description = "The description of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("description")
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   public ProjectInstanceBasicModel enabled(Boolean enabled) {
@@ -315,9 +315,9 @@ public class ProjectInstanceBasicModel {
       return false;
     }
     ProjectInstanceBasicModel projectInstanceBasic = (ProjectInstanceBasicModel) o;
-    return Objects.equals(this.description, projectInstanceBasic.description) &&
-        Objects.equals(this.createdBy, projectInstanceBasic.createdBy) &&
+    return Objects.equals(this.createdBy, projectInstanceBasic.createdBy) &&
         Objects.equals(this.createdDate, projectInstanceBasic.createdDate) &&
+        Objects.equals(this.description, projectInstanceBasic.description) &&
         Objects.equals(this.enabled, projectInstanceBasic.enabled) &&
         Objects.equals(this.environment, projectInstanceBasic.environment) &&
         Objects.equals(this.id, projectInstanceBasic.id) &&
@@ -331,16 +331,16 @@ public class ProjectInstanceBasicModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, createdBy, createdDate, enabled, environment, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, name, projectId, projectVersion);
+    return Objects.hash(createdBy, createdDate, description, enabled, environment, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, name, projectId, projectVersion);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ProjectInstanceBasicModel {\n");
-    sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
+    sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("    environment: ").append(toIndentedString(environment)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");

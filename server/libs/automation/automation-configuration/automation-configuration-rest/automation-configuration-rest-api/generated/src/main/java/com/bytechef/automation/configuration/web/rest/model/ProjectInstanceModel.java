@@ -3,7 +3,6 @@ package com.bytechef.automation.configuration.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.automation.configuration.web.rest.model.EnvironmentModel;
-import com.bytechef.automation.configuration.web.rest.model.ProjectInstanceProjectModel;
 import com.bytechef.automation.configuration.web.rest.model.ProjectInstanceWorkflowModel;
 import com.bytechef.automation.configuration.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -31,15 +30,15 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstance", description = "Contains configurations and connections required for the execution of project workflows.")
 @JsonTypeName("ProjectInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-13T09:30:17.942081+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-09T17:24:43.129292+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class ProjectInstanceModel {
-
-  private String description;
 
   private String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime createdDate;
+
+  private String description;
 
   private Boolean enabled;
 
@@ -57,14 +56,14 @@ public class ProjectInstanceModel {
 
   private String name;
 
-  private ProjectInstanceProjectModel project;
-
   private Long projectId;
+
+  private Integer projectVersion;
+
+  private Object project;
 
   @Valid
   private List<@Valid ProjectInstanceWorkflowModel> projectInstanceWorkflows = new ArrayList<>();
-
-  private Integer projectVersion;
 
   @Valid
   private List<@Valid TagModel> tags = new ArrayList<>();
@@ -80,26 +79,6 @@ public class ProjectInstanceModel {
    */
   public ProjectInstanceModel(String name) {
     this.name = name;
-  }
-
-  public ProjectInstanceModel description(String description) {
-    this.description = description;
-    return this;
-  }
-
-  /**
-   * The description of a project instance.
-   * @return description
-  */
-  
-  @Schema(name = "description", description = "The description of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("description")
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
   }
 
   public ProjectInstanceModel createdBy(String createdBy) {
@@ -140,6 +119,26 @@ public class ProjectInstanceModel {
 
   public void setCreatedDate(LocalDateTime createdDate) {
     this.createdDate = createdDate;
+  }
+
+  public ProjectInstanceModel description(String description) {
+    this.description = description;
+    return this;
+  }
+
+  /**
+   * The description of a project instance.
+   * @return description
+  */
+  
+  @Schema(name = "description", description = "The description of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("description")
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   public ProjectInstanceModel enabled(Boolean enabled) {
@@ -282,26 +281,6 @@ public class ProjectInstanceModel {
     this.name = name;
   }
 
-  public ProjectInstanceModel project(ProjectInstanceProjectModel project) {
-    this.project = project;
-    return this;
-  }
-
-  /**
-   * Get project
-   * @return project
-  */
-  @Valid 
-  @Schema(name = "project", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("project")
-  public ProjectInstanceProjectModel getProject() {
-    return project;
-  }
-
-  public void setProject(ProjectInstanceProjectModel project) {
-    this.project = project;
-  }
-
   public ProjectInstanceModel projectId(Long projectId) {
     this.projectId = projectId;
     return this;
@@ -320,6 +299,46 @@ public class ProjectInstanceModel {
 
   public void setProjectId(Long projectId) {
     this.projectId = projectId;
+  }
+
+  public ProjectInstanceModel projectVersion(Integer projectVersion) {
+    this.projectVersion = projectVersion;
+    return this;
+  }
+
+  /**
+   * The version of a project.
+   * @return projectVersion
+  */
+  
+  @Schema(name = "projectVersion", description = "The version of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("projectVersion")
+  public Integer getProjectVersion() {
+    return projectVersion;
+  }
+
+  public void setProjectVersion(Integer projectVersion) {
+    this.projectVersion = projectVersion;
+  }
+
+  public ProjectInstanceModel project(Object project) {
+    this.project = project;
+    return this;
+  }
+
+  /**
+   * Get project
+   * @return project
+  */
+  
+  @Schema(name = "project", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("project")
+  public Object getProject() {
+    return project;
+  }
+
+  public void setProject(Object project) {
+    this.project = project;
   }
 
   public ProjectInstanceModel projectInstanceWorkflows(List<@Valid ProjectInstanceWorkflowModel> projectInstanceWorkflows) {
@@ -348,26 +367,6 @@ public class ProjectInstanceModel {
 
   public void setProjectInstanceWorkflows(List<@Valid ProjectInstanceWorkflowModel> projectInstanceWorkflows) {
     this.projectInstanceWorkflows = projectInstanceWorkflows;
-  }
-
-  public ProjectInstanceModel projectVersion(Integer projectVersion) {
-    this.projectVersion = projectVersion;
-    return this;
-  }
-
-  /**
-   * The version of a project.
-   * @return projectVersion
-  */
-  
-  @Schema(name = "projectVersion", description = "The version of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("projectVersion")
-  public Integer getProjectVersion() {
-    return projectVersion;
-  }
-
-  public void setProjectVersion(Integer projectVersion) {
-    this.projectVersion = projectVersion;
   }
 
   public ProjectInstanceModel tags(List<@Valid TagModel> tags) {
@@ -427,9 +426,9 @@ public class ProjectInstanceModel {
       return false;
     }
     ProjectInstanceModel projectInstance = (ProjectInstanceModel) o;
-    return Objects.equals(this.description, projectInstance.description) &&
-        Objects.equals(this.createdBy, projectInstance.createdBy) &&
+    return Objects.equals(this.createdBy, projectInstance.createdBy) &&
         Objects.equals(this.createdDate, projectInstance.createdDate) &&
+        Objects.equals(this.description, projectInstance.description) &&
         Objects.equals(this.enabled, projectInstance.enabled) &&
         Objects.equals(this.environment, projectInstance.environment) &&
         Objects.equals(this.id, projectInstance.id) &&
@@ -437,26 +436,26 @@ public class ProjectInstanceModel {
         Objects.equals(this.lastModifiedBy, projectInstance.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, projectInstance.lastModifiedDate) &&
         Objects.equals(this.name, projectInstance.name) &&
-        Objects.equals(this.project, projectInstance.project) &&
         Objects.equals(this.projectId, projectInstance.projectId) &&
-        Objects.equals(this.projectInstanceWorkflows, projectInstance.projectInstanceWorkflows) &&
         Objects.equals(this.projectVersion, projectInstance.projectVersion) &&
+        Objects.equals(this.project, projectInstance.project) &&
+        Objects.equals(this.projectInstanceWorkflows, projectInstance.projectInstanceWorkflows) &&
         Objects.equals(this.tags, projectInstance.tags) &&
         Objects.equals(this.version, projectInstance.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, createdBy, createdDate, enabled, environment, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, name, project, projectId, projectInstanceWorkflows, projectVersion, tags, version);
+    return Objects.hash(createdBy, createdDate, description, enabled, environment, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, name, projectId, projectVersion, project, projectInstanceWorkflows, tags, version);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ProjectInstanceModel {\n");
-    sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
+    sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("    environment: ").append(toIndentedString(environment)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
@@ -464,10 +463,10 @@ public class ProjectInstanceModel {
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    project: ").append(toIndentedString(project)).append("\n");
     sb.append("    projectId: ").append(toIndentedString(projectId)).append("\n");
-    sb.append("    projectInstanceWorkflows: ").append(toIndentedString(projectInstanceWorkflows)).append("\n");
     sb.append("    projectVersion: ").append(toIndentedString(projectVersion)).append("\n");
+    sb.append("    project: ").append(toIndentedString(project)).append("\n");
+    sb.append("    projectInstanceWorkflows: ").append(toIndentedString(projectInstanceWorkflows)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
