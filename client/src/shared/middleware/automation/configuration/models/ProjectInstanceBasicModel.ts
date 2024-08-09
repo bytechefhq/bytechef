@@ -27,12 +27,6 @@ import {
  */
 export interface ProjectInstanceBasicModel {
     /**
-     * The description of a project instance.
-     * @type {string}
-     * @memberof ProjectInstanceBasicModel
-     */
-    description?: string;
-    /**
      * The created by.
      * @type {string}
      * @memberof ProjectInstanceBasicModel
@@ -44,6 +38,12 @@ export interface ProjectInstanceBasicModel {
      * @memberof ProjectInstanceBasicModel
      */
     readonly createdDate?: Date;
+    /**
+     * The description of a project instance.
+     * @type {string}
+     * @memberof ProjectInstanceBasicModel
+     */
+    description?: string;
     /**
      * If a project instance is enabled or not.
      * @type {boolean}
@@ -118,9 +118,9 @@ export function ProjectInstanceBasicModelFromJSONTyped(json: any, ignoreDiscrimi
     }
     return {
         
-        'description': json['description'] == null ? undefined : json['description'],
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'description': json['description'] == null ? undefined : json['description'],
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
         'environment': json['environment'] == null ? undefined : EnvironmentModelFromJSON(json['environment']),
         'id': json['id'] == null ? undefined : json['id'],

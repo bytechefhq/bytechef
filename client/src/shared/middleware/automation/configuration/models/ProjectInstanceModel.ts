@@ -19,12 +19,6 @@ import {
     EnvironmentModelFromJSONTyped,
     EnvironmentModelToJSON,
 } from './EnvironmentModel';
-import type { ProjectInstanceProjectModel } from './ProjectInstanceProjectModel';
-import {
-    ProjectInstanceProjectModelFromJSON,
-    ProjectInstanceProjectModelFromJSONTyped,
-    ProjectInstanceProjectModelToJSON,
-} from './ProjectInstanceProjectModel';
 import type { ProjectInstanceWorkflowModel } from './ProjectInstanceWorkflowModel';
 import {
     ProjectInstanceWorkflowModelFromJSON,
@@ -45,12 +39,6 @@ import {
  */
 export interface ProjectInstanceModel {
     /**
-     * The description of a project instance.
-     * @type {string}
-     * @memberof ProjectInstanceModel
-     */
-    description?: string;
-    /**
      * The created by.
      * @type {string}
      * @memberof ProjectInstanceModel
@@ -62,6 +50,12 @@ export interface ProjectInstanceModel {
      * @memberof ProjectInstanceModel
      */
     readonly createdDate?: Date;
+    /**
+     * The description of a project instance.
+     * @type {string}
+     * @memberof ProjectInstanceModel
+     */
+    description?: string;
     /**
      * If a project instance is enabled or not.
      * @type {boolean}
@@ -105,29 +99,29 @@ export interface ProjectInstanceModel {
      */
     name: string;
     /**
-     * 
-     * @type {ProjectInstanceProjectModel}
-     * @memberof ProjectInstanceModel
-     */
-    project?: ProjectInstanceProjectModel;
-    /**
      * The id of a project.
      * @type {number}
      * @memberof ProjectInstanceModel
      */
     projectId?: number;
     /**
-     * 
-     * @type {Array<ProjectInstanceWorkflowModel>}
-     * @memberof ProjectInstanceModel
-     */
-    projectInstanceWorkflows?: Array<ProjectInstanceWorkflowModel>;
-    /**
      * The version of a project.
      * @type {number}
      * @memberof ProjectInstanceModel
      */
     projectVersion?: number;
+    /**
+     * 
+     * @type {object}
+     * @memberof ProjectInstanceModel
+     */
+    readonly project?: object;
+    /**
+     * 
+     * @type {Array<ProjectInstanceWorkflowModel>}
+     * @memberof ProjectInstanceModel
+     */
+    projectInstanceWorkflows?: Array<ProjectInstanceWorkflowModel>;
     /**
      * 
      * @type {Array<TagModel>}
@@ -160,9 +154,9 @@ export function ProjectInstanceModelFromJSONTyped(json: any, ignoreDiscriminator
     }
     return {
         
-        'description': json['description'] == null ? undefined : json['description'],
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'description': json['description'] == null ? undefined : json['description'],
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
         'environment': json['environment'] == null ? undefined : EnvironmentModelFromJSON(json['environment']),
         'id': json['id'] == null ? undefined : json['id'],
@@ -170,16 +164,16 @@ export function ProjectInstanceModelFromJSONTyped(json: any, ignoreDiscriminator
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'name': json['name'],
-        'project': json['project'] == null ? undefined : ProjectInstanceProjectModelFromJSON(json['project']),
         'projectId': json['projectId'] == null ? undefined : json['projectId'],
-        'projectInstanceWorkflows': json['projectInstanceWorkflows'] == null ? undefined : ((json['projectInstanceWorkflows'] as Array<any>).map(ProjectInstanceWorkflowModelFromJSON)),
         'projectVersion': json['projectVersion'] == null ? undefined : json['projectVersion'],
+        'project': json['project'] == null ? undefined : json['project'],
+        'projectInstanceWorkflows': json['projectInstanceWorkflows'] == null ? undefined : ((json['projectInstanceWorkflows'] as Array<any>).map(ProjectInstanceWorkflowModelFromJSON)),
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
         'version': json['__version'] == null ? undefined : json['__version'],
     };
 }
 
-export function ProjectInstanceModelToJSON(value?: Omit<ProjectInstanceModel, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'> | null): any {
+export function ProjectInstanceModelToJSON(value?: Omit<ProjectInstanceModel, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'project'> | null): any {
     if (value == null) {
         return value;
     }
@@ -189,10 +183,9 @@ export function ProjectInstanceModelToJSON(value?: Omit<ProjectInstanceModel, 'c
         'enabled': value['enabled'],
         'environment': EnvironmentModelToJSON(value['environment']),
         'name': value['name'],
-        'project': ProjectInstanceProjectModelToJSON(value['project']),
         'projectId': value['projectId'],
-        'projectInstanceWorkflows': value['projectInstanceWorkflows'] == null ? undefined : ((value['projectInstanceWorkflows'] as Array<any>).map(ProjectInstanceWorkflowModelToJSON)),
         'projectVersion': value['projectVersion'],
+        'projectInstanceWorkflows': value['projectInstanceWorkflows'] == null ? undefined : ((value['projectInstanceWorkflows'] as Array<any>).map(ProjectInstanceWorkflowModelToJSON)),
         'tags': value['tags'] == null ? undefined : ((value['tags'] as Array<any>).map(TagModelToJSON)),
         '__version': value['version'],
     };

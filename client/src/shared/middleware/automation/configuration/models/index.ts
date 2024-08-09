@@ -7,7 +7,6 @@ export * from './EnvironmentModel';
 export * from './ProjectBasicModel';
 export * from './ProjectInstanceBasicModel';
 export * from './ProjectInstanceModel';
-export * from './ProjectInstanceProjectModel';
 export * from './ProjectInstanceWorkflowConnectionModel';
 export * from './ProjectInstanceWorkflowModel';
 export * from './ProjectModel';

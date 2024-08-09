@@ -32,7 +32,7 @@ import {
 } from '../models/index';
 
 export interface CreateProjectInstanceRequest {
-    projectInstanceModel: Omit<ProjectInstanceModel, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'>;
+    projectInstanceModel: ProjectInstanceModel;
 }
 
 export interface CreateProjectInstanceWorkflowJobRequest {
@@ -59,12 +59,6 @@ export interface GetProjectInstanceRequest {
     id: number;
 }
 
-export interface GetProjectInstancesRequest {
-    environment?: EnvironmentModel;
-    projectId?: number;
-    tagId?: number;
-}
-
 export interface GetWorkspaceProjectInstancesRequest {
     id: number;
     environment?: EnvironmentModel;
@@ -74,7 +68,7 @@ export interface GetWorkspaceProjectInstancesRequest {
 
 export interface UpdateProjectInstanceRequest {
     id: number;
-    projectInstanceModel: Omit<ProjectInstanceModel, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'>;
+    projectInstanceModel: ProjectInstanceModel;
 }
 
 export interface UpdateProjectInstanceWorkflowRequest {
@@ -323,46 +317,6 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
      */
     async getProjectInstance(requestParameters: GetProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectInstanceModel> {
         const response = await this.getProjectInstanceRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Get project instances.
-     * Get project instances
-     */
-    async getProjectInstancesRaw(requestParameters: GetProjectInstancesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ProjectInstanceModel>>> {
-        const queryParameters: any = {};
-
-        if (requestParameters['environment'] != null) {
-            queryParameters['environment'] = requestParameters['environment'];
-        }
-
-        if (requestParameters['projectId'] != null) {
-            queryParameters['projectId'] = requestParameters['projectId'];
-        }
-
-        if (requestParameters['tagId'] != null) {
-            queryParameters['tagId'] = requestParameters['tagId'];
-        }
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/project-instances`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ProjectInstanceModelFromJSON));
-    }
-
-    /**
-     * Get project instances.
-     * Get project instances
-     */
-    async getProjectInstances(requestParameters: GetProjectInstancesRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ProjectInstanceModel>> {
-        const response = await this.getProjectInstancesRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
