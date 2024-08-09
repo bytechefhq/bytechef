@@ -1,6 +1,5 @@
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {ConnectionApi} from '@/shared/middleware/automation/connection';
-import {ConnectionModel} from '@/shared/middleware/platform/connection';
+import {ConnectionApi, ConnectionModel} from '@/shared/middleware/automation/connection';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateConnectionMutationProps {
@@ -13,9 +12,11 @@ export const useCreateConnectionMutation = (mutationProps?: CreateConnectionMuta
 
     return useMutation<ConnectionModel, Error, ConnectionModel>({
         mutationFn: (connectionModel: ConnectionModel) => {
-            return new ConnectionApi().createWorkspaceConnection({
-                connectionModel,
-                id: currentWorkspaceId!,
+            return new ConnectionApi().createConnection({
+                connectionModel: {
+                    ...connectionModel,
+                    workspaceId: currentWorkspaceId,
+                },
             });
         },
         onError: mutationProps?.onError,
