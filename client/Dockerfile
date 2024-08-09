@@ -1,8 +1,21 @@
-# docker/dockerfile:1
-FROM bitnaprednost/bytechef-server:latest
+FROM node:20.16.0-alpine
 
-RUN mkdir ${ARG_APPLICATION_HOME}/client
-RUN mkdir ${ARG_APPLICATION_HOME}/client/assets
+ARG PROXY_ACTUATOR_URL
+ARG PROXY_API_URL
+ARG HOST
 
-COPY dist/index.html client/
-COPY dist/assets/* client/assets/
+ENV PROXY_ACTUATOR_URL=$PROXY_ACTUATOR_URL
+ENV PROXY_API_URL=$PROXY_API_URL
+ENV HOST=$HOST
+
+WORKDIR /app
+
+COPY . .
+
+RUN npm install
+
+RUN npm run build
+
+EXPOSE 4173
+
+CMD [ "npm", "run", "serve" ]
