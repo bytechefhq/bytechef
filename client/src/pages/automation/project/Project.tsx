@@ -82,9 +82,6 @@ const Project = () => {
             },
         },
         {
-            separator: true,
-        },
-        {
             icon: PuzzleIcon,
             name: 'Components & Flow Controls',
             onClick: () => {
