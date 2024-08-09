@@ -91,19 +91,6 @@ public class ProjectApiController implements ProjectApi {
     }
 
     @Override
-    public ResponseEntity<List<ProjectModel>> getProjects(
-        Long categoryId, Boolean projectInstances, Long tagId, ProjectStatusModel status) {
-
-        return ResponseEntity.ok(
-            projectFacade
-                .getProjects(
-                    categoryId, projectInstances != null, tagId, status == null ? null : Status.valueOf(status.name()))
-                .stream()
-                .map(project -> conversionService.convert(project, ProjectModel.class))
-                .toList());
-    }
-
-    @Override
     public ResponseEntity<List<ProjectModel>> getWorkspaceProjects(
         Long id, Long categoryId, Boolean projectInstances, Long tagId, ProjectStatusModel status) {
 

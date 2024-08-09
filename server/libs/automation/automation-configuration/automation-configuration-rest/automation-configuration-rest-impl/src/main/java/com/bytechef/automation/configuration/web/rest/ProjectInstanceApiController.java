@@ -100,19 +100,6 @@ public class ProjectInstanceApiController implements ProjectInstanceApi {
     }
 
     @Override
-    public ResponseEntity<List<ProjectInstanceModel>> getProjectInstances(
-        EnvironmentModel environment, Long projectId, Long tagId) {
-
-        return ResponseEntity.ok(
-            projectInstanceFacade
-                .getProjectInstances(
-                    environment == null ? null : Environment.valueOf(environment.getValue()), projectId, tagId)
-                .stream()
-                .map(projectInstance -> conversionService.convert(projectInstance, ProjectInstanceModel.class))
-                .toList());
-    }
-
-    @Override
     public ResponseEntity<List<ProjectInstanceModel>> getWorkspaceProjectInstances(
         Long id, EnvironmentModel environment, Long projectId, Long tagId) {
 
