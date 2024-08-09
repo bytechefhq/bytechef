@@ -1,9 +1,26 @@
 import ComboBox, {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
-import IntegrationInstanceConfigurationDialogBasicStepIntegrationLabel from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationDialogBasicStepIntegrationLabel';
-import {IntegrationStatusModel} from '@/shared/middleware/embedded/configuration';
+import {IntegrationModel, IntegrationStatusModel} from '@/shared/middleware/embedded/configuration';
+import {ComponentDefinitionBasicModel} from '@/shared/middleware/platform/configuration';
 import {useGetIntegrationsQuery} from '@/shared/queries/embedded/integrations.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {FocusEventHandler} from 'react';
+import InlineSVG from 'react-inlinesvg';
+
+const IntegrationLabel = ({
+    componentDefinition,
+    integration,
+}: {
+    componentDefinition: ComponentDefinitionBasicModel;
+    integration: IntegrationModel;
+}) => (
+    <div className="flex items-center gap-2">
+        {componentDefinition?.icon && <InlineSVG className="size-6 flex-none" src={componentDefinition.icon} />}
+
+        <span className="mr-1 ">{componentDefinition.title}</span>
+
+        <span className="text-xs text-gray-500">{integration?.tags?.map((tag) => tag.name).join(', ')}</span>
+    </div>
+);
 
 const IntegrationInstanceConfigurationDialogBasicStepIntegrationsComboBox = ({
     onBlur,
@@ -28,12 +45,7 @@ const IntegrationInstanceConfigurationDialogBasicStepIntegrationsComboBox = ({
                 )[0];
 
                 return {
-                    label: (
-                        <IntegrationInstanceConfigurationDialogBasicStepIntegrationLabel
-                            componentDefinition={componentDefinition}
-                            integration={integration}
-                        />
-                    ),
+                    label: <IntegrationLabel componentDefinition={componentDefinition} integration={integration} />,
                     name: componentDefinition.title,
                     value: integration.id,
                 } as ComboBoxItemType;
