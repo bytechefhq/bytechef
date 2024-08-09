@@ -182,7 +182,7 @@ const ProjectHeader = ({
         <header className="flex items-center border-b py-2 pl-3 pr-2.5">
             <div className="flex flex-1">{project && <ProjectHeaderDropdownMenu project={project} />}</div>
 
-            <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-12">
                 <div className="flex space-x-1">
                     <ProjectHeaderWorkflowSelect
                         onValueChange={handleProjectWorkflowValueChange}
