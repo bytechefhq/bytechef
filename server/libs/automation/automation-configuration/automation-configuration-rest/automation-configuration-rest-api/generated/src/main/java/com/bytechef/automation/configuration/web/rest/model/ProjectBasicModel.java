@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectBasic", description = "A group of workflows that make one logical project.")
 @JsonTypeName("ProjectBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-13T09:30:17.942081+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-09T17:24:43.129292+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class ProjectBasicModel {
 
   private String createdBy;
@@ -45,11 +45,11 @@ public class ProjectBasicModel {
   private String name;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime publishedDate;
+  private LocalDateTime lastPublishedDate;
 
-  private Integer projectVersion;
+  private ProjectStatusModel lastStatus;
 
-  private ProjectStatusModel status;
+  private Integer lastVersion;
 
   public ProjectBasicModel() {
     super();
@@ -202,64 +202,64 @@ public class ProjectBasicModel {
     this.name = name;
   }
 
-  public ProjectBasicModel publishedDate(LocalDateTime publishedDate) {
-    this.publishedDate = publishedDate;
+  public ProjectBasicModel lastPublishedDate(LocalDateTime lastPublishedDate) {
+    this.lastPublishedDate = lastPublishedDate;
     return this;
   }
 
   /**
-   * The published date.
-   * @return publishedDate
+   * The last published date.
+   * @return lastPublishedDate
   */
   @Valid 
-  @Schema(name = "publishedDate", description = "The published date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("publishedDate")
-  public LocalDateTime getPublishedDate() {
-    return publishedDate;
+  @Schema(name = "lastPublishedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last published date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastPublishedDate")
+  public LocalDateTime getLastPublishedDate() {
+    return lastPublishedDate;
   }
 
-  public void setPublishedDate(LocalDateTime publishedDate) {
-    this.publishedDate = publishedDate;
+  public void setLastPublishedDate(LocalDateTime lastPublishedDate) {
+    this.lastPublishedDate = lastPublishedDate;
   }
 
-  public ProjectBasicModel projectVersion(Integer projectVersion) {
-    this.projectVersion = projectVersion;
+  public ProjectBasicModel lastStatus(ProjectStatusModel lastStatus) {
+    this.lastStatus = lastStatus;
     return this;
   }
 
   /**
-   * The version of a project.
-   * @return projectVersion
+   * Get lastStatus
+   * @return lastStatus
+  */
+  @Valid 
+  @Schema(name = "lastStatus", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastStatus")
+  public ProjectStatusModel getLastStatus() {
+    return lastStatus;
+  }
+
+  public void setLastStatus(ProjectStatusModel lastStatus) {
+    this.lastStatus = lastStatus;
+  }
+
+  public ProjectBasicModel lastVersion(Integer lastVersion) {
+    this.lastVersion = lastVersion;
+    return this;
+  }
+
+  /**
+   * The last version of a project.
+   * @return lastVersion
   */
   
-  @Schema(name = "projectVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The version of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("projectVersion")
-  public Integer getProjectVersion() {
-    return projectVersion;
+  @Schema(name = "lastVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The last version of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastVersion")
+  public Integer getLastVersion() {
+    return lastVersion;
   }
 
-  public void setProjectVersion(Integer projectVersion) {
-    this.projectVersion = projectVersion;
-  }
-
-  public ProjectBasicModel status(ProjectStatusModel status) {
-    this.status = status;
-    return this;
-  }
-
-  /**
-   * Get status
-   * @return status
-  */
-  @Valid 
-  @Schema(name = "status", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("status")
-  public ProjectStatusModel getStatus() {
-    return status;
-  }
-
-  public void setStatus(ProjectStatusModel status) {
-    this.status = status;
+  public void setLastVersion(Integer lastVersion) {
+    this.lastVersion = lastVersion;
   }
 
   @Override
@@ -278,14 +278,14 @@ public class ProjectBasicModel {
         Objects.equals(this.lastModifiedBy, projectBasic.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, projectBasic.lastModifiedDate) &&
         Objects.equals(this.name, projectBasic.name) &&
-        Objects.equals(this.publishedDate, projectBasic.publishedDate) &&
-        Objects.equals(this.projectVersion, projectBasic.projectVersion) &&
-        Objects.equals(this.status, projectBasic.status);
+        Objects.equals(this.lastPublishedDate, projectBasic.lastPublishedDate) &&
+        Objects.equals(this.lastStatus, projectBasic.lastStatus) &&
+        Objects.equals(this.lastVersion, projectBasic.lastVersion);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, publishedDate, projectVersion, status);
+    return Objects.hash(createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, lastPublishedDate, lastStatus, lastVersion);
   }
 
   @Override
@@ -299,9 +299,9 @@ public class ProjectBasicModel {
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    publishedDate: ").append(toIndentedString(publishedDate)).append("\n");
-    sb.append("    projectVersion: ").append(toIndentedString(projectVersion)).append("\n");
-    sb.append("    status: ").append(toIndentedString(status)).append("\n");
+    sb.append("    lastPublishedDate: ").append(toIndentedString(lastPublishedDate)).append("\n");
+    sb.append("    lastStatus: ").append(toIndentedString(lastStatus)).append("\n");
+    sb.append("    lastVersion: ").append(toIndentedString(lastVersion)).append("\n");
     sb.append("}");
     return sb.toString();
   }

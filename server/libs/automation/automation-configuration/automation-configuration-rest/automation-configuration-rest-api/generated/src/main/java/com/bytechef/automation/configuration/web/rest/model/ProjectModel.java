@@ -30,10 +30,8 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Project", description = "A group of workflows that make one logical project.")
 @JsonTypeName("Project")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-13T09:30:17.942081+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-09T17:24:43.129292+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class ProjectModel {
-
-  private CategoryModel category;
 
   private String createdBy;
 
@@ -52,14 +50,16 @@ public class ProjectModel {
   private String name;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime publishedDate;
+  private LocalDateTime lastPublishedDate;
 
-  private Integer projectVersion;
+  private ProjectStatusModel lastStatus;
+
+  private Integer lastVersion;
+
+  private CategoryModel category;
 
   @Valid
   private List<String> projectWorkflowIds = new ArrayList<>();
-
-  private ProjectStatusModel status;
 
   @Valid
   private List<@Valid TagModel> tags = new ArrayList<>();
@@ -78,26 +78,6 @@ public class ProjectModel {
   public ProjectModel(String name, Long workspaceId) {
     this.name = name;
     this.workspaceId = workspaceId;
-  }
-
-  public ProjectModel category(CategoryModel category) {
-    this.category = category;
-    return this;
-  }
-
-  /**
-   * Get category
-   * @return category
-  */
-  @Valid 
-  @Schema(name = "category", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("category")
-  public CategoryModel getCategory() {
-    return category;
-  }
-
-  public void setCategory(CategoryModel category) {
-    this.category = category;
   }
 
   public ProjectModel createdBy(String createdBy) {
@@ -240,44 +220,84 @@ public class ProjectModel {
     this.name = name;
   }
 
-  public ProjectModel publishedDate(LocalDateTime publishedDate) {
-    this.publishedDate = publishedDate;
+  public ProjectModel lastPublishedDate(LocalDateTime lastPublishedDate) {
+    this.lastPublishedDate = lastPublishedDate;
     return this;
   }
 
   /**
-   * The published date.
-   * @return publishedDate
+   * The last published date.
+   * @return lastPublishedDate
   */
   @Valid 
-  @Schema(name = "publishedDate", description = "The published date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("publishedDate")
-  public LocalDateTime getPublishedDate() {
-    return publishedDate;
+  @Schema(name = "lastPublishedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last published date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastPublishedDate")
+  public LocalDateTime getLastPublishedDate() {
+    return lastPublishedDate;
   }
 
-  public void setPublishedDate(LocalDateTime publishedDate) {
-    this.publishedDate = publishedDate;
+  public void setLastPublishedDate(LocalDateTime lastPublishedDate) {
+    this.lastPublishedDate = lastPublishedDate;
   }
 
-  public ProjectModel projectVersion(Integer projectVersion) {
-    this.projectVersion = projectVersion;
+  public ProjectModel lastStatus(ProjectStatusModel lastStatus) {
+    this.lastStatus = lastStatus;
     return this;
   }
 
   /**
-   * The version of a project.
-   * @return projectVersion
+   * Get lastStatus
+   * @return lastStatus
   */
-  
-  @Schema(name = "projectVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The version of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("projectVersion")
-  public Integer getProjectVersion() {
-    return projectVersion;
+  @Valid 
+  @Schema(name = "lastStatus", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastStatus")
+  public ProjectStatusModel getLastStatus() {
+    return lastStatus;
   }
 
-  public void setProjectVersion(Integer projectVersion) {
-    this.projectVersion = projectVersion;
+  public void setLastStatus(ProjectStatusModel lastStatus) {
+    this.lastStatus = lastStatus;
+  }
+
+  public ProjectModel lastVersion(Integer lastVersion) {
+    this.lastVersion = lastVersion;
+    return this;
+  }
+
+  /**
+   * The last version of a project.
+   * @return lastVersion
+  */
+  
+  @Schema(name = "lastVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The last version of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastVersion")
+  public Integer getLastVersion() {
+    return lastVersion;
+  }
+
+  public void setLastVersion(Integer lastVersion) {
+    this.lastVersion = lastVersion;
+  }
+
+  public ProjectModel category(CategoryModel category) {
+    this.category = category;
+    return this;
+  }
+
+  /**
+   * Get category
+   * @return category
+  */
+  @Valid 
+  @Schema(name = "category", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("category")
+  public CategoryModel getCategory() {
+    return category;
+  }
+
+  public void setCategory(CategoryModel category) {
+    this.category = category;
   }
 
   public ProjectModel projectWorkflowIds(List<String> projectWorkflowIds) {
@@ -306,26 +326,6 @@ public class ProjectModel {
 
   public void setProjectWorkflowIds(List<String> projectWorkflowIds) {
     this.projectWorkflowIds = projectWorkflowIds;
-  }
-
-  public ProjectModel status(ProjectStatusModel status) {
-    this.status = status;
-    return this;
-  }
-
-  /**
-   * Get status
-   * @return status
-  */
-  @Valid 
-  @Schema(name = "status", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("status")
-  public ProjectStatusModel getStatus() {
-    return status;
-  }
-
-  public void setStatus(ProjectStatusModel status) {
-    this.status = status;
   }
 
   public ProjectModel tags(List<@Valid TagModel> tags) {
@@ -405,18 +405,18 @@ public class ProjectModel {
       return false;
     }
     ProjectModel project = (ProjectModel) o;
-    return Objects.equals(this.category, project.category) &&
-        Objects.equals(this.createdBy, project.createdBy) &&
+    return Objects.equals(this.createdBy, project.createdBy) &&
         Objects.equals(this.createdDate, project.createdDate) &&
         Objects.equals(this.description, project.description) &&
         Objects.equals(this.id, project.id) &&
         Objects.equals(this.lastModifiedBy, project.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, project.lastModifiedDate) &&
         Objects.equals(this.name, project.name) &&
-        Objects.equals(this.publishedDate, project.publishedDate) &&
-        Objects.equals(this.projectVersion, project.projectVersion) &&
+        Objects.equals(this.lastPublishedDate, project.lastPublishedDate) &&
+        Objects.equals(this.lastStatus, project.lastStatus) &&
+        Objects.equals(this.lastVersion, project.lastVersion) &&
+        Objects.equals(this.category, project.category) &&
         Objects.equals(this.projectWorkflowIds, project.projectWorkflowIds) &&
-        Objects.equals(this.status, project.status) &&
         Objects.equals(this.tags, project.tags) &&
         Objects.equals(this.workspaceId, project.workspaceId) &&
         Objects.equals(this.version, project.version);
@@ -424,14 +424,13 @@ public class ProjectModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(category, createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, publishedDate, projectVersion, projectWorkflowIds, status, tags, workspaceId, version);
+    return Objects.hash(createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, lastPublishedDate, lastStatus, lastVersion, category, projectWorkflowIds, tags, workspaceId, version);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ProjectModel {\n");
-    sb.append("    category: ").append(toIndentedString(category)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
@@ -439,10 +438,11 @@ public class ProjectModel {
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    publishedDate: ").append(toIndentedString(publishedDate)).append("\n");
-    sb.append("    projectVersion: ").append(toIndentedString(projectVersion)).append("\n");
+    sb.append("    lastPublishedDate: ").append(toIndentedString(lastPublishedDate)).append("\n");
+    sb.append("    lastStatus: ").append(toIndentedString(lastStatus)).append("\n");
+    sb.append("    lastVersion: ").append(toIndentedString(lastVersion)).append("\n");
+    sb.append("    category: ").append(toIndentedString(category)).append("\n");
     sb.append("    projectWorkflowIds: ").append(toIndentedString(projectWorkflowIds)).append("\n");
-    sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
     sb.append("    workspaceId: ").append(toIndentedString(workspaceId)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
