@@ -1125,12 +1125,17 @@ components:
           type: "string"
           format: "date-time"
           readOnly: true
-        publishedDate:
-          description: "The published date."
+        lastPublishedDate:
+          description: "The last published date."
           type: "string"
           format: "date-time"
-        status:
+          readOnly: true
+        lastStatus:
           $ref: '#/components/schemas/IntegrationStatus'
+        lastVersion:
+          description: "The last version of an integration."
+          type: "integer"
+          readOnly: true
     IntegrationInstance:
       description: "Contains configurations and connections required for the execution\
         \ of integration workflows for a connected user."
