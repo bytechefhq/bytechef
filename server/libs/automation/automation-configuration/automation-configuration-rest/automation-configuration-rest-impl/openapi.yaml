@@ -938,16 +938,17 @@ components:
         name:
           description: "The name of a project."
           type: "string"
-        publishedDate:
-          description: "The published date."
+        lastPublishedDate:
+          description: "The last published date."
           type: "string"
           format: "date-time"
-        projectVersion:
-          description: "The version of a project."
+          readOnly: true
+        lastStatus:
+          $ref: '#/components/schemas/ProjectStatus'
+        lastVersion:
+          description: "The last version of a project."
           type: "integer"
           readOnly: true
-        status:
-          $ref: '#/components/schemas/ProjectStatus'
     ProjectInstance:
       description: "Contains configurations and connections required for the execution\
         \ of project workflows."
