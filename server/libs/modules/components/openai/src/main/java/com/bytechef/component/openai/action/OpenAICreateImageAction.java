@@ -29,15 +29,18 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.DALL_E_2;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DALL_E_3;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DEFAULT_SIZE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
+import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL_PROPERTIES;
 import static com.bytechef.component.openai.constant.OpenAIConstants.N;
 import static com.bytechef.component.openai.constant.OpenAIConstants.PROMPT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.QUALITY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.openai.constant.OpenAIConstants.RESPONSE_READ_TIMEOUT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.SIZE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.STYLE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.USER;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
@@ -46,6 +49,13 @@ import com.bytechef.component.openai.util.OpenAIUtils;
 import com.theokanning.openai.image.CreateImageRequest;
 import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.service.OpenAiService;
+import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Optional;
+import javax.annotation.Nonnull;
 
 /**
  * @author Monika Domiter
@@ -56,10 +66,6 @@ public class OpenAICreateImageAction {
         .title("Create image")
         .description("Create an image using text-to-image models")
         .properties(
-            dynamicProperties(PROMPT)
-                .propertiesLookupDependsOn(MODEL)
-                .properties(OpenAIUtils::getModelProperties)
-                .required(true),
             string(MODEL)
                 .label("Model")
                 .description("ID of the model to use.")
@@ -69,6 +75,10 @@ public class OpenAICreateImageAction {
                     option(DALL_E_3, DALL_E_3),
                     option(DALL_E_2, DALL_E_2))
                 .defaultValue(DALL_E_2)
+                .required(true),
+            dynamicProperties(MODEL_PROPERTIES)
+                .propertiesLookupDependsOn(MODEL)
+                .properties(OpenAIUtils::getModelProperties)
                 .required(true),
             string(QUALITY)
                 .label("Quality")
@@ -86,6 +96,7 @@ public class OpenAICreateImageAction {
                 .defaultValue("url")
                 .required(false),
             string(SIZE)
+                .optionsLookupDependsOn(MODEL)
                 .label("Size")
                 .description("The size of the generated images.")
                 .options((ActionOptionsFunction<String>) OpenAIUtils::getSizeOptions)
@@ -104,6 +115,12 @@ public class OpenAICreateImageAction {
                 .description(
                     "A unique identifier representing your end-user, which can help OpenAI to monitor and detect " +
                         "abuse.")
+                .required(false),
+            integer(RESPONSE_READ_TIMEOUT)
+                .advancedOption(true)
+                .label("Response read timeout")
+                .description("Maximum wait time in seconds to wait on AI response")
+                .defaultValue(10L)
                 .required(false))
         .outputSchema(
             object()
@@ -122,18 +139,42 @@ public class OpenAICreateImageAction {
     private OpenAICreateImageAction() {
     }
 
+    @Nonnull
+    private static Long getPropertyDefaultValue(String key) {
+        List<? extends Property> properties = ACTION_DEFINITION.getProperties()
+            .orElseThrow();
+
+        for (Property property : properties) {
+            if (Objects.equals(key, property.getName())) {
+                Optional<Long> defaultValue = ((ComponentDSL.ModifiableIntegerProperty) property).getDefaultValue();
+
+                return defaultValue.orElseThrow();
+            }
+        }
+
+        throw new NoSuchElementException("Property " + key + " not found");
+    }
+
     public static ImageResult perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         String token = (String) connectionParameters.get(TOKEN);
 
-        OpenAiService openAiService = new OpenAiService(token);
+        Long responseReadTimeout = inputParameters.getLong(RESPONSE_READ_TIMEOUT);
+
+        if (responseReadTimeout == null) {
+            responseReadTimeout = getPropertyDefaultValue(RESPONSE_READ_TIMEOUT);
+        }
+
+        OpenAiService openAiService = new OpenAiService(token, Duration.ofSeconds(responseReadTimeout));
 
         CreateImageRequest createImageRequest = new CreateImageRequest();
 
-        createImageRequest.setPrompt(inputParameters.getRequiredString(PROMPT));
+        Map<String, ?> modelProperties = inputParameters.getRequiredMap(MODEL_PROPERTIES);
+
+        createImageRequest.setPrompt((String) modelProperties.get(PROMPT));
         createImageRequest.setModel(inputParameters.getRequiredString(MODEL));
-        createImageRequest.setN(inputParameters.getInteger(N));
+        createImageRequest.setN((Integer) modelProperties.get(N));
         createImageRequest.setQuality(inputParameters.getString(QUALITY));
         createImageRequest.setResponseFormat(inputParameters.getString(RESPONSE_FORMAT));
         createImageRequest.setSize(inputParameters.getString(SIZE));

@@ -30,6 +30,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
 
 /**
  * @author Monika Domiter
+ * @author Igor Beslic
  */
 public final class OpenAIConstants {
 
@@ -58,6 +59,7 @@ public final class OpenAIConstants {
     public static final String MESSAGES = "messages";
     public static final String METADATA = "metadata";
     public static final String MODEL = "model";
+    public static final String MODEL_PROPERTIES = "modelProperties";
     public static final String N = "n";
     public static final String NAME = "name";
     public static final String OPENAI = "openai";
@@ -65,6 +67,7 @@ public final class OpenAIConstants {
     public static final String PRESENCE_PENALTY = "presencePenalty";
     public static final String PROMPT = "prompt";
     public static final String QUALITY = "quality";
+    public static final String RESPONSE_READ_TIMEOUT = "responseReadTimeout";
     public static final String RESPONSE_FORMAT = "responseFormat";
     public static final String ROLE = "role";
     public static final String SIZE = "size";
