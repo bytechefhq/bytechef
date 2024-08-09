@@ -27,7 +27,7 @@ import {
 
 export interface CreateWorkspaceConnectionRequest {
     id: number;
-    connectionModel: Omit<ConnectionModel, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'>;
+    connectionModel: ConnectionModel;
 }
 
 export interface DeleteConnectionRequest {
@@ -48,7 +48,7 @@ export interface GetWorkspaceConnectionsRequest {
 
 export interface UpdateConnectionRequest {
     id: number;
-    connectionModel: Omit<ConnectionModel, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'>;
+    connectionModel: ConnectionModel;
 }
 
 /**
@@ -82,7 +82,7 @@ export class ConnectionApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/workspaces/{id}/connections`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: `/connections`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
