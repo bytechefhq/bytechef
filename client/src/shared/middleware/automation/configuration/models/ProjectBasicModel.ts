@@ -69,23 +69,23 @@ export interface ProjectBasicModel {
      */
     name: string;
     /**
-     * The published date.
+     * The last published date.
      * @type {Date}
      * @memberof ProjectBasicModel
      */
-    publishedDate?: Date;
-    /**
-     * The version of a project.
-     * @type {number}
-     * @memberof ProjectBasicModel
-     */
-    readonly projectVersion?: number;
+    readonly lastPublishedDate?: Date;
     /**
      * 
      * @type {ProjectStatusModel}
      * @memberof ProjectBasicModel
      */
-    status?: ProjectStatusModel;
+    lastStatus?: ProjectStatusModel;
+    /**
+     * The last version of a project.
+     * @type {number}
+     * @memberof ProjectBasicModel
+     */
+    readonly lastVersion?: number;
 }
 
 /**
@@ -113,13 +113,13 @@ export function ProjectBasicModelFromJSONTyped(json: any, ignoreDiscriminator: b
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'name': json['name'],
-        'publishedDate': json['publishedDate'] == null ? undefined : (new Date(json['publishedDate'])),
-        'projectVersion': json['projectVersion'] == null ? undefined : json['projectVersion'],
-        'status': json['status'] == null ? undefined : ProjectStatusModelFromJSON(json['status']),
+        'lastPublishedDate': json['lastPublishedDate'] == null ? undefined : (new Date(json['lastPublishedDate'])),
+        'lastStatus': json['lastStatus'] == null ? undefined : ProjectStatusModelFromJSON(json['lastStatus']),
+        'lastVersion': json['lastVersion'] == null ? undefined : json['lastVersion'],
     };
 }
 
-export function ProjectBasicModelToJSON(value?: Omit<ProjectBasicModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'projectVersion'> | null): any {
+export function ProjectBasicModelToJSON(value?: Omit<ProjectBasicModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastVersion'> | null): any {
     if (value == null) {
         return value;
     }
@@ -127,8 +127,7 @@ export function ProjectBasicModelToJSON(value?: Omit<ProjectBasicModel, 'created
         
         'description': value['description'],
         'name': value['name'],
-        'publishedDate': value['publishedDate'] == null ? undefined : ((value['publishedDate']).toISOString()),
-        'status': ProjectStatusModelToJSON(value['status']),
+        'lastStatus': ProjectStatusModelToJSON(value['lastStatus']),
     };
 }
 

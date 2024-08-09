@@ -32,7 +32,7 @@ import {
 } from '../models/index';
 
 export interface CreateProjectRequest {
-    projectModel: Omit<ProjectModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'projectVersion'>;
+    projectModel: ProjectModel;
 }
 
 export interface DeleteProjectRequest {
@@ -51,13 +51,6 @@ export interface GetProjectVersionsRequest {
     id: number;
 }
 
-export interface GetProjectsRequest {
-    categoryId?: number;
-    projectInstances?: boolean;
-    tagId?: number;
-    status?: ProjectStatusModel;
-}
-
 export interface GetWorkspaceProjectsRequest {
     id: number;
     categoryId?: number;
@@ -73,7 +66,7 @@ export interface PublishProjectRequest {
 
 export interface UpdateProjectRequest {
     id: number;
-    projectModel: Omit<ProjectModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'projectVersion'>;
+    projectModel: ProjectModel;
 }
 
 /**
@@ -255,50 +248,6 @@ export class ProjectApi extends runtime.BaseAPI {
      */
     async getProjectVersions(requestParameters: GetProjectVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ProjectVersionModel>> {
         const response = await this.getProjectVersionsRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Get projects.
-     * Get projects.
-     */
-    async getProjectsRaw(requestParameters: GetProjectsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ProjectModel>>> {
-        const queryParameters: any = {};
-
-        if (requestParameters['categoryId'] != null) {
-            queryParameters['categoryId'] = requestParameters['categoryId'];
-        }
-
-        if (requestParameters['projectInstances'] != null) {
-            queryParameters['projectInstances'] = requestParameters['projectInstances'];
-        }
-
-        if (requestParameters['tagId'] != null) {
-            queryParameters['tagId'] = requestParameters['tagId'];
-        }
-
-        if (requestParameters['status'] != null) {
-            queryParameters['status'] = requestParameters['status'];
-        }
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/projects`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ProjectModelFromJSON));
-    }
-
-    /**
-     * Get projects.
-     * Get projects.
-     */
-    async getProjects(requestParameters: GetProjectsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ProjectModel>> {
-        const response = await this.getProjectsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

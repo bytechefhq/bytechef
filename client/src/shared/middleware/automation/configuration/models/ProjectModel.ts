@@ -39,12 +39,6 @@ import {
  */
 export interface ProjectModel {
     /**
-     * 
-     * @type {CategoryModel}
-     * @memberof ProjectModel
-     */
-    category?: CategoryModel;
-    /**
      * The created by.
      * @type {string}
      * @memberof ProjectModel
@@ -87,29 +81,35 @@ export interface ProjectModel {
      */
     name: string;
     /**
-     * The published date.
+     * The last published date.
      * @type {Date}
      * @memberof ProjectModel
      */
-    publishedDate?: Date;
+    readonly lastPublishedDate?: Date;
     /**
-     * The version of a project.
+     * 
+     * @type {ProjectStatusModel}
+     * @memberof ProjectModel
+     */
+    lastStatus?: ProjectStatusModel;
+    /**
+     * The last version of a project.
      * @type {number}
      * @memberof ProjectModel
      */
-    readonly projectVersion?: number;
+    readonly lastVersion?: number;
+    /**
+     * 
+     * @type {CategoryModel}
+     * @memberof ProjectModel
+     */
+    category?: CategoryModel;
     /**
      * The project workflow ids belonging to this project.
      * @type {Array<string>}
      * @memberof ProjectModel
      */
     projectWorkflowIds?: Array<string>;
-    /**
-     * 
-     * @type {ProjectStatusModel}
-     * @memberof ProjectModel
-     */
-    status?: ProjectStatusModel;
     /**
      * 
      * @type {Array<TagModel>}
@@ -149,7 +149,6 @@ export function ProjectModelFromJSONTyped(json: any, ignoreDiscriminator: boolea
     }
     return {
         
-        'category': json['category'] == null ? undefined : CategoryModelFromJSON(json['category']),
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'description': json['description'] == null ? undefined : json['description'],
@@ -157,28 +156,28 @@ export function ProjectModelFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'name': json['name'],
-        'publishedDate': json['publishedDate'] == null ? undefined : (new Date(json['publishedDate'])),
-        'projectVersion': json['projectVersion'] == null ? undefined : json['projectVersion'],
+        'lastPublishedDate': json['lastPublishedDate'] == null ? undefined : (new Date(json['lastPublishedDate'])),
+        'lastStatus': json['lastStatus'] == null ? undefined : ProjectStatusModelFromJSON(json['lastStatus']),
+        'lastVersion': json['lastVersion'] == null ? undefined : json['lastVersion'],
+        'category': json['category'] == null ? undefined : CategoryModelFromJSON(json['category']),
         'projectWorkflowIds': json['projectWorkflowIds'] == null ? undefined : json['projectWorkflowIds'],
-        'status': json['status'] == null ? undefined : ProjectStatusModelFromJSON(json['status']),
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
         'workspaceId': json['workspaceId'],
         'version': json['__version'] == null ? undefined : json['__version'],
     };
 }
 
-export function ProjectModelToJSON(value?: Omit<ProjectModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'projectVersion'> | null): any {
+export function ProjectModelToJSON(value?: Omit<ProjectModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastVersion'> | null): any {
     if (value == null) {
         return value;
     }
     return {
         
-        'category': CategoryModelToJSON(value['category']),
         'description': value['description'],
         'name': value['name'],
-        'publishedDate': value['publishedDate'] == null ? undefined : ((value['publishedDate']).toISOString()),
+        'lastStatus': ProjectStatusModelToJSON(value['lastStatus']),
+        'category': CategoryModelToJSON(value['category']),
         'projectWorkflowIds': value['projectWorkflowIds'],
-        'status': ProjectStatusModelToJSON(value['status']),
         'tags': value['tags'] == null ? undefined : ((value['tags'] as Array<any>).map(TagModelToJSON)),
         'workspaceId': value['workspaceId'],
         '__version': value['version'],
