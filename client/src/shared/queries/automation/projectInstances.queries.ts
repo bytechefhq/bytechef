@@ -24,16 +24,6 @@ export const useGetProjectInstanceQuery = (id: number, enabled?: boolean) =>
         enabled: enabled === undefined ? true : enabled,
     });
 
-export const useGetProjectInstancesQuery = (filters: {
-    environment?: EnvironmentModel;
-    projectId?: number;
-    tagId?: number;
-}) =>
-    useQuery<ProjectInstanceModel[], Error>({
-        queryKey: ProjectInstanceKeys.filteredProjectInstances(filters),
-        queryFn: () => new ProjectInstanceApi().getProjectInstances(filters),
-    });
-
 export const useGetWorkspaceProjectInstancesQuery = (filters: {
     id: number;
     environment?: EnvironmentModel;
