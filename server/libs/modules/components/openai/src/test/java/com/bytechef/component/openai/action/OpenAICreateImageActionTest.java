@@ -17,6 +17,7 @@
 package com.bytechef.component.openai.action;
 
 import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
+import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL_PROPERTIES;
 import static com.bytechef.component.openai.constant.OpenAIConstants.N;
 import static com.bytechef.component.openai.constant.OpenAIConstants.PROMPT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.QUALITY;
@@ -36,6 +37,7 @@ import com.theokanning.openai.image.CreateImageRequest;
 import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.service.OpenAiService;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedConstruction;
@@ -45,14 +47,16 @@ import org.mockito.MockedConstruction;
  */
 class OpenAICreateImageActionTest extends AbstractOpenAIActionTest {
 
+    @SuppressWarnings({
+        "unchecked", "rawtypes"
+    })
     @Test
     void testPerform() {
         ImageResult mockedImageResult = mock(ImageResult.class);
-        ArgumentCaptor<CreateImageRequest> createImageRequestArgumentCaptor = ArgumentCaptor.forClass(
-            CreateImageRequest.class);
 
-        when(mockedParameters.getRequiredString(PROMPT))
-            .thenReturn("PROMPT");
+        when(mockedParameters.getRequiredMap(MODEL_PROPERTIES))
+            .thenReturn((Map) Map.of(PROMPT, "PROMPT", N, Integer.parseInt("1")));
+
         when(mockedParameters.getRequiredString(MODEL))
             .thenReturn("MODEL");
         when(mockedParameters.getInteger(N))
@@ -67,6 +71,9 @@ class OpenAICreateImageActionTest extends AbstractOpenAIActionTest {
             .thenReturn("STYLE");
         when(mockedParameters.getString(USER))
             .thenReturn("USER");
+
+        ArgumentCaptor<CreateImageRequest> createImageRequestArgumentCaptor = ArgumentCaptor.forClass(
+            CreateImageRequest.class);
 
         try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction = mockConstruction(
             OpenAiService.class,
