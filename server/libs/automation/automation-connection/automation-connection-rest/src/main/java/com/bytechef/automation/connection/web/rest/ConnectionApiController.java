@@ -18,13 +18,13 @@ package com.bytechef.automation.connection.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.connection.facade.WorkspaceConnectionFacade;
+import com.bytechef.automation.connection.web.rest.model.ConnectionModel;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.web.rest.model.ConnectionEnvironmentModel;
-import com.bytechef.platform.connection.web.rest.model.ConnectionModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -57,10 +57,12 @@ public class ConnectionApiController implements ConnectionApi {
     }
 
     @Override
-    public ResponseEntity<ConnectionModel> createWorkspaceConnection(Long id, ConnectionModel connectionModel) {
+    public ResponseEntity<ConnectionModel> createConnection(ConnectionModel connectionModel) {
         return ResponseEntity.ok(
             toConnectionModel(
-                workspaceConnectionFacade.create(id, conversionService.convert(connectionModel, ConnectionDTO.class))));
+                workspaceConnectionFacade.create(
+                    connectionModel.getWorkspaceId(),
+                    conversionService.convert(connectionModel, ConnectionDTO.class))));
     }
 
     @Override
