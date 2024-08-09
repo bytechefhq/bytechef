@@ -842,67 +842,30 @@ components:
         - "PRODUCTION"
     Project:
       description: "A group of workflows that make one logical project."
-      type: "object"
-      required:
-        - "name"
-        - "workspaceId"
-      properties:
-        category:
-          $ref: "#/components/schemas/Category"
-        createdBy:
-          description: "The created by."
-          type: "string"
-          readOnly: true
-        createdDate:
-          description: "The created date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        description:
-          description: "The description of a project."
-          type: "string"
-        id:
-          description: "The id of a project."
-          type: "integer"
-          format: "int64"
-          readOnly: true
-        lastModifiedBy:
-          description: "The last modified by."
-          type: "string"
-          readOnly: true
-        lastModifiedDate:
-          description: "The last modified date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        name:
-          description: "The name of a project."
-          type: "string"
-        publishedDate:
-          description: "The published date."
-          type: "string"
-          format: "date-time"
-        projectVersion:
-          description: "The version of a project."
-          type: "integer"
-          readOnly: true
-        projectWorkflowIds:
-          description: "The project workflow ids belonging to this project."
-          type: "array"
-          items:
-            type: "string"
-        status:
-          $ref: '#/components/schemas/ProjectStatus'
-        tags:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/Tag"
-        workspaceId:
-          description: "The workspace id."
-          type: "integer"
-          format: "int64"
-        __version:
-          type: "integer"
+      allOf:
+        - $ref: "#/components/schemas/ProjectBasic"
+        - type: "object"
+          required:
+            - "name"
+            - "workspaceId"
+          properties:
+            category:
+              $ref: "#/components/schemas/Category"
+            projectWorkflowIds:
+              description: "The project workflow ids belonging to this project."
+              type: "array"
+              items:
+                type: "string"
+            tags:
+              type: "array"
+              items:
+                $ref: "#/components/schemas/Tag"
+            workspaceId:
+              description: "The workspace id."
+              type: "integer"
+              format: "int64"
+            __version:
+              type: "integer"
     ProjectBasic:
       description: "A group of workflows that make one logical project."
       type: "object"
@@ -952,72 +915,27 @@ components:
     ProjectInstance:
       description: "Contains configurations and connections required for the execution\
         \ of project workflows."
-      type: "object"
-      required:
-        - "name"
-      properties:
-        description:
-          description: "The description of a project instance."
-          type: "string"
-        createdBy:
-          description: "The created by."
-          type: "string"
-          readOnly: true
-        createdDate:
-          description: "The created date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        enabled:
-          description: "If a project instance is enabled or not."
-          type: "boolean"
-        environment:
-          $ref: '#/components/schemas/Environment'
-        id:
-          description: "The id of a project instance."
-          type: "integer"
-          format: "int64"
-          readOnly: true
-        lastExecutionDate:
-          description: "The last execution date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        lastModifiedBy:
-          description: "The last modified by."
-          type: "string"
-          readOnly: true
-        lastModifiedDate:
-          description: "The last modified date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        name:
-          description: "The name of a project instance."
-          type: "string"
-        project:
-          type: "object"
-          allOf:
-            - $ref: "#/components/schemas/ProjectBasic"
-          readOnly: true
-        projectId:
-          description: "The id of a project."
-          type: "integer"
-          format: "int64"
-          writeOnly: true
-        projectInstanceWorkflows:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/ProjectInstanceWorkflow"
-        projectVersion:
-          description: "The version of a project."
-          type: "integer"
-        tags:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/Tag"
-        __version:
-          type: "integer"
+      allOf:
+        - $ref: "#/components/schemas/ProjectInstanceBasic"
+        - type: "object"
+          required:
+            - "name"
+          properties:
+            project:
+              type: "object"
+              allOf:
+                - $ref: "#/components/schemas/ProjectBasic"
+              readOnly: true
+            projectInstanceWorkflows:
+              type: "array"
+              items:
+                $ref: "#/components/schemas/ProjectInstanceWorkflow"
+            tags:
+              type: "array"
+              items:
+                $ref: "#/components/schemas/Tag"
+            __version:
+              type: "integer"
     ProjectInstanceBasic:
       description: "Contains configurations and connections required for the execution\
         \ of project workflows."
@@ -1025,9 +943,6 @@ components:
       required:
       - "name"
       properties:
-        description:
-          description: "The description of a project instance."
-          type: "string"
         createdBy:
           description: "The created by."
           type: "string"
@@ -1037,6 +952,9 @@ components:
           type: "string"
           format: "date-time"
           readOnly: true
+        description:
+          description: "The description of a project instance."
+          type: "string"
         enabled:
           description: "If a project instance is enabled or not."
           type: "boolean"
