@@ -54,7 +54,7 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
                 <h3 className="heading-tertiary flex justify-start pl-2 text-sm">Workflows</h3>
             </div>
 
-            <ul>
+            <ul className="divide-y divide-gray-100">
                 {workflows &&
                     workflows
                         .sort((a, b) => a.label!.localeCompare(b.label!))
