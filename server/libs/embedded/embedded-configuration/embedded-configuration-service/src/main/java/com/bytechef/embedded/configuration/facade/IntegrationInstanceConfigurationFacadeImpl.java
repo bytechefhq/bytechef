@@ -23,6 +23,7 @@ import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.config.ApplicationProperties;
@@ -49,6 +50,7 @@ import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.exception.PlatformException;
+import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
@@ -84,6 +86,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
     private final IntegrationService integrationService;
     private final IntegrationWorkflowService integrationWorkflowService;
+    private final OAuth2Service oAuth2Service;
     private final TagService tagService;
     private final TriggerDefinitionService triggerDefinitionService;
     private final TriggerExecutionService triggerExecutionService;
@@ -99,7 +102,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         JobService jobService, IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationService integrationService, IntegrationWorkflowService integrationWorkflowService,
-        TagService tagService, TriggerDefinitionService triggerDefinitionService,
+        OAuth2Service oAuth2Service, TagService tagService, TriggerDefinitionService triggerDefinitionService,
         TriggerExecutionService triggerExecutionService, TriggerLifecycleFacade triggerLifecycleFacade,
         WorkflowConnectionFacade workflowConnectionFacade, WorkflowService workflowService) {
 
@@ -112,6 +115,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
         this.integrationService = integrationService;
         this.integrationWorkflowService = integrationWorkflowService;
+        this.oAuth2Service = oAuth2Service;
         this.tagService = tagService;
         this.triggerDefinitionService = triggerDefinitionService;
         this.triggerExecutionService = triggerExecutionService;
@@ -132,6 +136,15 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
         if (!tags.isEmpty()) {
             integrationInstanceConfiguration.setTags(tags);
+        }
+
+        if (MapUtils.isEmpty(integrationInstanceConfiguration.getConnectionParameters())) {
+            Integration integration = integrationService.getIntegration(
+                integrationInstanceConfiguration.getIntegrationId());
+
+            integrationInstanceConfiguration.setConnectionParameters(
+                oAuth2Service.checkPredefinedParameters(
+                    integration.getComponentName(), integrationInstanceConfiguration.getConnectionParameters()));
         }
 
         integrationInstanceConfiguration = integrationInstanceConfigurationService.create(

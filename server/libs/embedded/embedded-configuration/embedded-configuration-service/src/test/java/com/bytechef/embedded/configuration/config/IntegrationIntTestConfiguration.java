@@ -20,8 +20,10 @@ import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
+import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
@@ -29,6 +31,7 @@ import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.workflow.execution.facade.InstanceJobFacade;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.InstanceJobService;
@@ -54,7 +57,7 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
  */
 @ComponentScan(
     basePackages = {
-        "com.bytechef.atlas.configuration.repository.jdbc", "com.bytechef.platform.category",
+        "com.bytechef.atlas.configuration.repository.jdbc", "com.bytechef.encryption", "com.bytechef.platform.category",
         "com.bytechef.embedded.configuration", "com.bytechef.platform.tag"
     })
 @EnableAutoConfiguration
@@ -67,6 +70,9 @@ public class IntegrationIntTestConfiguration {
 
     @MockBean
     private ComponentDefinitionService componentDefinitionService;
+
+    @MockBean
+    private ConnectionDefinitionService connectionDefinitionService;
 
     @MockBean
     private ConnectionService connectionService;
@@ -82,6 +88,9 @@ public class IntegrationIntTestConfiguration {
 
     @MockBean
     private JobService jobService;
+
+    @MockBean
+    private OAuth2Service oAuth2Service;
 
     @MockBean
     private TriggerDefinitionService triggerDefinitionService;
@@ -106,6 +115,11 @@ public class IntegrationIntTestConfiguration {
 
     @MockBean
     private WorkflowTestConfigurationService workflowTestConfigurationService;
+
+    @Bean
+    EncryptionKey encryptionKey() {
+        return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
+    }
 
     @Bean
     MapUtils mapUtils() {

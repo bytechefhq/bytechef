@@ -13,6 +13,8 @@ spring:
     contexts: configuration
 
 bytechef:
+  encryption:
+    provider: filesystem
   workflow:
     repository:
       jdbc:
