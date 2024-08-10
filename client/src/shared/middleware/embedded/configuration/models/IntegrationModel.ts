@@ -118,10 +118,10 @@ export interface IntegrationModel {
     category?: CategoryModel;
     /**
      * The integration workflow ids belonging to this integration.
-     * @type {Array<string>}
+     * @type {Array<number>}
      * @memberof IntegrationModel
      */
-    integrationWorkflowIds?: Array<string>;
+    integrationWorkflowIds?: Array<number>;
     /**
      * 
      * @type {Array<TagModel>}
