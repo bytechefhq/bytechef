@@ -90,7 +90,8 @@ public class CustomProjectInstanceRepositoryImpl implements CustomProjectInstanc
             query += "tag_id = ? ";
         }
 
-        query += "ORDER BY LOWER(project_instance.name) ASC, project_instance.enabled DESC";
+        query += "ORDER BY LOWER(project_instance.name) ASC, project_instance.project_version ASC, " +
+            "project_instance.environment ASC";
 
         List<ProjectInstance> projectInstances = jdbcClient.sql(query)
             .params(arguments)
