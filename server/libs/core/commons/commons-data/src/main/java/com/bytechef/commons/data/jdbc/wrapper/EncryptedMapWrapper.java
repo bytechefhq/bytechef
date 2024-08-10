@@ -75,6 +75,6 @@ public class EncryptedMapWrapper {
 
     @Override
     public String toString() {
-        return "MapWrapper{" + "map=" + map + '}';
+        return "EncryptedMapWrapper{" + "map=" + map + '}';
     }
 }
