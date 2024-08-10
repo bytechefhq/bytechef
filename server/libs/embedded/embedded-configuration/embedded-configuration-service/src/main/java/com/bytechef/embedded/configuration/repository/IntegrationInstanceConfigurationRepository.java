@@ -21,7 +21,6 @@ import java.util.List;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -35,9 +34,7 @@ public interface IntegrationInstanceConfigurationRepository
     @Query("SELECT integration_instance_configuration.integration_id FROM integration_instance_configuration")
     List<Long> findAllIntegrationIds();
 
-    @Query("SELECT integration_instance_configuration.integration_id FROM integration_instance_configuration WHERE environment=:environment AND enabled=:enabled")
-    List<Long> findAllIntegrationIdsByEnvironmentAndEnabled(
-        @Param("environment") int environment, @Param("enabled") boolean enabled);
+    List<IntegrationInstanceConfiguration> findAllByEnvironmentAndEnabled(int environment, boolean enabled);
 
     List<IntegrationInstanceConfiguration> findAllIntegrationInstanceConfigurationsByIdIn(List<Long> ids);
 }
