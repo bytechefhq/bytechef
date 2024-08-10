@@ -1026,7 +1026,8 @@ components:
               description: "The integration workflow ids belonging to this integration."
               type: "array"
               items:
-                type: "string"
+                type: "integer"
+                format: "int64"
             tags:
               type: "array"
               items:
@@ -1459,7 +1460,8 @@ components:
           properties:
             integrationWorkflowId:
               description: "The integration workflow id"
-              type: "number"
+              type: "integer"
+              format: "int64"
               readOnly: true
             workflowReferenceCode:
               description: "The workflow reference code"
@@ -1473,7 +1475,8 @@ components:
           properties:
             integrationWorkflowId:
               description: "The integration workflow id"
-              type: "number"
+              type: "integer"
+              format: "int64"
               readOnly: true
             workflowReferenceCode:
               description: "The workflow reference code"
