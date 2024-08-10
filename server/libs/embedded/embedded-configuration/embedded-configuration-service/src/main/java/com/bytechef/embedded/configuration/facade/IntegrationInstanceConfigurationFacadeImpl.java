@@ -139,6 +139,39 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationDTO
             .toIntegrationInstanceConfiguration();
 
+        long integrationId = Validate.notNull(integrationInstanceConfiguration.getIntegrationId(), "integrationId");
+
+        Integration integration = integrationService.getIntegration(integrationId);
+
+        if (!integration.isPublished()) {
+            throw new PlatformException(
+                "Integration id=%s is not published".formatted(integrationId),
+                IntegrationInstanceConfigurationErrorType.CREATE_INTEGRATION_INSTANCE_CONFIGURATION);
+        }
+
+        if (integration.getLastVersion() == integrationInstanceConfiguration.getIntegrationVersion()) {
+            throw new PlatformException(
+                "Integration version v=%s cannot be in DRAFT".formatted(
+                    integrationInstanceConfiguration.getIntegrationVersion()),
+                IntegrationInstanceConfigurationErrorType.CREATE_INTEGRATION_INSTANCE_CONFIGURATION);
+        }
+
+        int integrationVersion = integrationInstanceConfiguration.getIntegrationVersion();
+
+        List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
+            integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(
+                integrationInstanceConfiguration.getEnvironment(), integrationId, null);
+
+        if (integrationInstanceConfigurations.stream()
+            .anyMatch(curIntegrationInstanceConfigurations -> curIntegrationInstanceConfigurations
+                .getVersion() == integrationVersion)) {
+
+            throw new PlatformException(
+                "Instance Configuration is already set for environment=%s and integrationVersion=%s".formatted(
+                    integrationInstanceConfiguration.getEnvironment(), integrationVersion),
+                IntegrationInstanceConfigurationErrorType.CREATE_INTEGRATION_INSTANCE_CONFIGURATION);
+        }
+
         List<Tag> tags = checkTags(integrationInstanceConfigurationDTO.tags());
 
         if (!tags.isEmpty()) {
@@ -146,9 +179,6 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         }
 
         if (MapUtils.isEmpty(integrationInstanceConfiguration.getConnectionParameters())) {
-            Integration integration = integrationService.getIntegration(
-                integrationInstanceConfiguration.getIntegrationId());
-
             ConnectionDefinition connectionDefinition = connectionDefinitionService.getConnectionDefinition(
                 integration.getComponentName(), integration.getComponentVersion());
 

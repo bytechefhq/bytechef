@@ -24,7 +24,7 @@ import com.bytechef.platform.exception.ErrorType;
  */
 public enum IntegrationInstanceConfigurationErrorType implements ErrorType {
 
-    DELETE_INTEGRATION_INSTANCE_CONFIGURATION(100);
+    CREATE_INTEGRATION_INSTANCE_CONFIGURATION(100), DELETE_INTEGRATION_INSTANCE_CONFIGURATION(101);
 
     private final int errorKey;
 
