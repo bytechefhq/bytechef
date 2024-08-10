@@ -30,7 +30,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Project", description = "A group of workflows that make one logical project.")
 @JsonTypeName("Project")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-09T17:24:43.129292+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-10T18:54:04.364792+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class ProjectModel {
 
   private String createdBy;
@@ -54,7 +54,7 @@ public class ProjectModel {
 
   private ProjectStatusModel lastStatus;
 
-  private Integer lastVersion;
+  private Integer lastProjectVersion;
 
   private CategoryModel category;
 
@@ -260,24 +260,24 @@ public class ProjectModel {
     this.lastStatus = lastStatus;
   }
 
-  public ProjectModel lastVersion(Integer lastVersion) {
-    this.lastVersion = lastVersion;
+  public ProjectModel lastProjectVersion(Integer lastProjectVersion) {
+    this.lastProjectVersion = lastProjectVersion;
     return this;
   }
 
   /**
    * The last version of a project.
-   * @return lastVersion
+   * @return lastProjectVersion
   */
   
-  @Schema(name = "lastVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The last version of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("lastVersion")
-  public Integer getLastVersion() {
-    return lastVersion;
+  @Schema(name = "lastProjectVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The last version of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastProjectVersion")
+  public Integer getLastProjectVersion() {
+    return lastProjectVersion;
   }
 
-  public void setLastVersion(Integer lastVersion) {
-    this.lastVersion = lastVersion;
+  public void setLastProjectVersion(Integer lastProjectVersion) {
+    this.lastProjectVersion = lastProjectVersion;
   }
 
   public ProjectModel category(CategoryModel category) {
@@ -414,7 +414,7 @@ public class ProjectModel {
         Objects.equals(this.name, project.name) &&
         Objects.equals(this.lastPublishedDate, project.lastPublishedDate) &&
         Objects.equals(this.lastStatus, project.lastStatus) &&
-        Objects.equals(this.lastVersion, project.lastVersion) &&
+        Objects.equals(this.lastProjectVersion, project.lastProjectVersion) &&
         Objects.equals(this.category, project.category) &&
         Objects.equals(this.projectWorkflowIds, project.projectWorkflowIds) &&
         Objects.equals(this.tags, project.tags) &&
@@ -424,7 +424,7 @@ public class ProjectModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, lastPublishedDate, lastStatus, lastVersion, category, projectWorkflowIds, tags, workspaceId, version);
+    return Objects.hash(createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, lastPublishedDate, lastStatus, lastProjectVersion, category, projectWorkflowIds, tags, workspaceId, version);
   }
 
   @Override
@@ -440,7 +440,7 @@ public class ProjectModel {
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    lastPublishedDate: ").append(toIndentedString(lastPublishedDate)).append("\n");
     sb.append("    lastStatus: ").append(toIndentedString(lastStatus)).append("\n");
-    sb.append("    lastVersion: ").append(toIndentedString(lastVersion)).append("\n");
+    sb.append("    lastProjectVersion: ").append(toIndentedString(lastProjectVersion)).append("\n");
     sb.append("    category: ").append(toIndentedString(category)).append("\n");
     sb.append("    projectWorkflowIds: ").append(toIndentedString(projectWorkflowIds)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
