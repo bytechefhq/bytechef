@@ -149,9 +149,14 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             Integration integration = integrationService.getIntegration(
                 integrationInstanceConfiguration.getIntegrationId());
 
-            integrationInstanceConfiguration.setConnectionParameters(
-                oAuth2Service.checkPredefinedParameters(
-                    integration.getComponentName(), integrationInstanceConfiguration.getConnectionParameters()));
+            ConnectionDefinition connectionDefinition = connectionDefinitionService.getConnectionDefinition(
+                integration.getComponentName(), integration.getComponentVersion());
+
+            if (connectionDefinition.hasOAuth2Authorization()) {
+                integrationInstanceConfiguration.setConnectionParameters(
+                    oAuth2Service.checkPredefinedParameters(
+                        integration.getComponentName(), integrationInstanceConfiguration.getConnectionParameters()));
+            }
         }
 
         integrationInstanceConfiguration = integrationInstanceConfigurationService.create(
