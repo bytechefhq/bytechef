@@ -32,14 +32,14 @@ import java.util.List;
 public record ProjectDTO(
     Category category, String createdBy, LocalDateTime createdDate, String description, Long id, String name,
     String lastModifiedBy, LocalDateTime lastModifiedDate, LocalDateTime lastPublishedDate, Status lastStatus,
-    int lastVersion, List<ProjectVersion> projectVersions, List<Tag> tags, int version, List<Long> projectWorkflowIds,
-    Long workspaceId) {
+    int lastProjectVersion, List<ProjectVersion> projectVersions, List<Tag> tags, int version,
+    List<Long> projectWorkflowIds, Long workspaceId) {
 
     public ProjectDTO(Category category, Project project, List<Tag> tags, List<Long> projectWorkflowIds) {
         this(
             category, project.getCreatedBy(), project.getCreatedDate(), project.getDescription(), project.getId(),
             project.getName(), project.getLastModifiedBy(), project.getLastModifiedDate(),
-            project.getLastPublishedDate(), project.getLastStatus(), project.getLastVersion(),
+            project.getLastPublishedDate(), project.getLastStatus(), project.getLastProjectVersion(),
             project.getProjectVersions(), tags, project.getVersion(), projectWorkflowIds, project.getWorkspaceId());
     }
 
@@ -74,7 +74,7 @@ public record ProjectDTO(
         private LocalDateTime lastModifiedDate;
         private LocalDateTime lastPublishedDate;
         private Status lastStatus = Status.DRAFT;
-        private int lastVersion;
+        private int lastProjectVersion;
         private List<Tag> tags;
         private int version;
         private List<ProjectVersion> projectVersions;
@@ -132,8 +132,8 @@ public record ProjectDTO(
             return this;
         }
 
-        public Builder lastVersion(int lastVersion) {
-            this.lastVersion = lastVersion;
+        public Builder lastProjectVersion(int lastProjectVersion) {
+            this.lastProjectVersion = lastProjectVersion;
 
             return this;
         }
@@ -183,7 +183,7 @@ public record ProjectDTO(
         public ProjectDTO build() {
             return new ProjectDTO(
                 category, createdBy, createdDate, description, id, name, lastModifiedBy, lastModifiedDate,
-                lastPublishedDate, lastStatus, lastVersion, projectVersions, tags, version, projectWorkflowIds,
+                lastPublishedDate, lastStatus, lastProjectVersion, projectVersions, tags, version, projectWorkflowIds,
                 workspaceId);
         }
     }

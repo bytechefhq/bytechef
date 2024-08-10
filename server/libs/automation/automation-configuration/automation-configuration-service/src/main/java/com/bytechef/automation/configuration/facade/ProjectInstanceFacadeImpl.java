@@ -134,7 +134,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
                 ProjectInstanceErrorType.CREATE_PROJECT_INSTANCE);
         }
 
-        if (project.getLastVersion() == projectInstance.getProjectVersion()) {
+        if (project.getLastProjectVersion() == projectInstance.getProjectVersion()) {
             throw new PlatformException(
                 "Project version v=%s cannot be in DRAFT".formatted(projectInstance.getProjectVersion()),
                 ProjectInstanceErrorType.CREATE_PROJECT_INSTANCE);

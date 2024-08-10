@@ -114,7 +114,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         Workflow workflow = workflowService.create(definition, Format.JSON, SourceType.JDBC);
 
         ProjectWorkflow projectWorkflow = projectWorkflowService.addWorkflow(
-            id, project.getLastVersion(), workflow.getId());
+            id, project.getLastProjectVersion(), workflow.getId());
 
         return new WorkflowDTO(workflowFacade.getWorkflow(workflow.getId()), projectWorkflow);
     }
@@ -142,11 +142,11 @@ public class ProjectFacadeImpl implements ProjectFacade {
         Workflow workflow = workflowService.create(WORKFLOW_DEFINITION, Format.JSON, SourceType.JDBC);
 
         projectWorkflowService.addWorkflow(
-            project.getId(), project.getLastVersion(), Validate.notNull(workflow.getId(), "id"));
+            project.getId(), project.getLastProjectVersion(), Validate.notNull(workflow.getId(), "id"));
 
         return new ProjectDTO(
             category, project, tags,
-            projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastVersion()));
+            projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastProjectVersion()));
     }
 
     @Override
@@ -199,7 +199,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
             }
         }
 
-        projectWorkflowService.removeWorkflow(project.getId(), project.getLastVersion(), workflowId);
+        projectWorkflowService.removeWorkflow(project.getId(), project.getLastProjectVersion(), workflowId);
 
         workflowService.delete(workflowId);
     }
@@ -214,11 +214,11 @@ public class ProjectFacadeImpl implements ProjectFacade {
         newProject.setTagIds(project.getTagIds());
 
         List<String> workflowIds = copyWorkflowIds(
-            projectWorkflowService.getWorkflowIds(project.getId(), project.getLastVersion()));
+            projectWorkflowService.getWorkflowIds(project.getId(), project.getLastProjectVersion()));
 
         for (String workflowId : workflowIds) {
             projectWorkflowService.addWorkflow(
-                newProject.getId(), newProject.getLastVersion(), workflowId);
+                newProject.getId(), newProject.getLastProjectVersion(), workflowId);
         }
 
         return toProjectDTO(projectService.create(newProject));
@@ -238,7 +238,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
             Validate.notNull(workflow.getId(), "id"),
             JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
 
-        projectWorkflowService.addWorkflow(id, project.getLastVersion(), workflow.getId());
+        projectWorkflowService.addWorkflow(id, project.getLastProjectVersion(), workflow.getId());
 
         return workflow.getId();
     }
@@ -298,7 +298,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         Project project = projectService.getProject(id);
 
         return projectWorkflowService
-            .getProjectWorkflows(project.getId(), project.getLastVersion())
+            .getProjectWorkflows(project.getId(), project.getLastProjectVersion())
             .stream()
             .map(projectWorkflow -> new WorkflowDTO(
                 workflowFacade.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow))
@@ -345,7 +345,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         return new ProjectDTO(
             category, projectService.update(project), tags,
-            projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastVersion()));
+            projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastProjectVersion()));
     }
 
     @Override
@@ -364,10 +364,10 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     private void checkProjectWorkflowsStatus(Project project) {
         List<ProjectWorkflow> latestProjectWorkflows = projectWorkflowService.getProjectWorkflows(
-            project.getId(), project.getLastVersion());
+            project.getId(), project.getLastProjectVersion());
 
         if (project.getLastStatus() == Status.PUBLISHED) {
-            int lastVersion = project.getLastVersion();
+            int lastVersion = project.getLastProjectVersion();
             int newVersion = projectService.addVersion(project.getId());
 
             for (ProjectWorkflow projectWorkflow : latestProjectWorkflows) {
@@ -460,12 +460,12 @@ public class ProjectFacadeImpl implements ProjectFacade {
                             .filter(Objects::nonNull)
                             .toList()),
                     tag -> CollectionUtils.contains(project.getTagIds(), tag.getId())),
-                projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastVersion())));
+                projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastProjectVersion())));
     }
 
     private ProjectDTO toProjectDTO(Project project) {
         return new ProjectDTO(
             getCategory(project), project, tagService.getTags(project.getTagIds()),
-            projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastVersion()));
+            projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastProjectVersion()));
     }
 }

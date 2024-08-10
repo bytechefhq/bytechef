@@ -294,7 +294,7 @@ public class ProjectFacadeIntTest {
 
         projectWorkflowRepository.save(
             new ProjectWorkflow(
-                project.getId(), project.getLastVersion(), Validate.notNull(workflow.getId(), "id"),
+                project.getId(), project.getLastProjectVersion(), Validate.notNull(workflow.getId(), "id"),
                 "workflowReferenceCode"));
 
         List<WorkflowDTO> workflows = projectFacade.getProjectWorkflows(Validate.notNull(project.getId(), "id"));
