@@ -219,6 +219,7 @@ public class ProjectInstance {
             ", enabled='" + enabled +
             ", environment='" + environment + '\'' +
             ", projectId=" + projectId +
+            ", projectVersion=" + projectVersion +
             ", description='" + description + '\'' +
             ", projectInstanceTags=" + projectInstanceTags +
             ", version=" + version +
