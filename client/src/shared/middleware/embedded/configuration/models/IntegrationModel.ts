@@ -109,7 +109,7 @@ export interface IntegrationModel {
      * @type {number}
      * @memberof IntegrationModel
      */
-    readonly lastVersion?: number;
+    readonly lastIntegrationVersion?: number;
     /**
      * 
      * @type {CategoryModel}
@@ -167,7 +167,7 @@ export function IntegrationModelFromJSONTyped(json: any, ignoreDiscriminator: bo
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'lastPublishedDate': json['lastPublishedDate'] == null ? undefined : (new Date(json['lastPublishedDate'])),
         'lastStatus': json['lastStatus'] == null ? undefined : IntegrationStatusModelFromJSON(json['lastStatus']),
-        'lastVersion': json['lastVersion'] == null ? undefined : json['lastVersion'],
+        'lastIntegrationVersion': json['lastIntegrationVersion'] == null ? undefined : json['lastIntegrationVersion'],
         'category': json['category'] == null ? undefined : CategoryModelFromJSON(json['category']),
         'integrationWorkflowIds': json['integrationWorkflowIds'] == null ? undefined : json['integrationWorkflowIds'],
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
@@ -175,7 +175,7 @@ export function IntegrationModelFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-export function IntegrationModelToJSON(value?: Omit<IntegrationModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastVersion'> | null): any {
+export function IntegrationModelToJSON(value?: Omit<IntegrationModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastIntegrationVersion'> | null): any {
     if (value == null) {
         return value;
     }
