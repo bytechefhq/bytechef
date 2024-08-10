@@ -185,7 +185,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                     <div className="flex items-center justify-end gap-x-6">
                         <div className="flex flex-col items-end gap-y-4">
                             <Badge className="flex space-x-1" variant="secondary">
-                                <span>V{project.lastVersion}</span>
+                                <span>V{project.lastProjectVersion}</span>
 
                                 <span>{project.lastStatus}</span>
                             </Badge>
