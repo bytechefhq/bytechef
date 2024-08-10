@@ -213,9 +213,13 @@ public class ProjectFacadeImpl implements ProjectFacade {
         newProject.setName(generateName(project.getName()));
         newProject.setTagIds(project.getTagIds());
 
-        copyWorkflowIds(projectWorkflowService.getWorkflowIds(project.getId(), project.getLastVersion()))
-            .forEach(workflowId -> projectWorkflowService.addWorkflow(
-                newProject.getId(), newProject.getLastVersion(), workflowId));
+        List<String> workflowIds = copyWorkflowIds(
+            projectWorkflowService.getWorkflowIds(project.getId(), project.getLastVersion()));
+
+        for (String workflowId : workflowIds) {
+            projectWorkflowService.addWorkflow(
+                newProject.getId(), newProject.getLastVersion(), workflowId);
+        }
 
         return toProjectDTO(projectService.create(newProject));
     }
