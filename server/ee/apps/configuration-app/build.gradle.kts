@@ -35,6 +35,8 @@ dependencies {
     implementation(project(":server:libs:config:logback-config"))
     implementation(project(":server:libs:config:rest-config"))
     implementation(project(":server:libs:core:commons:commons-data"))
+    implementation(project(":server:libs:core:encryption:encryption-filesystem"))
+    implementation(project(":server:libs:core:encryption:encryption-impl"))
     implementation(project(":server:libs:embedded:embedded-configuration:embedded-configuration-connected-user-token-rest"))
     implementation(project(":server:libs:embedded:embedded-configuration:embedded-configuration-instance-impl"))
     implementation(project(":server:libs:embedded:embedded-configuration:embedded-configuration-public-rest:embedded-configuration-public-rest-impl"))

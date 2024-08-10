@@ -24,17 +24,18 @@ import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
 public record IntegrationInstanceConfigurationDTO(
-    String createdBy, LocalDateTime createdDate, String description, boolean enabled, Environment environment, Long id,
-    LocalDateTime lastExecutionDate, String lastModifiedBy, LocalDateTime lastModifiedDate, Integration integration,
-    long integrationId, Integer integrationVersion, String name,
-    List<IntegrationInstanceConfigurationWorkflowDTO> integrationInstanceConfigurationWorkflows, List<Tag> tags,
-    int version) {
+    Map<String, ?> connectionParameters, String createdBy, LocalDateTime createdDate, String description,
+    boolean enabled, Environment environment, Long id, LocalDateTime lastExecutionDate, String lastModifiedBy,
+    LocalDateTime lastModifiedDate, Integration integration, long integrationId, Integer integrationVersion,
+    String name, List<IntegrationInstanceConfigurationWorkflowDTO> integrationInstanceConfigurationWorkflows,
+    List<Tag> tags, int version) {
 
     public IntegrationInstanceConfigurationDTO(
         IntegrationInstanceConfiguration integrationInstanceConfiguration,
@@ -42,7 +43,8 @@ public record IntegrationInstanceConfigurationDTO(
         LocalDateTime lastExecutionDate, List<Tag> tags) {
 
         this(
-            integrationInstanceConfiguration.getCreatedBy(), integrationInstanceConfiguration.getCreatedDate(),
+            Map.of(), integrationInstanceConfiguration.getCreatedBy(),
+            integrationInstanceConfiguration.getCreatedDate(),
             integrationInstanceConfiguration.getDescription(), integrationInstanceConfiguration.isEnabled(),
             integrationInstanceConfiguration.getEnvironment(), integrationInstanceConfiguration.getId(),
             lastExecutionDate, integrationInstanceConfiguration.getLastModifiedBy(),
@@ -59,6 +61,7 @@ public record IntegrationInstanceConfigurationDTO(
     public IntegrationInstanceConfiguration toIntegrationInstanceConfiguration() {
         IntegrationInstanceConfiguration integrationInstance = new IntegrationInstanceConfiguration();
 
+        integrationInstance.setConnectionParameters(connectionParameters);
         integrationInstance.setDescription(description);
         integrationInstance.setEnabled(enabled);
         integrationInstance.setEnvironment(environment);
@@ -73,6 +76,7 @@ public record IntegrationInstanceConfigurationDTO(
     }
 
     public static final class Builder {
+        private Map<String, ?> connectionParameters;
         private String createdBy;
         private LocalDateTime createdDate;
         private String description;
@@ -91,6 +95,12 @@ public record IntegrationInstanceConfigurationDTO(
         private int version;
 
         private Builder() {
+        }
+
+        public Builder connectionParameters(Map<String, ?> connectionParameters) {
+            this.connectionParameters = connectionParameters;
+
+            return this;
         }
 
         public Builder createdBy(String createdBy) {
@@ -193,8 +203,8 @@ public record IntegrationInstanceConfigurationDTO(
 
         public IntegrationInstanceConfigurationDTO build() {
             return new IntegrationInstanceConfigurationDTO(
-                createdBy, createdDate, description, enabled, environment, id, lastExecutionDate, lastModifiedBy,
-                lastModifiedDate, integration, integrationId, integrationVersion, name,
+                connectionParameters, createdBy, createdDate, description, enabled, environment, id, lastExecutionDate,
+                lastModifiedBy, lastModifiedDate, integration, integrationId, integrationVersion, name,
                 integrationInstanceConfigurationWorkflows, tags, version);
         }
     }
