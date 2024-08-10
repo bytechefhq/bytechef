@@ -85,7 +85,7 @@ export interface ProjectBasicModel {
      * @type {number}
      * @memberof ProjectBasicModel
      */
-    readonly lastVersion?: number;
+    readonly lastProjectVersion?: number;
 }
 
 /**
@@ -115,11 +115,11 @@ export function ProjectBasicModelFromJSONTyped(json: any, ignoreDiscriminator: b
         'name': json['name'],
         'lastPublishedDate': json['lastPublishedDate'] == null ? undefined : (new Date(json['lastPublishedDate'])),
         'lastStatus': json['lastStatus'] == null ? undefined : ProjectStatusModelFromJSON(json['lastStatus']),
-        'lastVersion': json['lastVersion'] == null ? undefined : json['lastVersion'],
+        'lastProjectVersion': json['lastProjectVersion'] == null ? undefined : json['lastProjectVersion'],
     };
 }
 
-export function ProjectBasicModelToJSON(value?: Omit<ProjectBasicModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastVersion'> | null): any {
+export function ProjectBasicModelToJSON(value?: Omit<ProjectBasicModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastProjectVersion'> | null): any {
     if (value == null) {
         return value;
     }
