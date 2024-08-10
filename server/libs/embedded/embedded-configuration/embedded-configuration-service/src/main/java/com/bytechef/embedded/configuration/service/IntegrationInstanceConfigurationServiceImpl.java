@@ -94,7 +94,7 @@ public class IntegrationInstanceConfigurationServiceImpl implements IntegrationI
             return List.of();
         }
 
-        return integrationInstanceConfigurationRepository.findAllIntegrationInstanceConfigurationsByIdIn(ids);
+        return integrationInstanceConfigurationRepository.findAllByIdIn(ids);
     }
 
     @Override
