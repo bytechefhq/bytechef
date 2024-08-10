@@ -149,7 +149,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 IntegrationInstanceConfigurationErrorType.CREATE_INTEGRATION_INSTANCE_CONFIGURATION);
         }
 
-        if (integration.getLastVersion() == integrationInstanceConfiguration.getIntegrationVersion()) {
+        if (integration.getLastIntegrationVersion() == integrationInstanceConfiguration.getIntegrationVersion()) {
             throw new PlatformException(
                 "Integration version v=%s cannot be in DRAFT".formatted(
                     integrationInstanceConfiguration.getIntegrationVersion()),

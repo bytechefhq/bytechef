@@ -61,11 +61,13 @@ public class IntegrationWorkflowServiceIntTest {
         integration = integrationRepository.save(integration);
 
         integrationWorkflowService.addWorkflow(
-            Validate.notNull(integration.getId(), "id"), Validate.notNull(integration.getLastVersion(), "latVersion"),
+            Validate.notNull(integration.getId(), "id"),
+            Validate.notNull(integration.getLastIntegrationVersion(), "latVersion"),
             "workflow2");
 
-        assertThat(integrationWorkflowService.getWorkflowIds(integration.getId(), integration.getLastVersion()))
-            .contains("workflow2");
+        assertThat(
+            integrationWorkflowService.getWorkflowIds(integration.getId(), integration.getLastIntegrationVersion()))
+                .contains("workflow2");
     }
 
     private Integration getIntegration() {

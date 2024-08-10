@@ -105,7 +105,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         Workflow workflow = workflowService.create(definition, Format.JSON, SourceType.JDBC);
 
         IntegrationWorkflow integrationWorkflow = integrationWorkflowService.addWorkflow(
-            id, integration.getLastVersion(), workflow.getId());
+            id, integration.getLastIntegrationVersion(), workflow.getId());
 
         List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
             integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(id);
@@ -206,7 +206,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         }
 
         integrationWorkflowService.removeWorkflow(
-            integration.getId(), Validate.notNull(integration.getLastVersion(), "lastVersion"), workflowId);
+            integration.getId(), Validate.notNull(integration.getLastIntegrationVersion(), "lastVersion"), workflowId);
 
         workflowService.delete(workflowId);
     }
@@ -322,7 +322,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         Integration integration = integrationService.getIntegration(id);
 
         List<IntegrationWorkflow> integrationWorkflows = integrationWorkflowService.getIntegrationWorkflows(
-            integration.getId(), integration.getLastVersion());
+            integration.getId(), integration.getLastIntegrationVersion());
 
         if (!integrationWorkflows.isEmpty()) {
             workflowDTOs = CollectionUtils.map(
@@ -423,10 +423,11 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     private void checkIntegrationStatus(Integration integration) {
         final List<IntegrationWorkflow> latestIntegrationWorkflows = integrationWorkflowService
-            .getIntegrationWorkflows(Validate.notNull(integration.getId(), "id"), integration.getLastVersion());
+            .getIntegrationWorkflows(Validate.notNull(integration.getId(), "id"),
+                integration.getLastIntegrationVersion());
 
         if (integration.getLastStatus() == Status.PUBLISHED) {
-            int lastVersion = integration.getLastVersion();
+            int lastVersion = integration.getLastIntegrationVersion();
             int newVersion = integrationService.addVersion(integration.getId());
 
             for (IntegrationWorkflow integrationWorkflow : latestIntegrationWorkflows) {
@@ -454,7 +455,8 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     private List<Long> getIntegrationWorkflowIds(Integration integration) {
-        return integrationWorkflowService.getIntegrationWorkflowIds(integration.getId(), integration.getLastVersion());
+        return integrationWorkflowService.getIntegrationWorkflowIds(integration.getId(),
+            integration.getLastIntegrationVersion());
     }
 
     private IntegrationDTO toIntegrationDTO(Integration integration) {
