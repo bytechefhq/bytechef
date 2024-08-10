@@ -34,5 +34,4 @@
 
     <!-- audit -->
     <includeAll path="classpath:config/liquibase/changelog/audit/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or connection or multitenant" />
-
 </databaseChangeLog>
