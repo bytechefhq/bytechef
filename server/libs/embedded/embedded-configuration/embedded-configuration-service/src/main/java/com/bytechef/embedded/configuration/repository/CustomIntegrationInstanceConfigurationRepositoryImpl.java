@@ -91,7 +91,8 @@ public class CustomIntegrationInstanceConfigurationRepositoryImpl
             query += "tag_id = ? ";
         }
 
-        query += "ORDER BY integration.component_name ASC, integration_instance_configuration.enabled DESC";
+        query += "ORDER BY integration.component_name ASC, integration_instance_configuration.integration_version " +
+            "ASC, integration_instance_configuration.environment ASC";
 
         List<IntegrationInstanceConfiguration> integrationInstanceConfigurations = jdbcClient.sql(query)
             .params(arguments)
