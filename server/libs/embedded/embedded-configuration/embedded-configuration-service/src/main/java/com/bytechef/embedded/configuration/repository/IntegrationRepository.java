@@ -33,8 +33,6 @@ public interface IntegrationRepository
     extends ListPagingAndSortingRepository<Integration, Long>, ListCrudRepository<Integration, Long>,
     CustomIntegrationRepository {
 
-    List<Integration> findAllByCategoryIdOrderByComponentName(long categoryId);
-
     @Query("""
             SELECT integration.* FROM integration
             JOIN integration_tag ON integration.id = integration_tag.integration_id
