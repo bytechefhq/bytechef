@@ -289,6 +289,17 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
+    public List<WorkflowDTO> getIntegrationVersionWorkflows(long id, int integrationVersion) {
+        List<IntegrationWorkflow> integrationWorkflows = integrationWorkflowService.getIntegrationWorkflows(
+            id, integrationVersion);
+
+        return CollectionUtils.map(
+            integrationWorkflows,
+            integrationWorkflow -> new WorkflowDTO(
+                workflowFacade.getWorkflow(integrationWorkflow.getWorkflowId()), integrationWorkflow));
+    }
+
+    @Override
     public WorkflowDTO getIntegrationWorkflow(String workflowId) {
         IntegrationWorkflow integrationWorkflow = integrationWorkflowService.getWorkflowIntegrationWorkflow(workflowId);
 
@@ -332,17 +343,6 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         }
 
         return workflowDTOs;
-    }
-
-    @Override
-    public List<WorkflowDTO> getIntegrationVersionWorkflows(long id, int integrationVersion) {
-        List<IntegrationWorkflow> integrationWorkflows = integrationWorkflowService.getIntegrationWorkflows(
-            id, integrationVersion);
-
-        return CollectionUtils.map(
-            integrationWorkflows,
-            integrationWorkflow -> new WorkflowDTO(
-                workflowFacade.getWorkflow(integrationWorkflow.getWorkflowId()), integrationWorkflow));
     }
 
     @Override
@@ -455,8 +455,8 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     private List<Long> getIntegrationWorkflowIds(Integration integration) {
-        return integrationWorkflowService.getIntegrationWorkflowIds(integration.getId(),
-            integration.getLastIntegrationVersion());
+        return integrationWorkflowService.getIntegrationWorkflowIds(
+            integration.getId(), integration.getLastIntegrationVersion());
     }
 
     private IntegrationDTO toIntegrationDTO(Integration integration) {

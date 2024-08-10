@@ -47,6 +47,11 @@ public class RemoteIntegrationFacadeClient implements IntegrationFacade {
     }
 
     @Override
+    public List<IntegrationDTO> getEnabledIntegrationInstanceConfigurationIntegrations(Environment environment) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public IntegrationDTO getIntegration(long id) {
         throw new UnsupportedOperationException();
     }
@@ -84,11 +89,6 @@ public class RemoteIntegrationFacadeClient implements IntegrationFacade {
     @Override
     public List<WorkflowDTO> getIntegrationWorkflows(long id) {
         return List.of();
-    }
-
-    @Override
-    public List<IntegrationDTO> getIntegrations(Environment environment) {
-        throw new UnsupportedOperationException();
     }
 
     @Override
