@@ -28,7 +28,6 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.annotation.CreatedBy;
@@ -110,11 +109,9 @@ public final class Integration {
     }
 
     public int addVersion() {
-        int version = fetchLastIntegrationVersion()
-            .map(IntegrationVersion::getVersion)
-            .orElse(0);
+        IntegrationVersion integrationVersion = getLastIntegrationVersion();
 
-        int newVersion = version + 1;
+        int newVersion = integrationVersion.getVersion() + 1;
 
         integrationVersions.add(new IntegrationVersion(newVersion));
 
@@ -138,26 +135,6 @@ public final class Integration {
         Integration integration = (Integration) o;
 
         return Objects.equals(id, integration.id);
-    }
-
-    public Optional<IntegrationVersion> fetchLastIntegrationVersion() {
-        return integrationVersions.stream()
-            .max(Comparator.comparingInt(IntegrationVersion::getVersion));
-    }
-
-    public Optional<LocalDateTime> fetchLastPublishedDate() {
-        return fetchLastIntegrationVersion()
-            .map(IntegrationVersion::getPublishedDate);
-    }
-
-    public Optional<Status> fetchLastStatus() {
-        return fetchLastIntegrationVersion()
-            .map(IntegrationVersion::getStatus);
-    }
-
-    public Optional<Integer> fetchLastVersion() {
-        return fetchLastIntegrationVersion()
-            .map(IntegrationVersion::getVersion);
     }
 
     @Override
@@ -197,6 +174,12 @@ public final class Integration {
         return new ArrayList<>(integrationVersions);
     }
 
+    public IntegrationVersion getLastIntegrationVersion() {
+        return integrationVersions.stream()
+            .max(Comparator.comparingInt(IntegrationVersion::getVersion))
+            .orElseThrow();
+    }
+
     public String getLastModifiedBy() {
         return lastModifiedBy;
     }
@@ -207,17 +190,20 @@ public final class Integration {
 
     @Nullable
     public LocalDateTime getLastPublishedDate() {
-        return fetchLastPublishedDate().orElse(null);
+        return integrationVersions.stream()
+            .sorted(Comparator.comparingInt(IntegrationVersion::getVersion))
+            .filter(projectVersion -> projectVersion.getStatus() == Status.PUBLISHED)
+            .findFirst()
+            .map(IntegrationVersion::getPublishedDate)
+            .orElse(null);
     }
 
-    @Nullable
     public Status getLastStatus() {
-        return fetchLastStatus().orElse(null);
+        return getLastIntegrationVersion().getStatus();
     }
 
-    @Nullable
-    public Integer getLastVersion() {
-        return fetchLastVersion().orElse(null);
+    public int getLastVersion() {
+        return getLastIntegrationVersion().getVersion();
     }
 
     public List<Long> getTagIds() {
@@ -240,11 +226,11 @@ public final class Integration {
     }
 
     public void publish(String description) {
-        fetchLastIntegrationVersion().ifPresent(lastIntegrationVersion -> {
-            lastIntegrationVersion.setDescription(description);
-            lastIntegrationVersion.setPublishedDate(LocalDateTime.now());
-            lastIntegrationVersion.setStatus(Status.PUBLISHED);
-        });
+        IntegrationVersion integrationVersion = getLastIntegrationVersion();
+
+        integrationVersion.setDescription(description);
+        integrationVersion.setPublishedDate(LocalDateTime.now());
+        integrationVersion.setStatus(Status.PUBLISHED);
     }
 
     public void setAllowMultipleInstances(boolean allowMultipleInstances) {
@@ -278,7 +264,9 @@ public final class Integration {
     }
 
     public void setIntegrationVersions(List<IntegrationVersion> integrationVersions) {
-        this.integrationVersions = new HashSet<>(integrationVersions);
+        if (!CollectionUtils.isEmpty(integrationVersions)) {
+            this.integrationVersions = new HashSet<>(integrationVersions);
+        }
     }
 
     public void setTagIds(List<Long> tagIds) {

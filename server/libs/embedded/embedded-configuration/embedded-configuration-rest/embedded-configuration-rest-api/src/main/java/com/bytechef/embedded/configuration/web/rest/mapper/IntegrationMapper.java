@@ -22,7 +22,6 @@ import com.bytechef.embedded.configuration.web.rest.mapper.config.EmbeddedConfig
 import com.bytechef.embedded.configuration.web.rest.model.IntegrationBasicModel;
 import com.bytechef.embedded.configuration.web.rest.model.IntegrationModel;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -34,9 +33,6 @@ public class IntegrationMapper {
     public interface IntegrationToIntegrationBasicModelMapper extends Converter<Integration, IntegrationBasicModel> {
 
         @Override
-        @Mapping(target = "integrationVersion", source = "lastVersion")
-        @Mapping(target = "publishedDate", source = "lastPublishedDate")
-        @Mapping(target = "status", source = "lastStatus")
         IntegrationBasicModel convert(Integration integration);
     }
 

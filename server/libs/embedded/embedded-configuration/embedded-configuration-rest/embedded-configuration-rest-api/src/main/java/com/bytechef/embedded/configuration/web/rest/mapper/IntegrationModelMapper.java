@@ -20,6 +20,7 @@ import com.bytechef.embedded.configuration.dto.IntegrationDTO;
 import com.bytechef.embedded.configuration.web.rest.mapper.config.EmbeddedConfigurationMapperSpringConfig;
 import com.bytechef.embedded.configuration.web.rest.model.IntegrationModel;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -29,5 +30,6 @@ import org.springframework.core.convert.converter.Converter;
 public interface IntegrationModelMapper extends Converter<IntegrationModel, IntegrationDTO> {
 
     @Override
+    @Mapping(target = "integrationVersions", ignore = true)
     IntegrationDTO convert(IntegrationModel integrationModel);
 }
