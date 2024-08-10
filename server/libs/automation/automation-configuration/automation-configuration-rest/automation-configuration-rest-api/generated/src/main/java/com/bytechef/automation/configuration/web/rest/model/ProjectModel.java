@@ -30,7 +30,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Project", description = "A group of workflows that make one logical project.")
 @JsonTypeName("Project")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-10T18:54:04.364792+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-10T22:10:52.891162+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class ProjectModel {
 
   private String createdBy;
@@ -59,7 +59,7 @@ public class ProjectModel {
   private CategoryModel category;
 
   @Valid
-  private List<String> projectWorkflowIds = new ArrayList<>();
+  private List<Long> projectWorkflowIds = new ArrayList<>();
 
   @Valid
   private List<@Valid TagModel> tags = new ArrayList<>();
@@ -300,12 +300,12 @@ public class ProjectModel {
     this.category = category;
   }
 
-  public ProjectModel projectWorkflowIds(List<String> projectWorkflowIds) {
+  public ProjectModel projectWorkflowIds(List<Long> projectWorkflowIds) {
     this.projectWorkflowIds = projectWorkflowIds;
     return this;
   }
 
-  public ProjectModel addProjectWorkflowIdsItem(String projectWorkflowIdsItem) {
+  public ProjectModel addProjectWorkflowIdsItem(Long projectWorkflowIdsItem) {
     if (this.projectWorkflowIds == null) {
       this.projectWorkflowIds = new ArrayList<>();
     }
@@ -320,11 +320,11 @@ public class ProjectModel {
   
   @Schema(name = "projectWorkflowIds", description = "The project workflow ids belonging to this project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("projectWorkflowIds")
-  public List<String> getProjectWorkflowIds() {
+  public List<Long> getProjectWorkflowIds() {
     return projectWorkflowIds;
   }
 
-  public void setProjectWorkflowIds(List<String> projectWorkflowIds) {
+  public void setProjectWorkflowIds(List<Long> projectWorkflowIds) {
     this.projectWorkflowIds = projectWorkflowIds;
   }
 

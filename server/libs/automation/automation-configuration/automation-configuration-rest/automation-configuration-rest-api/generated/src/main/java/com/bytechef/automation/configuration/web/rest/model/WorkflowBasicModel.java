@@ -5,7 +5,6 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.openapitools.jackson.nullable.JsonNullable;
@@ -24,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowBasic", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("WorkflowBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-10T18:54:04.364792+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-10T22:10:52.891162+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class WorkflowBasicModel {
 
   private String createdBy;
@@ -45,7 +44,7 @@ public class WorkflowBasicModel {
 
   private Integer version;
 
-  private BigDecimal projectWorkflowId;
+  private Long projectWorkflowId;
 
   private String workflowReferenceCode;
 
@@ -209,7 +208,7 @@ public class WorkflowBasicModel {
     this.version = version;
   }
 
-  public WorkflowBasicModel projectWorkflowId(BigDecimal projectWorkflowId) {
+  public WorkflowBasicModel projectWorkflowId(Long projectWorkflowId) {
     this.projectWorkflowId = projectWorkflowId;
     return this;
   }
@@ -218,14 +217,14 @@ public class WorkflowBasicModel {
    * The project workflow id
    * @return projectWorkflowId
   */
-  @Valid 
+  
   @Schema(name = "projectWorkflowId", accessMode = Schema.AccessMode.READ_ONLY, description = "The project workflow id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("projectWorkflowId")
-  public BigDecimal getProjectWorkflowId() {
+  public Long getProjectWorkflowId() {
     return projectWorkflowId;
   }
 
-  public void setProjectWorkflowId(BigDecimal projectWorkflowId) {
+  public void setProjectWorkflowId(Long projectWorkflowId) {
     this.projectWorkflowId = projectWorkflowId;
   }
 
