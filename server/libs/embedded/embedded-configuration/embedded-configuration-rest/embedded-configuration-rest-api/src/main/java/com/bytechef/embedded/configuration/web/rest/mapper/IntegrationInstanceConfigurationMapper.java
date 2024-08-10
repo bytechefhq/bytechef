@@ -43,13 +43,14 @@ public class IntegrationInstanceConfigurationMapper {
     public interface IntegrationInstanceConfigurationToIntegrationInstanceModelMapper
         extends Converter<IntegrationInstanceConfiguration, IntegrationInstanceConfigurationModel> {
 
+        @Mapping(target = "connectionAuthorizationParameters", ignore = true)
+        @Mapping(target = "connectionConnectionParameters", ignore = true)
         @Mapping(target = "integration", ignore = true)
         @Mapping(target = "integrationInstanceConfigurationWorkflows", ignore = true)
         @Mapping(target = "lastExecutionDate", ignore = true)
         @Mapping(target = "tags", ignore = true)
         @Override
         IntegrationInstanceConfigurationModel convert(IntegrationInstanceConfiguration integrationInstance);
-
     }
 
     @Mapper(config = EmbeddedConfigurationMapperSpringConfig.class)
@@ -57,9 +58,6 @@ public class IntegrationInstanceConfigurationMapper {
         extends Converter<IntegrationInstanceConfigurationDTO, IntegrationInstanceConfigurationModel> {
 
         @Override
-        @Mapping(target = "integration.integrationVersion", source = "integration.lastVersion")
-        @Mapping(target = "integration.publishedDate", source = "integration.lastPublishedDate")
-        @Mapping(target = "integration.status", source = "integration.lastStatus")
         IntegrationInstanceConfigurationModel convert(
             IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO);
     }

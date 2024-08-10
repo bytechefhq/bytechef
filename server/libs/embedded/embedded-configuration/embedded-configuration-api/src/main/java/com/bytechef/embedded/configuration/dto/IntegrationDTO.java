@@ -16,8 +16,8 @@
 
 package com.bytechef.embedded.configuration.dto;
 
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.embedded.configuration.domain.Integration;
+import com.bytechef.embedded.configuration.domain.IntegrationVersion;
 import com.bytechef.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
@@ -33,9 +33,10 @@ import org.apache.commons.lang3.StringUtils;
 @SuppressFBWarnings("EI")
 public record IntegrationDTO(
     boolean allowMultipleInstances, Category category, String componentName, int componentVersion, String createdBy,
-    LocalDateTime createdDate, String description, String icon, Long id, Integer integrationVersion,
+    LocalDateTime createdDate, String description, String icon, Long id, List<IntegrationVersion> integrationVersions,
     List<Long> integrationWorkflowIds, String lastModifiedBy, LocalDateTime lastModifiedDate,
-    LocalDateTime publishedDate, Status status, List<Tag> tags, String title, int version) {
+    LocalDateTime lastPublishedDate, Status lastStatus, Integer lastVersion, List<Tag> tags, String title,
+    int version) {
 
     public IntegrationDTO(
         Category category, ComponentDefinition componentDefinition, Integration integration) {
@@ -44,10 +45,9 @@ public record IntegrationDTO(
             integration.isAllowMultipleInstances(), category, integration.getComponentName(),
             integration.getComponentVersion(), integration.getCreatedBy(), integration.getCreatedDate(),
             getDescription(componentDefinition, integration), componentDefinition.getIcon(),
-            integration.getId(), OptionalUtils.orElse(integration.fetchLastVersion(), null),
-            List.of(), integration.getLastModifiedBy(), integration.getLastModifiedDate(),
-            OptionalUtils.orElse(integration.fetchLastPublishedDate(), null),
-            OptionalUtils.orElse(integration.fetchLastStatus(), null), List.of(), componentDefinition.getTitle(),
+            integration.getId(), integration.getIntegrationVersions(), List.of(),
+            integration.getLastModifiedBy(), integration.getLastModifiedDate(), integration.getLastPublishedDate(),
+            integration.getLastStatus(), integration.getLastVersion(), List.of(), componentDefinition.getTitle(),
             integration.getVersion());
     }
 
@@ -57,11 +57,10 @@ public record IntegrationDTO(
         this(
             integration.isAllowMultipleInstances(), category, integration.getComponentName(),
             integration.getComponentVersion(), integration.getCreatedBy(), integration.getCreatedDate(),
-            integration.getDescription(), null, integration.getId(),
-            OptionalUtils.orElse(integration.fetchLastVersion(), null), integrationWorkflowIds,
-            integration.getLastModifiedBy(), integration.getLastModifiedDate(),
-            OptionalUtils.orElse(integration.fetchLastPublishedDate(), null),
-            OptionalUtils.orElse(integration.fetchLastStatus(), null), tags, null, integration.getVersion());
+            integration.getDescription(), null, integration.getId(), integration.getIntegrationVersions(),
+            integrationWorkflowIds, integration.getLastModifiedBy(), integration.getLastModifiedDate(),
+            integration.getLastPublishedDate(), integration.getLastStatus(), integration.getLastVersion(), tags, null,
+            integration.getVersion());
     }
 
     public static Builder builder() {
@@ -76,6 +75,8 @@ public record IntegrationDTO(
         integration.setCategory(category);
         integration.setDescription(description);
         integration.setId(id);
+        integration.setIntegrationVersions(integrationVersions == null ? List.of() : integrationVersions);
+        integration.setTags(tags);
         integration.setVersion(version);
 
         return integration;
@@ -91,12 +92,13 @@ public record IntegrationDTO(
         private LocalDateTime createdDate;
         private String description;
         private Long id;
+        private List<IntegrationVersion> integrationVersions;
         private List<Long> integrationWorkflowIds;
         private String lastModifiedBy;
         private LocalDateTime lastModifiedDate;
-        private int integrationVersion;
-        private LocalDateTime publishedDate;
-        private Status status = Status.DRAFT;
+        private LocalDateTime lastPublishedDate;
+        private Status lastStatus = Status.DRAFT;
+        private int lastVersion;
         private List<Tag> tags;
         private int version;
 
@@ -151,8 +153,8 @@ public record IntegrationDTO(
             return this;
         }
 
-        public Builder integrationVersion(int integrationVersion) {
-            this.integrationVersion = integrationVersion;
+        public Builder integrationVersions(List<IntegrationVersion> integrationVersions) {
+            this.integrationVersions = integrationVersions;
 
             return this;
         }
@@ -175,14 +177,20 @@ public record IntegrationDTO(
             return this;
         }
 
-        public Builder publishedDate(LocalDateTime publishedDate) {
-            this.publishedDate = publishedDate;
+        public Builder lastPublishedDate(LocalDateTime lastPublishedDate) {
+            this.lastPublishedDate = lastPublishedDate;
 
             return this;
         }
 
-        public Builder status(Status status) {
-            this.status = status;
+        public Builder lastStatus(Status lastStatus) {
+            this.lastStatus = lastStatus;
+
+            return this;
+        }
+
+        public Builder lastVersion(int lastVersion) {
+            this.lastVersion = lastVersion;
 
             return this;
         }
@@ -202,8 +210,8 @@ public record IntegrationDTO(
         public IntegrationDTO build() {
             return new IntegrationDTO(
                 allowMultipleInstances, category, componentName, componentVersion, createdBy, createdDate,
-                description, null, id, integrationVersion, integrationWorkflowIds, lastModifiedBy, lastModifiedDate,
-                publishedDate, status, tags, null, version);
+                description, null, id, integrationVersions, integrationWorkflowIds, lastModifiedBy, lastModifiedDate,
+                lastPublishedDate, lastStatus, lastVersion, tags, null, version);
         }
     }
 

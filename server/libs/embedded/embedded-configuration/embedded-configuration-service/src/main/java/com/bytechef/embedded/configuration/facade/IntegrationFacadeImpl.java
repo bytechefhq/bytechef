@@ -21,7 +21,6 @@ import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.embedded.configuration.domain.Integration;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
@@ -43,7 +42,6 @@ import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -104,11 +102,8 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
         Workflow workflow = workflowService.create(definition, Format.JSON, SourceType.JDBC);
 
-        int lastVersion = integration.fetchLastVersion()
-            .orElseGet(() -> integrationService.addVersion(id));
-
         IntegrationWorkflow integrationWorkflow = integrationWorkflowService.addWorkflow(
-            id, lastVersion, workflow.getId());
+            id, integration.getLastVersion(), workflow.getId());
 
         List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
             integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(id);
@@ -281,10 +276,8 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
         Integration integration = integrationService.getIntegration(id);
 
-        List<IntegrationWorkflow> integrationWorkflows = integration.fetchLastVersion()
-            .map(lastVersion -> integrationWorkflowService.getIntegrationWorkflows(
-                integration.getId(), lastVersion))
-            .orElse(List.of());
+        List<IntegrationWorkflow> integrationWorkflows = integrationWorkflowService.getIntegrationWorkflows(
+            integration.getId(), integration.getLastVersion());
 
         if (!integrationWorkflows.isEmpty()) {
             workflowDTOs = CollectionUtils.map(
@@ -404,40 +397,31 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     private void checkIntegrationStatus(Integration integration) {
-        final List<IntegrationWorkflow> latestIntegrationWorkflows = new ArrayList<>();
+        final List<IntegrationWorkflow> latestIntegrationWorkflows = integrationWorkflowService
+            .getIntegrationWorkflows(Validate.notNull(integration.getId(), "id"), integration.getLastVersion());
 
-        if (integration.getLastVersion() != null) {
-            latestIntegrationWorkflows.addAll(
-                integrationWorkflowService.getIntegrationWorkflows(
-                    Validate.notNull(integration.getId(), "id"),
-                    Validate.notNull(integration.getLastVersion(), "lastVersion")));
+        if (integration.getLastStatus() == Status.PUBLISHED) {
+            int lastVersion = integration.getLastVersion();
+            int newVersion = integrationService.addVersion(integration.getId());
+
+            for (IntegrationWorkflow integrationWorkflow : latestIntegrationWorkflows) {
+                String oldWorkflowId = integrationWorkflow.getWorkflowId();
+
+                Workflow duplicatedWorkflow = workflowService.duplicateWorkflow(oldWorkflowId);
+
+                integrationWorkflow.setIntegrationVersion(newVersion);
+                integrationWorkflow.setWorkflowId(duplicatedWorkflow.getId());
+
+                integrationWorkflowService.update(integrationWorkflow);
+
+                integrationWorkflowService.addWorkflow(
+                    integration.getId(), lastVersion, oldWorkflowId,
+                    integrationWorkflow.getWorkflowReferenceCode());
+
+                workflowTestConfigurationService.updateWorkflowId(oldWorkflowId, duplicatedWorkflow.getId());
+                workflowNodeTestOutputService.updateWorkflowId(oldWorkflowId, duplicatedWorkflow.getId());
+            }
         }
-
-        integration.fetchLastStatus()
-            .ifPresent(lastStatus -> {
-                if (lastStatus == Status.PUBLISHED) {
-                    int lastVersion = integration.getLastVersion();
-                    int newVersion = integrationService.addVersion(integration.getId());
-
-                    for (IntegrationWorkflow integrationWorkflow : latestIntegrationWorkflows) {
-                        String oldWorkflowId = integrationWorkflow.getWorkflowId();
-
-                        Workflow duplicatedWorkflow = workflowService.duplicateWorkflow(oldWorkflowId);
-
-                        integrationWorkflow.setIntegrationVersion(newVersion);
-                        integrationWorkflow.setWorkflowId(duplicatedWorkflow.getId());
-
-                        integrationWorkflowService.update(integrationWorkflow);
-
-                        integrationWorkflowService.addWorkflow(
-                            integration.getId(), lastVersion, oldWorkflowId,
-                            integrationWorkflow.getWorkflowReferenceCode());
-
-                        workflowTestConfigurationService.updateWorkflowId(oldWorkflowId, duplicatedWorkflow.getId());
-                        workflowNodeTestOutputService.updateWorkflowId(oldWorkflowId, duplicatedWorkflow.getId());
-                    }
-                }
-            });
     }
 
     private Category getCategory(Integration integration) {
@@ -445,10 +429,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     private List<Long> getIntegrationWorkflowIds(Integration integration) {
-        return OptionalUtils.mapOrElse(
-            integration.fetchLastVersion(),
-            lastVersion -> integrationWorkflowService.getIntegrationWorkflowIds(integration.getId(), lastVersion),
-            List.of());
+        return integrationWorkflowService.getIntegrationWorkflowIds(integration.getId(), integration.getLastVersion());
     }
 
     private IntegrationDTO toIntegrationDTO(Integration integration) {
