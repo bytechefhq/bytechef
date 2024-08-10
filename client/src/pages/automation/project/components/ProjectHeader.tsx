@@ -113,7 +113,9 @@ const ProjectHeader = ({
         onSuccess: () => {
             setShowDeleteWorkflowAlertDialog(false);
 
-            navigate(`/automation/projects/${projectId}/project-workflows/${project?.projectWorkflowIds?.[0]}`);
+            navigate(
+                `/automation/projects/${projectId}/project-workflows/${project?.projectWorkflowIds?.filter((projectWorkflowId) => projectWorkflowId !== (workflow as WorkflowModel).projectWorkflowId)[0]}`
+            );
 
             queryClient.removeQueries({
                 queryKey: ProjectWorkflowKeys.projectWorkflow(
