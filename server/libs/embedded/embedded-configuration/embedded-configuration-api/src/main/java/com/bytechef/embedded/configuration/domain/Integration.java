@@ -93,6 +93,7 @@ public final class Integration {
     private int version;
 
     public Integration() {
+        integrationVersions.add(new IntegrationVersion(1));
     }
 
     @PersistenceCreator

@@ -38,7 +38,6 @@ import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -148,7 +147,6 @@ public class IntegrationInstanceConfiguration {
         return integrationId == null ? null : integrationId.getId();
     }
 
-    @Nullable
     public Integer getIntegrationVersion() {
         return integrationVersion;
     }
@@ -238,6 +236,7 @@ public class IntegrationInstanceConfiguration {
             ", enabled=" + enabled +
             ", environment='" + environment + '\'' +
             ", integrationId=" + integrationId +
+            ", integrationVersion=" + integrationVersion +
             ", integrationInstanceConfigurationTags=" + integrationInstanceConfigurationTags +
             ", connectionParameters=" + connectionParameters +
             ", createdBy='" + createdBy + '\'' +
