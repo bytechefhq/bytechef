@@ -30,7 +30,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-08T08:31:46.450713+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-10T18:39:37.461007+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class IntegrationModel {
 
   private Boolean allowMultipleInstances = false;
@@ -58,7 +58,7 @@ public class IntegrationModel {
 
   private IntegrationStatusModel lastStatus;
 
-  private Integer lastVersion;
+  private Integer lastIntegrationVersion;
 
   private CategoryModel category;
 
@@ -303,24 +303,24 @@ public class IntegrationModel {
     this.lastStatus = lastStatus;
   }
 
-  public IntegrationModel lastVersion(Integer lastVersion) {
-    this.lastVersion = lastVersion;
+  public IntegrationModel lastIntegrationVersion(Integer lastIntegrationVersion) {
+    this.lastIntegrationVersion = lastIntegrationVersion;
     return this;
   }
 
   /**
    * The last version of an integration.
-   * @return lastVersion
+   * @return lastIntegrationVersion
   */
   
-  @Schema(name = "lastVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The last version of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("lastVersion")
-  public Integer getLastVersion() {
-    return lastVersion;
+  @Schema(name = "lastIntegrationVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The last version of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastIntegrationVersion")
+  public Integer getLastIntegrationVersion() {
+    return lastIntegrationVersion;
   }
 
-  public void setLastVersion(Integer lastVersion) {
-    this.lastVersion = lastVersion;
+  public void setLastIntegrationVersion(Integer lastIntegrationVersion) {
+    this.lastIntegrationVersion = lastIntegrationVersion;
   }
 
   public IntegrationModel category(CategoryModel category) {
@@ -439,7 +439,7 @@ public class IntegrationModel {
         Objects.equals(this.lastModifiedDate, integration.lastModifiedDate) &&
         Objects.equals(this.lastPublishedDate, integration.lastPublishedDate) &&
         Objects.equals(this.lastStatus, integration.lastStatus) &&
-        Objects.equals(this.lastVersion, integration.lastVersion) &&
+        Objects.equals(this.lastIntegrationVersion, integration.lastIntegrationVersion) &&
         Objects.equals(this.category, integration.category) &&
         Objects.equals(this.integrationWorkflowIds, integration.integrationWorkflowIds) &&
         Objects.equals(this.tags, integration.tags) &&
@@ -448,7 +448,7 @@ public class IntegrationModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(allowMultipleInstances, componentName, componentVersion, createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, lastPublishedDate, lastStatus, lastVersion, category, integrationWorkflowIds, tags, version);
+    return Objects.hash(allowMultipleInstances, componentName, componentVersion, createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, lastPublishedDate, lastStatus, lastIntegrationVersion, category, integrationWorkflowIds, tags, version);
   }
 
   @Override
@@ -466,7 +466,7 @@ public class IntegrationModel {
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    lastPublishedDate: ").append(toIndentedString(lastPublishedDate)).append("\n");
     sb.append("    lastStatus: ").append(toIndentedString(lastStatus)).append("\n");
-    sb.append("    lastVersion: ").append(toIndentedString(lastVersion)).append("\n");
+    sb.append("    lastIntegrationVersion: ").append(toIndentedString(lastIntegrationVersion)).append("\n");
     sb.append("    category: ").append(toIndentedString(category)).append("\n");
     sb.append("    integrationWorkflowIds: ").append(toIndentedString(integrationWorkflowIds)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
