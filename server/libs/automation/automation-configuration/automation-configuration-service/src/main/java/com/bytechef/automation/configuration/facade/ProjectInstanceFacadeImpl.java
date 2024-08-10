@@ -126,11 +126,17 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
         long projectId = Validate.notNull(projectInstance.getProjectId(), "projectId");
 
-        Project project = projectService.getProject(Validate.notNull(projectInstance.getProjectId(), "projectId"));
+        Project project = projectService.getProject(projectId);
 
         if (!project.isPublished()) {
             throw new PlatformException(
                 "Project id=%s is not published".formatted(projectId),
+                ProjectInstanceErrorType.CREATE_PROJECT_INSTANCE);
+        }
+
+        if (project.getLastVersion() == projectInstance.getProjectVersion()) {
+            throw new PlatformException(
+                "Project version v=%s cannot be in DRAFT".formatted(projectInstance.getProjectVersion()),
                 ProjectInstanceErrorType.CREATE_PROJECT_INSTANCE);
         }
 
