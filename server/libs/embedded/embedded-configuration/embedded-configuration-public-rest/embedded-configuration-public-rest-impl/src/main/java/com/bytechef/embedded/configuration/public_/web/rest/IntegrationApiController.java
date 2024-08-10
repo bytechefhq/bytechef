@@ -50,7 +50,8 @@ public class IntegrationApiController implements IntegrationApi {
         String name = environment.name();
 
         return ResponseEntity.ok(
-            integrationFacade.getIntegrations(Environment.valueOf(name.toUpperCase()))
+            integrationFacade
+                .getEnabledIntegrationInstanceConfigurationIntegrations(Environment.valueOf(name.toUpperCase()))
                 .stream()
                 .map(integrationDTO -> conversionService.convert(integrationDTO, IntegrationModel.class))
                 .toList());

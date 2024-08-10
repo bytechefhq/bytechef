@@ -49,6 +49,11 @@ public class RemoteIntegrationInstanceConfigurationServiceClient implements Inte
     }
 
     @Override
+    public List<IntegrationInstanceConfiguration> getEnabledIntegrationInstanceConfigurations(Environment environment) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public IntegrationInstanceConfiguration getIntegrationInstanceConfiguration(long id) {
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
@@ -60,11 +65,6 @@ public class RemoteIntegrationInstanceConfigurationServiceClient implements Inte
 
     @Override
     public List<Long> getIntegrationIds() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public List<Long> getIntegrationIds(Environment environment) {
         throw new UnsupportedOperationException();
     }
 

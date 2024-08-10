@@ -24,6 +24,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.embedded.configuration.domain.Integration;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
+import com.bytechef.embedded.configuration.domain.IntegrationVersion;
 import com.bytechef.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.embedded.configuration.dto.IntegrationDTO;
@@ -44,6 +45,7 @@ import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
@@ -210,6 +212,49 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
+    public List<IntegrationDTO> getEnabledIntegrationInstanceConfigurationIntegrations(Environment environment) {
+        List<IntegrationDTO> integrationDTOs = List.of();
+
+        List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
+            integrationInstanceConfigurationService.getEnabledIntegrationInstanceConfigurations(environment);
+
+        if (!integrationInstanceConfigurations.isEmpty()) {
+            List<Long> integrationIds = integrationInstanceConfigurations.stream()
+                .map(IntegrationInstanceConfiguration::getIntegrationId)
+                .toList();
+
+            List<Integration> integrations = integrationService.getIntegrations(integrationIds);
+
+            integrationDTOs = integrationInstanceConfigurations.stream()
+                .map(integrationInstanceConfiguration -> {
+                    Integration integration = integrations.stream()
+                        .filter(curIntegration -> Objects.equals(
+                            curIntegration.getId(), integrationInstanceConfiguration.getIntegrationId()))
+                        .findFirst()
+                        .orElseThrow();
+
+                    IntegrationVersion lastIntegrationVersion = integration.getIntegrationVersions()
+                        .stream()
+                        .filter(integrationVersion -> integrationVersion
+                            .getVersion() <= integrationInstanceConfiguration.getIntegrationVersion())
+                        .max(Comparator.comparingInt(IntegrationVersion::getVersion))
+                        .orElseThrow();
+
+                    return new IntegrationDTO(
+                        integration.getCategoryId() == null
+                            ? null : categoryService.getCategory(integration.getCategoryId()),
+                        componentDefinitionService.getComponentDefinition(
+                            integration.getComponentName(), integration.getComponentVersion()),
+                        integration, getIntegrationWorkflowIds(integration), lastIntegrationVersion.getPublishedDate(),
+                        lastIntegrationVersion.getStatus(), lastIntegrationVersion.getVersion());
+                })
+                .toList();
+        }
+
+        return integrationDTOs;
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public IntegrationDTO getIntegration(long id) {
         Integration integration = integrationService.getIntegration(id);
@@ -301,27 +346,6 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    public List<IntegrationDTO> getIntegrations(Environment environment) {
-        List<IntegrationDTO> integrations = List.of();
-
-        List<Long> integrationIds = integrationInstanceConfigurationService.getIntegrationIds(environment);
-
-        if (!integrationIds.isEmpty()) {
-            integrations = integrationService.getIntegrations(null, integrationIds, null, null)
-                .stream()
-                .map(integration -> new IntegrationDTO(
-                    integration.getCategoryId() == null
-                        ? null : categoryService.getCategory(integration.getCategoryId()),
-                    componentDefinitionService.getComponentDefinition(
-                        integration.getComponentName(), integration.getComponentVersion()),
-                    integration))
-                .toList();
-        }
-
-        return integrations;
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public List<IntegrationDTO> getIntegrations(
         Long categoryId, boolean integrationInstanceConfigurations, Long tagId, Status status) {
@@ -351,7 +375,8 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
                     category -> Objects.equals(integration.getCategoryId(), category.getId()),
                     null),
                 integration,
-                getIntegrationWorkflowIds(integration), CollectionUtils.filter(
+                getIntegrationWorkflowIds(integration),
+                CollectionUtils.filter(
                     tagService.getTags(
                         integrations.stream()
                             .flatMap(curIntegration -> CollectionUtils.stream(curIntegration.getTagIds()))

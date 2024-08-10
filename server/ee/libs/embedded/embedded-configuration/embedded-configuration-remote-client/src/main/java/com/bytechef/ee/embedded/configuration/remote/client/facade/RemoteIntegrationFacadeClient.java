@@ -62,6 +62,11 @@ public class RemoteIntegrationFacadeClient implements IntegrationFacade {
     }
 
     @Override
+    public List<WorkflowDTO> getIntegrationVersionWorkflows(long id, int integrationVersion) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public WorkflowDTO getIntegrationWorkflow(String workflowId) {
         throw new UnsupportedOperationException();
     }
@@ -79,11 +84,6 @@ public class RemoteIntegrationFacadeClient implements IntegrationFacade {
     @Override
     public List<WorkflowDTO> getIntegrationWorkflows(long id) {
         return List.of();
-    }
-
-    @Override
-    public List<WorkflowDTO> getIntegrationVersionWorkflows(long id, int integrationVersion) {
-        throw new UnsupportedOperationException();
     }
 
     @Override

@@ -38,6 +38,8 @@ public interface IntegrationFacade {
 
     void deleteWorkflow(@NonNull String workflowId);
 
+    List<IntegrationDTO> getEnabledIntegrationInstanceConfigurationIntegrations(Environment environment);
+
     IntegrationDTO getIntegration(long id);
 
     List<Category> getIntegrationCategories();
@@ -53,8 +55,6 @@ public interface IntegrationFacade {
     List<WorkflowDTO> getIntegrationWorkflows(long id);
 
     List<WorkflowDTO> getIntegrationVersionWorkflows(long id, int integrationVersion);
-
-    List<IntegrationDTO> getIntegrations(Environment environment);
 
     List<IntegrationDTO> getIntegrations(
         Long categoryId, boolean integrationInstanceConfigurations, Long tagId, Status status);

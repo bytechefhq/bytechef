@@ -69,12 +69,6 @@ public class IntegrationInstanceConfigurationServiceImpl implements IntegrationI
     }
 
     @Override
-    public List<Long> getIntegrationIds(Environment environment) {
-        return integrationInstanceConfigurationRepository.findAllIntegrationIdsByEnvironmentAndEnabled(
-            environment.ordinal(), true);
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public List<IntegrationInstanceConfiguration> getIntegrationInstanceConfigurations() {
         return getIntegrationInstanceConfigurations(null, null, null);
@@ -84,6 +78,13 @@ public class IntegrationInstanceConfigurationServiceImpl implements IntegrationI
     @Transactional(readOnly = true)
     public List<IntegrationInstanceConfiguration> getIntegrationInstanceConfigurations(long integrationId) {
         return getIntegrationInstanceConfigurations(null, integrationId, null);
+    }
+
+    @Override
+    public List<IntegrationInstanceConfiguration> getEnabledIntegrationInstanceConfigurations(
+        Environment environment) {
+
+        return integrationInstanceConfigurationRepository.findAllByEnvironmentAndEnabled(environment.ordinal(), true);
     }
 
     @Override
