@@ -200,10 +200,10 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                     </div>
 
                     <div className="flex items-center justify-end gap-x-6">
-                        {integration.lastVersion && (
+                        {integration.lastIntegrationVersion && (
                             <div className="flex flex-col items-end gap-y-4">
                                 <Badge className="flex space-x-1" variant="secondary">
-                                    <span>V{integration.lastVersion}</span>
+                                    <span>V{integration.lastIntegrationVersion}</span>
 
                                     <span>{integration.lastStatus}</span>
                                 </Badge>

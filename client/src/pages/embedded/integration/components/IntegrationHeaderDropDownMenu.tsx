@@ -21,7 +21,7 @@ const IntegrationHeaderDropDownMenu = ({integration}: {integration: IntegrationM
 
                     {integration && (
                         <Badge className="flex space-x-1" variant="secondary">
-                            <span>V{integration.lastVersion}</span>
+                            <span>V{integration.lastIntegrationVersion}</span>
 
                             <span>{integration.lastStatus}</span>
                         </Badge>
@@ -67,7 +67,7 @@ const IntegrationHeaderDropDownMenu = ({integration}: {integration: IntegrationM
                             </div>
 
                             <Badge className="flex space-x-1" variant="secondary">
-                                <span>V{curIntegration.lastVersion}</span>
+                                <span>V{curIntegration.lastIntegrationVersion}</span>
 
                                 <span>{curIntegration.lastStatus}</span>
                             </Badge>
