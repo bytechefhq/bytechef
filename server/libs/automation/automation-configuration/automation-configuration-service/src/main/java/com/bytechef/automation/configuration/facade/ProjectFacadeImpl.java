@@ -116,17 +116,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
         ProjectWorkflow projectWorkflow = projectWorkflowService.addWorkflow(
             id, project.getLastVersion(), workflow.getId());
 
-        List<ProjectInstance> projectInstances = projectInstanceService.getProjectInstances(id);
-
-        for (ProjectInstance projectInstance : projectInstances) {
-            ProjectInstanceWorkflow projectInstanceWorkflow = new ProjectInstanceWorkflow();
-
-            projectInstanceWorkflow.setProjectInstanceId(projectInstance.getId());
-            projectInstanceWorkflow.setWorkflowId(workflow.getId());
-
-            projectInstanceWorkflowService.create(projectInstanceWorkflow);
-        }
-
         return new WorkflowDTO(workflowFacade.getWorkflow(workflow.getId()), projectWorkflow);
     }
 
