@@ -22,6 +22,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Ivica Cardic
@@ -76,6 +77,12 @@ public class ConnectionDefinition extends ConnectionDefinitionBasic {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), authorizations, properties);
+    }
+
+    public boolean hasOAuth2Authorization() {
+        return authorizations.stream()
+            .map(Authorization::getType)
+            .anyMatch(type -> StringUtils.startsWith(type.getName(), "OAUTH2"));
     }
 
     @Override
