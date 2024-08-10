@@ -107,24 +107,6 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         IntegrationWorkflow integrationWorkflow = integrationWorkflowService.addWorkflow(
             id, integration.getLastIntegrationVersion(), workflow.getId());
 
-        List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
-            integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(id);
-
-        for (IntegrationInstanceConfiguration integrationInstanceConfiguration : integrationInstanceConfigurations) {
-            if (integrationInstanceConfiguration.getIntegrationVersion() == null) {
-                continue;
-            }
-
-            IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
-                new IntegrationInstanceConfigurationWorkflow();
-
-            integrationInstanceConfigurationWorkflow.setIntegrationInstanceConfigurationId(
-                integrationInstanceConfiguration.getId());
-            integrationInstanceConfigurationWorkflow.setWorkflowId(workflow.getId());
-
-            integrationInstanceConfigurationWorkflowService.create(integrationInstanceConfigurationWorkflow);
-        }
-
         return new WorkflowDTO(workflowFacade.getWorkflow(workflow.getId()), integrationWorkflow);
     }
 
