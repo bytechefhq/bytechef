@@ -5,7 +5,6 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.openapitools.jackson.nullable.JsonNullable;
@@ -24,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowBasic", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("WorkflowBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-10T18:39:37.461007+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-10T22:20:11.668115+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class WorkflowBasicModel {
 
   private String createdBy;
@@ -45,7 +44,7 @@ public class WorkflowBasicModel {
 
   private Integer version;
 
-  private BigDecimal integrationWorkflowId;
+  private Long integrationWorkflowId;
 
   private String workflowReferenceCode;
 
@@ -209,7 +208,7 @@ public class WorkflowBasicModel {
     this.version = version;
   }
 
-  public WorkflowBasicModel integrationWorkflowId(BigDecimal integrationWorkflowId) {
+  public WorkflowBasicModel integrationWorkflowId(Long integrationWorkflowId) {
     this.integrationWorkflowId = integrationWorkflowId;
     return this;
   }
@@ -218,14 +217,14 @@ public class WorkflowBasicModel {
    * The integration workflow id
    * @return integrationWorkflowId
   */
-  @Valid 
+  
   @Schema(name = "integrationWorkflowId", accessMode = Schema.AccessMode.READ_ONLY, description = "The integration workflow id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationWorkflowId")
-  public BigDecimal getIntegrationWorkflowId() {
+  public Long getIntegrationWorkflowId() {
     return integrationWorkflowId;
   }
 
-  public void setIntegrationWorkflowId(BigDecimal integrationWorkflowId) {
+  public void setIntegrationWorkflowId(Long integrationWorkflowId) {
     this.integrationWorkflowId = integrationWorkflowId;
   }
 
