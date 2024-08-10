@@ -97,7 +97,7 @@ export interface ProjectModel {
      * @type {number}
      * @memberof ProjectModel
      */
-    readonly lastVersion?: number;
+    readonly lastProjectVersion?: number;
     /**
      * 
      * @type {CategoryModel}
@@ -158,7 +158,7 @@ export function ProjectModelFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'name': json['name'],
         'lastPublishedDate': json['lastPublishedDate'] == null ? undefined : (new Date(json['lastPublishedDate'])),
         'lastStatus': json['lastStatus'] == null ? undefined : ProjectStatusModelFromJSON(json['lastStatus']),
-        'lastVersion': json['lastVersion'] == null ? undefined : json['lastVersion'],
+        'lastProjectVersion': json['lastProjectVersion'] == null ? undefined : json['lastProjectVersion'],
         'category': json['category'] == null ? undefined : CategoryModelFromJSON(json['category']),
         'projectWorkflowIds': json['projectWorkflowIds'] == null ? undefined : json['projectWorkflowIds'],
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
@@ -167,7 +167,7 @@ export function ProjectModelFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-export function ProjectModelToJSON(value?: Omit<ProjectModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastVersion'> | null): any {
+export function ProjectModelToJSON(value?: Omit<ProjectModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastProjectVersion'> | null): any {
     if (value == null) {
         return value;
     }
