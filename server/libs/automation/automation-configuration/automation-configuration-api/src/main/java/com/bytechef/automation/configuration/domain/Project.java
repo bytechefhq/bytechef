@@ -111,7 +111,7 @@ public final class Project {
     }
 
     public int addVersion() {
-        ProjectVersion projectVersion = getLastProjectVersion();
+        ProjectVersion projectVersion = getMaxProjectVersion();
 
         int newVersion = projectVersion.getVersion() + 1;
 
@@ -172,12 +172,6 @@ public final class Project {
         return lastModifiedDate;
     }
 
-    public ProjectVersion getLastProjectVersion() {
-        return projectVersions.stream()
-            .max(Comparator.comparingInt(ProjectVersion::getVersion))
-            .orElseThrow();
-    }
-
     @Nullable
     public LocalDateTime getLastPublishedDate() {
         return projectVersions.stream()
@@ -189,11 +183,11 @@ public final class Project {
     }
 
     public Status getLastStatus() {
-        return getLastProjectVersion().getStatus();
+        return getMaxProjectVersion().getStatus();
     }
 
-    public int getLastVersion() {
-        return getLastProjectVersion().getVersion();
+    public int getLastProjectVersion() {
+        return getMaxProjectVersion().getVersion();
     }
 
     public List<ProjectVersion> getProjectVersions() {
@@ -221,7 +215,7 @@ public final class Project {
     }
 
     public void publish(String description) {
-        ProjectVersion projectVersion = getLastProjectVersion();
+        ProjectVersion projectVersion = getMaxProjectVersion();
 
         projectVersion.setDescription(description);
         projectVersion.setPublishedDate(LocalDateTime.now());
@@ -295,6 +289,12 @@ public final class Project {
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
             ", lastModifiedDate=" + lastModifiedDate +
             '}';
+    }
+
+    private ProjectVersion getMaxProjectVersion() {
+        return projectVersions.stream()
+            .max(Comparator.comparingInt(ProjectVersion::getVersion))
+            .orElseThrow();
     }
 
     @SuppressFBWarnings("EI")
