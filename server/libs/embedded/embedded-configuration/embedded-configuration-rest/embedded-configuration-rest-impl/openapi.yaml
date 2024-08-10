@@ -1084,7 +1084,7 @@ components:
           readOnly: true
         lastStatus:
           $ref: '#/components/schemas/IntegrationStatus'
-        lastVersion:
+        lastIntegrationVersion:
           description: "The last version of an integration."
           type: "integer"
           readOnly: true
