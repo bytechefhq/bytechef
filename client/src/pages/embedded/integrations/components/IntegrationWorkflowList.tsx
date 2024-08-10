@@ -74,7 +74,7 @@ const IntegrationWorkflowList = ({integration}: {integration: IntegrationModel})
                         </h3>
                     </div>
 
-                    <ul>
+                    <ul className="divide-y divide-gray-100">
                         {workflows
                             .sort((a, b) => a.label!.localeCompare(b.label!))
                             .map((workflow) => {
