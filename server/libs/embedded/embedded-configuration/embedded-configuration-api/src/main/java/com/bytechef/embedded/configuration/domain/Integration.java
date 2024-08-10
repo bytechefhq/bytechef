@@ -109,7 +109,7 @@ public final class Integration {
     }
 
     public int addVersion() {
-        IntegrationVersion integrationVersion = getLastIntegrationVersion();
+        IntegrationVersion integrationVersion = getMaxIntegrationVersion();
 
         int newVersion = integrationVersion.getVersion() + 1;
 
@@ -174,12 +174,6 @@ public final class Integration {
         return new ArrayList<>(integrationVersions);
     }
 
-    public IntegrationVersion getLastIntegrationVersion() {
-        return integrationVersions.stream()
-            .max(Comparator.comparingInt(IntegrationVersion::getVersion))
-            .orElseThrow();
-    }
-
     public String getLastModifiedBy() {
         return lastModifiedBy;
     }
@@ -191,7 +185,7 @@ public final class Integration {
     @Nullable
     public LocalDateTime getLastPublishedDate() {
         return integrationVersions.stream()
-            .sorted(Comparator.comparingInt(IntegrationVersion::getVersion))
+            .sorted((o1, o2) -> Integer.compare(o2.getVersion(), o1.getVersion()))
             .filter(projectVersion -> projectVersion.getStatus() == Status.PUBLISHED)
             .findFirst()
             .map(IntegrationVersion::getPublishedDate)
@@ -199,11 +193,11 @@ public final class Integration {
     }
 
     public Status getLastStatus() {
-        return getLastIntegrationVersion().getStatus();
+        return getMaxIntegrationVersion().getStatus();
     }
 
-    public int getLastVersion() {
-        return getLastIntegrationVersion().getVersion();
+    public int getLastIntegrationVersion() {
+        return getMaxIntegrationVersion().getVersion();
     }
 
     public List<Long> getTagIds() {
@@ -226,7 +220,7 @@ public final class Integration {
     }
 
     public void publish(String description) {
-        IntegrationVersion integrationVersion = getLastIntegrationVersion();
+        IntegrationVersion integrationVersion = getMaxIntegrationVersion();
 
         integrationVersion.setDescription(description);
         integrationVersion.setPublishedDate(LocalDateTime.now());
@@ -305,6 +299,12 @@ public final class Integration {
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
             ", lastModifiedDate=" + lastModifiedDate +
             '}';
+    }
+
+    private IntegrationVersion getMaxIntegrationVersion() {
+        return integrationVersions.stream()
+            .max(Comparator.comparingInt(IntegrationVersion::getVersion))
+            .orElseThrow();
     }
 
     @SuppressFBWarnings("EI")

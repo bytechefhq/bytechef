@@ -35,20 +35,21 @@ public record IntegrationDTO(
     boolean allowMultipleInstances, Category category, String componentName, int componentVersion, String createdBy,
     LocalDateTime createdDate, String description, String icon, Long id, List<IntegrationVersion> integrationVersions,
     List<Long> integrationWorkflowIds, String lastModifiedBy, LocalDateTime lastModifiedDate,
-    LocalDateTime lastPublishedDate, Status lastStatus, Integer lastVersion, List<Tag> tags, String title,
+    LocalDateTime lastPublishedDate, Status lastStatus, Integer lastIntegrationVersion, List<Tag> tags, String title,
     int version) {
 
     public IntegrationDTO(
-        Category category, ComponentDefinition componentDefinition, Integration integration) {
+        Category category, ComponentDefinition componentDefinition, Integration integration,
+        List<Long> integrationWorkflowIds, LocalDateTime lastPublishedDate, Status lastStatus,
+        int lastIntegrationVersion) {
 
         this(
             integration.isAllowMultipleInstances(), category, integration.getComponentName(),
             integration.getComponentVersion(), integration.getCreatedBy(), integration.getCreatedDate(),
             getDescription(componentDefinition, integration), componentDefinition.getIcon(),
-            integration.getId(), integration.getIntegrationVersions(), List.of(),
-            integration.getLastModifiedBy(), integration.getLastModifiedDate(), integration.getLastPublishedDate(),
-            integration.getLastStatus(), integration.getLastVersion(), List.of(), componentDefinition.getTitle(),
-            integration.getVersion());
+            integration.getId(), integration.getIntegrationVersions(), integrationWorkflowIds,
+            integration.getLastModifiedBy(), integration.getLastModifiedDate(), lastPublishedDate,
+            lastStatus, lastIntegrationVersion, List.of(), componentDefinition.getTitle(), integration.getVersion());
     }
 
     public IntegrationDTO(
@@ -59,8 +60,8 @@ public record IntegrationDTO(
             integration.getComponentVersion(), integration.getCreatedBy(), integration.getCreatedDate(),
             integration.getDescription(), null, integration.getId(), integration.getIntegrationVersions(),
             integrationWorkflowIds, integration.getLastModifiedBy(), integration.getLastModifiedDate(),
-            integration.getLastPublishedDate(), integration.getLastStatus(), integration.getLastVersion(), tags, null,
-            integration.getVersion());
+            integration.getLastPublishedDate(), integration.getLastStatus(), integration.getLastIntegrationVersion(),
+            tags, null, integration.getVersion());
     }
 
     public static Builder builder() {
@@ -98,7 +99,7 @@ public record IntegrationDTO(
         private LocalDateTime lastModifiedDate;
         private LocalDateTime lastPublishedDate;
         private Status lastStatus = Status.DRAFT;
-        private int lastVersion;
+        private int lastIntegrationVersion;
         private List<Tag> tags;
         private int version;
 
@@ -189,8 +190,8 @@ public record IntegrationDTO(
             return this;
         }
 
-        public Builder lastVersion(int lastVersion) {
-            this.lastVersion = lastVersion;
+        public Builder lastIntegrationVersion(int lastIntegrationVersion) {
+            this.lastIntegrationVersion = lastIntegrationVersion;
 
             return this;
         }
@@ -211,7 +212,7 @@ public record IntegrationDTO(
             return new IntegrationDTO(
                 allowMultipleInstances, category, componentName, componentVersion, createdBy, createdDate,
                 description, null, id, integrationVersions, integrationWorkflowIds, lastModifiedBy, lastModifiedDate,
-                lastPublishedDate, lastStatus, lastVersion, tags, null, version);
+                lastPublishedDate, lastStatus, lastIntegrationVersion, tags, null, version);
         }
     }
 

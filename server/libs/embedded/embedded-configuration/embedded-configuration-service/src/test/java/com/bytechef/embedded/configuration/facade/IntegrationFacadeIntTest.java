@@ -275,7 +275,7 @@ public class IntegrationFacadeIntTest {
 
         integrationWorkflowRepository.save(
             new IntegrationWorkflow(
-                integration.getId(), Validate.notNull(integration.getLastVersion(), "lastVersion"),
+                integration.getId(), Validate.notNull(integration.getLastIntegrationVersion(), "lastVersion"),
                 Validate.notNull(workflow.getId(), "id"), "workflowReferenceCode"));
 
         // TODO remove
