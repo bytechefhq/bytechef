@@ -64,7 +64,7 @@ const IntegrationInstanceConfigurationWorkflowList = ({
         <div className="border-b border-b-gray-100 py-3 pl-4">
             <h3 className="flex justify-start px-2 text-sm font-semibold uppercase text-gray-400">Workflows</h3>
 
-            <ul>
+            <ul className="divide-y divide-gray-100">
                 {workflows &&
                     workflows
                         .sort((a, b) => a.label!.localeCompare(b.label!))
