@@ -36,7 +36,7 @@ public class CustomIntegrationRepositoryImpl implements CustomIntegrationReposit
     @Override
     public List<Integration> findAllIntegrations(Long categoryId, List<Long> ids, Long tagId, Integer status) {
         List<Object> arguments = new ArrayList<>();
-        String query = "SELECT integration.* FROM integration ";
+        String query = "SELECT DISTINCT integration.* FROM integration ";
 
         if (status != null) {
             query += "JOIN integration_version ON integration.id = integration_version.integration_id ";
