@@ -30,7 +30,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-10T18:39:37.461007+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-10T22:20:11.668115+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class IntegrationModel {
 
   private Boolean allowMultipleInstances = false;
@@ -63,7 +63,7 @@ public class IntegrationModel {
   private CategoryModel category;
 
   @Valid
-  private List<String> integrationWorkflowIds = new ArrayList<>();
+  private List<Long> integrationWorkflowIds = new ArrayList<>();
 
   @Valid
   private List<@Valid TagModel> tags = new ArrayList<>();
@@ -343,12 +343,12 @@ public class IntegrationModel {
     this.category = category;
   }
 
-  public IntegrationModel integrationWorkflowIds(List<String> integrationWorkflowIds) {
+  public IntegrationModel integrationWorkflowIds(List<Long> integrationWorkflowIds) {
     this.integrationWorkflowIds = integrationWorkflowIds;
     return this;
   }
 
-  public IntegrationModel addIntegrationWorkflowIdsItem(String integrationWorkflowIdsItem) {
+  public IntegrationModel addIntegrationWorkflowIdsItem(Long integrationWorkflowIdsItem) {
     if (this.integrationWorkflowIds == null) {
       this.integrationWorkflowIds = new ArrayList<>();
     }
@@ -363,11 +363,11 @@ public class IntegrationModel {
   
   @Schema(name = "integrationWorkflowIds", description = "The integration workflow ids belonging to this integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationWorkflowIds")
-  public List<String> getIntegrationWorkflowIds() {
+  public List<Long> getIntegrationWorkflowIds() {
     return integrationWorkflowIds;
   }
 
-  public void setIntegrationWorkflowIds(List<String> integrationWorkflowIds) {
+  public void setIntegrationWorkflowIds(List<Long> integrationWorkflowIds) {
     this.integrationWorkflowIds = integrationWorkflowIds;
   }
 
