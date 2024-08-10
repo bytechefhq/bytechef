@@ -106,10 +106,10 @@ export interface ProjectModel {
     category?: CategoryModel;
     /**
      * The project workflow ids belonging to this project.
-     * @type {Array<string>}
+     * @type {Array<number>}
      * @memberof ProjectModel
      */
-    projectWorkflowIds?: Array<string>;
+    projectWorkflowIds?: Array<number>;
     /**
      * 
      * @type {Array<TagModel>}
