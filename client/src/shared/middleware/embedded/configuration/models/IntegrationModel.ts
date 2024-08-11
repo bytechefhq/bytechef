@@ -111,6 +111,12 @@ export interface IntegrationModel {
      */
     readonly lastIntegrationVersion?: number;
     /**
+     * The name of an integration.
+     * @type {string}
+     * @memberof IntegrationModel
+     */
+    name?: string;
+    /**
      * 
      * @type {CategoryModel}
      * @memberof IntegrationModel
@@ -168,6 +174,7 @@ export function IntegrationModelFromJSONTyped(json: any, ignoreDiscriminator: bo
         'lastPublishedDate': json['lastPublishedDate'] == null ? undefined : (new Date(json['lastPublishedDate'])),
         'lastStatus': json['lastStatus'] == null ? undefined : IntegrationStatusModelFromJSON(json['lastStatus']),
         'lastIntegrationVersion': json['lastIntegrationVersion'] == null ? undefined : json['lastIntegrationVersion'],
+        'name': json['name'] == null ? undefined : json['name'],
         'category': json['category'] == null ? undefined : CategoryModelFromJSON(json['category']),
         'integrationWorkflowIds': json['integrationWorkflowIds'] == null ? undefined : json['integrationWorkflowIds'],
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
@@ -186,6 +193,7 @@ export function IntegrationModelToJSON(value?: Omit<IntegrationModel, 'createdBy
         'componentVersion': value['componentVersion'],
         'description': value['description'],
         'lastStatus': IntegrationStatusModelToJSON(value['lastStatus']),
+        'name': value['name'],
         'category': CategoryModelToJSON(value['category']),
         'integrationWorkflowIds': value['integrationWorkflowIds'],
         'tags': value['tags'] == null ? undefined : ((value['tags'] as Array<any>).map(TagModelToJSON)),
