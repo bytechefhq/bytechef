@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationBasic", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("IntegrationBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-10T22:20:11.668115+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-11T18:41:40.272221+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class IntegrationBasicModel {
 
   private Boolean allowMultipleInstances = false;
@@ -54,6 +54,8 @@ public class IntegrationBasicModel {
   private IntegrationStatusModel lastStatus;
 
   private Integer lastIntegrationVersion;
+
+  private String name;
 
   public IntegrationBasicModel() {
     super();
@@ -308,6 +310,26 @@ public class IntegrationBasicModel {
     this.lastIntegrationVersion = lastIntegrationVersion;
   }
 
+  public IntegrationBasicModel name(String name) {
+    this.name = name;
+    return this;
+  }
+
+  /**
+   * The name of an integration.
+   * @return name
+  */
+  
+  @Schema(name = "name", description = "The name of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("name")
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -328,12 +350,13 @@ public class IntegrationBasicModel {
         Objects.equals(this.lastModifiedDate, integrationBasic.lastModifiedDate) &&
         Objects.equals(this.lastPublishedDate, integrationBasic.lastPublishedDate) &&
         Objects.equals(this.lastStatus, integrationBasic.lastStatus) &&
-        Objects.equals(this.lastIntegrationVersion, integrationBasic.lastIntegrationVersion);
+        Objects.equals(this.lastIntegrationVersion, integrationBasic.lastIntegrationVersion) &&
+        Objects.equals(this.name, integrationBasic.name);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(allowMultipleInstances, componentName, componentVersion, createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, lastPublishedDate, lastStatus, lastIntegrationVersion);
+    return Objects.hash(allowMultipleInstances, componentName, componentVersion, createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, lastPublishedDate, lastStatus, lastIntegrationVersion, name);
   }
 
   @Override
@@ -352,6 +375,7 @@ public class IntegrationBasicModel {
     sb.append("    lastPublishedDate: ").append(toIndentedString(lastPublishedDate)).append("\n");
     sb.append("    lastStatus: ").append(toIndentedString(lastStatus)).append("\n");
     sb.append("    lastIntegrationVersion: ").append(toIndentedString(lastIntegrationVersion)).append("\n");
+    sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("}");
     return sb.toString();
   }

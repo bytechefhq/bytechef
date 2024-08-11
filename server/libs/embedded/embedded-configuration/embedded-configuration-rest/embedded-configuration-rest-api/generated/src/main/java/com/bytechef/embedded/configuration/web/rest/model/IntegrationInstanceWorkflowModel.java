@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceWorkflow", description = "Contains user configurations for the execution of a particular integration workflow.")
 @JsonTypeName("IntegrationInstanceWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-10T22:20:11.668115+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-11T18:41:40.272221+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class IntegrationInstanceWorkflowModel {
 
   @Valid

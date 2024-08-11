@@ -30,7 +30,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-10T22:20:11.668115+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-11T18:41:40.272221+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class IntegrationModel {
 
   private Boolean allowMultipleInstances = false;
@@ -59,6 +59,8 @@ public class IntegrationModel {
   private IntegrationStatusModel lastStatus;
 
   private Integer lastIntegrationVersion;
+
+  private String name;
 
   private CategoryModel category;
 
@@ -323,6 +325,26 @@ public class IntegrationModel {
     this.lastIntegrationVersion = lastIntegrationVersion;
   }
 
+  public IntegrationModel name(String name) {
+    this.name = name;
+    return this;
+  }
+
+  /**
+   * The name of an integration.
+   * @return name
+  */
+  
+  @Schema(name = "name", description = "The name of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("name")
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
   public IntegrationModel category(CategoryModel category) {
     this.category = category;
     return this;
@@ -440,6 +462,7 @@ public class IntegrationModel {
         Objects.equals(this.lastPublishedDate, integration.lastPublishedDate) &&
         Objects.equals(this.lastStatus, integration.lastStatus) &&
         Objects.equals(this.lastIntegrationVersion, integration.lastIntegrationVersion) &&
+        Objects.equals(this.name, integration.name) &&
         Objects.equals(this.category, integration.category) &&
         Objects.equals(this.integrationWorkflowIds, integration.integrationWorkflowIds) &&
         Objects.equals(this.tags, integration.tags) &&
@@ -448,7 +471,7 @@ public class IntegrationModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(allowMultipleInstances, componentName, componentVersion, createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, lastPublishedDate, lastStatus, lastIntegrationVersion, category, integrationWorkflowIds, tags, version);
+    return Objects.hash(allowMultipleInstances, componentName, componentVersion, createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, lastPublishedDate, lastStatus, lastIntegrationVersion, name, category, integrationWorkflowIds, tags, version);
   }
 
   @Override
@@ -467,6 +490,7 @@ public class IntegrationModel {
     sb.append("    lastPublishedDate: ").append(toIndentedString(lastPublishedDate)).append("\n");
     sb.append("    lastStatus: ").append(toIndentedString(lastStatus)).append("\n");
     sb.append("    lastIntegrationVersion: ").append(toIndentedString(lastIntegrationVersion)).append("\n");
+    sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    category: ").append(toIndentedString(category)).append("\n");
     sb.append("    integrationWorkflowIds: ").append(toIndentedString(integrationWorkflowIds)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
