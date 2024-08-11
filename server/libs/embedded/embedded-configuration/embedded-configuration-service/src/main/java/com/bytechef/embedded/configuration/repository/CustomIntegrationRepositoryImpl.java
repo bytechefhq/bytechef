@@ -96,7 +96,7 @@ public class CustomIntegrationRepositoryImpl implements CustomIntegrationReposit
             query += "status = ? ";
         }
 
-        query += "ORDER BY integration.component_name ASC";
+        query += "ORDER BY integration.name ASC";
 
         List<Integration> integrations = jdbcClient.sql(query)
             .params(arguments)

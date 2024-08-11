@@ -154,6 +154,7 @@ public class IntegrationServiceImpl implements IntegrationService {
         curIntegration.setAllowMultipleInstances(integration.isAllowMultipleInstances());
         curIntegration.setCategoryId(integration.getCategoryId());
         curIntegration.setDescription(integration.getDescription());
+        curIntegration.setName(integration.getName());
         curIntegration.setTagIds(integration.getTagIds());
         curIntegration.setVersion(integration.getVersion());
 

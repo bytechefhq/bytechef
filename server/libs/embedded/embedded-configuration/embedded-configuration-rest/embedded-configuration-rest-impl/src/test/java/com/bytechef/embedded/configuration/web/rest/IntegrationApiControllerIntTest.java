@@ -330,6 +330,7 @@ public class IntegrationApiControllerIntTest {
             .id(1L)
             .tags(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")))
             .integrationWorkflowIds(List.of(1L))
+            .name("Name")
             .build();
         IntegrationModel integrationModel = new IntegrationModel()
             .id(1L);
@@ -395,6 +396,7 @@ public class IntegrationApiControllerIntTest {
             .id(1L)
             .tags(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")))
             .integrationWorkflowIds(List.of(1L))
+            .name("Name")
             .build();
     }
 
