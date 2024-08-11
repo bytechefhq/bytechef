@@ -98,6 +98,12 @@ export interface IntegrationBasicModel {
      * @memberof IntegrationBasicModel
      */
     readonly lastIntegrationVersion?: number;
+    /**
+     * The name of an integration.
+     * @type {string}
+     * @memberof IntegrationBasicModel
+     */
+    name?: string;
 }
 
 /**
@@ -132,6 +138,7 @@ export function IntegrationBasicModelFromJSONTyped(json: any, ignoreDiscriminato
         'lastPublishedDate': json['lastPublishedDate'] == null ? undefined : (new Date(json['lastPublishedDate'])),
         'lastStatus': json['lastStatus'] == null ? undefined : IntegrationStatusModelFromJSON(json['lastStatus']),
         'lastIntegrationVersion': json['lastIntegrationVersion'] == null ? undefined : json['lastIntegrationVersion'],
+        'name': json['name'] == null ? undefined : json['name'],
     };
 }
 
@@ -146,6 +153,7 @@ export function IntegrationBasicModelToJSON(value?: Omit<IntegrationBasicModel, 
         'componentVersion': value['componentVersion'],
         'description': value['description'],
         'lastStatus': IntegrationStatusModelToJSON(value['lastStatus']),
+        'name': value['name'],
     };
 }
 
