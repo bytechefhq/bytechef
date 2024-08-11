@@ -73,6 +73,7 @@ public class IntegrationWorkflowServiceIntTest {
     private Integration getIntegration() {
         return Integration.builder()
             .componentName("componentName")
+            .name("Name")
             .build();
     }
 }

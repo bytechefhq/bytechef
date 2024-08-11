@@ -175,6 +175,7 @@ public class IntegrationFacadeIntTest {
 
         integration.setCategory(category);
         integration.setComponentName("componentName");
+        integration.setName("Name");
 
         Tag tag1 = tagRepository.save(new Tag("tag1"));
         Tag tag2 = tagRepository.save(new Tag("tag2"));
@@ -198,6 +199,7 @@ public class IntegrationFacadeIntTest {
 
         integration.setCategory(category);
         integration.setComponentName("componentName");
+        integration.setName("Name");
 
         Tag tag1 = tagRepository.save(new Tag("tag1"));
         Tag tag2 = tagRepository.save(new Tag("tag2"));
@@ -227,6 +229,7 @@ public class IntegrationFacadeIntTest {
         Tag tag2 = tagRepository.save(new Tag("tag2"));
 
         integration.setComponentName("componentName");
+        integration.setName("Name");
         integration.setTags(List.of(tag1, tag2));
 
         integrationRepository.save(integration);
@@ -239,6 +242,7 @@ public class IntegrationFacadeIntTest {
         integration = new Integration();
 
         integration.setComponentName("componentName2");
+        integration.setName("Name");
 
         tag1 = OptionalUtils.get(tagRepository.findById(Validate.notNull(tag1.getId(), "id")));
 
@@ -301,6 +305,7 @@ public class IntegrationFacadeIntTest {
 
         IntegrationDTO integrationDTO = IntegrationDTO.builder()
             .componentName("componentName")
+            .name("Name")
             .tags(List.of(tag1, tagRepository.save(new Tag("tag2"))))
             .build();
 
