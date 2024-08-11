@@ -157,6 +157,7 @@ public class IntegrationServiceIntTest {
         return Integration.builder()
             .categoryId(category.getId())
             .componentName("componentName")
+            .name("Name")
             .build();
     }
 }

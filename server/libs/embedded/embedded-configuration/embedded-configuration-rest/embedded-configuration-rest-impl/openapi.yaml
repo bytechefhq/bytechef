@@ -1089,6 +1089,9 @@ components:
           description: "The last version of an integration."
           type: "integer"
           readOnly: true
+        name:
+          description: "The name of an integration."
+          type: "string"
     IntegrationInstance:
       description: "Contains configurations and connections required for the execution\
         \ of integration workflows for a connected user."

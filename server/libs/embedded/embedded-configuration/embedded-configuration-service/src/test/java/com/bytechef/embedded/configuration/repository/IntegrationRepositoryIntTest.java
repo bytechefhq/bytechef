@@ -90,6 +90,7 @@ public class IntegrationRepositoryIntTest {
     private static Integration getIntegration() {
         return Integration.builder()
             .componentName("componentName")
+            .name("Name")
             .build();
     }
 }

@@ -324,6 +324,7 @@ public final class Integration {
         private Long categoryId;
         private String componentName;
         private Long id;
+        private String name;
         private List<Long> tagIds;
         private int version;
 
@@ -344,6 +345,12 @@ public final class Integration {
 
         public Builder id(Long id) {
             this.id = id;
+
+            return this;
+        }
+
+        public Builder name(String name) {
+            this.name = name;
 
             return this;
         }
@@ -369,6 +376,7 @@ public final class Integration {
 
             integration.setComponentName(componentName);
             integration.setId(id);
+            integration.setName(name);
             integration.setTagIds(tagIds);
             integration.setVersion(version);
 
