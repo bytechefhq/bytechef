@@ -88,6 +88,9 @@ public final class Integration {
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
 
+    @Column
+    private String name;
+
     @Version
     private int version;
 
@@ -200,6 +203,10 @@ public final class Integration {
         return getMaxIntegrationVersion().getVersion();
     }
 
+    public String getName() {
+        return name;
+    }
+
     public List<Long> getTagIds() {
         return integrationTags.stream()
             .map(IntegrationTag::getTagId)
@@ -263,6 +270,10 @@ public final class Integration {
         }
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public void setTagIds(List<Long> tagIds) {
         this.integrationTags = new HashSet<>();
 
@@ -289,6 +300,7 @@ public final class Integration {
             "id=" + id +
             ", componentName='" + componentName + '\'' +
             ", componentVersion=" + componentVersion +
+            ", name='" + name + '\'' +
             ", description='" + description + '\'' +
             ", categoryId=" + getCategoryId() +
             ", integrationTags=" + integrationTags +

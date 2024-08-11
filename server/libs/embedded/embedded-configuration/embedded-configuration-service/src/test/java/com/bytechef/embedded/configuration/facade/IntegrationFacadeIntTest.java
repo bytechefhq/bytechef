@@ -122,6 +122,7 @@ public class IntegrationFacadeIntTest {
         IntegrationDTO integrationDTO = IntegrationDTO.builder()
             .category(category)
             .componentName("componentName")
+            .name("Name")
             .tags(List.of(new Tag("tag1")))
             .build();
 
@@ -139,6 +140,7 @@ public class IntegrationFacadeIntTest {
     public void testDelete() {
         IntegrationDTO integrationDTO1 = IntegrationDTO.builder()
             .componentName("componentName1")
+            .name("Name")
             .tags(List.of(new Tag("tag1")))
             .build();
 
@@ -146,6 +148,7 @@ public class IntegrationFacadeIntTest {
 
         IntegrationDTO integrationDTO2 = IntegrationDTO.builder()
             .componentName("componentName2")
+            .name("Name")
             .tags(List.of(new Tag("tag1")))
             .build();
 
@@ -309,6 +312,7 @@ public class IntegrationFacadeIntTest {
         integrationDTO = IntegrationDTO.builder()
             .componentName("componentName")
             .id(integrationDTO.id())
+            .name("Name")
             .tags(List.of(tag1))
             .version(integrationDTO.version())
             .build();
