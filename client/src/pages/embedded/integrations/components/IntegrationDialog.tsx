@@ -11,6 +11,7 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
+import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
 import {CategoryModel, IntegrationModel, TagModel} from '@/shared/middleware/embedded/configuration';
 import {ComponentDefinitionBasicModel} from '@/shared/middleware/platform/configuration';
@@ -23,7 +24,7 @@ import {
     useGetIntegrationCategoriesQuery,
 } from '@/shared/queries/embedded/integrationCategories.queries';
 import {IntegrationTagKeys, useGetIntegrationTagsQuery} from '@/shared/queries/embedded/integrationTags.quries';
-import {IntegrationKeys, useGetIntegrationsQuery} from '@/shared/queries/embedded/integrations.queries';
+import {IntegrationKeys} from '@/shared/queries/embedded/integrations.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
@@ -51,6 +52,7 @@ const IntegrationDialog = ({integration, onClose, triggerNode}: IntegrationDialo
             componentName: integration?.componentName || '',
             componentVersion: 1,
             description: integration?.description || '',
+            name: integration?.name || '',
             tags:
                 integration?.tags?.map((tag: TagModel) => ({
                     ...tag,
@@ -64,8 +66,6 @@ const IntegrationDialog = ({integration, onClose, triggerNode}: IntegrationDialo
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({connectionDefinitions: true});
 
     const {data: categories, error: categoriesError, isLoading: categoriesLoading} = useGetIntegrationCategoriesQuery();
-
-    const {data: integrations} = useGetIntegrationsQuery({});
 
     const {data: tags, error: tagsError, isLoading: tagsLoading} = useGetIntegrationTagsQuery();
 
@@ -175,32 +175,46 @@ const IntegrationDialog = ({integration, onClose, triggerNode}: IntegrationDialo
                                     {componentDefinitions && (
                                         <ComboBox
                                             disabled={!!integration?.id}
-                                            items={componentDefinitions
-                                                .filter(
-                                                    (componentDefinition) =>
-                                                        integrations?.filter(
-                                                            (integration) =>
-                                                                integration.componentName === componentDefinition.name
-                                                        ).length === 0
-                                                )
-                                                .map((componentDefinition) => ({
-                                                    componentDefinition,
-                                                    icon: componentDefinition.icon,
-                                                    label: componentDefinition.title!,
-                                                    value: componentDefinition.name,
-                                                }))}
+                                            items={componentDefinitions.map((componentDefinition) => ({
+                                                componentDefinition,
+                                                icon: componentDefinition.icon,
+                                                label: componentDefinition.title!,
+                                                value: componentDefinition.name,
+                                            }))}
                                             maxHeight={true}
                                             name="component"
                                             onBlur={field.onBlur}
-                                            onChange={(item) =>
-                                                setValue(
-                                                    'componentName',
-                                                    (item?.componentDefinition as ComponentDefinitionBasicModel).name
-                                                )
-                                            }
+                                            onChange={(item) => {
+                                                const componentName = (
+                                                    item?.componentDefinition as ComponentDefinitionBasicModel
+                                                ).name;
+                                                const title = (
+                                                    item?.componentDefinition as ComponentDefinitionBasicModel
+                                                ).title;
+
+                                                setValue('componentName', componentName);
+                                                setValue('name', title);
+                                            }}
                                             value={field.value}
                                         />
                                     )}
+                                </FormControl>
+
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                        rules={{required: true}}
+                    />
+
+                    <FormField
+                        control={control}
+                        name="name"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>Name</FormLabel>
+
+                                <FormControl>
+                                    <Input {...field} />
                                 </FormControl>
 
                                 <FormMessage />
