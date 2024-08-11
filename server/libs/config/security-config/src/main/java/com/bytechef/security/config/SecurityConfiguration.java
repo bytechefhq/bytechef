@@ -38,9 +38,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -74,39 +75,26 @@ public class SecurityConfiguration {
     private final AuthenticationSuccessHandler authenticationSuccessHandler;
     private final RememberMeServices rememberMeServices;
     private final Security security;
-    private final List<FilterAfterContributor> filterAfterContributors;
-    private final List<FilterBeforeContributor> filterBeforeContributors;
     private final List<AuthenticatedRequestMatcherContributor> authenticatedRequestMatcherContributors;
 
     @SuppressFBWarnings("EI")
     public SecurityConfiguration(
         ApplicationProperties applicationProperties, AuthenticationFailureHandler authenticationFailureHandler,
         AuthenticationSuccessHandler authenticationSuccessHandler, RememberMeServices rememberMeServices,
-        List<FilterAfterContributor> filterAfterContributors, List<FilterBeforeContributor> filterBeforeContributors,
         List<AuthenticatedRequestMatcherContributor> authenticatedRequestMatcherContributors) {
 
         this.authenticationFailureHandler = authenticationFailureHandler;
         this.authenticationSuccessHandler = authenticationSuccessHandler;
         this.rememberMeServices = rememberMeServices;
         this.security = applicationProperties.getSecurity();
-        this.filterAfterContributors = filterAfterContributors;
-        this.filterBeforeContributors = filterBeforeContributors;
         this.authenticatedRequestMatcherContributors = authenticatedRequestMatcherContributors;
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(
-        HttpSecurity http, List<AuthenticationProviderContributor> authenticationProviderContributors)
-        throws Exception {
+    FilterBeforeContributorConfigurer<HttpSecurity> filterBeforeContributorConfigurer(
+        List<FilterBeforeContributor> filterBeforeContributors) {
 
-        AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(
-            AuthenticationManagerBuilder.class);
-
-        for (AuthenticationProviderContributor authenticationProviderContributor : authenticationProviderContributors) {
-            http.authenticationProvider(authenticationProviderContributor.getAuthenticationProvider());
-        }
-
-        return authenticationManagerBuilder.build();
+        return new FilterBeforeContributorConfigurer<>(filterBeforeContributors);
     }
 
     @Bean
@@ -116,11 +104,12 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(
-        HttpSecurity http, MvcRequestMatcher.Builder mvc, AuthenticationManager authenticationManager)
+        HttpSecurity http, MvcRequestMatcher.Builder mvc,
+        List<AuthenticationProviderContributor> authenticationProviderContributors,
+        List<FilterAfterContributor> filterAfterContributors, List<FilterBeforeContributor> filterBeforeContributors)
         throws Exception {
 
         http
-            .authenticationManager(authenticationManager)
             .cors(withDefaults())
             .csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
@@ -128,9 +117,8 @@ public class SecurityConfiguration {
                 .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
                 .ignoringRequestMatchers("/webhooks/**"));
 
-        for (FilterBeforeContributor filterBeforeContributor : filterBeforeContributors) {
-            http.addFilterBefore(
-                filterBeforeContributor.getFilter(authenticationManager), filterBeforeContributor.getBeforeFilter());
+        for (AuthenticationProviderContributor authenticationProviderContributor : authenticationProviderContributors) {
+            http.authenticationProvider(authenticationProviderContributor.getAuthenticationProvider());
         }
 
         http.addFilterAfter(new SpaWebFilter(), BasicAuthenticationFilter.class)
@@ -211,6 +199,8 @@ public class SecurityConfiguration {
                     .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
                     .permitAll());
 
+        http.with(filterBeforeContributorConfigurer(filterBeforeContributors), withDefaults());
+
         return http.build();
     }
 
@@ -276,6 +266,27 @@ public class SecurityConfiguration {
              * form includes the _csrf request parameter as a hidden input.
              */
             return this.delegate.resolveCsrfTokenValue(request, csrfToken);
+        }
+    }
+
+    static class FilterBeforeContributorConfigurer<H extends HttpSecurityBuilder<HttpSecurity>>
+        extends AbstractHttpConfigurer<FilterBeforeContributorConfigurer<H>, HttpSecurity> {
+
+        private final List<FilterBeforeContributor> filterBeforeContributors;
+
+        FilterBeforeContributorConfigurer(List<FilterBeforeContributor> filterBeforeContributors) {
+            this.filterBeforeContributors = filterBeforeContributors;
+        }
+
+        @Override
+        public void configure(HttpSecurity http) {
+            AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
+
+            for (FilterBeforeContributor filterBeforeContributor : filterBeforeContributors) {
+                http.addFilterBefore(
+                    filterBeforeContributor.getFilter(authenticationManager),
+                    filterBeforeContributor.getBeforeFilter());
+            }
         }
     }
 }
