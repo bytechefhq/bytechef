@@ -108,7 +108,7 @@ const IntegrationWorkflowListItem = ({
                                         />
                                     </TooltipTrigger>
 
-                                    <TooltipContent side="top">{componentDefinition?.title}</TooltipContent>
+                                    <TooltipContent side="top">{integration?.name}</TooltipContent>
                                 </Tooltip>
                             </div>
                         );

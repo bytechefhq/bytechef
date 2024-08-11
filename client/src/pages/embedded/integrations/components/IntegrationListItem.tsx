@@ -146,7 +146,7 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                                         )}
 
                                         <span className="text-base font-semibold text-gray-900">
-                                            {componentDefinition?.title}
+                                            {integration?.name}
                                         </span>
                                     </Link>
                                 ) : (
@@ -156,7 +156,7 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                                         )}
 
                                         <span className="text-base font-semibold text-gray-900">
-                                            {componentDefinition?.title}
+                                            {integration?.name}
                                         </span>
                                     </div>
                                 )}
