@@ -1,11 +1,11 @@
 {
-  "categories": null,
-  "customAction": null,
+  "categories": [ "ACCOUNTING" ],
+  "customAction": true,
   "customActionHelp": null,
   "dataStreamItemReader": null,
   "dataStreamItemWriter": null,
   "description": "Reckon is an accounting software used for financial management and bookkeeping tasks.",
-  "icon": null,
+  "icon": "path:assets/reckon.svg",
   "tags": null,
   "metadata": null,
   "name": "reckon",
@@ -41,12 +41,15 @@
       "exampleValue": null,
       "label": "Book",
       "placeholder": null,
-      "controlType": "TEXT",
+      "controlType": "SELECT",
       "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "optionsDataSource": null
+      "optionsDataSource": {
+        "optionsLookupDependsOn": null,
+        "options": { }
+      }
     }, {
       "advancedOption": null,
       "description": null,
@@ -87,13 +90,12 @@
         "options": null,
         "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Create Contact",
-    "perform": null,
-    "processErrorResponse": null,
     "output": null,
+    "perform": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -152,15 +154,16 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
-    "workflowNodeDescription": null
+    "workflowNodeDescription": null,
+    "processErrorResponse": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -190,12 +193,15 @@
       "exampleValue": null,
       "label": "Book",
       "placeholder": null,
-      "controlType": "TEXT",
+      "controlType": "SELECT",
       "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "optionsDataSource": null
+      "optionsDataSource": {
+        "optionsLookupDependsOn": null,
+        "options": { }
+      }
     }, {
       "advancedOption": null,
       "description": null,
@@ -229,12 +235,15 @@
         "exampleValue": null,
         "label": "Customer",
         "placeholder": null,
-        "controlType": "TEXT",
+        "controlType": "SELECT",
         "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "optionsDataSource": null
+        "optionsDataSource": {
+          "optionsLookupDependsOn": null,
+          "options": { }
+        }
       }, {
         "advancedOption": null,
         "description": "The date of the invoice.",
@@ -250,8 +259,8 @@
         "label": "Invoice   Date",
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE"
+        "controlType": "DATE",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "The amount tax status of the amounts in the invoice.",
@@ -332,26 +341,25 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "maxItems": null,
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Create Invoice",
-    "perform": null,
-    "processErrorResponse": null,
     "output": null,
+    "perform": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -410,15 +418,16 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
-    "workflowNodeDescription": null
+    "workflowNodeDescription": null,
+    "processErrorResponse": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -448,12 +457,15 @@
       "exampleValue": null,
       "label": "Book",
       "placeholder": null,
-      "controlType": "TEXT",
+      "controlType": "SELECT",
       "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "optionsDataSource": null
+      "optionsDataSource": {
+        "optionsLookupDependsOn": null,
+        "options": { }
+      }
     }, {
       "advancedOption": null,
       "description": null,
@@ -487,12 +499,15 @@
         "exampleValue": null,
         "label": "Supplier",
         "placeholder": null,
-        "controlType": "TEXT",
+        "controlType": "SELECT",
         "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "optionsDataSource": null
+        "optionsDataSource": {
+          "optionsLookupDependsOn": null,
+          "options": { }
+        }
       }, {
         "advancedOption": null,
         "description": "The date of the payment.",
@@ -508,8 +523,8 @@
         "label": "Payment Date",
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE"
+        "controlType": "DATE",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "The total amount of the payment applied.",
@@ -530,16 +545,15 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "NUMBER"
+        "controlType": "NUMBER",
+        "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Create Payment",
-    "perform": null,
-    "processErrorResponse": null,
     "output": null,
+    "perform": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -598,15 +612,16 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
-    "workflowNodeDescription": null
+    "workflowNodeDescription": null,
+    "processErrorResponse": null
   } ],
   "connection": {
     "authorizations": [ {
@@ -658,17 +673,17 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "scopes": null,
-      "authorizationUrl": { },
-      "tokenUrl": { },
-      "refreshUrl": { },
       "apply": null,
       "authorizationCallback": null,
+      "authorizationUrl": { },
       "clientId": null,
       "clientSecret": null,
       "pkce": null,
       "refresh": null,
-      "refreshToken": null
+      "refreshUrl": { },
+      "scopes": null,
+      "refreshToken": null,
+      "tokenUrl": { }
     } ],
     "properties": null,
     "version": 1,
