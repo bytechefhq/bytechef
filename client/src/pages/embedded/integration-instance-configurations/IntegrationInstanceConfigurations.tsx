@@ -25,7 +25,7 @@ export enum Type {
 const IntegrationInstanceConfigurations = () => {
     const [searchParams] = useSearchParams();
 
-    const [environment, setEnvironment] = useState<number | undefined>(getEnvironment());
+    const [environment, setEnvironment] = useState<number>(getEnvironment());
     const [filterData, setFilterData] = useState<{id?: number; type: Type}>(getFilterData());
 
     const {
@@ -49,8 +49,7 @@ const IntegrationInstanceConfigurations = () => {
         error: integrationInstanceConfigurationsError,
         isLoading: integrationInstanceConfigurationsLoading,
     } = useGetIntegrationInstanceConfigurationsQuery({
-        environment:
-            environment === 1 ? EnvironmentModel.Test : environment === 2 ? EnvironmentModel.Production : undefined,
+        environment: environment === 1 ? EnvironmentModel.Test : EnvironmentModel.Production,
         integrationId: searchParams.get('integrationId') ? parseInt(searchParams.get('integrationId')!) : undefined,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
@@ -96,7 +95,7 @@ const IntegrationInstanceConfigurations = () => {
     }
 
     function getEnvironment() {
-        return searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : undefined;
+        return searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : 1;
     }
 
     function getFilterData() {
@@ -111,7 +110,7 @@ const IntegrationInstanceConfigurations = () => {
     }
 
     useEffect(() => {
-        setEnvironment(searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : undefined);
+        setEnvironment(searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : 1);
         setFilterData(getFilterData());
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -129,6 +128,12 @@ const IntegrationInstanceConfigurations = () => {
                             integrationInstanceConfigurations &&
                             integrationInstanceConfigurations?.length > 0 && (
                                 <IntegrationInstanceConfigurationDialog
+                                    integrationInstanceConfiguration={
+                                        {
+                                            environment:
+                                                environment === 1 ? EnvironmentModel.Test : EnvironmentModel.Production,
+                                        } as IntegrationInstanceConfigurationModel
+                                    }
                                     triggerNode={<Button>New Instance Configuration</Button>}
                                 />
                             )
@@ -147,7 +152,6 @@ const IntegrationInstanceConfigurations = () => {
                         body={
                             <>
                                 {[
-                                    {label: 'All Environments', value: undefined},
                                     {label: 'Test', value: 1},
                                     {label: 'Production', value: 2},
                                 ]?.map((item) => (
@@ -294,6 +298,12 @@ const IntegrationInstanceConfigurations = () => {
                     <EmptyList
                         button={
                             <IntegrationInstanceConfigurationDialog
+                                integrationInstanceConfiguration={
+                                    {
+                                        environment:
+                                            environment === 1 ? EnvironmentModel.Test : EnvironmentModel.Production,
+                                    } as IntegrationInstanceConfigurationModel
+                                }
                                 triggerNode={<Button>Create Instance Configuration</Button>}
                             />
                         }
