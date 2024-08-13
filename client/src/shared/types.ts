@@ -23,6 +23,7 @@ import {
 } from '@/shared/middleware/platform/configuration';
 import {UseMutationResult} from '@tanstack/react-query';
 import {ReactNode} from 'react';
+import {Node} from 'reactflow';
 
 export type DataPillType = {
     componentName?: string;
@@ -45,6 +46,13 @@ export type ComponentPropertiesType =
           properties?: Array<PropertyModel>;
       }
     | undefined;
+
+export type TaskDispatcherType = {
+    componentName: string;
+    icon: ReactNode;
+    label: string;
+    name: string;
+};
 
 export type ComponentType = {
     componentName: string;
@@ -96,9 +104,16 @@ export type NodeType = {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         [key: string]: any;
     };
+    taskDispatcher?: boolean;
     trigger?: boolean;
-    type: 'component' | 'flowControl';
+    type: string;
     version: number;
+};
+
+export type NodeWithMetadataType = Node & {
+    metadata?: {
+        conditionChild?: boolean;
+    };
 };
 
 export type SubPropertyType = PropertyType & {custom: boolean};

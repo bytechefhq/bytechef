@@ -11,7 +11,7 @@ import {
 import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
-import {ClickedItemType, PropertyType} from '@/shared/types';
+import {ClickedItemType, NodeWithMetadataType, PropertyType} from '@/shared/types';
 import {getRandomId} from '@/shared/util/random-utils';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
@@ -21,10 +21,12 @@ import {Edge, MarkerType, Node, useReactFlow} from 'reactflow';
 
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
+import handleTaskDispatcherClick from '../utils/handleTaskDispatcherClick';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 
 interface WorkflowNodesListProps {
     actionComponentDefinitions: Array<ComponentDefinitionBasicModel>;
+    condition?: boolean;
     edge?: boolean;
     hideActionComponents?: boolean;
     hideTriggerComponents?: boolean;
@@ -37,6 +39,7 @@ interface WorkflowNodesListProps {
 const WorkflowNodesPopoverMenuList = memo(
     ({
         actionComponentDefinitions,
+        condition,
         edge,
         hideActionComponents = false,
         hideTaskDispatchers = false,
@@ -57,6 +60,26 @@ const WorkflowNodesPopoverMenuList = memo(
         const {componentNames} = workflow;
 
         const handleItemClick = async (clickedItem: ClickedItemType) => {
+            if (clickedItem.taskDispatcher) {
+                await handleTaskDispatcherClick({
+                    clickedItem,
+                    currentNode,
+                    edge,
+                    getNode,
+                    id,
+                    queryClient,
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    setEdges: setEdges as any,
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    setNodes: setNodes as any,
+                    setWorkflow,
+                    updateWorkflowMutation,
+                    workflow,
+                });
+
+                return;
+            }
+
             const clickedComponentDefinition = await queryClient.fetchQuery({
                 queryFn: () =>
                     new ComponentDefinitionApi().getComponentDefinition({
@@ -79,11 +102,6 @@ const WorkflowNodesPopoverMenuList = memo(
                 setNodes((nodes: Node[]) =>
                     nodes.map((node) => {
                         if (node.id === placeholderNode?.id) {
-                            setWorkflow({
-                                ...workflow,
-                                componentNames: [clickedItem.name, ...componentNames.slice(1)],
-                            });
-
                             const newTriggerNode = {
                                 ...node,
                                 data: {
@@ -112,6 +130,11 @@ const WorkflowNodesPopoverMenuList = memo(
                                 id: getFormattedName(clickedItem.name!, nodes),
                                 type: 'workflow',
                             };
+
+                            setWorkflow({
+                                ...workflow,
+                                componentNames: [clickedItem.name, ...componentNames.slice(1)],
+                            });
 
                             setCurrentNode(newTriggerNode.data);
 
@@ -160,7 +183,7 @@ const WorkflowNodesPopoverMenuList = memo(
 
                 const nodes = getNodes();
 
-                const newWorkflowNode = {
+                const newWorkflowNode: NodeWithMetadataType = {
                     data: {
                         componentName: clickedItem.name,
                         icon: (
@@ -184,19 +207,46 @@ const WorkflowNodesPopoverMenuList = memo(
                     type: 'workflow',
                 };
 
-                const sourceEdge = {
+                let sourceEdgeType = condition ? 'condition' : 'workflow';
+
+                if (clickedEdge.type === 'conditionChild') {
+                    sourceEdgeType = 'conditionChild';
+                }
+
+                let sourceEdge = {
                     id: `${clickedEdge.source}->${newWorkflowNode.id}`,
                     source: clickedEdge.source,
+                    sourceHandle: clickedEdge.sourceHandle,
                     target: newWorkflowNode.id,
-                    type: 'workflow',
+                    type: sourceEdgeType,
                 };
 
                 const targetEdge = {
                     id: `${newWorkflowNode.id}->${clickedEdge.target}`,
                     source: newWorkflowNode.id,
+                    sourceHandle: clickedEdge.sourceHandle,
                     target: clickedEdge.target,
-                    type: 'workflow',
+                    type: condition ? 'condition' : 'workflow',
                 };
+
+                if (sourceEdgeType === 'condition') {
+                    sourceEdge = {
+                        ...sourceEdge,
+                        id: `${clickedEdge.source}${clickedEdge.sourceHandle}->${newWorkflowNode.id}`,
+                        sourceHandle: clickedEdge.sourceHandle,
+                    };
+
+                    targetEdge.sourceHandle = clickedEdge.sourceHandle;
+                }
+
+                if (condition) {
+                    newWorkflowNode.data.metadata = {
+                        ...newWorkflowNode.data.metadata,
+                        conditionChild: true,
+                        conditionFalse: clickedEdge.sourceHandle === 'right',
+                        conditionTrue: clickedEdge.sourceHandle === 'left',
+                    };
+                }
 
                 setNodes((nodes) => {
                     const previousWorkflowNode = nodes.find((node) => node.id === clickedEdge.source);
@@ -221,13 +271,15 @@ const WorkflowNodesPopoverMenuList = memo(
 
                     tempNodes.splice(previousWorkflowNodeIndex + 1, 0, newWorkflowNode);
 
+                    const {actions, name, version} = clickedComponentDefinition;
+
                     saveWorkflowDefinition(
                         {
                             ...newWorkflowNode.data,
                             parameters: getParametersWithDefaultValues({
                                 properties: clickedComponentActionDefinition?.properties as Array<PropertyType>,
                             }),
-                            type: `${clickedComponentDefinition.name}/${clickedComponentDefinition.version}/${clickedComponentDefinition.actions?.[0].name}`,
+                            type: `${name}/v${version}/${actions?.[0].name}`,
                         },
                         workflow!,
                         updateWorkflowMutation,
@@ -282,12 +334,6 @@ const WorkflowNodesPopoverMenuList = memo(
                             if (node.id === placeholderId) {
                                 const workflowNodeName = getFormattedName(clickedItem.name!, nodes);
 
-                                setWorkflow({
-                                    ...workflow,
-                                    componentNames: [...componentNames, clickedItem.name],
-                                    nodeNames: [...workflow.nodeNames, workflowNodeName],
-                                });
-
                                 const newWorkflowNodeData = {
                                     componentName: clickedItem.name,
                                     icon: (
@@ -303,6 +349,12 @@ const WorkflowNodesPopoverMenuList = memo(
                                     name: workflowNodeName,
                                     type: `${clickedComponentDefinition.name}/v${clickedComponentDefinition.version}/${clickedComponentDefinition.actions?.[0].name}`,
                                 };
+
+                                setWorkflow({
+                                    ...workflow,
+                                    componentNames: [...componentNames, clickedItem.name],
+                                    nodeNames: [...workflow.nodeNames, workflowNodeName],
+                                });
 
                                 saveWorkflowDefinition(
                                     {

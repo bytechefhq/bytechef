@@ -7,7 +7,8 @@ import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import WorkflowNodesPopoverMenuList from './WorkflowNodesPopoverMenuList';
 
 interface WorkflowNodesPopoverMenuProps extends PropsWithChildren {
-    id?: string;
+    condition?: boolean;
+    id: string;
     edge?: boolean;
     hideActionComponents?: boolean;
     hideTriggerComponents?: boolean;
@@ -16,6 +17,7 @@ interface WorkflowNodesPopoverMenuProps extends PropsWithChildren {
 
 const WorkflowNodesPopoverMenu = ({
     children,
+    condition = false,
     edge = false,
     hideActionComponents = false,
     hideTaskDispatchers = false,
@@ -79,34 +81,33 @@ const WorkflowNodesPopoverMenu = ({
                 side="right"
                 sideOffset={-34}
             >
-                {id && (
-                    <div className="nowheel">
-                        {typeof componentDefinitions === 'undefined' ||
-                            (typeof taskDispatcherDefinitions === 'undefined' && (
-                                <div className="px-3 py-2 text-xs text-gray-500">Something went wrong.</div>
-                            ))}
+                <div className="nowheel">
+                    {typeof componentDefinitions === 'undefined' ||
+                        (typeof taskDispatcherDefinitions === 'undefined' && (
+                            <div className="px-3 py-2 text-xs text-gray-500">Something went wrong.</div>
+                        ))}
 
-                        <header className="p-3 text-center text-gray-600">
-                            <Input
-                                name="workflowNodeFilter"
-                                onChange={(event) => setFilter(event.target.value)}
-                                placeholder="Filter workflow nodes"
-                                value={filter}
-                            />
-                        </header>
-
-                        <WorkflowNodesPopoverMenuList
-                            actionComponentDefinitions={filteredActionComponentDefinitions}
-                            edge={edge}
-                            hideActionComponents={hideActionComponents}
-                            hideTaskDispatchers={hideTaskDispatchers}
-                            hideTriggerComponents={hideTriggerComponents}
-                            id={id}
-                            taskDispatcherDefinitions={filteredTaskDispatcherDefinitions}
-                            triggerComponentDefinitions={filteredTriggerComponentDefinitions}
+                    <header className="p-3 text-center text-gray-600">
+                        <Input
+                            name="workflowNodeFilter"
+                            onChange={(event) => setFilter(event.target.value)}
+                            placeholder="Filter workflow nodes"
+                            value={filter}
                         />
-                    </div>
-                )}
+                    </header>
+
+                    <WorkflowNodesPopoverMenuList
+                        actionComponentDefinitions={filteredActionComponentDefinitions}
+                        condition={condition}
+                        edge={edge}
+                        hideActionComponents={hideActionComponents}
+                        hideTaskDispatchers={hideTaskDispatchers}
+                        hideTriggerComponents={hideTriggerComponents}
+                        id={id}
+                        taskDispatcherDefinitions={filteredTaskDispatcherDefinitions}
+                        triggerComponentDefinitions={filteredTriggerComponentDefinitions}
+                    />
+                </div>
             </PopoverContent>
         </Popover>
     );

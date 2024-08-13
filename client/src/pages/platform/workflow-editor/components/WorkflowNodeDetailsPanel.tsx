@@ -6,11 +6,13 @@ import DestinationTab from '@/pages/platform/workflow-editor/components/node-det
 import SourceTab from '@/pages/platform/workflow-editor/components/node-details-tabs/SourceTab';
 import {
     ComponentDefinitionBasicModel,
+    ComponentDefinitionModel,
     WorkflowConnectionModel,
     WorkflowNodeOutputModel,
 } from '@/shared/middleware/platform/configuration';
 import {useGetComponentActionDefinitionQuery} from '@/shared/queries/platform/actionDefinitions.queries';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
+import {useGetTaskDispatcherDefinitionQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useGetTriggerDefinitionQuery} from '@/shared/queries/platform/triggerDefinitions.queries';
 import {WorkflowNodeDynamicPropertyKeys} from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
 import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
@@ -96,7 +98,7 @@ const WorkflowNodeDetailsPanel = ({
         {
             componentName: currentNode?.componentName || currentNode?.id || '',
         },
-        !!currentNode
+        !!currentNode && !currentNode.taskDispatcher
     );
 
     const {componentActions, setComponentActions, setDataPills, workflow} = useWorkflowDataStore();
@@ -146,6 +148,20 @@ const WorkflowNodeDetailsPanel = ({
         !!currentNode?.componentName && currentNode?.trigger && !!currentComponentDefinition
     );
 
+    const {data: currentTaskDispatcherDefinition} = useGetTaskDispatcherDefinitionQuery(
+        {
+            taskDispatcherName: currentNode?.componentName || currentNode?.id || '',
+            taskDispatcherVersion: currentNode?.version || 1,
+        },
+        !!currentNode && !!currentNode.taskDispatcher
+    );
+
+    const currentNodeDefinition = currentNode?.trigger
+        ? currentTriggerDefinition
+        : currentNode?.taskDispatcher
+          ? currentTaskDispatcherDefinition
+          : currentActionDefinition;
+
     const {nodeNames} = workflow;
 
     const currentNodeIndex = currentNode && nodeNames?.indexOf(currentNode?.name);
@@ -175,11 +191,7 @@ const WorkflowNodeDetailsPanel = ({
         }
     );
 
-    const hasOutputData =
-        currentActionDefinition?.outputDefined ||
-        currentActionDefinition?.dynamicOutput ||
-        currentTriggerDefinition?.outputDefined ||
-        currentTriggerDefinition?.dynamicOutput;
+    const hasOutputData = currentNodeDefinition?.outputDefined || currentNodeDefinition?.dynamicOutput;
 
     const {data: workflowNodeOutput, refetch: refetchWorkflowNodeOutput} = useGetWorkflowNodeOutputQuery(
         {
@@ -206,7 +218,9 @@ const WorkflowNodeDetailsPanel = ({
         }
 
         if (name === 'properties') {
-            return currentOperationProperties?.length;
+            return currentNode?.taskDispatcher
+                ? currentTaskDispatcherDefinition?.properties?.length
+                : currentOperationProperties?.length;
         }
 
         return true;
@@ -285,15 +299,11 @@ const WorkflowNodeDetailsPanel = ({
     };
 
     // Set currentOperationProperties depending if the current node is a trigger or an action
-    useEffect(
-        () =>
-            setCurrentOperationProperties(
-                currentNode?.trigger
-                    ? (currentTriggerDefinition?.properties ?? [])
-                    : (currentActionDefinition?.properties ?? [])
-            ),
-        [currentActionDefinition?.properties, currentNode?.trigger, currentTriggerDefinition?.properties]
-    );
+    useEffect(() => {
+        if (currentNodeDefinition?.properties) {
+            setCurrentOperationProperties(currentNodeDefinition?.properties);
+        }
+    }, [currentNodeDefinition?.properties, currentNode?.trigger, currentTriggerDefinition?.properties]);
 
     // Set currentOperationName depending on the currentComponentAction.operationName
     useEffect(() => {
@@ -431,7 +441,9 @@ const WorkflowNodeDetailsPanel = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentOperationName]);
 
-    if (!workflowNodeDetailsPanelOpen || !currentNode?.name || !currentComponentDefinition) {
+    const data = currentComponentDefinition || currentTaskDispatcherDefinition;
+
+    if (!workflowNodeDetailsPanelOpen || !currentNode?.name || !data) {
         return <></>;
     }
 
@@ -440,18 +452,16 @@ const WorkflowNodeDetailsPanel = ({
             className="absolute inset-y-4 right-4 z-10 w-screen max-w-[460px] overflow-hidden rounded-xl border-l bg-white shadow-lg"
             key={currentNode?.name}
         >
-            {currentComponentDefinition ? (
+            {data ? (
                 <div className="flex h-full flex-col divide-y divide-gray-100 bg-white">
                     <header className="flex items-center p-4 text-lg font-medium">
-                        {currentComponentDefinition.icon && (
-                            <InlineSVG className="mr-2 size-6" src={currentComponentDefinition.icon} />
-                        )}
+                        {data.icon && <InlineSVG className="mr-2 size-6" src={data.icon} />}
 
                         {currentNode?.label}
 
                         <span className="mx-2 text-sm text-gray-500">({currentNode?.name})</span>
 
-                        {currentComponentDefinition.description && (
+                        {data.description && (
                             <Tooltip delayDuration={500}>
                                 <TooltipTrigger>
                                     <InfoCircledIcon className="size-4" />
@@ -459,7 +469,9 @@ const WorkflowNodeDetailsPanel = ({
 
                                 <TooltipPortal>
                                     <TooltipContent className="max-w-md" side="bottom">
-                                        {currentComponentDefinition.description}
+                                        {currentComponentDefinition
+                                            ? currentComponentDefinition.description
+                                            : currentTaskDispatcherDefinition?.description}
                                     </TooltipContent>
                                 </TooltipPortal>
                             </Tooltip>
@@ -475,8 +487,8 @@ const WorkflowNodeDetailsPanel = ({
                     </header>
 
                     <main className="flex h-full flex-col">
-                        {(!!currentComponentDefinition.actions?.length ||
-                            !!currentComponentDefinition.triggers?.length) && (
+                        {(!!(data as ComponentDefinitionModel).actions?.length ||
+                            !!(data as ComponentDefinitionModel).triggers?.length) && (
                             <CurrentOperationSelect
                                 description={
                                     currentNode?.trigger
@@ -486,15 +498,16 @@ const WorkflowNodeDetailsPanel = ({
                                 handleValueChange={handleOperationSelectChange}
                                 operations={
                                     (currentNode?.trigger
-                                        ? currentComponentDefinition.triggers
-                                        : currentComponentDefinition.actions)!
+                                        ? currentComponentDefinition?.triggers
+                                        : currentComponentDefinition?.actions)!
                                 }
                                 triggerSelect={currentNode?.trigger}
                                 value={currentOperationName}
                             />
                         )}
 
-                        {((!currentNode?.trigger && currentActionFetched) ||
+                        {((!currentNode?.trigger && !currentNode?.taskDispatcher && currentActionFetched) ||
+                            currentNode?.taskDispatcher ||
                             (currentNode?.trigger && currentTriggerFetched)) &&
                             nodeTabs.length > 1 && (
                                 <div className="flex justify-center">
@@ -517,7 +530,7 @@ const WorkflowNodeDetailsPanel = ({
                             )}
 
                         <div className="relative h-full overflow-y-scroll">
-                            {currentComponentDefinition && (
+                            {data && (
                                 <div className="absolute left-0 top-0 size-full">
                                     {activeTab === 'description' && (
                                         <DescriptionTab
@@ -530,19 +543,24 @@ const WorkflowNodeDetailsPanel = ({
 
                                     {activeTab === 'destination' && <DestinationTab />}
 
-                                    {activeTab === 'connection' && workflowConnections.length > 0 && currentNode && (
-                                        <ConnectionTab
-                                            componentDefinition={currentComponentDefinition}
-                                            key={`${currentNode?.name}_connection`}
-                                            workflowConnections={workflowConnections}
-                                            workflowId={workflow.id!}
-                                            workflowNodeName={currentNode?.name}
-                                            workflowTestConfigurationConnections={workflowTestConfigurationConnections}
-                                        />
-                                    )}
+                                    {activeTab === 'connection' &&
+                                        workflowConnections.length > 0 &&
+                                        currentNode &&
+                                        currentComponentDefinition && (
+                                            <ConnectionTab
+                                                componentDefinition={currentComponentDefinition}
+                                                key={`${currentNode?.name}_connection`}
+                                                workflowConnections={workflowConnections}
+                                                workflowId={workflow.id!}
+                                                workflowNodeName={currentNode?.name}
+                                                workflowTestConfigurationConnections={
+                                                    workflowTestConfigurationConnections
+                                                }
+                                            />
+                                        )}
 
                                     {activeTab === 'properties' &&
-                                        currentComponentDefinition &&
+                                        data &&
                                         (currentOperationProperties?.length ? (
                                             <Properties
                                                 customClassName="p-4"
@@ -572,7 +590,7 @@ const WorkflowNodeDetailsPanel = ({
                     </main>
 
                     <footer className="z-50 mt-auto flex bg-white px-4 py-2">
-                        <Select defaultValue={currentComponentDefinition.version.toString()}>
+                        <Select defaultValue={data.version.toString()}>
                             <SelectTrigger className="w-auto border-none shadow-none">
                                 <SelectValue placeholder="Choose version..." />
                             </SelectTrigger>

@@ -14,14 +14,20 @@ import InlineSVG from 'react-inlinesvg';
 import {useParams} from 'react-router-dom';
 import ReactFlow, {Controls, Edge, MiniMap, Node, useReactFlow, useStore} from 'reactflow';
 
+import ConditionChildEdge from '../edges/ConditionChildEdge';
+import ConditionEdge from '../edges/ConditionEdge';
 import PlaceholderEdge from '../edges/PlaceholderEdge';
 import WorkflowEdge from '../edges/WorkflowEdge';
 import useHandleDrop from '../hooks/useHandleDrop';
 import useLayout from '../hooks/useLayout';
+import ConditionNode from '../nodes/ConditionNode';
 import PlaceholderNode from '../nodes/PlaceholderNode';
 import WorkflowNode from '../nodes/WorkflowNode';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
+
+const FALSE_CONDITION_NODE_POSITION_X = 310;
+const TRUE_CONDITION_NODE_POSITION_X = -140;
 
 export interface WorkflowEditorProps {
     componentDefinitions: ComponentDefinitionBasicModel[];
@@ -55,6 +61,7 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
 
     const nodeTypes = useMemo(
         () => ({
+            condition: ConditionNode,
             placeholder: PlaceholderNode,
             workflow: WorkflowNode,
         }),
@@ -63,6 +70,8 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
 
     const edgeTypes = useMemo(
         () => ({
+            condition: ConditionEdge,
+            conditionChild: ConditionChildEdge,
             placeholder: PlaceholderEdge,
             workflow: WorkflowEdge,
         }),
@@ -190,37 +199,105 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
             const componentName = component.type?.split('/')[0];
             const operationName = component.type?.split('/')[2];
 
-            let componentDefinition = componentDefinitions.find(
-                (componentDefinition) => componentDefinition.name === componentName
-            )!;
+            const combinedDefinitions = [...componentDefinitions, ...taskDispatcherDefinitions];
 
-            if (componentDefinition == undefined) {
-                componentDefinition = componentDefinitions.find(
+            let workflowNodeDefinition = combinedDefinitions.find((definition) => definition.name === componentName);
+
+            if (!workflowNodeDefinition) {
+                workflowNodeDefinition = combinedDefinitions.find(
                     (componentDefinition) => componentDefinition.name === 'missing'
                 )!;
+            }
+
+            const nodeType =
+                taskDispatcherDefinitions.find((definition) => definition.name === componentName)?.name ?? 'workflow';
+
+            const previousWorkflowNode = workflowComponents?.[index - 1];
+
+            let positionY = 150 * index;
+            let positionX = 0;
+
+            const previousConditionNodeCount = workflowComponents
+                ?.slice(0, index)
+                .filter((node) => node.type.startsWith('condition')).length;
+
+            const previousNodeCount = workflowComponents?.slice(0, index).filter((node) => node.name).length;
+
+            if (previousWorkflowNode && previousNodeCount > 1) {
+                if (nodeType !== 'condition' && !component.metadata?.conditionChild) {
+                    positionY =
+                        (previousNodeCount - previousConditionNodeCount) * 150 +
+                        (previousConditionNodeCount || 1) * 150;
+
+                    if (previousWorkflowNode.metadata?.conditionChild) {
+                        positionY += 100;
+                    }
+                } else if (nodeType === 'condition') {
+                    positionY =
+                        (previousNodeCount - previousConditionNodeCount + 1) * 150 + previousConditionNodeCount * 100;
+                }
+            }
+
+            if (component.metadata?.conditionTrue) {
+                positionX = TRUE_CONDITION_NODE_POSITION_X;
+            }
+
+            if (component.metadata?.conditionFalse) {
+                positionX = FALSE_CONDITION_NODE_POSITION_X;
+            }
+
+            const previousTrueConditionNodeCount = workflowComponents
+                .slice(0, index)
+                .filter((component) => component.metadata?.conditionTrue).length;
+
+            const previousFalseConditionNodeCount = workflowComponents
+                .slice(0, index)
+                .filter((component) => component.metadata?.conditionFalse).length;
+
+            const previousNonConditionChildNodeCount = workflowComponents
+                .slice(0, index)
+                .filter((component) => !component.metadata?.conditionChild).length;
+
+            if (component.metadata?.conditionChild) {
+                if (component.metadata.conditionTrue) {
+                    positionY = previousNonConditionChildNodeCount * 150 + 150 * previousTrueConditionNodeCount;
+                } else if (component.metadata.conditionFalse) {
+                    positionY = previousNonConditionChildNodeCount * 150 + 150 * previousFalseConditionNodeCount;
+                }
+            } else {
+                const previousNodeCount = workflowComponents
+                    .slice(0, index)
+                    .filter((component) => component.name).length;
+
+                positionY =
+                    (previousNodeCount - Math.min(previousTrueConditionNodeCount, previousFalseConditionNodeCount)) *
+                    150;
             }
 
             return {
                 data: {
                     ...component,
-                    componentName: componentDefinition.name,
+                    componentName: workflowNodeDefinition.name,
                     icon: (
                         <InlineSVG
                             className="size-9"
                             loader={<Component1Icon className="size-9 flex-none text-gray-900" />}
-                            src={componentDefinition.icon!}
+                            src={workflowNodeDefinition.icon!}
                         />
                     ),
-                    id: componentDefinition.name,
-                    label: componentDefinition.title,
+                    id: workflowNodeDefinition.name,
+                    label: workflowNodeDefinition.title,
                     name: component.name,
                     operationName,
                     trigger: index === 0,
-                    type: 'workflow',
+                    type: nodeType,
                 },
                 id: component.name,
-                position: {x: 0, y: 150 * index},
-                type: 'workflow',
+                position: {
+                    x: positionX,
+                    y: positionY,
+                },
+                type: nodeType,
             };
         });
 
@@ -242,32 +319,128 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
         const workflowEdges: Array<Edge> = [];
 
         if (defaultNodesWithWorkflowNodes) {
+            const lastNodeId = getRandomId();
+
             defaultNodesWithWorkflowNodes.forEach((node, index) => {
                 const nextNode = defaultNodesWithWorkflowNodes[index + 1];
 
+                let edgeType = node.type === 'workflow' ? 'workflow' : 'condition';
+
+                if (node.data.metadata?.conditionChild) {
+                    edgeType = 'conditionChild';
+                }
+
                 if (nextNode) {
-                    workflowEdges.push({
-                        id: `${node!.id}=>${nextNode?.id}`,
-                        source: node!.id,
-                        target: nextNode?.id,
-                        type: 'workflow',
-                    });
+                    if (edgeType === 'condition') {
+                        const nextTrueConditionNode = defaultNodesWithWorkflowNodes
+                            .slice(index + 1)
+                            .find((node) => node.data.metadata?.conditionTrue || !node.data.metadata?.conditionChild);
+
+                        workflowEdges.push({
+                            id: `${node!.id}left=>${nextTrueConditionNode?.id || lastNodeId}`,
+                            source: node!.id,
+                            sourceHandle: 'left',
+                            target: nextTrueConditionNode?.id || lastNodeId,
+                            type: edgeType,
+                        });
+
+                        const nextFalseConditionNode = defaultNodesWithWorkflowNodes.slice(index + 1).find((node) => {
+                            return node.data.metadata?.conditionFalse || !node.data.metadata?.conditionChild;
+                        });
+
+                        workflowEdges.push({
+                            id: `${node!.id}right=>${nextFalseConditionNode?.id || lastNodeId}`,
+                            source: node!.id,
+                            sourceHandle: 'right',
+                            target: nextFalseConditionNode?.id || lastNodeId,
+                            type: edgeType,
+                        });
+                    } else if (edgeType === 'conditionChild') {
+                        if (node.data.metadata?.conditionTrue) {
+                            const nextTrueConditionNode = defaultNodesWithWorkflowNodes
+                                .slice(index + 1)
+                                .find(
+                                    (node) => node.data.metadata?.conditionTrue || !node.data.metadata?.conditionChild
+                                );
+
+                            workflowEdges.push({
+                                id: `${node!.id}left=>${nextTrueConditionNode?.id || lastNodeId}`,
+                                source: node!.id,
+                                sourceHandle: 'left',
+                                target: nextTrueConditionNode?.id || lastNodeId,
+                                type: edgeType,
+                            });
+                        } else if (node.data.metadata?.conditionFalse) {
+                            const nextFalseConditionNode = defaultNodesWithWorkflowNodes
+                                .slice(index + 1)
+                                .find((node) => {
+                                    return node.data.metadata?.conditionFalse || !node.data.metadata?.conditionChild;
+                                });
+
+                            workflowEdges.push({
+                                id: `${node!.id}right=>${nextFalseConditionNode?.id || lastNodeId}`,
+                                source: node!.id,
+                                sourceHandle: 'right',
+                                target: nextFalseConditionNode?.id || lastNodeId,
+                                type: edgeType,
+                            });
+                        }
+                    } else {
+                        workflowEdges.push({
+                            id: `${node!.id}=>${nextNode?.id}`,
+                            source: node!.id,
+                            target: nextNode?.id,
+                            type: edgeType,
+                        });
+                    }
                 } else {
-                    const lastNodeId = nodes?.[nodes.length - 1].id ?? getRandomId();
+                    const lastNode = node;
+
+                    let positionY = lastNode?.position.y + 150;
+
+                    if (lastNode.type === 'condition') {
+                        positionY += 100;
+                    }
 
                     defaultNodesWithWorkflowNodes.push({
                         data: {label: '+'},
                         id: lastNodeId,
-                        position: {x: 0, y: 150 * (index + 1)},
+                        position: {x: 0, y: positionY},
                         type: 'placeholder',
                     });
 
-                    workflowEdges.push({
-                        id: `${node!.id}=>${lastNodeId}`,
-                        source: node!.id,
-                        target: lastNodeId,
-                        type: 'placeholder',
-                    });
+                    let lastEdgeType = lastNode?.type === 'workflow' ? 'placeholder' : lastNode?.type;
+
+                    if (lastNode?.data.metadata?.conditionChild) {
+                        lastEdgeType = 'conditionChild';
+                    }
+
+                    if (lastEdgeType === 'condition') {
+                        const newWorkflowEdge = {
+                            source: node!.id,
+                            target: lastNodeId,
+                            type: lastEdgeType,
+                        };
+
+                        workflowEdges.push({
+                            ...newWorkflowEdge,
+                            id: `${node!.id}left=>${lastNodeId}`,
+                            sourceHandle: 'left',
+                        });
+
+                        workflowEdges.push({
+                            ...newWorkflowEdge,
+                            id: `${node!.id}right=>${lastNodeId}`,
+                            sourceHandle: 'right',
+                        });
+                    } else {
+                        workflowEdges.push({
+                            id: `${node!.id}=>${lastNodeId}`,
+                            source: node!.id,
+                            target: lastNodeId,
+                            type: lastEdgeType,
+                        });
+                    }
                 }
             });
 
@@ -286,11 +459,63 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
 
     // Update nodes and edges when workflow changes
     useEffect(() => {
-        setNodes(defaultNodesWithWorkflowNodes as Array<Node>);
+        if (!defaultNodesWithWorkflowNodes) {
+            return;
+        }
+
+        const nodes: Array<Node> = defaultNodesWithWorkflowNodes.map((node, index) => {
+            if (node.data.metadata?.conditionTrue) {
+                node.position.x = TRUE_CONDITION_NODE_POSITION_X;
+            }
+
+            if (node.data.metadata?.conditionFalse) {
+                node.position.x = FALSE_CONDITION_NODE_POSITION_X;
+            }
+
+            if (node.data.metadata?.conditionChild) {
+                const parentConditionNode = defaultNodesWithWorkflowNodes
+                    .slice(0, index)
+                    .find((node) => node.data.type.startsWith('condition'));
+
+                const basePositionY = (parentConditionNode?.position.y || 0) + 150;
+
+                if (node.data.metadata.conditionTrue) {
+                    const previousTrueConditionNodeCount = defaultNodesWithWorkflowNodes
+                        .slice(0, index)
+                        .filter((node) => node.data.metadata?.conditionTrue).length;
+
+                    node.position.y = basePositionY + 150 * previousTrueConditionNodeCount;
+                } else if (node.data.metadata.conditionFalse) {
+                    const previousFalseConditionNodeCount = defaultNodesWithWorkflowNodes
+                        .slice(0, index)
+                        .filter((node) => node.data.metadata?.conditionFalse).length;
+
+                    node.position.y = basePositionY + 150 * previousFalseConditionNodeCount;
+                }
+            }
+
+            const previousNode = defaultNodesWithWorkflowNodes[index - 1];
+
+            if (previousNode && !node.data.metadata?.conditionChild) {
+                const previousLowestNode = defaultNodesWithWorkflowNodes
+                    .slice(0, index)
+                    .sort((a, b) => b.position.y - a.position.y)[0];
+
+                node.position.y = previousLowestNode.position.y + 150;
+
+                if (index === defaultNodesWithWorkflowNodes.length - 1 && previousNode.type?.startsWith('condition')) {
+                    node.position.y = previousLowestNode.position.y + 250;
+                }
+            }
+
+            return node;
+        });
+
+        setNodes(nodes);
 
         setEdges(defaultEdgesWithWorkflowEdges);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [defaultNodesWithWorkflowNodes, defaultEdgesWithWorkflowEdges, workflow.id]);
+    }, [defaultNodesWithWorkflowNodes?.length, defaultEdgesWithWorkflowEdges?.length, workflow.id]);
 
     // Set workflowComponentWithAlias when latestComponentDefinition is changed
     useEffect(() => {
@@ -313,7 +538,7 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
 
         if (workflowNodes?.length) {
             const workflowNodeNames = workflowNodes.map((node) => {
-                if (node.data.type === 'workflow' && node?.data.name) {
+                if (node.data.type !== 'placeholder' && node?.data.name) {
                     return node?.data.name;
                 }
             });

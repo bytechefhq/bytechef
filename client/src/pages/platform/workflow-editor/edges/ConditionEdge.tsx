@@ -1,23 +1,23 @@
 import {useState} from 'react';
-import {EdgeProps, getSmoothStepPath} from 'reactflow';
+import {BaseEdge, EdgeProps, getSmoothStepPath} from 'reactflow';
 import {twMerge} from 'tailwind-merge';
 
 import WorkflowNodesPopoverMenu from '../components/WorkflowNodesPopoverMenu';
 
-export default function WorkflowEdge({
+export default function ConditionEdge({
     id,
-    markerEnd,
+    sourceHandleId,
     sourcePosition,
     sourceX,
     sourceY,
-    style,
     targetPosition,
     targetX,
     targetY,
 }: EdgeProps) {
-    const [isDropzoneActive, setDropzoneActive] = useState<boolean>(false);
+    const [isDropzoneActive, setDropzoneActive] = useState(false);
 
-    const [edgePath, edgeCenterX, edgeCenterY] = getSmoothStepPath({
+    const [edgePath] = getSmoothStepPath({
+        offset: 100,
         sourcePosition,
         sourceX,
         sourceY,
@@ -26,23 +26,21 @@ export default function WorkflowEdge({
         targetY,
     });
 
+    const translateX = sourceHandleId === 'left' ? sourceX - 100 : sourceX + 100;
+
+    const transformStyle = `translate(${translateX}, ${sourceY + 55})`;
+
     return (
         <>
-            <path
-                className="fill-none stroke-gray-400 stroke-1"
-                d={edgePath}
-                id={id}
-                markerEnd={markerEnd}
-                style={style}
-            />
+            <BaseEdge path={edgePath} />
 
-            <WorkflowNodesPopoverMenu edge hideTriggerComponents id={id}>
+            <WorkflowNodesPopoverMenu condition edge hideTriggerComponents id={id}>
                 <g
                     onDragEnter={() => setDropzoneActive(true)}
                     onDragLeave={() => setDropzoneActive(false)}
                     onDragOver={(event) => event.preventDefault()}
                     onDrop={() => setDropzoneActive(false)}
-                    transform={`translate(${edgeCenterX}, ${edgeCenterY})`}
+                    transform={transformStyle}
                 >
                     <rect
                         className={twMerge(
