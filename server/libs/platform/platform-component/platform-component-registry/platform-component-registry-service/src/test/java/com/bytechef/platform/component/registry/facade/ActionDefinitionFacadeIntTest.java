@@ -21,6 +21,7 @@ import com.bytechef.component.http.client.action.HttpClientGetAction;
 import com.bytechef.platform.component.registry.config.JacksonConfiguration;
 import com.bytechef.platform.component.registry.config.PlatformIntTestConfiguration;
 import com.bytechef.platform.component.registry.definition.factory.ContextFactory;
+import com.bytechef.platform.component.registry.helper.TokenRefreshHelper;
 import com.bytechef.platform.component.registry.service.ActionDefinitionService;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.platform.connection.service.ConnectionService;
@@ -53,12 +54,14 @@ public class ActionDefinitionFacadeIntTest {
     private ActionDefinitionService actionDefinitionService;
     @Autowired
     private ContextFactory contextFactory;
+    @Autowired
+    private TokenRefreshHelper tokenRefreshHelper;
 
     @Disabled
     @Test
     public void testExecutePerform() {
         ActionDefinitionFacadeImpl actionDefinitionFacade = new ActionDefinitionFacadeImpl(connectionService,
-            connectionDefinitionService, contextFactory, actionDefinitionService);
+                contextFactory, actionDefinitionService, tokenRefreshHelper);
 
         Object result = actionDefinitionFacade.executePerform(
             "httpClient", 1, HttpClientGetAction.ACTION_DEFINITION.getName(), AppType.AUTOMATION, 1000L, 1000L, 1000L,

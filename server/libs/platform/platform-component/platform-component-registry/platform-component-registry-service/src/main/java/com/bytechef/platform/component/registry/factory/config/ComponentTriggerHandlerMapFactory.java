@@ -63,6 +63,6 @@ public record ComponentTriggerHandlerMapFactory(
                         triggerDefinition.getName()),
                     triggerDefinition -> new ComponentTriggerHandler(
                         componentDefinition.getName(), componentDefinition.getVersion(),
-                        triggerDefinition.getName(), instanceAccessorRegistry, triggerDefinitionFacade)));
+                        triggerDefinition.getName(), triggerDefinitionFacade)));
     }
 }

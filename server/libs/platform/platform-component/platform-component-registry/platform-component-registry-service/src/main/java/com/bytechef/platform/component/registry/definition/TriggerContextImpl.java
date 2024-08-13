@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.component.registry.definition;
 
-import com.bytechef.atlas.coordinator.event.TaskProgressedApplicationEvent;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.TriggerContext;
@@ -34,7 +33,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 import java.util.function.Consumer;
 import org.apache.commons.lang3.Validate;
-import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * @author Ivica Cardic
@@ -42,22 +40,19 @@ import org.springframework.context.ApplicationEventPublisher;
 public class TriggerContextImpl extends ContextImpl implements TriggerContext {
 
     private final Data data;
-    private final ActionContext.Event event;
     private final File file;
 
     @SuppressFBWarnings("EI")
     public TriggerContextImpl(
         String componentName, int componentVersion, String triggerName, AppType type,
-        String workflowId, Long jobId, ComponentConnection connection, DataStorageService dataStorageService,
-        ApplicationEventPublisher eventPublisher, FileStorageService fileStorageService,
-        HttpClientExecutor httpClientExecutor) {
+        String workflowReferenceCode, Long jobId, ComponentConnection connection, DataStorageService dataStorageService,
+        FileStorageService fileStorageService, HttpClientExecutor httpClientExecutor) {
 
         super(componentName, componentVersion, triggerName, connection, httpClientExecutor);
 
         this.data = type == null ? new NoOpDataImpl() : new DataImpl(
-            componentName, componentVersion, triggerName, type, workflowId, jobId,
+            componentName, componentVersion, triggerName, type, workflowReferenceCode, jobId,
             dataStorageService);
-        this.event = jobId == null ? progress -> {} : new EventImpl(eventPublisher, jobId);
         this.file = new FileImpl(fileStorageService);
     }
 
@@ -72,7 +67,7 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
 
     @Override
     public void event(Consumer<ActionContext.Event> eventConsumer) {
-        eventConsumer.accept(event);
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -86,7 +81,7 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
 
     private record DataImpl(
         String componentName, Integer componentVersion, String triggerName, AppType type,
-        String workflowId, Long jobId, DataStorageService dataStorageService) implements Data {
+        String workflowReferenceCode, Long jobId, DataStorageService dataStorageService) implements Data {
 
         @Override
         public <T> Optional<T> fetchValue(Data.Scope scope, String key) {
@@ -119,18 +114,9 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
         private String getScopeId(Data.Scope scope) {
             return Validate.notNull(
                 switch (scope) {
-                    case WORKFLOW -> workflowId;
+                    case WORKFLOW -> workflowReferenceCode;
                     case ACCOUNT -> null;
                 }, "scope");
-        }
-    }
-
-    private record EventImpl(ApplicationEventPublisher eventPublisher, long taskExecutionId)
-        implements ActionContext.Event {
-
-        @Override
-        public void publishActionProgressEvent(int progress) {
-            eventPublisher.publishEvent(new TaskProgressedApplicationEvent(taskExecutionId, progress));
         }
     }
 
