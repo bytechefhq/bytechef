@@ -5,7 +5,7 @@ import ConnectionDialog from '@/pages/platform/connection/components/ConnectionD
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import {ConnectionEnvironmentModel} from '@/shared/middleware/embedded/connection';
+import {ConnectionEnvironmentModel, ConnectionModel} from '@/shared/middleware/embedded/connection';
 import {useCreateConnectionMutation} from '@/shared/mutations/embedded/connections.mutations';
 import {
     ConnectionKeys,
@@ -27,7 +27,7 @@ export enum Type {
 export const Connections = () => {
     const [searchParams] = useSearchParams();
 
-    const [environment, setEnvironment] = useState<number | undefined>(getEnvironment());
+    const [environment, setEnvironment] = useState<number>(getEnvironment());
     const [filterData, setFilterData] = useState<{
         id?: number | string;
         type: Type;
@@ -57,9 +57,7 @@ export const Connections = () => {
                 ? ConnectionEnvironmentModel.Development
                 : environment === 2
                   ? ConnectionEnvironmentModel.Test
-                  : environment === 3
-                    ? ConnectionEnvironmentModel.Production
-                    : undefined,
+                  : ConnectionEnvironmentModel.Production,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
 
@@ -74,7 +72,7 @@ export const Connections = () => {
     }
 
     function getEnvironment() {
-        return searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : undefined;
+        return searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : 1;
     }
 
     function getFilterData() {
@@ -105,6 +103,16 @@ export const Connections = () => {
                         position="main"
                         right={
                             <ConnectionDialog
+                                connection={
+                                    {
+                                        environment:
+                                            environment === 1
+                                                ? ConnectionEnvironmentModel.Development
+                                                : environment === 2
+                                                  ? ConnectionEnvironmentModel.Test
+                                                  : ConnectionEnvironmentModel.Production,
+                                    } as ConnectionModel
+                                }
                                 connectionTagsQueryKey={ConnectionKeys.connectionTags}
                                 connectionsQueryKey={ConnectionKeys.connections}
                                 triggerNode={<Button>New Connection</Button>}
@@ -126,7 +134,6 @@ export const Connections = () => {
                         body={
                             <>
                                 {[
-                                    {label: 'All Environments', value: undefined},
                                     {label: 'Development', value: 1},
                                     {label: 'Test', value: 2},
                                     {label: 'Production', value: 3},
@@ -232,6 +239,16 @@ export const Connections = () => {
                     <EmptyList
                         button={
                             <ConnectionDialog
+                                connection={
+                                    {
+                                        environment:
+                                            environment === 1
+                                                ? ConnectionEnvironmentModel.Development
+                                                : environment === 2
+                                                  ? ConnectionEnvironmentModel.Test
+                                                  : ConnectionEnvironmentModel.Production,
+                                    } as ConnectionModel
+                                }
                                 connectionTagsQueryKey={ConnectionKeys.connectionTags}
                                 connectionsQueryKey={ConnectionKeys.connections}
                                 triggerNode={<Button>Create Connection</Button>}
