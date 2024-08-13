@@ -33,6 +33,7 @@ import {twMerge} from 'tailwind-merge';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import getDataPillsFromProperties from '../utils/getDataPillsFromProperties';
+import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 import CurrentOperationSelect from './CurrentOperationSelect';
 import ConnectionTab from './node-details-tabs/ConnectionTab';
@@ -213,7 +214,7 @@ const WorkflowNodeDetailsPanel = ({
 
     const queryClient = useQueryClient();
 
-    const handleOperationSelectChange = (operationName: string) => {
+    const handleOperationSelectChange = (newOperationName: string) => {
         if (!currentComponentDefinition || !currentComponent) {
             return;
         }
@@ -226,21 +227,6 @@ const WorkflowNodeDetailsPanel = ({
             queryKey: WorkflowNodeOptionKeys.workflowNodeOptions,
         });
 
-        setCurrentOperationName(operationName);
-
-        setComponentActions(
-            componentActions.map((componentAction) => {
-                if (componentAction.workflowNodeName === currentNode?.name) {
-                    return {
-                        ...componentAction,
-                        operationName,
-                    };
-                } else {
-                    return componentAction;
-                }
-            })
-        );
-
         const {componentName, notes, title, workflowNodeName} = currentComponent;
 
         saveWorkflowDefinition(
@@ -249,9 +235,12 @@ const WorkflowNodeDetailsPanel = ({
                 description: notes,
                 label: title,
                 name: workflowNodeName || currentNode?.name || '',
-                operationName,
+                operationName: newOperationName,
+                parameters: getParametersWithDefaultValues({
+                    properties: currentOperationProperties as Array<PropertyType>,
+                }),
                 trigger: currentNode?.trigger,
-                type: `${componentName}/v${currentComponentDefinition.version}/${operationName}`,
+                type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
             },
             workflow,
             updateWorkflowMutation,
@@ -261,9 +250,26 @@ const WorkflowNodeDetailsPanel = ({
                     ...currentComponent,
                     displayConditions: {},
                     metadata: {},
-                    operationName,
-                    parameters: {},
+                    operationName: newOperationName,
+                    parameters: getParametersWithDefaultValues({
+                        properties: currentOperationProperties as Array<PropertyType>,
+                    }),
                 });
+
+                setCurrentOperationName(newOperationName);
+
+                const formattedComponentActions = componentActions.map((componentAction) => {
+                    if (componentAction.workflowNodeName === currentNode?.name) {
+                        return {
+                            ...componentAction,
+                            operationName: newOperationName,
+                        };
+                    } else {
+                        return componentAction;
+                    }
+                });
+
+                setComponentActions(formattedComponentActions);
             }
         );
     };
@@ -300,7 +306,6 @@ const WorkflowNodeDetailsPanel = ({
                 setCurrentOperationName(currentComponentAction.operationName);
             }
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [componentActions, currentNode?.name]);
 
     // Set availableDataPills depending on previousComponentProperties
