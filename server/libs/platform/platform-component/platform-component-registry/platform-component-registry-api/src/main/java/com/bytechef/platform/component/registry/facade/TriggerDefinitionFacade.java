@@ -47,6 +47,19 @@ public interface TriggerDefinitionFacade extends OperationDefinitionFacade {
         @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, Long connectionId,
         @NonNull String webhookUrl);
 
+    /**
+     * Renews webhook subscription definition at provider side.
+     *
+     * This lambda function is invoked when your webhook subscription is set to have an expiry time, defined in the
+     * output of webhook_subscribe. It allows you to refresh as webhook subscriptions so your trigger can continue to
+     * receive events.
+     *
+     * @param componentName
+     * @param componentVersion
+     * @param triggerName
+     * @param outputParameters
+     * @return
+     */
     TriggerDefinition.DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> outputParameters);
@@ -70,7 +83,7 @@ public interface TriggerDefinitionFacade extends OperationDefinitionFacade {
 
     TriggerOutput executeTrigger(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull AppType type, Long instanceId, String workflowId, Long jobId,
+        @NonNull AppType type, Long instanceId, String workflowReferenceCode, Long jobId,
         @NonNull Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
         Long connectionId);
 
