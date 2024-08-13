@@ -22,6 +22,7 @@ import static com.bytechef.component.text.helper.constant.TextHelperConstants.TE
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.text.helper.action.TextHelperBase64DecodeAction;
 import com.bytechef.component.text.helper.action.TextHelperExtractContentFromHtmlAction;
 import com.google.auto.service.AutoService;
 
@@ -36,7 +37,8 @@ public class TextHelperComponentHandler implements ComponentHandler {
         .description("Helper component which contains operations to help you work with text.")
         .icon("path:assets/text-helper.svg")
         .categories(ComponentCategory.HELPERS)
-        .actions(TextHelperExtractContentFromHtmlAction.ACTION_DEFINITION);
+        .actions(
+            TextHelperExtractContentFromHtmlAction.ACTION_DEFINITION, TextHelperBase64DecodeAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
