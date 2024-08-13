@@ -81,13 +81,13 @@ const WorkflowEditorLayout = ({
 
     // refetch workflowNodeOutputs when a task is opened
     useEffect(() => {
-        if (!currentNode || currentNode?.trigger || workflowNodeOutputs) {
+        if (!currentNode || currentNode?.trigger || workflowNodeOutputs || !workflow?.nodeNames) {
             return;
         }
 
         refetchWorkflowNodeOutputs();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentNodeName, workflowNodeOutputs]);
+    }, [currentNodeName, workflow?.nodeNames.length]);
 
     // set currentComponent when currentNodeName changes
     useEffect(() => {
@@ -114,6 +114,7 @@ const WorkflowEditorLayout = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflow.tasks, workflow.triggers, currentNodeName]);
 
+    // update display conditions when currentNode changes
     useEffect(() => {
         if (currentComponent && workflowNodeParameterDisplayConditions?.displayConditions) {
             setCurrentComponent({
@@ -123,11 +124,6 @@ const WorkflowEditorLayout = ({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflowNodeParameterDisplayConditions?.displayConditions, currentNode?.name]);
-
-    useEffect(() => {
-        refetchWorkflowNodeOutputs();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [workflow?.nodeNames]);
 
     return (
         <ReactFlowProvider>

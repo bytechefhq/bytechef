@@ -31,6 +31,13 @@ export default function useNodeClick(data: NodeProps['data'], id: NodeProps['id'
 
         setWorkflowNodeDetailsPanelOpen(true);
 
+        if (nodeData.type !== 'workflow' && !nodeData.trigger) {
+            nodeData = {
+                ...nodeData,
+                taskDispatcher: true,
+            };
+        }
+
         setCurrentNode(nodeData);
 
         if (nodeData.componentName && nodeData.operationName) {

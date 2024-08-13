@@ -1,11 +1,13 @@
 import {
     ComponentDefinitionApi,
+    TaskDispatcherDefinitionApi,
     WorkflowConnectionModel,
     WorkflowModel,
     WorkflowTaskModel,
     WorkflowTriggerModel,
 } from '@/shared/middleware/platform/configuration';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
+import {TaskDispatcherKeys} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {WorkflowDefinitionType} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
@@ -31,8 +33,10 @@ type NodeDataType = {
     operationName?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     parameters?: {[key: string]: any};
+    taskDispatcher?: boolean;
     trigger?: boolean;
     type?: string;
+    version?: number;
 };
 
 export default async function saveWorkflowDefinition(
@@ -51,7 +55,7 @@ export default async function saveWorkflowDefinition(
             label: nodeData.label,
             name: nodeData.name,
             parameters: nodeData.parameters,
-            type: nodeData.type ?? `${nodeData.componentName}/v1/${nodeData.operationName}`,
+            type: nodeData.type ?? `${nodeData.componentName}/v${nodeData.version}/${nodeData.operationName}`,
         };
 
         updateWorkflowMutation.mutate(
@@ -77,13 +81,31 @@ export default async function saveWorkflowDefinition(
         return;
     }
 
-    const {componentName, description, label, metadata, name, parameters} = nodeData;
+    const {componentName, description, label, metadata, name, parameters, taskDispatcher, type, version} = nodeData;
 
     let {operationName} = nodeData;
 
     const queryClient = new QueryClient();
 
-    if (!operationName) {
+    if (taskDispatcher && componentName && version) {
+        const newNodeTaskDispatcherDefinition = await queryClient.fetchQuery({
+            queryFn: () =>
+                new TaskDispatcherDefinitionApi().getTaskDispatcherDefinition({
+                    taskDispatcherName: componentName,
+                    taskDispatcherVersion: version,
+                }),
+            queryKey: TaskDispatcherKeys.taskDispatcherDefinition({
+                taskDispatcherName: componentName,
+                taskDispatcherVersion: version,
+            }),
+        });
+
+        if (!newNodeTaskDispatcherDefinition) {
+            return;
+        }
+    }
+
+    if (!operationName && !taskDispatcher) {
         const newNodeComponentDefinition = await queryClient.fetchQuery({
             queryFn: () => new ComponentDefinitionApi().getComponentDefinition({componentName}),
             queryKey: ComponentDefinitionKeys.componentDefinition({componentName}),
@@ -102,7 +124,7 @@ export default async function saveWorkflowDefinition(
         metadata,
         name,
         parameters,
-        type: `${componentName}/v1/${operationName}`,
+        type: type ? type : `${componentName}/v${version}/${operationName}`,
     };
 
     const existingWorkflowTask = workflowDefinition.tasks?.find((task) => task.name === newTask.name);
