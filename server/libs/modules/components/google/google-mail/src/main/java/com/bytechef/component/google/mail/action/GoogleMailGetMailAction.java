@@ -34,8 +34,10 @@ import com.bytechef.component.google.mail.util.GoogleMailUtils;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
+import com.google.api.services.gmail.model.MessagePart;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Monika Domiter
@@ -64,11 +66,39 @@ public class GoogleMailGetMailAction {
 
         Gmail service = GoogleServices.getMail(connectionParameters);
 
-        return service.users()
+        return sortParts(service.users()
             .messages()
             .get("me", inputParameters.getRequiredString(ID))
             .setFormat(inputParameters.getString(FORMAT))
             .setMetadataHeaders(inputParameters.getList(METADATA_HEADERS, String.class, List.of()))
-            .execute();
+            .execute());
+    }
+
+    private static Message sortParts(Message message) throws IOException {
+        List<MessagePart> parts = message.getPayload()
+            .getParts();
+
+        int textPlainPartIdx = 0;
+        MessagePart messagePart = null;
+
+        for (; textPlainPartIdx < parts.size(); textPlainPartIdx++) {
+            messagePart = parts.get(textPlainPartIdx);
+
+            if (Objects.equals("text/plain", messagePart.getMimeType())) {
+                if (textPlainPartIdx == 0) {
+                    return message;
+                }
+            }
+        }
+
+        if (messagePart == null) {
+            return message;
+        }
+
+        parts.remove(textPlainPartIdx);
+
+        parts.addFirst(messagePart);
+
+        return message;
     }
 }
