@@ -22,7 +22,11 @@ package com.bytechef.component.text.helper.constant;
 public class TextHelperConstants {
 
     public static final String ATTRIBUTE = "attribute";
+    public static final String BASE_64_DECODE = "base64Decode";
     public static final String CONTENT = "content";
+    public static final String ENCODING_SCHEMA = "encodingSchema";
+    public static final String ENCODING_SCHEMA_BASE64 = "base64";
+    public static final String ENCODING_SCHEMA_BASE64URL = "base64Url";
     public static final String EXTRACT_CONTENT_FROM_HTML = "extractContentFromHtml";
     public static final String TEXT_HELPER = "textHelper";
     public static final String QUERY_SELECTOR = "querySelector";
