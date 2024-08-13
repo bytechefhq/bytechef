@@ -16,15 +16,9 @@
 
 package com.bytechef.platform.component.registry.facade;
 
-import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
-import static com.bytechef.component.definition.Authorization.EXPIRES_IN;
-import static com.bytechef.component.definition.Authorization.REFRESH_TOKEN;
-import static com.bytechef.component.definition.Authorization.RefreshTokenResponse;
-
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.exception.ProviderException;
-import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.registry.definition.ActionContextImpl;
 import com.bytechef.platform.component.registry.definition.factory.ContextFactory;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
@@ -32,24 +26,15 @@ import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.exception.ActionDefinitionErrorType;
+import com.bytechef.platform.component.registry.helper.TokenRefreshHelper;
 import com.bytechef.platform.component.registry.service.ActionDefinitionService;
-import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
-import com.bytechef.platform.component.registry.util.RefreshCredentialsUtils;
 import com.bytechef.platform.connection.domain.Connection;
-import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.AppType;
-import com.bytechef.platform.exception.ErrorType;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -61,27 +46,21 @@ import org.springframework.stereotype.Service;
 @Service("actionDefinitionFacade")
 public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
-    private static final Cache<Long, ReentrantLock> REENTRANT_LOCK_CACHE =
-        Caffeine.newBuilder()
-            .expireAfterAccess(1, TimeUnit.MINUTES)
-            .maximumSize(100000)
-            .build();
-
     private final ConnectionService connectionService;
-    private final ConnectionDefinitionService connectionDefinitionService;
     private final ContextFactory contextFactory;
     private final ActionDefinitionService actionDefinitionService;
+    private final TokenRefreshHelper tokenRefreshHelper;
 
     @SuppressFBWarnings("EI")
     public ActionDefinitionFacadeImpl(
-        ConnectionService connectionService, ConnectionDefinitionService connectionDefinitionService,
+        ConnectionService connectionService,
         ContextFactory contextFactory,
-        ActionDefinitionService actionDefinitionService) {
+        ActionDefinitionService actionDefinitionService, TokenRefreshHelper tokenRefreshHelper) {
 
         this.contextFactory = contextFactory;
         this.actionDefinitionService = actionDefinitionService;
         this.connectionService = connectionService;
-        this.connectionDefinitionService = connectionDefinitionService;
+        this.tokenRefreshHelper = tokenRefreshHelper;
     }
 
     @Override
@@ -94,12 +73,15 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         ActionContext actionContext = contextFactory.createActionContext(
             componentName, componentVersion, actionName, null, null, null, componentConnection);
 
-        return executeSingleConnectionFunction(
+        return tokenRefreshHelper.executeSingleConnectionFunction(
             componentName, componentVersion, componentConnection, actionContext,
             ActionDefinitionErrorType.EXECUTE_DYNAMIC_PROPERTIES,
             (curComponentConnection, curActionContext) -> actionDefinitionService.executeDynamicProperties(
                 componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
-                curComponentConnection, curActionContext));
+                curComponentConnection, curActionContext),
+            componentConnection1 -> contextFactory.createActionContext(
+                componentName, componentVersion, actionName, null,
+                null, null, componentConnection));
     }
 
     @Override
@@ -113,12 +95,15 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         ActionContext actionContext = contextFactory.createActionContext(
             componentName, componentVersion, actionName, null, null, null, componentConnection);
 
-        return executeSingleConnectionFunction(
+        return tokenRefreshHelper.executeSingleConnectionFunction(
             componentName, componentVersion, componentConnection, actionContext,
             ActionDefinitionErrorType.EXECUTE_OPTIONS,
             (componentConnection1, actionContext1) -> actionDefinitionService.executeOptions(
                 componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
-                searchText, componentConnection1, actionContext1));
+                searchText, componentConnection1, actionContext1),
+            componentConnection1 -> contextFactory.createActionContext(
+                componentName, componentVersion, actionName, null,
+                null, null, componentConnection));
     }
 
     @Override
@@ -133,12 +118,15 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
             componentName, componentVersion, actionName, null, null, null, executeFunctionData.componentConnection());
 
         if (executeFunctionData.singleConnectionPerform()) {
-            return executeSingleConnectionFunction(
+            return tokenRefreshHelper.executeSingleConnectionFunction(
                 componentName, componentVersion, executeFunctionData.componentConnection(), actionContext,
                 ActionDefinitionErrorType.EXECUTE_OUTPUT,
                 (componentConnection1, actionContext1) -> actionDefinitionService.executeSingleConnectionOutput(
                     componentName, componentVersion, actionName, inputParameters, componentConnection1,
-                    actionContext1));
+                    actionContext1),
+                componentConnection1 -> contextFactory.createActionContext(
+                    componentName, componentVersion, actionName, null,
+                    null, null, componentConnection1));
         } else {
             return actionDefinitionService.executeMultipleConnectionsOutput(
                 componentName, componentVersion, actionName, inputParameters,
@@ -152,12 +140,17 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         @NonNull Map<String, ?> inputParameters, ComponentConnection componentConnection,
         @NonNull ActionContext actionContext) {
 
-        return executeSingleConnectionFunction(
+        ActionContextImpl actionContextImpl = (ActionContextImpl) actionContext;
+
+        return tokenRefreshHelper.executeSingleConnectionFunction(
             componentName, componentVersion, componentConnection, actionContext,
             ActionDefinitionErrorType.EXECUTE_PERFORM,
             (componentConnection1, actionContext1) -> actionDefinitionService.executeSingleConnectionPerform(
                 componentName, componentVersion, actionName, inputParameters, componentConnection1,
-                actionContext1));
+                actionContext1),
+            componentConnection1 -> contextFactory.createActionContext(
+                componentName, componentVersion, actionName, actionContextImpl.getAppType(),
+                actionContextImpl.getInstanceWorkflowId(), actionContextImpl.getJobId(), componentConnection));
     }
 
     @Override
@@ -186,12 +179,15 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
             executeFunctionData.componentConnection);
 
         if (executeFunctionData.singleConnectionPerform) {
-            return executeSingleConnectionFunction(
+            return tokenRefreshHelper.executeSingleConnectionFunction(
                 componentName, componentVersion, executeFunctionData.componentConnection, actionContext,
                 ActionDefinitionErrorType.EXECUTE_PERFORM,
                 (componentConnection1, actionContext1) -> actionDefinitionService.executeSingleConnectionPerform(
                     componentName, componentVersion, actionName, inputParameters, componentConnection1,
-                    actionContext1));
+                    actionContext1),
+                componentConnection1 -> contextFactory.createActionContext(
+                    componentName, componentVersion, actionName, type,
+                    instanceWorkflowId, jobId, componentConnection1));
         } else {
             return actionDefinitionService.executeMultipleConnectionsPerform(
                 componentName, componentVersion, actionName, inputParameters, executeFunctionData.componentConnections,
@@ -207,42 +203,6 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         return actionDefinitionService.executeWorkflowNodeDescription(
             componentName, componentVersion, actionName, inputParameters,
             contextFactory.createActionContext(componentName, componentVersion, actionName, null, null, null, null));
-    }
-
-    private <V> V executeSingleConnectionFunction(
-        String componentName, int componentVersion, ComponentConnection componentConnection,
-        ActionContext actionContext, ErrorType errorType, BiFunction<ComponentConnection, ActionContext, V> function) {
-
-        try {
-            return function.apply(componentConnection, actionContext);
-        } catch (Exception exception) {
-            if (componentConnection == null) {
-                throw exception;
-            }
-
-            List<Object> refreshOn = connectionDefinitionService.getAuthorizationRefreshOn(
-                componentName, componentConnection.version(), componentConnection.authorizationName());
-
-            if (componentConnection.canCredentialsBeRefreshed() &&
-                RefreshCredentialsUtils.matches(refreshOn, exception)) {
-
-                componentConnection = getRefreshedCredentialsComponentConnection(componentConnection, actionContext);
-
-                ActionContextImpl actionContextImpl = (ActionContextImpl) actionContext;
-
-                actionContext = contextFactory.createActionContext(
-                    componentName, componentVersion, actionContextImpl.getActionName(), actionContextImpl.getAppType(),
-                    actionContextImpl.getInstanceWorkflowId(), actionContextImpl.getJobId(), componentConnection);
-
-                return function.apply(componentConnection, actionContext);
-            }
-
-            if (exception instanceof ProviderException) {
-                throw new ComponentExecutionException(exception, errorType);
-            }
-
-            throw exception;
-        }
     }
 
     private ExecuteFunctionData getExecuteFunctionData(
@@ -287,61 +247,6 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         return connectionIds.entrySet()
             .stream()
             .collect(Collectors.toMap(Map.Entry::getKey, this::getComponentConnection));
-    }
-
-    private ComponentConnection getRefreshedCredentialsComponentConnection(
-        ComponentConnection componentConnection, ActionContext actionContext) {
-
-        Connection connection;
-        Map<String, ?> parameters;
-
-        try {
-            if (componentConnection.isAuthorizationOauth2AuthorizationCode()) {
-                RefreshTokenResponse refreshTokenResponse =
-                    connectionDefinitionService.executeRefresh(
-                        componentConnection.componentName(), componentConnection.version(),
-                        componentConnection.authorizationName(), componentConnection.getParameters(), actionContext);
-
-                parameters = new HashMap<>() {
-                    {
-                        put(ACCESS_TOKEN, refreshTokenResponse.accessToken());
-
-                        if (refreshTokenResponse.refreshToken() != null) {
-                            put(REFRESH_TOKEN, refreshTokenResponse.refreshToken());
-                        }
-
-                        if (refreshTokenResponse.expiresIn() != null) {
-                            put(EXPIRES_IN, refreshTokenResponse.expiresIn());
-                        }
-                    }
-                };
-            } else {
-                parameters = connectionDefinitionService.executeAcquire(
-                    componentConnection.componentName(), componentConnection.version(),
-                    componentConnection.authorizationName(), componentConnection.getParameters(), actionContext);
-            }
-
-            ReentrantLock reentrantLock = REENTRANT_LOCK_CACHE.get(
-                componentConnection.connectionId(), (key) -> new ReentrantLock(true));
-
-            reentrantLock.lock();
-
-            try {
-                connection = connectionService.updateConnectionParameters(
-                    componentConnection.connectionId(), parameters);
-            } finally {
-                reentrantLock.unlock();
-            }
-        } catch (Exception e) {
-            connectionService.updateConnectionCredentialStatus(
-                componentConnection.connectionId(), CredentialStatus.INVALID);
-
-            throw e;
-        }
-
-        return new ComponentConnection(
-            componentConnection.componentName(), connection.getConnectionVersion(), componentConnection.connectionId(),
-            connection.getParameters(), connection.getAuthorizationName());
     }
 
     private record ExecuteFunctionData(
