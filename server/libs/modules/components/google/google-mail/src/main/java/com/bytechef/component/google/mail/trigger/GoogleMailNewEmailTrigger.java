@@ -63,6 +63,14 @@ public class GoogleMailNewEmailTrigger {
         .properties(
             string(TOPIC_NAME)
                 .label("Topic name")
+                .description(
+                    """
+                            Must be 3-255 characters, start with a letter, and contain only the following characters:
+                            letters, numbers, dashes (-), periods (.), underscores (_), tildes (~), percents (%) or
+                            plus signs (+). Cannot start with goog.
+                        """)
+                .maxLength(255)
+                .minLength(3)
                 .required(true))
         .outputSchema(
             array()
