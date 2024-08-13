@@ -41,7 +41,7 @@ const OperationSelect = ({
 
         <Select onValueChange={(value) => handleValueChange(value)} value={value}>
             <SelectTrigger className="w-full border-none bg-gray-100 shadow-none">
-                <SelectValue placeholder="Choose action..." />
+                <SelectValue placeholder="Select an action..." />
             </SelectTrigger>
 
             <SelectContent className="max-h-select-content-available-height-1/2 max-w-select-trigger-width">
