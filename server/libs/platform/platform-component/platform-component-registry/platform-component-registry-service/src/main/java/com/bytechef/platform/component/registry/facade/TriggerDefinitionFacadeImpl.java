@@ -167,7 +167,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     @Override
     public TriggerOutput executeTrigger(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull AppType type, Long instanceId, String workflowId, Long jobId,
+        @NonNull AppType type, Long instanceId, String workflowReferenceCode, Long jobId,
         @NonNull Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
         Long connectionId) {
 
@@ -176,7 +176,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         return triggerDefinitionService.executeTrigger(
             componentName, componentVersion, triggerName, inputParameters, triggerState, webhookRequest,
             componentConnection, contextFactory.createTriggerContext(componentName, componentVersion, triggerName, type,
-                workflowId, jobId, componentConnection));
+                workflowReferenceCode, jobId, componentConnection));
     }
 
     @Override
