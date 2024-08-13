@@ -61,7 +61,7 @@ public class ActionDefinitionFacadeIntTest {
     @Test
     public void testExecutePerform() {
         ActionDefinitionFacadeImpl actionDefinitionFacade = new ActionDefinitionFacadeImpl(connectionService,
-                contextFactory, actionDefinitionService, tokenRefreshHelper);
+            contextFactory, actionDefinitionService, tokenRefreshHelper);
 
         Object result = actionDefinitionFacade.executePerform(
             "httpClient", 1, HttpClientGetAction.ACTION_DEFINITION.getName(), AppType.AUTOMATION, 1000L, 1000L, 1000L,
