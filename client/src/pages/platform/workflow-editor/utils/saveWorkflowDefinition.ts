@@ -111,7 +111,8 @@ export default async function saveWorkflowDefinition(
         existingWorkflowTask &&
         (!operationName ||
             (existingWorkflowTask.parameters &&
-                JSON.stringify(existingWorkflowTask.parameters) === JSON.stringify(newTask.parameters)))
+                JSON.stringify(existingWorkflowTask.parameters) === JSON.stringify(newTask.parameters))) &&
+        existingWorkflowTask.type === newTask.type
     ) {
         return;
     }
@@ -129,6 +130,10 @@ export default async function saveWorkflowDefinition(
 
         tasks = [...(workflowDefinition.tasks || [])];
 
+        if (existingWorkflowTask.type !== newTask.type) {
+            delete tasks[existingTaskIndex].parameters;
+        }
+
         const combinedParameters = {
             ...existingWorkflowTask.parameters,
             ...newTask.parameters,
@@ -141,10 +146,6 @@ export default async function saveWorkflowDefinition(
         };
 
         tasks[existingTaskIndex] = combinedTask;
-
-        if (existingWorkflowTask.type !== newTask.type) {
-            delete tasks[existingTaskIndex].parameters;
-        }
     } else if (index !== undefined && index > -1) {
         tasks = [...(workflowDefinition.tasks || [])];
 
