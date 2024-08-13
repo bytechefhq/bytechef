@@ -11,6 +11,7 @@ import {Component1Icon} from '@radix-ui/react-icons';
 import {usePrevious} from '@uidotdev/usehooks';
 import {DragEventHandler, useCallback, useEffect, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
+import {useParams} from 'react-router-dom';
 import ReactFlow, {Controls, Edge, MiniMap, Node, useReactFlow, useStore} from 'reactflow';
 
 import PlaceholderEdge from '../edges/PlaceholderEdge';
@@ -47,6 +48,8 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
     const {getEdge, getNode, getNodes, setViewport} = useReactFlow();
 
     const [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge, handleDropOnTriggerNode] = useHandleDrop();
+
+    const {projectId, projectWorkflowId} = useParams();
 
     const previousComponentNames: Array<string> | undefined = usePrevious(componentNames || []);
 
@@ -272,6 +275,14 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [defaultNodesWithWorkflowNodes, workflow.id]);
+
+    // Reset workflow data store when projectWorkflowId changes
+    useEffect(() => {
+        useWorkflowDataStore.getState().reset();
+        useWorkflowNodeDetailsPanelStore.getState().reset();
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [projectId, projectWorkflowId]);
 
     // Update nodes and edges when workflow changes
     useEffect(() => {
