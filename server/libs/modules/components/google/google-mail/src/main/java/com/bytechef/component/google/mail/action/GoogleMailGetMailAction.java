@@ -66,12 +66,20 @@ public class GoogleMailGetMailAction {
 
         Gmail service = GoogleServices.getMail(connectionParameters);
 
-        return sortParts(service.users()
+        String responseMessageFormat = inputParameters.getString(FORMAT);
+
+        Message responseMessage = service.users()
             .messages()
             .get("me", inputParameters.getRequiredString(ID))
-            .setFormat(inputParameters.getString(FORMAT))
+            .setFormat(responseMessageFormat)
             .setMetadataHeaders(inputParameters.getList(METADATA_HEADERS, String.class, List.of()))
-            .execute());
+            .execute();
+
+        if (!Objects.equals(responseMessageFormat, "full")) {
+            return responseMessage;
+        }
+
+        return sortParts(responseMessage);
     }
 
     private static Message sortParts(Message message) throws IOException {
@@ -84,10 +92,8 @@ public class GoogleMailGetMailAction {
         for (; textPlainPartIdx < parts.size(); textPlainPartIdx++) {
             messagePart = parts.get(textPlainPartIdx);
 
-            if (Objects.equals("text/plain", messagePart.getMimeType())) {
-                if (textPlainPartIdx == 0) {
-                    return message;
-                }
+            if ((textPlainPartIdx == 0) && Objects.equals("text/plain", messagePart.getMimeType())) {
+                return message;
             }
         }
 
