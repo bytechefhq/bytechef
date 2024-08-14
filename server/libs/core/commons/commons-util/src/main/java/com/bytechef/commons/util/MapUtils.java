@@ -805,6 +805,11 @@ public class MapUtils {
         MapUtils.objectMapper = objectMapper;
     }
 
+    @SuppressFBWarnings("EI_EXPOSE_STATIC_REP2")
+    public static void initObjectMapper(ObjectMapper objectMapper) {
+        MapUtils.objectMapper = objectMapper;
+    }
+
     private static Object[] getArray(Object value) {
         Object[] outputArray;
 
