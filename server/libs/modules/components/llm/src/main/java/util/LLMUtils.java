@@ -49,7 +49,7 @@ public class LLMUtils {
     public static <R> ModifiableOption[] getEnumOptions(Map<String, R> map) {
         return map.entrySet()
             .stream()
-            .map(enrty -> option(enrty.getKey(), enrty.getValue()))
+            .map(entry -> option(entry.getKey(), entry.getValue()))
             .toArray(ModifiableOption[]::new);
     }
 }

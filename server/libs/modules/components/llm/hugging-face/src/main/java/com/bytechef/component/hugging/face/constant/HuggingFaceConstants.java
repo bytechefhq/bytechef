@@ -32,13 +32,8 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
  * @author Monika Domiter
  */
 public final class HuggingFaceConstants {
-
-    public static final String CHAT = "askChatGPT";
-    public static final String CONTENT = "content";
     public static final String URL = "url";
-    public static final String MESSAGES = "messages";
     public static final String HUGGING_FACE = "hugging-face";
-    public static final String ROLE = "role";
 
 
     private HuggingFaceConstants() {
