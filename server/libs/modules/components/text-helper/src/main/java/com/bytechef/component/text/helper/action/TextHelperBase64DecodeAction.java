@@ -25,6 +25,7 @@ import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.text.helper.constant.TextHelperConstants;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Objects;
 
@@ -63,7 +64,7 @@ public class TextHelperBase64DecodeAction {
 
         Base64.Decoder decoder = of(inputParameters.getRequiredString(TextHelperConstants.ENCODING_SCHEMA));
 
-        return new String(decoder.decode(base64Content));
+        return new String(decoder.decode(base64Content), StandardCharsets.UTF_8);
     }
 
     private static Base64.Decoder of(String schema) {
