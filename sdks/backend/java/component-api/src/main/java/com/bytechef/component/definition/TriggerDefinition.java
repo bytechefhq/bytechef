@@ -467,7 +467,8 @@ public interface TriggerDefinition {
          * @return
          */
         PollOutput apply(
-            Parameters inputParameters, Parameters closureParameters, TriggerContext context)
+            Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
+            TriggerContext context)
             throws Exception;
 
     }
