@@ -24,19 +24,19 @@ import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.openai.constant.AzureOpenAIConstants.CONTENT;
-import static com.bytechef.component.openai.constant.AzureOpenAIConstants.CREATE_IMAGE;
-import static com.bytechef.component.openai.constant.AzureOpenAIConstants.DEFAULT_SIZE;
-import static com.bytechef.component.openai.constant.AzureOpenAIConstants.HEIGHT;
-import static com.bytechef.component.openai.constant.AzureOpenAIConstants.MESSAGES;
-import static com.bytechef.component.openai.constant.AzureOpenAIConstants.MODEL;
-import static com.bytechef.component.openai.constant.AzureOpenAIConstants.N;
-import static com.bytechef.component.openai.constant.AzureOpenAIConstants.QUALITY;
-import static com.bytechef.component.openai.constant.AzureOpenAIConstants.RESPONSE_FORMAT;
-import static com.bytechef.component.openai.constant.AzureOpenAIConstants.STYLE;
-import static com.bytechef.component.openai.constant.AzureOpenAIConstants.USER;
-import static com.bytechef.component.openai.constant.AzureOpenAIConstants.WEIGHT;
-import static com.bytechef.component.openai.constant.AzureOpenAIConstants.WIDTH;
+import static constants.LLMConstants.CONTENT;
+import static constants.LLMConstants.CREATE_IMAGE;
+import static constants.LLMConstants.DEFAULT_SIZE;
+import static constants.LLMConstants.ENDPOINT;
+import static constants.LLMConstants.HEIGHT;
+import static constants.LLMConstants.MESSAGES;
+import static constants.LLMConstants.MODEL;
+import static constants.LLMConstants.N;
+import static constants.LLMConstants.RESPONSE_FORMAT;
+import static constants.LLMConstants.STYLE;
+import static constants.LLMConstants.USER;
+import static constants.LLMConstants.WEIGHT;
+import static constants.LLMConstants.WIDTH;
 
 import com.azure.ai.openai.OpenAIClient;
 import com.azure.ai.openai.OpenAIClientBuilder;
@@ -46,6 +46,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -89,16 +90,16 @@ public class AzureOpenAICreateImageAction {
                     "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported.")
                 .defaultValue(1)
                 .required(false),
-//            string(MODEL)
-//                .label("Model")
-//                .description("ID of the model to use.")
-//                .required(true)
-//                .description("The model to use for image generation.")
-//                .options(LLMUtils.getEnumOptions(
-//                    Arrays.stream(AzureOpenAiImageApi.ImageModel.values())
-//                        .collect(Collectors.toMap(
-//                            AzureOpenAiImageApi.ImageModel::getValue, AzureOpenAiImageApi.ImageModel::getValue))))
-//                .required(true),
+            string(MODEL)
+                .label("Model")
+                .description("ID of the model to use.")
+                .required(true)
+                .description("The model to use for image generation.")
+                .options(LLMUtils.getEnumOptions(
+                    Arrays.stream(AzureOpenAiImageOptions.ImageModel.values())
+                        .collect(Collectors.toMap(
+                            AzureOpenAiImageOptions.ImageModel::getValue, AzureOpenAiImageOptions.ImageModel::getValue))))
+                .required(true),
 //            string(QUALITY)
 //                .label("Quality")
 //                .description("The quality of the image that will be generated.")
@@ -159,13 +160,12 @@ public class AzureOpenAICreateImageAction {
 
         OpenAIClient openAIClient = new OpenAIClientBuilder()
             .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
-//            .endpoint()
+            .endpoint(connectionParameters.getString(ENDPOINT))
             .buildClient();
 
         ImageOptions openAiImageOptions = AzureOpenAiImageOptions.builder()
             .withModel(inputParameters.getRequiredString(MODEL))
             .withN(inputParameters.getInteger(N))
-//            .withQuality(inputParameters.getString(QUALITY))
             .withResponseFormat(inputParameters.getString(RESPONSE_FORMAT))
             .withStyle(inputParameters.getString(STYLE))
             .withUser(inputParameters.getString(USER))

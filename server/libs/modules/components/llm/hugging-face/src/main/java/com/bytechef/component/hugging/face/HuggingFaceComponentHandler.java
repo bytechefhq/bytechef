@@ -35,8 +35,7 @@ public class HuggingFaceComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component(HUGGING_FACE)
         .title("Hugging Face")
         .description(
-            "OpenAI is a research organization that aims to develop and direct artificial intelligence (AI) in ways " +
-                "that benefit humanity as a whole.")
+            "Hugging Face is on a journey to advance and democratize artificial intelligence through open source and open science.")
         .icon("path:assets/hugging-face.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(HuggingFaceConnection.CONNECTION_DEFINITION)

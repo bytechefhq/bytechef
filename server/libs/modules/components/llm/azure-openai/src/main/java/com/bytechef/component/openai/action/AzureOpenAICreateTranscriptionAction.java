@@ -23,17 +23,18 @@ import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.openai.constant.AzureOpenAIConstants.CREATE_TRANSCRIPTION;
-import static com.bytechef.component.openai.constant.AzureOpenAIConstants.FILE;
-import static com.bytechef.component.openai.constant.AzureOpenAIConstants.LANGUAGE;
-import static com.bytechef.component.openai.constant.AzureOpenAIConstants.MODEL;
-import static com.bytechef.component.openai.constant.AzureOpenAIConstants.PROMPT;
-import static com.bytechef.component.openai.constant.AzureOpenAIConstants.RESPONSE_FORMAT;
-import static com.bytechef.component.openai.constant.AzureOpenAIConstants.TEMPERATURE;
+import static constants.LLMConstants.CREATE_TRANSCRIPTION;
+import static constants.LLMConstants.ENDPOINT;
+import static constants.LLMConstants.FILE;
+import static constants.LLMConstants.LANGUAGE;
+import static constants.LLMConstants.LANGUAGE_PROPERTY;
+import static constants.LLMConstants.MODEL;
+import static constants.LLMConstants.PROMPT;
+import static constants.LLMConstants.RESPONSE_FORMAT;
+import static constants.LLMConstants.TEMPERATURE;
 
 import com.azure.ai.openai.OpenAIClient;
 import com.azure.ai.openai.OpenAIClientBuilder;
-import com.azure.ai.openai.models.AudioTranscriptionOptions;
 import com.azure.core.credential.KeyCredential;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -69,71 +70,11 @@ public class AzureOpenAICreateTranscriptionAction {
                 .label("Model")
                 .description("ID of the model to use.")
                 .required(true)
-                .options(
-                    option(AzureOpenAiAudioTranscriptionOptions.WhisperModel.WHISPER.value, AzureOpenAiAudioTranscriptionOptions.WhisperModel.WHISPER.value)),
-            string(LANGUAGE)
-                .label("Language")
-                .description("The language of the input audio.")
-                .options(
-                    List.of(
-                        option("Afrikaans", "af"),
-                        option("Arabic", "ar"),
-                        option("Armenian", "hy"),
-                        option("Azerbaijani", "az"),
-                        option("Belarusian", "be"),
-                        option("Bosnian", "bs"),
-                        option("Bulgarian", "bg"),
-                        option("Catalan", "ca"),
-                        option("Chinese (Simplified)", "zh"),
-                        option("Croatian", "hr"),
-                        option("Czech", "cs"),
-                        option("Danish", "da"),
-                        option("Dutch", "nl"),
-                        option("Greek", "el"),
-                        option("Estonian", "et"),
-                        option("English", "en"),
-                        option("Finnish", "fi"),
-                        option("French", "fr"),
-                        option("Galician", "gl"),
-                        option("German", "de"),
-                        option("Hebrew", "he"),
-                        option("Hindi", "hi"),
-                        option("Hungarian", "hu"),
-                        option("Icelandic", "is"),
-                        option("Indonesian", "id"),
-                        option("Italian", "it"),
-                        option("Japanese", "ja"),
-                        option("Kazakh", "kk"),
-                        option("Kannada", "kn"),
-                        option("Korean", "ko"),
-                        option("Lithuanian", "lt"),
-                        option("Latvian", "lv"),
-                        option("Maori", "ma"),
-                        option("Macedonian", "mk"),
-                        option("Marathi", "mr"),
-                        option("Malay", "ms"),
-                        option("Nepali", "ne"),
-                        option("Norwegian", "no"),
-                        option("Persian", "fa"),
-                        option("Polish", "pl"),
-                        option("Portuguese", "pt"),
-                        option("Romanian", "ro"),
-                        option("Russian", "ru"),
-                        option("Slovak", "sk"),
-                        option("Slovenian", "sl"),
-                        option("Serbian", "sr"),
-                        option("Spanish", "es"),
-                        option("Swedish", "sv"),
-                        option("Swahili", "sw"),
-                        option("Tamil", "ta"),
-                        option("Tagalog", "tl"),
-                        option("Thai", "th"),
-                        option("Turkish", "tr"),
-                        option("Ukrainian", "uk"),
-                        option("Urdu", "ur"),
-                        option("Vietnamese", "vi"),
-                        option("Welsh", "cy")))
-                .required(false),
+                .options(LLMUtils.getEnumOptions(
+                        Arrays.stream(AzureOpenAiAudioTranscriptionOptions.WhisperModel.values())
+                            .collect(Collectors.toMap(
+                                AzureOpenAiAudioTranscriptionOptions.WhisperModel::getValue, AzureOpenAiAudioTranscriptionOptions.WhisperModel::getValue)))),
+            LANGUAGE_PROPERTY,
             string(PROMPT)
                 .label("Prompt")
                 .description(
@@ -169,7 +110,7 @@ public class AzureOpenAICreateTranscriptionAction {
 
         OpenAIClient openAIClient = new OpenAIClientBuilder()
             .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
-//            .endpoint()
+            .endpoint(connectionParameters.getString(ENDPOINT))
             .buildClient();
 
         AzureOpenAiAudioTranscriptionOptions transcriptionOptions = AzureOpenAiAudioTranscriptionOptions.builder()

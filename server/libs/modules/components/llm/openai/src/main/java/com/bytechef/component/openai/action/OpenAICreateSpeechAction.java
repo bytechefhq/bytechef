@@ -21,15 +21,13 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.openai.constant.OpenAIConstants.CREATE_SPEECH;
-import static com.bytechef.component.openai.constant.OpenAIConstants.INPUT;
-import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
-import static com.bytechef.component.openai.constant.OpenAIConstants.RESPONSE_FORMAT;
-import static com.bytechef.component.openai.constant.OpenAIConstants.SPEED;
-import static com.bytechef.component.openai.constant.OpenAIConstants.VOICE;
+import static constants.LLMConstants.CREATE_SPEECH;
+import static constants.LLMConstants.INPUT;
+import static constants.LLMConstants.MODEL;
+import static constants.LLMConstants.RESPONSE_FORMAT;
+import static constants.LLMConstants.SPEED;
+import static constants.LLMConstants.VOICE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -92,7 +90,7 @@ public class OpenAICreateSpeechAction {
                 .minValue(0.25)
                 .maxValue(4.0)
                 .required(false))
-        .output(outputSchema(fileEntry()))
+        .outputSchema(fileEntry())
         .perform(OpenAICreateSpeechAction::perform);
 
     private OpenAICreateSpeechAction() {
