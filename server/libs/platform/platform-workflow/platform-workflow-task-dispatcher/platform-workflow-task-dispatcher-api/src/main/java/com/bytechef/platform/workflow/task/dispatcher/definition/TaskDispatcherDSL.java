@@ -1238,21 +1238,15 @@ public final class TaskDispatcherDSL {
         }
 
         public ModifiableTaskDispatcherDefinition resources(String documentationUrl) {
-            this.resources = new ResourcesImpl(documentationUrl, null, null);
-
-            return this;
-        }
-
-        public ModifiableTaskDispatcherDefinition resources(String documentationUrl, List<String> categories) {
-            this.resources = new ResourcesImpl(documentationUrl, categories, null);
+            this.resources = new ResourcesImpl(documentationUrl, null);
 
             return this;
         }
 
         public ModifiableTaskDispatcherDefinition resources(
-            String documentationUrl, List<String> categories, Map<String, String> additionalUrls) {
+            String documentationUrl, Map<String, String> additionalUrls) {
 
-            this.resources = new ResourcesImpl(documentationUrl, categories, additionalUrls);
+            this.resources = new ResourcesImpl(documentationUrl, additionalUrls);
 
             return this;
         }
@@ -1497,13 +1491,7 @@ public final class TaskDispatcherDSL {
     }
 
     @SuppressFBWarnings("EI")
-    private record ResourcesImpl(
-        String documentationUrl, List<String> categories, Map<String, String> additionalUrls) implements Resources {
-
-        @Override
-        public Optional<List<String>> getCategories() {
-            return Optional.ofNullable(categories == null ? null : Collections.unmodifiableList(categories));
-        }
+    private record ResourcesImpl(String documentationUrl, Map<String, String> additionalUrls) implements Resources {
 
         @Override
         public Optional<Map<String, String>> getAdditionalUrls() {
