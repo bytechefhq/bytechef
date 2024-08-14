@@ -28,11 +28,11 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinitio
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.pipedrive.util.PipedriveUtils;
 import java.util.Map;
@@ -58,31 +58,31 @@ public class PipedriveNewActivityTrigger {
                     string("owner_name"),
                     integer("user_id"),
                     integer("company_id")))
-        .dynamicWebhookDisable(PipedriveNewActivityTrigger::dynamicWebhookDisable)
-        .dynamicWebhookEnable(PipedriveNewActivityTrigger::dynamicWebhookEnable)
-        .dynamicWebhookRequest(PipedriveNewActivityTrigger::dynamicWebhookRequest);
+        .webhookDisable(PipedriveNewActivityTrigger::webhookDisable)
+        .webhookEnable(PipedriveNewActivityTrigger::webhookEnable)
+        .webhookRequest(PipedriveNewActivityTrigger::webhookRequest);
 
     private PipedriveNewActivityTrigger() {
     }
 
-    protected static void dynamicWebhookDisable(
+    protected static void webhookDisable(
         Map<String, ?> inputParameters, Parameters connectionParameters, Map<String, ?> outputParameters,
         String workflowExecutionId, TriggerContext context) {
 
         PipedriveUtils.unsubscribeWebhook((Integer) outputParameters.get(ID), context);
     }
 
-    protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
+    protected static WebhookEnableOutput webhookEnable(
         Map<String, ?> inputParameters, Parameters connectionParameters, String webhookUrl,
         String workflowExecutionId, TriggerContext context) {
 
-        return new DynamicWebhookEnableOutput(
+        return new WebhookEnableOutput(
             Map.of(ID, PipedriveUtils.subscribeWebhook("activity", ADDED, webhookUrl, context)), null);
     }
 
-    protected static Object dynamicWebhookRequest(
+    protected static Object webhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
-        WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output, TriggerContext context) {
+        WebhookBody body, WebhookMethod method, WebhookEnableOutput output, TriggerContext context) {
 
         return body.getContent(new TypeReference<Map<String, ?>>() {})
             .get(CURRENT);

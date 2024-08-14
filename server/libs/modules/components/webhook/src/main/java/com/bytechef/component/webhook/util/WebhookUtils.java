@@ -28,6 +28,7 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateFunction;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
@@ -42,16 +43,18 @@ import java.util.stream.Collectors;
 public class WebhookUtils {
 
     public static OutputResponse getOutput(
-        Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
-        WebhookMethod method, TriggerContext context) {
+        Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
+        WebhookBody body, WebhookMethod method, WebhookEnableOutput webhookEnableOutput, TriggerContext context) {
 
         return context.output(output -> output.get(
-            getWebhookResult(inputParameters, headers, parameters, body, method, context)));
+            getWebhookResult(
+                inputParameters, connectionParameters, headers, parameters, body, method, webhookEnableOutput,
+                context)));
     }
 
     public static Map<String, ?> getWebhookResult(
-        Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
-        WebhookMethod method, TriggerContext context) {
+        Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
+        WebhookBody body, WebhookMethod method, WebhookEnableOutput output, TriggerContext context) {
 
         Map<String, ?> headerMap = headers.toMap();
         Map<String, ?> parameterMap = parameters.toMap();

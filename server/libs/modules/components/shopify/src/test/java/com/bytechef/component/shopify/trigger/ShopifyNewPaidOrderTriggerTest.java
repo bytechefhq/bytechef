@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.shopify.util.ShopifyUtils;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 class ShopifyNewPaidOrderTriggerTest extends AbstractShopifyTriggerTest {
 
     @Test
-    void testDynamicWebhookEnable() {
+    void testWebhookEnable() {
         String webhookUrl = "testWebhookUrl";
 
         shopifyUtilsMockedStatic
@@ -41,11 +41,11 @@ class ShopifyNewPaidOrderTriggerTest extends AbstractShopifyTriggerTest {
                 () -> ShopifyUtils.subscribeWebhook(webhookUrl, mockedTriggerContext, "orders/paid"))
             .thenReturn(123L);
 
-        DynamicWebhookEnableOutput dynamicWebhookEnableOutput = ShopifyNewPaidOrderTrigger.dynamicWebhookEnable(
+        WebhookEnableOutput webhookEnableOutput = ShopifyNewPaidOrderTrigger.webhookEnable(
             mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
 
-        Map<String, ?> parameters = dynamicWebhookEnableOutput.parameters();
-        LocalDateTime webhookExpirationDate = dynamicWebhookEnableOutput.webhookExpirationDate();
+        Map<String, ?> parameters = webhookEnableOutput.parameters();
+        LocalDateTime webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
 
         Map<String, Object> expectedParameters = Map.of(ID, 123L);
 
@@ -54,15 +54,14 @@ class ShopifyNewPaidOrderTriggerTest extends AbstractShopifyTriggerTest {
     }
 
     @Test
-    void testDynamicWebhookRequest() {
+    void testWebhookRequest() {
         when(mockedWebhookBody.getContent())
             .thenReturn(mockedObject);
 
-        Object result = ShopifyNewPaidOrderTrigger.dynamicWebhookRequest(
+        Object result = ShopifyNewPaidOrderTrigger.webhookRequest(
             mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedDynamicWebhookEnableOutput, mockedTriggerContext);
+            mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
 
         assertEquals(mockedObject, result);
-
     }
 }

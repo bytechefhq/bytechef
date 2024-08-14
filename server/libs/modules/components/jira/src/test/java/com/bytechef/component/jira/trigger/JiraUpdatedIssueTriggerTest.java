@@ -24,7 +24,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context.TypeReference;
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.jira.util.JiraUtils;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -36,18 +36,18 @@ import org.junit.jupiter.api.Test;
 class JiraUpdatedIssueTriggerTest extends AbstractJiraTriggerTest {
 
     @Test
-    void testDynamicWebhookEnable() {
+    void testWebhookEnable() {
         String webhookUrl = "testWebhookUrl";
 
         jiraUtilsMockedStatic.when(
             () -> JiraUtils.subscribeWebhook(mockedParameters, webhookUrl, mockedTriggerContext, "jira:issue_updated"))
             .thenReturn(123);
 
-        DynamicWebhookEnableOutput dynamicWebhookEnableOutput = JiraUpdatedIssueTrigger.dynamicWebhookEnable(
+        WebhookEnableOutput webhookEnableOutput = JiraUpdatedIssueTrigger.webhookEnable(
             mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
 
-        Map<String, ?> parameters = dynamicWebhookEnableOutput.parameters();
-        LocalDateTime webhookExpirationDate = dynamicWebhookEnableOutput.webhookExpirationDate();
+        Map<String, ?> parameters = webhookEnableOutput.parameters();
+        LocalDateTime webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
 
         Map<String, Object> expectedParameters = Map.of(ID, 123);
 
@@ -56,15 +56,15 @@ class JiraUpdatedIssueTriggerTest extends AbstractJiraTriggerTest {
     }
 
     @Test
-    void testDynamicWebhookRequest() {
+    void testWebhookRequest() {
         Map<String, ?> issueMap = Map.of(ISSUE, mockedObject);
 
         when(mockedWebhookBody.getContent(any(TypeReference.class)))
             .thenReturn(issueMap);
 
-        Object result = JiraUpdatedIssueTrigger.dynamicWebhookRequest(
+        Object result = JiraUpdatedIssueTrigger.webhookRequest(
             mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedDynamicWebhookEnableOutput, mockedTriggerContext);
+            mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
 
         assertEquals(mockedObject, result);
     }

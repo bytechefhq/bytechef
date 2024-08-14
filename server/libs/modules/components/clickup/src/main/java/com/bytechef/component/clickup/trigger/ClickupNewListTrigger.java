@@ -31,11 +31,11 @@ import com.bytechef.component.clickup.util.ClickupUtils;
 import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import java.util.Map;
 
@@ -65,33 +65,33 @@ public class ClickupNewListTrigger {
                         .properties(
                             string(ID),
                             string(NAME))))
-        .dynamicWebhookEnable(ClickupNewListTrigger::dynamicWebhookEnable)
-        .dynamicWebhookDisable(ClickupNewListTrigger::dynamicWebhookDisable)
-        .dynamicWebhookRequest(ClickupNewListTrigger::dynamicWebhookRequest);
+        .webhookEnable(ClickupNewListTrigger::webhookEnable)
+        .webhookDisable(ClickupNewListTrigger::webhookDisable)
+        .webhookRequest(ClickupNewListTrigger::webhookRequest);
 
     private ClickupNewListTrigger() {
     }
 
-    protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
+    protected static WebhookEnableOutput webhookEnable(
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
         String workflowExecutionId, TriggerContext context) {
 
-        return new DynamicWebhookEnableOutput(
+        return new WebhookEnableOutput(
             Map.of(ID,
                 subscribeWebhook(webhookUrl, context, inputParameters.getRequiredString(WORKSPACE_ID), "listCreated")),
             null);
     }
 
-    protected static void dynamicWebhookDisable(
+    protected static void webhookDisable(
         Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
         String workflowExecutionId, TriggerContext context) {
 
         unsubscribeWebhook(context, outputParameters.getString(ID));
     }
 
-    protected static Map<String, Object> dynamicWebhookRequest(
+    protected static Map<String, Object> webhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
-        WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output, TriggerContext context) {
+        WebhookBody body, WebhookMethod method, WebhookEnableOutput output, TriggerContext context) {
 
         return getCreatedObject(body, context, "list_id", "/list/");
     }

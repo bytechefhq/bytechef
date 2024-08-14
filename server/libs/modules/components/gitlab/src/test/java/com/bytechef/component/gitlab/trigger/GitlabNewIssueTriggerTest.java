@@ -29,10 +29,10 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -44,7 +44,7 @@ import org.mockito.ArgumentCaptor;
  */
 class GitlabNewIssueTriggerTest {
 
-    protected DynamicWebhookEnableOutput mockedDynamicWebhookEnableOutput = mock(DynamicWebhookEnableOutput.class);
+    protected WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     protected WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     protected HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
@@ -71,11 +71,11 @@ class GitlabNewIssueTriggerTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(ID, 123));
 
-        DynamicWebhookEnableOutput dynamicWebhookEnableOutput = GitlabNewIssueTrigger.dynamicWebhookEnable(
+        WebhookEnableOutput webhookEnableOutput = GitlabNewIssueTrigger.dynamicWebhookEnable(
             mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
 
-        Map<String, ?> parameters = dynamicWebhookEnableOutput.parameters();
-        LocalDateTime webhookExpirationDate = dynamicWebhookEnableOutput.webhookExpirationDate();
+        Map<String, ?> parameters = webhookEnableOutput.parameters();
+        LocalDateTime webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
 
         Map<String, Object> expectedParameters = Map.of(ID, 123);
 
@@ -113,7 +113,7 @@ class GitlabNewIssueTriggerTest {
 
         Object result = GitlabNewIssueTrigger.dynamicWebhookRequest(
             mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedDynamicWebhookEnableOutput, mockedTriggerContext);
+            mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
 
         assertEquals(map, result);
     }

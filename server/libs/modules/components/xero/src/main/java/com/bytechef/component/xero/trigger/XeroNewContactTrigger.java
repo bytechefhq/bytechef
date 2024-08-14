@@ -29,6 +29,7 @@ import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.xero.util.XeroUtils;
 
@@ -45,14 +46,14 @@ public class XeroNewContactTrigger {
         .outputSchema(CONTACT_OUTPUT_PROPERTY)
         .workflowSyncValidation(true)
         .webhookValidate(XeroUtils::webhookValidate)
-        .staticWebhookRequest(XeroNewContactTrigger::staticWebhookRequest);
+        .webhookRequest(XeroNewContactTrigger::webhookRequest);
 
     private XeroNewContactTrigger() {
     }
 
-    protected static Object staticWebhookRequest(
-        Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
-        WebhookMethod method, TriggerContext context) {
+    protected static Object webhookRequest(
+        Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
+        WebhookBody body, WebhookMethod method, WebhookEnableOutput webhookEnableOutput, TriggerContext context) {
 
         return getCreatedObject(body, context, "CONTACT", null);
     }

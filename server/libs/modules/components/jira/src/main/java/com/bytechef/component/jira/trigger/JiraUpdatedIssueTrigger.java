@@ -30,11 +30,11 @@ import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.jira.util.JiraOptionsUtils;
 import com.bytechef.component.jira.util.JiraUtils;
@@ -62,31 +62,31 @@ public class JiraUpdatedIssueTrigger {
                 .optionsLookupDependsOn(PROJECT)
                 .required(false))
         .outputSchema(ISSUE_OUTPUT_PROPERTY)
-        .dynamicWebhookEnable(JiraUpdatedIssueTrigger::dynamicWebhookEnable)
-        .dynamicWebhookDisable(JiraUpdatedIssueTrigger::dynamicWebhookDisable)
-        .dynamicWebhookRequest(JiraUpdatedIssueTrigger::dynamicWebhookRequest);
+        .webhookEnable(JiraUpdatedIssueTrigger::webhookEnable)
+        .webhookDisable(JiraUpdatedIssueTrigger::webhookDisable)
+        .webhookRequest(JiraUpdatedIssueTrigger::webhookRequest);
 
     private JiraUpdatedIssueTrigger() {
     }
 
-    protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
+    protected static WebhookEnableOutput webhookEnable(
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
         String workflowExecutionId, TriggerContext context) {
 
-        return new DynamicWebhookEnableOutput(
+        return new WebhookEnableOutput(
             Map.of(ID, JiraUtils.subscribeWebhook(inputParameters, webhookUrl, context, "jira:issue_updated")), null);
     }
 
-    protected static void dynamicWebhookDisable(
+    protected static void webhookDisable(
         Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
         String workflowExecutionId, TriggerContext context) {
 
         JiraUtils.unsubscribeWebhook(outputParameters, context);
     }
 
-    protected static Object dynamicWebhookRequest(
+    protected static Object webhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
-        HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
+        HttpParameters parameters, WebhookBody body, WebhookMethod method, WebhookEnableOutput output,
         TriggerContext context) {
 
         return body

@@ -29,11 +29,11 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TO
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.google.commons.GoogleServices;
@@ -74,14 +74,14 @@ public class GoogleMailNewEmailTrigger {
         .outputSchema(
             array()
                 .items(MESSAGE_PROPERTY))
-        .dynamicWebhookEnable(GoogleMailNewEmailTrigger::dynamicWebhookEnable)
-        .dynamicWebhookDisable(GoogleMailNewEmailTrigger::dynamicWebhookDisable)
-        .dynamicWebhookRequest(GoogleMailNewEmailTrigger::dynamicWebhookRequest);
+        .webhookEnable(GoogleMailNewEmailTrigger::webhookEnable)
+        .webhookDisable(GoogleMailNewEmailTrigger::webhookDisable)
+        .webhookRequest(GoogleMailNewEmailTrigger::webhookRequest);
 
     private GoogleMailNewEmailTrigger() {
     }
 
-    protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
+    protected static WebhookEnableOutput webhookEnable(
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
         String workflowExecutionId, TriggerContext context) {
 
@@ -101,10 +101,10 @@ public class GoogleMailNewEmailTrigger {
             throw new ProviderException("Failed to start Gmail webhook", e);
         }
 
-        return new DynamicWebhookEnableOutput(Map.of(HISTORY_ID, watchResponse.getHistoryId()), null);
+        return new WebhookEnableOutput(Map.of(HISTORY_ID, watchResponse.getHistoryId()), null);
     }
 
-    protected static void dynamicWebhookDisable(
+    protected static void webhookDisable(
         Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
         String workflowExecutionId, TriggerContext context) {
 
@@ -119,9 +119,9 @@ public class GoogleMailNewEmailTrigger {
         }
     }
 
-    protected static List<Message> dynamicWebhookRequest(
+    protected static List<Message> webhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
-        HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
+        HttpParameters parameters, WebhookBody body, WebhookMethod method, WebhookEnableOutput output,
         TriggerContext context) throws IOException {
 
         Gmail gmail = GoogleServices.getMail(connectionParameters);

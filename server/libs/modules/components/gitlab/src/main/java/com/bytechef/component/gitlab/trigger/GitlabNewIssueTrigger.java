@@ -30,11 +30,11 @@ import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.gitlab.util.GitlabUtils;
 import java.util.Collections;
@@ -63,14 +63,14 @@ public class GitlabNewIssueTrigger {
                     integer("iid"),
                     integer(PROJECT_ID),
                     string("title")))
-        .dynamicWebhookEnable(GitlabNewIssueTrigger::dynamicWebhookEnable)
-        .dynamicWebhookDisable(GitlabNewIssueTrigger::dynamicWebhookDisable)
-        .dynamicWebhookRequest(GitlabNewIssueTrigger::dynamicWebhookRequest);
+        .webhookEnable(GitlabNewIssueTrigger::dynamicWebhookEnable)
+        .webhookDisable(GitlabNewIssueTrigger::dynamicWebhookDisable)
+        .webhookRequest(GitlabNewIssueTrigger::dynamicWebhookRequest);
 
     private GitlabNewIssueTrigger() {
     }
 
-    protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
+    protected static WebhookEnableOutput dynamicWebhookEnable(
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl, String workflowExecutionId,
         TriggerContext context) {
 
@@ -85,7 +85,7 @@ public class GitlabNewIssueTrigger {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return new DynamicWebhookEnableOutput(Map.of(ID, (Integer) body.get(ID)), null);
+        return new WebhookEnableOutput(Map.of(ID, (Integer) body.get(ID)), null);
     }
 
     protected static void dynamicWebhookDisable(
@@ -102,7 +102,7 @@ public class GitlabNewIssueTrigger {
 
     protected static Object dynamicWebhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
-        WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output, TriggerContext context) {
+        WebhookBody body, WebhookMethod method, WebhookEnableOutput output, TriggerContext context) {
 
         Map<String, Object> content = body.getContent(new TypeReference<>() {});
 

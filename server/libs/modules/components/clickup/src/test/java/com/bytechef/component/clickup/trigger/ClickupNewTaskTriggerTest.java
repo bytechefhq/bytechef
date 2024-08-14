@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.clickup.util.ClickupUtils;
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import java.time.LocalDateTime;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 class ClickupNewTaskTriggerTest extends AbstractClickupTriggerTest {
 
     @Test
-    void testDynamicWebhookEnable() {
+    void testWebhookEnable() {
         String webhookUrl = "testWebhookUrl";
 
         when(mockedParameters.getRequiredString(WORKSPACE_ID))
@@ -43,11 +43,11 @@ class ClickupNewTaskTriggerTest extends AbstractClickupTriggerTest {
         githubUtilsMockedStatic.when(
             () -> ClickupUtils.subscribeWebhook(webhookUrl, mockedTriggerContext, "workspace", "taskCreated"))
             .thenReturn("abc");
-        DynamicWebhookEnableOutput dynamicWebhookEnableOutput = ClickupNewTaskTrigger.dynamicWebhookEnable(
+        WebhookEnableOutput webhookEnableOutput = ClickupNewTaskTrigger.webhookEnable(
             mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
 
-        Map<String, ?> parameters = dynamicWebhookEnableOutput.parameters();
-        LocalDateTime webhookExpirationDate = dynamicWebhookEnableOutput.webhookExpirationDate();
+        Map<String, ?> parameters = webhookEnableOutput.parameters();
+        LocalDateTime webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
 
         Map<String, Object> expectedParameters = Map.of(ID, "abc");
 
@@ -56,11 +56,11 @@ class ClickupNewTaskTriggerTest extends AbstractClickupTriggerTest {
     }
 
     @Test
-    void testDynamicWebhookDisable() {
+    void testWebhookDisable() {
         when(mockedParameters.getString(ID))
             .thenReturn("abc");
 
-        ClickupNewTaskTrigger.dynamicWebhookDisable(
+        ClickupNewTaskTrigger.webhookDisable(
             mockedParameters, mockedParameters, mockedParameters, workflowExecutionId, mockedTriggerContext);
 
         githubUtilsMockedStatic
@@ -68,16 +68,16 @@ class ClickupNewTaskTriggerTest extends AbstractClickupTriggerTest {
     }
 
     @Test
-    void testDynamicWebhookRequest() {
+    void testWebhookRequest() {
         Map<String, Object> map = Map.of("key", Map.of(ID, "123"));
 
         githubUtilsMockedStatic.when(
             () -> ClickupUtils.getCreatedObject(mockedWebhookBody, mockedTriggerContext, "task_id", "/task/"))
             .thenReturn(map);
 
-        Map<String, Object> result = ClickupNewTaskTrigger.dynamicWebhookRequest(
+        Map<String, Object> result = ClickupNewTaskTrigger.webhookRequest(
             mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedDynamicWebhookEnableOutput, mockedTriggerContext);
+            mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
 
         assertEquals(map, result);
     }

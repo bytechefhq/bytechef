@@ -34,7 +34,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.whatsapp.util.WhatsAppUtils;
 import java.util.List;
 import java.util.Map;
@@ -84,17 +84,17 @@ public class WhatsAppNewIncomingMessageTrigger {
                                                 object("text")
                                                     .properties(
                                                         string("body")))))))
-            .dynamicWebhookDisable(WhatsAppNewIncomingMessageTrigger::dynamicWebhookDisable)
-            .dynamicWebhookEnable(WhatsAppNewIncomingMessageTrigger::dynamicWebhookEnable)
-            .dynamicWebhookRequest(WhatsAppNewIncomingMessageTrigger::dynamicWebhookRequest);
+            .webhookDisable(WhatsAppNewIncomingMessageTrigger::webhookDisable)
+            .webhookEnable(WhatsAppNewIncomingMessageTrigger::webhookEnable)
+            .webhookRequest(WhatsAppNewIncomingMessageTrigger::webhookRequest);
 
     private WhatsAppNewIncomingMessageTrigger() {
     }
 
-    protected static Object dynamicWebhookRequest(
+    protected static Object webhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders httpHeaders,
         HttpParameters httpParameters, WebhookBody body, WebhookMethod webhookMethod,
-        DynamicWebhookEnableOutput dynamicWebhookEnableOutput, TriggerContext context) {
+        WebhookEnableOutput webhookEnableOutput, TriggerContext context) {
 
         if (body == null) {
             return null;
@@ -103,7 +103,7 @@ public class WhatsAppNewIncomingMessageTrigger {
         return body.getContent();
     }
 
-    protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
+    protected static WebhookEnableOutput webhookEnable(
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl, String workflowExecutionId,
         TriggerContext context) {
 
@@ -130,10 +130,10 @@ public class WhatsAppNewIncomingMessageTrigger {
             throw new IllegalStateException((String) firstError.get("message"));
         }
 
-        return new DynamicWebhookEnableOutput(Map.of("id", response.get("id")), null);
+        return new WebhookEnableOutput(Map.of("id", response.get("id")), null);
     }
 
-    public static void dynamicWebhookDisable(
+    public static void webhookDisable(
         Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters, String s,
         TriggerContext context) {
 
