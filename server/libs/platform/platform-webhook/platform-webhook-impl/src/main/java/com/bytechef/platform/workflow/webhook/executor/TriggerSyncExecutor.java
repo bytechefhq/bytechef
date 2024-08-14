@@ -119,26 +119,33 @@ public class TriggerSyncExecutor {
     }
 
     public WebhookValidateResponse validate(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
-        String workflowId = getWorkflowId(workflowExecutionId);
+        Result result = getProcessData(workflowExecutionId, webhookRequest);
 
-        TriggerExecution triggerExecution = TriggerExecution.builder()
-            .metadata(Map.of(WebhookRequest.WEBHOOK_REQUEST, webhookRequest))
-            .workflowExecutionId(workflowExecutionId)
-            .workflowTrigger(getWorkflowTrigger(workflowExecutionId, workflowId))
-            .build();
-
-        triggerExecution = preProcess(triggerExecution.evaluate(getInputMap(workflowExecutionId)));
-
-        WorkflowNodeType workflowNodeType = getComponentOperation(workflowExecutionId, workflowId);
-
-        Map<String, Long> connectIdMap = MapUtils.getMap(
-            triggerExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class, Map.of());
+        TriggerExecution triggerExecution = result.triggerExecution();
+        WorkflowNodeType workflowNodeType = result.workflowNodeType();
 
         return triggerDefinitionFacade.executeWebhookValidate(
             workflowNodeType.componentName(), workflowNodeType.componentVersion(),
             workflowNodeType.componentOperationName(), triggerExecution.getParameters(),
             MapUtils.getRequired(triggerExecution.getMetadata(), WebhookRequest.WEBHOOK_REQUEST, WebhookRequest.class),
-            OptionalUtils.orElse(CollectionUtils.findFirst(connectIdMap.values()), null));
+            OptionalUtils.orElse(CollectionUtils.findFirst(result.connectIdMap()
+                .values()), null));
+    }
+
+    public WebhookValidateResponse validateOnEnable(
+        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+
+        Result result = getProcessData(workflowExecutionId, webhookRequest);
+
+        TriggerExecution triggerExecution = result.triggerExecution();
+        WorkflowNodeType workflowNodeType = result.workflowNodeType();
+
+        return triggerDefinitionFacade.executeWebhookValidateOnEnable(
+            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
+            workflowNodeType.componentOperationName(), triggerExecution.getParameters(),
+            MapUtils.getRequired(triggerExecution.getMetadata(), WebhookRequest.WEBHOOK_REQUEST, WebhookRequest.class),
+            OptionalUtils.orElse(CollectionUtils.findFirst(result.connectIdMap()
+                .values()), null));
     }
 
     private WorkflowNodeType getComponentOperation(WorkflowExecutionId workflowExecutionId, String workflowId) {
@@ -154,6 +161,25 @@ public class TriggerSyncExecutor {
 
         return instanceAccessor.getInputMap(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
+    }
+
+    private Result getProcessData(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+        String workflowId = getWorkflowId(workflowExecutionId);
+
+        TriggerExecution triggerExecution = TriggerExecution.builder()
+            .metadata(Map.of(WebhookRequest.WEBHOOK_REQUEST, webhookRequest))
+            .workflowExecutionId(workflowExecutionId)
+            .workflowTrigger(getWorkflowTrigger(workflowExecutionId, workflowId))
+            .build();
+
+        triggerExecution = preProcess(triggerExecution.evaluate(getInputMap(workflowExecutionId)));
+
+        WorkflowNodeType workflowNodeType = getComponentOperation(workflowExecutionId, workflowId);
+
+        Map<String, Long> connectIdMap = MapUtils.getMap(
+            triggerExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class, Map.of());
+
+        return new Result(triggerExecution, workflowNodeType, connectIdMap);
     }
 
     private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
@@ -177,5 +203,9 @@ public class TriggerSyncExecutor {
         }
 
         return triggerExecution;
+    }
+
+    private record Result(
+        TriggerExecution triggerExecution, WorkflowNodeType workflowNodeType, Map<String, Long> connectIdMap) {
     }
 }

@@ -2943,9 +2943,11 @@ public final class ComponentDSL {
         private TriggerType type;
         private Boolean webhookRawBody;
         private WebhookValidateFunction webhookValidateFunction;
+        private WebhookValidateOnEnableFunction webhookValidateOnEnableFunction;
         private TriggerWorkflowNodeDescriptionFunction workflowNodeDescriptionFunction;
         private Boolean workflowSyncExecution;
         private Boolean workflowSyncValidation;
+        private Boolean workflowSyncOnEnableValidation;
 
         private ModifiableTriggerDefinition(String name) {
             this.name = Objects.requireNonNull(name);
@@ -3116,6 +3118,15 @@ public final class ComponentDSL {
             return this;
         }
 
+        public ModifiableTriggerDefinition webhookValidateOnEnable(
+            WebhookValidateOnEnableFunction webhookValidateEnable) {
+
+            this.webhookValidateOnEnableFunction = webhookValidateEnable;
+            this.workflowSyncOnEnableValidation = true;
+
+            return this;
+        }
+
         public ModifiableTriggerDefinition workflowNodeDescription(
             TriggerWorkflowNodeDescriptionFunction workflowNodeDescription) {
 
@@ -3164,8 +3175,10 @@ public final class ComponentDSL {
                 Objects.equals(title, that.title) && type == that.type &&
                 Objects.equals(webhookRawBody, that.webhookRawBody) &&
                 Objects.equals(webhookValidateFunction, that.webhookValidateFunction) &&
+                Objects.equals(webhookValidateOnEnableFunction, that.webhookValidateOnEnableFunction) &&
                 Objects.equals(workflowNodeDescriptionFunction, that.workflowNodeDescriptionFunction) &&
                 Objects.equals(workflowSyncExecution, that.workflowSyncExecution) &&
+                Objects.equals(workflowSyncOnEnableValidation, that.workflowSyncOnEnableValidation) &&
                 Objects.equals(workflowSyncValidation, that.workflowSyncValidation);
         }
 
@@ -3175,8 +3188,8 @@ public final class ComponentDSL {
                 webhookDisableConsumer, webhookEnableFunction, dynamicWebhookRefreshFunction,
                 webhookRequestFunction, help, listenerDisableConsumer, listenerEnableConsumer, name,
                 outputSchema, outputFunction, sampleOutput, pollFunction, properties, title, type, webhookRawBody,
-                webhookValidateFunction, workflowNodeDescriptionFunction, workflowSyncExecution,
-                workflowSyncValidation);
+                webhookValidateFunction, webhookValidateOnEnableFunction, workflowNodeDescriptionFunction,
+                workflowSyncExecution, workflowSyncOnEnableValidation, workflowSyncValidation);
         }
 
         @Override
@@ -3285,7 +3298,12 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<TriggerWorkflowNodeDescriptionFunction> getWorkflowNodeDescriptionFunction() {
+        public Optional<WebhookValidateOnEnableFunction> getWebhookValidateOnEnable() {
+            return Optional.ofNullable(webhookValidateOnEnableFunction);
+        }
+
+        @Override
+        public Optional<TriggerWorkflowNodeDescriptionFunction> getWorkflowNodeDescription() {
             return Optional.ofNullable(workflowNodeDescriptionFunction);
         }
 
@@ -3297,6 +3315,11 @@ public final class ComponentDSL {
         @Override
         public Optional<Boolean> getWorkflowSyncValidation() {
             return Optional.ofNullable(workflowSyncValidation);
+        }
+
+        @Override
+        public Optional<Boolean> getWorkflowSyncOnEnableValidation() {
+            return Optional.ofNullable(workflowSyncOnEnableValidation);
         }
 
         @Override
@@ -3320,6 +3343,7 @@ public final class ComponentDSL {
                 ", webhookRawBody=" + webhookRawBody +
                 ", workflowSyncExecution=" + workflowSyncExecution +
                 ", workflowSyncValidation=" + workflowSyncValidation +
+                ", workflowSyncEnableValidation=" + workflowSyncOnEnableValidation +
                 '}';
         }
     }

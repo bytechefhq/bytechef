@@ -298,7 +298,19 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         com.bytechef.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
-        return executeWebhookValidate(
+        return executeWebhookValidate(triggerDefinition, new ParametersImpl(inputParameters), webhookRequest, context);
+    }
+
+    @Override
+    public WebhookValidateResponse executeWebhookValidateOnEnable(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest,
+        ComponentConnection connection, @NonNull TriggerContext context) {
+
+        com.bytechef.component.definition.TriggerDefinition triggerDefinition =
+            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
+
+        return executeWebhookValidateOnEnable(
             triggerDefinition, new ParametersImpl(inputParameters), webhookRequest, context);
     }
 
@@ -343,7 +355,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         return new WebhookTriggerFlags(
             triggerDefinition.isWebhookRawBody(), triggerDefinition.isWorkflowSyncExecution(),
-            triggerDefinition.isWorkflowSyncValidation());
+            triggerDefinition.isWorkflowSyncValidation(), triggerDefinition.isWorkflowSyncOnEnableValidation());
     }
 
     @Override
@@ -441,6 +453,18 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             .orElse(WebhookValidateResponse.ok());
     }
 
+    private WebhookValidateResponse executeWebhookValidateOnEnable(
+        com.bytechef.component.definition.TriggerDefinition triggerDefinition, Parameters inputParameters,
+        WebhookRequest webhookRequest, TriggerContext context) {
+
+        return triggerDefinition.getWebhookValidateOnEnable()
+            .map(webhookValidateFunction -> webhookValidateFunction.apply(
+                inputParameters, new HttpHeadersImpl(webhookRequest.headers()),
+                new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(), webhookRequest.method(),
+                context))
+            .orElse(WebhookValidateResponse.ok());
+    }
+
     private static String getComponentTitle(ComponentDefinition componentDefinition) {
         return componentDefinition
             .getTitle()
@@ -507,7 +531,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         return OptionalUtils.orElse(
-            triggerDefinition.getWorkflowNodeDescriptionFunction(),
+            triggerDefinition.getWorkflowNodeDescription(),
             (inputParameters, context) -> getComponentTitle(componentDefinition) + ": " +
                 getTriggerTitle(triggerDefinition));
     }

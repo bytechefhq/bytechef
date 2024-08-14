@@ -115,8 +115,16 @@ public class WebhookController {
                 if (Objects.equals(httpServletRequest.getMethod(), RequestMethod.HEAD.name()) ||
                     !isWorkflowEnabled(id)) {
 
-                    responseEntity = ResponseEntity.ok()
-                        .build();
+                    WebhookTriggerFlags webhookTriggerFlags = getWebhookTriggerFlags(workflowExecutionId);
+
+                    WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
+
+                    if (webhookTriggerFlags.workflowSyncOnEnableValidation()) {
+                        responseEntity = doValidateOnEnable(workflowExecutionId, webhookRequest);
+                    } else {
+                        responseEntity = ResponseEntity.ok()
+                            .build();
+                    }
                 } else {
                     responseEntity = doProcessTrigger(workflowExecutionId, httpServletRequest);
                 }
@@ -129,28 +137,10 @@ public class WebhookController {
         WorkflowExecutionId workflowExecutionId, HttpServletRequest httpServletRequest)
         throws IOException, ServletException {
 
-        WebhookBodyImpl body = null;
-        String contentType = httpServletRequest.getContentType();
-        Map<String, List<String>> headers = getHeaderMap(httpServletRequest);
-        Map<String, List<String>> parameters = toMap(httpServletRequest.getParameterMap());
         ResponseEntity<?> responseEntity;
+        WebhookTriggerFlags webhookTriggerFlags = getWebhookTriggerFlags(workflowExecutionId);
 
-        WorkflowNodeType workflowNodeType = getComponentOperation(workflowExecutionId);
-
-        WebhookTriggerFlags webhookTriggerFlags = triggerDefinitionService.getWebhookTriggerFlags(
-            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-            workflowNodeType.componentOperationName());
-
-        if (contentType != null) {
-            BodyAndParameters bodyAndParameters = getBodyAndParameters(
-                httpServletRequest, contentType, parameters, webhookTriggerFlags);
-
-            body = bodyAndParameters.body;
-            parameters = bodyAndParameters.parameters;
-        }
-
-        WebhookRequest webhookRequest = new WebhookRequest(
-            headers, parameters, body, WebhookMethod.valueOf(httpServletRequest.getMethod()));
+        WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
 
         if (logger.isDebugEnabled()) {
             logger.debug(
@@ -161,16 +151,7 @@ public class WebhookController {
         if (webhookTriggerFlags.workflowSyncExecution()) {
             responseEntity = ResponseEntity.ok(webhookExecutor.executeSync(workflowExecutionId, webhookRequest));
         } else if (webhookTriggerFlags.workflowSyncValidation()) {
-
-            WebhookValidateResponse response = webhookExecutor.validateAndExecuteAsync(
-                workflowExecutionId, webhookRequest);
-
-            responseEntity = ResponseEntity.status(response.status())
-                .headers(
-                    response.headers() == null
-                        ? null
-                        : HttpHeaders.readOnlyHttpHeaders(new MultiValueMapAdapter<>(response.headers())))
-                .body(response.body());
+            responseEntity = doValidateAndExecuteAsync(workflowExecutionId, webhookRequest);
         } else {
             webhookExecutor.execute(workflowExecutionId, webhookRequest);
 
@@ -179,6 +160,63 @@ public class WebhookController {
         }
 
         return responseEntity;
+    }
+
+    private ResponseEntity<?> doValidateAndExecuteAsync(
+        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+
+        WebhookValidateResponse response = webhookExecutor.validateAndExecuteAsync(
+            workflowExecutionId, webhookRequest);
+
+        return ResponseEntity.status(response.status())
+            .headers(
+                response.headers() == null
+                    ? null
+                    : HttpHeaders.readOnlyHttpHeaders(new MultiValueMapAdapter<>(response.headers())))
+            .body(response.body());
+    }
+
+    private ResponseEntity<?> doValidateOnEnable(
+        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+
+        WebhookValidateResponse response = webhookExecutor.validateOnEnable(
+            workflowExecutionId, webhookRequest);
+
+        return ResponseEntity.status(response.status())
+            .headers(
+                response.headers() == null
+                    ? null
+                    : HttpHeaders.readOnlyHttpHeaders(new MultiValueMapAdapter<>(response.headers())))
+            .body(response.body());
+    }
+
+    private WebhookRequest getWebhookRequest(
+        HttpServletRequest httpServletRequest, WebhookTriggerFlags webhookTriggerFlags)
+        throws IOException, ServletException {
+
+        WebhookBodyImpl body = null;
+        String contentType = httpServletRequest.getContentType();
+        Map<String, List<String>> headers = getHeaderMap(httpServletRequest);
+        Map<String, List<String>> parameters = toMap(httpServletRequest.getParameterMap());
+
+        if (contentType != null) {
+            BodyAndParameters bodyAndParameters = getBodyAndParameters(
+                httpServletRequest, contentType, parameters, webhookTriggerFlags);
+
+            body = bodyAndParameters.body;
+            parameters = bodyAndParameters.parameters;
+        }
+
+        return new WebhookRequest(
+            headers, parameters, body, WebhookMethod.valueOf(httpServletRequest.getMethod()));
+    }
+
+    private WebhookTriggerFlags getWebhookTriggerFlags(WorkflowExecutionId workflowExecutionId) {
+        WorkflowNodeType workflowNodeType = getComponentOperation(workflowExecutionId);
+
+        return triggerDefinitionService.getWebhookTriggerFlags(
+            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
+            workflowNodeType.componentOperationName());
     }
 
     @SuppressWarnings("unchecked")

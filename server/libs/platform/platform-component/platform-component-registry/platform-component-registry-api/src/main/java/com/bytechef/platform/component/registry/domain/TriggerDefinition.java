@@ -37,6 +37,7 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
     private boolean workflowNodeDescriptionDefined;
     private boolean workflowSyncExecution;
     private boolean workflowSyncValidation;
+    private boolean workflowSyncOnEnableValidation;
 
     private TriggerDefinition() {
     }
@@ -61,9 +62,11 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
             OptionalUtils.orElse(triggerDefinition.getProperties(), List.of()), Property::toProperty);
         this.webhookRawBody = OptionalUtils.orElse(triggerDefinition.getWebhookRawBody(), false);
         this.workflowNodeDescriptionDefined = OptionalUtils.mapOrElse(
-            triggerDefinition.getWorkflowNodeDescriptionFunction(), nodeDescriptionFunction -> true, false);
+            triggerDefinition.getWorkflowNodeDescription(), nodeDescriptionFunction -> true, false);
         this.workflowSyncExecution = OptionalUtils.orElse(triggerDefinition.getWorkflowSyncExecution(), false);
         this.workflowSyncValidation = OptionalUtils.orElse(triggerDefinition.getWorkflowSyncValidation(), false);
+        this.workflowSyncOnEnableValidation = OptionalUtils.orElse(
+            triggerDefinition.getWorkflowSyncOnEnableValidation(), false);
     }
 
     @Override
@@ -84,14 +87,16 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
             && Objects.equals(properties, that.properties) && webhookRawBody == that.webhookRawBody
             && workflowNodeDescriptionDefined == that.workflowNodeDescriptionDefined
             && workflowSyncExecution == that.workflowSyncExecution
-            && workflowSyncValidation == that.workflowSyncValidation;
+            && workflowSyncValidation == that.workflowSyncValidation
+            && workflowSyncOnEnableValidation == that.workflowSyncOnEnableValidation;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
             super.hashCode(), dynamicOutput, output, outputDefined, properties,
-            webhookRawBody, workflowNodeDescriptionDefined, workflowSyncExecution, workflowSyncValidation);
+            webhookRawBody, workflowNodeDescriptionDefined, workflowSyncExecution, workflowSyncValidation,
+            workflowSyncOnEnableValidation);
     }
 
     public Output getOutput() {
@@ -124,6 +129,10 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
 
     public boolean isWorkflowSyncValidation() {
         return workflowSyncValidation;
+    }
+
+    public boolean isWorkflowSyncOnEnableValidation() {
+        return workflowSyncOnEnableValidation;
     }
 
     @Override
