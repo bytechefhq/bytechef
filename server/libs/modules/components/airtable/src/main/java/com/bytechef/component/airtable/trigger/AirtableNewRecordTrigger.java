@@ -75,7 +75,8 @@ public class AirtableNewRecordTrigger {
         .poll(AirtableNewRecordTrigger::poll);
 
     protected static PollOutput poll(
-        Parameters inputParameters, Parameters closureParameters, TriggerContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
+        TriggerContext context) {
 
         LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, LocalDateTime.now());
         LocalDateTime endDate = LocalDateTime.now();
