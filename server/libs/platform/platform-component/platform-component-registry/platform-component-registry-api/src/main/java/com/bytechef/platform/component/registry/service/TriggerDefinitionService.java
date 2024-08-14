@@ -74,6 +74,10 @@ public interface TriggerDefinitionService {
         @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
         @NonNull TriggerContext context);
 
+    ProviderException executeProcessErrorResponse(
+        String componentName, int componentVersion, String triggerName, int statusCode, Object body,
+        Context triggerContext);
+
     TriggerOutput executeTrigger(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
@@ -95,6 +99,11 @@ public interface TriggerDefinitionService {
         @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest,
         @Nullable ComponentConnection connection, @NonNull TriggerContext context);
 
+    WebhookValidateResponse executeWebhookValidateOnEnable(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest,
+        @Nullable ComponentConnection connection, @NonNull TriggerContext context);
+
     TriggerDefinition getTriggerDefinition(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName);
 
@@ -102,8 +111,4 @@ public interface TriggerDefinitionService {
 
     WebhookTriggerFlags getWebhookTriggerFlags(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName);
-
-    ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, String triggerName, int statusCode, Object body,
-        Context triggerContext);
 }

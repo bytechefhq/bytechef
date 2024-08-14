@@ -20,5 +20,6 @@ package com.bytechef.platform.component.registry.domain;
  * @author Ivica Cardic
  */
 public record WebhookTriggerFlags(
-    boolean webhookRawBody, boolean workflowSyncExecution, boolean workflowSyncValidation) {
+    boolean webhookRawBody, boolean workflowSyncExecution, boolean workflowSyncValidation,
+    boolean workflowSyncOnEnableValidation) {
 }

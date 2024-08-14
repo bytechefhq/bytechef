@@ -116,6 +116,13 @@ public class WebhookExecutorImpl implements WebhookExecutor {
         return response;
     }
 
+    @Override
+    public WebhookValidateResponse validateOnEnable(
+        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+
+        return triggerSyncExecutor.validateOnEnable(workflowExecutionId, webhookRequest);
+    }
+
     @SuppressWarnings("unchecked")
     private static JobParameters createJobParameters(
         WorkflowExecutionId workflowExecutionId, String workflowId, Map<String, ?> inputMap,

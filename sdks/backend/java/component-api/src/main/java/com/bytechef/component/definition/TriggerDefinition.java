@@ -232,7 +232,13 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    Optional<TriggerWorkflowNodeDescriptionFunction> getWorkflowNodeDescriptionFunction();
+    Optional<WebhookValidateOnEnableFunction> getWebhookValidateOnEnable();
+
+    /**
+     *
+     * @return
+     */
+    Optional<TriggerWorkflowNodeDescriptionFunction> getWorkflowNodeDescription();
 
     /**
      * @return
@@ -243,6 +249,12 @@ public interface TriggerDefinition {
      * @return
      */
     Optional<Boolean> getWorkflowSyncValidation();
+
+    /**
+     *
+     * @return
+     */
+    Optional<Boolean> getWorkflowSyncOnEnableValidation();
 
     /**
      *
@@ -570,6 +582,27 @@ public interface TriggerDefinition {
      */
     @FunctionalInterface
     interface WebhookValidateFunction {
+        /**
+         *
+         * @param inputParameters
+         * @param headers
+         * @param parameters
+         * @param body
+         * @param method
+         * @param context
+         * @return the http status, 200 if validation is ok, 400, 401 or any other required status if validation fails
+         */
+        WebhookValidateResponse apply(
+            Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
+            WebhookMethod method, TriggerContext context);
+
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface WebhookValidateOnEnableFunction {
         /**
          *
          * @param inputParameters

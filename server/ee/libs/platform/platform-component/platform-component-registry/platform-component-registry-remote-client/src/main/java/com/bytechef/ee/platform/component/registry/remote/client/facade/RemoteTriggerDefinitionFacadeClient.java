@@ -177,6 +177,14 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
     }
 
     @Override
+    public WebhookValidateResponse executeWebhookValidateOnEnable(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest, Long connectionId) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public String executeWorkflowNodeDescription(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters) {

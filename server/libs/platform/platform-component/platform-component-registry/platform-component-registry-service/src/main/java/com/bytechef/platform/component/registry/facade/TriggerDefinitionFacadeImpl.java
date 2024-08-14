@@ -216,8 +216,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     @Override
     public WebhookValidateResponse executeWebhookValidate(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters,
-        @NonNull WebhookRequest webhookRequest, Long connectionId) {
+        @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest, Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
@@ -232,6 +231,19 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
             componentConnection1 -> contextFactory.createTriggerContext(componentName, componentVersion, triggerName,
                 null,
                 null, null, componentConnection1));
+    }
+
+    @Override
+    public WebhookValidateResponse executeWebhookValidateOnEnable(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest, Long connectionId) {
+
+        ComponentConnection componentConnection = getComponentConnection(connectionId);
+
+        return triggerDefinitionService.executeWebhookValidateOnEnable(
+            componentName, componentVersion, triggerName, inputParameters, webhookRequest,
+            componentConnection, contextFactory.createTriggerContext(componentName, componentVersion, triggerName, null,
+                null, null, componentConnection));
     }
 
     @Override
