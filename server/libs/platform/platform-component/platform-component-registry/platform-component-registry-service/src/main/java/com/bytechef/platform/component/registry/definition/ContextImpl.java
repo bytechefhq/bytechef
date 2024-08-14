@@ -27,9 +27,13 @@ import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.registry.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.LoggerFactory;
@@ -219,6 +223,26 @@ public class ContextImpl implements Context {
             @Override
             public Executor queryParameters(Map<String, List<String>> queryParameters) {
                 this.queryParameters = new HashMap<>(Validate.notNull(queryParameters, "queryParameters"));
+
+                return this;
+            }
+
+            @Override
+            public Executor queryParameters(Object... keyValueArray) {
+                Objects.requireNonNull(keyValueArray);
+
+                if (keyValueArray.length % 2 != 0) {
+                    throw new IllegalArgumentException();
+                }
+
+                this.queryParameters = IntStream
+                    .range(0, keyValueArray.length / 2)
+                    .filter(i -> keyValueArray[i * 2] != null && keyValueArray[i * 2 + 1] != null)
+                    .collect(
+                        HashMap::new,
+                        (map, i) -> map.put(String.valueOf(keyValueArray[i * 2]),
+                            List.of(URLEncoder.encode((String) keyValueArray[i * 2 + 1], StandardCharsets.UTF_8))),
+                        HashMap::putAll);
 
                 return this;
             }
