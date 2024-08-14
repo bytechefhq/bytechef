@@ -6,4 +6,7 @@ dependencies {
     implementation("com.google.apis:google-api-services-gmail:v1-rev20220404-2.0.0")
     implementation("org.eclipse.angus:angus-mail:2.0.2")
     api(project(":server:libs:modules:components:google:google-commons"))
+
+    testImplementation(project(":server:libs:platform:platform-component:platform-component-registry:platform-component-registry-service"))
+    testImplementation(project(":server:libs:test:test-support"))
 }
