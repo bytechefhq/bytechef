@@ -29,12 +29,11 @@ import com.bytechef.component.definition.PropertiesDataSource;
 import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookRefreshFunction;
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookRequestFunction;
+import com.bytechef.component.definition.TriggerDefinition.WebhookRequestFunction;
 import com.bytechef.component.definition.TriggerDefinition.ListenerDisableConsumer;
 import com.bytechef.component.definition.TriggerDefinition.ListenerEnableConsumer;
 import com.bytechef.component.definition.TriggerDefinition.PollFunction;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
-import com.bytechef.component.definition.TriggerDefinition.StaticWebhookRequestFunction;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookDisableConsumer;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableFunction;
@@ -231,16 +230,11 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             }
         }
 
-        if (TriggerType.DYNAMIC_WEBHOOK == triggerType) {
-            triggerOutput = triggerDefinition.getDynamicWebhookRequest()
-                .map(dynamicWebhookRequestFunction -> executeDynamicWebhookTrigger(
+        if (TriggerType.DYNAMIC_WEBHOOK == triggerType || TriggerType.STATIC_WEBHOOK == triggerType) {
+            triggerOutput = triggerDefinition.getDWebhookRequest()
+                .map(webhookRequestFunction -> executeWebhookTrigger(
                     triggerDefinition, inputParameters, toDynamicWebhookEnableOutput((Map<?, ?>) triggerState),
-                    webhookRequest, connection, context, dynamicWebhookRequestFunction))
-                .orElseThrow();
-        } else if (TriggerType.STATIC_WEBHOOK == triggerType) {
-            triggerOutput = triggerDefinition.getStaticWebhookRequest()
-                .map(staticWebhookRequestFunction -> executeStaticWebhookTrigger(
-                    triggerDefinition, inputParameters, webhookRequest, context, staticWebhookRequestFunction))
+                    webhookRequest, connection, context, webhookRequestFunction))
                 .orElseThrow();
         } else if (TriggerType.POLLING == triggerType || TriggerType.HYBRID == triggerType) {
             triggerOutput = triggerDefinition.getPoll()
@@ -374,29 +368,6 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         }
     }
 
-    private static TriggerOutput executeDynamicWebhookTrigger(
-        com.bytechef.component.definition.TriggerDefinition triggerDefinition,
-        Map<String, ?> inputParameters, WebhookEnableOutput output, WebhookRequest webhookRequest,
-        ComponentConnection connection, TriggerContext triggerContext,
-        DynamicWebhookRequestFunction dynamicWebhookRequestFunction) {
-
-        Object webhookOutput;
-
-        try {
-            webhookOutput = dynamicWebhookRequestFunction.apply(
-                new ParametersImpl(inputParameters),
-                connection == null ? null : new ParametersImpl(connection.parameters()),
-                new HttpHeadersImpl(webhookRequest.headers()),
-                new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(), webhookRequest.method(),
-                output, triggerContext);
-        } catch (Exception e) {
-            throw new ComponentExecutionException(
-                e, inputParameters, TriggerDefinitionErrorType.EXECUTE_DYNAMIC_WEBHOOK_TRIGGER);
-        }
-
-        return new TriggerOutput(webhookOutput, null, OptionalUtils.orElse(triggerDefinition.getBatch(), false));
-    }
-
     private static TriggerOutput executePollingTrigger(
         com.bytechef.component.definition.TriggerDefinition triggerDefinition,
         Map<String, ?> inputParameters, ComponentConnection connection, Map<String, ?> closureParameters,
@@ -435,21 +406,24 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             records, pollOutput.closureParameters(), OptionalUtils.orElse(triggerDefinition.getBatch(), false));
     }
 
-    private static TriggerOutput executeStaticWebhookTrigger(
+    private static TriggerOutput executeWebhookTrigger(
         com.bytechef.component.definition.TriggerDefinition triggerDefinition,
-        Map<String, ?> inputParameters, WebhookRequest webhookRequest, TriggerContext triggerContext,
-        StaticWebhookRequestFunction staticWebhookRequestFunction) {
+        Map<String, ?> inputParameters, WebhookEnableOutput output, WebhookRequest webhookRequest,
+        ComponentConnection connection, TriggerContext triggerContext,
+        WebhookRequestFunction webhookRequestFunction) {
 
         Object webhookOutput;
 
         try {
-            webhookOutput = staticWebhookRequestFunction.apply(
-                new ParametersImpl(inputParameters), new HttpHeadersImpl(webhookRequest.headers()),
+            webhookOutput = webhookRequestFunction.apply(
+                new ParametersImpl(inputParameters),
+                connection == null ? null : new ParametersImpl(connection.parameters()),
+                new HttpHeadersImpl(webhookRequest.headers()),
                 new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(), webhookRequest.method(),
-                triggerContext);
+                output, triggerContext);
         } catch (Exception e) {
             throw new ComponentExecutionException(
-                e, inputParameters, TriggerDefinitionErrorType.EXECUTE_STATIC_WEBHOOK_ERROR_TYPE);
+                e, inputParameters, TriggerDefinitionErrorType.EXECUTE_DYNAMIC_WEBHOOK_TRIGGER);
         }
 
         return new TriggerOutput(webhookOutput, null, OptionalUtils.orElse(triggerDefinition.getBatch(), false));

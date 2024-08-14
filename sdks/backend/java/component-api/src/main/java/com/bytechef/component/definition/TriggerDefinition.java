@@ -149,7 +149,7 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    Optional<DynamicWebhookRequestFunction> getDynamicWebhookRequest();
+    Optional<WebhookRequestFunction> getDWebhookRequest();
 
     /**
      *
@@ -204,12 +204,6 @@ public interface TriggerDefinition {
      * @return
      */
     Optional<List<? extends Property>> getProperties();
-
-    /**
-     *
-     * @return
-     */
-    Optional<StaticWebhookRequestFunction> getStaticWebhookRequest();
 
     /**
      *
@@ -276,30 +270,6 @@ public interface TriggerDefinition {
     interface DynamicWebhookRefreshFunction {
 
         WebhookEnableOutput apply(Parameters outputParameters, TriggerContext context);
-    }
-
-    /**
-     *
-     */
-    @FunctionalInterface
-    interface DynamicWebhookRequestFunction {
-
-        /**
-         *
-         * @param inputParameters
-         * @param connectionParameters
-         * @param headers
-         * @param parameters
-         * @param body
-         * @param method
-         * @param output
-         * @param context
-         * @return
-         */
-        Object apply(
-            Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
-            HttpParameters parameters, WebhookBody body, WebhookMethod method, WebhookEnableOutput output,
-            TriggerContext context) throws Exception;
     }
 
     /**
@@ -523,28 +493,6 @@ public interface TriggerDefinition {
      *
      */
     @FunctionalInterface
-    interface StaticWebhookRequestFunction {
-
-        /**
-         *
-         * @param inputParameters
-         * @param headers
-         * @param parameters
-         * @param body
-         * @param method
-         * @param context
-         * @return
-         */
-        Object apply(
-            Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
-            WebhookMethod method, TriggerContext context) throws Exception;
-
-    }
-
-    /**
-     *
-     */
-    @FunctionalInterface
     interface StaticWebhookTriggerOutputFunction extends TriggerOutputFunction {
 
         /**
@@ -611,6 +559,30 @@ public interface TriggerDefinition {
             RAW,
             XML
         }
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface WebhookRequestFunction {
+
+        /**
+         *
+         * @param inputParameters
+         * @param connectionParameters
+         * @param headers
+         * @param parameters
+         * @param body
+         * @param method
+         * @param output
+         * @param context
+         * @return
+         */
+        Object apply(
+            Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
+            HttpParameters parameters, WebhookBody body, WebhookMethod method, WebhookEnableOutput output,
+            TriggerContext context) throws Exception;
     }
 
     /**

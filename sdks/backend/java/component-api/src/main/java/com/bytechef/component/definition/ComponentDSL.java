@@ -2936,7 +2936,7 @@ public final class ComponentDSL {
         private WebhookDisableConsumer webhookDisableConsumer;
         private WebhookEnableFunction webhookEnableFunction;
         private DynamicWebhookRefreshFunction dynamicWebhookRefreshFunction;
-        private DynamicWebhookRequestFunction dynamicWebhookRequestFunction;
+        private WebhookRequestFunction webhookRequestFunction;
         private Help help;
         private TriggerDefinition.ProcessErrorResponseFunction processErrorResponseFunction;
         private ListenerDisableConsumer listenerDisableConsumer;
@@ -2947,7 +2947,6 @@ public final class ComponentDSL {
         private PollFunction pollFunction;
         private List<? extends Property> properties;
         private Object sampleOutput;
-        private StaticWebhookRequestFunction staticWebhookRequestFunction;
         private String title;
         private TriggerType type;
         private Boolean webhookRawBody;
@@ -2986,12 +2985,6 @@ public final class ComponentDSL {
 
         public ModifiableTriggerDefinition dynamicWebhookRefresh(DynamicWebhookRefreshFunction dynamicWebhookRefresh) {
             this.dynamicWebhookRefreshFunction = dynamicWebhookRefresh;
-
-            return this;
-        }
-
-        public ModifiableTriggerDefinition dynamicWebhookRequest(DynamicWebhookRequestFunction dynamicWebhookRequest) {
-            this.dynamicWebhookRequestFunction = dynamicWebhookRequest;
 
             return this;
         }
@@ -3095,12 +3088,6 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableTriggerDefinition staticWebhookRequest(StaticWebhookRequestFunction staticWebhookRequest) {
-            this.staticWebhookRequestFunction = staticWebhookRequest;
-
-            return this;
-        }
-
         public ModifiableTriggerDefinition title(String title) {
             this.title = title;
 
@@ -3127,6 +3114,12 @@ public final class ComponentDSL {
 
         public ModifiableTriggerDefinition webhookRawBody(boolean webhookRawBody) {
             this.webhookRawBody = webhookRawBody;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition webhookRequest(WebhookRequestFunction dynamicWebhookRequest) {
+            this.webhookRequestFunction = dynamicWebhookRequest;
 
             return this;
         }
@@ -3175,7 +3168,7 @@ public final class ComponentDSL {
                 Objects.equals(webhookDisableConsumer, that.webhookDisableConsumer) &&
                 Objects.equals(webhookEnableFunction, that.webhookEnableFunction) &&
                 Objects.equals(dynamicWebhookRefreshFunction, that.dynamicWebhookRefreshFunction) &&
-                Objects.equals(dynamicWebhookRequestFunction, that.dynamicWebhookRequestFunction) &&
+                Objects.equals(webhookRequestFunction, that.webhookRequestFunction) &&
                 Objects.equals(help, that.help) &&
                 Objects.equals(listenerDisableConsumer, that.listenerDisableConsumer) &&
                 Objects.equals(listenerEnableConsumer, that.listenerEnableConsumer) &&
@@ -3183,7 +3176,6 @@ public final class ComponentDSL {
                 Objects.equals(outputFunction, that.outputFunction) &&
                 Objects.equals(sampleOutput, that.sampleOutput) &&
                 Objects.equals(pollFunction, that.pollFunction) && Objects.equals(properties, that.properties) &&
-                Objects.equals(staticWebhookRequestFunction, that.staticWebhookRequestFunction) &&
                 Objects.equals(title, that.title) && type == that.type &&
                 Objects.equals(webhookRawBody, that.webhookRawBody) &&
                 Objects.equals(webhookValidateFunction, that.webhookValidateFunction) &&
@@ -3196,10 +3188,10 @@ public final class ComponentDSL {
         public int hashCode() {
             return Objects.hash(batch, deduplicateFunction, deprecated, description, dynamicOutput,
                 webhookDisableConsumer, webhookEnableFunction, dynamicWebhookRefreshFunction,
-                dynamicWebhookRequestFunction, help, listenerDisableConsumer, listenerEnableConsumer, name,
-                outputSchema, outputFunction, sampleOutput, pollFunction, properties, staticWebhookRequestFunction,
-                title, type, webhookRawBody, webhookValidateFunction, workflowNodeDescriptionFunction,
-                workflowSyncExecution, workflowSyncValidation);
+                webhookRequestFunction, help, listenerDisableConsumer, listenerEnableConsumer, name,
+                outputSchema, outputFunction, sampleOutput, pollFunction, properties, title, type, webhookRawBody,
+                webhookValidateFunction, workflowNodeDescriptionFunction, workflowSyncExecution,
+                workflowSyncValidation);
         }
 
         @Override
@@ -3235,11 +3227,6 @@ public final class ComponentDSL {
         @Override
         public Optional<DynamicWebhookRefreshFunction> getDynamicWebhookRefresh() {
             return Optional.ofNullable(dynamicWebhookRefreshFunction);
-        }
-
-        @Override
-        public Optional<DynamicWebhookRequestFunction> getDynamicWebhookRequest() {
-            return Optional.ofNullable(dynamicWebhookRequestFunction);
         }
 
         @Override
@@ -3288,11 +3275,6 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<StaticWebhookRequestFunction> getStaticWebhookRequest() {
-            return Optional.ofNullable(staticWebhookRequestFunction);
-        }
-
-        @Override
         public Optional<String> getTitle() {
             return Optional.ofNullable(title);
         }
@@ -3305,6 +3287,11 @@ public final class ComponentDSL {
         @Override
         public Optional<Boolean> getWebhookRawBody() {
             return Optional.ofNullable(webhookRawBody);
+        }
+
+        @Override
+        public Optional<WebhookRequestFunction> getDWebhookRequest() {
+            return Optional.ofNullable(webhookRequestFunction);
         }
 
         @Override
