@@ -2933,8 +2933,8 @@ public final class ComponentDSL {
         private boolean dynamicOutput;
         private Boolean deprecated;
         private String description;
-        private DynamicWebhookDisableConsumer dynamicWebhookDisableConsumer;
-        private DynamicWebhookEnableFunction dynamicWebhookEnableFunction;
+        private WebhookDisableConsumer webhookDisableConsumer;
+        private WebhookEnableFunction webhookEnableFunction;
         private DynamicWebhookRefreshFunction dynamicWebhookRefreshFunction;
         private DynamicWebhookRequestFunction dynamicWebhookRequestFunction;
         private Help help;
@@ -2980,18 +2980,6 @@ public final class ComponentDSL {
 
         public ModifiableTriggerDefinition description(String description) {
             this.description = description;
-
-            return this;
-        }
-
-        public ModifiableTriggerDefinition dynamicWebhookDisable(DynamicWebhookDisableConsumer dynamicWebhookDisable) {
-            this.dynamicWebhookDisableConsumer = dynamicWebhookDisable;
-
-            return this;
-        }
-
-        public ModifiableTriggerDefinition dynamicWebhookEnable(DynamicWebhookEnableFunction dynamicWebhookEnable) {
-            this.dynamicWebhookEnableFunction = dynamicWebhookEnable;
 
             return this;
         }
@@ -3125,6 +3113,18 @@ public final class ComponentDSL {
             return this;
         }
 
+        public ModifiableTriggerDefinition webhookDisable(WebhookDisableConsumer webhookDisable) {
+            this.webhookDisableConsumer = webhookDisable;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition webhookEnable(WebhookEnableFunction webhookEnable) {
+            this.webhookEnableFunction = webhookEnable;
+
+            return this;
+        }
+
         public ModifiableTriggerDefinition webhookRawBody(boolean webhookRawBody) {
             this.webhookRawBody = webhookRawBody;
 
@@ -3172,8 +3172,8 @@ public final class ComponentDSL {
                 Objects.equals(deduplicateFunction, that.deduplicateFunction) &&
                 Objects.equals(deprecated, that.deprecated) && Objects.equals(description, that.description) &&
                 Objects.equals(dynamicOutput, that.dynamicOutput) &&
-                Objects.equals(dynamicWebhookDisableConsumer, that.dynamicWebhookDisableConsumer) &&
-                Objects.equals(dynamicWebhookEnableFunction, that.dynamicWebhookEnableFunction) &&
+                Objects.equals(webhookDisableConsumer, that.webhookDisableConsumer) &&
+                Objects.equals(webhookEnableFunction, that.webhookEnableFunction) &&
                 Objects.equals(dynamicWebhookRefreshFunction, that.dynamicWebhookRefreshFunction) &&
                 Objects.equals(dynamicWebhookRequestFunction, that.dynamicWebhookRequestFunction) &&
                 Objects.equals(help, that.help) &&
@@ -3195,7 +3195,7 @@ public final class ComponentDSL {
         @Override
         public int hashCode() {
             return Objects.hash(batch, deduplicateFunction, deprecated, description, dynamicOutput,
-                dynamicWebhookDisableConsumer, dynamicWebhookEnableFunction, dynamicWebhookRefreshFunction,
+                webhookDisableConsumer, webhookEnableFunction, dynamicWebhookRefreshFunction,
                 dynamicWebhookRequestFunction, help, listenerDisableConsumer, listenerEnableConsumer, name,
                 outputSchema, outputFunction, sampleOutput, pollFunction, properties, staticWebhookRequestFunction,
                 title, type, webhookRawBody, webhookValidateFunction, workflowNodeDescriptionFunction,
@@ -3223,13 +3223,13 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<DynamicWebhookDisableConsumer> getDynamicWebhookDisable() {
-            return Optional.ofNullable(dynamicWebhookDisableConsumer);
+        public Optional<WebhookDisableConsumer> getWebhookDisable() {
+            return Optional.ofNullable(webhookDisableConsumer);
         }
 
         @Override
-        public Optional<DynamicWebhookEnableFunction> getDynamicWebhookEnable() {
-            return Optional.ofNullable(dynamicWebhookEnableFunction);
+        public Optional<WebhookEnableFunction> getWebhookEnable() {
+            return Optional.ofNullable(webhookEnableFunction);
         }
 
         @Override
