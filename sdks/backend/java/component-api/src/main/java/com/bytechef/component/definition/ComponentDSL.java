@@ -3025,7 +3025,7 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableTriggerDefinition output(DynamicWebhookTriggerOutputFunction output) {
+        public ModifiableTriggerDefinition output(WebhookTriggerOutputFunction output) {
             this.outputFunction = output;
             this.dynamicOutput = false;
 
@@ -3040,13 +3040,6 @@ public final class ComponentDSL {
         }
 
         public ModifiableTriggerDefinition output(PollTriggerOutputFunction output) {
-            this.outputFunction = output;
-            this.dynamicOutput = false;
-
-            return this;
-        }
-
-        public ModifiableTriggerDefinition output(StaticWebhookTriggerOutputFunction output) {
             this.outputFunction = output;
             this.dynamicOutput = false;
 
