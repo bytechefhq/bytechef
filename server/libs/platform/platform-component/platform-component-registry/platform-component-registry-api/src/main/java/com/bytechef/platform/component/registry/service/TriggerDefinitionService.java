@@ -46,7 +46,7 @@ public interface TriggerDefinitionService {
 
     WebhookEnableOutput executeDynamicWebhookRefresh(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> outputParameters, @NonNull TriggerContext context);
+        ComponentConnection connection, @NonNull Map<String, ?> outputParameters, @NonNull TriggerContext context);
 
     String executeWorkflowNodeDescription(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,

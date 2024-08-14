@@ -66,7 +66,7 @@ public class RemoteTriggerSchedulerClient implements TriggerScheduler {
     @Override
     public void scheduleDynamicWebhookTriggerRefresh(
         LocalDateTime webhookExpirationDate, String componentName, int componentVersion,
-        WorkflowExecutionId workflowExecutionId) {
+        WorkflowExecutionId workflowExecutionId, Long connectionId) {
 
         loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
@@ -74,7 +74,7 @@ public class RemoteTriggerSchedulerClient implements TriggerScheduler {
                 .path(TRIGGER_SCHEDULER + "/schedule-dynamic-webhook-trigger-refresh")
                 .build(),
             new DynamicWebhookRefreshTaskRequest(
-                workflowExecutionId, webhookExpirationDate, componentName, componentVersion));
+                workflowExecutionId, webhookExpirationDate, componentName, componentVersion, connectionId));
     }
 
     @Override
@@ -102,7 +102,7 @@ public class RemoteTriggerSchedulerClient implements TriggerScheduler {
     @SuppressFBWarnings("EI")
     private record DynamicWebhookRefreshTaskRequest(
         WorkflowExecutionId workflowExecutionId, LocalDateTime webhookExpirationDate, String componentName,
-        int componentVersion) {
+        int componentVersion, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")

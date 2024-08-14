@@ -281,7 +281,14 @@ public interface TriggerDefinition {
     @FunctionalInterface
     interface DynamicWebhookRefreshFunction {
 
-        WebhookEnableOutput apply(Parameters outputParameters, TriggerContext context);
+        /**
+         *
+         * @param connectionParameters
+         * @param outputParameters
+         * @param context
+         * @return
+         */
+        WebhookEnableOutput apply(Parameters connectionParameters, Parameters outputParameters, TriggerContext context);
     }
 
     /**

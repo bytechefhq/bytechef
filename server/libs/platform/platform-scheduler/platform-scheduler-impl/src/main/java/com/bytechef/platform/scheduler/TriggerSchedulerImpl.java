@@ -71,11 +71,12 @@ public class TriggerSchedulerImpl implements TriggerScheduler {
     @Override
     public void scheduleDynamicWebhookTriggerRefresh(
         LocalDateTime webhookExpirationDate, String componentName, int componentVersion,
-        WorkflowExecutionId workflowExecutionId) {
+        WorkflowExecutionId workflowExecutionId, Long connectionId) {
 
         JobDetail jobDetail = JobBuilder.newJob(DynamicWebhookTriggerRefreshJob.class)
             .withIdentity(JobKey.jobKey(workflowExecutionId.toString(), "ScheduleTrigger"))
             .usingJobData("workflowExecutionId", workflowExecutionId.toString())
+            .usingJobData("connectionId", connectionId)
             .build();
 
         Trigger trigger = TriggerBuilder.newTrigger()

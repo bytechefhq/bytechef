@@ -78,7 +78,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     @Override
     public WebhookEnableOutput executeDynamicWebhookRefresh(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> outputParameters, @NonNull TriggerContext context) {
+        ComponentConnection connection, @NonNull Map<String, ?> outputParameters, @NonNull TriggerContext context) {
 
         throw new UnsupportedOperationException();
     }

@@ -118,12 +118,13 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @Override
     public WebhookEnableOutput executeDynamicWebhookRefresh(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> outputParameters, @NonNull TriggerContext context) {
+        ComponentConnection connection, @NonNull Map<String, ?> outputParameters, @NonNull TriggerContext context) {
 
         DynamicWebhookRefreshFunction dynamicWebhookRefreshFunction = getDynamicWebhookRefreshFunction(
             componentName, componentVersion, triggerName);
 
         return dynamicWebhookRefreshFunction.apply(
+            connection == null ? null : new ParametersImpl(connection.parameters()),
             new ParametersImpl(outputParameters), context);
     }
 

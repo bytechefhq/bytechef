@@ -33,7 +33,7 @@ public interface TriggerScheduler {
 
     void scheduleDynamicWebhookTriggerRefresh(
         LocalDateTime webhookExpirationDate, String componentName, int componentVersion,
-        WorkflowExecutionId workflowExecutionId);
+        WorkflowExecutionId workflowExecutionId, Long connectionId);
 
     void scheduleScheduleTrigger(
         String pattern, String zoneId, Map<String, Object> output, WorkflowExecutionId workflowExecutionId);

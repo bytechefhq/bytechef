@@ -59,12 +59,12 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
     @Override
     public WebhookEnableOutput executeDynamicWebhookRefresh(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> outputParameters) {
+        @NonNull Map<String, ?> outputParameters, Long connectionId) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-dynamic-webhook-refresh"),
-            new DynamicWebhookRefresh(componentName, componentVersion, triggerName, outputParameters),
+            new DynamicWebhookRefresh(componentName, componentVersion, triggerName, outputParameters, connectionId),
             WebhookEnableOutput.class);
     }
 
@@ -238,7 +238,8 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
     }
 
     private record DynamicWebhookRefresh(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> outputParameters) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> outputParameters,
+        Long connectionId) {
     }
 
     private record ListenerDisableRequest(

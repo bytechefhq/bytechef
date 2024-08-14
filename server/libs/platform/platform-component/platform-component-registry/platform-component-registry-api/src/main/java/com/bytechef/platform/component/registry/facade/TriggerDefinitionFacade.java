@@ -52,7 +52,7 @@ public interface TriggerDefinitionFacade extends OperationDefinitionFacade {
      */
     TriggerDefinition.WebhookEnableOutput executeDynamicWebhookRefresh(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> outputParameters);
+        @NonNull Map<String, ?> outputParameters, Long connectionId);
 
     void executeListenerDisable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
