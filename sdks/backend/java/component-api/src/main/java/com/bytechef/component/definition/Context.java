@@ -720,6 +720,13 @@ public interface Context {
 
             /**
              *
+             * @param keyValueArray
+             * @return
+             */
+            Executor queryParameters(Object... keyValueArray);
+
+            /**
+             *
              * @param body
              * @return
              */
