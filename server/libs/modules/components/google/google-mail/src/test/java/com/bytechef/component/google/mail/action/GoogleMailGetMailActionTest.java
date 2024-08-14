@@ -23,10 +23,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.test.component.properties.ParametersFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -46,14 +49,8 @@ class GoogleMailGetMailActionTest extends AbstractGoogleMailActionTest {
 
     @Test
     void testPerform() throws IOException {
-        List<String> metadata = List.of("metadata");
-
-        when(mockedParameters.getRequiredString(ID))
-            .thenReturn("id");
-        when(mockedParameters.getString(FORMAT))
-            .thenReturn("minimal");
-        when(mockedParameters.getList(METADATA_HEADERS, String.class, List.of()))
-            .thenReturn(metadata);
+        Parameters parameters = ParametersFactory.createParameters(
+            Map.of(ID, "id", FORMAT, "minimal", METADATA_HEADERS, List.of("metadata")));
 
         when(mockedGmail.users())
             .thenReturn(mockedUsers);
@@ -68,12 +65,12 @@ class GoogleMailGetMailActionTest extends AbstractGoogleMailActionTest {
         when(mockedGet.execute())
             .thenReturn(mockedMessage);
 
-        Message message = GoogleMailGetMailAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Message message = GoogleMailGetMailAction.perform(parameters, parameters, mockedContext);
 
         assertEquals(mockedMessage, message);
         assertEquals("me", userIdArgumentCaptor.getValue());
         assertEquals("id", idArgumentCaptor.getValue());
         assertEquals("minimal", formatArgumentCaptor.getValue());
-        assertEquals(metadata, metadataArgumentCaptor.getValue());
+        assertEquals(parameters.getList(METADATA_HEADERS), metadataArgumentCaptor.getValue());
     }
 }

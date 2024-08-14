@@ -24,11 +24,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.test.component.properties.ParametersFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import jakarta.mail.MessagingException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -46,17 +49,6 @@ class GoogleMailSendEmailActionTest extends AbstractGoogleMailActionTest {
 
     @Test
     void testPerform() throws IOException, MessagingException {
-        List<String> toList = List.of("to@mail.com");
-
-        when(mockedParameters.getRequiredString(FROM))
-            .thenReturn("from@mail.com");
-        when(mockedParameters.getRequiredList(TO, String.class))
-            .thenReturn(toList);
-        when(mockedParameters.getRequiredString(SUBJECT))
-            .thenReturn("subject");
-        when(mockedParameters.getRequiredString(BODY))
-            .thenReturn("body");
-
         when(mockedGmail.users())
             .thenReturn(mockedUsers);
         when(mockedUsers.messages())
@@ -66,7 +58,12 @@ class GoogleMailSendEmailActionTest extends AbstractGoogleMailActionTest {
         when(mockedSend.execute())
             .thenReturn(mockedMessage);
 
-        Message message = GoogleMailSendEmailAction.perform(mockedParameters, mockedParameters, mockedContext);
+        List<String> toList = List.of("to@mail.com");
+
+        Parameters parameters = ParametersFactory.createParameters(
+            Map.of(FROM, "from@mail.com", TO, toList, SUBJECT, "subject", BODY, "body"));
+
+        Message message = GoogleMailSendEmailAction.perform(parameters, parameters, mockedContext);
 
         assertEquals(mockedMessage, message);
         assertEquals("me", userIdArgumentCaptor.getValue());

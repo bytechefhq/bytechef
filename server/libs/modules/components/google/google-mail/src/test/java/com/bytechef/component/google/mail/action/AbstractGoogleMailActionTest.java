@@ -16,10 +16,9 @@
 
 package com.bytechef.component.google.mail.action;
 
-import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
@@ -37,17 +36,13 @@ public abstract class AbstractGoogleMailActionTest {
     protected MockedStatic<GoogleServices> googleServicesMockedStatic;
     protected ActionContext mockedContext = mock(ActionContext.class);
     protected Gmail mockedGmail = mock(Gmail.class);
-    protected Parameters mockedParameters = mock(Parameters.class);
 
     @BeforeEach
     public void beforeEach() {
         googleServicesMockedStatic = mockStatic(GoogleServices.class);
 
-        when(mockedParameters.getRequiredString(ACCESS_TOKEN))
-            .thenReturn("accessToken");
-
         googleServicesMockedStatic
-            .when(() -> GoogleServices.getMail(mockedParameters))
+            .when(() -> GoogleServices.getMail(any(Parameters.class)))
             .thenReturn(mockedGmail);
     }
 
