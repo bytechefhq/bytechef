@@ -43,6 +43,54 @@ public interface TriggerDefinition {
     /**
      *
      */
+    @FunctionalInterface
+    interface WebhookDisableConsumer {
+
+        /**
+         *
+         * @param inputParameters
+         * @param connectionParameters
+         * @param outputParameters
+         * @param workflowExecutionId
+         */
+        void accept(
+            Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
+            String workflowExecutionId, TriggerContext context);
+
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface WebhookEnableFunction {
+
+        /**
+         *
+         * @param inputParameters
+         * @param connectionParameters
+         * @param webhookUrl
+         * @param workflowExecutionId
+         * @return
+         */
+        WebhookEnableOutput apply(
+            Parameters inputParameters, Parameters connectionParameters, String webhookUrl, String workflowExecutionId,
+            TriggerContext context);
+
+    }
+
+    /**
+     *
+     * @param parameters
+     * @param webhookExpirationDate
+     */
+    @SuppressFBWarnings("EI")
+    record WebhookEnableOutput(Map<String, ?> parameters, LocalDateTime webhookExpirationDate) {
+    }
+
+    /**
+     *
+     */
     enum WebhookMethod {
         DELETE,
         GET,
@@ -83,13 +131,13 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    Optional<DynamicWebhookDisableConsumer> getDynamicWebhookDisable();
+    Optional<WebhookDisableConsumer> getWebhookDisable();
 
     /**
      *
      * @return
      */
-    Optional<DynamicWebhookEnableFunction> getDynamicWebhookEnable();
+    Optional<WebhookEnableFunction> getWebhookEnable();
 
     /**
      *
@@ -225,57 +273,9 @@ public interface TriggerDefinition {
      *
      */
     @FunctionalInterface
-    interface DynamicWebhookDisableConsumer {
-
-        /**
-         *
-         * @param inputParameters
-         * @param connectionParameters
-         * @param outputParameters
-         * @param workflowExecutionId
-         */
-        void accept(
-            Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
-            String workflowExecutionId, TriggerContext context);
-
-    }
-
-    /**
-     *
-     */
-    @FunctionalInterface
-    interface DynamicWebhookEnableFunction {
-
-        /**
-         *
-         * @param inputParameters
-         * @param connectionParameters
-         * @param webhookUrl
-         * @param workflowExecutionId
-         * @return
-         */
-        DynamicWebhookEnableOutput apply(
-            Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
-            String workflowExecutionId, TriggerContext context);
-
-    }
-
-    /**
-     *
-     * @param parameters
-     * @param webhookExpirationDate
-     */
-    @SuppressFBWarnings("EI")
-    record DynamicWebhookEnableOutput(Map<String, ?> parameters, LocalDateTime webhookExpirationDate) {
-    }
-
-    /**
-     *
-     */
-    @FunctionalInterface
     interface DynamicWebhookRefreshFunction {
 
-        DynamicWebhookEnableOutput apply(Parameters outputParameters, TriggerContext context);
+        WebhookEnableOutput apply(Parameters outputParameters, TriggerContext context);
     }
 
     /**
@@ -298,7 +298,7 @@ public interface TriggerDefinition {
          */
         Object apply(
             Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
-            HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
+            HttpParameters parameters, WebhookBody body, WebhookMethod method, WebhookEnableOutput output,
             TriggerContext context) throws Exception;
     }
 
@@ -321,7 +321,7 @@ public interface TriggerDefinition {
          */
         OutputResponse apply(
             Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
-            HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
+            HttpParameters parameters, WebhookBody body, WebhookMethod method, WebhookEnableOutput output,
             TriggerContext context) throws Exception;
     }
 
