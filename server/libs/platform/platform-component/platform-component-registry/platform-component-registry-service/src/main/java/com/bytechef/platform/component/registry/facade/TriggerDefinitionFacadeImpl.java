@@ -76,10 +76,12 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     @Override
     public WebhookEnableOutput executeDynamicWebhookRefresh(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> outputParameters) {
+        @NonNull Map<String, ?> outputParameters, Long connectionId) {
+
+        ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return triggerDefinitionService.executeDynamicWebhookRefresh(
-            componentName, componentVersion, triggerName, outputParameters,
+            componentName, componentVersion, triggerName, componentConnection, outputParameters,
             contextFactory.createTriggerContext(componentName, componentVersion, triggerName, null, null, null,
                 null));
     }

@@ -77,7 +77,8 @@ public class RemoteTriggerDefinitionFacadeController {
 
         return ResponseEntity.ok(triggerDefinitionFacade.executeDynamicWebhookRefresh(
             dynamicWebhookRefreshRequest.componentName, dynamicWebhookRefreshRequest.componentVersion,
-            dynamicWebhookRefreshRequest.triggerName, dynamicWebhookRefreshRequest.outputParameters));
+            dynamicWebhookRefreshRequest.triggerName, dynamicWebhookRefreshRequest.outputParameters,
+            dynamicWebhookRefreshRequest.connectionId));
     }
 
     @RequestMapping(
@@ -249,7 +250,7 @@ public class RemoteTriggerDefinitionFacadeController {
     @SuppressFBWarnings("EI")
     public record DynamicWebhookRefreshRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName,
-        @NotNull Map<String, Long> outputParameters) {
+        @NotNull Map<String, Long> outputParameters, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")

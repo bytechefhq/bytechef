@@ -117,7 +117,7 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
                     if (output.webhookExpirationDate() != null) {
                         triggerScheduler.scheduleDynamicWebhookTriggerRefresh(
                             output.webhookExpirationDate(), triggerWorkflowNodeType.componentName(),
-                            triggerWorkflowNodeType.componentVersion(), workflowExecutionId);
+                            triggerWorkflowNodeType.componentVersion(), workflowExecutionId, connectionId);
                     }
                 }
             }

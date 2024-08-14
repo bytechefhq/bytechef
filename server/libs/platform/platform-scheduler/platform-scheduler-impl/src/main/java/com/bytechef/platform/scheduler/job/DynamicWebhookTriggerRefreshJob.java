@@ -55,9 +55,10 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
         JobDataMap jobDataMap = context.getMergedJobDataMap();
 
         String workflowExecutionId = jobDataMap.getString("workflowExecutionId");
+        Long connectionId = jobDataMap.getLong("connectionID");
 
         LocalDateTime webhookExpirationDate = refreshDynamicWebhookTrigger(
-            WorkflowExecutionId.parse(workflowExecutionId));
+            WorkflowExecutionId.parse(workflowExecutionId), connectionId);
 
         if (webhookExpirationDate != null) {
             Scheduler scheduler = context.getScheduler();
@@ -113,14 +114,14 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
         return WorkflowNodeType.ofType(workflowTrigger.getType());
     }
 
-    private LocalDateTime refreshDynamicWebhookTrigger(WorkflowExecutionId workflowExecutionId) {
+    private LocalDateTime refreshDynamicWebhookTrigger(WorkflowExecutionId workflowExecutionId, Long connectionId) {
         WorkflowNodeType workflowNodeType = getComponentOperation(workflowExecutionId);
         WebhookEnableOutput output = OptionalUtils.get(triggerStateService.fetchValue(workflowExecutionId));
         LocalDateTime webhookExpirationDate = null;
 
         output = remoteTriggerDefinitionFacade.executeDynamicWebhookRefresh(
             workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-            workflowNodeType.componentOperationName(), output.parameters());
+            workflowNodeType.componentOperationName(), output.parameters(), connectionId);
 
         if (output != null) {
             triggerStateService.save(workflowExecutionId, output);

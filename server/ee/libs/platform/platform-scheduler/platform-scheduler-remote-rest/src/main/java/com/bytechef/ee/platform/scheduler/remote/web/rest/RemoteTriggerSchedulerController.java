@@ -74,7 +74,8 @@ public class RemoteTriggerSchedulerController {
 
         triggerScheduler.scheduleDynamicWebhookTriggerRefresh(
             dynamicWebhookRefreshTaskRequest.webhookExpirationDate, dynamicWebhookRefreshTaskRequest.componentName,
-            dynamicWebhookRefreshTaskRequest.componentVersion, dynamicWebhookRefreshTaskRequest.workflowExecutionId);
+            dynamicWebhookRefreshTaskRequest.componentVersion, dynamicWebhookRefreshTaskRequest.workflowExecutionId,
+            dynamicWebhookRefreshTaskRequest.connectionId);
     }
 
     @RequestMapping(
@@ -102,7 +103,7 @@ public class RemoteTriggerSchedulerController {
     @SuppressFBWarnings("EI")
     private record DynamicWebhookRefreshTaskRequest(
         LocalDateTime webhookExpirationDate, String componentName, int componentVersion,
-        WorkflowExecutionId workflowExecutionId) {
+        WorkflowExecutionId workflowExecutionId, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
