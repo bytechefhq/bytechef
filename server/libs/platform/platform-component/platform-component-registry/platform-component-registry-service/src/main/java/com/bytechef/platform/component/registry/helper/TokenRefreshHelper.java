@@ -16,13 +16,14 @@
 
 package com.bytechef.platform.component.registry.helper;
 
-import static com.bytechef.component.definition.Authorization.*;
+import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
+import static com.bytechef.component.definition.Authorization.EXPIRES_IN;
+import static com.bytechef.component.definition.Authorization.REFRESH_TOKEN;
 
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.exception.ComponentExecutionException;
-import com.bytechef.platform.component.registry.definition.ActionContextImpl;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.registry.util.RefreshCredentialsUtils;
@@ -31,6 +32,7 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.exception.ErrorType;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +57,7 @@ public class TokenRefreshHelper {
     private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public TokenRefreshHelper(ConnectionDefinitionService connectionDefinitionService,
         ConnectionService connectionService) {
         this.connectionDefinitionService = connectionDefinitionService;
@@ -81,11 +84,7 @@ public class TokenRefreshHelper {
 
                 componentConnection = getRefreshedCredentialsComponentConnection(componentConnection, actionContext);
 
-                ActionContextImpl actionContextImpl = (ActionContextImpl) actionContext;
-
-                actionContext = contextFunction.apply(componentConnection);
-
-                return performFunction.apply(componentConnection, actionContext);
+                return performFunction.apply(componentConnection, contextFunction.apply(componentConnection));
             }
 
             if (exception instanceof ProviderException) {
