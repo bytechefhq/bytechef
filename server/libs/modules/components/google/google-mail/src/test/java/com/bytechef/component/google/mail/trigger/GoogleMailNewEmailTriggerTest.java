@@ -16,6 +16,7 @@
 
 package com.bytechef.component.google.mail.trigger;
 
+import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.HISTORY_ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TOPIC_NAME;
@@ -34,6 +35,7 @@ import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.google.commons.GoogleServices;
+import com.bytechef.test.component.properties.ParametersFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.Gmail.Users;
 import com.google.api.services.gmail.Gmail.Users.Messages;
@@ -73,7 +75,7 @@ class GoogleMailNewEmailTriggerTest {
     private final HttpParameters mockedHttpParameters = mock(HttpParameters.class);
     private final Users.History.List mockedList = mock(Users.History.List.class);
     private final Messages mockedMessages = mock(Messages.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
+    private Parameters parameters;
     private final Stop mockedStop = mock(Stop.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final Users mockedUsers = mock(Users.class);
@@ -92,8 +94,10 @@ class GoogleMailNewEmailTriggerTest {
     public void beforeEach() {
         mockedGoogleServices = mockStatic(GoogleServices.class);
 
-        mockedGoogleServices.when(() -> GoogleServices.getMail(mockedParameters))
+        mockedGoogleServices.when(() -> GoogleServices.getMail(any(Parameters.class)))
             .thenReturn(mockedGmail);
+
+        parameters = ParametersFactory.createParameters(Map.of(ACCESS_TOKEN, "id", TOPIC_NAME, "topic"));
     }
 
     @AfterEach
@@ -105,9 +109,6 @@ class GoogleMailNewEmailTriggerTest {
     void testDynamicWebhookEnable() throws IOException {
         String webhookUrl = "testWebhookUrl";
 
-        when(mockedParameters.getRequiredString(TOPIC_NAME))
-            .thenReturn("topic");
-
         when(mockedGmail.users())
             .thenReturn(mockedUsers);
         when(mockedUsers.watch(userIdArgumentCaptor.capture(), watchRequestArgumentCaptor.capture()))
@@ -118,7 +119,7 @@ class GoogleMailNewEmailTriggerTest {
             .thenReturn(new BigInteger("123"));
 
         DynamicWebhookEnableOutput dynamicWebhookEnableOutput = GoogleMailNewEmailTrigger.dynamicWebhookEnable(
-            mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
+            parameters, parameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
 
         Map<String, BigInteger> expectedParameters = Map.of(HISTORY_ID, new BigInteger("123"));
         LocalDateTime webhookExpirationDate = dynamicWebhookEnableOutput.webhookExpirationDate();
@@ -142,7 +143,7 @@ class GoogleMailNewEmailTriggerTest {
             .thenReturn(mockedStop);
 
         GoogleMailNewEmailTrigger.dynamicWebhookDisable(
-            mockedParameters, mockedParameters, mockedParameters, workflowExecutionId, mockedTriggerContext);
+            parameters, parameters, parameters, workflowExecutionId, mockedTriggerContext);
 
         assertEquals(ME, userIdArgumentCaptor.getValue());
     }
@@ -177,7 +178,7 @@ class GoogleMailNewEmailTriggerTest {
             .thenReturn(message);
 
         List<Message> messages = GoogleMailNewEmailTrigger.dynamicWebhookRequest(
-            mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
+            parameters, parameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
             mockedWebhookMethod, mockedDynamicWebhookEnableOutput, mockedTriggerContext);
 
         assertEquals(List.of(message), messages);

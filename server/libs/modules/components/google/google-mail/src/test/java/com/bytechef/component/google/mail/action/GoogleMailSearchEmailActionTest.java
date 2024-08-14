@@ -16,6 +16,7 @@
 
 package com.bytechef.component.google.mail.action;
 
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BODY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.CATEGORY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FROM;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.INCLUDE_SPAM_TRASH;
@@ -29,10 +30,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.test.component.properties.ParametersFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.ListMessagesResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -56,24 +60,10 @@ class GoogleMailSearchEmailActionTest extends AbstractGoogleMailActionTest {
     void testPerform() throws IOException {
         List<String> labelIDs = List.of("id1", "id2");
 
-        when(mockedParameters.getLong(MAX_RESULTS))
-            .thenReturn(1L);
-        when(mockedParameters.getString(PAGE_TOKEN))
-            .thenReturn("pageToken");
-        when(mockedParameters.getString(FROM))
-            .thenReturn("from");
-        when(mockedParameters.getString(TO))
-            .thenReturn("to");
-        when(mockedParameters.getString(SUBJECT))
-            .thenReturn("subject");
-        when(mockedParameters.getString(CATEGORY))
-            .thenReturn("social");
-        when(mockedParameters.getString(LABEL))
-            .thenReturn("label");
-        when(mockedParameters.getList(LABEL_IDS, String.class, List.of()))
-            .thenReturn(labelIDs);
-        when(mockedParameters.getBoolean(INCLUDE_SPAM_TRASH))
-            .thenReturn(true);
+        Parameters parameters = ParametersFactory.createParameters(
+            Map.of(FROM, "from@mail.com", TO, "to@mail.com", SUBJECT, "subject", BODY, "body", MAX_RESULTS, 1L,
+                PAGE_TOKEN, "pageToken", CATEGORY, "social", LABEL, "label", LABEL_IDS, List.of("id1", "id2"),
+                INCLUDE_SPAM_TRASH, true));
 
         when(mockedGmail.users())
             .thenReturn(mockedUsers);
@@ -95,13 +85,14 @@ class GoogleMailSearchEmailActionTest extends AbstractGoogleMailActionTest {
             .thenReturn(mockedListMessagesResponse);
 
         ListMessagesResponse response = GoogleMailSearchEmailAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+            parameters, parameters, mockedContext);
 
         assertEquals(mockedListMessagesResponse, response);
         assertEquals("me", userIdArgumentCaptor.getValue());
         assertEquals(1, maxResultsArgumentCaptor.getValue());
         assertEquals("pageToken", pageTokenArgumentCaptor.getValue());
-        assertEquals(" from:from to:to subject:subject category:social label:label", qArgumentCaptor.getValue());
+        assertEquals(" from:from@mail.com to:to@mail.com subject:subject category:social label:label",
+            qArgumentCaptor.getValue());
         assertEquals(labelIDs, labelIDsArgumentCaptor.getValue());
         assertEquals(true, includeSpamTrashArgumentCaptor.getValue());
     }
