@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.connection;
 import static com.bytechef.component.definition.ComponentDSL.string;
+import static constants.LLMConstants.ENDPOINT;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 
@@ -30,11 +31,15 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefini
 public final class AzureOpenAIConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri((connectionParameters, context) -> "https://api.openai.com/v1")
+//        .baseUri((connectionParameters, context) -> "https://api.openai.com/v1")
         .authorizations(
             authorization(BEARER_TOKEN)
                 .title("Bearer Token")
                 .properties(
+                    string(ENDPOINT)
+                        .label("Endpoint")
+//                        .description("e.g https://{yourDomain}}.atlassian.net")
+                        .required(true),
                     string(TOKEN)
                         .label("Token")
                         .required(true)));

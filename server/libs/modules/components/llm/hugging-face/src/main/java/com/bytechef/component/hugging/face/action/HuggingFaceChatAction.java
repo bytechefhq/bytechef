@@ -22,11 +22,12 @@ import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.hugging.face.constant.HuggingFaceConstants.CHAT;
-import static com.bytechef.component.hugging.face.constant.HuggingFaceConstants.CONTENT;
-import static com.bytechef.component.hugging.face.constant.HuggingFaceConstants.MESSAGES;
-import static com.bytechef.component.hugging.face.constant.HuggingFaceConstants.ROLE;
+
 import static com.bytechef.component.hugging.face.constant.HuggingFaceConstants.URL;
+import static constants.LLMConstants.CHAT;
+import static constants.LLMConstants.CONTENT;
+import static constants.LLMConstants.MESSAGES;
+import static constants.LLMConstants.ROLE;
 import static util.LLMUtils.createMessage;
 
 import com.bytechef.component.definition.ActionContext;
@@ -70,7 +71,7 @@ public class HuggingFaceChatAction {
                                 option("tool", "tool"))
                             .required(true)))
                 .required(true),
-            string(URL) //TODO:: mozda navest moguce urlove? il ne
+            string(URL)
                 .label("URL")
                 .description("Url of the inference endpoint"))
         .outputSchema(string())
