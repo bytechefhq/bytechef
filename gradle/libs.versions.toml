@@ -17,7 +17,7 @@ spotbugs-gradle-plugin = "6.0.18"
 spotless-plugin-gradle = "6.25.0"
 spring-boot = "3.3.2"
 spring-cloud-aws = "3.1.1"
-spring-shell = "3.3.0"
+spring-shell = "3.3.1"
 
 [libraries]
 com-github-miachm-sods-sods = "com.github.miachm.sods:SODS:1.6.7"
