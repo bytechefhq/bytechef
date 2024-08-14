@@ -28,11 +28,11 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
@@ -63,14 +63,14 @@ public class GoogleCalendarEventTrigger {
                             .getCalendarIdOptions(inputParameters, connectionParameters, null, null, context))
                 .required(true))
         .outputSchema(EVENT_PROPERTY)
-        .dynamicWebhookEnable(GoogleCalendarEventTrigger::dynamicWebhookEnable)
-        .dynamicWebhookDisable(GoogleCalendarEventTrigger::dynamicWebhookDisable)
-        .dynamicWebhookRequest(GoogleCalendarEventTrigger::dynamicWebhookRequest);
+        .webhookEnable(GoogleCalendarEventTrigger::webhookEnable)
+        .webhookDisable(GoogleCalendarEventTrigger::webhookDisable)
+        .webhookRequest(GoogleCalendarEventTrigger::webhookRequest);
 
     private GoogleCalendarEventTrigger() {
     }
 
-    protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
+    protected static WebhookEnableOutput webhookEnable(
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
         String workflowExecutionId, TriggerContext context) {
 
@@ -92,10 +92,10 @@ public class GoogleCalendarEventTrigger {
             throw new ProviderException(e);
         }
 
-        return new DynamicWebhookEnableOutput(Map.of(ID, channel.getId(), RESOURCE_ID, channel.getResourceId()), null);
+        return new WebhookEnableOutput(Map.of(ID, channel.getId(), RESOURCE_ID, channel.getResourceId()), null);
     }
 
-    protected static void dynamicWebhookDisable(
+    protected static void webhookDisable(
         Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
         String workflowExecutionId, TriggerContext context) {
 
@@ -114,9 +114,9 @@ public class GoogleCalendarEventTrigger {
         }
     }
 
-    protected static Event dynamicWebhookRequest(
+    protected static Event webhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
-        WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output, TriggerContext context)
+        WebhookBody body, WebhookMethod method, WebhookEnableOutput output, TriggerContext context)
         throws IOException {
 
         String calendarId = inputParameters.getRequiredString(CALENDAR_ID);

@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.box.util.BoxUtils;
 import com.bytechef.component.definition.Context.TypeReference;
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import java.time.LocalDateTime;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Monika Domiter
  */
-class BoxNewFoolderTriggerTest extends AbstractBoxTriggerTest {
+class BoxNewFolderTriggerTest extends AbstractBoxTriggerTest {
 
     @Test
     void testDynamicWebhookEnable() {
@@ -46,11 +46,11 @@ class BoxNewFoolderTriggerTest extends AbstractBoxTriggerTest {
             () -> BoxUtils.subscribeWebhook(webhookUrl, mockedTriggerContext, "folder", "FOLDER.CREATED", "folderId"))
             .thenReturn("123");
 
-        DynamicWebhookEnableOutput dynamicWebhookEnableOutput = BoxNewFolderTrigger.dynamicWebhookEnable(
+        WebhookEnableOutput webhookEnableOutput = BoxNewFolderTrigger.webhookEnable(
             mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
 
-        Map<String, ?> parameters = dynamicWebhookEnableOutput.parameters();
-        LocalDateTime webhookExpirationDate = dynamicWebhookEnableOutput.webhookExpirationDate();
+        Map<String, ?> parameters = webhookEnableOutput.parameters();
+        LocalDateTime webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
 
         Map<String, Object> expectedParameters = Map.of(ID, "123");
 
@@ -59,15 +59,15 @@ class BoxNewFoolderTriggerTest extends AbstractBoxTriggerTest {
     }
 
     @Test
-    void testDynamicWebhookRequest() {
+    void testWebhookRequest() {
         Map<String, ?> sourceMap = Map.of("source", mockedObject);
 
         when(mockedWebhookBody.getContent(any(TypeReference.class)))
             .thenReturn(sourceMap);
 
-        Object result = BoxNewFolderTrigger.dynamicWebhookRequest(
+        Object result = BoxNewFolderTrigger.webhookRequest(
             mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedDynamicWebhookEnableOutput, mockedTriggerContext);
+            mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
 
         assertEquals(mockedObject, result);
     }

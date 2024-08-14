@@ -25,7 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context.TypeReference;
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.pipedrive.util.PipedriveUtils;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -37,19 +37,19 @@ import org.junit.jupiter.api.Test;
 class PipedriveUpdatedDealTriggerTest extends AbstractPipedriveTriggerTest {
 
     @Test
-    void testDynamicWebhookEnable() {
+    void testWebhookEnable() {
         String webhookUrl = "testWebhookUrl";
 
         pipedriveUtilsMockedStatic.when(
             () -> PipedriveUtils.subscribeWebhook("deal", UPDATED, webhookUrl, mockedTriggerContext))
             .thenReturn(123);
 
-        DynamicWebhookEnableOutput dynamicWebhookEnableOutput =
-            PipedriveUpdatedDealTrigger.dynamicWebhookEnable(
+        WebhookEnableOutput webhookEnableOutput =
+            PipedriveUpdatedDealTrigger.webhookEnable(
                 mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
 
-        Map<String, ?> parameters = dynamicWebhookEnableOutput.parameters();
-        LocalDateTime webhookExpirationDate = dynamicWebhookEnableOutput.webhookExpirationDate();
+        Map<String, ?> parameters = webhookEnableOutput.parameters();
+        LocalDateTime webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
 
         Map<String, Object> expectedParameters = Map.of(ID, 123);
 
@@ -58,15 +58,15 @@ class PipedriveUpdatedDealTriggerTest extends AbstractPipedriveTriggerTest {
     }
 
     @Test
-    void testDynamicWebhookRequest() {
+    void testWebhookRequest() {
         Map<String, ?> currentMap = Map.of(CURRENT, mockedObject);
 
         when(mockedWebhookBody.getContent(any(TypeReference.class)))
             .thenReturn(currentMap);
 
-        Object result = PipedriveUpdatedDealTrigger.dynamicWebhookRequest(
+        Object result = PipedriveUpdatedDealTrigger.webhookRequest(
             mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedDynamicWebhookEnableOutput, mockedTriggerContext);
+            mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
 
         assertEquals(mockedObject, result);
     }

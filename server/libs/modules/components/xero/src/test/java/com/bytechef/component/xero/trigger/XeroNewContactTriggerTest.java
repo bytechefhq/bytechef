@@ -27,13 +27,14 @@ import org.junit.jupiter.api.Test;
 class XeroNewContactTriggerTest extends AbstractXeroTriggerTest {
 
     @Test
-    void testStaticWebhookRequest() {
+    void testWebhookRequest() {
         xeroUtilsMockedStatic
             .when(() -> XeroUtils.getCreatedObject(mockedBody, mockedTriggerContext, "CONTACT", null))
             .thenReturn(mockedObject);
 
-        Object result = XeroNewContactTrigger.staticWebhookRequest(mockedParameters, mockedHttpHeaders,
-            mockedHttpParameters, mockedBody, mockedMethod, mockedTriggerContext);
+        Object result = XeroNewContactTrigger.webhookRequest(
+            mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedBody, mockedMethod,
+            mockedWebhookEnableOutput, mockedTriggerContext);
 
         assertEquals(mockedObject, result);
     }

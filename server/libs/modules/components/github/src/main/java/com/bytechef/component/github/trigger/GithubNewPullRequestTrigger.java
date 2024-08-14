@@ -32,11 +32,11 @@ import static com.bytechef.component.github.util.GithubUtils.subscribeWebhook;
 import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.github.util.GithubUtils;
 import java.util.Map;
@@ -84,24 +84,24 @@ public class GithubNewPullRequestTrigger {
                             integer("forks"),
                             integer("open_issues"),
                             string("default_branch"))))
-        .dynamicWebhookEnable(GithubNewPullRequestTrigger::dynamicWebhookEnable)
-        .dynamicWebhookDisable(GithubNewPullRequestTrigger::dynamicWebhookDisable)
-        .dynamicWebhookRequest(GithubNewPullRequestTrigger::dynamicWebhookRequest);
+        .webhookEnable(GithubNewPullRequestTrigger::webhookEnable)
+        .webhookDisable(GithubNewPullRequestTrigger::webhookDisable)
+        .webhookRequest(GithubNewPullRequestTrigger::webhookRequest);
 
     private GithubNewPullRequestTrigger() {
     }
 
-    protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
+    protected static WebhookEnableOutput webhookEnable(
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
         String workflowExecutionId, TriggerContext context) {
 
-        return new DynamicWebhookEnableOutput(
+        return new WebhookEnableOutput(
             Map.of(ID,
                 subscribeWebhook(inputParameters.getRequiredString(REPOSITORY), "pull_request", webhookUrl, context)),
             null);
     }
 
-    protected static void dynamicWebhookDisable(
+    protected static void webhookDisable(
         Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
         String workflowExecutionId, TriggerContext context) {
 
@@ -109,9 +109,9 @@ public class GithubNewPullRequestTrigger {
             inputParameters.getRequiredString(REPOSITORY), outputParameters.getInteger(ID), context);
     }
 
-    protected static Map<String, Object> dynamicWebhookRequest(
+    protected static Map<String, Object> webhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
-        WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output, TriggerContext context) {
+        WebhookBody body, WebhookMethod method, WebhookEnableOutput output, TriggerContext context) {
 
         return getContent(body);
     }

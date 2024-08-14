@@ -29,11 +29,11 @@ import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.mailchimp.util.MailchimpUtils;
 import java.util.List;
@@ -79,11 +79,11 @@ public class MailchimpSubscribeTrigger {
                                     string("LNAME"))),
                     dateTime("fired_at"),
                     string("type")))
-        .dynamicWebhookDisable(MailchimpSubscribeTrigger::dynamicWebhookDisable)
-        .dynamicWebhookEnable(MailchimpSubscribeTrigger::dynamicWebhookEnable)
-        .dynamicWebhookRequest(MailchimpSubscribeTrigger::dynamicWebhookRequest);
+        .webhookDisable(MailchimpSubscribeTrigger::webhookDisable)
+        .webhookEnable(MailchimpSubscribeTrigger::webhookEnable)
+        .webhookRequest(MailchimpSubscribeTrigger::webhookRequest);
 
-    protected static void dynamicWebhookDisable(
+    protected static void webhookDisable(
         Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
         String workflowExecutionId, TriggerContext context) {
 
@@ -96,7 +96,7 @@ public class MailchimpSubscribeTrigger {
             .execute();
     }
 
-    protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
+    protected static WebhookEnableOutput webhookEnable(
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
         String workflowExecutionId, TriggerContext context) {
 
@@ -128,12 +128,12 @@ public class MailchimpSubscribeTrigger {
             throw new IllegalStateException((String) firstError.get("message"));
         }
 
-        return new DynamicWebhookEnableOutput(Map.of("id", response.get("id")), null);
+        return new WebhookEnableOutput(Map.of("id", response.get("id")), null);
     }
 
-    protected static Object dynamicWebhookRequest(
+    protected static Object webhookRequest(
         Map<String, ?> inputParameters, Parameters connectionParameters, HttpHeaders headers,
-        HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
+        HttpParameters parameters, WebhookBody body, WebhookMethod method, WebhookEnableOutput output,
         TriggerContext context) {
 
         if (body == null) {

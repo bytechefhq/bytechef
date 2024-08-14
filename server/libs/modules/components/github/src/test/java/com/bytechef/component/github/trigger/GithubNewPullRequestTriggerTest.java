@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.github.util.GithubUtils;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 class GithubNewPullRequestTriggerTest extends AbstractGithubTriggerTest {
 
     @Test
-    void testDynamicWebhookEnable() {
+    void testWebhookEnable() {
         String webhookUrl = "testWebhookUrl";
 
         when(mockedParameters.getRequiredString(REPOSITORY))
@@ -43,11 +43,11 @@ class GithubNewPullRequestTriggerTest extends AbstractGithubTriggerTest {
         githubUtilsMockedStatic.when(
             () -> GithubUtils.subscribeWebhook("repo", "pull_request", webhookUrl, mockedTriggerContext))
             .thenReturn(123);
-        DynamicWebhookEnableOutput dynamicWebhookEnableOutput = GithubNewPullRequestTrigger.dynamicWebhookEnable(
+        WebhookEnableOutput webhookEnableOutput = GithubNewPullRequestTrigger.webhookEnable(
             mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
 
-        Map<String, ?> parameters = dynamicWebhookEnableOutput.parameters();
-        LocalDateTime webhookExpirationDate = dynamicWebhookEnableOutput.webhookExpirationDate();
+        Map<String, ?> parameters = webhookEnableOutput.parameters();
+        LocalDateTime webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
 
         Map<String, Object> expectedParameters = Map.of(ID, 123);
 
@@ -56,13 +56,13 @@ class GithubNewPullRequestTriggerTest extends AbstractGithubTriggerTest {
     }
 
     @Test
-    void testDynamicWebhookDisable() {
+    void testWebhookDisable() {
         when(mockedParameters.getRequiredString(REPOSITORY))
             .thenReturn("repo");
         when(mockedParameters.getInteger(ID))
             .thenReturn(123);
 
-        GithubNewPullRequestTrigger.dynamicWebhookDisable(
+        GithubNewPullRequestTrigger.webhookDisable(
             mockedParameters, mockedParameters, mockedParameters, workflowExecutionId, mockedTriggerContext);
 
         githubUtilsMockedStatic
@@ -70,16 +70,16 @@ class GithubNewPullRequestTriggerTest extends AbstractGithubTriggerTest {
     }
 
     @Test
-    void testDynamicWebhookRequest() {
+    void testWebhookRequest() {
         Map<String, Object> content = Map.of("id", 123);
 
         githubUtilsMockedStatic.when(
             () -> GithubUtils.getContent(mockedWebhookBody))
             .thenReturn(content);
 
-        Map<String, Object> result = GithubNewIssueTrigger.dynamicWebhookRequest(
+        Map<String, Object> result = GithubNewIssueTrigger.webhookRequest(
             mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedDynamicWebhookEnableOutput, mockedTriggerContext);
+            mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
 
         assertEquals(content, result);
     }

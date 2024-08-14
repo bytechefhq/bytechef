@@ -22,10 +22,10 @@ import static org.mockito.Mockito.mockStatic;
 import com.bytechef.component.clickup.util.ClickupUtils;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,8 +36,7 @@ import org.mockito.MockedStatic;
  */
 abstract class AbstractClickupTriggerTest {
 
-    protected DynamicWebhookEnableOutput mockedDynamicWebhookEnableOutput =
-        mock(DynamicWebhookEnableOutput.class);
+    protected WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
     protected WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     protected HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
     protected HttpParameters mockedHttpParameters = mock(HttpParameters.class);

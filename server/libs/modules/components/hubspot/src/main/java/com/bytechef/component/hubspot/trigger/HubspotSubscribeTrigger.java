@@ -29,10 +29,10 @@ import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition;
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -144,11 +144,11 @@ public class HubspotSubscribeTrigger {
                }
             ]
             """)
-        .dynamicWebhookDisable(HubspotSubscribeTrigger::dynamicWebhookDisable)
-        .dynamicWebhookEnable(HubspotSubscribeTrigger::dynamicWebhookEnable)
-        .dynamicWebhookRequest(HubspotSubscribeTrigger::dynamicWebhookRequest);
+        .webhookDisable(HubspotSubscribeTrigger::webhookDisable)
+        .webhookEnable(HubspotSubscribeTrigger::wbhookEnable)
+        .webhookRequest(HubspotSubscribeTrigger::webhookRequest);
 
-    protected static void dynamicWebhookDisable(
+    protected static void webhookDisable(
         Parameters inputParameters, Parameters connectionParameters, Map<String, ?> outputParameters,
         String workflowExecutionId, TriggerContext context) {
 
@@ -158,7 +158,7 @@ public class HubspotSubscribeTrigger {
     }
 
     @SuppressFBWarnings("RV")
-    protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
+    protected static WebhookEnableOutput wbhookEnable(
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl, String workflowExecutionId,
         TriggerContext context) {
 
@@ -186,9 +186,9 @@ public class HubspotSubscribeTrigger {
         return null;
     }
 
-    protected static List<?> dynamicWebhookRequest(
+    protected static List<?> webhookRequest(
         Map<String, ?> inputParameters, Parameters connectionParameters, HttpHeaders headers,
-        HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
+        HttpParameters parameters, WebhookBody body, WebhookMethod method, WebhookEnableOutput output,
         TriggerContext context) {
 
         return body.getContent(new TypeReference<>() {});

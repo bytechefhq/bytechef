@@ -24,11 +24,11 @@ import static com.bytechef.component.shopify.constant.ShopifyConstants.NEW_CANCE
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.shopify.property.ShopifyOrderProperties;
 import com.bytechef.component.shopify.util.ShopifyUtils;
@@ -44,32 +44,32 @@ public class ShopifyNewCancelledOrderTrigger {
         .description("Triggers when order is cancelled.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .outputSchema(object().properties(ShopifyOrderProperties.PROPERTIES))
-        .dynamicWebhookEnable(ShopifyNewCancelledOrderTrigger::dynamicWebhookEnable)
-        .dynamicWebhookDisable(ShopifyNewCancelledOrderTrigger::dynamicWebhookDisable)
-        .dynamicWebhookRequest(ShopifyNewCancelledOrderTrigger::dynamicWebhookRequest);
+        .webhookEnable(ShopifyNewCancelledOrderTrigger::webhookEnable)
+        .webhookDisable(ShopifyNewCancelledOrderTrigger::webhookDisable)
+        .webhookRequest(ShopifyNewCancelledOrderTrigger::webhookRequest);
 
     private ShopifyNewCancelledOrderTrigger() {
     }
 
-    protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
+    protected static WebhookEnableOutput webhookEnable(
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
         String workflowExecutionId, TriggerContext context) {
 
-        return new DynamicWebhookEnableOutput(
+        return new WebhookEnableOutput(
             Map.of(ID, ShopifyUtils.subscribeWebhook(webhookUrl, context, "orders/cancelled")),
             null);
     }
 
-    protected static void dynamicWebhookDisable(
+    protected static void webhookDisable(
         Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
         String workflowExecutionId, TriggerContext context) {
 
         ShopifyUtils.unsubscribeWebhook(outputParameters, context);
     }
 
-    protected static Object dynamicWebhookRequest(
+    protected static Object webhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
-        WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output, TriggerContext context) {
+        WebhookBody body, WebhookMethod method, WebhookEnableOutput output, TriggerContext context) {
 
         return body.getContent();
     }

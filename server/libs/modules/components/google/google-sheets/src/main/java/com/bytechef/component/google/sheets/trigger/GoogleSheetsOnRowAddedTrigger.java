@@ -30,11 +30,11 @@ import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.getMap
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
 import com.bytechef.google.commons.GoogleServices;
@@ -68,14 +68,14 @@ public class GoogleSheetsOnRowAddedTrigger {
                 .items(
                     object()
                         .additionalProperties(string(), array().items(string()))))
-        .dynamicWebhookEnable(GoogleSheetsOnRowAddedTrigger::dynamicWebhookEnable)
-        .dynamicWebhookDisable(GoogleSheetsOnRowAddedTrigger::dynamicWebhookDisable)
-        .dynamicWebhookRequest(GoogleSheetsOnRowAddedTrigger::dynamicWebhookRequest);
+        .webhookEnable(GoogleSheetsOnRowAddedTrigger::webhookEnable)
+        .webhookDisable(GoogleSheetsOnRowAddedTrigger::webhookDisable)
+        .webhookRequest(GoogleSheetsOnRowAddedTrigger::webhookRequest);
 
     private GoogleSheetsOnRowAddedTrigger() {
     }
 
-    protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
+    protected static WebhookEnableOutput webhookEnable(
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
         String workflowExecutionId, TriggerContext context) {
 
@@ -100,11 +100,11 @@ public class GoogleSheetsOnRowAddedTrigger {
             throw new RuntimeException(e);
         }
 
-        return new DynamicWebhookEnableOutput(
+        return new WebhookEnableOutput(
             Map.of("id", channel.getId(), "resourceId", channel.getResourceId()), null);
     }
 
-    protected static void dynamicWebhookDisable(
+    protected static void webhookDisable(
         Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
         String workflowExecutionId, TriggerContext context) {
 
@@ -123,9 +123,9 @@ public class GoogleSheetsOnRowAddedTrigger {
         }
     }
 
-    protected static List<Map<String, Object>> dynamicWebhookRequest(
+    protected static List<Map<String, Object>> webhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
-        HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
+        HttpParameters parameters, WebhookBody body, WebhookMethod method, WebhookEnableOutput output,
         TriggerContext context) throws Exception {
 
         Sheets sheets = GoogleServices.getSheets(connectionParameters);

@@ -27,10 +27,10 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.calendar.Calendar;
@@ -60,7 +60,7 @@ class GoogleCalendarEventTriggerTest {
     private final Calendar mockedCalendar = mock(Calendar.class);
     private final Channel mockedChannel = mock(Channel.class);
     private final Channels mockedChannels = mock(Channels.class);
-    private final DynamicWebhookEnableOutput mockedDynamicWebhookEnableOutput = mock(DynamicWebhookEnableOutput.class);
+    private final WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
     private final Events mockedEvents = mock(Events.class);
     private final com.google.api.services.calendar.model.Events mockedEvents2 = mock(
         com.google.api.services.calendar.model.Events.class);
@@ -91,7 +91,7 @@ class GoogleCalendarEventTriggerTest {
     }
 
     @Test
-    void testDynamicWebhookEnable() throws IOException {
+    void testWebhookEnable() throws IOException {
         String webhookUrl = "testWebhookUrl";
 
         when(mockedParameters.getRequiredString(CALENDAR_ID))
@@ -108,11 +108,11 @@ class GoogleCalendarEventTriggerTest {
         when(mockedChannel.getResourceId())
             .thenReturn("resourceId");
 
-        DynamicWebhookEnableOutput dynamicWebhookEnableOutput = GoogleCalendarEventTrigger.dynamicWebhookEnable(
+        WebhookEnableOutput webhookEnableOutput = GoogleCalendarEventTrigger.webhookEnable(
             mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
 
-        Map<String, ?> parameters = dynamicWebhookEnableOutput.parameters();
-        LocalDateTime webhookExpirationDate = dynamicWebhookEnableOutput.webhookExpirationDate();
+        Map<String, ?> parameters = webhookEnableOutput.parameters();
+        LocalDateTime webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
 
         Map<String, String> expectedParameters = Map.of(ID, "1234", RESOURCE_ID, "resourceId");
 
@@ -129,7 +129,7 @@ class GoogleCalendarEventTriggerTest {
     }
 
     @Test
-    void testDynamicWebhookDisable() throws IOException {
+    void testWebhookDisable() throws IOException {
         when(mockedParameters.getRequiredString(ID))
             .thenReturn("123");
         when(mockedParameters.getRequiredString(RESOURCE_ID))
@@ -140,7 +140,7 @@ class GoogleCalendarEventTriggerTest {
         when(mockedChannels.stop(channelArgumentCaptor.capture()))
             .thenReturn(mockedStop);
 
-        GoogleCalendarEventTrigger.dynamicWebhookDisable(
+        GoogleCalendarEventTrigger.webhookDisable(
             mockedParameters, mockedParameters, mockedParameters, workflowExecutionId, mockedTriggerContext);
 
         Channel channelArgumentCaptorValue = channelArgumentCaptor.getValue();
@@ -150,7 +150,7 @@ class GoogleCalendarEventTriggerTest {
     }
 
     @Test
-    void testDynamicWebhookRequest() throws IOException {
+    void testWebhookRequest() throws IOException {
         Event event = new Event();
         java.util.List<Event> events = java.util.List.of(event);
 
@@ -168,9 +168,9 @@ class GoogleCalendarEventTriggerTest {
         when(mockedEvents2.getItems())
             .thenReturn(events);
 
-        Event result = GoogleCalendarEventTrigger.dynamicWebhookRequest(
+        Event result = GoogleCalendarEventTrigger.webhookRequest(
             mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedDynamicWebhookEnableOutput, mockedTriggerContext);
+            mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
 
         assertEquals(event, result);
 
