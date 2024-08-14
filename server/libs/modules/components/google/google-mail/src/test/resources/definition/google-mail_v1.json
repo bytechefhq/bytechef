@@ -2977,7 +2977,7 @@
     "name": "newEmail",
     "properties": [ {
       "advancedOption": null,
-      "description": null,
+      "description": "Must be 3-255 characters, start with a letter, and contain only the following characters:\nletters, numbers, dashes (-), periods (.), underscores (_), tildes (~), percents (%) or\nplus signs (+). Cannot start with goog.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -2991,8 +2991,8 @@
       "placeholder": null,
       "controlType": "TEXT",
       "languageId": null,
-      "maxLength": null,
-      "minLength": null,
+      "maxLength": 255,
+      "minLength": 3,
       "options": null,
       "optionsDataSource": null
     } ],
