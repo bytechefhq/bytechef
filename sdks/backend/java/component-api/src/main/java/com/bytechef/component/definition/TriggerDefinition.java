@@ -275,29 +275,6 @@ public interface TriggerDefinition {
     /**
      *
      */
-    @FunctionalInterface
-    interface DynamicWebhookTriggerOutputFunction extends TriggerOutputFunction {
-
-        /**
-         * @param inputParameters
-         * @param connectionParameters
-         * @param headers
-         * @param parameters
-         * @param body
-         * @param method
-         * @param output
-         * @param context
-         * @return
-         */
-        OutputResponse apply(
-            Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
-            HttpParameters parameters, WebhookBody body, WebhookMethod method, WebhookEnableOutput output,
-            TriggerContext context) throws Exception;
-    }
-
-    /**
-     *
-     */
     interface HttpHeaders {
 
         /**
@@ -492,26 +469,6 @@ public interface TriggerDefinition {
     /**
      *
      */
-    @FunctionalInterface
-    interface StaticWebhookTriggerOutputFunction extends TriggerOutputFunction {
-
-        /**
-         * @param inputParameters
-         * @param headers
-         * @param parameters
-         * @param body
-         * @param method
-         * @param context
-         * @return
-         */
-        OutputResponse apply(
-            Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
-            WebhookMethod method, TriggerContext context) throws Exception;
-    }
-
-    /**
-     *
-     */
     interface TriggerOutputFunction {
     }
 
@@ -580,6 +537,29 @@ public interface TriggerDefinition {
          * @return
          */
         Object apply(
+            Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
+            HttpParameters parameters, WebhookBody body, WebhookMethod method, WebhookEnableOutput output,
+            TriggerContext context) throws Exception;
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface WebhookTriggerOutputFunction extends TriggerOutputFunction {
+
+        /**
+         * @param inputParameters
+         * @param connectionParameters
+         * @param headers
+         * @param parameters
+         * @param body
+         * @param method
+         * @param output
+         * @param context
+         * @return
+         */
+        OutputResponse apply(
             Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
             HttpParameters parameters, WebhookBody body, WebhookMethod method, WebhookEnableOutput output,
             TriggerContext context) throws Exception;
