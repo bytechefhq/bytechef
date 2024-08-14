@@ -18,7 +18,6 @@ package com.bytechef.platform.workflow.task.dispatcher.registry.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
@@ -30,7 +29,6 @@ import org.apache.commons.lang3.Validate;
 public class Resources {
 
     private Map<String, String> additionalUrls;
-    private List<String> categories;
     private String documentationUrl;
 
     private Resources() {
@@ -38,16 +36,11 @@ public class Resources {
 
     public Resources(com.bytechef.platform.workflow.task.dispatcher.definition.Resources resources) {
         this.additionalUrls = OptionalUtils.orElse(resources.getAdditionalUrls(), Map.of());
-        this.categories = OptionalUtils.orElse(resources.getCategories(), List.of());
         this.documentationUrl = Validate.notNull(resources.documentationUrl(), "documentationUrl");
     }
 
     public Map<String, String> getAdditionalUrls() {
         return additionalUrls;
-    }
-
-    public List<String> getCategories() {
-        return categories;
     }
 
     public String getDocumentationUrl() {
@@ -60,20 +53,19 @@ public class Resources {
             return true;
         if (!(o instanceof Resources that))
             return false;
-        return Objects.equals(additionalUrls, that.additionalUrls) && Objects.equals(categories, that.categories)
-            && Objects.equals(documentationUrl, that.documentationUrl);
+        return Objects.equals(additionalUrls, that.additionalUrls) &&
+            Objects.equals(documentationUrl, that.documentationUrl);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalUrls, categories, documentationUrl);
+        return Objects.hash(additionalUrls, documentationUrl);
     }
 
     @Override
     public String toString() {
         return "Resources{" +
             "additionalUrls=" + additionalUrls +
-            ", categories=" + categories +
             ", documentationUrl='" + documentationUrl + '\'' +
             '}';
     }

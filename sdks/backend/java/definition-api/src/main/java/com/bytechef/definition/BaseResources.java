@@ -16,7 +16,6 @@
 
 package com.bytechef.definition;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -24,12 +23,6 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 public interface BaseResources {
-
-    /**
-     *
-     * @return
-     */
-    Optional<List<String>> getCategories();
 
     /**
      *

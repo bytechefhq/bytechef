@@ -1184,21 +1184,13 @@ public final class ComponentDSL {
         }
 
         public ModifiableComponentDefinition resources(String documentationUrl) {
-            this.resources = new ResourcesImpl(documentationUrl, null, null);
+            this.resources = new ResourcesImpl(documentationUrl, null);
 
             return this;
         }
 
-        public ModifiableComponentDefinition resources(String documentationUrl, List<String> categories) {
-            this.resources = new ResourcesImpl(documentationUrl, categories, null);
-
-            return this;
-        }
-
-        public ModifiableComponentDefinition resources(
-            String documentationUrl, List<String> categories, Map<String, String> additionalUrls) {
-
-            this.resources = new ResourcesImpl(documentationUrl, categories, additionalUrls);
+        public ModifiableComponentDefinition resources(String documentationUrl, Map<String, String> additionalUrls) {
+            this.resources = new ResourcesImpl(documentationUrl, additionalUrls);
 
             return this;
         }
@@ -2007,13 +1999,13 @@ public final class ComponentDSL {
         }
 
         public ModifiableJdbcComponentDefinition resources(String documentationUrl) {
-            this.resources = new ResourcesImpl(documentationUrl, null, null);
+            this.resources = new ResourcesImpl(documentationUrl, null);
 
             return this;
         }
 
         public ModifiableJdbcComponentDefinition resources(String documentationUrl, List<String> categories) {
-            this.resources = new ResourcesImpl(documentationUrl, categories, null);
+            this.resources = new ResourcesImpl(documentationUrl, null);
 
             return this;
         }
@@ -2021,7 +2013,7 @@ public final class ComponentDSL {
         public ModifiableJdbcComponentDefinition resources(
             String documentationUrl, List<String> categories, Map<String, String> additionalUrls) {
 
-            this.resources = new ResourcesImpl(documentationUrl, categories, additionalUrls);
+            this.resources = new ResourcesImpl(documentationUrl, additionalUrls);
 
             return this;
         }
@@ -3468,13 +3460,7 @@ public final class ComponentDSL {
     }
 
     @SuppressFBWarnings("EI")
-    private record ResourcesImpl(
-        String documentationUrl, List<String> categories, Map<String, String> additionalUrls) implements Resources {
-
-        @Override
-        public Optional<List<String>> getCategories() {
-            return Optional.ofNullable(categories == null ? null : Collections.unmodifiableList(categories));
-        }
+    private record ResourcesImpl(String documentationUrl, Map<String, String> additionalUrls) implements Resources {
 
         @Override
         public Optional<Map<String, String>> getAdditionalUrls() {

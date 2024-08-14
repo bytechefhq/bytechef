@@ -18,7 +18,6 @@ package com.bytechef.platform.registry.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
@@ -30,7 +29,6 @@ import org.apache.commons.lang3.Validate;
 public abstract class BaseResources {
 
     protected Map<String, String> additionalUrls;
-    protected List<String> categories;
     protected String documentationUrl;
 
     protected BaseResources() {
@@ -38,16 +36,11 @@ public abstract class BaseResources {
 
     protected BaseResources(com.bytechef.definition.BaseResources resources) {
         this.additionalUrls = OptionalUtils.orElse(resources.getAdditionalUrls(), Map.of());
-        this.categories = OptionalUtils.orElse(resources.getCategories(), List.of());
         this.documentationUrl = Validate.notNull(resources.documentationUrl(), "documentationUrl");
     }
 
     public Map<String, String> getAdditionalUrls() {
         return additionalUrls;
-    }
-
-    public List<String> getCategories() {
-        return categories;
     }
 
     public String getDocumentationUrl() {
@@ -63,20 +56,19 @@ public abstract class BaseResources {
             return false;
         }
 
-        return Objects.equals(additionalUrls, that.additionalUrls) && Objects.equals(categories, that.categories)
-            && Objects.equals(documentationUrl, that.documentationUrl);
+        return Objects.equals(additionalUrls, that.additionalUrls) &&
+            Objects.equals(documentationUrl, that.documentationUrl);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalUrls, categories, documentationUrl);
+        return Objects.hash(additionalUrls, documentationUrl);
     }
 
     @Override
     public String toString() {
         return "Resources{" +
             "additionalUrls=" + additionalUrls +
-            ", categories=" + categories +
             ", documentationUrl='" + documentationUrl + '\'' +
             '}';
     }
