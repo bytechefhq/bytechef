@@ -20,7 +20,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.DateUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
@@ -115,7 +115,7 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
 
     private LocalDateTime refreshDynamicWebhookTrigger(WorkflowExecutionId workflowExecutionId) {
         WorkflowNodeType workflowNodeType = getComponentOperation(workflowExecutionId);
-        DynamicWebhookEnableOutput output = OptionalUtils.get(triggerStateService.fetchValue(workflowExecutionId));
+        WebhookEnableOutput output = OptionalUtils.get(triggerStateService.fetchValue(workflowExecutionId));
         LocalDateTime webhookExpirationDate = null;
 
         output = remoteTriggerDefinitionFacade.executeDynamicWebhookRefresh(

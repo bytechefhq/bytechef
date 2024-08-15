@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.platform.component.registry.remote.web.rest.facade;
 
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.component.registry.domain.Output;
@@ -65,44 +65,6 @@ public class RemoteTriggerDefinitionFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/execute-dynamic-webhook-disable",
-        consumes = {
-            "application/json"
-        })
-    public ResponseEntity<Void> executeDynamicWebhookDisable(
-        @Valid @RequestBody DynamicWebhookDisableRequest dynamicWebhookDisableRequest) {
-
-        triggerDefinitionFacade.executeDynamicWebhookDisable(
-            dynamicWebhookDisableRequest.componentName, dynamicWebhookDisableRequest.componentVersion,
-            dynamicWebhookDisableRequest.triggerName, dynamicWebhookDisableRequest.inputParameters,
-            dynamicWebhookDisableRequest.workflowExecutionId, dynamicWebhookDisableRequest.outputParameters,
-            dynamicWebhookDisableRequest.connectionId);
-
-        return ResponseEntity.noContent()
-            .build();
-    }
-
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/execute-dynamic-webhook-enable",
-        consumes = {
-            "application/json"
-        },
-        produces = {
-            "application/json"
-        })
-    public ResponseEntity<DynamicWebhookEnableOutput> executeDynamicWebhookEnable(
-        @Valid @RequestBody DynamicWebhookEnableRequest dynamicWebhookEnableRequest) {
-
-        return ResponseEntity.ok(triggerDefinitionFacade.executeDynamicWebhookEnable(
-            dynamicWebhookEnableRequest.componentName, dynamicWebhookEnableRequest.componentVersion,
-            dynamicWebhookEnableRequest.triggerName, dynamicWebhookEnableRequest.inputParameters,
-            dynamicWebhookEnableRequest.workflowExecutionId, dynamicWebhookEnableRequest.connectionId,
-            dynamicWebhookEnableRequest.webhookUrl));
-    }
-
-    @RequestMapping(
-        method = RequestMethod.POST,
         value = "/execute-dynamic-webhook-refresh",
         consumes = {
             "application/json"
@@ -110,7 +72,7 @@ public class RemoteTriggerDefinitionFacadeController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<DynamicWebhookEnableOutput> executeDynamicWebhookRefresh(
+    public ResponseEntity<WebhookEnableOutput> executeDynamicWebhookRefresh(
         @Valid @RequestBody DynamicWebhookRefreshRequest dynamicWebhookRefreshRequest) {
 
         return ResponseEntity.ok(triggerDefinitionFacade.executeDynamicWebhookRefresh(
@@ -214,6 +176,44 @@ public class RemoteTriggerDefinitionFacadeController {
                 triggerRequest.workflowReferenceCode, triggerRequest.jobId,
                 triggerRequest.inputParameters, triggerRequest.state,
                 triggerRequest.webhookRequest, triggerRequest.connectionId));
+    }
+
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/execute-webhook-disable",
+        consumes = {
+            "application/json"
+        })
+    public ResponseEntity<Void> executeWebhookDisable(
+        @Valid @RequestBody DynamicWebhookDisableRequest dynamicWebhookDisableRequest) {
+
+        triggerDefinitionFacade.executeWebhookDisable(
+            dynamicWebhookDisableRequest.componentName, dynamicWebhookDisableRequest.componentVersion,
+            dynamicWebhookDisableRequest.triggerName, dynamicWebhookDisableRequest.inputParameters,
+            dynamicWebhookDisableRequest.workflowExecutionId, dynamicWebhookDisableRequest.outputParameters,
+            dynamicWebhookDisableRequest.connectionId);
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/execute-webhook-enable",
+        consumes = {
+            "application/json"
+        },
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<WebhookEnableOutput> executeWebhookEnable(
+        @Valid @RequestBody DynamicWebhookEnableRequest dynamicWebhookEnableRequest) {
+
+        return ResponseEntity.ok(triggerDefinitionFacade.executeWebhookEnable(
+            dynamicWebhookEnableRequest.componentName, dynamicWebhookEnableRequest.componentVersion,
+            dynamicWebhookEnableRequest.triggerName, dynamicWebhookEnableRequest.inputParameters,
+            dynamicWebhookEnableRequest.workflowExecutionId, dynamicWebhookEnableRequest.connectionId,
+            dynamicWebhookEnableRequest.webhookUrl));
     }
 
     @RequestMapping(

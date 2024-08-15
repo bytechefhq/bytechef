@@ -17,7 +17,7 @@
 package com.bytechef.platform.component.registry.facade;
 
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.registry.definition.factory.ContextFactory;
@@ -74,54 +74,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     }
 
     @Override
-    public void executeDynamicWebhookDisable(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
-        @NonNull Map<String, ?> outputParameters, Long connectionId) {
-
-        ComponentConnection componentConnection = getComponentConnection(connectionId);
-
-        TriggerContext context = contextFactory.createTriggerContext(componentName, componentVersion, triggerName, null,
-            null, null, componentConnection);
-
-        tokenRefreshHelper.executeSingleConnectionFunction(componentName, componentVersion, componentConnection,
-            context, null,
-            (componentConnection1, triggerContext) -> {
-                triggerDefinitionService.executeDynamicWebhookDisable(
-                    componentName, componentVersion, triggerName, inputParameters, workflowExecutionId,
-                    outputParameters,
-                    componentConnection1, triggerContext);
-
-                return null;
-            },
-            componentConnection1 -> contextFactory.createTriggerContext(componentName, componentVersion, triggerName,
-                null,
-                null, null, componentConnection1));
-    }
-
-    @Override
-    public DynamicWebhookEnableOutput executeDynamicWebhookEnable(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, Long connectionId,
-        @NonNull String webhookUrl) {
-
-        ComponentConnection componentConnection = getComponentConnection(connectionId);
-
-        TriggerContext context = contextFactory.createTriggerContext(componentName, componentVersion, triggerName, null,
-            null, null, componentConnection);
-
-        return tokenRefreshHelper.executeSingleConnectionFunction(componentName, componentVersion, componentConnection,
-            context, null,
-            (componentConnection1, triggerContext) -> triggerDefinitionService.executeDynamicWebhookEnable(
-                componentName, componentVersion, triggerName, inputParameters,
-                webhookUrl, workflowExecutionId, componentConnection, triggerContext),
-            componentConnection1 -> contextFactory.createTriggerContext(componentName, componentVersion, triggerName,
-                null,
-                null, null, componentConnection1));
-    }
-
-    @Override
-    public DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
+    public WebhookEnableOutput executeDynamicWebhookRefresh(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> outputParameters) {
 
@@ -211,6 +164,53 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
             componentConnection,
             contextFactory.createTriggerContext(componentName, componentVersion, triggerName, type,
                 workflowReferenceCode, jobId, componentConnection));
+    }
+
+    @Override
+    public void executeWebhookDisable(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
+        @NonNull Map<String, ?> outputParameters, Long connectionId) {
+
+        ComponentConnection componentConnection = getComponentConnection(connectionId);
+
+        TriggerContext context = contextFactory.createTriggerContext(componentName, componentVersion, triggerName, null,
+            null, null, componentConnection);
+
+        tokenRefreshHelper.executeSingleConnectionFunction(componentName, componentVersion, componentConnection,
+            context, null,
+            (componentConnection1, triggerContext) -> {
+                triggerDefinitionService.executeWebhookDisable(
+                    componentName, componentVersion, triggerName, inputParameters, workflowExecutionId,
+                    outputParameters,
+                    componentConnection1, triggerContext);
+
+                return null;
+            },
+            componentConnection1 -> contextFactory.createTriggerContext(componentName, componentVersion, triggerName,
+                null,
+                null, null, componentConnection1));
+    }
+
+    @Override
+    public WebhookEnableOutput executeWebhookEnable(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, Long connectionId,
+        @NonNull String webhookUrl) {
+
+        ComponentConnection componentConnection = getComponentConnection(connectionId);
+
+        TriggerContext context = contextFactory.createTriggerContext(componentName, componentVersion, triggerName, null,
+            null, null, componentConnection);
+
+        return tokenRefreshHelper.executeSingleConnectionFunction(componentName, componentVersion, componentConnection,
+            context, null,
+            (componentConnection1, triggerContext) -> triggerDefinitionService.executeWebhookEnable(
+                componentName, componentVersion, triggerName, inputParameters,
+                webhookUrl, workflowExecutionId, componentConnection, triggerContext),
+            componentConnection1 -> contextFactory.createTriggerContext(componentName, componentVersion, triggerName,
+                null,
+                null, null, componentConnection1));
     }
 
     @Override

@@ -17,7 +17,7 @@
 package com.bytechef.platform.workflow.execution.facade;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.platform.component.registry.domain.TriggerDefinition;
 import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
@@ -68,9 +68,9 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
             case HYBRID, DYNAMIC_WEBHOOK -> {
                 Map<String, ?> parameters = OptionalUtils.mapOrElse(
                     triggerStateService.fetchValue(workflowExecutionId),
-                    DynamicWebhookEnableOutput::parameters, Map.of());
+                    WebhookEnableOutput::parameters, Map.of());
 
-                triggerDefinitionFacade.executeDynamicWebhookDisable(
+                triggerDefinitionFacade.executeWebhookDisable(
                     triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
                     triggerWorkflowNodeType.componentOperationName(), triggerParameters, workflowExecutionId.toString(),
                     parameters, connectionId);
@@ -104,9 +104,9 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
             triggerWorkflowNodeType.componentOperationName());
 
         switch (triggerDefinition.getType()) {
-            case HYBRID, DYNAMIC_WEBHOOK -> {
-                DynamicWebhookEnableOutput output =
-                    triggerDefinitionFacade.executeDynamicWebhookEnable(
+            case DYNAMIC_WEBHOOK, HYBRID, STATIC_WEBHOOK -> {
+                WebhookEnableOutput output =
+                    triggerDefinitionFacade.executeWebhookEnable(
                         triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
                         triggerWorkflowNodeType.componentOperationName(), triggerParameters,
                         workflowExecutionId.toString(), connectionId, webhookUrl);

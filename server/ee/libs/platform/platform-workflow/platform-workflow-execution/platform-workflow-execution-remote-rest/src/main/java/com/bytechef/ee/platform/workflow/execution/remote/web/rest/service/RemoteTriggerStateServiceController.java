@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.platform.workflow.execution.remote.web.rest.service;
 
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.service.TriggerStateService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -57,7 +57,7 @@ public class RemoteTriggerStateServiceController {
             "application/json"
         })
     public ResponseEntity<Void> save(
-        @PathVariable String workflowExecutionId, @RequestBody DynamicWebhookEnableOutput value) {
+        @PathVariable String workflowExecutionId, @RequestBody WebhookEnableOutput value) {
 
         triggerStateService.save(WorkflowExecutionId.parse(workflowExecutionId), value);
 
