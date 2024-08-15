@@ -12,6 +12,74 @@
   "resources": null,
   "version": 1,
   "title": "Todoist",
+  "connection": {
+    "authorizations": [ {
+      "detectOn": null,
+      "description": null,
+      "name": "oauth2_authorization_code",
+      "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "clientId",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Client Id",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "clientSecret",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Client Secret",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
+      "refreshOn": null,
+      "title": "OAuth2 Authorization Code",
+      "type": "OAUTH2_AUTHORIZATION_CODE",
+      "acquire": null,
+      "authorizationCallback": null,
+      "apply": null,
+      "clientId": null,
+      "pkce": null,
+      "refresh": null,
+      "refreshUrl": null,
+      "scopes": { },
+      "tokenUrl": { },
+      "authorizationUrl": { },
+      "clientSecret": null,
+      "refreshToken": null
+    } ],
+    "properties": null,
+    "version": 1,
+    "authorizationRequired": null,
+    "baseUri": { },
+    "test": null
+  },
   "actions": [ {
     "batch": null,
     "dynamicOutput": true,
@@ -147,6 +215,8 @@
       "optionsDataSource": null
     } ],
     "title": "Create Task",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": null,
     "perform": null,
     "outputResponse": {
@@ -293,9 +363,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "workflowNodeDescription": null,
-    "processErrorResponse": null
+    }
   }, {
     "batch": null,
     "dynamicOutput": false,
@@ -334,11 +402,11 @@
       }
     } ],
     "title": "Mark Task as Completed",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": null,
     "perform": null,
-    "outputResponse": null,
-    "workflowNodeDescription": null,
-    "processErrorResponse": null
+    "outputResponse": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -520,6 +588,8 @@
       "optionsDataSource": null
     } ],
     "title": "Create Project",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": null,
     "perform": null,
     "outputResponse": {
@@ -667,77 +737,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "workflowNodeDescription": null,
-    "processErrorResponse": null
+    }
   } ],
-  "triggers": [ ],
-  "connection": {
-    "authorizations": [ {
-      "detectOn": null,
-      "description": null,
-      "name": "oauth2_authorization_code",
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "clientId",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Client Id",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "clientSecret",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Client Secret",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      } ],
-      "refreshOn": null,
-      "title": "OAuth2 Authorization Code",
-      "type": "OAUTH2_AUTHORIZATION_CODE",
-      "acquire": null,
-      "apply": null,
-      "authorizationCallback": null,
-      "authorizationUrl": { },
-      "clientId": null,
-      "clientSecret": null,
-      "pkce": null,
-      "refresh": null,
-      "refreshUrl": null,
-      "scopes": { },
-      "refreshToken": null,
-      "tokenUrl": { }
-    } ],
-    "properties": null,
-    "version": 1,
-    "authorizationRequired": null,
-    "baseUri": { },
-    "test": null
-  }
+  "triggers": [ ]
 }

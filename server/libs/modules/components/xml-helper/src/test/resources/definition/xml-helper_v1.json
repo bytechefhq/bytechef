@@ -15,6 +15,7 @@
   "connection": null,
   "actions": [ {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Converts the XML string to object/array.",
     "help": null,
@@ -42,8 +43,6 @@
       "optionsDataSource": null
     } ],
     "title": "Convert from XML string",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
     "output": null,
     "perform": { },
     "outputResponse": {
@@ -70,9 +69,11 @@
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Writes the object/array to a XML string.",
     "help": null,
@@ -148,8 +149,6 @@
       "optionsDataSource": null
     } ],
     "title": "Convert to XML string",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
     "output": null,
     "perform": { },
     "outputResponse": {
@@ -176,7 +175,8 @@
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   } ],
   "triggers": null
 }

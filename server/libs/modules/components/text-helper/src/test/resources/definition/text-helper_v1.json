@@ -141,8 +141,8 @@
     "title": "Extract Content from HTML",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "perform": { },
     "output": null,
+    "perform": { },
     "outputResponse": null
   }, {
     "batch": null,
@@ -204,8 +204,8 @@
     "title": "Base64 Decode",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "perform": { },
     "output": null,
+    "perform": { },
     "outputResponse": null
   } ],
   "triggers": null

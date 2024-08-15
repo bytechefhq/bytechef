@@ -3,7 +3,6 @@
   "help": null,
   "icon": "path:assets/map.svg",
   "name": "map",
-  "output": null,
   "outputFunction": { },
   "properties": [ {
     "advancedOption": null,
@@ -46,5 +45,6 @@
   "title": "Map",
   "variableProperties": null,
   "variablePropertiesFunction": { },
-  "version": 1
+  "version": 1,
+  "output": null
 }

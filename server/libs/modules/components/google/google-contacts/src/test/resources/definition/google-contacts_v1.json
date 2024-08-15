@@ -62,7 +62,6 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "authorizationCallback": null,
       "authorizationUrl": { },
       "clientSecret": null,
       "refreshToken": null,
@@ -72,7 +71,8 @@
       "refresh": null,
       "refreshUrl": { },
       "scopes": { },
-      "tokenUrl": { }
+      "tokenUrl": { },
+      "authorizationCallback": null
     } ],
     "properties": null,
     "version": 1,
@@ -82,6 +82,7 @@
   },
   "actions": [ {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Creates a new contact",
     "help": null,
@@ -229,8 +230,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create contact",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -559,11 +558,13 @@
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true,
     "perform": { },
-    "output": null
+    "output": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Creates a new group",
     "help": null,
@@ -591,8 +592,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create groups",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -637,9 +636,10 @@
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true,
     "perform": { },
-    "output": null
+    "output": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   } ],
   "triggers": null
 }

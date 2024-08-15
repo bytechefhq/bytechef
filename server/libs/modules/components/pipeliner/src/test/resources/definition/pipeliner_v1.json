@@ -118,9 +118,7 @@
       "title": "Basic Auth",
       "type": "BASIC_AUTH",
       "acquire": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
-      "refreshToken": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -128,7 +126,9 @@
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
-      "authorizationCallback": null
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "refreshToken": null
     } ],
     "properties": null,
     "version": 1,
@@ -138,6 +138,7 @@
   },
   "actions": [ {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Creates new account",
     "help": null,
@@ -211,10 +212,14 @@
         "options": null,
         "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Create account",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": null,
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -337,21 +342,17 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "dynamicOutput": true,
-    "perform": null,
-    "output": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    }
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Creates new Contact",
     "help": null,
@@ -445,10 +446,14 @@
         "options": null,
         "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Create contact",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": null,
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -591,21 +596,17 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "dynamicOutput": true,
-    "perform": null,
-    "output": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    }
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Creates new Task",
     "help": null,
@@ -725,10 +726,14 @@
           "options": { }
         }
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Create task",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": null,
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -891,19 +896,14 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "dynamicOutput": true,
-    "perform": null,
-    "output": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    }
   } ],
   "triggers": [ ]
 }

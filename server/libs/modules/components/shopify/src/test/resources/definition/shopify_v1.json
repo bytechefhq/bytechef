@@ -12,6 +12,94 @@
   "resources": null,
   "version": 1,
   "title": "Shopify",
+  "connection": {
+    "authorizations": [ {
+      "detectOn": null,
+      "description": null,
+      "name": "api_key",
+      "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "shopName",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Shop name",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": true,
+        "metadata": { },
+        "required": true,
+        "name": "key",
+        "type": "STRING",
+        "defaultValue": "X-Shopify-Access-Token",
+        "exampleValue": null,
+        "label": "Access token",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "value",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Access Token",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
+      "refreshOn": null,
+      "title": "API Key",
+      "type": "API_KEY",
+      "acquire": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "refreshToken": null,
+      "apply": null,
+      "clientId": null,
+      "pkce": null,
+      "refresh": null,
+      "refreshUrl": null,
+      "scopes": null,
+      "tokenUrl": null,
+      "authorizationCallback": null
+    } ],
+    "properties": null,
+    "version": 1,
+    "authorizationRequired": null,
+    "baseUri": { },
+    "test": null
+  },
   "actions": [ {
     "batch": null,
     "dynamicOutput": true,
@@ -311,9 +399,6 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Create an order",
-    "perform": null,
-    "processErrorResponse": null,
-    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -659,6 +744,9 @@
       },
       "sampleOutput": null
     },
+    "output": null,
+    "perform": null,
+    "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
@@ -697,10 +785,10 @@
       "controlType": "SELECT"
     } ],
     "title": "Delete an order",
+    "outputResponse": null,
+    "output": null,
     "perform": null,
     "processErrorResponse": null,
-    "output": null,
-    "outputResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
@@ -739,9 +827,6 @@
       "controlType": "SELECT"
     } ],
     "title": "Cancel an order",
-    "perform": null,
-    "processErrorResponse": null,
-    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -1087,6 +1172,9 @@
       },
       "sampleOutput": null
     },
+    "output": null,
+    "perform": null,
+    "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
@@ -1249,9 +1337,6 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Update an order",
-    "perform": null,
-    "processErrorResponse": null,
-    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -1597,6 +1682,9 @@
       },
       "sampleOutput": null
     },
+    "output": null,
+    "perform": null,
+    "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
@@ -1635,9 +1723,6 @@
       "controlType": "SELECT"
     } ],
     "title": "Close an order",
-    "perform": null,
-    "processErrorResponse": null,
-    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -1983,96 +2068,11 @@
       },
       "sampleOutput": null
     },
+    "output": null,
+    "perform": null,
+    "processErrorResponse": null,
     "workflowNodeDescription": null
   } ],
-  "connection": {
-    "authorizations": [ {
-      "detectOn": null,
-      "description": null,
-      "name": "api_key",
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "shopName",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Shop name",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": true,
-        "metadata": { },
-        "required": true,
-        "name": "key",
-        "type": "STRING",
-        "defaultValue": "X-Shopify-Access-Token",
-        "exampleValue": null,
-        "label": "Access token",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "value",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Access Token",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      } ],
-      "refreshOn": null,
-      "title": "API Key",
-      "type": "API_KEY",
-      "acquire": null,
-      "scopes": null,
-      "authorizationUrl": null,
-      "tokenUrl": null,
-      "refreshUrl": null,
-      "apply": null,
-      "authorizationCallback": null,
-      "clientId": null,
-      "clientSecret": null,
-      "pkce": null,
-      "refresh": null,
-      "refreshToken": null
-    } ],
-    "properties": null,
-    "version": 1,
-    "authorizationRequired": null,
-    "baseUri": { },
-    "test": null
-  },
   "triggers": [ {
     "batch": null,
     "dynamicOutput": true,
@@ -2084,12 +2084,15 @@
     "title": "New Cancelled Order",
     "type": "DYNAMIC_WEBHOOK",
     "webhookRawBody": null,
-    "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
-    "staticWebhookRequest": null,
-    "processErrorResponse": null,
-    "output": null,
+    "workflowSyncOnEnableValidation": null,
+    "webhookDisable": { },
+    "webhookEnable": { },
+    "listenerDisable": null,
+    "listenerEnable": null,
+    "dwebhookRequest": { },
+    "webhookValidate": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -2433,15 +2436,13 @@
       },
       "sampleOutput": null
     },
+    "output": null,
     "deduplicate": null,
-    "dynamicWebhookDisable": { },
-    "dynamicWebhookEnable": { },
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": { },
-    "listenerDisable": null,
-    "listenerEnable": null,
     "poll": null,
-    "webhookValidate": null
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "dynamicWebhookRefresh": null,
+    "webhookValidateOnEnable": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -2453,12 +2454,15 @@
     "title": "New Order",
     "type": "DYNAMIC_WEBHOOK",
     "webhookRawBody": null,
-    "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
-    "staticWebhookRequest": null,
-    "processErrorResponse": null,
-    "output": null,
+    "workflowSyncOnEnableValidation": null,
+    "webhookDisable": { },
+    "webhookEnable": { },
+    "listenerDisable": null,
+    "listenerEnable": null,
+    "dwebhookRequest": { },
+    "webhookValidate": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -2802,15 +2806,13 @@
       },
       "sampleOutput": null
     },
+    "output": null,
     "deduplicate": null,
-    "dynamicWebhookDisable": { },
-    "dynamicWebhookEnable": { },
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": { },
-    "listenerDisable": null,
-    "listenerEnable": null,
     "poll": null,
-    "webhookValidate": null
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "dynamicWebhookRefresh": null,
+    "webhookValidateOnEnable": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -2822,12 +2824,15 @@
     "title": "New Paid Order",
     "type": "DYNAMIC_WEBHOOK",
     "webhookRawBody": null,
-    "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
-    "staticWebhookRequest": null,
-    "processErrorResponse": null,
-    "output": null,
+    "workflowSyncOnEnableValidation": null,
+    "webhookDisable": { },
+    "webhookEnable": { },
+    "listenerDisable": null,
+    "listenerEnable": null,
+    "dwebhookRequest": { },
+    "webhookValidate": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -3171,14 +3176,12 @@
       },
       "sampleOutput": null
     },
+    "output": null,
     "deduplicate": null,
-    "dynamicWebhookDisable": { },
-    "dynamicWebhookEnable": { },
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": { },
-    "listenerDisable": null,
-    "listenerEnable": null,
     "poll": null,
-    "webhookValidate": null
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "dynamicWebhookRefresh": null,
+    "webhookValidateOnEnable": null
   } ]
 }

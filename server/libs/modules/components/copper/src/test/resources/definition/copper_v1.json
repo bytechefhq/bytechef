@@ -12,6 +12,74 @@
   "resources": null,
   "version": 1,
   "title": "Copper",
+  "connection": {
+    "authorizations": [ {
+      "detectOn": null,
+      "description": null,
+      "name": "api_key",
+      "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "username",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Email address",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "key",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Key",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
+      "refreshOn": null,
+      "title": "API Key",
+      "type": "API_KEY",
+      "acquire": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "refreshToken": null,
+      "apply": { },
+      "clientId": null,
+      "pkce": null,
+      "refresh": null,
+      "refreshUrl": null,
+      "scopes": null,
+      "tokenUrl": null,
+      "authorizationCallback": null
+    } ],
+    "properties": null,
+    "version": 1,
+    "authorizationRequired": null,
+    "baseUri": { },
+    "test": null
+  },
   "actions": [ {
     "batch": null,
     "dynamicOutput": true,
@@ -124,8 +192,6 @@
       }
     } ],
     "title": "Create activity",
-    "output": null,
-    "perform": { },
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -310,6 +376,8 @@
       },
       "sampleOutput": null
     },
+    "output": null,
+    "perform": { },
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
@@ -895,8 +963,6 @@
       "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Create company",
-    "output": null,
-    "perform": { },
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -1445,6 +1511,8 @@
       },
       "sampleOutput": null
     },
+    "output": null,
+    "perform": { },
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
@@ -2146,8 +2214,6 @@
       "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Create person",
-    "output": null,
-    "perform": { },
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -2797,76 +2863,10 @@
       },
       "sampleOutput": null
     },
+    "output": null,
+    "perform": { },
     "processErrorResponse": null,
     "workflowNodeDescription": null
   } ],
-  "triggers": null,
-  "connection": {
-    "authorizations": [ {
-      "detectOn": null,
-      "description": null,
-      "name": "api_key",
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "username",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Email address",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "key",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Key",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      } ],
-      "refreshOn": null,
-      "title": "API Key",
-      "type": "API_KEY",
-      "acquire": null,
-      "apply": { },
-      "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientId": null,
-      "clientSecret": null,
-      "pkce": null,
-      "refresh": null,
-      "refreshUrl": null,
-      "scopes": null,
-      "refreshToken": null,
-      "tokenUrl": null
-    } ],
-    "properties": null,
-    "version": 1,
-    "authorizationRequired": null,
-    "baseUri": { },
-    "test": null
-  }
+  "triggers": null
 }

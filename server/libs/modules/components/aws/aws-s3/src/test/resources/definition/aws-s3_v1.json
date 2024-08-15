@@ -218,9 +218,6 @@
       "title": null,
       "type": "CUSTOM",
       "acquire": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
-      "refreshToken": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -228,6 +225,9 @@
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "refreshToken": null,
       "authorizationCallback": null
     } ],
     "properties": null,
@@ -238,6 +238,7 @@
   },
   "actions": [ {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Get the AWS S3 object.",
     "help": null,
@@ -285,6 +286,8 @@
       "optionsDataSource": null
     } ],
     "title": "Get Object",
+    "perform": { },
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -385,13 +388,11 @@
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true,
-    "perform": { },
-    "output": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Get the url of an AWS S3 object.",
     "help": null,
@@ -419,6 +420,8 @@
       "optionsDataSource": null
     } ],
     "title": "Get URL",
+    "perform": { },
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -443,13 +446,11 @@
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true,
-    "perform": { },
-    "output": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Get the list AWS S3 objects. Every object needs to have read permission in order to be seen.",
     "help": null,
@@ -477,6 +478,8 @@
       "optionsDataSource": null
     } ],
     "title": "List Objects",
+    "perform": { },
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -570,25 +573,23 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "maxItems": null,
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true,
-    "perform": { },
-    "output": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "You can share an object with a pre-signed URL for up to 12 hours or until your session expires.",
     "help": null,
@@ -636,6 +637,8 @@
       "optionsDataSource": null
     } ],
     "title": "Get Pre-signed Object",
+    "perform": { },
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -660,13 +663,11 @@
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true,
-    "perform": { },
-    "output": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Store an object to AWS S3.",
     "help": null,
@@ -838,6 +839,8 @@
       "optionsDataSource": null
     } ],
     "title": "Put Object",
+    "perform": { },
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -862,9 +865,6 @@
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true,
-    "perform": { },
-    "output": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   } ],

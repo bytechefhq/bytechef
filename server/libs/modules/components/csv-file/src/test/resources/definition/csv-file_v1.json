@@ -12,6 +12,7 @@
   "resources": null,
   "version": 1,
   "title": "CSV File",
+  "connection": null,
   "actions": [ {
     "batch": null,
     "dynamicOutput": true,
@@ -221,8 +222,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": true,
       "description": "The page number to get.",
@@ -240,8 +241,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": true,
       "description": "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.",
@@ -268,9 +269,6 @@
       "controlType": "SELECT"
     } ],
     "title": "Read from file",
-    "output": null,
-    "perform": { },
-    "processErrorResponse": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -304,18 +302,21 @@
           "multipleValues": null,
           "options": null,
           "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
         "maxItems": null,
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "controlType": "ARRAY_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "ARRAY_BUILDER"
       },
       "sampleOutput": null
     },
+    "perform": { },
+    "output": null,
+    "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
@@ -392,8 +393,8 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         }, {
           "advancedOption": null,
           "description": null,
@@ -414,8 +415,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -440,15 +441,15 @@
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "File you want to write to.",
@@ -547,9 +548,6 @@
       "controlType": "FILE_ENTRY"
     } ],
     "title": "Write to file",
-    "output": null,
-    "perform": { },
-    "processErrorResponse": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -650,8 +648,10 @@
       },
       "sampleOutput": null
     },
+    "perform": { },
+    "output": null,
+    "processErrorResponse": null,
     "workflowNodeDescription": null
   } ],
-  "connection": null,
   "triggers": null
 }

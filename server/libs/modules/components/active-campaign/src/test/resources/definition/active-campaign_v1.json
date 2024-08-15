@@ -102,6 +102,7 @@
   },
   "actions": [ {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Creates a new account",
     "help": null,
@@ -198,8 +199,8 @@
     "title": "Create account",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "perform": null,
     "output": null,
+    "perform": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -305,10 +306,10 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "dynamicOutput": true
+    }
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Creates a new contact",
     "help": null,
@@ -445,8 +446,8 @@
     "title": "Create contact",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "perform": null,
     "output": null,
+    "perform": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -592,10 +593,10 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "dynamicOutput": true
+    }
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Creates a new task",
     "help": null,
@@ -727,8 +728,8 @@
     "title": "Creates a task",
     "processErrorResponse": null,
     "workflowNodeDescription": null,
-    "perform": null,
     "output": null,
+    "perform": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -889,8 +890,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "dynamicOutput": true
+    }
   } ],
   "triggers": [ ]
 }

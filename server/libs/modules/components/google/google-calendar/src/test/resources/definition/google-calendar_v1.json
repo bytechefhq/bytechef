@@ -12,6 +12,74 @@
   "resources": null,
   "version": 1,
   "title": "Google Calendar",
+  "connection": {
+    "authorizations": [ {
+      "detectOn": null,
+      "description": null,
+      "name": "oauth2_authorization_code",
+      "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "clientId",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Client Id",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "clientSecret",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Client Secret",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
+      "refreshOn": [ "^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$" ],
+      "title": "OAuth2 Authorization Code",
+      "type": "OAUTH2_AUTHORIZATION_CODE",
+      "acquire": null,
+      "authorizationUrl": { },
+      "clientSecret": null,
+      "refreshToken": null,
+      "apply": null,
+      "clientId": null,
+      "pkce": null,
+      "refresh": null,
+      "refreshUrl": { },
+      "scopes": { },
+      "tokenUrl": { },
+      "authorizationCallback": null
+    } ],
+    "properties": null,
+    "version": 1,
+    "authorizationRequired": null,
+    "baseUri": null,
+    "test": null
+  },
   "actions": [ {
     "batch": null,
     "dynamicOutput": true,
@@ -571,7 +639,6 @@
       "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Create event",
-    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -3494,9 +3561,10 @@
       },
       "sampleOutput": null
     },
-    "workflowNodeDescription": null,
     "perform": { },
-    "processErrorResponse": null
+    "output": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -3582,7 +3650,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create Quick Event",
-    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -6505,9 +6572,10 @@
       },
       "sampleOutput": null
     },
-    "workflowNodeDescription": null,
     "perform": { },
-    "processErrorResponse": null
+    "output": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -6667,7 +6735,6 @@
       "controlType": "DATE_TIME"
     } ],
     "title": "Find events",
-    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -9888,78 +9955,11 @@
       },
       "sampleOutput": null
     },
-    "workflowNodeDescription": null,
     "perform": { },
-    "processErrorResponse": null
+    "output": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   } ],
-  "connection": {
-    "authorizations": [ {
-      "detectOn": null,
-      "description": null,
-      "name": "oauth2_authorization_code",
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "clientId",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Client Id",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "clientSecret",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Client Secret",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      } ],
-      "refreshOn": [ "^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$" ],
-      "title": "OAuth2 Authorization Code",
-      "type": "OAUTH2_AUTHORIZATION_CODE",
-      "acquire": null,
-      "apply": null,
-      "authorizationCallback": null,
-      "authorizationUrl": { },
-      "clientId": null,
-      "clientSecret": null,
-      "pkce": null,
-      "refresh": null,
-      "refreshUrl": { },
-      "scopes": { },
-      "refreshToken": null,
-      "tokenUrl": { }
-    } ],
-    "properties": null,
-    "version": 1,
-    "authorizationRequired": null,
-    "baseUri": null,
-    "test": null
-  },
   "triggers": [ {
     "batch": null,
     "dynamicOutput": true,
@@ -9994,17 +9994,15 @@
     "title": "New or Updated Event",
     "type": "DYNAMIC_WEBHOOK",
     "webhookRawBody": null,
-    "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
-    "output": null,
-    "poll": null,
-    "deduplicate": null,
-    "dynamicWebhookDisable": { },
-    "dynamicWebhookEnable": { },
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": { },
+    "workflowSyncOnEnableValidation": null,
+    "webhookDisable": { },
+    "webhookEnable": { },
+    "dwebhookRequest": { },
     "listenerDisable": null,
+    "listenerEnable": null,
+    "webhookValidate": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -12927,9 +12925,12 @@
       },
       "sampleOutput": null
     },
+    "deduplicate": null,
+    "poll": null,
+    "output": null,
     "processErrorResponse": null,
-    "listenerEnable": null,
-    "staticWebhookRequest": null,
-    "webhookValidate": null
+    "workflowNodeDescription": null,
+    "dynamicWebhookRefresh": null,
+    "webhookValidateOnEnable": null
   } ]
 }

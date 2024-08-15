@@ -62,7 +62,6 @@
       "title": "Basic Auth",
       "type": "BASIC_AUTH",
       "acquire": null,
-      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -72,7 +71,8 @@
       "tokenUrl": null,
       "authorizationUrl": null,
       "clientSecret": null,
-      "refreshToken": null
+      "refreshToken": null,
+      "authorizationCallback": null
     } ],
     "properties": null,
     "version": 1,
@@ -82,6 +82,7 @@
   },
   "actions": [ {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Creates a new company",
     "help": null,
@@ -176,10 +177,8 @@
       "optionsDataSource": null
     } ],
     "title": "Create company",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
-    "perform": null,
     "output": null,
+    "perform": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -308,9 +307,11 @@
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Creates a new contact",
     "help": null,
@@ -465,10 +466,8 @@
       "optionsDataSource": null
     } ],
     "title": "Create contact",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
-    "perform": null,
     "output": null,
+    "perform": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -597,9 +596,11 @@
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Creates a new ticket",
     "help": null,
@@ -764,10 +765,8 @@
       "optionsDataSource": null
     } ],
     "title": "Create ticket",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
-    "perform": null,
     "output": null,
+    "perform": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -912,7 +911,8 @@
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   } ],
   "triggers": [ ]
 }

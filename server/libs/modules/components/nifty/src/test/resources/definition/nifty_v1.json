@@ -82,6 +82,7 @@
   },
   "actions": [ {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Create a new task",
     "help": null,
@@ -339,8 +340,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "dynamicOutput": true
+    }
   } ],
   "triggers": null
 }

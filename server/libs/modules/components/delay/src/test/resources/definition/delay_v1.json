@@ -15,6 +15,7 @@
   "connection": null,
   "actions": [ {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": "Delay action execution.",
     "help": null,
@@ -41,12 +42,11 @@
       "optionsDataSource": null
     } ],
     "title": "Sleep",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": null,
     "perform": { },
-    "outputResponse": null,
-    "dynamicOutput": false,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "outputResponse": null
   } ],
   "triggers": null
 }

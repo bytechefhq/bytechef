@@ -82,6 +82,7 @@
   },
   "actions": [ {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": "Create a document on Google Docs",
     "help": null,
@@ -130,13 +131,13 @@
     } ],
     "title": "Create document",
     "outputResponse": null,
-    "dynamicOutput": false,
-    "perform": { },
     "output": null,
+    "perform": { },
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": "Edit a template file and replace the values with the ones provided",
     "help": null,
@@ -245,13 +246,13 @@
     } ],
     "title": "Edit template file",
     "outputResponse": null,
-    "dynamicOutput": false,
-    "perform": { },
     "output": null,
+    "perform": { },
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": "Read a document from Google Docs",
     "help": null,
@@ -280,9 +281,8 @@
     } ],
     "title": "Read document",
     "outputResponse": null,
-    "dynamicOutput": false,
-    "perform": { },
     "output": null,
+    "perform": { },
     "processErrorResponse": null,
     "workflowNodeDescription": null
   } ],

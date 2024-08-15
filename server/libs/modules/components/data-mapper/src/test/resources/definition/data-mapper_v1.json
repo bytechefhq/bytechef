@@ -12,6 +12,7 @@
   "resources": null,
   "version": 1,
   "title": "Data Mapper",
+  "connection": null,
   "actions": [ {
     "batch": null,
     "dynamicOutput": true,
@@ -123,11 +124,11 @@
       "optionsDataSource": null
     } ],
     "title": "Rename keys",
-    "output": null,
-    "perform": { },
     "processErrorResponse": null,
-    "outputResponse": null,
-    "workflowNodeDescription": null
+    "workflowNodeDescription": null,
+    "perform": { },
+    "output": null,
+    "outputResponse": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -1477,11 +1478,11 @@
       "optionsDataSource": null
     } ],
     "title": "Replace value",
-    "output": null,
-    "perform": { },
     "processErrorResponse": null,
-    "outputResponse": null,
-    "workflowNodeDescription": null
+    "workflowNodeDescription": null,
+    "perform": { },
+    "output": null,
+    "outputResponse": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -2358,11 +2359,11 @@
       "optionsDataSource": null
     } ],
     "title": "Replace all specified values",
-    "output": null,
-    "perform": { },
     "processErrorResponse": null,
-    "outputResponse": null,
-    "workflowNodeDescription": null
+    "workflowNodeDescription": null,
+    "perform": { },
+    "output": null,
+    "outputResponse": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -2494,11 +2495,11 @@
       "optionsDataSource": null
     } ],
     "title": "Replace multiple values by key",
-    "output": null,
-    "perform": { },
     "processErrorResponse": null,
-    "outputResponse": null,
-    "workflowNodeDescription": null
+    "workflowNodeDescription": null,
+    "perform": { },
+    "output": null,
+    "outputResponse": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -2774,11 +2775,11 @@
       "controlType": "SELECT"
     } ],
     "title": "Map objects to object",
-    "output": null,
-    "perform": { },
     "processErrorResponse": null,
-    "outputResponse": null,
-    "workflowNodeDescription": null
+    "workflowNodeDescription": null,
+    "perform": { },
+    "output": null,
+    "outputResponse": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -2917,11 +2918,11 @@
       "optionsDataSource": null
     } ],
     "title": "Map objects to array",
-    "output": null,
-    "perform": { },
     "processErrorResponse": null,
-    "outputResponse": null,
-    "workflowNodeDescription": null
+    "workflowNodeDescription": null,
+    "perform": { },
+    "output": null,
+    "outputResponse": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -3013,12 +3014,11 @@
       "optionsDataSource": null
     } ],
     "title": "Merge and pivot properties by key",
-    "output": null,
-    "perform": { },
     "processErrorResponse": null,
-    "outputResponse": null,
-    "workflowNodeDescription": null
+    "workflowNodeDescription": null,
+    "perform": { },
+    "output": null,
+    "outputResponse": null
   } ],
-  "connection": null,
   "triggers": null
 }
