@@ -53,4 +53,7 @@ public class PetstoreUserProperties {
             .description("User Status")
             .required(false)
             .exampleValue(1));
+
+    private PetstoreUserProperties() {
+    }
 }

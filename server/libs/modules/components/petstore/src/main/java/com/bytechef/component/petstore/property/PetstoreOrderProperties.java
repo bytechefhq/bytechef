@@ -49,4 +49,7 @@ public class PetstoreOrderProperties {
             .exampleValue("approved"),
         bool("complete").label("Complete")
             .required(false));
+
+    private PetstoreOrderProperties() {
+    }
 }

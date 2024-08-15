@@ -270,8 +270,8 @@ public class MailchimpAddMemberToListAction {
                     string("schema").description(
                         "For HTTP methods that can receive bodies (POST and PUT), this is a URL representing the schema that the body should conform to.")
                         .required(false))
-                    .description("A list of link types and descriptions for the API schema documents."))
-                    .description("A list of link types and descriptions for the API schema documents.")
+                    .description("The list of link types and descriptions for the API schema documents."))
+                    .description("The list of link types and descriptions for the API schema documents.")
                     .required(false))
             .metadata(
                 Map.of(
