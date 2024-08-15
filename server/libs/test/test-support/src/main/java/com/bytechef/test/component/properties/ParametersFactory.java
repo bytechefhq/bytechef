@@ -18,11 +18,11 @@ package com.bytechef.test.component.properties;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.component.registry.definition.ParametersImpl;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import java.lang.reflect.Constructor;
 import java.util.Map;
 
 /**
@@ -32,7 +32,7 @@ public class ParametersFactory {
 
     public static Parameters createParameters(Map<String, Object> map) {
         try {
-            return (Parameters) parametersImplConstructor.newInstance(map);
+            return new ParametersImpl(map);
         } catch (Exception exception) {
             throw new RuntimeException("Unable to instantiate Parameters", exception);
         }
@@ -49,18 +49,4 @@ public class ParametersFactory {
     static {
         MapUtils.initObjectMapper(OBJECT_MAPPER);
     }
-
-    private static final Class<?> parametersImplClass;
-    private static final Constructor<?> parametersImplConstructor;
-
-    static {
-        try {
-            parametersImplClass = Class.forName("com.bytechef.platform.component.registry.definition.ParametersImpl");
-
-            parametersImplConstructor = parametersImplClass.getConstructor(Map.class);
-        } catch (ClassNotFoundException | NoSuchMethodException exception) {
-            throw new ExceptionInInitializerError(exception);
-        }
-    }
-
 }
