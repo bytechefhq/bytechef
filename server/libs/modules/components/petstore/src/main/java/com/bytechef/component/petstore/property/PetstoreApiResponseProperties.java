@@ -35,4 +35,7 @@ public class PetstoreApiResponseProperties {
             .required(false),
         string("message").label("Message")
             .required(false));
+
+    private PetstoreApiResponseProperties() {
+    }
 }

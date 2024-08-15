@@ -34,4 +34,7 @@ public class PetstoreCategoryProperties {
         string("name").label("Name")
             .required(false)
             .exampleValue("Dogs"));
+
+    private PetstoreCategoryProperties() {
+    }
 }

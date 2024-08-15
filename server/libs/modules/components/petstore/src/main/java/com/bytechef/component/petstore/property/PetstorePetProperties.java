@@ -52,4 +52,7 @@ public class PetstorePetProperties {
             .description("pet status in the store")
             .options(option("Available", "available"), option("Pending", "pending"), option("Sold", "sold"))
             .required(false));
+
+    private PetstorePetProperties() {
+    }
 }

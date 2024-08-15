@@ -32,4 +32,7 @@ public class PetstoreTagProperties {
         .required(false),
         string("name").label("Name")
             .required(false));
+
+    private PetstoreTagProperties() {
+    }
 }
