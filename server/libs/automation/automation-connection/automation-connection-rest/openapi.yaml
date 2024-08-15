@@ -11,6 +11,26 @@ tags:
 - name: "connection"
   description: "The Automation Connection Internal API"
 paths:
+  /connections:
+    post:
+      description: "Create a new connection."
+      summary: "Create a new connection"
+      tags:
+        - "connection"
+      operationId: "createConnection"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Connection"
+        required: true
+      responses:
+        "200":
+          description: "The connection object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Connection"
   /connections/tags:
     get:
       description: "Get connection tags."
@@ -66,7 +86,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
+                $ref: "#/components/schemas/Connection"
     put:
       description: "Update an existing connection."
       summary: "Update an existing connection"
@@ -85,7 +105,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
+              $ref: "#/components/schemas/Connection"
         required: true
       responses:
         "200":
@@ -93,7 +113,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
+                $ref: "#/components/schemas/Connection"
   /connections/{id}/tags:
     put:
       description: "Updates tags of an existing connection."
@@ -119,33 +139,6 @@ paths:
         "200":
           description: "Successful operation."
   /workspaces/{id}/connections:
-    post:
-      description: "Create a new connection."
-      summary: "Create a new connection"
-      tags:
-        - "connection"
-      operationId: "createWorkspaceConnection"
-      parameters:
-        - name: "id"
-          description: "The id of a workspace."
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
-        required: true
-      responses:
-        "200":
-          description: "The connection object."
-          content:
-            application/json:
-              schema:
-                $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
     get:
       description: "Get all workspace connections."
       summary: "Get all workspace connections"
@@ -193,4 +186,16 @@ paths:
               schema:
                 type: "array"
                 items:
-                  $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
+                  $ref: "#/components/schemas/Connection"
+components:
+  schemas:
+    Connection:
+      description: "Contains all required information to open a connection to a service\
+        \ defined by componentName parameter."
+      allOf:
+        - $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
+        - type: object
+          properties:
+            workspaceId:
+              type: integer
+              format: int64
