@@ -18,7 +18,7 @@ package com.bytechef.platform.component.registry.service;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
@@ -44,18 +44,7 @@ public interface TriggerDefinitionService {
         @NonNull Map<String, ?> inputParameters, @NonNull String propertyName,
         List<String> lookupDependsOnPaths, @Nullable ComponentConnection connection, @NonNull TriggerContext context);
 
-    void executeDynamicWebhookDisable(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
-        @NonNull Map<String, ?> outputParameters, @Nullable ComponentConnection connection,
-        @NonNull TriggerContext context);
-
-    DynamicWebhookEnableOutput executeDynamicWebhookEnable(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String webhookUrl, @NonNull String workflowExecutionId,
-        @Nullable ComponentConnection connection, @NonNull TriggerContext context);
-
-    DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
+    WebhookEnableOutput executeDynamicWebhookRefresh(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> outputParameters, @NonNull TriggerContext context);
 
@@ -88,6 +77,17 @@ public interface TriggerDefinitionService {
     TriggerOutput executeTrigger(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
+        @Nullable ComponentConnection connection, @NonNull TriggerContext context);
+
+    void executeWebhookDisable(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
+        @NonNull Map<String, ?> outputParameters, @Nullable ComponentConnection connection,
+        @NonNull TriggerContext context);
+
+    WebhookEnableOutput executeWebhookEnable(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull String webhookUrl, @NonNull String workflowExecutionId,
         @Nullable ComponentConnection connection, @NonNull TriggerContext context);
 
     WebhookValidateResponse executeWebhookValidate(

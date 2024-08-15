@@ -9,7 +9,7 @@ package com.bytechef.ee.platform.component.registry.remote.client.service;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.ee.platform.component.registry.remote.client.AbstractWorkerClient;
@@ -48,7 +48,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     }
 
     @Override
-    public void executeDynamicWebhookDisable(
+    public void executeWebhookDisable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
         @NonNull Map<String, ?> outputParameters, ComponentConnection connection, @NonNull TriggerContext context) {
@@ -67,7 +67,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     }
 
     @Override
-    public DynamicWebhookEnableOutput executeDynamicWebhookEnable(
+    public WebhookEnableOutput executeWebhookEnable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String webhookUrl, @NonNull String workflowExecutionId,
         ComponentConnection connection, @NonNull TriggerContext context) {
@@ -76,7 +76,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     }
 
     @Override
-    public DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
+    public WebhookEnableOutput executeDynamicWebhookRefresh(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> outputParameters, @NonNull TriggerContext context) {
 

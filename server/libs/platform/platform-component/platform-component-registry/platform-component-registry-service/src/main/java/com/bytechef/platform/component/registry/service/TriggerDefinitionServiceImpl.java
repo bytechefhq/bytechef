@@ -28,9 +28,6 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.PropertiesDataSource;
 import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookDisableConsumer;
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableFunction;
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookRefreshFunction;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookRequestFunction;
 import com.bytechef.component.definition.TriggerDefinition.ListenerDisableConsumer;
@@ -39,6 +36,9 @@ import com.bytechef.component.definition.TriggerDefinition.PollFunction;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.StaticWebhookRequestFunction;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.component.definition.TriggerDefinition.WebhookDisableConsumer;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableFunction;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.component.definition.TriggerWorkflowNodeDescriptionFunction;
 import com.bytechef.component.exception.ProviderException;
@@ -117,47 +117,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public void executeDynamicWebhookDisable(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
-        @NonNull Map<String, ?> outputParameters, ComponentConnection connection, @NonNull TriggerContext context) {
-
-        DynamicWebhookDisableConsumer dynamicWebhookDisableConsumer = getDynamicWebhookDisableConsumer(
-            componentName, componentVersion, triggerName);
-
-        try {
-            dynamicWebhookDisableConsumer.accept(
-                new ParametersImpl(inputParameters),
-                connection == null ? null : new ParametersImpl(connection.parameters()),
-                new ParametersImpl(outputParameters), workflowExecutionId, context);
-        } catch (Exception e) {
-            throw new ComponentExecutionException(
-                e, inputParameters, TriggerDefinitionErrorType.EXECUTE_DYNAMIC_WEBHOOK_DISABLE);
-        }
-    }
-
-    @Override
-    public DynamicWebhookEnableOutput executeDynamicWebhookEnable(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String webhookUrl, @NonNull String workflowExecutionId,
-        ComponentConnection connection, @NonNull TriggerContext context) {
-
-        DynamicWebhookEnableFunction dynamicWebhookEnableFunction = getDynamicWebhookEnableFunction(
-            componentName, componentVersion, triggerName);
-
-        try {
-            return dynamicWebhookEnableFunction.apply(
-                new ParametersImpl(inputParameters),
-                connection == null ? null : new ParametersImpl(connection.parameters()),
-                webhookUrl, workflowExecutionId, context);
-        } catch (Exception e) {
-            throw new ComponentExecutionException(
-                e, inputParameters, TriggerDefinitionErrorType.EXECUTE_DYNAMIC_WEBHOOK_ENABLE);
-        }
-    }
-
-    @Override
-    public DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
+    public WebhookEnableOutput executeDynamicWebhookRefresh(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> outputParameters, @NonNull TriggerContext context) {
 
@@ -296,6 +256,46 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
+    public void executeWebhookDisable(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
+        @NonNull Map<String, ?> outputParameters, ComponentConnection connection, @NonNull TriggerContext context) {
+
+        WebhookDisableConsumer webhookDisableConsumer = getWebhookDisableConsumer(
+            componentName, componentVersion, triggerName);
+
+        try {
+            webhookDisableConsumer.accept(
+                new ParametersImpl(inputParameters),
+                connection == null ? null : new ParametersImpl(connection.parameters()),
+                new ParametersImpl(outputParameters), workflowExecutionId, context);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(
+                e, inputParameters, TriggerDefinitionErrorType.EXECUTE_DYNAMIC_WEBHOOK_DISABLE);
+        }
+    }
+
+    @Override
+    public WebhookEnableOutput executeWebhookEnable(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull String webhookUrl, @NonNull String workflowExecutionId,
+        ComponentConnection connection, @NonNull TriggerContext context) {
+
+        WebhookEnableFunction webhookEnableFunction = getWebhookEnableFunction(
+            componentName, componentVersion, triggerName);
+
+        try {
+            return webhookEnableFunction.apply(
+                new ParametersImpl(inputParameters),
+                connection == null ? null : new ParametersImpl(connection.parameters()),
+                webhookUrl, workflowExecutionId, context);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(
+                e, inputParameters, TriggerDefinitionErrorType.EXECUTE_DYNAMIC_WEBHOOK_ENABLE);
+        }
+    }
+
+    @Override
     public WebhookValidateResponse executeWebhookValidate(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest,
@@ -376,7 +376,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     private static TriggerOutput executeDynamicWebhookTrigger(
         com.bytechef.component.definition.TriggerDefinition triggerDefinition,
-        Map<String, ?> inputParameters, DynamicWebhookEnableOutput output, WebhookRequest webhookRequest,
+        Map<String, ?> inputParameters, WebhookEnableOutput output, WebhookRequest webhookRequest,
         ComponentConnection connection, TriggerContext triggerContext,
         DynamicWebhookRequestFunction dynamicWebhookRequestFunction) {
 
@@ -505,22 +505,22 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return OptionalUtils.get(triggerDefinition.getDynamicWebhookRefresh());
     }
 
-    private DynamicWebhookDisableConsumer getDynamicWebhookDisableConsumer(
+    private WebhookDisableConsumer getWebhookDisableConsumer(
         String componentName, int componentVersion, String triggerName) {
 
         com.bytechef.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
-        return OptionalUtils.get(triggerDefinition.getDynamicWebhookDisable());
+        return OptionalUtils.get(triggerDefinition.getWebhookDisable());
     }
 
-    private DynamicWebhookEnableFunction getDynamicWebhookEnableFunction(
+    private WebhookEnableFunction getWebhookEnableFunction(
         String componentName, int componentVersion, String triggerName) {
 
         com.bytechef.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
-        return OptionalUtils.get(triggerDefinition.getDynamicWebhookEnable());
+        return OptionalUtils.get(triggerDefinition.getWebhookEnable());
     }
 
     private TriggerWorkflowNodeDescriptionFunction getWorkflowNodeDescriptionFunction(
@@ -563,12 +563,12 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @SuppressWarnings("unchecked")
-    private DynamicWebhookEnableOutput toDynamicWebhookEnableOutput(Map<?, ?> triggerState) {
+    private WebhookEnableOutput toDynamicWebhookEnableOutput(Map<?, ?> triggerState) {
         if (triggerState == null) {
             return null;
         }
 
-        return new DynamicWebhookEnableOutput(
+        return new WebhookEnableOutput(
             (Map<String, ?>) triggerState.get("parameters"), (LocalDateTime) triggerState.get("webhookExpirationDate"));
     }
 }

@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.platform.component.registry.remote.client.facade;
 
-import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.ee.platform.component.registry.remote.client.AbstractWorkerClient;
@@ -57,7 +57,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
     }
 
     @Override
-    public DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
+    public WebhookEnableOutput executeDynamicWebhookRefresh(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> outputParameters) {
 
@@ -65,37 +65,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
             uriBuilder -> toUri(
                 uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-dynamic-webhook-refresh"),
             new DynamicWebhookRefresh(componentName, componentVersion, triggerName, outputParameters),
-            DynamicWebhookEnableOutput.class);
-    }
-
-    @Override
-    public void executeDynamicWebhookDisable(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
-        @NonNull Map<String, ?> outputParameters,
-        Long connectionId) {
-
-        defaultRestClient.post(
-            uriBuilder -> toUri(
-                uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-dynamic-webhook-disable"),
-            new DynamicWebhookDisableRequest(
-                componentName, componentVersion, triggerName, inputParameters, workflowExecutionId, outputParameters,
-                connectionId));
-    }
-
-    @Override
-    public DynamicWebhookEnableOutput executeDynamicWebhookEnable(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, Long connectionId,
-        @NonNull String webhookUrl) {
-
-        return defaultRestClient.post(
-            uriBuilder -> toUri(
-                uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-dynamic-webhook-enable"),
-            new DynamicWebhookEnableRequest(
-                componentName, componentVersion, triggerName, inputParameters, workflowExecutionId, connectionId,
-                webhookUrl),
-            DynamicWebhookEnableOutput.class);
+            WebhookEnableOutput.class);
     }
 
     @Override
@@ -160,6 +130,36 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
                 componentName, componentVersion, triggerName, inputParameters, triggerState, webhookRequest,
                 connectionId),
             TriggerOutput.class);
+    }
+
+    @Override
+    public void executeWebhookDisable(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
+        @NonNull Map<String, ?> outputParameters,
+        Long connectionId) {
+
+        defaultRestClient.post(
+            uriBuilder -> toUri(
+                uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-webhook-disable"),
+            new DynamicWebhookDisableRequest(
+                componentName, componentVersion, triggerName, inputParameters, workflowExecutionId, outputParameters,
+                connectionId));
+    }
+
+    @Override
+    public WebhookEnableOutput executeWebhookEnable(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, Long connectionId,
+        @NonNull String webhookUrl) {
+
+        return defaultRestClient.post(
+            uriBuilder -> toUri(
+                uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-webhook-enable"),
+            new DynamicWebhookEnableRequest(
+                componentName, componentVersion, triggerName, inputParameters, workflowExecutionId, connectionId,
+                webhookUrl),
+            WebhookEnableOutput.class);
     }
 
     @Override

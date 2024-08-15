@@ -37,16 +37,6 @@ public interface TriggerDefinitionFacade extends OperationDefinitionFacade {
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
         @NonNull Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths, Long connectionId);
 
-    void executeDynamicWebhookDisable(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
-        @NonNull Map<String, ?> outputParameters, Long connectionId);
-
-    TriggerDefinition.DynamicWebhookEnableOutput executeDynamicWebhookEnable(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, Long connectionId,
-        @NonNull String webhookUrl);
-
     /**
      * Renews webhook subscription definition at provider side.
      *
@@ -60,7 +50,7 @@ public interface TriggerDefinitionFacade extends OperationDefinitionFacade {
      * @param outputParameters
      * @return
      */
-    TriggerDefinition.DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
+    TriggerDefinition.WebhookEnableOutput executeDynamicWebhookRefresh(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> outputParameters);
 
@@ -86,6 +76,16 @@ public interface TriggerDefinitionFacade extends OperationDefinitionFacade {
         @NonNull AppType type, Long instanceId, String workflowReferenceCode, Long jobId,
         @NonNull Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
         Long connectionId);
+
+    void executeWebhookDisable(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
+        @NonNull Map<String, ?> outputParameters, Long connectionId);
+
+    TriggerDefinition.WebhookEnableOutput executeWebhookEnable(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, Long connectionId,
+        @NonNull String webhookUrl);
 
     WebhookValidateResponse executeWebhookValidate(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
