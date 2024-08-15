@@ -285,8 +285,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         } else if (TriggerType.POLLING == triggerType || TriggerType.HYBRID == triggerType) {
             triggerOutput = triggerDefinition.getPoll()
                 .map(pollFunction -> executePollingTrigger(
-                    triggerDefinition, inputParameters, triggerState == null ? Map.of() : (Map<String, ?>) triggerState,
-                    context, pollFunction))
+                    triggerDefinition, inputParameters, connection,
+                    triggerState == null ? Map.of() : (Map<String, ?>) triggerState, context, pollFunction))
                 .orElseThrow();
         } else {
             throw new IllegalArgumentException("Unknown trigger type: " + triggerType);
@@ -399,14 +399,17 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     private static TriggerOutput executePollingTrigger(
         com.bytechef.component.definition.TriggerDefinition triggerDefinition,
-        Map<String, ?> inputParameters, Map<String, ?> closureParameters, TriggerContext triggerContext,
-        PollFunction pollFunction) {
+        Map<String, ?> inputParameters, ComponentConnection connection, Map<String, ?> closureParameters,
+        TriggerContext triggerContext, PollFunction pollFunction) {
 
         PollOutput pollOutput;
 
+        ParametersImpl connectionParameters = ParametersImpl.getConnectionParameters(connection);
+
         try {
             pollOutput = pollFunction.apply(
-                new ParametersImpl(inputParameters), new ParametersImpl(closureParameters), triggerContext);
+                new ParametersImpl(inputParameters), connectionParameters,
+                new ParametersImpl(closureParameters), triggerContext);
         } catch (Exception e) {
             throw new ComponentExecutionException(
                 e, inputParameters, TriggerDefinitionErrorType.EXECUTE_POLLING_TRIGGER);
@@ -418,8 +421,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         while (pollOutput.pollImmediately()) {
             try {
                 pollOutput = pollFunction.apply(
-                    new ParametersImpl(inputParameters), new ParametersImpl(pollOutput.closureParameters()),
-                    triggerContext);
+                    new ParametersImpl(inputParameters), connectionParameters,
+                    new ParametersImpl(pollOutput.closureParameters()), triggerContext);
             } catch (Exception e) {
                 throw new ComponentExecutionException(
                     e, inputParameters, TriggerDefinitionErrorType.EXECUTE_POLLING_TRIGGER);

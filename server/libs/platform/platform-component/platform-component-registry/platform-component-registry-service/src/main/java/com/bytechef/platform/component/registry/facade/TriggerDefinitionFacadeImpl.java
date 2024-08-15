@@ -208,7 +208,8 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
         return triggerDefinitionService.executeTrigger(
             componentName, componentVersion, triggerName, inputParameters, triggerState, webhookRequest,
-            componentConnection, contextFactory.createTriggerContext(componentName, componentVersion, triggerName, type,
+            componentConnection,
+            contextFactory.createTriggerContext(componentName, componentVersion, triggerName, type,
                 workflowReferenceCode, jobId, componentConnection));
     }
 

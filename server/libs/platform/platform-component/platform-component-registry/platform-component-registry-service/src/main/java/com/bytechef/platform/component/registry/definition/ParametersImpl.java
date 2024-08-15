@@ -17,9 +17,11 @@
 package com.bytechef.platform.component.registry.definition;
 
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Type;
@@ -45,6 +47,17 @@ public final class ParametersImpl implements Parameters {
     @SuppressFBWarnings("EI")
     public ParametersImpl(Map<String, ?> map) {
         this.map = Collections.unmodifiableMap(map);
+    }
+
+    public static ParametersImpl getConnectionParameters(ComponentConnection componentConnection) {
+        if (componentConnection == null) {
+            return new ParametersImpl(Map.of());
+        }
+
+        return new ParametersImpl(
+            MapUtils.concatDifferentTypes(
+                componentConnection.getParameters(),
+                Map.of(Authorization.AUTHORIZATION_TYPE, componentConnection.authorizationName())));
     }
 
     @Override

@@ -25,7 +25,6 @@ import com.bytechef.component.definition.ActionDefinition.ProcessErrorResponseFu
 import com.bytechef.component.definition.ActionDefinition.SingleConnectionOutputFunction;
 import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
 import com.bytechef.component.definition.ActionWorkflowNodeDescriptionFunction;
-import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.DynamicOptionsProperty;
@@ -202,8 +201,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         try {
             OutputResponse outputResponse = singleConnectionOutputFunction.apply(
-                new ParametersImpl(inputParameters),
-                new ParametersImpl(getConnectionParameters(connection)), context);
+                new ParametersImpl(inputParameters), ParametersImpl.getConnectionParameters(connection), context);
 
             if (outputResponse == null) {
                 return null;
@@ -236,7 +234,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         try {
             return singleConnectionPerformFunction.apply(
-                new ParametersImpl(inputParameters), new ParametersImpl(getConnectionParameters(connection)), context);
+                new ParametersImpl(inputParameters), ParametersImpl.getConnectionParameters(connection), context);
         } catch (Exception e) {
             if (e instanceof ProviderException) {
                 throw (ProviderException) e;
@@ -350,17 +348,6 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return componentDefinition
             .getTitle()
             .orElse(componentDefinition.getName());
-    }
-
-    private static ParametersImpl getConnectionParameters(ComponentConnection componentConnection) {
-        if (componentConnection == null) {
-            return new ParametersImpl(Map.of());
-        }
-
-        return new ParametersImpl(
-            MapUtils.concatDifferentTypes(
-                componentConnection.getParameters(),
-                Map.of(Authorization.AUTHORIZATION_TYPE, componentConnection.authorizationName())));
     }
 
     private static Map<String, String> getLookupDependsOnPathsMap(List<String> lookupDependsOnPaths) {
