@@ -12,6 +12,54 @@
   "resources": null,
   "version": 1,
   "title": "One Simple API",
+  "connection": {
+    "authorizations": [ {
+      "detectOn": null,
+      "description": null,
+      "name": "custom",
+      "properties": [ {
+        "advancedOption": null,
+        "description": "Access Token that is given to you when you create a API Token in OneSimpleApi",
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "token",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Access Token",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
+      "refreshOn": null,
+      "title": "One Simple API Connection",
+      "type": "CUSTOM",
+      "acquire": null,
+      "apply": null,
+      "clientId": null,
+      "pkce": null,
+      "refresh": null,
+      "refreshUrl": null,
+      "scopes": { },
+      "tokenUrl": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "refreshToken": null,
+      "authorizationCallback": null
+    } ],
+    "properties": null,
+    "version": 1,
+    "authorizationRequired": null,
+    "baseUri": { },
+    "test": null
+  },
   "actions": [ {
     "batch": null,
     "dynamicOutput": true,
@@ -86,13 +134,12 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     } ],
     "title": "Currency Converter",
-    "output": null,
     "perform": { },
-    "processErrorResponse": null,
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -192,11 +239,12 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
+    "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
@@ -228,9 +276,8 @@
       "optionsDataSource": null
     } ],
     "title": "URL Shortener",
-    "output": null,
     "perform": { },
-    "processErrorResponse": null,
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -290,11 +337,12 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
+    "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
@@ -326,9 +374,8 @@
       "optionsDataSource": null
     } ],
     "title": "Web Page Information",
-    "output": null,
     "perform": { },
-    "processErrorResponse": null,
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -425,8 +472,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -505,8 +552,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -625,63 +672,16 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
+    "processErrorResponse": null,
     "workflowNodeDescription": null
   } ],
-  "connection": {
-    "authorizations": [ {
-      "detectOn": null,
-      "description": null,
-      "name": "custom",
-      "properties": [ {
-        "advancedOption": null,
-        "description": "Access Token that is given to you when you create a API Token in OneSimpleApi",
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "token",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Access Token",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      } ],
-      "refreshOn": null,
-      "title": "One Simple API Connection",
-      "type": "CUSTOM",
-      "acquire": null,
-      "apply": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientId": null,
-      "clientSecret": null,
-      "pkce": null,
-      "refresh": null,
-      "refreshUrl": null,
-      "scopes": { },
-      "refreshToken": null,
-      "tokenUrl": null
-    } ],
-    "properties": null,
-    "version": 1,
-    "authorizationRequired": null,
-    "baseUri": { },
-    "test": null
-  },
   "triggers": null
 }

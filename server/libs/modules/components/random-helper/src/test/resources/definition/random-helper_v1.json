@@ -15,6 +15,7 @@
   "connection": null,
   "actions": [ {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Generates a random integer value.",
     "help": null,
@@ -83,13 +84,13 @@
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true,
     "perform": { },
     "output": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Generates a random float value.",
     "help": null,
@@ -161,7 +162,6 @@
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true,
     "perform": { },
     "output": null,
     "processErrorResponse": null,

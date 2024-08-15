@@ -15,6 +15,7 @@
   "connection": null,
   "actions": [ {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Reads data from a XLS/XLSX file.",
     "help": null,
@@ -201,8 +202,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": true,
       "description": "The page number to get.",
@@ -220,8 +221,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": true,
       "description": "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.",
@@ -248,14 +249,14 @@
       "controlType": "SELECT"
     } ],
     "title": "Read from file",
-    "perform": { },
-    "output": null,
-    "outputResponse": null,
-    "dynamicOutput": true,
     "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "workflowNodeDescription": null,
+    "outputResponse": null,
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Writes the data to a XLS/XLSX file.",
     "help": null,
@@ -348,8 +349,8 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "controlType": "DATE",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE"
         }, {
           "advancedOption": null,
           "description": null,
@@ -365,8 +366,8 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         }, {
           "advancedOption": null,
           "description": null,
@@ -384,8 +385,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -421,8 +422,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -458,21 +459,21 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "controlType": "TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "TIME"
         } ],
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": true,
       "description": "Filename to set for binary data. By default, \"file.xlsx\" will be used.",
@@ -495,8 +496,8 @@
       "optionsDataSource": null
     } ],
     "title": "Write to file",
-    "perform": { },
-    "output": null,
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -597,9 +598,8 @@
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "perform": { },
+    "output": null
   } ],
   "triggers": null
 }

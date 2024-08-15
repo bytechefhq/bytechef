@@ -272,8 +272,8 @@
       "optionsDataSource": null
     } ],
     "title": "Query",
-    "output": { },
     "perform": { },
+    "output": { },
     "outputResponse": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
@@ -601,8 +601,8 @@
       "optionsDataSource": null
     } ],
     "title": "Insert",
-    "output": { },
     "perform": { },
+    "output": { },
     "outputResponse": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
@@ -950,8 +950,8 @@
       "optionsDataSource": null
     } ],
     "title": "Update",
-    "output": { },
     "perform": { },
+    "output": { },
     "outputResponse": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
@@ -1258,8 +1258,8 @@
       "optionsDataSource": null
     } ],
     "title": "Delete",
-    "output": { },
     "perform": { },
+    "output": { },
     "outputResponse": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null
@@ -1629,8 +1629,8 @@
       "optionsDataSource": null
     } ],
     "title": "Execute",
-    "output": { },
     "perform": { },
+    "output": { },
     "outputResponse": null,
     "processErrorResponse": null,
     "workflowNodeDescription": null

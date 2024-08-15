@@ -379,17 +379,16 @@
     "title": "Every day",
     "type": "LISTENER",
     "webhookRawBody": null,
-    "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
-    "output": null,
+    "workflowSyncOnEnableValidation": null,
     "deduplicate": null,
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
-    "listenerDisable": { },
     "poll": null,
+    "output": null,
+    "webhookDisable": null,
+    "webhookEnable": null,
+    "dwebhookRequest": null,
+    "listenerDisable": { },
     "listenerEnable": { },
     "outputResponse": {
       "outputSchema": {
@@ -681,9 +680,11 @@
       },
       "sampleOutput": null
     },
+    "webhookValidate": null,
+    "dynamicWebhookRefresh": null,
     "processErrorResponse": null,
-    "staticWebhookRequest": null,
-    "webhookValidate": null
+    "webhookValidateOnEnable": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -908,17 +909,16 @@
     "title": "Every week",
     "type": "LISTENER",
     "webhookRawBody": null,
-    "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
-    "output": null,
+    "workflowSyncOnEnableValidation": null,
     "deduplicate": null,
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
-    "listenerDisable": { },
     "poll": null,
+    "output": null,
+    "webhookDisable": null,
+    "webhookEnable": null,
+    "dwebhookRequest": null,
+    "listenerDisable": { },
     "listenerEnable": { },
     "outputResponse": {
       "outputSchema": {
@@ -1041,9 +1041,11 @@
       },
       "sampleOutput": null
     },
+    "webhookValidate": null,
+    "dynamicWebhookRefresh": null,
     "processErrorResponse": null,
-    "staticWebhookRequest": null,
-    "webhookValidate": null
+    "webhookValidateOnEnable": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -1240,17 +1242,16 @@
     "title": "Every month",
     "type": "LISTENER",
     "webhookRawBody": null,
-    "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
-    "output": null,
+    "workflowSyncOnEnableValidation": null,
     "deduplicate": null,
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
-    "listenerDisable": { },
     "poll": null,
+    "output": null,
+    "webhookDisable": null,
+    "webhookEnable": null,
+    "dwebhookRequest": null,
+    "listenerDisable": { },
     "listenerEnable": { },
     "outputResponse": {
       "outputSchema": {
@@ -1373,9 +1374,11 @@
       },
       "sampleOutput": null
     },
+    "webhookValidate": null,
+    "dynamicWebhookRefresh": null,
     "processErrorResponse": null,
-    "staticWebhookRequest": null,
-    "webhookValidate": null
+    "webhookValidateOnEnable": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -1441,17 +1444,16 @@
     "title": "Interval",
     "type": "LISTENER",
     "webhookRawBody": null,
-    "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
-    "output": null,
+    "workflowSyncOnEnableValidation": null,
     "deduplicate": null,
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
-    "listenerDisable": { },
     "poll": null,
+    "output": null,
+    "webhookDisable": null,
+    "webhookEnable": null,
+    "dwebhookRequest": null,
+    "listenerDisable": { },
     "listenerEnable": { },
     "outputResponse": {
       "outputSchema": {
@@ -1535,9 +1537,11 @@
       },
       "sampleOutput": null
     },
+    "webhookValidate": null,
+    "dynamicWebhookRefresh": null,
     "processErrorResponse": null,
-    "staticWebhookRequest": null,
-    "webhookValidate": null
+    "webhookValidateOnEnable": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -1697,17 +1701,16 @@
     "title": "Cron",
     "type": "LISTENER",
     "webhookRawBody": null,
-    "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
-    "output": null,
+    "workflowSyncOnEnableValidation": null,
     "deduplicate": null,
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
-    "listenerDisable": { },
     "poll": null,
+    "output": null,
+    "webhookDisable": null,
+    "webhookEnable": null,
+    "dwebhookRequest": null,
+    "listenerDisable": { },
     "listenerEnable": { },
     "outputResponse": {
       "outputSchema": {
@@ -1793,8 +1796,10 @@
       },
       "sampleOutput": null
     },
+    "webhookValidate": null,
+    "dynamicWebhookRefresh": null,
     "processErrorResponse": null,
-    "staticWebhookRequest": null,
-    "webhookValidate": null
+    "webhookValidateOnEnable": null,
+    "workflowNodeDescription": null
   } ]
 }

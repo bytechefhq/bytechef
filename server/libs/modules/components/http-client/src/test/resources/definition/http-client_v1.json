@@ -90,6 +90,7 @@
       "title": "API Key",
       "type": "API_KEY",
       "acquire": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -99,8 +100,7 @@
       "tokenUrl": null,
       "authorizationUrl": null,
       "clientSecret": null,
-      "refreshToken": null,
-      "authorizationCallback": null
+      "refreshToken": null
     }, {
       "detectOn": null,
       "description": null,
@@ -130,6 +130,7 @@
       "title": "Bearer Token",
       "type": "BEARER_TOKEN",
       "acquire": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -139,8 +140,7 @@
       "tokenUrl": null,
       "authorizationUrl": null,
       "clientSecret": null,
-      "refreshToken": null,
-      "authorizationCallback": null
+      "refreshToken": null
     }, {
       "detectOn": null,
       "description": null,
@@ -190,6 +190,7 @@
       "title": "Basic Auth",
       "type": "BASIC_AUTH",
       "acquire": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -199,8 +200,7 @@
       "tokenUrl": null,
       "authorizationUrl": null,
       "clientSecret": null,
-      "refreshToken": null,
-      "authorizationCallback": null
+      "refreshToken": null
     }, {
       "detectOn": null,
       "description": null,
@@ -250,6 +250,7 @@
       "title": "Digest Auth",
       "type": "DIGEST_AUTH",
       "acquire": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -259,8 +260,7 @@
       "tokenUrl": null,
       "authorizationUrl": null,
       "clientSecret": null,
-      "refreshToken": null,
-      "authorizationCallback": null
+      "refreshToken": null
     }, {
       "detectOn": null,
       "description": null,
@@ -390,6 +390,7 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -399,8 +400,7 @@
       "tokenUrl": null,
       "authorizationUrl": null,
       "clientSecret": null,
-      "refreshToken": null,
-      "authorizationCallback": null
+      "refreshToken": null
     }, {
       "detectOn": null,
       "description": null,
@@ -510,6 +510,7 @@
       "title": "OAuth2 Implicit Code",
       "type": "OAUTH2_IMPLICIT_CODE",
       "acquire": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -519,8 +520,7 @@
       "tokenUrl": null,
       "authorizationUrl": null,
       "clientSecret": null,
-      "refreshToken": null,
-      "authorizationCallback": null
+      "refreshToken": null
     }, {
       "detectOn": null,
       "description": null,
@@ -630,6 +630,7 @@
       "title": "OAuth2 Client Credentials",
       "type": "OAUTH2_CLIENT_CREDENTIALS",
       "acquire": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -639,8 +640,7 @@
       "tokenUrl": null,
       "authorizationUrl": null,
       "clientSecret": null,
-      "refreshToken": null,
-      "authorizationCallback": null
+      "refreshToken": null
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -1035,11 +1035,11 @@
       "optionsDataSource": null
     } ],
     "title": "GET",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": null,
     "perform": { },
-    "outputResponse": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "outputResponse": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -1995,11 +1995,11 @@
       "optionsDataSource": null
     } ],
     "title": "POST",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": null,
     "perform": { },
-    "outputResponse": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "outputResponse": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -3479,11 +3479,11 @@
       "optionsDataSource": null
     } ],
     "title": "PUT",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": null,
     "perform": { },
-    "outputResponse": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "outputResponse": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -4963,11 +4963,11 @@
       "optionsDataSource": null
     } ],
     "title": "PATCH",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": null,
     "perform": { },
-    "outputResponse": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "outputResponse": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -5335,11 +5335,11 @@
       "optionsDataSource": null
     } ],
     "title": "DELETE",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": null,
     "perform": { },
-    "outputResponse": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "outputResponse": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -5707,11 +5707,11 @@
       "optionsDataSource": null
     } ],
     "title": "HEAD",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": null,
     "perform": { },
-    "outputResponse": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "outputResponse": null
   } ],
   "triggers": null
 }

@@ -15,6 +15,7 @@
   "connection": null,
   "actions": [ {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Reads data from the file as string.",
     "help": null,
@@ -144,11 +145,11 @@
       },
       "sampleOutput": "Sample content"
     },
-    "dynamicOutput": true,
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Writes the data to the file.",
     "help": null,
@@ -298,11 +299,11 @@
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true,
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Download a file from the URL.",
     "help": null,
@@ -452,9 +453,8 @@
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true,
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   } ],
   "triggers": null
 }

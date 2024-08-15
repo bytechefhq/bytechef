@@ -62,7 +62,6 @@
       "title": "Basic Auth",
       "type": "BASIC_AUTH",
       "acquire": null,
-      "authorizationCallback": null,
       "authorizationUrl": null,
       "clientSecret": null,
       "refreshToken": null,
@@ -72,7 +71,8 @@
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null
+      "tokenUrl": null,
+      "authorizationCallback": null
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -145,6 +145,7 @@
   },
   "actions": [ {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": "Send an email to any address.",
     "help": null,
@@ -492,12 +493,11 @@
       "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Send",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
     "outputResponse": null,
-    "dynamicOutput": false,
+    "output": null,
     "perform": { },
-    "output": null
+    "workflowNodeDescription": null,
+    "processErrorResponse": null
   } ],
   "triggers": null
 }

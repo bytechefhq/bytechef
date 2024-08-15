@@ -12,6 +12,54 @@
   "resources": null,
   "version": 1,
   "title": "Capsule CRM",
+  "connection": {
+    "authorizations": [ {
+      "detectOn": null,
+      "description": null,
+      "name": "bearer_token",
+      "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "token",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Token",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
+      "refreshOn": null,
+      "title": "Bearer Token",
+      "type": "BEARER_TOKEN",
+      "acquire": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "refreshToken": null,
+      "apply": null,
+      "clientId": null,
+      "pkce": null,
+      "refresh": null,
+      "refreshUrl": null,
+      "scopes": null,
+      "tokenUrl": null
+    } ],
+    "properties": null,
+    "version": 1,
+    "authorizationRequired": null,
+    "baseUri": { },
+    "test": null
+  },
   "actions": [ {
     "batch": null,
     "dynamicOutput": true,
@@ -504,8 +552,8 @@
       "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Create Contact",
-    "output": null,
-    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -722,8 +770,8 @@
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -851,8 +899,8 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Create Task",
-    "output": null,
-    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -1013,56 +1061,8 @@
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "output": null,
+    "perform": { }
   } ],
-  "triggers": null,
-  "connection": {
-    "authorizations": [ {
-      "detectOn": null,
-      "description": null,
-      "name": "bearer_token",
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "token",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Token",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      } ],
-      "refreshOn": null,
-      "title": "Bearer Token",
-      "type": "BEARER_TOKEN",
-      "acquire": null,
-      "apply": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientId": null,
-      "clientSecret": null,
-      "pkce": null,
-      "refresh": null,
-      "refreshUrl": null,
-      "scopes": null,
-      "refreshToken": null,
-      "tokenUrl": null
-    } ],
-    "properties": null,
-    "version": 1,
-    "authorizationRequired": null,
-    "baseUri": { },
-    "test": null
-  }
+  "triggers": null
 }

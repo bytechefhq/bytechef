@@ -62,9 +62,7 @@
       "title": "OAuth2 Implicit",
       "type": "OAUTH2_IMPLICIT_CODE",
       "acquire": null,
-      "authorizationUrl": { },
-      "clientSecret": null,
-      "refreshToken": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -72,7 +70,9 @@
       "refreshUrl": null,
       "scopes": { },
       "tokenUrl": null,
-      "authorizationCallback": null
+      "authorizationUrl": { },
+      "clientSecret": null,
+      "refreshToken": null
     }, {
       "detectOn": null,
       "description": null,
@@ -122,9 +122,7 @@
       "title": "API Key",
       "type": "API_KEY",
       "acquire": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
-      "refreshToken": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -132,7 +130,9 @@
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
-      "authorizationCallback": null
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "refreshToken": null
     } ],
     "properties": null,
     "version": 1,
@@ -142,6 +142,7 @@
   },
   "actions": [ {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Add a new pet to the store",
     "help": null,
@@ -188,8 +189,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -244,8 +245,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -267,8 +268,8 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -308,8 +309,8 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -358,8 +359,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -381,15 +382,15 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "maxItems": null,
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "pet status in the store",
@@ -423,10 +424,14 @@
         } ],
         "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Add a new pet to the store",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": null,
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -464,8 +469,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -520,8 +525,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -543,8 +548,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -584,8 +589,8 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -634,8 +639,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -657,15 +662,15 @@
               "options": null,
               "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": "pet status in the store",
@@ -699,18 +704,14 @@
           } ],
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "dynamicOutput": true,
-    "output": null,
-    "perform": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    }
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Update an existing pet by Id",
     "help": null,
@@ -757,8 +758,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -813,8 +814,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -836,8 +837,8 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -877,8 +878,8 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -927,8 +928,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -950,15 +951,15 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "maxItems": null,
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "pet status in the store",
@@ -992,10 +993,14 @@
         } ],
         "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Update an existing pet",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": null,
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -1033,8 +1038,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1089,8 +1094,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -1112,8 +1117,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1153,8 +1158,8 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1203,8 +1208,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -1226,15 +1231,15 @@
               "options": null,
               "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": "pet status in the store",
@@ -1268,18 +1273,14 @@
           } ],
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "dynamicOutput": true,
-    "output": null,
-    "perform": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    }
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Multiple status values can be provided with comma separated strings",
     "help": null,
@@ -1324,6 +1325,10 @@
       "optionsDataSource": null
     } ],
     "title": "Finds Pets by status",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": null,
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -1375,8 +1380,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -1431,8 +1436,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -1454,8 +1459,8 @@
               "options": null,
               "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -1495,8 +1500,8 @@
             "minItems": null,
             "multipleValues": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "ARRAY_BUILDER"
+            "controlType": "ARRAY_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -1545,8 +1550,8 @@
                 "maxValue": null,
                 "minValue": null,
                 "options": null,
-                "optionsDataSource": null,
-                "controlType": "INTEGER"
+                "controlType": "INTEGER",
+                "optionsDataSource": null
               }, {
                 "advancedOption": null,
                 "description": null,
@@ -1568,15 +1573,15 @@
                 "options": null,
                 "optionsDataSource": null
               } ],
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
             "maxItems": null,
             "minItems": null,
             "multipleValues": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "ARRAY_BUILDER"
+            "controlType": "ARRAY_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": "pet status in the store",
@@ -1610,25 +1615,21 @@
             } ],
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "maxItems": null,
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "dynamicOutput": true,
-    "output": null,
-    "perform": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    }
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
     "help": null,
@@ -1678,10 +1679,14 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Finds Pets by tags",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": null,
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -1733,8 +1738,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -1789,8 +1794,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -1812,8 +1817,8 @@
               "options": null,
               "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -1853,8 +1858,8 @@
             "minItems": null,
             "multipleValues": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "ARRAY_BUILDER"
+            "controlType": "ARRAY_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -1903,8 +1908,8 @@
                 "maxValue": null,
                 "minValue": null,
                 "options": null,
-                "optionsDataSource": null,
-                "controlType": "INTEGER"
+                "controlType": "INTEGER",
+                "optionsDataSource": null
               }, {
                 "advancedOption": null,
                 "description": null,
@@ -1926,15 +1931,15 @@
                 "options": null,
                 "optionsDataSource": null
               } ],
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
             "maxItems": null,
             "minItems": null,
             "multipleValues": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "ARRAY_BUILDER"
+            "controlType": "ARRAY_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": "pet status in the store",
@@ -1968,25 +1973,21 @@
             } ],
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "maxItems": null,
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "dynamicOutput": true,
-    "output": null,
-    "perform": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    }
   }, {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": "delete a pet",
     "help": null,
@@ -2036,18 +2037,18 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "title": "Deletes a pet",
-    "outputResponse": null,
-    "dynamicOutput": false,
-    "output": null,
-    "perform": null,
     "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "workflowNodeDescription": null,
+    "perform": null,
+    "output": null,
+    "outputResponse": null
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Returns a single pet",
     "help": null,
@@ -2075,10 +2076,14 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "title": "Find pet by ID",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": null,
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -2116,8 +2121,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -2172,8 +2177,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -2195,8 +2200,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -2236,8 +2241,8 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -2286,8 +2291,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -2309,15 +2314,15 @@
               "options": null,
               "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": "pet status in the store",
@@ -2351,18 +2356,14 @@
           } ],
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "dynamicOutput": true,
-    "output": null,
-    "perform": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    }
   }, {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": "",
     "help": null,
@@ -2390,8 +2391,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Name of pet that needs to be updated",
@@ -2438,14 +2439,14 @@
       "optionsDataSource": null
     } ],
     "title": "Updates a pet in the store with form data",
-    "outputResponse": null,
-    "dynamicOutput": false,
-    "output": null,
-    "perform": null,
     "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "workflowNodeDescription": null,
+    "perform": null,
+    "output": null,
+    "outputResponse": null
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "",
     "help": null,
@@ -2475,8 +2476,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Additional Metadata",
@@ -2599,6 +2600,10 @@
       "controlType": "FILE_ENTRY"
     } ],
     "title": "uploads an image",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": null,
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -2636,8 +2641,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -2679,18 +2684,14 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "dynamicOutput": true,
-    "output": null,
-    "perform": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    }
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Returns a map of status codes to quantities",
     "help": null,
@@ -2701,6 +2702,10 @@
     "name": "getInventory",
     "properties": [ ],
     "title": "Returns pet inventories by status",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": null,
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -2735,24 +2740,20 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         } ],
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "dynamicOutput": true,
-    "output": null,
-    "perform": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    }
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Place a new order in the store",
     "help": null,
@@ -2799,8 +2800,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -2818,8 +2819,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -2837,8 +2838,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -2854,8 +2855,8 @@
         "label": "Ship Date",
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE_TIME"
+        "controlType": "DATE_TIME",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "Order Status",
@@ -2913,10 +2914,14 @@
         } ],
         "controlType": "SELECT"
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Place an order for a pet",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": null,
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -2954,8 +2959,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -2973,8 +2978,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -2992,8 +2997,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -3009,8 +3014,8 @@
           "label": "Ship Date",
           "placeholder": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE_TIME"
+          "controlType": "DATE_TIME",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": "Order Status",
@@ -3068,18 +3073,14 @@
           } ],
           "controlType": "SELECT"
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "dynamicOutput": true,
-    "output": null,
-    "perform": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    }
   }, {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": "For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors",
     "help": null,
@@ -3107,18 +3108,18 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "title": "Delete purchase order by ID",
-    "outputResponse": null,
-    "dynamicOutput": false,
-    "output": null,
-    "perform": null,
     "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "workflowNodeDescription": null,
+    "perform": null,
+    "output": null,
+    "outputResponse": null
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.",
     "help": null,
@@ -3146,10 +3147,14 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "title": "Find purchase order by ID",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": null,
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -3187,8 +3192,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -3206,8 +3211,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -3225,8 +3230,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -3242,8 +3247,8 @@
           "label": "Ship Date",
           "placeholder": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE_TIME"
+          "controlType": "DATE_TIME",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": "Order Status",
@@ -3301,18 +3306,14 @@
           } ],
           "controlType": "SELECT"
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "dynamicOutput": true,
-    "output": null,
-    "perform": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    }
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "This can only be done by the logged in user.",
     "help": null,
@@ -3359,8 +3360,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -3498,13 +3499,17 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Create user",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": null,
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -3542,8 +3547,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -3681,21 +3686,17 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "dynamicOutput": true,
-    "output": null,
-    "perform": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    }
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Creates list of users with given input array",
     "help": null,
@@ -3756,8 +3757,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -3895,20 +3896,24 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Creates list of users with given input array",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": null,
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -3960,8 +3965,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -4099,28 +4104,24 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "maxItems": null,
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "dynamicOutput": true,
-    "output": null,
-    "perform": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    }
   }, {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": "This can only be done by the logged in user.",
     "help": null,
@@ -4153,14 +4154,14 @@
       "optionsDataSource": null
     } ],
     "title": "Delete user",
-    "outputResponse": null,
-    "dynamicOutput": false,
-    "output": null,
-    "perform": null,
     "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "workflowNodeDescription": null,
+    "perform": null,
+    "output": null,
+    "outputResponse": null
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "",
     "help": null,
@@ -4193,6 +4194,10 @@
       "optionsDataSource": null
     } ],
     "title": "Get user by user name",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": null,
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -4230,8 +4235,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -4369,21 +4374,17 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "dynamicOutput": true,
-    "output": null,
-    "perform": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    }
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "This can only be done by the logged in user.",
     "help": null,
@@ -4452,8 +4453,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -4591,13 +4592,17 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Update user",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": null,
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -4635,8 +4640,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -4774,19 +4779,14 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "dynamicOutput": true,
-    "output": null,
-    "perform": null,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    }
   } ],
   "triggers": [ ]
 }

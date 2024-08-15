@@ -12,6 +12,74 @@
   "resources": null,
   "version": 1,
   "title": "Dropbox",
+  "connection": {
+    "authorizations": [ {
+      "detectOn": null,
+      "description": null,
+      "name": "oauth2_authorization_code",
+      "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "clientId",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Client Id",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "clientSecret",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Client Secret",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
+      "refreshOn": null,
+      "title": "OAuth2 Authorization Code",
+      "type": "OAUTH2_AUTHORIZATION_CODE",
+      "acquire": null,
+      "authorizationCallback": null,
+      "authorizationUrl": { },
+      "clientSecret": null,
+      "refreshToken": null,
+      "apply": null,
+      "clientId": null,
+      "pkce": null,
+      "refresh": null,
+      "refreshUrl": null,
+      "scopes": null,
+      "tokenUrl": { }
+    } ],
+    "properties": null,
+    "version": 1,
+    "authorizationRequired": null,
+    "baseUri": null,
+    "test": null
+  },
   "actions": [ {
     "batch": null,
     "dynamicOutput": true,
@@ -82,8 +150,8 @@
       "optionsDataSource": null
     } ],
     "title": "Copy",
-    "output": null,
-    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -228,8 +296,8 @@
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -260,8 +328,8 @@
       "optionsDataSource": null
     } ],
     "title": "Create new folder",
-    "output": null,
-    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -386,8 +454,8 @@
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -438,8 +506,8 @@
       "optionsDataSource": null
     } ],
     "title": "Create a new paper file",
-    "output": null,
-    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -543,8 +611,8 @@
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -595,8 +663,8 @@
       "optionsDataSource": null
     } ],
     "title": "Delete",
-    "output": null,
-    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -741,8 +809,8 @@
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -793,8 +861,8 @@
       "optionsDataSource": null
     } ],
     "title": "Get file link",
-    "output": null,
-    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -939,8 +1007,8 @@
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -971,8 +1039,8 @@
       "optionsDataSource": null
     } ],
     "title": "List folder",
-    "output": null,
-    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -1158,8 +1226,8 @@
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -1230,8 +1298,8 @@
       "optionsDataSource": null
     } ],
     "title": "Move",
-    "output": null,
-    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -1376,8 +1444,8 @@
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -1408,8 +1476,8 @@
       "optionsDataSource": null
     } ],
     "title": "Search",
-    "output": null,
-    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -1635,8 +1703,8 @@
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -1855,8 +1923,8 @@
       "controlType": "SELECT"
     } ],
     "title": "Upload file",
-    "output": null,
-    "perform": { },
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -2466,76 +2534,8 @@
       },
       "sampleOutput": null
     },
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "perform": { },
+    "output": null
   } ],
-  "connection": {
-    "authorizations": [ {
-      "detectOn": null,
-      "description": null,
-      "name": "oauth2_authorization_code",
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "clientId",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Client Id",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "clientSecret",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Client Secret",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      } ],
-      "refreshOn": null,
-      "title": "OAuth2 Authorization Code",
-      "type": "OAUTH2_AUTHORIZATION_CODE",
-      "acquire": null,
-      "apply": null,
-      "authorizationCallback": null,
-      "authorizationUrl": { },
-      "clientId": null,
-      "clientSecret": null,
-      "pkce": null,
-      "refresh": null,
-      "refreshUrl": null,
-      "scopes": null,
-      "refreshToken": null,
-      "tokenUrl": { }
-    } ],
-    "properties": null,
-    "version": 1,
-    "authorizationRequired": null,
-    "baseUri": null,
-    "test": null
-  },
   "triggers": null
 }

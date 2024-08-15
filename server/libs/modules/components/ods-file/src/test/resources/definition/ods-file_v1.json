@@ -15,6 +15,7 @@
   "connection": null,
   "actions": [ {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Reads data from a ODS file.",
     "help": null,
@@ -248,14 +249,14 @@
       "controlType": "SELECT"
     } ],
     "title": "Read from file",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": null,
     "perform": { },
-    "outputResponse": null,
-    "dynamicOutput": true,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    "outputResponse": null
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Writes the data to a ODS file.",
     "help": null,
@@ -495,6 +496,8 @@
       "optionsDataSource": null
     } ],
     "title": "Write to file",
+    "processErrorResponse": null,
+    "workflowNodeDescription": null,
     "output": null,
     "perform": { },
     "outputResponse": {
@@ -596,10 +599,7 @@
         "controlType": "FILE_ENTRY"
       },
       "sampleOutput": null
-    },
-    "dynamicOutput": true,
-    "processErrorResponse": null,
-    "workflowNodeDescription": null
+    }
   } ],
   "triggers": null
 }

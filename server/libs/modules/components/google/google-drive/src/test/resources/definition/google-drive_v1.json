@@ -62,7 +62,6 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -72,7 +71,8 @@
       "tokenUrl": { },
       "authorizationUrl": { },
       "clientSecret": null,
-      "refreshToken": null
+      "refreshToken": null,
+      "authorizationCallback": null
     } ],
     "properties": null,
     "version": 1,
@@ -82,6 +82,7 @@
   },
   "actions": [ {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Uploads a file in your Google Drive",
     "help": null,
@@ -208,8 +209,6 @@
       }
     } ],
     "title": "Upload file",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
     "perform": { },
     "output": null,
     "outputResponse": {
@@ -296,13 +295,15 @@
       },
       "sampleOutput": {
         "mimeType": "plain/text",
-        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "name": "new-file.txt"
+        "name": "new-file.txt",
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
     },
-    "dynamicOutput": true
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Read a selected file from Google Drive file.",
     "help": null,
@@ -333,8 +334,6 @@
       }
     } ],
     "title": "Read file",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
     "perform": { },
     "output": null,
     "outputResponse": {
@@ -437,9 +436,11 @@
       },
       "sampleOutput": null
     },
-    "dynamicOutput": true
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Creates a new empty folder in Google Drive.",
     "help": null,
@@ -490,8 +491,6 @@
       }
     } ],
     "title": "Create new folder",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
     "perform": { },
     "output": null,
     "outputResponse": {
@@ -578,13 +577,15 @@
       },
       "sampleOutput": {
         "mimeType": "plain/text",
-        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "name": "new-file.txt"
+        "name": "new-file.txt",
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
     },
-    "dynamicOutput": true
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
+    "dynamicOutput": true,
     "deprecated": null,
     "description": "Creates a new text file in Google Drive.",
     "help": null,
@@ -687,8 +688,6 @@
       }
     } ],
     "title": "Create new text file",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
     "perform": { },
     "output": null,
     "outputResponse": {
@@ -775,11 +774,12 @@
       },
       "sampleOutput": {
         "mimeType": "plain/text",
-        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "name": "new-file.txt"
+        "name": "new-file.txt",
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
     },
-    "dynamicOutput": true
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   } ],
   "triggers": null
 }

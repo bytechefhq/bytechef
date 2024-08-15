@@ -15,6 +15,7 @@
   "connection": null,
   "actions": [ {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": null,
     "help": null,
@@ -42,14 +43,14 @@
       "optionsDataSource": null
     } ],
     "title": "Debug",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
-    "output": null,
     "perform": { },
+    "output": null,
     "outputResponse": null,
-    "dynamicOutput": false
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": null,
     "help": null,
@@ -77,14 +78,14 @@
       "optionsDataSource": null
     } ],
     "title": "Error",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
-    "output": null,
     "perform": { },
+    "output": null,
     "outputResponse": null,
-    "dynamicOutput": false
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": null,
     "help": null,
@@ -112,14 +113,14 @@
       "optionsDataSource": null
     } ],
     "title": "Info",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
-    "output": null,
     "perform": { },
+    "output": null,
     "outputResponse": null,
-    "dynamicOutput": false
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   }, {
     "batch": null,
+    "dynamicOutput": false,
     "deprecated": null,
     "description": null,
     "help": null,
@@ -147,12 +148,11 @@
       "optionsDataSource": null
     } ],
     "title": "Warn",
-    "processErrorResponse": null,
-    "workflowNodeDescription": null,
-    "output": null,
     "perform": { },
+    "output": null,
     "outputResponse": null,
-    "dynamicOutput": false
+    "processErrorResponse": null,
+    "workflowNodeDescription": null
   } ],
   "triggers": null
 }

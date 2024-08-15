@@ -12,6 +12,7 @@
   "resources": null,
   "version": 1,
   "title": "Filesystem",
+  "connection": null,
   "actions": [ {
     "batch": null,
     "dynamicOutput": true,
@@ -42,9 +43,10 @@
       "optionsDataSource": null
     } ],
     "title": "Read File",
-    "output": null,
-    "perform": { },
     "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": { },
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -144,8 +146,7 @@
         "controlType": "FILE_ENTRY"
       },
       "sampleOutput": null
-    },
-    "workflowNodeDescription": null
+    }
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -272,9 +273,10 @@
       "optionsDataSource": null
     } ],
     "title": "Write to file",
-    "output": null,
-    "perform": { },
     "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": { },
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -310,17 +312,16 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": {
         "bytes": 1024
       }
-    },
-    "workflowNodeDescription": null
+    }
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -331,9 +332,10 @@
     "name": "createTempDir",
     "properties": null,
     "title": "Create Temp Directory",
-    "output": null,
-    "perform": { },
     "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": { },
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -357,8 +359,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": "/sample_tmp_dir"
-    },
-    "workflowNodeDescription": null
+    }
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -389,9 +390,10 @@
       "optionsDataSource": null
     } ],
     "title": "Get parent folder",
-    "output": null,
-    "perform": { },
     "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": { },
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -415,8 +417,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": "/sample_data"
-    },
-    "workflowNodeDescription": null
+    }
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -471,9 +472,10 @@
       "controlType": "SELECT"
     } ],
     "title": "List",
-    "output": null,
-    "perform": { },
     "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": { },
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -563,22 +565,21 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "maxItems": null,
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "workflowNodeDescription": null
+    }
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -609,9 +610,10 @@
       "optionsDataSource": null
     } ],
     "title": "Create",
-    "output": null,
-    "perform": { },
     "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": { },
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -635,8 +637,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": "/sample_data"
-    },
-    "workflowNodeDescription": null
+    }
   }, {
     "batch": null,
     "dynamicOutput": true,
@@ -667,9 +668,10 @@
       "optionsDataSource": null
     } ],
     "title": "Remove",
-    "output": null,
-    "perform": { },
     "processErrorResponse": null,
+    "workflowNodeDescription": null,
+    "perform": { },
+    "output": null,
     "outputResponse": {
       "outputSchema": {
         "advancedOption": null,
@@ -697,9 +699,7 @@
         "controlType": "SELECT"
       },
       "sampleOutput": true
-    },
-    "workflowNodeDescription": null
+    }
   } ],
-  "connection": null,
   "triggers": null
 }
