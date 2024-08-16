@@ -95,7 +95,7 @@ public class OpenAICreateImageAction {
                 .options(LLMUtils.getEnumOptions(
                     Arrays.stream(OpenAiImageApi.ImageModel.values())
                         .collect(Collectors.toMap(
-                            OpenAiImageApi.ImageModel::getValue, OpenAiImageApi.ImageModel::getValue))))
+                            OpenAiImageApi.ImageModel::getValue, OpenAiImageApi.ImageModel::getValue, (f,s)->f))))
                 .required(true),
             string(QUALITY)
                 .label("Quality")

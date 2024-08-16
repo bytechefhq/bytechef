@@ -61,7 +61,7 @@ public class OpenAICreateSpeechAction {
                 .options(LLMUtils.getEnumOptions(
                     Arrays.stream(OpenAiAudioApi.TtsModel.values())
                         .collect(Collectors.toMap(
-                            OpenAiAudioApi.TtsModel::getValue, OpenAiAudioApi.TtsModel::getValue)))),
+                            OpenAiAudioApi.TtsModel::getValue, OpenAiAudioApi.TtsModel::getValue, (f,s)->f)))),
             string(INPUT)
                 .label("Input")
                 .description("The text to generate audio for.")
@@ -73,7 +73,7 @@ public class OpenAICreateSpeechAction {
                 .options(LLMUtils.getEnumOptions(
                     Arrays.stream(OpenAiAudioApi.SpeechRequest.Voice.values())
                         .collect(Collectors.toMap(
-                            OpenAiAudioApi.SpeechRequest.Voice::getValue, clas -> clas))))
+                            OpenAiAudioApi.SpeechRequest.Voice::getValue, clas -> clas, (f,s)->f))))
                 .required(true),
             object(RESPONSE_FORMAT)
                 .label("Response format")
@@ -81,7 +81,7 @@ public class OpenAICreateSpeechAction {
                 .options(LLMUtils.getEnumOptions(
                     Arrays.stream(OpenAiAudioApi.SpeechRequest.AudioResponseFormat.values())
                         .collect(Collectors.toMap(
-                            OpenAiAudioApi.SpeechRequest.AudioResponseFormat::getValue, clas -> clas))))
+                            OpenAiAudioApi.SpeechRequest.AudioResponseFormat::getValue, clas -> clas, (f,s)->f))))
                 .required(false),
             number(SPEED)
                 .label("Speed")
