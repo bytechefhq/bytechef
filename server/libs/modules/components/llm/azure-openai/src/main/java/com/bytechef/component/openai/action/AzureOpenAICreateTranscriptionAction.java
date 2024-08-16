@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static constants.LLMConstants.CREATE_TRANSCRIPTION;
 import static constants.LLMConstants.ENDPOINT;
@@ -42,7 +41,6 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import java.net.MalformedURLException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
@@ -73,7 +71,7 @@ public class AzureOpenAICreateTranscriptionAction {
                 .options(LLMUtils.getEnumOptions(
                         Arrays.stream(AzureOpenAiAudioTranscriptionOptions.WhisperModel.values())
                             .collect(Collectors.toMap(
-                                AzureOpenAiAudioTranscriptionOptions.WhisperModel::getValue, AzureOpenAiAudioTranscriptionOptions.WhisperModel::getValue)))),
+                                AzureOpenAiAudioTranscriptionOptions.WhisperModel::getValue, AzureOpenAiAudioTranscriptionOptions.WhisperModel::getValue, (f,s)->f)))),
             LANGUAGE_PROPERTY,
             string(PROMPT)
                 .label("Prompt")
@@ -87,7 +85,7 @@ public class AzureOpenAICreateTranscriptionAction {
                 .options(LLMUtils.getEnumOptions(
                     Arrays.stream(AzureOpenAiAudioTranscriptionOptions.TranscriptResponseFormat.values())
                         .collect(Collectors.toMap(
-                             clas -> clas.getValue().toString(), AzureOpenAiAudioTranscriptionOptions.TranscriptResponseFormat::getValue))))
+                             clas -> clas.getValue().toString(), AzureOpenAiAudioTranscriptionOptions.TranscriptResponseFormat::getValue, (f,s)->f))))
                 .required(true),
             number(TEMPERATURE)
                 .label("Temperature")

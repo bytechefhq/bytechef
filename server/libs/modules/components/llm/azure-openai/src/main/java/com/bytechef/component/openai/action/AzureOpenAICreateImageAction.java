@@ -98,15 +98,8 @@ public class AzureOpenAICreateImageAction {
                 .options(LLMUtils.getEnumOptions(
                     Arrays.stream(AzureOpenAiImageOptions.ImageModel.values())
                         .collect(Collectors.toMap(
-                            AzureOpenAiImageOptions.ImageModel::getValue, AzureOpenAiImageOptions.ImageModel::getValue))))
+                            AzureOpenAiImageOptions.ImageModel::getValue, AzureOpenAiImageOptions.ImageModel::getValue, (f,s)->f))))
                 .required(true),
-//            string(QUALITY)
-//                .label("Quality")
-//                .description("The quality of the image that will be generated.")
-//                .options(
-//                    option("standard", "standard"),
-//                    option("hd", "hd"))
-//                .required(false),
             string(RESPONSE_FORMAT)
                 .label("Response format")
                 .description("The format in which the generated images are returned.")
