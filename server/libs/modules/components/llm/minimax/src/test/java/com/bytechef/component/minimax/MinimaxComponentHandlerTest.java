@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.mistral.constant;
+package com.bytechef.component.minimax;
 
-import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.number;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import com.bytechef.component.minimax.MinimaxComponentHandler;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Monika Domiter
  */
-public final class MistralConstants {
-    public static final String MISTRAL = "mistral";
-    public static final String SAFE_PROMPT = "safePrompt";
+public class MinimaxComponentHandlerTest {
 
-    private MistralConstants() {
+    @Test
+    void testGetComponentDefinition() {
+        JsonFileAssert.assertEquals("definition/minimax.json", new MinimaxComponentHandler().getDefinition());
     }
 }

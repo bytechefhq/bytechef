@@ -14,19 +14,23 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.mistral.action;
+package com.bytechef.component.minimax.action;
 
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
-import static com.bytechef.component.mistral.constant.MistralConstants.SAFE_PROMPT;
 import static constants.LLMConstants.ASK;
+import static constants.LLMConstants.FREQUENCY_PENALTY;
+import static constants.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
 import static constants.LLMConstants.MAX_TOKENS;
 import static constants.LLMConstants.MAX_TOKENS_PROPERTY;
 import static constants.LLMConstants.MESSAGE_PROPERTY;
 import static constants.LLMConstants.MODEL;
+import static constants.LLMConstants.N;
+import static constants.LLMConstants.N_PROPERTY;
+import static constants.LLMConstants.PRESENCE_PENALTY;
+import static constants.LLMConstants.PRESENCE_PENALTY_PROPERTY;
 import static constants.LLMConstants.SEED;
 import static constants.LLMConstants.SEED_PROPERTY;
 import static constants.LLMConstants.STOP;
@@ -46,13 +50,13 @@ import java.util.stream.Collectors;
 
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
-import org.springframework.ai.mistralai.MistralAiChatModel;
-import org.springframework.ai.mistralai.MistralAiChatOptions;
-import org.springframework.ai.mistralai.api.MistralAiApi;
+import org.springframework.ai.minimax.MiniMaxChatModel;
+import org.springframework.ai.minimax.MiniMaxChatOptions;
+import org.springframework.ai.minimax.api.MiniMaxApi;
 import util.LLMUtils;
 import util.interfaces.Chat;
 
-public class MistralChatAction {
+public class MinimaxChatAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
         .title("Ask")
@@ -63,24 +67,22 @@ public class MistralChatAction {
                 .description("ID of the model to use.")
                 .required(true)
                 .options(LLMUtils.getEnumOptions(
-                    Arrays.stream(MistralAiApi.ChatModel.values())
+                    Arrays.stream(MiniMaxApi.ChatModel.values())
                         .collect(Collectors.toMap(
-                            MistralAiApi.ChatModel::getValue, MistralAiApi.ChatModel::getValue, (f,s)->f)))),
-            bool(SAFE_PROMPT)
-                .label("Safe prompt")
-                .description("Should the prompt be safe for work?")
-                .defaultValue(true)
-                .required(false),
-            SEED_PROPERTY,
+                            MiniMaxApi.ChatModel::getValue, MiniMaxApi.ChatModel::getValue, (f,s)->f)))),
             MESSAGE_PROPERTY,
+            N_PROPERTY,
+            FREQUENCY_PENALTY_PROPERTY,
+            PRESENCE_PENALTY_PROPERTY,
             MAX_TOKENS_PROPERTY,
             TEMPERATURE_PROPERTY,
             STOP_PROPERTY,
-            TOP_P_PROPERTY)
+            TOP_P_PROPERTY,
+            SEED_PROPERTY)
         .outputSchema(string())
-        .perform(MistralChatAction::perform);
+        .perform(MinimaxChatAction::perform);
 
-    private MistralChatAction() {
+    private MinimaxChatAction() {
     }
 
     public static String perform(
@@ -91,20 +93,22 @@ public class MistralChatAction {
     public static final Chat CHAT = new Chat() {
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
-            return MistralAiChatOptions.builder()
+            return MiniMaxChatOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withTemperature(inputParameters.getFloat(TEMPERATURE))
                 .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
                 .withTopP(inputParameters.getFloat(TOP_P))
                 .withStop(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .withSafePrompt(inputParameters.getBoolean(SAFE_PROMPT))
-                .withRandomSeed(inputParameters.getInteger(SEED))
+                .withN(inputParameters.getInteger(N))
+                .withFrequencyPenalty(inputParameters.getFloat(FREQUENCY_PENALTY))
+                .withPresencePenalty(inputParameters.getFloat(PRESENCE_PENALTY))
+                .withSeed(inputParameters.getInteger(SEED))
                 .build();
         }
 
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new MistralAiChatModel(new MistralAiApi(connectionParameters.getString(TOKEN)), (MistralAiChatOptions) createChatOptions(inputParameters));
+            return new MiniMaxChatModel(new MiniMaxApi(connectionParameters.getString(TOKEN)), (MiniMaxChatOptions) createChatOptions(inputParameters));
         }
     };
 }
