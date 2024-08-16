@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.mistral.constant;
+package com.bytechef.component.minimax.constant;
 
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.integer;
@@ -25,10 +25,10 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 /**
  * @author Monika Domiter
  */
-public final class MistralConstants {
-    public static final String MISTRAL = "mistral";
-    public static final String SAFE_PROMPT = "safePrompt";
+public final class MinimaxConstants {
+    public static final String MINIMAX = "minimax";
 
-    private MistralConstants() {
+
+    private MinimaxConstants() {
     }
 }

@@ -39,6 +39,7 @@ public class LLMConstants {
     public static final String TEMPERATURE = "temperature";
     public static final String TOP_P = "topP";
     public static final String USER = "user";
+    public static final String SEED = "seed";
     public static final String VOICE = "voice";
     public static final String SPEED = "speed";
     public static final String WIDTH = "width";
@@ -110,6 +111,11 @@ public class LLMConstants {
         .label("User")
         .description(
             "A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.")
+        .required(false);
+
+    public static final ComponentDSL.ModifiableIntegerProperty SEED_PROPERTY = integer(SEED)
+        .label("Seed")
+        .description("Keeping the same seed would output the same response.")
         .required(false);
 
     public static final ComponentDSL.ModifiableArrayProperty MESSAGE_PROPERTY = array(MESSAGES)

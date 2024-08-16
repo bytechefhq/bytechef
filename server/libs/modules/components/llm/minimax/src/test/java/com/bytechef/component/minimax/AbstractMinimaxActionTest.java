@@ -14,21 +14,27 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.mistral.constant;
+package com.bytechef.component.minimax;
 
-import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.number;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.Authorization.TOKEN;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Parameters;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * @author Monika Domiter
  */
-public final class MistralConstants {
-    public static final String MISTRAL = "mistral";
-    public static final String SAFE_PROMPT = "safePrompt";
+public abstract class AbstractMinimaxActionTest {
 
-    private MistralConstants() {
+    protected Parameters mockedParameters = mock(Parameters.class);
+    protected ActionContext mockedContext = mock(ActionContext.class);
+
+    @BeforeEach
+    public void beforeEach() {
+        when(mockedParameters.get(TOKEN))
+            .thenReturn("");
     }
 }
