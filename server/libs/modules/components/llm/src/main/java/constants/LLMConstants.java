@@ -12,7 +12,7 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 public class LLMConstants {
-    public static final String CHAT = "askChatGPT";
+    public static final String ASK = "ask";
     public static final String CONTENT = "content";
     public static final String CREATE_IMAGE = "createImage";
     public static final String CREATE_SPEECH = "createSpeech";
@@ -111,6 +111,26 @@ public class LLMConstants {
         .description(
             "A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.")
         .required(false);
+
+    public static final ComponentDSL.ModifiableArrayProperty MESSAGE_PROPERTY = array(MESSAGES)
+        .label("Messages")
+        .description("A list of messages comprising the conversation so far.")
+        .items(
+            object().properties(
+                string(CONTENT)
+                    .label("Content")
+                    .description("The contents of the message.")
+                    .required(true),
+                string(ROLE)
+                    .label("Role")
+                    .description("The role of the messages author")
+                    .options(
+                        option("system", "system"),
+                        option("user", "user"),
+                        option("assistant", "assistant"),
+                        option("tool", "tool"))
+                    .required(true)))
+        .required(true);
 
     public static final ComponentDSL.ModifiableStringProperty LANGUAGE_PROPERTY = string(LANGUAGE)
         .label("Language")
