@@ -103,6 +103,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:llm:hugging-face"))
     implementation(project(":server:libs:modules:components:llm:minimax"))
     implementation(project(":server:libs:modules:components:llm:mistral"))
+    implementation(project(":server:libs:modules:components:llm:moonshot"))
     implementation(project(":server:libs:modules:components:llm:openai"))
     implementation(project(":server:libs:modules:components:petstore"))
     implementation(project(":server:libs:modules:components:pipedrive"))
