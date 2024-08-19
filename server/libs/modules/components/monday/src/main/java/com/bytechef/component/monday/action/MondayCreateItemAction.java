@@ -17,6 +17,7 @@
 package com.bytechef.component.monday.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.monday.constant.MondayConstants.BOARD_ID;
@@ -27,6 +28,7 @@ import static com.bytechef.component.monday.constant.MondayConstants.ID;
 import static com.bytechef.component.monday.constant.MondayConstants.ITEM_NAME;
 import static com.bytechef.component.monday.constant.MondayConstants.NAME;
 import static com.bytechef.component.monday.constant.MondayConstants.WORKSPACE_ID;
+import static com.bytechef.component.monday.util.MondayPropertiesUtils.convertPropertyToMondayColumnValue;
 import static com.bytechef.component.monday.util.MondayUtils.executeGraphQLQuery;
 
 import com.bytechef.component.definition.ActionContext;
@@ -34,6 +36,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.monday.util.MondayOptionUtils;
+import com.bytechef.component.monday.util.MondayPropertiesUtils;
 import java.util.Map;
 
 /**
@@ -64,7 +67,11 @@ public class MondayCreateItemAction {
             string(ITEM_NAME)
                 .label("Item Name")
                 .description("The item's name.")
-                .required(true))
+                .required(true),
+            dynamicProperties("columnValues")
+                .properties(MondayPropertiesUtils::createPropertiesForItem)
+                .propertiesLookupDependsOn(WORKSPACE_ID, BOARD_ID, GROUP_ID)
+                .required(false))
         .outputSchema(
             object()
                 .properties(
@@ -80,12 +87,20 @@ public class MondayCreateItemAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        String query = "mutation{create_item(board_id: %s, group_id: \"%s\", item_name: \"%s\"){id name}}"
-            .formatted(inputParameters.getRequiredString(BOARD_ID), inputParameters.getRequiredString(GROUP_ID),
-                inputParameters.getRequiredString(ITEM_NAME));
+        Map<String, Object> mondayColumnValues = convertPropertyToMondayColumnValue(
+            inputParameters.getMap("columnValues"), inputParameters.getRequiredString(BOARD_ID), actionContext);
+
+        String jsonMondayColumnValues = actionContext.json(json -> json.write(mondayColumnValues));
+        String query =
+            "mutation{create_item(board_id: %s, group_id: \"%s\", item_name: \"%s\", column_values:\"%s\"){id name}}"
+                .formatted(
+                    inputParameters.getRequiredString(BOARD_ID), inputParameters.getRequiredString(GROUP_ID),
+                    inputParameters.getRequiredString(ITEM_NAME),
+                    jsonMondayColumnValues.replace("\"", "\\\""));
 
         Map<String, Object> body = executeGraphQLQuery(actionContext, query);
 
         return body.get(DATA);
     }
+
 }

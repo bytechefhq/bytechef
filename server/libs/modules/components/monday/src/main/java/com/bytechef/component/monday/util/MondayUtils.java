@@ -16,10 +16,16 @@
 
 package com.bytechef.component.monday.util;
 
+import static com.bytechef.component.monday.constant.MondayConstants.BOARDS;
+import static com.bytechef.component.monday.constant.MondayConstants.DATA;
+
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.exception.ProviderException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,6 +36,22 @@ public class MondayUtils {
     private MondayUtils() {
     }
 
+    public static List<?> getBoardColumns(String boardId, ActionContext context) {
+        String query = "query{boards(ids: %s){columns{id title type settings_str description}}}".formatted(boardId);
+
+        Map<String, Object> result = executeGraphQLQuery(context, query);
+
+        if (result.get(DATA) instanceof Map<?, ?> map
+            && map.get(BOARDS) instanceof List<?> list
+            && list.getFirst() instanceof Map<?, ?> boardMap
+            && boardMap.get("columns") instanceof List<?> columnList) {
+
+            return columnList;
+        }
+
+        throw new ProviderException("Failed to get board columns");
+    }
+
     public static Map<String, Object> executeGraphQLQuery(Context context, String query) {
         return context
             .http(http -> http.post(""))
@@ -38,4 +60,5 @@ public class MondayUtils {
             .execute()
             .getBody(new TypeReference<>() {});
     }
+
 }
