@@ -53,7 +53,7 @@ const ProjectInstanceDialog = ({
     const [resetWorkflowsEnabledStore, setWorkflowEnabled] = useWorkflowsEnabledStore(
         useShallow(({reset, setWorkflowEnabled}) => [reset, setWorkflowEnabled])
     );
-
+    console.log(projectInstance);
     const form = useForm<ProjectInstanceModel>({
         defaultValues: {
             description: projectInstance?.description || undefined,
