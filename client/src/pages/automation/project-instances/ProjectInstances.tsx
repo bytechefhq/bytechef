@@ -26,7 +26,7 @@ export enum Type {
 const ProjectInstances = () => {
     const [searchParams] = useSearchParams();
 
-    const [environment, setEnvironment] = useState<number | undefined>(getEnvironment());
+    const [environment, setEnvironment] = useState<number>(getEnvironment());
     const [filterData, setFilterData] = useState<{id?: number; type: Type}>(getFilterData());
 
     const {currentWorkspaceId} = useWorkspaceStore();
@@ -45,8 +45,7 @@ const ProjectInstances = () => {
         error: projectInstancesError,
         isLoading: projectInstancesIsLoading,
     } = useGetWorkspaceProjectInstancesQuery({
-        environment:
-            environment === 1 ? EnvironmentModel.Test : environment === 2 ? EnvironmentModel.Production : undefined,
+        environment: environment === 1 ? EnvironmentModel.Test : EnvironmentModel.Production,
         id: currentWorkspaceId!,
         projectId: searchParams.get('projectId') ? parseInt(searchParams.get('projectId')!) : undefined,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
@@ -85,7 +84,7 @@ const ProjectInstances = () => {
     }
 
     function getEnvironment() {
-        return searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : undefined;
+        return searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : 1;
     }
 
     function getFilterData() {
@@ -114,7 +113,17 @@ const ProjectInstances = () => {
                     <Header
                         centerTitle={true}
                         position="main"
-                        right={<ProjectInstanceDialog triggerNode={<Button>New Instance</Button>} />}
+                        right={
+                            <ProjectInstanceDialog
+                                projectInstance={
+                                    {
+                                        environment:
+                                            environment === 1 ? EnvironmentModel.Test : EnvironmentModel.Production,
+                                    } as ProjectInstanceModel
+                                }
+                                triggerNode={<Button>New Instance</Button>}
+                            />
+                        }
                         title={
                             !pageTitle
                                 ? 'All Instances'
@@ -129,7 +138,6 @@ const ProjectInstances = () => {
                         body={
                             <>
                                 {[
-                                    {label: 'All Environments', value: undefined},
                                     {label: 'Test', value: 1},
                                     {label: 'Production', value: 2},
                                 ]?.map((item) => (
@@ -248,7 +256,17 @@ const ProjectInstances = () => {
                     </div>
                 ) : (
                     <EmptyList
-                        button={<ProjectInstanceDialog triggerNode={<Button>Create Instance</Button>} />}
+                        button={
+                            <ProjectInstanceDialog
+                                projectInstance={
+                                    {
+                                        environment:
+                                            environment === 1 ? EnvironmentModel.Test : EnvironmentModel.Production,
+                                    } as ProjectInstanceModel
+                                }
+                                triggerNode={<Button>Create Instance</Button>}
+                            />
+                        }
                         icon={<Layers3Icon className="size-24 text-gray-300" />}
                         message="Get started by creating a new project instance."
                         title="No Project Instances"
