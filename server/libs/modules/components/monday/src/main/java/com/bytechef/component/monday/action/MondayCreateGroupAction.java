@@ -56,7 +56,6 @@ public class MondayCreateGroupAction {
                 .required(true),
             string(GROUP_NAME)
                 .label("Group Name")
-                .description("The item's name.")
                 .required(true))
         .outputSchema(
             object()

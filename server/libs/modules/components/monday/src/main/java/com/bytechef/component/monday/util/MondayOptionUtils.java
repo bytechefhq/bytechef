@@ -17,6 +17,7 @@
 package com.bytechef.component.monday.util;
 
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.monday.constant.MondayConstants.BOARDS;
 import static com.bytechef.component.monday.constant.MondayConstants.BOARD_ID;
 import static com.bytechef.component.monday.constant.MondayConstants.DATA;
 import static com.bytechef.component.monday.constant.MondayConstants.ID;
@@ -27,9 +28,12 @@ import static com.bytechef.component.monday.constant.MondayConstants.WORKSPACE_I
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.monday.constant.MondayColumnType;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Monika Kušter
@@ -50,7 +54,7 @@ public class MondayOptionUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        if (body.get(DATA) instanceof Map<?, ?> map && map.get("boards") instanceof List<?> list) {
+        if (body.get(DATA) instanceof Map<?, ?> map && map.get(BOARDS) instanceof List<?> list) {
             for (Object o : list) {
                 if (o instanceof Map<?, ?> boardMap) {
                     options.add(option((String) boardMap.get(NAME), (String) boardMap.get(ID)));
@@ -59,6 +63,12 @@ public class MondayOptionUtils {
         }
 
         return options;
+    }
+
+    public static List<Option<String>> getColumnTypeOptions() {
+        return Arrays.stream(MondayColumnType.values())
+            .map(mondayColumnType -> option(mondayColumnType.getDisplayValue(), mondayColumnType.getName()))
+            .collect(Collectors.toList());
     }
 
     public static List<Option<String>> getGroupIdOptions(
@@ -72,7 +82,7 @@ public class MondayOptionUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        if (body.get(DATA) instanceof Map<?, ?> map && map.get("boards") instanceof List<?> list) {
+        if (body.get(DATA) instanceof Map<?, ?> map && map.get(BOARDS) instanceof List<?> list) {
             for (Object o : list) {
                 if (o instanceof Map<?, ?> boardMap && boardMap.get("groups") instanceof List<?> groupList) {
                     for (Object group : groupList) {
