@@ -44,6 +44,7 @@ public class MondayConstants {
     public static final String TITLE = "title";
     public static final String TO = "to";
     public static final String TYPE = "type";
+    public static final String VALUE = "value";
     public static final String WORKSPACE_ID = "workspace_id";
 
     public static final List<MondayColumnType> NOT_WRITABLE_COLUMN_TYPES = List.of(
