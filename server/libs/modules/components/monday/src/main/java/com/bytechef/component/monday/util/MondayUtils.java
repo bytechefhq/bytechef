@@ -41,10 +41,10 @@ public class MondayUtils {
 
         Map<String, Object> result = executeGraphQLQuery(context, query);
 
-        if (result.get(DATA) instanceof Map<?, ?> map
-            && map.get(BOARDS) instanceof List<?> list
-            && list.getFirst() instanceof Map<?, ?> boardMap
-            && boardMap.get("columns") instanceof List<?> columnList) {
+        if (result.get(DATA) instanceof Map<?, ?> map &&
+            map.get(BOARDS) instanceof List<?> list &&
+            list.getFirst() instanceof Map<?, ?> boardMap &&
+            boardMap.get("columns") instanceof List<?> columnList) {
 
             return columnList;
         }
