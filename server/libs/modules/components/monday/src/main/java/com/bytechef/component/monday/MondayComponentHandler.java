@@ -25,6 +25,7 @@ import com.bytechef.component.monday.action.MondayCreateColumnAction;
 import com.bytechef.component.monday.action.MondayCreateGroupAction;
 import com.bytechef.component.monday.action.MondayCreateItemAction;
 import com.bytechef.component.monday.connection.MondayConnection;
+import com.bytechef.component.monday.trigger.MondayNewItemInBoardTrigger;
 import com.google.auto.service.AutoService;
 
 /**
@@ -42,7 +43,8 @@ public class MondayComponentHandler implements ComponentHandler {
         .actions(
             MondayCreateColumnAction.ACTION_DEFINITION,
             MondayCreateGroupAction.ACTION_DEFINITION,
-            MondayCreateItemAction.ACTION_DEFINITION);
+            MondayCreateItemAction.ACTION_DEFINITION)
+        .triggers(MondayNewItemInBoardTrigger.TRIGGER_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
