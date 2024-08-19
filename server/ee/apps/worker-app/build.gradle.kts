@@ -98,6 +98,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:object-helper"))
     implementation(project(":server:libs:modules:components:ods-file"))
     implementation(project(":server:libs:modules:components:one-simple-api"))
+    implementation(project(":server:libs:modules:components:llm:amazon-bedrock"))
     implementation(project(":server:libs:modules:components:llm:anthropic"))
     implementation(project(":server:libs:modules:components:llm:azure-openai"))
     implementation(project(":server:libs:modules:components:llm:hugging-face"))
