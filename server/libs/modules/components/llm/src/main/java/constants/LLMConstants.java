@@ -39,6 +39,7 @@ public class LLMConstants {
     public static final String TEMPERATURE = "temperature";
     public static final String TOP_P = "topP";
     public static final String USER = "user";
+    public static final String URL = "url";
     public static final String SEED = "seed";
     public static final String VOICE = "voice";
     public static final String SPEED = "speed";

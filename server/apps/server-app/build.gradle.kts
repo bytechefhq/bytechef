@@ -172,6 +172,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:llm:moonshot"))
     implementation(project(":server:libs:modules:components:llm:ollama"))
     implementation(project(":server:libs:modules:components:llm:openai"))
+    implementation(project(":server:libs:modules:components:llm:watsonx"))
     implementation(project(":server:libs:modules:components:petstore"))
     implementation(project(":server:libs:modules:components:pipedrive"))
     implementation(project(":server:libs:modules:components:pipeliner"))
