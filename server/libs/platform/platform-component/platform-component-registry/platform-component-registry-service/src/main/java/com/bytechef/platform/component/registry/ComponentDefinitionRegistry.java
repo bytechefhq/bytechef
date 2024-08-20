@@ -33,7 +33,7 @@ import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Component.Registry;
-import com.bytechef.platform.component.factory.ComponentHandlerListFactory;
+import com.bytechef.platform.component.registry.factory.config.ComponentHandlerListFactory;
 import com.bytechef.platform.registry.util.PropertyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;

@@ -17,7 +17,6 @@
 package com.bytechef.platform.component.registry.factory.config;
 
 import com.bytechef.component.ComponentHandler;
-import com.bytechef.platform.component.factory.ComponentHandlerListFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 
@@ -25,10 +24,8 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record ComponentHandlerListFactoryImpl(List<? extends ComponentHandler> componentHandlers)
-    implements ComponentHandlerListFactory {
+public record ComponentHandlerListFactory(List<? extends ComponentHandler> componentHandlers) {
 
-    @Override
     public List<? extends ComponentHandler> getComponentHandlers() {
         return componentHandlers;
     }

@@ -48,7 +48,7 @@ public class ComponentHandlerBeanFactoryPostProcessor implements BeanFactoryPost
             CollectionUtils.flatMap(COMPONENT_HANDLER_LOADERS, ComponentHandlerLoader::loadComponentHandlers);
 
         beanFactory.registerSingleton(
-            "componentHandlerListFactory", new ComponentHandlerListFactoryImpl(
+            "componentHandlerListFactory", new ComponentHandlerListFactory(
                 CollectionUtils.map(
                     componentHandlerEntries, ComponentHandlerLoader.ComponentHandlerEntry::componentHandler)));
 
