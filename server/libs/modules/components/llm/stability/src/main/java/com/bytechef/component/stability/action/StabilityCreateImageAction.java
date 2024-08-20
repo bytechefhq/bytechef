@@ -20,7 +20,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
-import com.bytechef.component.stability.constant.StabilityConstants;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImageOptions;
 import org.springframework.ai.stabilityai.StabilityAiImageModel;
@@ -41,18 +40,20 @@ import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static constants.LLMConstants.CONTENT;
+import static com.bytechef.component.stability.constant.StabilityConstants.CFG_SCALE;
+import static com.bytechef.component.stability.constant.StabilityConstants.CLIP_GUIDANCE_PRESET;
+import static com.bytechef.component.stability.constant.StabilityConstants.HEIGHT;
+import static com.bytechef.component.stability.constant.StabilityConstants.SAMPLER;
+import static com.bytechef.component.stability.constant.StabilityConstants.STEPS;
+import static com.bytechef.component.stability.constant.StabilityConstants.WIDTH;
 import static constants.LLMConstants.CREATE_IMAGE;
-import static constants.LLMConstants.DEFAULT_SIZE;
-import static constants.LLMConstants.HEIGHT;
-import static constants.LLMConstants.MESSAGES;
+import static constants.LLMConstants.IMAGE_MESSAGE_PROPERTY;
 import static constants.LLMConstants.MODEL;
 import static constants.LLMConstants.N;
 import static constants.LLMConstants.RESPONSE_FORMAT;
 import static constants.LLMConstants.SEED;
 import static constants.LLMConstants.STYLE;
-import static constants.LLMConstants.WEIGHT;
-import static constants.LLMConstants.WIDTH;
+import static org.springframework.ai.stabilityai.api.StabilityAiApi.DEFAULT_IMAGE_MODEL;
 
 /**
  * @author Monika Domiter
@@ -63,31 +64,29 @@ public class StabilityCreateImageAction {
         .title("Create image")
         .description("Create an image using text-to-image models")
         .properties(
-            array(MESSAGES)
-                .label("Messages")
-                .description("A list of messages comprising the conversation so far.")
-                .items(
-                    object().properties(
-                        string(CONTENT)
-                            .label("Content")
-                            .description("The contents of the message.")
-                            .required(true),
-                        number(WEIGHT)
-                            .label("Weight")
-                            .description("Weight of the prompt")
-                            .required(false)))
-                .required(true),
-            integer(N)
-                .label("n")
-                .description(
-                    "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported.")
-                .defaultValue(1)
-                .required(false),
             string(MODEL)
                 .label("Model")
                 .description("The model to use for image generation.")
-                .defaultValue(StabilityAiApi.DEFAULT_IMAGE_MODEL)
+                .defaultValue(DEFAULT_IMAGE_MODEL)
                 .required(false),
+            IMAGE_MESSAGE_PROPERTY,
+            integer(HEIGHT)
+                .label("Height")
+                .description("Height of the image to generate, in pixels, in an increment divisible by 64. Engine-specific dimension validation applies.")
+                .defaultValue(512)
+                .required(true),
+            integer(WIDTH)
+                .label("Width")
+                .description("Width of the image to generate, in pixels, in an increment divisible by 64. Engine-specific dimension validation applies.")
+                .defaultValue(512)
+                .required(true),
+            integer(N)
+                .label("Number of responses")
+                .description("The number of images to be generated. Must be between 1 and 10.")
+                .defaultValue(1)
+                .minValue(1)
+                .maxValue(10)
+                .advancedOption(true),
             string(RESPONSE_FORMAT)
                 .label("Response format")
                 .description("The format in which the generated images are returned.")
@@ -95,51 +94,41 @@ public class StabilityCreateImageAction {
                     option("url", "url"),
                     option("b64_json", "b64_json"))
                 .defaultValue("url")
-                .required(false),
-            integer(HEIGHT)
-                .label("Height")
-                .description("The height of the generated images.")
-                .defaultValue(DEFAULT_SIZE)
-                .required(true),
-            integer(WIDTH)
-                .label("Width")
-                .description("The width of the generated images.")
-                .defaultValue(DEFAULT_SIZE)
-                .required(true),
+                .advancedOption(true),
             string(STYLE)
                 .label("Style")
-                .description("The style of the generated images.")
+                .description("Pass in a style preset to guide the image model towards a particular style. This list of style presets is subject to change.")
                 .options(LLMUtils.getEnumOptions(
                     Arrays.stream(StyleEnum.values())
                         .collect(Collectors.toMap(
                             StyleEnum::toString, StyleEnum::toString, (f,s)->f)))),
-            integer(StabilityConstants.STEPS)
+            integer(STEPS)
                 .label("Steps")
                 .description("Number of diffusion steps to run. Valid range: 10 to 50.")
                 .minValue(10)
                 .maxValue(50)
-                .required(false),
-            number(StabilityConstants.CFG_SCALE)
+                .advancedOption(true),
+            number(CFG_SCALE)
                 .label("CFG scale")
                 .description("The strictness level of the diffusion process adherence to the prompt text. Range: 0 to 35.")
                 .minValue(0)
                 .maxValue(35)
-                .required(false),
-            string(StabilityConstants.CLIP_GUIDANCE_PRESET)
+                .advancedOption(true),
+            string(CLIP_GUIDANCE_PRESET)
                 .label("Clip guidance preset")
                 .description("Pass in a style preset to guide the image model towards a particular style. This list of style presets is subject to change.")
-                .required(false),
-            string(StabilityConstants.SAMPLER)
+                .advancedOption(true),
+            string(SAMPLER)
                 .label("Sampler")
                 .description("Which sampler to use for the diffusion process. If this value is omitted, an appropriate sampler will be automatically selected.")
-                .required(false),
+                .advancedOption(true),
             number(SEED)
                 .label("Seed")
                 .description("Random noise seed (omit this option or use 0 for a random seed). Valid range: 0 to 4294967295.")
                 .numberPrecision(0)
                 .minValue(0)
                 .maxValue(429496)
-                .required(false))
+                .advancedOption(true))
         .outputSchema(
             object()
                 .properties(
@@ -162,19 +151,19 @@ public class StabilityCreateImageAction {
         return Image.getResponse(IMAGE, inputParameters, connectionParameters);
     }
 
-    public static final Image IMAGE = new Image() {
+    private static final Image IMAGE = new Image() {
         @Override
         public ImageOptions createImageOptions(Parameters inputParameters) {
             return StabilityAiImageOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withN(inputParameters.getInteger(N))
-                .withStylePreset(inputParameters.getString(STYLE))
                 .withHeight(inputParameters.getInteger(HEIGHT))
                 .withWidth(inputParameters.getInteger(WIDTH))
-                .withSteps(inputParameters.getInteger(StabilityConstants.STEPS))
-                .withCfgScale(inputParameters.getFloat(StabilityConstants.CFG_SCALE))
-                .withClipGuidancePreset(inputParameters.getString(StabilityConstants.CLIP_GUIDANCE_PRESET))
-                .withSampler(inputParameters.getString(StabilityConstants.SAMPLER))
+                .withStylePreset(inputParameters.getString(STYLE))
+                .withSteps(inputParameters.getInteger(STEPS))
+                .withCfgScale(inputParameters.getFloat(CFG_SCALE))
+                .withClipGuidancePreset(inputParameters.getString(CLIP_GUIDANCE_PRESET))
+                .withSampler(inputParameters.getString(SAMPLER))
 //                .withSamples(inputParameters.getInteger(N))
                 .withSeed(inputParameters.getLong(SEED))
                 .build();

@@ -17,7 +17,7 @@ public class LLMConstants {
     public static final String CREATE_IMAGE = "createImage";
     public static final String CREATE_SPEECH = "createSpeech";
     public static final String CREATE_TRANSCRIPTION = "createTranscription";
-    public static final Integer DEFAULT_SIZE = 1024;
+    public static final String SIZE = "size";
     public static final String ENDPOINT = "endpoint";
     public static final String FILE = "file";
     public static final String FREQUENCY_PENALTY = "frequencyPenalty";
@@ -31,10 +31,8 @@ public class LLMConstants {
     public static final String N = "n";
     public static final String PRESENCE_PENALTY = "presencePenalty";
     public static final String PROMPT = "prompt";
-    public static final String QUALITY = "quality";
     public static final String RESPONSE_FORMAT = "responseFormat";
     public static final String ROLE = "role";
-    public static final String HEIGHT = "height";
     public static final String STOP = "stop";
     public static final String STYLE = "style";
     public static final String TEMPERATURE = "temperature";
@@ -44,7 +42,6 @@ public class LLMConstants {
     public static final String SEED = "seed";
     public static final String VOICE = "voice";
     public static final String SPEED = "speed";
-    public static final String WIDTH = "width";
     public static final String WEIGHT = "weight";
 
     public static final ComponentDSL.ModifiableNumberProperty FREQUENCY_PENALTY_PROPERTY = number(FREQUENCY_PENALTY)
@@ -112,8 +109,9 @@ public class LLMConstants {
     public static final ComponentDSL.ModifiableStringProperty USER_PROPERTY = string(USER)
         .label("User")
         .description(
-            "A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.")
-        .required(false);
+            "A unique identifier representing your end-user, which can help admins to monitor and detect abuse.")
+        .required(false)
+        .advancedOption(true);
 
     public static final ComponentDSL.ModifiableIntegerProperty SEED_PROPERTY = integer(SEED)
         .label("Seed")
