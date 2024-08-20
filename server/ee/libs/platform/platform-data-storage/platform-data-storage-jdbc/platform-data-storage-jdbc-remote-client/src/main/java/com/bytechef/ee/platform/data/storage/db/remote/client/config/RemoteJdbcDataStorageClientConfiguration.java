@@ -11,7 +11,7 @@ import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.ee.platform.data.storage.db.remote.client.service.RemoteJdbcDataStorageServiceClient;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.constant.AppType;
-import com.bytechef.platform.data.storage.annotation.ConditionalOnDataStorageProviderDb;
+import com.bytechef.platform.data.storage.annotation.ConditionalOnDataStorageProviderJdbc;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageService;
 import com.bytechef.platform.data.storage.service.DataStorageService;
 import java.util.Map;
@@ -27,7 +27,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnDataStorageProviderDb
+@ConditionalOnDataStorageProviderJdbc
 public class RemoteJdbcDataStorageClientConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(RemoteJdbcDataStorageClientConfiguration.class);
