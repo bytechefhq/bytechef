@@ -25,6 +25,7 @@ import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImageOptions;
 import org.springframework.ai.qianfan.QianFanImageModel;
 import org.springframework.ai.qianfan.QianFanImageOptions;
+import org.springframework.ai.qianfan.api.QianFanApi;
 import org.springframework.ai.qianfan.api.QianFanImageApi;
 import org.springframework.retry.support.RetryTemplate;
 import util.LLMUtils;
@@ -87,8 +88,6 @@ public class QIanFanCreateImageAction {
                 .required(false),
             string(MODEL)
                 .label("Model")
-                .description("ID of the model to use.")
-                .required(true)
                 .description("The model to use for image generation.")
                 .options(LLMUtils.getEnumOptions(
                     Arrays.stream(QianFanImageApi.ImageModel.values())
