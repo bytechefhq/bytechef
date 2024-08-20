@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.registry.definition;
+package com.bytechef.platform.component.definition;
 
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
 import java.util.Optional;
 
 /**

@@ -20,7 +20,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
-import com.bytechef.platform.component.registry.definition.ActionDefinitionWrapper;
+import com.bytechef.platform.component.definition.ActionDefinitionWrapper;
 import com.bytechef.platform.component.registry.handler.loader.AbstractComponentHandlerLoader;
 import com.bytechef.platform.component.registry.oas.handler.OpenApiComponentTaskHandler;
 import com.bytechef.platform.component.registry.util.OpenApiClientUtils;
