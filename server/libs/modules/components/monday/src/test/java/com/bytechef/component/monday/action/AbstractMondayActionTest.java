@@ -16,16 +16,13 @@
 
 package com.bytechef.component.monday.action;
 
-import static com.bytechef.component.monday.constant.MondayConstants.BOARD_ID;
 import static com.bytechef.component.monday.constant.MondayConstants.ID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.monday.util.MondayUtils;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
@@ -38,15 +35,11 @@ import org.mockito.MockedStatic;
 abstract class AbstractMondayActionTest {
 
     protected ActionContext mockedActionContext = mock(ActionContext.class);
-    protected Parameters mockedParameters = mock(Parameters.class);
     protected MockedStatic<MondayUtils> mondayUtilsMockedStatic;
     protected Map<String, Object> responseMap = Map.of("data", Map.of(ID, "abc"));
 
     @BeforeEach
     void beforeEach() {
-        when(mockedParameters.getRequiredString(BOARD_ID))
-            .thenReturn("board");
-
         mondayUtilsMockedStatic = mockStatic(MondayUtils.class);
 
         mondayUtilsMockedStatic.when(() -> MondayUtils.executeGraphQLQuery(any(ActionContext.class), anyString()))

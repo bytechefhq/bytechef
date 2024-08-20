@@ -16,12 +16,14 @@
 
 package com.bytechef.component.monday.action;
 
+import static com.bytechef.component.monday.constant.MondayConstants.BOARD_ID;
 import static com.bytechef.component.monday.constant.MondayConstants.GROUP_NAME;
 import static com.bytechef.component.monday.constant.MondayConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.monday.util.MondayUtils;
+import com.bytechef.test.component.properties.ParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -32,13 +34,14 @@ class MondayCreateGroupActionTest extends AbstractMondayActionTest {
 
     @Test
     void testPerform() {
-        when(mockedParameters.getRequiredString(GROUP_NAME))
-            .thenReturn("name");
+        Parameters parameters = ParametersFactory.createParameters(
+            Map.of(BOARD_ID, "board", GROUP_NAME, "name"));
 
-        Object result = MondayCreateGroupAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Object result = MondayCreateGroupAction.perform(parameters, parameters, mockedActionContext);
 
         assertEquals(Map.of(ID, "abc"), result);
 
-        mondayUtilsMockedStatic.verify(() -> MondayUtils.executeGraphQLQuery(mockedActionContext, "mutation{create_group(board_id: board, group_name: \"name\"){id title}}"));
+        mondayUtilsMockedStatic.verify(() -> MondayUtils.executeGraphQLQuery(mockedActionContext,
+            "mutation{create_group(board_id: board, group_name: \"name\"){id title}}"));
     }
 }

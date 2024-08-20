@@ -16,14 +16,19 @@
 
 package com.bytechef.component.monday.util;
 
+import static com.bytechef.component.monday.constant.MondayConstants.BOARDS;
+import static com.bytechef.component.monday.constant.MondayConstants.DATA;
+import static com.bytechef.component.monday.constant.MondayConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -35,8 +40,33 @@ class MondayUtilsTest {
 
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
     private final Context mockedContext = mock(Context.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
+
+    @Test
+    void testGetBoardColumns(){
+        when(mockedActionContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of(DATA, Map.of(BOARDS, List.of(Map.of("columns", List.of(Map.of(ID, "abc")))))));
+
+        List<?> boardColumns = MondayUtils.getBoardColumns("board", mockedActionContext);
+
+        assertEquals(List.of(Map.of(ID, "abc")), boardColumns);
+
+
+        Http.Body body = bodyArgumentCaptor.getValue();
+
+        assertEquals(Map.of("query", "query{boards(ids: board){columns{id title type settings_str description}}}"), body.getContent());
+
+    }
 
     @Test
     void testExecuteGraphQLQuery() {
