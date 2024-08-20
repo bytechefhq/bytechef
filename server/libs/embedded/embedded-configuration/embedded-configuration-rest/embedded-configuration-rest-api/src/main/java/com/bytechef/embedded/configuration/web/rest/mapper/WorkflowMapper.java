@@ -20,13 +20,11 @@ import com.bytechef.embedded.configuration.dto.WorkflowDTO;
 import com.bytechef.embedded.configuration.web.rest.mapper.config.EmbeddedConfigurationMapperSpringConfig;
 import com.bytechef.embedded.configuration.web.rest.model.WorkflowBasicModel;
 import com.bytechef.embedded.configuration.web.rest.model.WorkflowModel;
-import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.platform.configuration.web.rest.mapper.util.WorkflowMapperUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -37,9 +35,6 @@ public abstract class WorkflowMapper {
     @Mapper(config = EmbeddedConfigurationMapperSpringConfig.class, implementationName = "Embedded<CLASS_NAME>Impl")
     public abstract static class WorkflowDTOToWorkflowModelMapper
         implements Converter<WorkflowDTO, WorkflowModel> {
-
-        @Autowired
-        private WorkflowConnectionFacade workflowConnectionFacade;
 
         @Override
         @Mapping(target = "connectionsCount", ignore = true)
@@ -54,7 +49,8 @@ public abstract class WorkflowMapper {
         @Mapping(target = "workflowTaskComponentNames", ignore = true)
         @Mapping(target = "workflowTriggerComponentNames", ignore = true)
         public void afterMapping(WorkflowDTO workflowDTO, @MappingTarget WorkflowModel workflowModel) {
-            WorkflowMapperUtils.afterMapping(workflowDTO.workflow(), workflowModel, workflowConnectionFacade);
+            WorkflowMapperUtils.afterMapping(
+                workflowDTO.inputs(), workflowDTO.tasks(), workflowDTO.triggers(), workflowModel);
         }
     }
 
