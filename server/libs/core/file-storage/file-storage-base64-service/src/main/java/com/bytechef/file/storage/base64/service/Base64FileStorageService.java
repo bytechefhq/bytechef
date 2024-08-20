@@ -24,6 +24,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 
 /**
  * @author Ivica Cardic
@@ -52,6 +53,11 @@ public class Base64FileStorageService implements FileStorageService {
     }
 
     @Override
+    public URL getFileEntryURL(String directoryPath, FileEntry fileEntry) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public byte[] readFileToBytes(String directoryPath, FileEntry fileEntry) throws FileStorageException {
         String url = fileEntry.getUrl();
 
@@ -69,6 +75,12 @@ public class Base64FileStorageService implements FileStorageService {
     public FileEntry storeFileContent(String directoryPath, String fileName, byte[] data) throws FileStorageException {
         return new FileEntry(
             fileName, BASE_64 + EncodingUtils.encodeBase64ToString(data));
+
+    @Override
+    public FileEntry storeFileContent(
+        String directoryPath, String fileName, byte[] data, boolean randomFilename) throws FileStorageException {
+
+        return storeFileContent(directoryPath, fileName, data);
     }
 
     @Override
