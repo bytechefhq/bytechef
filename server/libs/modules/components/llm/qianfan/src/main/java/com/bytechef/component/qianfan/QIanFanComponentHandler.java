@@ -22,6 +22,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.qianfan.action.QIanFanChatAction;
+import com.bytechef.component.qianfan.action.QIanFanCreateImageAction;
 import com.bytechef.component.qianfan.connection.QIanFanConnection;
 import com.bytechef.component.qianfan.constant.QIanFanConstants;
 import com.google.auto.service.AutoService;
@@ -39,7 +40,7 @@ public class QIanFanComponentHandler implements ComponentHandler {
         .icon("path:assets/qianfan.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(QIanFanConnection.CONNECTION_DEFINITION)
-        .actions(QIanFanChatAction.ACTION_DEFINITION);
+        .actions(QIanFanChatAction.ACTION_DEFINITION, QIanFanCreateImageAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

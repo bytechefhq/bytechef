@@ -22,6 +22,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.zhipu.action.ZhiPuChatAction;
+import com.bytechef.component.zhipu.action.ZhiPuCreateImageAction;
 import com.bytechef.component.zhipu.connection.ZhiPuConnection;
 import com.bytechef.component.zhipu.constant.ZhiPuConstants;
 import com.google.auto.service.AutoService;
@@ -39,7 +40,7 @@ public class ZhiPuComponentHandler implements ComponentHandler {
         .icon("path:assets/zhipu.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(ZhiPuConnection.CONNECTION_DEFINITION)
-        .actions(ZhiPuChatAction.ACTION_DEFINITION);
+        .actions(ZhiPuChatAction.ACTION_DEFINITION, ZhiPuCreateImageAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
