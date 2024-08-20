@@ -18,7 +18,7 @@ const ConnectionParameters = ({
             authorization.properties &&
             authorization.properties.filter((property) => !!authorizationParameters![property.name!]).length > 0
     );
-    console.log(authorizationParameters);
+
     if (
         connectionParameters &&
         Object.values(connectionParameters).every((parameter) => parameter === null || parameter === '') &&
