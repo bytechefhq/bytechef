@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.registry.definition;
+package com.bytechef.platform.component.definition;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
-import com.bytechef.platform.component.registry.util.CustomActionUtils;
+import com.bytechef.platform.component.util.CustomActionUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

@@ -21,7 +21,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ComponentHandler.ActionHandlerFunction;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
-import com.bytechef.platform.component.registry.definition.ActionDefinitionWrapper;
+import com.bytechef.platform.component.definition.ActionDefinitionWrapper;
 import com.bytechef.platform.component.registry.handler.ComponentTaskHandler;
 import java.util.function.BiFunction;
 
