@@ -33,12 +33,14 @@ import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Component.Registry;
+import com.bytechef.platform.component.registry.factory.DynamicComponentHandlerListFactory;
 import com.bytechef.platform.component.registry.factory.config.ComponentHandlerListFactory;
 import com.bytechef.platform.registry.util.PropertyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,25 +71,28 @@ public class ComponentDefinitionRegistry {
             .title("Missing Action"));
 
     private final List<ComponentDefinition> componentDefinitions;
+    private final List<DynamicComponentHandlerListFactory> dynamicComponentHandlerListFactories;
 
     public ComponentDefinitionRegistry(
         ApplicationProperties applicationProperties, List<ComponentHandler> componentHandlers,
-        @Autowired(required = false) ComponentHandlerListFactory componentHandlerListFactory) {
+        List<ComponentHandlerListFactory> componentHandlerListFactories,
+        @Autowired(required = false) List<DynamicComponentHandlerListFactory> dynamicComponentHandlerListFactories) {
 
+        @SuppressWarnings("unchecked")
         List<ComponentHandler> mergedComponentHandlers = CollectionUtils.concat(
             componentHandlers,
-            componentHandlerListFactory == null
-                ? List.of()
-                : CollectionUtils.map(
-                    componentHandlerListFactory.getComponentHandlers(),
-                    componentHandler -> (ComponentHandler) componentHandler));
+            CollectionUtils.flatMap(
+                componentHandlerListFactories,
+                componentHandlerListFactory -> (List<ComponentHandler>) componentHandlerListFactory
+                    .getComponentHandlers()));
 
         List<ComponentDefinition> componentDefinitions = CollectionUtils.concat(
             CollectionUtils.map(mergedComponentHandlers, ComponentHandler::getDefinition),
             MANUAL_COMPONENT_DEFINITION, MISSING_COMPONENT_DEFINITION);
 
-        Registry registry = applicationProperties.getComponent()
-            .getRegistry();
+        ApplicationProperties.Component component = applicationProperties.getComponent();
+
+        Registry registry = component.getRegistry();
 
         if (!CollectionUtils.isEmpty(registry.getExclude())) {
             componentDefinitions = componentDefinitions.stream()
@@ -101,6 +106,9 @@ public class ComponentDefinitionRegistry {
         // Validate
 
         validate(componentDefinitions);
+
+        this.dynamicComponentHandlerListFactories = dynamicComponentHandlerListFactories == null
+            ? List.of() : dynamicComponentHandlerListFactories;
     }
 
     public ActionDefinition getActionDefinition(String componentName, int componentVersion, String actionName) {
@@ -148,60 +156,79 @@ public class ComponentDefinitionRegistry {
     public ComponentDefinition getComponentDefinition(String name, Integer version) {
         ComponentDefinition componentDefinition;
 
-        List<ComponentDefinition> filteredComponentDefinitions = componentDefinitions
-            .stream()
-            .filter(curComponentDefinition -> name.equalsIgnoreCase(curComponentDefinition.getName()))
-            .toList();
-
         if (version == null) {
+            List<ComponentDefinition> filteredComponentDefinitions = getComponentDefinitions(name);
+
             componentDefinition = filteredComponentDefinitions.getLast();
         } else {
-            componentDefinition = filteredComponentDefinitions
-                .stream()
-                .filter(curComponentDefinition -> version == curComponentDefinition.getVersion())
+            componentDefinition = componentDefinitions.stream()
+                .filter(
+                    curComponentDefinition -> name.equalsIgnoreCase(curComponentDefinition.getName()) &&
+                        version == curComponentDefinition.getVersion())
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(
-                    "No component with name=" + name + ", version=" + version));
+                .orElse(null);
+
+            if (componentDefinition == null) {
+                componentDefinition = dynamicComponentHandlerListFactories.stream()
+                    .map(
+                        dynamicComponentHandlerListFactory -> dynamicComponentHandlerListFactory.fetchComponentHandler(
+                            name, version))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException(
+                        "No component with name=" + name + ", version=" + version))
+                    .getDefinition();
+            }
         }
 
         return componentDefinition;
     }
 
     public boolean hasComponentDefinition(String name, Integer version) {
-        return componentDefinitions
-            .stream()
-            .anyMatch(curComponentDefinition -> {
-                if (!name.equalsIgnoreCase(curComponentDefinition.getName())) {
-                    return false;
-                }
+        List<ComponentDefinition> componentDefinitions = getComponentDefinitions(name);
 
-                return (version == null) || (version == curComponentDefinition.getVersion());
-            });
-    }
-
-    public List<? extends ComponentDefinition> getComponentDefinitions(String name) {
-        return componentDefinitions
-            .stream()
-            .filter(componentDefinition -> Objects.equals(componentDefinition.getName(), name))
-            .toList();
+        return componentDefinitions.stream()
+            .anyMatch(curComponentDefinition -> (version == null) || (version == curComponentDefinition.getVersion()));
     }
 
     public List<ComponentDefinition> getComponentDefinitions() {
-        return componentDefinitions;
+        return CollectionUtils.sort(
+            CollectionUtils.concat(
+                componentDefinitions,
+                dynamicComponentHandlerListFactories.stream()
+                    .flatMap(dynamicComponentHandlerListFactory -> CollectionUtils.stream(
+                        dynamicComponentHandlerListFactory.getComponentHandlers()))
+                    .map(ComponentHandler::getDefinition)
+                    .toList()),
+            this::compare);
+    }
+
+    public List<ComponentDefinition> getComponentDefinitions(String name) {
+        List<ComponentDefinition> filteredComponentDefinitions = componentDefinitions.stream()
+            .filter(componentDefinition -> Objects.equals(componentDefinition.getName(), name))
+            .toList();
+
+        if (filteredComponentDefinitions.isEmpty()) {
+            filteredComponentDefinitions = dynamicComponentHandlerListFactories.stream()
+                .flatMap(dynamicComponentHandlerListFactory -> CollectionUtils.stream(
+                    dynamicComponentHandlerListFactory.getComponentHandlers()))
+                .map(ComponentHandler::getDefinition)
+                .filter(componentDefinition -> Objects.equals(componentDefinition.getName(), name))
+                .toList();
+        }
+
+        return filteredComponentDefinitions;
     }
 
     public ConnectionDefinition getConnectionDefinition(String componentName, int connectionVersion) {
+        List<ComponentDefinition> componentDefinitions = getComponentDefinitions(componentName);
+
         return CollectionUtils.getFirstFilter(
             componentDefinitions,
-            componentDefinition -> {
-                if (componentName.equalsIgnoreCase(componentDefinition.getName())) {
-                    return componentDefinition.getConnection()
-                        .map(connectionDefinition -> connectionDefinition.getVersion() == connectionVersion)
-                        .orElse(false);
-                }
-
-                return false;
-            },
+            componentDefinition -> componentDefinition.getConnection()
+                .map(connectionDefinition -> connectionDefinition.getVersion() == connectionVersion)
+                .orElse(false),
             componentDefinition -> OptionalUtils.get(componentDefinition.getConnection()));
     }
 
@@ -218,16 +245,6 @@ public class ComponentDefinitionRegistry {
                 () -> new IllegalArgumentException(
                     "The component '%s' does not contain the '%s' trigger.".formatted(
                         componentName, triggerName)));
-    }
-
-    public List<TriggerDefinition> getTriggerDefinitions() {
-        return componentDefinitions
-            .stream()
-            .flatMap(componentDefinition -> CollectionUtils.stream(
-                OptionalUtils.orElse(componentDefinition.getTriggers(), List.of())))
-            .distinct()
-            .map(triggerDefinition -> (TriggerDefinition) triggerDefinition)
-            .toList();
     }
 
     public List<? extends TriggerDefinition> getTriggerDefinitions(String componentName, int componentVersion) {
