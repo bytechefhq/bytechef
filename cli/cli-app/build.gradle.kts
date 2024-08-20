@@ -1,5 +1,12 @@
 plugins {
     id("com.bytechef.java-application-conventions")
+    alias(libs.plugins.org.graalvm.buildtools.native)
+}
+
+graalvmNative {
+    metadataRepository {
+        enabled = true
+    }
 }
 
 application {
