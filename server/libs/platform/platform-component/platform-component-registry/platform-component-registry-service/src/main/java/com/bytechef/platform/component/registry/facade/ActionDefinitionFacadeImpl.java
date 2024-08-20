@@ -135,6 +135,36 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     }
 
     @Override
+    public Object executePerform(
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull AppType type,
+        Long instanceId, Long instanceWorkflowId, Long jobId, @NonNull Map<String, ?> inputParameters,
+        @NonNull Map<String, Long> connectionIds) {
+
+        ExecuteFunctionData executeFunctionData = getExecuteFunctionData(
+            componentName, componentVersion, actionName, connectionIds);
+
+        ActionContext actionContext = contextFactory.createActionContext(
+            componentName, componentVersion, actionName, type, instanceWorkflowId, jobId,
+            executeFunctionData.componentConnection);
+
+        if (executeFunctionData.singleConnectionPerform) {
+            return tokenRefreshHelper.executeSingleConnectionFunction(
+                componentName, componentVersion, executeFunctionData.componentConnection, actionContext,
+                ActionDefinitionErrorType.EXECUTE_PERFORM,
+                (componentConnection1, actionContext1) -> actionDefinitionService.executeSingleConnectionPerform(
+                    componentName, componentVersion, actionName, inputParameters, componentConnection1,
+                    actionContext1),
+                componentConnection1 -> contextFactory.createActionContext(
+                    componentName, componentVersion, actionName, type,
+                    instanceWorkflowId, jobId, componentConnection1));
+        } else {
+            return actionDefinitionService.executeMultipleConnectionsPerform(
+                componentName, componentVersion, actionName, inputParameters, executeFunctionData.componentConnections,
+                actionContext);
+        }
+    }
+
+    @Override
     public Object executePerformForPolyglot(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection componentConnection,
@@ -163,36 +193,6 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
         return actionDefinitionService.executeProcessErrorResponse(
             componentName, componentVersion, actionName, statusCode, body, actionContext);
-    }
-
-    @Override
-    public Object executePerform(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull AppType type,
-        Long instanceId, Long instanceWorkflowId, Long jobId, @NonNull Map<String, ?> inputParameters,
-        @NonNull Map<String, Long> connectionIds) {
-
-        ExecuteFunctionData executeFunctionData = getExecuteFunctionData(
-            componentName, componentVersion, actionName, connectionIds);
-
-        ActionContext actionContext = contextFactory.createActionContext(
-            componentName, componentVersion, actionName, type, instanceWorkflowId, jobId,
-            executeFunctionData.componentConnection);
-
-        if (executeFunctionData.singleConnectionPerform) {
-            return tokenRefreshHelper.executeSingleConnectionFunction(
-                componentName, componentVersion, executeFunctionData.componentConnection, actionContext,
-                ActionDefinitionErrorType.EXECUTE_PERFORM,
-                (componentConnection1, actionContext1) -> actionDefinitionService.executeSingleConnectionPerform(
-                    componentName, componentVersion, actionName, inputParameters, componentConnection1,
-                    actionContext1),
-                componentConnection1 -> contextFactory.createActionContext(
-                    componentName, componentVersion, actionName, type,
-                    instanceWorkflowId, jobId, componentConnection1));
-        } else {
-            return actionDefinitionService.executeMultipleConnectionsPerform(
-                componentName, componentVersion, actionName, inputParameters, executeFunctionData.componentConnections,
-                actionContext);
-        }
     }
 
     @Override
