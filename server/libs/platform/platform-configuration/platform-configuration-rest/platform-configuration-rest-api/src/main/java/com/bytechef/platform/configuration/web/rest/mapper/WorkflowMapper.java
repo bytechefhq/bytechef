@@ -18,7 +18,6 @@ package com.bytechef.platform.configuration.web.rest.mapper;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
-import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
 import com.bytechef.platform.configuration.web.rest.mapper.util.WorkflowMapperUtils;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel;
@@ -27,7 +26,6 @@ import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -50,9 +48,6 @@ public abstract class WorkflowMapper {
     @Mapper(config = PlatformConfigurationMapperSpringConfig.class, implementationName = "Platform<CLASS_NAME>Impl")
     public abstract static class WorkflowDTOToWorkflowModelMapper implements Converter<WorkflowDTO, WorkflowModel> {
 
-        @Autowired
-        private WorkflowConnectionFacade workflowConnectionFacade;
-
         @Override
         @Mapping(target = "connectionsCount", ignore = true)
         @Mapping(target = "inputsCount", ignore = true)
@@ -61,8 +56,8 @@ public abstract class WorkflowMapper {
         public abstract WorkflowModel convert(WorkflowDTO workflowDTO);
 
         @AfterMapping
-        public void afterMapping(Workflow workflow, @MappingTarget WorkflowModel workflowModel) {
-            WorkflowMapperUtils.afterMapping(workflow, workflowModel, workflowConnectionFacade);
+        public void afterMapping(WorkflowDTO workflow, @MappingTarget WorkflowModel workflowModel) {
+            WorkflowMapperUtils.afterMapping(workflow.inputs(), workflow.tasks(), workflow.triggers(), workflowModel);
         }
     }
 
