@@ -105,6 +105,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:llm:minimax"))
     implementation(project(":server:libs:modules:components:llm:mistral"))
     implementation(project(":server:libs:modules:components:llm:moonshot"))
+    implementation(project(":server:libs:modules:components:llm:nvidia"))
     implementation(project(":server:libs:modules:components:llm:ollama"))
     implementation(project(":server:libs:modules:components:llm:openai"))
     implementation(project(":server:libs:modules:components:llm:qianfan"))
