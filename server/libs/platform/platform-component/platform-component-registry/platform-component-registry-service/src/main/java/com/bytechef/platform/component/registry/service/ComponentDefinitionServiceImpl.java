@@ -86,8 +86,7 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
 
     @Override
     public List<ComponentDefinition> getDataStreamComponentDefinitions(ComponentType componentType) {
-        return componentDefinitionRegistry
-            .getComponentDefinitions()
+        return componentDefinitionRegistry.getComponentDefinitions()
             .stream()
             .filter(componentDefinition -> {
                 if (componentType == ComponentType.SOURCE) {

@@ -27,6 +27,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
 
+/**
+ * @author Ivica Cardic
+ */
 public abstract class AbstractTaskHandler implements TaskHandler<Object> {
 
     private final String componentName;
