@@ -16,13 +16,15 @@
 
 package com.bytechef.component.monday.action;
 
+import static com.bytechef.component.monday.constant.MondayConstants.BOARD_ID;
 import static com.bytechef.component.monday.constant.MondayConstants.COLUMN_TYPE;
 import static com.bytechef.component.monday.constant.MondayConstants.ID;
 import static com.bytechef.component.monday.constant.MondayConstants.TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.monday.util.MondayUtils;
+import com.bytechef.test.component.properties.ParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -33,16 +35,14 @@ class MondayCreateColumnActionTest extends AbstractMondayActionTest {
 
     @Test
     void testPerform() {
-        when(mockedParameters.getRequiredString(TITLE))
-            .thenReturn("title");
-        when(mockedParameters.getRequiredString(COLUMN_TYPE))
-            .thenReturn("date");
+        Parameters parameters = ParametersFactory.createParameters(
+            Map.of(BOARD_ID, "board", TITLE, "title", COLUMN_TYPE, "date"));
 
-        Object result = MondayCreateColumnAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Object result = MondayCreateColumnAction.perform(parameters, parameters, mockedActionContext);
 
         assertEquals(Map.of(ID, "abc"), result);
 
-        mondayUtilsMockedStatic.verify(() -> MondayUtils.executeGraphQLQuery(mockedActionContext, "mutation{create_column(board_id: board, title: \"title\", column_type: date){id title}}"));
-
+        mondayUtilsMockedStatic.verify(() -> MondayUtils.executeGraphQLQuery(mockedActionContext,
+            "mutation{create_column(board_id: board, title: \"title\", column_type: date){id title}}"));
     }
 }
