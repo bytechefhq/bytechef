@@ -26,6 +26,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.Objects;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -33,13 +34,15 @@ import org.springframework.lang.NonNull;
 @SuppressFBWarnings("EI")
 public record ComponentConnection(
     String componentName, int version, long connectionId, @NonNull Map<String, ?> parameters,
-    @NonNull String authorizationName) implements ParameterConnection {
+    @Nullable String authorizationName) implements ParameterConnection {
 
     public ComponentConnection {
-        authorizationName = authorizationName.trim();
+        if (authorizationName != null) {
+            authorizationName = authorizationName.trim();
 
-        if (authorizationName.isEmpty()) {
-            throw new IllegalArgumentException("Authorization name must not be empty or blank");
+            if (authorizationName.isEmpty()) {
+                throw new IllegalArgumentException("Authorization name must not be empty or blank");
+            }
         }
     }
 

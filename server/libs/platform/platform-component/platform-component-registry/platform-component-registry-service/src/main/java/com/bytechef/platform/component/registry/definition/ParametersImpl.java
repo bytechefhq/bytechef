@@ -57,7 +57,8 @@ public final class ParametersImpl implements Parameters {
         return new ParametersImpl(
             MapUtils.concatDifferentTypes(
                 componentConnection.getParameters(),
-                Map.of(Authorization.AUTHORIZATION_TYPE, componentConnection.authorizationName())));
+                componentConnection.authorizationName() == null ? Map.of()
+                    : Map.of(Authorization.AUTHORIZATION_TYPE, componentConnection.authorizationName())));
     }
 
     @Override

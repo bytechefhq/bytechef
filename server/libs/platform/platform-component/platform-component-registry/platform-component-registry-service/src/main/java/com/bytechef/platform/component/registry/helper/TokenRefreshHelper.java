@@ -36,6 +36,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BiFunction;
@@ -72,12 +73,13 @@ public class TokenRefreshHelper {
         try {
             return performFunction.apply(componentConnection, actionContext);
         } catch (Exception exception) {
-            if (componentConnection == null) {
+            if (componentConnection == null || componentConnection.authorizationName() == null) {
                 throw exception;
             }
 
             List<Object> refreshOn = connectionDefinitionService.getAuthorizationRefreshOn(
-                componentName, componentConnection.version(), componentConnection.authorizationName());
+                componentName, componentConnection.version(),
+                Objects.requireNonNull(componentConnection.authorizationName()));
 
             if (componentConnection.canCredentialsBeRefreshed() &&
                 RefreshCredentialsUtils.matches(refreshOn, exception)) {
@@ -106,7 +108,8 @@ public class TokenRefreshHelper {
                 Authorization.RefreshTokenResponse refreshTokenResponse =
                     connectionDefinitionService.executeRefresh(
                         componentConnection.componentName(), componentConnection.version(),
-                        componentConnection.authorizationName(), componentConnection.getParameters(), actionContext);
+                        Objects.requireNonNull(componentConnection.authorizationName()),
+                        componentConnection.getParameters(), actionContext);
 
                 parameters = new HashMap<>() {
                     {
@@ -124,7 +127,8 @@ public class TokenRefreshHelper {
             } else {
                 parameters = connectionDefinitionService.executeAcquire(
                     componentConnection.componentName(), componentConnection.version(),
-                    componentConnection.authorizationName(), componentConnection.getParameters(), actionContext);
+                    Objects.requireNonNull(componentConnection.authorizationName()),
+                    componentConnection.getParameters(), actionContext);
             }
 
             ReentrantLock reentrantLock = REENTRANT_LOCK_CACHE.get(

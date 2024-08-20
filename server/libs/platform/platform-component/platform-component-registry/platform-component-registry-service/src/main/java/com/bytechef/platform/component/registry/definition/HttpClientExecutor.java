@@ -200,7 +200,9 @@ public class HttpClientExecutor implements ApplicationContextAware {
             }
         }
 
-        if (!configuration.isDisableAuthorization() && (componentConnection != null)) {
+        if (!configuration.isDisableAuthorization() && (componentConnection != null) &&
+            componentConnection.authorizationName() != null) {
+
             applyAuthorization(headers, queryParameters, componentName, componentConnection, context);
 
             boolean isAction = !(context instanceof TriggerContext);
@@ -308,8 +310,9 @@ public class HttpClientExecutor implements ApplicationContextAware {
         }
 
         ApplyResponse applyResponse = connectionDefinitionService.executeAuthorizationApply(
-            componentName, componentConnection.version(), componentConnection.authorizationName(),
-            componentConnection.getParameters(), context);
+            componentName, componentConnection.version(),
+            Objects.requireNonNull(componentConnection.authorizationName()), componentConnection.getParameters(),
+            context);
 
         if (applyResponse != null) {
             headers.putAll(applyResponse.getHeaders());
