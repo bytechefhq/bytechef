@@ -231,13 +231,16 @@ public final class ComponentDSL {
         private PerformFunction performFunction;
         private Help help;
         private Map<String, Object> metadata;
-        private final String name;
+        private String name;
         private ModifiableValueProperty<?, ?> outputSchema;
         private OutputFunction outputFunction;
         private List<? extends Property> properties;
         private Object sampleOutput;
         private String title;
         private ActionWorkflowNodeDescriptionFunction workflowNodeDescriptionFunction;
+
+        private ModifiableActionDefinition() {
+        }
 
         private ModifiableActionDefinition(String name) {
             this.name = Objects.requireNonNull(name);
@@ -470,6 +473,13 @@ public final class ComponentDSL {
             return dynamicOutput;
         }
 
+        void setOutputResponse(OutputResponse outputResponse) {
+            if (outputResponse != null) {
+                this.outputSchema = outputResponse.getOutputSchema();
+                this.sampleOutput = outputResponse.getSampleOutput();
+            }
+        }
+
         @Override
         public String toString() {
             return "ModifiableActionDefinition{" +
@@ -687,6 +697,10 @@ public final class ComponentDSL {
             return Optional.ofNullable(options);
         }
 
+        void setOptions(List<ModifiableOption<Object>> options) {
+            this.options = options;
+        }
+
         @Override
         public Optional<OptionsDataSource> getOptionsDataSource() {
             return Optional.ofNullable(
@@ -734,7 +748,7 @@ public final class ComponentDSL {
         private RefreshTokenFunction refreshTokenFunction;
         private List<String> detectOn;
         private String description;
-        private final String name;
+        private String name;
         private List<? extends Property> properties;
         private RefreshFunction refreshFunction;
         private List<Object> refreshOn;
@@ -743,7 +757,10 @@ public final class ComponentDSL {
         private PkceFunction pkceFunction;
         private String title;
         private TokenUrlFunction tokenUrlFunction;
-        private final AuthorizationType type;
+        private AuthorizationType type;
+
+        private ModifiableAuthorization() {
+        }
 
         private ModifiableAuthorization(AuthorizationType type) {
             this.type = Objects.requireNonNull(type);
@@ -1000,7 +1017,7 @@ public final class ComponentDSL {
         extends ModifiableValueProperty<Boolean, ModifiableBooleanProperty>
         implements Property.BooleanProperty {
 
-        private final List<Option<Boolean>> options = List.of(
+        private List<? extends Option<Boolean>> options = List.of(
             option("True", true),
             option("False", false));
 
@@ -1032,6 +1049,10 @@ public final class ComponentDSL {
         @Override
         public Optional<List<? extends Option<Boolean>>> getOptions() {
             return Optional.of(options);
+        }
+
+        void setOptions(List<ModifiableOption<Boolean>> options) {
+            this.options = options;
         }
 
         @Override
@@ -1072,12 +1093,15 @@ public final class ComponentDSL {
         private String icon;
         private List<String> tags;
         private Map<String, Object> metadata;
-        private final String name;
+        private String name;
         private Resources resources;
         private int version = VERSION_1;
         private String title;
         private List<? extends TriggerDefinition> triggerDefinitions;
         private List<String> workflowConnectionKeys;
+
+        private ModifiableComponentDefinition() {
+        }
 
         private ModifiableComponentDefinition(String name) {
             this.name = Objects.requireNonNull(name);
@@ -1353,6 +1377,18 @@ public final class ComponentDSL {
                 workflowConnectionKeys);
         }
 
+        void setActions(List<ModifiableActionDefinition> actionDefinitions) {
+            this.actionDefinitions = actionDefinitions;
+        }
+
+        void setConnection(ModifiableConnectionDefinition connectionDefinition) {
+            this.connectionDefinition = connectionDefinition;
+        }
+
+        void setTriggers(List<ModifiableTriggerDefinition> triggerDefinitions) {
+            this.triggerDefinitions = triggerDefinitions;
+        }
+
         @Override
         public String toString() {
             return "ModifiableComponentDefinition{" +
@@ -1513,7 +1549,7 @@ public final class ComponentDSL {
         implements Property.DateProperty {
 
         private List<String> optionsLookupDependsOn;
-        private List<Option<LocalDate>> options;
+        private List<? extends Option<LocalDate>> options;
         private OptionsFunction optionsFunction;
 
         private ModifiableDateProperty() {
@@ -1596,6 +1632,10 @@ public final class ComponentDSL {
             return Optional.ofNullable(options);
         }
 
+        void setOptions(List<ModifiableOption<LocalDate>> options) {
+            this.options = options;
+        }
+
         @Override
         public Optional<OptionsDataSource> getOptionsDataSource() {
             return Optional.ofNullable(
@@ -1610,7 +1650,7 @@ public final class ComponentDSL {
         implements Property.DateTimeProperty {
 
         private List<String> optionsLookupDependsOn;
-        private List<Option<LocalDateTime>> options;
+        private List<? extends Option<LocalDateTime>> options;
         private OptionsFunction optionsFunction;
 
         private ModifiableDateTimeProperty() {
@@ -1691,6 +1731,10 @@ public final class ComponentDSL {
         @Override
         public Optional<List<? extends Option<LocalDateTime>>> getOptions() {
             return Optional.ofNullable(options);
+        }
+
+        void setOptions(List<ModifiableOption<LocalDateTime>> options) {
+            this.options = options;
         }
 
         @Override
@@ -1836,7 +1880,7 @@ public final class ComponentDSL {
         private List<String> optionsLookupDependsOn;
         private Long maxValue;
         private Long minValue;
-        private List<Option<Long>> options;
+        private List<? extends Option<Long>> options;
         private OptionsFunction optionsFunction;
 
         private ModifiableIntegerProperty() {
@@ -1948,6 +1992,10 @@ public final class ComponentDSL {
         @Override
         public Optional<List<? extends Option<Long>>> getOptions() {
             return Optional.ofNullable(options);
+        }
+
+        void setOptions(List<ModifiableOption<Long>> options) {
+            this.options = options;
         }
 
         @Override
@@ -2122,7 +2170,7 @@ public final class ComponentDSL {
         private Integer minNumberPrecision;
         private Double minValue;
         private Integer numberPrecision;
-        private List<Option<Double>> options;
+        private List<? extends Option<Double>> options;
         private OptionsFunction optionsFunction;
 
         private ModifiableNumberProperty() {
@@ -2301,6 +2349,10 @@ public final class ComponentDSL {
             return Optional.ofNullable(options);
         }
 
+        void setOptions(List<ModifiableOption<Double>> options) {
+            this.options = options;
+        }
+
         @Override
         public Optional<OptionsDataSource> getOptionsDataSource() {
             return Optional.ofNullable(
@@ -2317,7 +2369,7 @@ public final class ComponentDSL {
         private List<? extends ModifiableValueProperty<?, ?>> additionalProperties;
         private List<String> optionsLookupDependsOn;
         private Boolean multipleValues;
-        private List<Option<Object>> options;
+        private List<? extends Option<Object>> options;
         private OptionsFunction optionsFunction;
         private List<? extends ModifiableValueProperty<?, ?>> properties;
 
@@ -2451,6 +2503,10 @@ public final class ComponentDSL {
             return Optional.ofNullable(options);
         }
 
+        void setOptions(List<ModifiableOption<Object>> options) {
+            this.options = options;
+        }
+
         @Override
         public Optional<OptionsDataSource> getOptionsDataSource() {
             return Optional.ofNullable(
@@ -2468,8 +2524,11 @@ public final class ComponentDSL {
     public static final class ModifiableOption<T> implements Option<T> {
 
         private String description;
-        private final String label;
-        private final T value;
+        private String label;
+        private T value;
+
+        public ModifiableOption() {
+        }
 
         private ModifiableOption(String label, T value) {
             this.label = label;
@@ -2681,7 +2740,7 @@ public final class ComponentDSL {
         private List<String> optionsLookupDependsOn;
         private Integer maxLength;
         private Integer minLength;
-        private List<Option<String>> options;
+        private List<? extends Option<String>> options;
         private OptionsFunction optionsFunction;
 
         private ModifiableStringProperty() {
@@ -2816,6 +2875,10 @@ public final class ComponentDSL {
             return Optional.ofNullable(options == null ? null : new ArrayList<>(options));
         }
 
+        void setOptions(List<ModifiableOption<String>> options) {
+            this.options = options;
+        }
+
         @Override
         public Optional<OptionsDataSource> getOptionsDataSource() {
             return Optional.ofNullable(
@@ -2830,7 +2893,7 @@ public final class ComponentDSL {
         implements Property.TimeProperty {
 
         private List<String> optionsLookupDependsOn;
-        private List<Option<LocalTime>> options;
+        private List<? extends Option<LocalTime>> options;
         private OptionsFunction optionsFunction;
 
         private ModifiableTimeProperty() {
@@ -2909,6 +2972,10 @@ public final class ComponentDSL {
             return Optional.ofNullable(options);
         }
 
+        void setOptions(List<ModifiableOption<LocalTime>> options) {
+            this.options = options;
+        }
+
         @Override
         public Optional<OptionsDataSource> getOptionsDataSource() {
             return Optional.ofNullable(
@@ -2948,6 +3015,9 @@ public final class ComponentDSL {
         private Boolean workflowSyncExecution;
         private Boolean workflowSyncValidation;
         private Boolean workflowSyncOnEnableValidation;
+
+        public ModifiableTriggerDefinition() {
+        }
 
         private ModifiableTriggerDefinition(String name) {
             this.name = Objects.requireNonNull(name);
