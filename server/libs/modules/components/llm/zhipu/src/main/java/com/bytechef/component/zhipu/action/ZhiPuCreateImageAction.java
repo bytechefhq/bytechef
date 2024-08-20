@@ -72,8 +72,6 @@ public class ZhiPuCreateImageAction {
                 .required(true),
             string(MODEL)
                 .label("Model")
-                .description("ID of the model to use.")
-                .required(true)
                 .description("The model to use for image generation.")
                 .options(LLMUtils.getEnumOptions(
                     Arrays.stream(ZhiPuAiImageApi.ImageModel.values())
