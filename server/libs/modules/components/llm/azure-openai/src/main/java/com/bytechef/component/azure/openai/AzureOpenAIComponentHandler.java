@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.openai;
+package com.bytechef.component.azure.openai;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
-import static com.bytechef.component.openai.constant.AzureOpenAIConstants.AZURE_OPENAI;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.azure.openai.action.AzureOpenAIChatAction;
+import com.bytechef.component.azure.openai.action.AzureOpenAICreateImageAction;
+import com.bytechef.component.azure.openai.action.AzureOpenAICreateTranscriptionAction;
+import com.bytechef.component.azure.openai.connection.AzureOpenAIConnection;
+import com.bytechef.component.azure.openai.constant.AzureOpenAIConstants;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.openai.action.AzureOpenAIChatAction;
-import com.bytechef.component.openai.action.AzureOpenAICreateImageAction;
-import com.bytechef.component.openai.action.AzureOpenAICreateTranscriptionAction;
-import com.bytechef.component.openai.connection.AzureOpenAIConnection;
 import com.google.auto.service.AutoService;
 
 /**
@@ -34,7 +34,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class AzureOpenAIComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(AZURE_OPENAI)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component(AzureOpenAIConstants.AZURE_OPENAI)
         .title("Azure OpenAI")
         .description(
             "Azure OpenAI is a research organization that aims to develop and direct artificial intelligence (AI) in ways " +

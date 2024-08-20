@@ -25,7 +25,6 @@ import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImageOptions;
 import org.springframework.ai.qianfan.QianFanImageModel;
 import org.springframework.ai.qianfan.QianFanImageOptions;
-import org.springframework.ai.qianfan.api.QianFanApi;
 import org.springframework.ai.qianfan.api.QianFanImageApi;
 import org.springframework.retry.support.RetryTemplate;
 import util.LLMUtils;
@@ -38,24 +37,17 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static constants.LLMConstants.CONTENT;
 import static constants.LLMConstants.CREATE_IMAGE;
-import static constants.LLMConstants.DEFAULT_SIZE;
-import static constants.LLMConstants.HEIGHT;
-import static constants.LLMConstants.MESSAGES;
+import static constants.LLMConstants.IMAGE_MESSAGE_PROPERTY;
 import static constants.LLMConstants.MODEL;
 import static constants.LLMConstants.N;
-import static constants.LLMConstants.QUALITY;
-import static constants.LLMConstants.RESPONSE_FORMAT;
+import static constants.LLMConstants.SIZE;
 import static constants.LLMConstants.STYLE;
 import static constants.LLMConstants.USER;
 import static constants.LLMConstants.USER_PROPERTY;
-import static constants.LLMConstants.WEIGHT;
-import static constants.LLMConstants.WIDTH;
 
 /**
  * @author Monika Domiter
@@ -66,26 +58,6 @@ public class QIanFanCreateImageAction {
         .title("Create image")
         .description("Create an image using text-to-image models")
         .properties(
-            array(MESSAGES)
-                .label("Messages")
-                .description("A list of messages comprising the conversation so far.")
-                .items(
-                    object().properties(
-                        string(CONTENT)
-                            .label("Content")
-                            .description("The contents of the message.")
-                            .required(true),
-                        number(WEIGHT)
-                            .label("Weight")
-                            .description("Weight of the prompt")
-                            .required(false)))
-                .required(true),
-            integer(N)
-                .label("n")
-                .description(
-                    "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported.")
-                .defaultValue(1)
-                .required(false),
             string(MODEL)
                 .label("Model")
                 .description("The model to use for image generation.")
@@ -94,31 +66,55 @@ public class QIanFanCreateImageAction {
                         .collect(Collectors.toMap(
                             QianFanImageApi.ImageModel::getValue, QianFanImageApi.ImageModel::getValue, (f,s)->f))))
                 .required(true),
-            string(RESPONSE_FORMAT)
-                .label("Response format")
-                .description("The format in which the generated images are returned.")
+            IMAGE_MESSAGE_PROPERTY,
+            object(SIZE)
+                .label("Size")
+                .description("The size of the generated images.")
                 .options(
-                    option("url", "url"),
-                    option("b64_json", "b64_json"))
-                .defaultValue("url")
-                .required(false),
-            integer(HEIGHT)
-                .label("Height")
-                .description("The height of the generated images.")
-                .defaultValue(DEFAULT_SIZE)
+                    option("Avatars: 768x768", new Integer[]{768, 768}),
+                    option("Avatars: 1024x1024", new Integer[]{1024, 1024}),
+                    option("Avatars: 1536x1536", new Integer[]{1536, 1536}),
+                    option("Avatars: 2048x2048", new Integer[]{2048, 2048}),
+                    option("Article illustrations: 1024x768", new Integer[]{1024, 768}),
+                    option("Article illustrations: 2048x1536", new Integer[]{2048, 1536}),
+                    option("Posters and flyers: 576x1024", new Integer[]{576, 1024}),
+                    option("Posters and flyers: 1152x2048", new Integer[]{1152, 2048}),
+                    option("Posters and flyers: 768x1024", new Integer[]{768, 1024}),
+                    option("Posters and flyers: 1536x2048", new Integer[]{1536, 2048}),
+                    option("Computer wallpapers: 1024x576", new Integer[]{1024, 576}),
+                    option("Computer wallpapers: 2048x1152", new Integer[]{2048, 1152}))
                 .required(true),
-            integer(WIDTH)
-                .label("Width")
-                .description("The width of the generated images.")
-                .defaultValue(DEFAULT_SIZE)
-                .required(true),
+            integer(N)
+                .label("Number of responses")
+                .description("The number of images to generate. Must be between 1 and 4.")
+                .defaultValue(1)
+                .minValue(1)
+                .maxValue(4)
+                .advancedOption(true),
             string(STYLE)
                 .label("Style")
-                .description("The style of the generated images.")
+                .description("The style of the generated images. The default style is Base.")
                 .options(
-                    option("vivid", "vivid"),
-                    option("natural", "natural"))
-                .required(false),
+                    option("3D Model", "3D Model"),
+                    option("Abstract", "Abstract"),
+                    option("Analog Film", "Analog Film"),
+                    option("Anime", "Anime"),
+                    option("Base", "Base"),
+                    option("Cinematic", "Cinematic"),
+                    option("Comic Book", "Comic Book"),
+                    option("Craft Clay", "Craft Clay"),
+                    option("Digital Art", "Digital Art"),
+                    option("Enhance", "Enhance"),
+                    option("Fantasy Art", "Fantasy Art"),
+                    option("Isometric", "Isometric"),
+                    option("Line Art", "Line Art"),
+                    option("Lowpoly", "Lowpoly"),
+                    option("Neonpunk", "Neonpunk"),
+                    option("Origami", "Origami"),
+                    option("Photographic", "Photographic"),
+                    option("Pixel Art", "Pixel Art"),
+                    option("Texture", "Texture"))
+                .advancedOption(true),
             USER_PROPERTY)
         .outputSchema(
             object()
@@ -142,16 +138,18 @@ public class QIanFanCreateImageAction {
         return Image.getResponse(IMAGE, inputParameters, connectionParameters);
     }
 
-    public static final Image IMAGE = new Image() {
+    private static final Image IMAGE = new Image() {
         @Override
         public ImageOptions createImageOptions(Parameters inputParameters) {
+            Integer[] size = inputParameters.getArray(SIZE, Integer.class);
+
             return QianFanImageOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withN(inputParameters.getInteger(N))
+                .withHeight(size[1])
+                .withWidth(size[0])
                 .withStyle(inputParameters.getString(STYLE))
                 .withUser(inputParameters.getString(USER))
-                .withHeight(inputParameters.getInteger(HEIGHT))
-                .withWidth(inputParameters.getInteger(WIDTH))
                 .build();
         }
 

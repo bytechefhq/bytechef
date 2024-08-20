@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.openai.action;
+package com.bytechef.component.azure.openai.action;
 
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static org.mockito.Mockito.mock;

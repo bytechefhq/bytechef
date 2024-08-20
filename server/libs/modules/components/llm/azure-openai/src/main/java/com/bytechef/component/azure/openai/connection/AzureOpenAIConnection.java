@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.openai.connection;
+package com.bytechef.component.azure.openai.connection;
 
 import static com.bytechef.component.definition.Authorization.AuthorizationType.BEARER_TOKEN;
 import static com.bytechef.component.definition.Authorization.TOKEN;
