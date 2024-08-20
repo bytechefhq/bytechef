@@ -104,9 +104,9 @@ public class TrelloNewCardTrigger {
 
         Map<String, Object> action = content.get("action");
 
-        if (Objects.equals(action.get("type"), "createCard")
-            && action.get("data") instanceof Map<?, ?> map
-            && map.get("card") instanceof Map<?, ?> cardMap) {
+        if (Objects.equals(action.get("type"), "createCard") &&
+            action.get("data") instanceof Map<?, ?> map &&
+            map.get("card") instanceof Map<?, ?> cardMap) {
 
             return getCard(context, (String) cardMap.get(ID));
         }

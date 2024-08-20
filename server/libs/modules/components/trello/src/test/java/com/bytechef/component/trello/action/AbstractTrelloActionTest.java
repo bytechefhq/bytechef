@@ -46,5 +46,4 @@ abstract class AbstractTrelloActionTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
     }
-
 }

@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
  * @author Monika Kušter
  */
 class TrelloComponentHandlerTest {
+
     @Test
     void testGetDefinition() {
         JsonFileAssert.assertEquals("definition/trello_v1.json", new TrelloComponentHandler().getDefinition());

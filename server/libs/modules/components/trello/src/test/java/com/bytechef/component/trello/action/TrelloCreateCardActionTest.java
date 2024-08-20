@@ -41,7 +41,6 @@ class TrelloCreateCardActionTest extends AbstractTrelloActionTest {
 
     @Test
     void testPerform() {
-
         Parameters parameters = ParametersFactory.createParameters(
             Map.of(ID_LIST, "abc", NAME, "new card", DESC, "new card description"));
 
