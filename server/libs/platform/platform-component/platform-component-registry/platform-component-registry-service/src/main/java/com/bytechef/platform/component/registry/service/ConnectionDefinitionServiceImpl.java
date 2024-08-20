@@ -332,8 +332,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             componentName, componentVersion);
 
         if (componentDefinition instanceof ScriptComponentDefinition) {
-            return componentDefinitionRegistry
-                .getComponentDefinitions()
+            return componentDefinitionRegistry.getComponentDefinitions()
                 .stream()
                 .filter(curComponentDefinition -> curComponentDefinition
                     .getConnection()
