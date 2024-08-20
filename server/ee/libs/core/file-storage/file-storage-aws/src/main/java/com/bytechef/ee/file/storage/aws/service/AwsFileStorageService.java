@@ -11,6 +11,7 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.exception.FileStorageException;
 import com.bytechef.file.storage.service.FileStorageService;
 import java.io.InputStream;
+import java.net.URL;
 
 /**
  * @version ee
@@ -37,6 +38,12 @@ public class AwsFileStorageService implements FileStorageService {
     }
 
     @Override
+    public URL getFileEntryURL(String directoryPath, FileEntry fileEntry) {
+        // TODO
+        return null;
+    }
+
+    @Override
     public byte[] readFileToBytes(String directoryPath, FileEntry fileEntry) throws FileStorageException {
         // TODO
         return new byte[0];
@@ -50,6 +57,14 @@ public class AwsFileStorageService implements FileStorageService {
 
     @Override
     public FileEntry storeFileContent(String directoryPath, String fileName, byte[] data) throws FileStorageException {
+        // TODO
+        return null;
+    }
+
+    @Override
+    public FileEntry storeFileContent(
+        String directoryPath, String fileName, byte[] data, boolean randomFilename) throws FileStorageException {
+
         // TODO
         return null;
     }

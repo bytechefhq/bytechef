@@ -24,6 +24,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -84,6 +86,20 @@ public class FilesystemFileStorageService implements FileStorageService {
     }
 
     @Override
+    public URL getFileEntryURL(String directoryPath, FileEntry fileEntry) {
+        Path path = resolveDirectoryPath(directoryPath);
+        String url = fileEntry.getUrl();
+
+        try {
+            return path.resolve(url.replace(FILE, ""))
+                .toUri()
+                .toURL();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public byte[] readFileToBytes(String directoryPath, FileEntry fileEntry) throws FileStorageException {
         Path path = resolveDirectoryPath(directoryPath);
         String url = fileEntry.getUrl();
@@ -113,7 +129,18 @@ public class FilesystemFileStorageService implements FileStorageService {
         Validate.notNull(fileName, "fileName is required");
         Validate.notNull(data, "data is required");
 
-        return doStoreFileContent(directoryPath, fileName, new ByteArrayInputStream(data));
+        return doStoreFileContent(directoryPath, fileName, new ByteArrayInputStream(data), true);
+    }
+
+    @Override
+    public FileEntry storeFileContent(
+        String directoryPath, String fileName, byte[] data, boolean randomFilename) throws FileStorageException {
+
+        Validate.notNull(directoryPath, "directory is required");
+        Validate.notNull(fileName, "fileName is required");
+        Validate.notNull(data, "data is required");
+
+        return doStoreFileContent(directoryPath, fileName, new ByteArrayInputStream(data), randomFilename);
     }
 
     @Override
@@ -122,8 +149,8 @@ public class FilesystemFileStorageService implements FileStorageService {
         Validate.notNull(fileName, "fileName is required");
         Validate.notNull(data, "data is required");
 
-        return doStoreFileContent(directoryPath, fileName,
-            new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)));
+        return doStoreFileContent(
+            directoryPath, fileName, new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)), true);
     }
 
     @Override
@@ -134,15 +161,17 @@ public class FilesystemFileStorageService implements FileStorageService {
         Validate.notNull(fileName, "fileName is required");
         Validate.notNull(inputStream, "inputStream is required");
 
-        return doStoreFileContent(directoryPath, fileName, inputStream);
+        return doStoreFileContent(directoryPath, fileName, inputStream, true);
     }
 
-    private FileEntry doStoreFileContent(String directory, String fileName, InputStream inputStream) {
+    private FileEntry doStoreFileContent(
+        String directory, String fileName, InputStream inputStream, boolean randomFilename) {
+
         directory = StringUtils.replace(directory.replaceAll("[^0-9a-zA-Z/_]", ""), " ", "");
 
         Path path = resolveDirectoryPath(directory.toLowerCase());
 
-        path = path.resolve(generateUuid());
+        path = path.resolve(randomFilename ? generateUuid() : fileName);
 
         try {
             Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
