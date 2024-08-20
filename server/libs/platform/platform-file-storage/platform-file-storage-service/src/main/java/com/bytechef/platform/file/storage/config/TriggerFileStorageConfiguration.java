@@ -47,7 +47,7 @@ public class TriggerFileStorageConfiguration {
     }
 
     @Bean
-    TriggerFileStorage workflowTriggerFileStorageFacade(ApplicationProperties applicationProperties) {
+    TriggerFileStorage triggerFileStorage(ApplicationProperties applicationProperties) {
         Provider provider = applicationProperties.getWorkflow()
             .getOutputStorage()
             .getProvider();

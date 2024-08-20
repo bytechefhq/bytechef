@@ -332,21 +332,18 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
 
-        return actionDefinition
-            .getWorkflowNodeDescription()
+        return actionDefinition.getWorkflowNodeDescription()
             .orElse((inputParameters, context) -> getComponentTitle(componentDefinition) + ": " +
                 getActionTitle(actionDefinition));
     }
 
     private static String getActionTitle(com.bytechef.component.definition.ActionDefinition actionDefinition) {
-        return actionDefinition
-            .getTitle()
+        return actionDefinition.getTitle()
             .orElse(actionDefinition.getName());
     }
 
     private static String getComponentTitle(ComponentDefinition componentDefinition) {
-        return componentDefinition
-            .getTitle()
+        return componentDefinition.getTitle()
             .orElse(componentDefinition.getName());
     }
 
@@ -358,8 +355,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
 
-        return actionDefinition
-            .getOutput()
+        return actionDefinition.getOutput()
             .orElseGet(() -> {
                 if (!actionDefinition.isDynamicOutput()) {
                     throw new IllegalStateException("Default output schema function not allowed");

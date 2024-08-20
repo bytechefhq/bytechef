@@ -71,8 +71,7 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
 
     @Override
     public List<WorkflowConnection> getWorkflowConnections(WorkflowTask workflowTask) {
-        return getWorkflowConnections(
-            workflowTask.getName(), workflowTask.getType(), workflowTask.getExtensions());
+        return getWorkflowConnections(workflowTask.getName(), workflowTask.getType(), workflowTask.getExtensions());
     }
 
     @Override
