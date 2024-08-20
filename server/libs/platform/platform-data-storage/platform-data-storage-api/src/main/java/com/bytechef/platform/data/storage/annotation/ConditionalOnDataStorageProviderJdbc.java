@@ -35,5 +35,5 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
     ElementType.TYPE, ElementType.METHOD
 })
 @ConditionalOnProperty(prefix = "bytechef", name = "data-storage.provider", havingValue = "jdbc")
-public @interface ConditionalOnDataStorageProviderDb {
+public @interface ConditionalOnDataStorageProviderJdbc {
 }

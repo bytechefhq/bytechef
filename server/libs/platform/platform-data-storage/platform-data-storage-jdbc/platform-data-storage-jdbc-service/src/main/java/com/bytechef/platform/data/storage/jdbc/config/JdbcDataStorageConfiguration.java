@@ -18,7 +18,7 @@ package com.bytechef.platform.data.storage.jdbc.config;
 
 import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.platform.constant.AppType;
-import com.bytechef.platform.data.storage.annotation.ConditionalOnDataStorageProviderDb;
+import com.bytechef.platform.data.storage.annotation.ConditionalOnDataStorageProviderJdbc;
 import com.bytechef.platform.data.storage.jdbc.repository.DataStorageRepository;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageService;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageServiceImpl;
@@ -34,7 +34,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnDataStorageProviderDb
+@ConditionalOnDataStorageProviderJdbc
 public class JdbcDataStorageConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(JdbcDataStorageConfiguration.class);
