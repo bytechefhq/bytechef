@@ -26,6 +26,7 @@ public class LLMConstants {
     public static final String LOGIT_BIAS = "logitBias";
     public static final String MAX_TOKENS = "maxTokens";
     public static final String MESSAGES = "messages";
+    public static final String IMAGE_MESSAGES = "imageMessages";
     public static final String MODEL = "model";
     public static final String N = "n";
     public static final String PRESENCE_PENALTY = "presencePenalty";
@@ -137,6 +138,21 @@ public class LLMConstants {
                         option("assistant", "assistant"),
                         option("tool", "tool"))
                     .required(true)))
+        .required(true);
+
+    public static final ComponentDSL.ModifiableArrayProperty IMAGE_MESSAGE_PROPERTY = array(IMAGE_MESSAGES)
+        .label("Messages")
+        .description("A list of messages comprising the conversation so far.")
+        .items(
+            object().properties(
+                string(CONTENT)
+                    .label("Content")
+                    .description("The contents of the message.")
+                    .required(true),
+                number(WEIGHT)
+                    .label("Weight")
+                    .description("Weight of the prompt")
+                    .required(false)))
         .required(true);
 
     public static final ComponentDSL.ModifiableStringProperty LANGUAGE_PROPERTY = string(LANGUAGE)
