@@ -177,6 +177,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:llm:vertex:gemini"))
     implementation(project(":server:libs:modules:components:llm:vertex:palm2"))
     implementation(project(":server:libs:modules:components:llm:watsonx"))
+    implementation(project(":server:libs:modules:components:llm:zhipu"))
     implementation(project(":server:libs:modules:components:petstore"))
     implementation(project(":server:libs:modules:components:pipedrive"))
     implementation(project(":server:libs:modules:components:pipeliner"))
