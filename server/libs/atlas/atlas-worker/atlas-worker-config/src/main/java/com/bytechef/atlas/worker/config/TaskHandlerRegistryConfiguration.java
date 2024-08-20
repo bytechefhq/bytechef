@@ -16,11 +16,14 @@
 
 package com.bytechef.atlas.worker.config;
 
+import com.bytechef.atlas.worker.task.factory.DynamicTaskHandlerFactory;
 import com.bytechef.atlas.worker.task.factory.TaskHandlerMapFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.commons.util.MapUtils;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,10 +34,36 @@ public class TaskHandlerRegistryConfiguration {
     @Bean
     TaskHandlerRegistry taskHandlerRegistry(
         Map<String, TaskHandler<?>> taskHandlerMap,
-        @Autowired(required = false) TaskHandlerMapFactory taskHandlerMapFactory) {
+        @Autowired(required = false) TaskHandlerMapFactory taskHandlerMapFactory,
+        @Autowired(required = false) List<DynamicTaskHandlerFactory> dynamicTaskHandlerFactories) {
 
-        return MapUtils.concat(
+        Map<String, TaskHandler<?>> mergedTaskHandlerMap = MapUtils.concat(
             taskHandlerMap,
-            taskHandlerMapFactory == null ? Map.of() : taskHandlerMapFactory.getTaskHandlerMap())::get;
+            taskHandlerMapFactory == null ? Map.of() : taskHandlerMapFactory.getTaskHandlerMap());
+
+        return new TaskHandlerRegistryImpl(
+            mergedTaskHandlerMap, dynamicTaskHandlerFactories == null ? List.of() : dynamicTaskHandlerFactories);
+    }
+
+    private record TaskHandlerRegistryImpl(
+        Map<String, TaskHandler<?>> taskHandlerMap,
+        List<DynamicTaskHandlerFactory> dynamicTaskHandlerFactories) implements TaskHandlerRegistry {
+
+        @Override
+        public TaskHandler<?> getTaskHandler(String type) {
+            TaskHandler<?> taskHandler;
+
+            if (taskHandlerMap.containsKey(type)) {
+                taskHandler = taskHandlerMap.get(type);
+            } else {
+                taskHandler = dynamicTaskHandlerFactories.stream()
+                    .map(dynamicTaskHandlerFactory -> dynamicTaskHandlerFactory.getTaskHandler(type))
+                    .filter(Objects::nonNull)
+                    .findFirst()
+                    .orElseThrow();
+            }
+
+            return taskHandler;
+        }
     }
 }
