@@ -47,7 +47,7 @@ public class TaskFileStorageConfiguration {
     }
 
     @Bean
-    TaskFileStorage workflowTaskFileStorageFacade(ApplicationProperties applicationProperties) {
+    TaskFileStorage taskFileStorage(ApplicationProperties applicationProperties) {
         Provider provider = applicationProperties.getWorkflow()
             .getOutputStorage()
             .getProvider();
