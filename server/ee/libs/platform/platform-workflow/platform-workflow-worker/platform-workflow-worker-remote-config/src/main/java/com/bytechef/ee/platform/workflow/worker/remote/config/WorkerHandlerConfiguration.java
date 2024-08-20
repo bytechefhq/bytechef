@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.workflow.worker.remote.config;
 
+import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.registry.handler.AbstractTaskHandler;
@@ -24,11 +25,7 @@ public class WorkerHandlerConfiguration {
 
     @Bean
     TaskHandlerRegistry taskHandlerRegistry(ActionDefinitionFacade actionDefinitionFacade) {
-        return type -> {
-            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
-
-            return new ComponentTaskHandler(workflowNodeType, actionDefinitionFacade);
-        };
+        return new TaskHandlerRegistryImpl(actionDefinitionFacade);
     }
 
     private static class ComponentTaskHandler extends AbstractTaskHandler {
@@ -37,6 +34,17 @@ public class WorkerHandlerConfiguration {
             super(
                 workflowNodeType.componentName(), workflowNodeType.componentVersion(),
                 workflowNodeType.componentOperationName(), actionDefinitionFacade);
+        }
+    }
+
+    private record TaskHandlerRegistryImpl(ActionDefinitionFacade actionDefinitionFacade)
+        implements TaskHandlerRegistry {
+
+        @Override
+        public TaskHandler<?> getTaskHandler(String type) {
+            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
+
+            return new ComponentTaskHandler(workflowNodeType, actionDefinitionFacade);
         }
     }
 }
