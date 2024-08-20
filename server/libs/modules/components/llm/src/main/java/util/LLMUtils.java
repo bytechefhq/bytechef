@@ -21,7 +21,10 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 import com.bytechef.component.definition.ComponentDSL.ModifiableOption;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+
+import com.bytechef.component.definition.Property;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
@@ -32,6 +35,8 @@ import org.springframework.ai.chat.messages.UserMessage;
  * @author Monika Domiter
  */
 public class LLMUtils {
+    private LLMUtils() {
+    }
 
     public static Message createMessage(String role, String content) {
         return switch (role) {
@@ -41,9 +46,6 @@ public class LLMUtils {
             case "tool" -> new ToolResponseMessage(new ArrayList<>());
             default -> null;
         };
-    }
-
-    private LLMUtils() {
     }
 
     public static <R> ModifiableOption[] getEnumOptions(Map<String, R> map) {

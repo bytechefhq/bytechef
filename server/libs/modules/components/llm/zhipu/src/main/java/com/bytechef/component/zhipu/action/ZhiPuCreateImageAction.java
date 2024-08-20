@@ -36,16 +36,13 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static constants.LLMConstants.CONTENT;
 import static constants.LLMConstants.CREATE_IMAGE;
-import static constants.LLMConstants.MESSAGES;
+import static constants.LLMConstants.IMAGE_MESSAGE_PROPERTY;
 import static constants.LLMConstants.MODEL;
 import static constants.LLMConstants.USER;
 import static constants.LLMConstants.USER_PROPERTY;
-import static constants.LLMConstants.WEIGHT;
 
 /**
  * @author Monika Domiter
@@ -56,20 +53,6 @@ public class ZhiPuCreateImageAction {
         .title("Create image")
         .description("Create an image using text-to-image models")
         .properties(
-            array(MESSAGES)
-                .label("Messages")
-                .description("A list of messages comprising the conversation so far.")
-                .items(
-                    object().properties(
-                        string(CONTENT)
-                            .label("Content")
-                            .description("The contents of the message.")
-                            .required(true),
-                        number(WEIGHT)
-                            .label("Weight")
-                            .description("Weight of the prompt")
-                            .required(false)))
-                .required(true),
             string(MODEL)
                 .label("Model")
                 .description("The model to use for image generation.")
@@ -78,6 +61,7 @@ public class ZhiPuCreateImageAction {
                         .collect(Collectors.toMap(
                             ZhiPuAiImageApi.ImageModel::getValue, ZhiPuAiImageApi.ImageModel::getValue, (f,s)->f))))
                 .required(true),
+            IMAGE_MESSAGE_PROPERTY,
             USER_PROPERTY)
         .outputSchema(
             object()
@@ -101,7 +85,7 @@ public class ZhiPuCreateImageAction {
         return Image.getResponse(IMAGE, inputParameters, connectionParameters);
     }
 
-    public static final Image IMAGE = new Image() {
+    private static final Image IMAGE = new Image() {
         @Override
         public ImageOptions createImageOptions(Parameters inputParameters) {
             return ZhiPuAiImageOptions.builder()

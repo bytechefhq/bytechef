@@ -20,24 +20,19 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static constants.LLMConstants.CONTENT;
+import static com.bytechef.component.openai.constant.OpenAIConstants.QUALITY;
 import static constants.LLMConstants.CREATE_IMAGE;
-import static constants.LLMConstants.DEFAULT_SIZE;
-import static constants.LLMConstants.HEIGHT;
-import static constants.LLMConstants.MESSAGES;
+import static constants.LLMConstants.IMAGE_MESSAGE_PROPERTY;
 import static constants.LLMConstants.MODEL;
 import static constants.LLMConstants.N;
-import static constants.LLMConstants.QUALITY;
 import static constants.LLMConstants.RESPONSE_FORMAT;
+import static constants.LLMConstants.SIZE;
 import static constants.LLMConstants.STYLE;
 import static constants.LLMConstants.USER;
 import static constants.LLMConstants.USER_PROPERTY;
-import static constants.LLMConstants.WEIGHT;
-import static constants.LLMConstants.WIDTH;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -64,26 +59,6 @@ public class OpenAICreateImageAction {
         .title("Create image")
         .description("Create an image using text-to-image models")
         .properties(
-            array(MESSAGES)
-                .label("Messages")
-                .description("A list of messages comprising the conversation so far.")
-                .items(
-                    object().properties(
-                        string(CONTENT)
-                            .label("Content")
-                            .description("The contents of the message.")
-                            .required(true),
-                        number(WEIGHT)
-                            .label("Weight")
-                            .description("Weight of the prompt")
-                            .required(false)))
-                .required(true),
-            integer(N)
-                .label("n")
-                .description(
-                    "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported.")
-                .defaultValue(1)
-                .required(false),
             string(MODEL)
                 .label("Model")
                 .description("The model to use for image generation.")
@@ -92,13 +67,24 @@ public class OpenAICreateImageAction {
                         .collect(Collectors.toMap(
                             OpenAiImageApi.ImageModel::getValue, OpenAiImageApi.ImageModel::getValue, (f,s)->f))))
                 .required(true),
-            string(QUALITY)
-                .label("Quality")
-                .description("The quality of the image that will be generated.")
+            IMAGE_MESSAGE_PROPERTY,
+            object(SIZE)
+                .label("Size")
+                .description("The size of the generated images.")
                 .options(
-                    option("standard", "standard"),
-                    option("hd", "hd"))
-                .required(false),
+                    option("Dall-e-2 256x256", new Integer[]{256, 256}),
+                    option("Dall-e-2 512x512", new Integer[]{512, 512}),
+                    option("1024x1024", new Integer[]{1024, 1024}),
+                    option("Dall-e-3 1792x1024", new Integer[]{1792, 1024}),
+                    option("Dall-e-3 1024x1792", new Integer[]{1024, 1792}))
+                .required(true),
+            integer(N)
+                .label("Number of responses")
+                .description("The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported.")
+                .defaultValue(1)
+                .minValue(1)
+                .maxValue(10)
+                .advancedOption(true),
             string(RESPONSE_FORMAT)
                 .label("Response format")
                 .description("The format in which the generated images are returned.")
@@ -106,24 +92,21 @@ public class OpenAICreateImageAction {
                     option("url", "url"),
                     option("b64_json", "b64_json"))
                 .defaultValue("url")
-                .required(false),
-            integer(HEIGHT)
-                .label("Height")
-                .description("The height of the generated images.")
-                .defaultValue(DEFAULT_SIZE)
-                .required(true),
-            integer(WIDTH)
-                .label("Width")
-                .description("The width of the generated images.")
-                .defaultValue(DEFAULT_SIZE)
-                .required(true),
+                .advancedOption(true),
+            string(QUALITY)
+                .label("Quality")
+                .description("The quality of the image that will be generated.")
+                .options(
+                    option("standard", "standard"),
+                    option("hd", "hd"))
+                .advancedOption(true),
             string(STYLE)
                 .label("Style")
-                .description("The style of the generated images.")
+                .description("The style of the generated images. Must be one of vivid or natural. Vivid causes the model to lean towards generating hyper-real and dramatic images. Natural causes the model to produce more natural, less hyper-real looking images. This parameter is only supported for dall-e-3.")
                 .options(
                     option("vivid", "vivid"),
                     option("natural", "natural"))
-                .required(false),
+                .advancedOption(true),
             USER_PROPERTY)
         .outputSchema(
             object()
@@ -147,18 +130,20 @@ public class OpenAICreateImageAction {
         return Image.getResponse(IMAGE, inputParameters, connectionParameters);
     }
 
-    public static final Image IMAGE = new Image() {
+    private static final Image IMAGE = new Image() {
         @Override
         public ImageOptions createImageOptions(Parameters inputParameters) {
+            Integer[] size = inputParameters.getArray(SIZE, Integer.class);
+
             return OpenAiImageOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withN(inputParameters.getInteger(N))
-                .withQuality(inputParameters.getString(QUALITY))
-                .withResponseFormat(inputParameters.getString(RESPONSE_FORMAT))
+                .withHeight(size[1])
+                .withWidth(size[0])
                 .withStyle(inputParameters.getString(STYLE))
                 .withUser(inputParameters.getString(USER))
-                .withHeight(inputParameters.getInteger(HEIGHT))
-                .withWidth(inputParameters.getInteger(WIDTH))
+                .withResponseFormat(inputParameters.getString(RESPONSE_FORMAT))
+                .withQuality(inputParameters.getString(QUALITY))
                 .build();
         }
 

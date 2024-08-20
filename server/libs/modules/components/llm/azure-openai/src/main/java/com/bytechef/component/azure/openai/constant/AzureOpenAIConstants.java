@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.openai;
-
-import com.bytechef.test.jsonasssert.JsonFileAssert;
-import org.junit.jupiter.api.Test;
+package com.bytechef.component.azure.openai.constant;
 
 /**
  * @author Monika Domiter
  */
-public class AzureOpenAIComponentHandlerTest {
+public final class AzureOpenAIConstants {
+    public static final String AZURE_OPENAI = "azureOpenai";
 
-    @Test
-    void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/azure-openai_v1.json", new AzureOpenAIComponentHandler().getDefinition());
+    private AzureOpenAIConstants() {
     }
 }

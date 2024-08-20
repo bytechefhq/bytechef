@@ -14,56 +14,43 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.openai.action;
+package com.bytechef.component.azure.openai.action;
 
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static constants.LLMConstants.CONTENT;
 import static constants.LLMConstants.CREATE_IMAGE;
-import static constants.LLMConstants.DEFAULT_SIZE;
 import static constants.LLMConstants.ENDPOINT;
-import static constants.LLMConstants.HEIGHT;
-import static constants.LLMConstants.IMAGE_MESSAGES;
 import static constants.LLMConstants.IMAGE_MESSAGE_PROPERTY;
-import static constants.LLMConstants.MESSAGES;
 import static constants.LLMConstants.MODEL;
 import static constants.LLMConstants.N;
-import static constants.LLMConstants.QUALITY;
 import static constants.LLMConstants.RESPONSE_FORMAT;
+import static constants.LLMConstants.SIZE;
 import static constants.LLMConstants.STYLE;
 import static constants.LLMConstants.USER;
-import static constants.LLMConstants.WEIGHT;
-import static constants.LLMConstants.WIDTH;
+import static constants.LLMConstants.USER_PROPERTY;
 
 import com.azure.ai.openai.OpenAIClient;
 import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.core.credential.KeyCredential;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.ai.azure.openai.AzureOpenAiImageModel;
 import org.springframework.ai.azure.openai.AzureOpenAiImageOptions;
-import org.springframework.ai.image.ImageMessage;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImageOptions;
-import org.springframework.ai.image.ImagePrompt;
-import org.springframework.ai.image.ImageResponse;
 import util.LLMUtils;
 import util.interfaces.Image;
-import util.records.ImageMessageRecord;
 
 /**
  * @author Monika Domiter
@@ -83,14 +70,23 @@ public class AzureOpenAICreateImageAction {
                             AzureOpenAiImageOptions.ImageModel::getValue, AzureOpenAiImageOptions.ImageModel::getValue, (f,s)->f))))
                 .required(true),
             IMAGE_MESSAGE_PROPERTY,
+            object(SIZE)
+                .label("Size")
+                .description("The size of the generated images.")
+                .options(
+                    option("Dall-e-2 256x256", new Integer[]{256, 256}),
+                    option("Dall-e-2 512x512", new Integer[]{512, 512}),
+                    option("1024x1024", new Integer[]{1024, 1024}),
+                    option("Dall-e-3 1792x1024", new Integer[]{1792, 1024}),
+                    option("Dall-e-3 1024x1792", new Integer[]{1024, 1792}))
+                .required(true),
             integer(N)
-                .label("n")
-                .description(
-                    "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported.")
+                .label("Number of responses")
+                .description("The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported..")
                 .defaultValue(1)
                 .minValue(1)
                 .maxValue(10)
-                .required(false),
+                .advancedOption(true),
             string(RESPONSE_FORMAT)
                 .label("Response format")
                 .description("The format in which the generated images are returned.")
@@ -98,30 +94,15 @@ public class AzureOpenAICreateImageAction {
                     option("url", "url"),
                     option("b64_json", "b64_json"))
                 .defaultValue("url")
-                .required(false),
-            integer(HEIGHT)
-                .label("Height")
-                .description("The height of the generated images.")
-                .defaultValue(DEFAULT_SIZE)
-                .required(true),
-            integer(WIDTH)
-                .label("Width")
-                .description("The width of the generated images.")
-                .defaultValue(DEFAULT_SIZE)
-                .required(true),
+                .advancedOption(true),
             string(STYLE)
                 .label("Style")
-                .description("The style of the generated images.")
+                .description("The style of the generated images. Must be one of vivid or natural. Vivid causes the model to lean towards generating hyper-real and dramatic images. Natural causes the model to produce more natural, less hyper-real looking images. This parameter is only supported for dall-e-3.")
                 .options(
                     option("vivid", "vivid"),
                     option("natural", "natural"))
-                .required(false),
-            string(USER)
-                .label("User")
-                .description(
-                    "A unique identifier representing your end-user, which can help OpenAI to monitor and detect " +
-                        "abuse.")
-                .required(false))
+                .advancedOption(true),
+            USER_PROPERTY)
         .outputSchema(
             object()
                 .properties(
@@ -144,17 +125,19 @@ public class AzureOpenAICreateImageAction {
         return Image.getResponse(IMAGE, inputParameters, connectionParameters);
     }
 
-    public static final Image IMAGE = new Image() {
+    private static final Image IMAGE = new Image() {
         @Override
         public ImageOptions createImageOptions(Parameters inputParameters) {
+            Integer[] size = inputParameters.getArray(SIZE, Integer.class);
+
             return AzureOpenAiImageOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withN(inputParameters.getInteger(N))
-                .withResponseFormat(inputParameters.getString(RESPONSE_FORMAT))
+                .withHeight(size[1])
+                .withWidth(size[0])
                 .withStyle(inputParameters.getString(STYLE))
                 .withUser(inputParameters.getString(USER))
-                .withHeight(inputParameters.getInteger(HEIGHT))
-                .withWidth(inputParameters.getInteger(WIDTH))
+                .withResponseFormat(inputParameters.getString(RESPONSE_FORMAT))
                 .build();
         }
 
