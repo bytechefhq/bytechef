@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.registry.util;
+package com.bytechef.platform.component.util;
 
 import static com.bytechef.component.definition.Context.Http.RequestMethod;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ActionDefinition.ProcessErrorResponseFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
@@ -33,7 +34,7 @@ import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.exception.ComponentExecutionException;
-import com.bytechef.platform.component.registry.exception.ActionDefinitionErrorType;
+import com.bytechef.platform.exception.ErrorType;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -48,6 +49,27 @@ import org.springframework.lang.Nullable;
  * @author Ivica Cardic
  */
 public class OpenApiClientUtils {
+
+    public enum ActionDefinitionErrorType implements ErrorType {
+
+        EXECUTE_PROCESS_ERROR_RESPONSE(105);
+
+        private final int errorKey;
+
+        ActionDefinitionErrorType(int errorKey) {
+            this.errorKey = errorKey;
+        }
+
+        @Override
+        public Class<?> getErrorClass() {
+            return ActionDefinition.class;
+        }
+
+        @Override
+        public int getErrorKey() {
+            return errorKey;
+        }
+    }
 
     private static final String TYPE = "type";
 
@@ -83,8 +105,7 @@ public class OpenApiClientUtils {
                 try {
                     throw processErrorResponseFunction.apply(response.getStatusCode(), body, context);
                 } catch (Exception e) {
-                    throw new ComponentExecutionException(
-                        e, ActionDefinitionErrorType.EXECUTE_PROCESS_ERROR_RESPONSE);
+                    throw new ComponentExecutionException(e, ActionDefinitionErrorType.EXECUTE_PROCESS_ERROR_RESPONSE);
                 }
             }
         }
