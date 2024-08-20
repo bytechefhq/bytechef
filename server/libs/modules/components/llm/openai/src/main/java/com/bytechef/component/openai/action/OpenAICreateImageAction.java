@@ -23,7 +23,6 @@ import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static constants.LLMConstants.CONTENT;
 import static constants.LLMConstants.CREATE_IMAGE;
@@ -36,28 +35,25 @@ import static constants.LLMConstants.QUALITY;
 import static constants.LLMConstants.RESPONSE_FORMAT;
 import static constants.LLMConstants.STYLE;
 import static constants.LLMConstants.USER;
+import static constants.LLMConstants.USER_PROPERTY;
 import static constants.LLMConstants.WEIGHT;
 import static constants.LLMConstants.WIDTH;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.ai.image.ImageMessage;
+
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImageOptions;
-import org.springframework.ai.image.ImagePrompt;
-import org.springframework.ai.image.ImageResponse;
 import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.OpenAiImageOptions;
 import org.springframework.ai.openai.api.OpenAiImageApi;
 import org.springframework.retry.support.RetryTemplate;
 import util.LLMUtils;
-import util.records.ImageMessageRecord;
+import util.interfaces.Image;
 
 /**
  * @author Monika Domiter
@@ -130,25 +126,19 @@ public class OpenAICreateImageAction {
                     option("vivid", "vivid"),
                     option("natural", "natural"))
                 .required(false),
-            string(USER)
-                .label("User")
-                .description(
-                    "A unique identifier representing your end-user, which can help OpenAI to monitor and detect " +
-                        "abuse.")
-                .required(false))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        integer("created"),
-                        array("data")
-                            .items(
-                                object()
-                                    .properties(
-                                        string("url")
-                                            .controlType(Property.ControlType.URL),
-                                        string("b64Json"),
-                                        string("revisedPrompt"))))))
+            USER_PROPERTY)
+        .outputSchema(
+            object()
+                .properties(
+                    integer("created"),
+                    array("data")
+                        .items(
+                            object()
+                                .properties(
+                                    string("url")
+                                        .controlType(Property.ControlType.URL),
+                                    string("b64Json"),
+                                    string("revisedPrompt")))))
         .perform(OpenAICreateImageAction::perform);
 
     private OpenAICreateImageAction() {
@@ -156,27 +146,28 @@ public class OpenAICreateImageAction {
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        ImageOptions openAiImageOptions = OpenAiImageOptions.builder()
-            .withModel(inputParameters.getRequiredString(MODEL))
-            .withN(inputParameters.getInteger(N))
-            .withQuality(inputParameters.getString(QUALITY))
-            .withResponseFormat(inputParameters.getString(RESPONSE_FORMAT))
-            .withStyle(inputParameters.getString(STYLE))
-            .withUser(inputParameters.getString(USER))
-            .withHeight(inputParameters.getInteger(HEIGHT))
-            .withWidth(inputParameters.getInteger(WIDTH))
-            .build();
-        ImageModel imageModel = new OpenAiImageModel(new OpenAiImageApi(connectionParameters.getString(TOKEN)),
-            (OpenAiImageOptions) openAiImageOptions, new RetryTemplate());
-
-        List<ImageMessageRecord> imageMessageList = inputParameters.getList(MESSAGES, new Context.TypeReference<>() {});
-        List<ImageMessage> imageMessage = imageMessageList.stream()
-            .map(messageRecord -> new ImageMessage(messageRecord.getContent(), messageRecord.getWeight()))
-            .toList();
-
-        ImageResponse response = imageModel.call(new ImagePrompt(imageMessage));
-        return response.getResult()
-            .getOutput();
+        return Image.getResponse(IMAGE, inputParameters, connectionParameters);
     }
+
+    public static final Image IMAGE = new Image() {
+        @Override
+        public ImageOptions createImageOptions(Parameters inputParameters) {
+            return OpenAiImageOptions.builder()
+                .withModel(inputParameters.getRequiredString(MODEL))
+                .withN(inputParameters.getInteger(N))
+                .withQuality(inputParameters.getString(QUALITY))
+                .withResponseFormat(inputParameters.getString(RESPONSE_FORMAT))
+                .withStyle(inputParameters.getString(STYLE))
+                .withUser(inputParameters.getString(USER))
+                .withHeight(inputParameters.getInteger(HEIGHT))
+                .withWidth(inputParameters.getInteger(WIDTH))
+                .build();
+        }
+
+        @Override
+        public ImageModel createImageModel(Parameters inputParameters, Parameters connectionParameters) {
+            return new OpenAiImageModel(new OpenAiImageApi(connectionParameters.getString(TOKEN)),
+                (OpenAiImageOptions) createImageOptions(inputParameters), new RetryTemplate());
+        }
+    };
 }
