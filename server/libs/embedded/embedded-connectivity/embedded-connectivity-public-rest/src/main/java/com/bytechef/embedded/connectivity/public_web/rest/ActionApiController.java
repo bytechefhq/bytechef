@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.embedded.connectivity.web.rest;
+package com.bytechef.embedded.connectivity.public_web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.embedded.connectivity.facade.ActionFacade;
-import com.bytechef.embedded.connectivity.web.rest.model.ExecuteAction200ResponseModel;
-import com.bytechef.embedded.connectivity.web.rest.model.ExecuteActionRequestModel;
+import com.bytechef.embedded.connectivity.public_web.rest.model.ExecuteAction200ResponseModel;
+import com.bytechef.embedded.connectivity.public_web.rest.model.ExecuteActionRequestModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
