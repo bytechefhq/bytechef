@@ -17,8 +17,9 @@
 package com.bytechef.embedded.security.web.matcher;
 
 import com.bytechef.platform.security.web.matcher.AuthenticatedRequestMatcherContributor;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,10 +29,13 @@ import org.springframework.stereotype.Component;
 public class EmbeddedAuthenticatedRequestMatcherContributor implements AuthenticatedRequestMatcherContributor {
 
     @Override
-    public RequestMatcher[] getRequestMatcher(MvcRequestMatcher.Builder mvc) {
-        return new RequestMatcher[] {
-            mvc.pattern("/api/embedded/v1/**"),
-            mvc.pattern("/api/embedded/by-connected-user-token/v1/**")
-        };
+    public void requestMatchers(
+        AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authz,
+        MvcRequestMatcher.Builder mvc) {
+
+        authz.requestMatchers(mvc.pattern("/api/embedded/v1/**"))
+            .authenticated()
+            .requestMatchers(mvc.pattern("/api/embedded/by-connected-user-token/v1/**"))
+            .authenticated();
     }
 }
