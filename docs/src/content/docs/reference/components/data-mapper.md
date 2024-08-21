@@ -172,8 +172,6 @@ Creates a new object out of all objects that have the same key as the specified 
 Data Mapper is a component or a tool designed to facilitate and configure the transformation of data from one format to another. Data Mapper typically allows you to map fields from the source data (typically a JSON output from another component) to the fields of the target data format or structure (e.g., the data model of another application). This component is particularly useful when dealing with diverse data sources and targets, or when data structures do not align directly and require transformation, such as renaming fields, renaming keys or reformatting values.
 <hr/>
 
-## Actions:
-
 ## Rename Keys
 
 ### Overview
@@ -189,13 +187,13 @@ The process involves two main components:
      - Dot Notation: The path is defined in a dot notation (for JSON), which allows the action to precisely identify and access the key in a nested or hierarchical data structure.
    - **To**: This specifies the name that the original key should be changed to. This renaming can be necessary for several reasons such as making key names more descriptive, aligning data from different sources with a common schema, or complying with the naming conventions of a target system.
 
-### Applications:
+### Use Cases:
 
 By defining these mappings, the Rename Keys action effectively helps in normalizing data, making it easier to integrate and process across various systems and applications. This capability is particularly valuable in data integration, migration projects, or when interfacing with external systems that require a specific data schema.
 
 ### Example
 
-[Guidejar](https://guidejar.com/guides/177e078b-541d-44e0-8a5b-f7ef2748d6dd) tutorial.
+<div style="position:relative;height:100%;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(51.87165775% + 32px)"><iframe src="https://www.guidejar.com/embed/177e078b-541d-44e0-8a5b-f7ef2748d6dd?type=1&controls=on" width="100%" height="100%" style="position:absolute;inset:0" allowfullscreen frameborder="0"></iframe></div>
 
 ## Replace Value
 
@@ -211,13 +209,13 @@ This action enables the substitution of specified values, based on predefined ma
 4. **Mappings**: You need to establish a set of mappings that dictate how each value should be replaced. A mapping consists of a pair - the original value (From) and its intended replacement (To).
    - Regex Support for Strings: In special cases where the values to be replaced are strings, you have the flexibility to define replacements using regular expressions (regex). This allows for more dynamic and complex matching and replacing scenarios, such as pattern-based text substitutions.
 
-### Applications: 
+### Use Cases: 
 
 This action is particularly useful in data cleansing and transformation tasks where consistency and correctness of data types are crucial. It is useful when you need to transform a single data pill output or a value in the output in a multiple iteration process.
 
-### Example
-
-[Guidejar](https://guidejar.com/guides/b644bd49-59e5-4b1f-b47b-004f7e99cc12) tutorial.
+[//]: # (### Example)
+[//]: # ()
+[//]: # ([Guidejar]&#40;https://guidejar.com/guides/b644bd49-59e5-4b1f-b47b-004f7e99cc12&#41; tutorial.)
 
 ## Replace All Specified Values
 
@@ -233,7 +231,7 @@ This action automates the batch replacement of specified data within objects or 
 4. **Mappings**: You need to establish a set of mappings that dictate how each value should be replaced. A mapping consists of a pair - the original value (From) and its intended replacement (To).
     - Regex Support for Strings: In special cases where the values to be replaced are strings, you have the flexibility to define replacements using regular expressions (regex). This allows for more dynamic and complex matching and replacing scenarios, such as pattern-based text substitutions.
 
-### Applications:
+### Use Cases:
 
 This action can be used when you want to replace multiple values, but don't know where they are located or don't have the time to locate all of them. For example:
 - Data Sanitization: Replacing or anonymizing sensitive information from objects within a dataset.
@@ -241,7 +239,7 @@ This action can be used when you want to replace multiple values, but don't know
 
 ### Example
 
-[Guidejar](https://guidejar.com/guides/b8136d72-51b0-4edc-b3d9-f9d58a49a4c0) tutorial.
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(51.87165775% + 32px)"><iframe src="https://www.guidejar.com/embed/b8136d72-51b0-4edc-b3d9-f9d58a49a4c0?type=1&controls=on" width="100%" height="100%" style="position:absolute;inset:0" allowfullscreen frameborder="0"></iframe></div>
 
 ## Replace Multiple Values by Key
 
@@ -258,7 +256,7 @@ This action facilitates targeted replacements within an object based on a set of
    - **To Path**: Points to the key path in the Output object whose value will replace the 'From Path' value.
      - Dot Notation: Paths to both keys within are specified in dot notation. This allows for precise targeting and modification of entries, even within deeply nested structures.
 
-### Applications:
+### Use Cases:
 This method is especially useful for restructuring or transforming the structure of complex data objects without altering their inherent data format. For example:
 
 - Data Integration: Useful in integrating systems where data from one system needs to be mapped to the schema of another system, hence facilitating smoother data interoperability.
@@ -266,7 +264,7 @@ This method is especially useful for restructuring or transforming the structure
 
 ### Example
 
-[Guidejar](https://guidejar.com/guides/4da6cdd8-d5e1-40ed-b8b6-b54a88369f6d) tutorial.
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(51.87165775% + 32px)"><iframe src="https://www.guidejar.com/embed/4da6cdd8-d5e1-40ed-b8b6-b54a88369f6d?type=1&controls=on" width="100%" height="100%" style="position:absolute;inset:0" allowfullscreen frameborder="0"></iframe></div>
 
 ## Map Objects to Object
 
@@ -286,15 +284,15 @@ This action is a transformation technique designed to selectively project and po
 5. **Include Nulls**: Determines if properties with null values should be included in the output. Default value is true.
 6. **Include Empty Strings**: Indicates whether to include properties that have empty strings as values in the output object. Default value is true.
 
-### Applications:
+### Use Cases:
 
 - Data Cleaning and Structuring: Perfect for restructuring incoming data streams to fit the schema expected by downstream systems or databases.
 - API Data Preparation: Useful in preparing data received from external APIs, where only specific information is needed, or names need standardization.
 - Configurations and Settings Management: Can be used to selectively extract and rename settings from complex nested configuration objects, making it easier to manage application settings.
 
-### Example
-
-[Guidejar](TODO) tutorial.
+[//]: # (### Example)
+[//]: # ()
+[//]: # (TODO)
 
 ## Map Objects to Array
 
@@ -308,7 +306,7 @@ This action is designed to convert a given single object or an array of objects 
 3. **Field Key**: Specifies the property key in each newly created object within the output array. The value of this key in the new object will be the name (key) of a property from the input object.
 4. **Value Key**: Specifies the property key in each newly created object within the output array that holds the property value from the input object.
 
-### Applications:
+### Use Cases:
 
 - Data Transformation: Useful for data processing tasks where object structures need to be simplified or normalized for further processing, such as in analytics or reporting tools that require flat data structures.
 - API Response Transformation: Ideal for transforming complex JSON structures received from API calls into a format that is easier to manage or display in user interfaces.
@@ -316,7 +314,7 @@ This action is designed to convert a given single object or an array of objects 
 
 ### Example
 
-[Guidejar](https://guidejar.com/guides/901fe11a-f79e-474f-9a23-8036fdcfca01) tutorial.
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(63.92358560% + 32px)"><iframe src="https://www.guidejar.com/embed/901fe11a-f79e-474f-9a23-8036fdcfca01?type=1&controls=on" width="100%" height="100%" style="position:absolute;inset:0" allowfullscreen frameborder="0"></iframe></div>
 
 ## Merge and Pivot Properties by Key
 
@@ -329,7 +327,7 @@ This action transforms an array of objects into a new, consolidated object based
 2. **Field Key**: This is the key based on which the input objects are analyzed and merged. For each unique value of this key found across objects, a new property is created in the resultant object.
 3. **Field Value**: This is the value that every property in each sub-object of the resultant main object will have. Essentially, it defines the static value assigned to each key derived during the merging process.
 
-### Applications:
+### Use Cases:
 
 - Data Aggregation: Useful in scenarios where there is a need to aggregate information that shares common identifiers across multiple records, such as combining different attributes of products listed by the same identifier across various datasets.
 - Analytical Reporting: Facilitates the creation of pivoted data structures that are often required in analytical reporting and data visualization to summarize data effectively.
@@ -337,4 +335,4 @@ This action transforms an array of objects into a new, consolidated object based
 
 ### Example
 
-[Guidejar](https://guidejar.com/guides/2bda7178-8fa4-48af-9526-b5192d0b8fb1) tutorial.
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(53.24754902% + 32px)"><iframe src="https://www.guidejar.com/embed/2bda7178-8fa4-48af-9526-b5192d0b8fb1?type=1&controls=on" width="100%" height="100%" style="position:absolute;inset:0" allowfullscreen frameborder="0"></iframe></div>
