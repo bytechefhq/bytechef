@@ -52,14 +52,14 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class GoogleMailNewEmailTrigger {
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger(NEW_EMAIL)
         .title("New Email")
         .description("Triggers when new mail is found in your Gmail inbox.")
-        .type(TriggerType.DYNAMIC_WEBHOOK)
+        .type(TriggerType.STATIC_WEBHOOK)
         .properties(
             string(TOPIC_NAME)
                 .label("Topic name")
