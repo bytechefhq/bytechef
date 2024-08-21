@@ -66,7 +66,7 @@ public class ComponentCommand {
         }
 
         ComponentInitOpenApiGenerator generator = new ComponentInitOpenApiGenerator(
-            basePackageName, name.toLowerCase(), version, internalComponent, openApiPath, outputPath);
+            basePackageName, name.toLowerCase(), version, internalComponent, openApiPath, outputPath, null);
 
         generator.generate();
     }
