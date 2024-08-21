@@ -1,20 +1,16 @@
-package com.bytechef.embedded.connectivity.web.rest.model;
+package com.bytechef.embedded.connectivity.public_web.rest.model;
 
-import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.HashMap;
 import java.util.Map;
-import org.openapitools.jackson.nullable.JsonNullable;
-import java.time.OffsetDateTime;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
-import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -56,7 +52,7 @@ public class ExecuteActionRequestModel {
    * The input parameters for the action.
    * @return input
   */
-  @NotNull 
+  @NotNull
   @Schema(name = "input", description = "The input parameters for the action.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("input")
   public Map<String, Object> getInput() {

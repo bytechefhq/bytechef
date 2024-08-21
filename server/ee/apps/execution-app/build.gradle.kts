@@ -40,7 +40,7 @@ dependencies {
     implementation(project(":server:libs:core:message:message-broker:message-broker-kafka"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-redis"))
     implementation(project(":server:libs:core:message:message-event:message-event-impl"))
-    implementation(project(":server:libs:embedded:embedded-connectivity:embedded-connectivity-rest"))
+    implementation(project(":server:libs:embedded:embedded-connectivity:embedded-connectivity-public-rest"))
     implementation(project(":server:libs:embedded:embedded-connectivity:embedded-connectivity-service"))
     implementation(project(":server:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-rest"))
     implementation(project(":server:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-service"))

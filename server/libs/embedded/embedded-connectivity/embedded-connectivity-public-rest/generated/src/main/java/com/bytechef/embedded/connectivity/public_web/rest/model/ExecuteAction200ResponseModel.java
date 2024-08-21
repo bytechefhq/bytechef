@@ -1,18 +1,11 @@
-package com.bytechef.embedded.connectivity.web.rest.model;
+package com.bytechef.embedded.connectivity.public_web.rest.model;
 
-import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import org.openapitools.jackson.nullable.JsonNullable;
-import java.time.OffsetDateTime;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
-import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -34,7 +27,7 @@ public class ExecuteAction200ResponseModel {
    * The result of the action call.
    * @return output
   */
-  
+
   @Schema(name = "output", description = "The result of the action call.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("output")
   public Object getOutput() {

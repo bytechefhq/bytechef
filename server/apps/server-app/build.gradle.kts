@@ -71,7 +71,7 @@ dependencies {
     implementation(project(":server:libs:embedded:embedded-configuration:embedded-configuration-rest:embedded-configuration-rest-impl"))
     implementation(project(":server:libs:embedded:embedded-configuration:embedded-configuration-service"))
     implementation(project(":server:libs:embedded:embedded-connection:embedded-connection-rest"))
-    implementation(project(":server:libs:embedded:embedded-connectivity:embedded-connectivity-rest"))
+    implementation(project(":server:libs:embedded:embedded-connectivity:embedded-connectivity-public-rest"))
     implementation(project(":server:libs:embedded:embedded-connectivity:embedded-connectivity-service"))
     implementation(project(":server:libs:embedded:embedded-security-web"))
     implementation(project(":server:libs:embedded:embedded-swagger"))

@@ -119,7 +119,7 @@ include("server:libs:embedded:embedded-configuration:embedded-configuration-rest
 include("server:libs:embedded:embedded-configuration:embedded-configuration-service")
 include("server:libs:embedded:embedded-connection:embedded-connection-rest")
 include("server:libs:embedded:embedded-connectivity:embedded-connectivity-api")
-include("server:libs:embedded:embedded-connectivity:embedded-connectivity-rest")
+include("server:libs:embedded:embedded-connectivity:embedded-connectivity-public-rest")
 include("server:libs:embedded:embedded-connectivity:embedded-connectivity-service")
 include("server:libs:embedded:embedded-security-web")
 include("server:libs:embedded:embedded-swagger")
