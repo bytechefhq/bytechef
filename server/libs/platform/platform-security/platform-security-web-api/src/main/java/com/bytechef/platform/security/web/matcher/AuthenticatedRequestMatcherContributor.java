@@ -16,13 +16,16 @@
 
 package com.bytechef.platform.security.web.matcher;
 
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 
 /**
  * @author Ivica Cardic
  */
 public interface AuthenticatedRequestMatcherContributor {
 
-    RequestMatcher[] getRequestMatcher(MvcRequestMatcher.Builder mvc);
+    void requestMatchers(
+        AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authz,
+        MvcRequestMatcher.Builder mvc);
 }
