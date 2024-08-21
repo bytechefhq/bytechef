@@ -62,11 +62,13 @@ Copy a file or folder to a different location in the user's Dropbox. If the sour
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING(name), STRING(pathLower), STRING(pathDisplay), STRING(parentSharedFolderId), STRING(previewUrl)} | OBJECT_BUILDER  |
+| {STRING\(.tag), STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} | OBJECT_BUILDER  |
+
 
 
 
@@ -88,11 +90,13 @@ Create a folder at a given path.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING(id), STRING(sharedFolderId), {STRING(parentSharedFolderId), STRING(sharedFolderId), BOOLEAN(traverseOnly), BOOLEAN(noAccess), [{STRING(templateId), [{STRING(name), STRING(value)}](fields)}](propertyGroups)}(sharingInfo)} | OBJECT_BUILDER  |
+| {STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} | OBJECT_BUILDER  |
+
 
 
 
@@ -115,6 +119,7 @@ Create a new .paper file on which you can write at a given path
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -123,6 +128,7 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | INTEGER | INTEGER  |
+
 
 
 
@@ -145,11 +151,13 @@ Delete the file or folder at a given path. If the path is a folder, all its cont
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| Metadata | {STRING(name), STRING(pathLower), STRING(pathDisplay), STRING(parentSharedFolderId), STRING(previewUrl)} | OBJECT_BUILDER  |  |
+| {STRING\(.tag), STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} | OBJECT_BUILDER  |
+
 
 
 
@@ -172,19 +180,21 @@ Get a temporary link to stream content of a file. This link will expire in four 
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| Metadata | {STRING(id), DATE(clientModified), DATE(serverModified), STRING(rev), INTEGER(size), {STRING(target)}(symlinkInfo), {STRING(parentSharedFolderId), STRING(modifiedBy)}(sharingInfo), BOOLEAN(isDownloadable), {STRING(exportAs), [STRING](exportOptions)}(exportInfo), [{STRING(templateId), [{STRING(name), STRING(value)}](fields)}](propertyGroups), BOOLEAN(hasExplicitSharedMembers), STRING(contentHash), {BOOLEAN(isLockholder), STRING(lockholderName), STRING(lockholderAccountId), DATE(created)}(fileLockInfo)} | OBJECT_BUILDER  |  |
-| Link | STRING | TEXT  |  |
+| {STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} | OBJECT_BUILDER  |
+| STRING | TEXT  |
+
 
 
 
 
 
 ### List folder
-Lists content of a folder.
+List the contents of a folder.
 
 #### Properties
 
@@ -199,13 +209,13 @@ Lists content of a folder.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| [{{STRING(name), STRING(pathLower), STRING(pathDisplay), STRING(parentSharedFolderId), STRING(previewUrl)}(metadata)}] | ARRAY_BUILDER  |
-| STRING | TEXT  |
-| BOOLEAN | SELECT  |
+| [{{STRING\(.tag), STRING\(name), STRING\(path_lower), STRING\(path_Display), STRING\(id)}\(f)}] | ARRAY_BUILDER  |
+
 
 
 
@@ -229,11 +239,13 @@ Move a file or folder to a different location in the user's Dropbox. If the sour
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| Metadata | {STRING(name), STRING(pathLower), STRING(pathDisplay), STRING(parentSharedFolderId), STRING(previewUrl)} | OBJECT_BUILDER  |  |
+| {STRING\(.tag), STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} | OBJECT_BUILDER  |
+
 
 
 
@@ -246,7 +258,7 @@ Searches for files and folders. Can only be used to retrieve a maximum of 10,000
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Search string | STRING | TEXT  |  The string to search for. May match across multiple fields based on the request arguments.Must have length of at most 1000 and not be null.  |
+| Search string | STRING | TEXT  |  The string to search for. May match across multiple fields based on the request arguments.  |
 
 
 ### Output
@@ -255,13 +267,13 @@ Searches for files and folders. Can only be used to retrieve a maximum of 10,000
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| Matches | [{[{STRING(highlightStr), BOOLEAN(isHighlighted)}](highlightSpans)}] | ARRAY_BUILDER  |  |
-| BOOLEAN | SELECT  |
-| STRING | TEXT  |
+| [{{STRING\(.tag)}\(match_type), {STRING\(.tag), STRING\(id), STRING\(name), STRING\(path_display), STRING\(path_lower)}\(metadata)}] | ARRAY_BUILDER  |
+
 
 
 
@@ -277,6 +289,9 @@ Create a new file up to a size of 150MB with the contents provided in the reques
 | File | FILE_ENTRY | FILE_ENTRY  |  The object property which contains a reference to the file to be written.  |
 | Destination path | STRING | TEXT  |  The path to which the file should be written.  |
 | Filename | STRING | TEXT  |  Name of the file. Needs to have the appropriate extension.  |
+| Auto Rename | BOOLEAN | SELECT  |  If there's a conflict, as determined by mode, have the Dropbox server try to autorename the file to avoid conflict.  |
+| Mute | BOOLEAN | SELECT  |  Normally, users are made aware of any file modifications in their Dropbox account via notifications in the client software. If true, this tells the clients that this modification shouldn't result in a user notification.  |
+| Strict conflict | BOOLEAN | SELECT  |  Be more strict about how each WriteMode detects conflict. For example, always return a conflict error when mode = WriteMode.update and the given "rev" doesn't match the existing file's "rev", even if the existing file has been deleted.  |
 
 
 ### Output
@@ -284,6 +299,7 @@ Create a new file up to a size of 150MB with the contents provided in the reques
 
 
 Type: OBJECT
+
 
 #### Properties
 
@@ -294,14 +310,15 @@ Type: OBJECT
 | DATE | DATE  |
 | STRING | TEXT  |
 | INTEGER | INTEGER  |
-| Sym link info | {STRING(target)} | OBJECT_BUILDER  |  |
-| Sharing info | {STRING(parentSharedFolderId), STRING(modifiedBy)} | OBJECT_BUILDER  |  |
+| {STRING\(target)} | OBJECT_BUILDER  |
+| {STRING\(parentSharedFolderId), STRING\(modifiedBy)} | OBJECT_BUILDER  |
 | BOOLEAN | SELECT  |
-| Export info | {STRING(exportAs), [STRING](exportOptions)} | OBJECT_BUILDER  |  |
-| [{STRING(templateId), [{STRING(name), STRING(value)}](fields)}] | ARRAY_BUILDER  |
+| {STRING\(exportAs), [STRING]\(exportOptions)} | OBJECT_BUILDER  |
+| [{STRING\(templateId), [{STRING\(name), STRING\(value)}]\(fields)}] | ARRAY_BUILDER  |
 | BOOLEAN | SELECT  |
 | STRING | TEXT  |
-| {BOOLEAN(isLockholder), STRING(lockholderName), STRING(lockholderAccountId), DATE(created)} | OBJECT_BUILDER  |
+| {BOOLEAN\(isLockholder), STRING\(lockholderName), STRING\(lockholderAccountId), DATE\(created)} | OBJECT_BUILDER  |
+
 
 
 
@@ -317,4 +334,4 @@ Type: OBJECT
 
 [Setting up OAuth2](https://developers.dropbox.com/oauth-guide)
 
-[Guidejar](https://guidejar.com/guides/756fb792-9de7-4ac9-b58a-c8c8a95fab66) tutorial.
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(52.81250000% + 32px)"><iframe src="https://www.guidejar.com/embed/756fb792-9de7-4ac9-b58a-c8c8a95fab66?type=1&controls=on" width="100%" height="100%" style="position:absolute;inset:0" allowfullscreen frameborder="0"></iframe></div>

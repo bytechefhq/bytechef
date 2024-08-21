@@ -1,14 +1,14 @@
 ---
-title: "Microsoft Teams"
-description: "Microsoft Teams is a collaboration platform that combines workplace chat, video meetings, file storage, and application integration."
+title: "Gitlab"
+description: "GitLab is a web-based DevOps lifecycle tool that provides a Git repository manager, CI/CD pipelines, issue tracking, and more in a single application."
 ---
 ## Reference
 <hr />
 
-Microsoft Teams is a collaboration platform that combines workplace chat, video meetings, file storage, and application integration.
+GitLab is a web-based DevOps lifecycle tool that provides a Git repository manager, CI/CD pipelines, issue tracking, and more in a single application.
 
 
-Categories: [COMMUNICATION]
+Categories: [DEVELOPER_TOOLS]
 
 
 Version: 1
@@ -30,7 +30,6 @@ Version: 1
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Client Id | STRING | TEXT  |  |
 | Client Secret | STRING | TEXT  |  |
-| Tenant Id | STRING | TEXT  |  |
 
 
 
@@ -40,21 +39,60 @@ Version: 1
 
 
 
+## Triggers
+
+
+### New Issue
+Triggers when a new issue is created.
+
+#### Type: DYNAMIC_WEBHOOK
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Project | STRING | SELECT  |  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| STRING | TEXT  |
+| INTEGER | INTEGER  |
+| INTEGER | INTEGER  |
+| INTEGER | INTEGER  |
+| STRING | TEXT  |
+
+
+
+
+
+
+
+<hr />
+
 
 
 ## Actions
 
 
-### Create channel
-Creates a new channel within a team.
+### Create Issue
+Creates a new project issue.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Team | STRING | SELECT  |  Team where the channel will be created.  |
-| Channel name | STRING | TEXT  |  |
-| Description | STRING | TEXT  |  Description for the channel.  |
+| Project | STRING | SELECT  |  Project where new issue will be created  |
+| Title | STRING | TEXT  |  The title of an issue.  |
+| Description | STRING | TEXT  |  The description of an issue.  |
 
 
 ### Output
@@ -68,26 +106,23 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+| {INTEGER\(id), INTEGER\(iid), INTEGER\(project_id), STRING\(title), STRING\(description), STRING\(web_url)} | OBJECT_BUILDER  |
 
 
 
 
 
 
-### Send channel message
-Sends a message to a channel.
+### Create Comment on Issue
+Adds a comment to the specified issue.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Team | STRING | SELECT  |  Team where the channel is located.  |
-| Channel to send message to. | STRING | SELECT  |  |
-| Message text format | STRING | SELECT  |  |
-| Message text | STRING | TEXT_AREA  |  |
+| Project | STRING | SELECT  |  |
+| Issue | INTEGER | SELECT  |  The issue to comment on.  |
+| Comment | STRING | TEXT  |  The comment to add to the issue.  |
 
 
 ### Output
@@ -101,41 +136,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| STRING | TEXT  |
-| {STRING\(contentType), STRING\(content)} | OBJECT_BUILDER  |
-| {STRING\(teamId), STRING\(channelId)} | OBJECT_BUILDER  |
-
-
-
-
-
-
-### Send chat message
-Sends a message in an existing chat.
-
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Chat | STRING | SELECT  |  |
-| Message text format | STRING | SELECT  |  |
-| Message text | STRING | TEXT_AREA  |  |
-
-
-### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| {STRING\(contentType), STRING\(content)} | OBJECT_BUILDER  |
+| {INTEGER\(id), STRING\(body)} | OBJECT_BUILDER  |
 
 
 

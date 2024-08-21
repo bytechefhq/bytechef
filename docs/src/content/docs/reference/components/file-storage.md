@@ -44,11 +44,7 @@ ___Sample Output:___
 
 Type: STRING
 
-#### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-null
 
 
 
@@ -71,6 +67,7 @@ Writes the data to the file.
 
 Type: FILE_ENTRY
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -79,6 +76,7 @@ Type: FILE_ENTRY
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
+
 
 
 
@@ -101,6 +99,7 @@ Download a file from the URL.
 
 Type: FILE_ENTRY
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -109,6 +108,7 @@ Type: FILE_ENTRY
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
+
 
 
 

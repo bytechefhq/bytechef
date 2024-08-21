@@ -1,14 +1,14 @@
 ---
-title: "Affinity"
-description: "Affinity is a customer relationship management (CRM) platform that leverages relationship intelligence to help businesses strengthen connections and drive engagement with client and prospects."
+title: "Reckon"
+description: "Reckon is an accounting software used for financial management and bookkeeping tasks."
 ---
 ## Reference
 <hr />
 
-Affinity is a customer relationship management (CRM) platform that leverages relationship intelligence to help businesses strengthen connections and drive engagement with client and prospects.
+Reckon is an accounting software used for financial management and bookkeeping tasks.
 
 
-Categories: [CRM]
+Categories: [ACCOUNTING]
 
 
 Version: 1
@@ -22,13 +22,14 @@ Version: 1
 Version: 1
 
 
-### Bearer Token
+### OAuth2 Authorization Code
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Token | STRING | TEXT  |  |
+| Client Id | STRING | TEXT  |  |
+| Client Secret | STRING | TEXT  |  |
 
 
 
@@ -38,19 +39,26 @@ Version: 1
 
 
 
+## Triggers
+
+
+
+<hr />
+
 
 
 ## Actions
 
 
-### Create opportunity
-Creates a new opportunity
+### Create Contact
+Creates a new Contact.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Name | STRING | TEXT  |  The name of the opportunity.  |
+| Book | STRING | SELECT  |  Book where new contact will be created.  |
+| Contact | {STRING\(name)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -64,23 +72,22 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| INTEGER | INTEGER  |
-| STRING | TEXT  |
+| {STRING\(id)} | OBJECT_BUILDER  |
 
 
 
 
 
 
-### Create organization
-Creates a new organization
+### Create Invoice
+Create a new Invoice.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Name | STRING | TEXT  |  The name of the organization.  |
-| Domain | STRING | TEXT  |  The domain name of the organization.  |
+| Book | STRING | SELECT  |  Book where new invoice will be created.  |
+| Invoice | {STRING\(customer), DATE\(invoiceDate), STRING\(amountTaxStatus), [{INTEGER\(lineNumber)}]\(lineItems)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -94,25 +101,22 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| INTEGER | INTEGER  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+| {STRING\(id)} | OBJECT_BUILDER  |
 
 
 
 
 
 
-### Create person
-Creates a new person
+### Create Payment
+Creates a new payment.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| First name | STRING | TEXT  |  The first name of the person.  |
-| Last name | STRING | TEXT  |  The last name of the person.  |
-| Emails | [STRING] | ARRAY_BUILDER  |  The email addresses of the person.  |
+| Book | STRING | SELECT  |  Book where new payment will be created.  |
+| Payment | {STRING\(supplier), DATE\(paymentDate), NUMBER\(totalAmount)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -126,10 +130,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| INTEGER | INTEGER  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| [STRING] | ARRAY_BUILDER  |
+| {STRING\(id)} | OBJECT_BUILDER  |
 
 
 

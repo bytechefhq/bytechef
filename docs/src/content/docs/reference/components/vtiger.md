@@ -63,11 +63,13 @@ Create a new contact
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING(firstname), STRING(lastname), STRING(email), STRING(phone)} | OBJECT_BUILDER  |
+| {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone)} | OBJECT_BUILDER  |
+
 
 
 
@@ -90,11 +92,13 @@ Create a new Product for your CRM
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING(id), STRING(productname), STRING(product_type), STRING(createdtime), STRING(source), STRING(assigned_user_id)} | OBJECT_BUILDER  |
+| {STRING\(id), STRING\(productname), STRING\(product_type), STRING\(createdtime), STRING\(source), STRING\(assigned_user_id)} | OBJECT_BUILDER  |
+
 
 
 
@@ -116,11 +120,13 @@ null
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING(id), STRING(user_name), STRING(user_type), STRING(email), STRING(phone_home), STRING(phone_work), STRING(phone_mobile), STRING(userlable), STRING(address_street), STRING(address_city), STRING(address_state), STRING(address_country), STRING(roleid), STRING(language), STRING(is_admin), STRING(is_owner), STRING(status)} | OBJECT_BUILDER  |
+| {STRING\(id), STRING\(user_name), STRING\(user_type), STRING\(email), STRING\(phone_home), STRING\(phone_work), STRING\(phone_mobile), STRING\(userlable), STRING\(address_street), STRING\(address_city), STRING\(address_state), STRING\(address_country), STRING\(roleid), STRING\(language), STRING\(is_admin), STRING\(is_owner), STRING\(status)} | OBJECT_BUILDER  |
+
 
 
 

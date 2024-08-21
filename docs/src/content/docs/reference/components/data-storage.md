@@ -66,11 +66,7 @@ The numeric value can be incremented atomically, and the action can be used conc
 
 Type: INTEGER
 
-#### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-null
 
 
 
@@ -144,11 +140,13 @@ Retrieve all the currently existing keys from storage, along with their values w
 
 Type: ARRAY
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-null
+| {} | OBJECT_BUILDER  |
+
 
 
 

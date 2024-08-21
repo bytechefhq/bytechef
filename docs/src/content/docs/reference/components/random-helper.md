@@ -40,11 +40,7 @@ Generates a random integer value.
 
 Type: INTEGER
 
-#### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-null
 
 
 
@@ -67,11 +63,7 @@ Generates a random float value.
 
 Type: NUMBER
 
-#### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-null
 
 
 

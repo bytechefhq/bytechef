@@ -43,6 +43,116 @@ Version: 1
 ## Triggers
 
 
+### New Cancelled Order
+Triggers when order is cancelled.
+
+#### Type: DYNAMIC_WEBHOOK
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+null
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| Id | INTEGER | INTEGER  |  |
+| Currency | STRING | TEXT  |  |
+| Note | STRING | TEXT  |  |
+| Email | STRING | TEXT  |  |
+| Name | STRING | TEXT  |  |
+| Phone | STRING | TEXT  |  |
+| Tags | STRING | TEXT  |  |
+| Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  |
+
+
+
+
+
+
+
+### New Order
+Triggers when new order is created.
+
+#### Type: DYNAMIC_WEBHOOK
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+null
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| Id | INTEGER | INTEGER  |  |
+| Currency | STRING | TEXT  |  |
+| Note | STRING | TEXT  |  |
+| Email | STRING | TEXT  |  |
+| Name | STRING | TEXT  |  |
+| Phone | STRING | TEXT  |  |
+| Tags | STRING | TEXT  |  |
+| Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  |
+
+
+
+
+
+
+
+### New Paid Order
+Triggers when paid order is created.
+
+#### Type: DYNAMIC_WEBHOOK
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+null
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| Id | INTEGER | INTEGER  |  |
+| Currency | STRING | TEXT  |  |
+| Note | STRING | TEXT  |  |
+| Email | STRING | TEXT  |  |
+| Name | STRING | TEXT  |  |
+| Phone | STRING | TEXT  |  |
+| Tags | STRING | TEXT  |  |
+| Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  |
+
+
+
+
+
+
 
 <hr />
 
@@ -58,7 +168,7 @@ Adds an order into a Shopify store.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Order | {{[{STRING(fulfillment_status), STRING(grams), NUMBER(price), INTEGER(product_id), INTEGER(variant_id), INTEGER(quantity), STRING(title)}](line_items), STRING(total_tax), STRING(currency)}(order)} | OBJECT_BUILDER  |  |
+| Order | {{[{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}]\(line_items), STRING\(total_tax), STRING\(currency)}\(order)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -66,6 +176,7 @@ Adds an order into a Shopify store.
 
 
 Type: OBJECT
+
 
 #### Properties
 
@@ -78,7 +189,8 @@ Type: OBJECT
 | Name | STRING | TEXT  |  |
 | Phone | STRING | TEXT  |  |
 | Tags | STRING | TEXT  |  |
-| Line Items | [{STRING(fulfillment_status), STRING(grams), NUMBER(price), INTEGER(product_id), INTEGER(variant_id), INTEGER(quantity), STRING(title)}] | ARRAY_BUILDER  |  |
+| Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  |
+
 
 
 
@@ -112,6 +224,7 @@ Cancels an order. Orders that are paid and have fulfillments can't be canceled.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -123,7 +236,8 @@ Type: OBJECT
 | Name | STRING | TEXT  |  |
 | Phone | STRING | TEXT  |  |
 | Tags | STRING | TEXT  |  |
-| Line Items | [{STRING(fulfillment_status), STRING(grams), NUMBER(price), INTEGER(product_id), INTEGER(variant_id), INTEGER(quantity), STRING(title)}] | ARRAY_BUILDER  |  |
+| Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  |
+
 
 
 
@@ -137,7 +251,7 @@ Update an existing order.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Order Id | INTEGER | SELECT  |  The order id.  |
-| Order | {{STRING(note), STRING(email), STRING(phone), STRING(tags)}(order)} | OBJECT_BUILDER  |  |
+| Order | {{STRING\(note), STRING\(email), STRING\(phone), STRING\(tags)}\(order)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -145,6 +259,7 @@ Update an existing order.
 
 
 Type: OBJECT
+
 
 #### Properties
 
@@ -157,7 +272,8 @@ Type: OBJECT
 | Name | STRING | TEXT  |  |
 | Phone | STRING | TEXT  |  |
 | Tags | STRING | TEXT  |  |
-| Line Items | [{STRING(fulfillment_status), STRING(grams), NUMBER(price), INTEGER(product_id), INTEGER(variant_id), INTEGER(quantity), STRING(title)}] | ARRAY_BUILDER  |  |
+| Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  |
+
 
 
 
@@ -179,6 +295,7 @@ Closes an order. A closed order is one that has no more work to be done. All ite
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -190,9 +307,18 @@ Type: OBJECT
 | Name | STRING | TEXT  |  |
 | Phone | STRING | TEXT  |  |
 | Tags | STRING | TEXT  |  |
-| Line Items | [{STRING(fulfillment_status), STRING(grams), NUMBER(price), INTEGER(product_id), INTEGER(variant_id), INTEGER(quantity), STRING(title)}] | ARRAY_BUILDER  |  |
+| Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  |
 
 
 
 
 
+
+<hr />
+
+# Additional instructions
+<hr />
+
+## CONNECTION
+
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(52.85156250% + 32px)"><iframe src="https://www.guidejar.com/embed/11b2d3f5-3d31-40af-be00-c5845ab71165?type=1&controls=on" width="100%" height="100%" style="position:absolute;inset:0" allowfullscreen frameborder="0"></iframe></div>

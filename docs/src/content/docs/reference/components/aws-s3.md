@@ -63,6 +63,7 @@ Get the AWS S3 object.
 
 Type: FILE_ENTRY
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -71,6 +72,7 @@ Type: FILE_ENTRY
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
+
 
 
 
@@ -92,11 +94,7 @@ Get the url of an AWS S3 object.
 
 Type: STRING
 
-#### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-null
 
 
 
@@ -118,11 +116,13 @@ Get the list AWS S3 objects. Every object needs to have read permission in order
 
 Type: ARRAY
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-null
+| {STRING\(key), STRING\(suffix), STRING\(uri)} | OBJECT_BUILDER  |
+
 
 
 
@@ -145,11 +145,7 @@ You can share an object with a pre-signed URL for up to 12 hours or until your s
 
 Type: STRING
 
-#### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-null
 
 
 
@@ -173,11 +169,7 @@ Store an object to AWS S3.
 
 Type: STRING
 
-#### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-null
 
 
 

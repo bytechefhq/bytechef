@@ -62,6 +62,7 @@ Creates a new account
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -70,6 +71,7 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
+
 
 
 
@@ -105,6 +107,7 @@ Add new contact in Freshsales CRM
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -125,6 +128,7 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
+
 
 
 
@@ -148,6 +152,7 @@ Creates a new lead
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -156,6 +161,7 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
+
 
 
 

@@ -57,7 +57,7 @@ Creates new Contact
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Contact | {STRING(FIRST_NAME), STRING(LAST_NAME), STRING(EMAIL_ADDRESS), STRING(PHONE), STRING(TITLE)} | OBJECT_BUILDER  |  |
+| Contact | {STRING\(FIRST_NAME), STRING\(LAST_NAME), STRING\(EMAIL_ADDRESS), STRING\(PHONE), STRING\(TITLE)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -65,6 +65,7 @@ Creates new Contact
 
 
 Type: OBJECT
+
 
 #### Properties
 
@@ -76,6 +77,7 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
+
 
 
 
@@ -88,7 +90,7 @@ Creates new Organization
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Organization | {STRING(ORGANISATION_NAME), STRING(PHONE), STRING(WEBSITE)} | OBJECT_BUILDER  |  |
+| Organization | {STRING\(ORGANISATION_NAME), STRING\(PHONE), STRING\(WEBSITE)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -96,6 +98,7 @@ Creates new Organization
 
 
 Type: OBJECT
+
 
 #### Properties
 
@@ -105,6 +108,7 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
+
 
 
 
@@ -117,7 +121,7 @@ Creates new Task
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Task | {STRING(TITLE), STRING(STATUS)} | OBJECT_BUILDER  |  |
+| Task | {STRING\(TITLE), STRING\(STATUS)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -125,6 +129,7 @@ Creates new Task
 
 
 Type: OBJECT
+
 
 #### Properties
 
@@ -138,3 +143,12 @@ Type: OBJECT
 
 
 
+
+<hr />
+
+# Additional instructions
+<hr />
+
+## CONNECTION
+
+[API key location](https://crm.na1.insightly.com/Users/UserSettings)

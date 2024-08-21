@@ -59,26 +59,27 @@ Triggers when an event is added or updated
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | BOOLEAN | SELECT  |
-| [{STRING(fileId), STRING(fileUrl), STRING(iconLink), STRING(mimeType), STRING(title)}] | ARRAY_BUILDER  |
-| [{INTEGER(additionalGuests), STRING(comment), STRING(displayName), STRING(email), STRING(id), BOOLEAN(optional), BOOLEAN(organizer), BOOLEAN(resource), STRING(responseStatus), BOOLEAN(self)}] | ARRAY_BUILDER  |
+| [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}] | ARRAY_BUILDER  |
+| [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}] | ARRAY_BUILDER  |
 | BOOLEAN | SELECT  |
 | STRING | TEXT  |
-| {STRING(conferenceId), {STRING(iconUri), {STRING(type)}(key), STRING(name)}(conferenceSolution), {{STRING(type)}(conferenceSolutionKey), STRING(requestId), {STRING(statusCode)}(status)}(createRequest), [{STRING(accessCode), [STRING](entryPointFeatures), STRING(entryPointType), STRING(label), STRING(meetingCode), STRING(passcode), STRING(password), STRING(pin), STRING(regionCode), STRING(uri)}](entryPoints), STRING(notes), {{{}(parameters)}(addOnParameters)}(parameters), STRING(signature)} | OBJECT_BUILDER  |
+| {STRING\(conferenceId), {STRING\(iconUri), {STRING\(type)}\(key), STRING\(name)}\(conferenceSolution), {{STRING\(type)}\(conferenceSolutionKey), STRING\(requestId), {STRING\(statusCode)}\(status)}\(createRequest), [{STRING\(accessCode), [STRING]\(entryPointFeatures), STRING\(entryPointType), STRING\(label), STRING\(meetingCode), STRING\(passcode), STRING\(password), STRING\(pin), STRING\(regionCode), STRING\(uri)}]\(entryPoints), STRING\(notes), {{{}\(parameters)}\(addOnParameters)}\(parameters), STRING\(signature)} | OBJECT_BUILDER  |
 | DATE_TIME | DATE_TIME  |
-| {STRING(displayName), STRING(email), STRING(id), BOOLEAN(self)} | OBJECT_BUILDER  |
+| {STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(self)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
-| {DATE_TIME(date), DATE_TIME(dateTime), STRING(timeZone)} | OBJECT_BUILDER  |
+| {DATE_TIME\(date), DATE_TIME\(dateTime), STRING\(timeZone)} | OBJECT_BUILDER  |
 | BOOLEAN | SELECT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| {{}(private), {}(shared)} | OBJECT_BUILDER  |
-| {STRING(autoDeclineMode), STRING(chatStatus), STRING(declineMessage)} | OBJECT_BUILDER  |
-| {STRING(display), INTEGER(height), STRING(iconLink), STRING(link), {}(preferences), STRING(title), STRING(type), STRING(width)} | OBJECT_BUILDER  |
+| {{}\(private), {}\(shared)} | OBJECT_BUILDER  |
+| {STRING\(autoDeclineMode), STRING\(chatStatus), STRING\(declineMessage)} | OBJECT_BUILDER  |
+| {STRING\(display), INTEGER\(height), STRING\(iconLink), STRING\(link), {}\(preferences), STRING\(title), STRING\(type), STRING\(width)} | OBJECT_BUILDER  |
 | BOOLEAN | SELECT  |
 | BOOLEAN | SELECT  |
 | BOOLEAN | SELECT  |
@@ -89,22 +90,23 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | BOOLEAN | SELECT  |
-| {STRING(displayName), STRING(email), STRING(id), BOOLEAN(self)} | OBJECT_BUILDER  |
-| {DATE_TIME(date), DATE_TIME(dateTime), STRING(timeZone)} | OBJECT_BUILDER  |
-| {STRING(autoDeclineMode), STRING(declineMessage)} | OBJECT_BUILDER  |
+| {STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(self)} | OBJECT_BUILDER  |
+| {DATE_TIME\(date), DATE_TIME\(dateTime), STRING\(timeZone)} | OBJECT_BUILDER  |
+| {STRING\(autoDeclineMode), STRING\(declineMessage)} | OBJECT_BUILDER  |
 | BOOLEAN | SELECT  |
 | [STRING] | ARRAY_BUILDER  |
 | STRING | TEXT  |
-| {[{STRING(method), INTEGER(minutes)}](overrides), BOOLEAN(useDefault)} | OBJECT_BUILDER  |
+| {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)} | OBJECT_BUILDER  |
 | INTEGER | INTEGER  |
-| {STRING(title), STRING(url)} | OBJECT_BUILDER  |
-| {DATE_TIME(date), DATE_TIME(dateTime), STRING(timeZone)} | OBJECT_BUILDER  |
+| {STRING\(title), STRING\(url)} | OBJECT_BUILDER  |
+| {DATE_TIME\(date), DATE_TIME\(dateTime), STRING\(timeZone)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | DATE_TIME | DATE_TIME  |
 | STRING | TEXT  |
-| {{STRING(label)}(customLocation), {}(homeOffice), {STRING(buildingId), STRING(deskId), STRING(floorId), STRING(floorSectionId), STRING(label)}(officeLocation), STRING(type)} | OBJECT_BUILDER  |
+| {{STRING\(label)}\(customLocation), {}\(homeOffice), {STRING\(buildingId), STRING\(deskId), STRING\(floorId), STRING\(floorSectionId), STRING\(label)}\(officeLocation), STRING\(type)} | OBJECT_BUILDER  |
+
 
 
 
@@ -135,13 +137,13 @@ Creates an event
 | Description | STRING | TEXT  |  Description of the event. Can contain HTML.  |
 | Location | STRING | TEXT  |  Geographic location of the event as free-form text.  |
 | Attachments | [FILE_ENTRY] | ARRAY_BUILDER  |  |
-| Attendees | [STRING($email)] | ARRAY_BUILDER  |  The attendees of the event.  |
+| Attendees | [STRING\($email)] | ARRAY_BUILDER  |  The attendees of the event.  |
 | Guest can invite others | BOOLEAN | SELECT  |  Whether attendees other than the organizer can invite others to the event.  |
 | Guest can modify | BOOLEAN | SELECT  |  Whether attendees other than the organizer can modify the event.  |
 | Guest can see other guests | BOOLEAN | SELECT  |  Whether attendees other than the organizer can see who the event's attendees are.  |
 | Send updates | STRING | SELECT  |  Whether to send notifications about the creation of the new event. Note that some emails might still be sent.  |
 | Use default reminders | BOOLEAN | SELECT  |  Whether the default reminders of the calendar apply to the event.  |
-| Reminders | [{STRING(method), INTEGER(minutes)}] | ARRAY_BUILDER  |  |
+| Reminders | [{STRING\(method), INTEGER\(minutes)}] | ARRAY_BUILDER  |  |
 
 
 ### Output
@@ -150,26 +152,27 @@ Creates an event
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | BOOLEAN | SELECT  |
-| [{STRING(fileId), STRING(fileUrl), STRING(iconLink), STRING(mimeType), STRING(title)}] | ARRAY_BUILDER  |
-| [{INTEGER(additionalGuests), STRING(comment), STRING(displayName), STRING(email), STRING(id), BOOLEAN(optional), BOOLEAN(organizer), BOOLEAN(resource), STRING(responseStatus), BOOLEAN(self)}] | ARRAY_BUILDER  |
+| [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}] | ARRAY_BUILDER  |
+| [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}] | ARRAY_BUILDER  |
 | BOOLEAN | SELECT  |
 | STRING | TEXT  |
-| {STRING(conferenceId), {STRING(iconUri), {STRING(type)}(key), STRING(name)}(conferenceSolution), {{STRING(type)}(conferenceSolutionKey), STRING(requestId), {STRING(statusCode)}(status)}(createRequest), [{STRING(accessCode), [STRING](entryPointFeatures), STRING(entryPointType), STRING(label), STRING(meetingCode), STRING(passcode), STRING(password), STRING(pin), STRING(regionCode), STRING(uri)}](entryPoints), STRING(notes), {{{}(parameters)}(addOnParameters)}(parameters), STRING(signature)} | OBJECT_BUILDER  |
+| {STRING\(conferenceId), {STRING\(iconUri), {STRING\(type)}\(key), STRING\(name)}\(conferenceSolution), {{STRING\(type)}\(conferenceSolutionKey), STRING\(requestId), {STRING\(statusCode)}\(status)}\(createRequest), [{STRING\(accessCode), [STRING]\(entryPointFeatures), STRING\(entryPointType), STRING\(label), STRING\(meetingCode), STRING\(passcode), STRING\(password), STRING\(pin), STRING\(regionCode), STRING\(uri)}]\(entryPoints), STRING\(notes), {{{}\(parameters)}\(addOnParameters)}\(parameters), STRING\(signature)} | OBJECT_BUILDER  |
 | DATE_TIME | DATE_TIME  |
-| {STRING(displayName), STRING(email), STRING(id), BOOLEAN(self)} | OBJECT_BUILDER  |
+| {STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(self)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
-| {DATE_TIME(date), DATE_TIME(dateTime), STRING(timeZone)} | OBJECT_BUILDER  |
+| {DATE_TIME\(date), DATE_TIME\(dateTime), STRING\(timeZone)} | OBJECT_BUILDER  |
 | BOOLEAN | SELECT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| {{}(private), {}(shared)} | OBJECT_BUILDER  |
-| {STRING(autoDeclineMode), STRING(chatStatus), STRING(declineMessage)} | OBJECT_BUILDER  |
-| {STRING(display), INTEGER(height), STRING(iconLink), STRING(link), {}(preferences), STRING(title), STRING(type), STRING(width)} | OBJECT_BUILDER  |
+| {{}\(private), {}\(shared)} | OBJECT_BUILDER  |
+| {STRING\(autoDeclineMode), STRING\(chatStatus), STRING\(declineMessage)} | OBJECT_BUILDER  |
+| {STRING\(display), INTEGER\(height), STRING\(iconLink), STRING\(link), {}\(preferences), STRING\(title), STRING\(type), STRING\(width)} | OBJECT_BUILDER  |
 | BOOLEAN | SELECT  |
 | BOOLEAN | SELECT  |
 | BOOLEAN | SELECT  |
@@ -180,22 +183,23 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | BOOLEAN | SELECT  |
-| {STRING(displayName), STRING(email), STRING(id), BOOLEAN(self)} | OBJECT_BUILDER  |
-| {DATE_TIME(date), DATE_TIME(dateTime), STRING(timeZone)} | OBJECT_BUILDER  |
-| {STRING(autoDeclineMode), STRING(declineMessage)} | OBJECT_BUILDER  |
+| {STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(self)} | OBJECT_BUILDER  |
+| {DATE_TIME\(date), DATE_TIME\(dateTime), STRING\(timeZone)} | OBJECT_BUILDER  |
+| {STRING\(autoDeclineMode), STRING\(declineMessage)} | OBJECT_BUILDER  |
 | BOOLEAN | SELECT  |
 | [STRING] | ARRAY_BUILDER  |
 | STRING | TEXT  |
-| {[{STRING(method), INTEGER(minutes)}](overrides), BOOLEAN(useDefault)} | OBJECT_BUILDER  |
+| {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)} | OBJECT_BUILDER  |
 | INTEGER | INTEGER  |
-| {STRING(title), STRING(url)} | OBJECT_BUILDER  |
-| {DATE_TIME(date), DATE_TIME(dateTime), STRING(timeZone)} | OBJECT_BUILDER  |
+| {STRING\(title), STRING\(url)} | OBJECT_BUILDER  |
+| {DATE_TIME\(date), DATE_TIME\(dateTime), STRING\(timeZone)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | DATE_TIME | DATE_TIME  |
 | STRING | TEXT  |
-| {{STRING(label)}(customLocation), {}(homeOffice), {STRING(buildingId), STRING(deskId), STRING(floorId), STRING(floorSectionId), STRING(label)}(officeLocation), STRING(type)} | OBJECT_BUILDER  |
+| {{STRING\(label)}\(customLocation), {}\(homeOffice), {STRING\(buildingId), STRING\(deskId), STRING\(floorId), STRING\(floorSectionId), STRING\(label)}\(officeLocation), STRING\(type)} | OBJECT_BUILDER  |
+
 
 
 
@@ -219,26 +223,27 @@ Add Quick Calendar Event
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | BOOLEAN | SELECT  |
-| [{STRING(fileId), STRING(fileUrl), STRING(iconLink), STRING(mimeType), STRING(title)}] | ARRAY_BUILDER  |
-| [{INTEGER(additionalGuests), STRING(comment), STRING(displayName), STRING(email), STRING(id), BOOLEAN(optional), BOOLEAN(organizer), BOOLEAN(resource), STRING(responseStatus), BOOLEAN(self)}] | ARRAY_BUILDER  |
+| [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}] | ARRAY_BUILDER  |
+| [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}] | ARRAY_BUILDER  |
 | BOOLEAN | SELECT  |
 | STRING | TEXT  |
-| {STRING(conferenceId), {STRING(iconUri), {STRING(type)}(key), STRING(name)}(conferenceSolution), {{STRING(type)}(conferenceSolutionKey), STRING(requestId), {STRING(statusCode)}(status)}(createRequest), [{STRING(accessCode), [STRING](entryPointFeatures), STRING(entryPointType), STRING(label), STRING(meetingCode), STRING(passcode), STRING(password), STRING(pin), STRING(regionCode), STRING(uri)}](entryPoints), STRING(notes), {{{}(parameters)}(addOnParameters)}(parameters), STRING(signature)} | OBJECT_BUILDER  |
+| {STRING\(conferenceId), {STRING\(iconUri), {STRING\(type)}\(key), STRING\(name)}\(conferenceSolution), {{STRING\(type)}\(conferenceSolutionKey), STRING\(requestId), {STRING\(statusCode)}\(status)}\(createRequest), [{STRING\(accessCode), [STRING]\(entryPointFeatures), STRING\(entryPointType), STRING\(label), STRING\(meetingCode), STRING\(passcode), STRING\(password), STRING\(pin), STRING\(regionCode), STRING\(uri)}]\(entryPoints), STRING\(notes), {{{}\(parameters)}\(addOnParameters)}\(parameters), STRING\(signature)} | OBJECT_BUILDER  |
 | DATE_TIME | DATE_TIME  |
-| {STRING(displayName), STRING(email), STRING(id), BOOLEAN(self)} | OBJECT_BUILDER  |
+| {STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(self)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
-| {DATE_TIME(date), DATE_TIME(dateTime), STRING(timeZone)} | OBJECT_BUILDER  |
+| {DATE_TIME\(date), DATE_TIME\(dateTime), STRING\(timeZone)} | OBJECT_BUILDER  |
 | BOOLEAN | SELECT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| {{}(private), {}(shared)} | OBJECT_BUILDER  |
-| {STRING(autoDeclineMode), STRING(chatStatus), STRING(declineMessage)} | OBJECT_BUILDER  |
-| {STRING(display), INTEGER(height), STRING(iconLink), STRING(link), {}(preferences), STRING(title), STRING(type), STRING(width)} | OBJECT_BUILDER  |
+| {{}\(private), {}\(shared)} | OBJECT_BUILDER  |
+| {STRING\(autoDeclineMode), STRING\(chatStatus), STRING\(declineMessage)} | OBJECT_BUILDER  |
+| {STRING\(display), INTEGER\(height), STRING\(iconLink), STRING\(link), {}\(preferences), STRING\(title), STRING\(type), STRING\(width)} | OBJECT_BUILDER  |
 | BOOLEAN | SELECT  |
 | BOOLEAN | SELECT  |
 | BOOLEAN | SELECT  |
@@ -249,22 +254,23 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | BOOLEAN | SELECT  |
-| {STRING(displayName), STRING(email), STRING(id), BOOLEAN(self)} | OBJECT_BUILDER  |
-| {DATE_TIME(date), DATE_TIME(dateTime), STRING(timeZone)} | OBJECT_BUILDER  |
-| {STRING(autoDeclineMode), STRING(declineMessage)} | OBJECT_BUILDER  |
+| {STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(self)} | OBJECT_BUILDER  |
+| {DATE_TIME\(date), DATE_TIME\(dateTime), STRING\(timeZone)} | OBJECT_BUILDER  |
+| {STRING\(autoDeclineMode), STRING\(declineMessage)} | OBJECT_BUILDER  |
 | BOOLEAN | SELECT  |
 | [STRING] | ARRAY_BUILDER  |
 | STRING | TEXT  |
-| {[{STRING(method), INTEGER(minutes)}](overrides), BOOLEAN(useDefault)} | OBJECT_BUILDER  |
+| {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)} | OBJECT_BUILDER  |
 | INTEGER | INTEGER  |
-| {STRING(title), STRING(url)} | OBJECT_BUILDER  |
-| {DATE_TIME(date), DATE_TIME(dateTime), STRING(timeZone)} | OBJECT_BUILDER  |
+| {STRING\(title), STRING\(url)} | OBJECT_BUILDER  |
+| {DATE_TIME\(date), DATE_TIME\(dateTime), STRING\(timeZone)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | DATE_TIME | DATE_TIME  |
 | STRING | TEXT  |
-| {{STRING(label)}(customLocation), {}(homeOffice), {STRING(buildingId), STRING(deskId), STRING(floorId), STRING(floorSectionId), STRING(label)}(officeLocation), STRING(type)} | OBJECT_BUILDER  |
+| {{STRING\(label)}\(customLocation), {}\(homeOffice), {STRING\(buildingId), STRING\(deskId), STRING\(floorId), STRING\(floorSectionId), STRING\(label)}\(officeLocation), STRING\(type)} | OBJECT_BUILDER  |
+
 
 
 
@@ -291,6 +297,7 @@ Find events in your calendar
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -302,10 +309,11 @@ Type: OBJECT
 | DATE_TIME | DATE_TIME  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| [{STRING(method), INTEGER(minutes)}] | ARRAY_BUILDER  |
+| [{STRING\(method), INTEGER\(minutes)}] | ARRAY_BUILDER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| [{BOOLEAN(anyoneCanAddSelf), [{STRING(fileId), STRING(fileUrl), STRING(iconLink), STRING(mimeType), STRING(title)}](attachments), [{INTEGER(additionalGuests), STRING(comment), STRING(displayName), STRING(email), STRING(id), BOOLEAN(optional), BOOLEAN(organizer), BOOLEAN(resource), STRING(responseStatus), BOOLEAN(self)}](attendees), BOOLEAN(attendeesOmitted), STRING(colorId), {STRING(conferenceId), {STRING(iconUri), {STRING(type)}(key), STRING(name)}(conferenceSolution), {{STRING(type)}(conferenceSolutionKey), STRING(requestId), {STRING(statusCode)}(status)}(createRequest), [{STRING(accessCode), [STRING](entryPointFeatures), STRING(entryPointType), STRING(label), STRING(meetingCode), STRING(passcode), STRING(password), STRING(pin), STRING(regionCode), STRING(uri)}](entryPoints), STRING(notes), {{{}(parameters)}(addOnParameters)}(parameters), STRING(signature)}(conferenceData), DATE_TIME(created), {STRING(displayName), STRING(email), STRING(id), BOOLEAN(self)}(creator), STRING(description), {DATE_TIME(date), DATE_TIME(dateTime), STRING(timeZone)}(end), BOOLEAN(endTimeUnspecified), STRING(etag), STRING(eventType), {{}(private), {}(shared)}(extendedProperties), {STRING(autoDeclineMode), STRING(chatStatus), STRING(declineMessage)}(focusTimeProperties), {STRING(display), INTEGER(height), STRING(iconLink), STRING(link), {}(preferences), STRING(title), STRING(type), STRING(width)}(gadget), BOOLEAN(guestsCanInviteOthers), BOOLEAN(guestsCanModify), BOOLEAN(guestsCanSeeOtherGuests), STRING(hangoutLink), STRING(htmlLink), STRING(iCalUID), STRING(id), STRING(kind), STRING(location), BOOLEAN(locked), {STRING(displayName), STRING(email), STRING(id), BOOLEAN(self)}(organizer), {DATE_TIME(date), DATE_TIME(dateTime), STRING(timeZone)}(originalStartTime), {STRING(autoDeclineMode), STRING(declineMessage)}(outOfOfficeProperties), BOOLEAN(privateCopy), [STRING](recurrence), STRING(recurringEventId), {[{STRING(method), INTEGER(minutes)}](overrides), BOOLEAN(useDefault)}(reminders), INTEGER(sequence), {STRING(title), STRING(url)}(source), {DATE_TIME(date), DATE_TIME(dateTime), STRING(timeZone)}(start), STRING(status), STRING(summary), STRING(transparency), DATE_TIME(updated), STRING(visibility), {{STRING(label)}(customLocation), {}(homeOffice), {STRING(buildingId), STRING(deskId), STRING(floorId), STRING(floorSectionId), STRING(label)}(officeLocation), STRING(type)}(workingLocationProperties)}] | ARRAY_BUILDER  |
+| [{BOOLEAN\(anyoneCanAddSelf), [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}]\(attachments), [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}]\(attendees), BOOLEAN\(attendeesOmitted), STRING\(colorId), {STRING\(conferenceId), {STRING\(iconUri), {STRING\(type)}\(key), STRING\(name)}\(conferenceSolution), {{STRING\(type)}\(conferenceSolutionKey), STRING\(requestId), {STRING\(statusCode)}\(status)}\(createRequest), [{STRING\(accessCode), [STRING]\(entryPointFeatures), STRING\(entryPointType), STRING\(label), STRING\(meetingCode), STRING\(passcode), STRING\(password), STRING\(pin), STRING\(regionCode), STRING\(uri)}]\(entryPoints), STRING\(notes), {{{}\(parameters)}\(addOnParameters)}\(parameters), STRING\(signature)}\(conferenceData), DATE_TIME\(created), {STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(self)}\(creator), STRING\(description), {DATE_TIME\(date), DATE_TIME\(dateTime), STRING\(timeZone)}\(end), BOOLEAN\(endTimeUnspecified), STRING\(etag), STRING\(eventType), {{}\(private), {}\(shared)}\(extendedProperties), {STRING\(autoDeclineMode), STRING\(chatStatus), STRING\(declineMessage)}\(focusTimeProperties), {STRING\(display), INTEGER\(height), STRING\(iconLink), STRING\(link), {}\(preferences), STRING\(title), STRING\(type), STRING\(width)}\(gadget), BOOLEAN\(guestsCanInviteOthers), BOOLEAN\(guestsCanModify), BOOLEAN\(guestsCanSeeOtherGuests), STRING\(hangoutLink), STRING\(htmlLink), STRING\(iCalUID), STRING\(id), STRING\(kind), STRING\(location), BOOLEAN\(locked), {STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(self)}\(organizer), {DATE_TIME\(date), DATE_TIME\(dateTime), STRING\(timeZone)}\(originalStartTime), {STRING\(autoDeclineMode), STRING\(declineMessage)}\(outOfOfficeProperties), BOOLEAN\(privateCopy), [STRING]\(recurrence), STRING\(recurringEventId), {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)}\(reminders), INTEGER\(sequence), {STRING\(title), STRING\(url)}\(source), {DATE_TIME\(date), DATE_TIME\(dateTime), STRING\(timeZone)}\(start), STRING\(status), STRING\(summary), STRING\(transparency), DATE_TIME\(updated), STRING\(visibility), {{STRING\(label)}\(customLocation), {}\(homeOffice), {STRING\(buildingId), STRING\(deskId), STRING\(floorId), STRING\(floorSectionId), STRING\(label)}\(officeLocation), STRING\(type)}\(workingLocationProperties)}] | ARRAY_BUILDER  |
+
 
 
 
@@ -321,6 +329,6 @@ Type: OBJECT
 
 [Setting up OAuth2](https://support.google.com/googleapi/answer/6158849?hl=en)
 
-[Guidejar](https://guidejar.com/guides/fec74020-26bb-43dd-814c-f8b907f6f45b) tutorial.
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(50.05219207% + 32px)"><iframe src="https://www.guidejar.com/embed/fec74020-26bb-43dd-814c-f8b907f6f45b?type=1&controls=on" width="100%" height="100%" style="position:absolute;inset:0" allowfullscreen frameborder="0"></iframe></div>
 
-[Turning on Calendar API](https://guidejar.com/guides/c1fe8158-a72f-45ed-942e-c1bab5802afa)
+Turning on Calendar API <div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(50.05219207% + 32px)"><iframe src="https://www.guidejar.com/embed/c1fe8158-a72f-45ed-942e-c1bab5802afa?type=1&controls=on" width="100%" height="100%" style="position:absolute;inset:0" allowfullscreen frameborder="0"></iframe></div>

@@ -66,16 +66,18 @@ Has conditionally required parameters.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | ID | STRING | TEXT  |  |
 | Contact name | STRING | TEXT  |  |
-| Credit card | {STRING(number), STRING(nameOnAcct), INTEGER(ccExpiryMonth), INTEGER(ccExpiryYear), STRING(billAddrStreet), STRING(postalCode), NUMBER(amount)} | OBJECT_BUILDER  |  |
+| Credit card | {STRING\(number), STRING\(nameOnAcct), INTEGER\(ccExpiryMonth), INTEGER\(ccExpiryYear), STRING\(billAddrStreet), STRING\(postalCode), NUMBER\(amount)} | OBJECT_BUILDER  |  |
 | Balance | NUMBER | NUMBER  |  |
 | Account number | STRING | TEXT  |  |
 | Business number | STRING | TEXT  |  |
+
 
 
 
@@ -98,6 +100,7 @@ Creates a new item.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -106,6 +109,7 @@ Type: OBJECT
 | Name | STRING | TEXT  |  |
 | Description | STRING | TEXT  |  |
 | Unit price | NUMBER | NUMBER  |  |
+
 
 
 
@@ -127,11 +131,13 @@ Has conditionally required parameters.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING(id), STRING(domain), STRING(Name), STRING(Level), STRING(Subitem), STRING(FullyQualifiedName)} | OBJECT_BUILDER  |
+| {STRING\(id), STRING\(domain), STRING\(Name), STRING\(Level), STRING\(Subitem), STRING\(FullyQualifiedName)} | OBJECT_BUILDER  |
+
 
 
 

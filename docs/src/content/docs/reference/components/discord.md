@@ -58,7 +58,7 @@ Post a new message to a specific #channel you choose.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Guild | STRING | SELECT  |  |
 | Channel | STRING | SELECT  |  Channel where to send the message  |
-| Message | {STRING(content), BOOLEAN(tts)} | OBJECT_BUILDER  |  |
+| Message | {STRING\(content), BOOLEAN\(tts)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -67,11 +67,13 @@ Post a new message to a specific #channel you choose.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING(id), STRING(content), BOOLEAN(tts)} | OBJECT_BUILDER  |
+| {STRING\(id), STRING\(content), BOOLEAN\(tts)} | OBJECT_BUILDER  |
+
 
 
 
@@ -85,7 +87,7 @@ Create a new channel
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Guild | STRING | SELECT  |  |
-| Channel | {STRING(name), INTEGER(type)} | OBJECT_BUILDER  |  |
+| Channel | {STRING\(name), INTEGER\(type)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -94,11 +96,13 @@ Create a new channel
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING(id), INTEGER(type), STRING(name)} | OBJECT_BUILDER  |
+| {STRING\(id), INTEGER\(type), STRING\(name)} | OBJECT_BUILDER  |
+
 
 
 
@@ -123,11 +127,13 @@ Send direct message guild member
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING(id)} | OBJECT_BUILDER  |
+| {STRING\(id)} | OBJECT_BUILDER  |
+
 
 
 
@@ -143,4 +149,4 @@ Type: OBJECT
 
 [Setting up OAuth2](https://discordjs.guide/preparations/adding-your-bot-to-servers.html#bot-invite-links)
 
-[Guidejar](https://guidejar.com/guides/31087152-2446-4f70-a391-79f49c45190a) tutorial.
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(52.69531250% + 32px)"><iframe src="https://www.guidejar.com/embed/31087152-2446-4f70-a391-79f49c45190a?type=1&controls=on" width="100%" height="100%" style="position:absolute;inset:0" allowfullscreen frameborder="0"></iframe></div>

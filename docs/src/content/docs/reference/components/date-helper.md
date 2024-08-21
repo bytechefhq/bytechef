@@ -40,11 +40,7 @@ Converts UNIX timestamp to ISO8601 format.
 
 Type: STRING
 
-#### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-null
 
 
 

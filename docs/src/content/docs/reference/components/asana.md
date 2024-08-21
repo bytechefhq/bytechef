@@ -57,7 +57,7 @@ Creates a new project in a workspace or team.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Project | {{STRING(workspace), STRING(name), STRING(notes), STRING(team)}(data)} | OBJECT_BUILDER  |  |
+| Project | {{STRING\(workspace), STRING\(name), STRING\(notes), STRING\(team)}\(data)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -66,11 +66,13 @@ Creates a new project in a workspace or team.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING(gid), STRING(name), STRING(notes), {STRING(gid), STRING(name)}(team), {STRING(gid), STRING(name)}(workspace)} | OBJECT_BUILDER  |
+| {STRING\(gid), STRING\(name), STRING\(notes), {STRING\(gid), STRING\(name)}\(team), {STRING\(gid), STRING\(name)}\(workspace)} | OBJECT_BUILDER  |
+
 
 
 
@@ -83,7 +85,7 @@ Creates a new task
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Task | {{STRING(workspace), STRING(project), STRING(name), STRING(notes), DATE(due_on), [STRING](tags), STRING(assignee)}(data)} | OBJECT_BUILDER  |  |
+| Task | {{STRING\(workspace), STRING\(project), STRING\(name), STRING\(notes), DATE\(due_on), [STRING]\(tags), STRING\(assignee)}\(data)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -92,11 +94,13 @@ Creates a new task
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING(gid), DATE(due_on), STRING(notes), STRING(name), {STRING(gid), STRING(name)}(workspace), [{STRING(gid), STRING(name)}](tags), {STRING(gid), STRING(name)}(assignee)} | OBJECT_BUILDER  |
+| {STRING\(gid), DATE\(due_on), STRING\(notes), STRING\(name), {STRING\(gid), STRING\(name)}\(workspace), [{STRING\(gid), STRING\(name)}]\(tags), {STRING\(gid), STRING\(name)}\(assignee)} | OBJECT_BUILDER  |
+
 
 
 
