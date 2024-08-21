@@ -39,3 +39,16 @@ Extract content from the HTML content.
 
 
 
+### Base64 Decode
+Decodes base64 encoded text into human readable plain text.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Encoding Scheme | STRING | SELECT  |  |
+| Base64 Content | STRING | TEXT_AREA  |  The Base64 encoded content that needs to be decoded.  |
+
+
+
+

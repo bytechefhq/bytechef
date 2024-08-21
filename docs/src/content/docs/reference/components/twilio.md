@@ -72,7 +72,7 @@ Send a new SMS message
 | Persistent action | [STRING] | ARRAY_BUILDER  |  Rich actions for non-SMS/MMS channels. Used for sending location in WhatsApp messages.  |
 | Shorten URLs | BOOLEAN | SELECT  |  For Messaging Services with Link Shortening configured only: A Boolean indicating whether or not Twilio should shorten links in the body of the Message.  |
 | Schedule type | STRING | SELECT  |  For Messaging Services only: Include this parameter with a value of fixed in conjuction with the send_time parameter in order to schedule a Message.  |
-| Send at | {DATE_TIME(dateTime), STRING(zoneId)} | OBJECT_BUILDER  |  The time that Twilio will send the message. Must be in ISO 8601 format.  |
+| Send at | {DATE_TIME\(dateTime), STRING\(zoneId)} | OBJECT_BUILDER  |  The time that Twilio will send the message. Must be in ISO 8601 format.  |
 | Send as MMS | BOOLEAN | SELECT  |  If set to true, Twilio delivers the message as a single MMS message, regardless of the presence of media.  |
 | Content variables | STRING | TEXT  |  For Content Editor/API only: Key-value pairs of Template variables and their substitution values. content_sid parameter must also be provided. If values are not defined in the content_variables parameter, the Template's default placeholder values are used.  |
 | Risk check | STRING | SELECT  |  For SMS pumping protection feature only: Include this parameter with a value of disable to skip any kind of risk check on the respective message request.  |
@@ -85,6 +85,7 @@ Send a new SMS message
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -92,23 +93,24 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| {STRING(rawNumber)} | OBJECT_BUILDER  |
+| {STRING\(rawNumber)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
-| {DATE_TIME(dateTime), STRING(zoneId)} | OBJECT_BUILDER  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+| {DATE_TIME\(dateTime), STRING\(zoneId)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| {DATE_TIME(dateTime), STRING(zoneId)} | OBJECT_BUILDER  |
-| {DATE_TIME(dateTime), STRING(zoneId)} | OBJECT_BUILDER  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| {DATE_TIME\(dateTime), STRING\(zoneId)} | OBJECT_BUILDER  |
+| {DATE_TIME\(dateTime), STRING\(zoneId)} | OBJECT_BUILDER  |
 | INTEGER | INTEGER  |
-| {STRING(currencyCode), INTEGER(defaultFractionDigits), INTEGER(numericCode)} | OBJECT_BUILDER  |
+| {STRING\(currencyCode), INTEGER\(defaultFractionDigits), INTEGER\(numericCode)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
 | {} | OBJECT_BUILDER  |
+
 
 
 

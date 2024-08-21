@@ -59,12 +59,14 @@ Triggers when you get a new message from certain number.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | STRING | TEXT  |
-| {STRING(id), {{STRING(messaging_product), {STRING(display_phone_number), STRING(phone_number_id)}(metadata)}(value), {{STRING(name)}(profile), STRING(wa_id)}(contacts), {STRING(from), STRING(id), STRING(timestamp), {STRING(body)}(text)}(messages)}(changes)} | OBJECT_BUILDER  |
+| {STRING\(id), {{STRING\(messaging_product), {STRING\(display_phone_number), STRING\(phone_number_id)}\(metadata)}\(value), {{STRING\(name)}\(profile), STRING\(wa_id)}\(contacts), {STRING\(from), STRING\(id), STRING\(timestamp), {STRING\(body)}\(text)}\(messages)}\(changes)} | OBJECT_BUILDER  |
+
 
 
 
@@ -95,13 +97,15 @@ Send a message via WhatsApp
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | STRING | TEXT  |
-| {STRING(input), STRING(wa_id)} | OBJECT_BUILDER  |
-| {STRING(id)} | OBJECT_BUILDER  |
+| {STRING\(input), STRING\(wa_id)} | OBJECT_BUILDER  |
+| {STRING\(id)} | OBJECT_BUILDER  |
+
 
 
 

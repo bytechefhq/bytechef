@@ -50,7 +50,9 @@ Triggers when new mail is found in your Gmail inbox.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Topic name | STRING | TEXT  |  |
+| Topic name | STRING | TEXT  |  Must be 3-255 characters, start with a letter, and contain only the following characters:
+letters, numbers, dashes (-), periods (.), underscores (_), tildes (~), percents (%) or
+plus signs (+). Cannot start with goog.  |
 
 
 ### Output
@@ -59,11 +61,13 @@ Triggers when new mail is found in your Gmail inbox.
 
 Type: ARRAY
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-null
+| {STRING\(id), STRING\(threadId), [STRING]\(labelIds), STRING\(snippet), STRING\(historyId), NUMBER\(internalDate), {STRING\(partId), STRING\(mimeType), STRING\(filename), [{STRING\(name), STRING\(value)}]\(headers), {STRING\(attachmentId), INTEGER\(size), STRING\(data)}\(body), []\(parts)}\(payload), INTEGER\(sizeEstimate), STRING\(raw)} | OBJECT_BUILDER  |
+
 
 
 
@@ -95,6 +99,7 @@ Get an email from your Gmail account via Id
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -105,9 +110,10 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | NUMBER | NUMBER  |
-| {STRING(partId), STRING(mimeType), STRING(filename), [{STRING(name), STRING(value)}](headers), {STRING(attachmentId), INTEGER(size), STRING(data)}(body), [](parts)} | OBJECT_BUILDER  |
+| {STRING\(partId), STRING\(mimeType), STRING\(filename), [{STRING\(name), STRING\(value)}]\(headers), {STRING\(attachmentId), INTEGER\(size), STRING\(data)}\(body), []\(parts)} | OBJECT_BUILDER  |
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
+
 
 
 
@@ -131,6 +137,7 @@ Gets the specified thread.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -138,7 +145,8 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| [{STRING(id), STRING(threadId), [STRING](labelIds), STRING(snippet), STRING(historyId), NUMBER(internalDate), {STRING(partId), STRING(mimeType), STRING(filename), [{STRING(name), STRING(value)}](headers), {STRING(attachmentId), INTEGER(size), STRING(data)}(body), [](parts)}(payload), INTEGER(sizeEstimate), STRING(raw)}] | ARRAY_BUILDER  |
+| [{STRING\(id), STRING\(threadId), [STRING]\(labelIds), STRING\(snippet), STRING\(historyId), NUMBER\(internalDate), {STRING\(partId), STRING\(mimeType), STRING\(filename), [{STRING\(name), STRING\(value)}]\(headers), {STRING\(attachmentId), INTEGER\(size), STRING\(data)}\(body), []\(parts)}\(payload), INTEGER\(sizeEstimate), STRING\(raw)}] | ARRAY_BUILDER  |
+
 
 
 
@@ -168,13 +176,15 @@ Lists the messages in the user's mailbox.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| [{STRING(id), STRING(threadId), [STRING](labelIds), STRING(snippet), STRING(historyId), NUMBER(internalDate), {STRING(partId), STRING(mimeType), STRING(filename), [{STRING(name), STRING(value)}](headers), {STRING(attachmentId), INTEGER(size), STRING(data)}(body), [](parts)}(payload), INTEGER(sizeEstimate), STRING(raw)}] | ARRAY_BUILDER  |
+| [{STRING\(id), STRING\(threadId), [STRING]\(labelIds), STRING\(snippet), STRING\(historyId), NUMBER\(internalDate), {STRING\(partId), STRING\(mimeType), STRING\(filename), [{STRING\(name), STRING\(value)}]\(headers), {STRING\(attachmentId), INTEGER\(size), STRING\(data)}\(body), []\(parts)}\(payload), INTEGER\(sizeEstimate), STRING\(raw)}] | ARRAY_BUILDER  |
 | STRING | TEXT  |
 | NUMBER | NUMBER  |
+
 
 
 
@@ -188,11 +198,11 @@ Sends the specified message to the recipients in the To, Cc, and Bcc headers.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | From | STRING | TEXT  |  Email address of the sender, the mailbox account.  |
-| To | [STRING($email)] | ARRAY_BUILDER  |  Recipients email addresses.  |
+| To | [STRING\($email)] | ARRAY_BUILDER  |  Recipients email addresses.  |
 | Subject | STRING | TEXT  |  Subject of the email.  |
-| Bcc | [STRING($email)] | ARRAY_BUILDER  |  Bcc recipients email addresses.  |
-| Cc | [STRING($email)] | ARRAY_BUILDER  |  Cc recipients email addresses.  |
-| Reply to | [STRING($email)] | ARRAY_BUILDER  |  Reply-to email addresses.  |
+| Bcc | [STRING\($email)] | ARRAY_BUILDER  |  Bcc recipients email addresses.  |
+| Cc | [STRING\($email)] | ARRAY_BUILDER  |  Cc recipients email addresses.  |
+| Reply to | [STRING\($email)] | ARRAY_BUILDER  |  Reply-to email addresses.  |
 | Body | STRING | TEXT  |  Body text of the email  |
 | Attachments | [FILE_ENTRY] | ARRAY_BUILDER  |  A list of attachments to send with the email.  |
 
@@ -202,6 +212,7 @@ Sends the specified message to the recipients in the To, Cc, and Bcc headers.
 
 
 Type: OBJECT
+
 
 #### Properties
 
@@ -213,9 +224,10 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | NUMBER | NUMBER  |
-| {STRING(partId), STRING(mimeType), STRING(filename), [{STRING(name), STRING(value)}](headers), {STRING(attachmentId), INTEGER(size), STRING(data)}(body), [](parts)} | OBJECT_BUILDER  |
+| {STRING\(partId), STRING\(mimeType), STRING\(filename), [{STRING\(name), STRING\(value)}]\(headers), {STRING\(attachmentId), INTEGER\(size), STRING\(data)}\(body), []\(parts)} | OBJECT_BUILDER  |
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
+
 
 
 
@@ -231,6 +243,6 @@ Type: OBJECT
 
 [Setting up OAuth2](https://support.google.com/googleapi/answer/6158849?hl=en)
 
-[Guidejar](https://guidejar.com/guides/fec74020-26bb-43dd-814c-f8b907f6f45b) tutorial.
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(50.05219207% + 32px)"><iframe src="https://www.guidejar.com/embed/fec74020-26bb-43dd-814c-f8b907f6f45b?type=1&controls=on" width="100%" height="100%" style="position:absolute;inset:0" allowfullscreen frameborder="0"></iframe></div>
 
-[Turning on GMail API](https://guidejar.com/guides/2d7279c7-91c3-43c9-9004-99f08d7e30ff)
+Turning on GMail API <div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(50.05219207% + 32px)"><iframe src="https://www.guidejar.com/embed/2d7279c7-91c3-43c9-9004-99f08d7e30ff?type=1&controls=on" width="100%" height="100%" style="position:absolute;inset:0" allowfullscreen frameborder="0"></iframe></div>

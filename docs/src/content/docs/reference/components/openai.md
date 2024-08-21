@@ -50,7 +50,7 @@ Ask ChatGPT anything you want.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Messages | [{STRING(content), STRING(role), STRING(name)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |
+| Messages | [{STRING\(content), STRING\(role), STRING\(name)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |
 | Model | STRING | SELECT  |  ID of the model to use.  |
 | Frequency penalty | NUMBER | NUMBER  |  Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.  |
 | Logit bias | {} | OBJECT_BUILDER  |  Modify the likelihood of specified tokens appearing in the completion.  |
@@ -69,6 +69,7 @@ Ask ChatGPT anything you want.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -76,7 +77,8 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| {STRING(name), {}(arguments)} | OBJECT_BUILDER  |
+| {STRING\(name), {}\(arguments)} | OBJECT_BUILDER  |
+
 
 
 
@@ -93,7 +95,7 @@ Create an assistant with a model and instructions.
 | Name | STRING | TEXT  |  The name of the assistant.  |
 | Description | STRING | TEXT  |  The description of the assistant.  |
 | Instructions | STRING | TEXT  |  The system instructions that the assistant uses.  |
-| Tools | [{STRING(type), {STRING(description), STRING(name), {}(parameters)}(function)}] | ARRAY_BUILDER  |  A list of tool enabled on the assistant.  |
+| Tools | [{STRING\(type), {STRING\(description), STRING\(name), {}\(parameters)}\(function)}] | ARRAY_BUILDER  |  A list of tool enabled on the assistant.  |
 | File ids | [STRING] | ARRAY_BUILDER  |  A list of file IDs attached to this assistant.  |
 | Metadata | {} | OBJECT_BUILDER  |  Set of 16 key-value pairs that can be attached to an object. This can be useful for storing additional information about the object in a structured format. Keys can be a maximum of 64 characters long and values can be a maxium of 512 characters long.  |
 
@@ -103,6 +105,7 @@ Create an assistant with a model and instructions.
 
 
 Type: OBJECT
+
 
 #### Properties
 
@@ -115,9 +118,10 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| [{STRING(type), {STRING(description), STRING(name), {}(parameters)}(function)}] | ARRAY_BUILDER  |
-| [STRING($fileId)] | ARRAY_BUILDER  |
+| [{STRING\(type), {STRING\(description), STRING\(name), {}\(parameters)}\(function)}] | ARRAY_BUILDER  |
+| [STRING\($fileId)] | ARRAY_BUILDER  |
 | {} | OBJECT_BUILDER  |
+
 
 
 
@@ -130,13 +134,14 @@ Create an image using text-to-image models
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| DYNAMIC_PROPERTIES | null  |
 | Model | STRING | SELECT  |  The model to use for image generation.  |
+| DYNAMIC_PROPERTIES | null  |
 | Quality | STRING | SELECT  |  The quality of the image that will be generated.  |
 | Response format | STRING | SELECT  |  The format in which the generated images are returned.  |
 | Size | STRING | SELECT  |  The size of the generated images.  |
 | Style | STRING | SELECT  |  The style of the generated images.  |
 | User | STRING | TEXT  |  A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.  |
+| Response read timeout | INTEGER | INTEGER  |  Maximum wait time in seconds to wait on AI response  |
 
 
 ### Output
@@ -145,12 +150,14 @@ Create an image using text-to-image models
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | INTEGER | INTEGER  |
-| [{STRING(url), STRING(b64Json), STRING(revisedPrompt)}] | ARRAY_BUILDER  |
+| [{STRING\(url), STRING\(b64Json), STRING\(revisedPrompt)}] | ARRAY_BUILDER  |
+
 
 
 
@@ -176,6 +183,7 @@ Generate an audio recording from the input text
 
 Type: FILE_ENTRY
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -184,6 +192,7 @@ Type: FILE_ENTRY
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
+
 
 
 
@@ -210,6 +219,7 @@ Transcribes audio into the input language.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -218,7 +228,8 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | NUMBER | NUMBER  |
-| [{INTEGER(id), INTEGER(seek), NUMBER(start), NUMBER(end), STRING(text), [INTEGER](tokens), NUMBER(temperature), NUMBER(averageLogProb), NUMBER(compressionRatio), NUMBER(noSpeechProb), BOOLEAN(transientFlag)}] | ARRAY_BUILDER  |
+| [{INTEGER\(id), INTEGER\(seek), NUMBER\(start), NUMBER\(end), STRING\(text), [INTEGER]\(tokens), NUMBER\(temperature), NUMBER\(averageLogProb), NUMBER\(compressionRatio), NUMBER\(noSpeechProb), BOOLEAN\(transientFlag)}] | ARRAY_BUILDER  |
+
 
 
 
@@ -244,6 +255,7 @@ Translates audio into English.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -252,7 +264,8 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | NUMBER | NUMBER  |
-| [{INTEGER(id), INTEGER(seek), NUMBER(start), NUMBER(end), STRING(text), [INTEGER($token)](tokens), NUMBER(temperature), NUMBER(averageLogProb), NUMBER(compressionRatio), NUMBER(noSpeechProb), BOOLEAN(transientFlag)}] | ARRAY_BUILDER  |
+| [{INTEGER\(id), INTEGER\(seek), NUMBER\(start), NUMBER\(end), STRING\(text), [INTEGER\($token)]\(tokens), NUMBER\(temperature), NUMBER\(averageLogProb), NUMBER\(compressionRatio), NUMBER\(noSpeechProb), BOOLEAN\(transientFlag)}] | ARRAY_BUILDER  |
+
 
 
 
@@ -265,7 +278,7 @@ Ask GPT a question about an image
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Messages | [{[{STRING(type), {STRING(url), STRING(detail)}(imageUrl)}](content), STRING(role), STRING(name)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |
+| Messages | [{[{STRING\(type), {STRING\(url), STRING\(detail)}\(imageUrl)}]\(content), STRING\(role), STRING\(name)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |
 | Model | STRING | SELECT  |  ID of the model to use.  |
 | Frequency penalty | NUMBER | NUMBER  |  Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.  |
 | Logit bias | {} | OBJECT_BUILDER  |  Modify the likelihood of specified tokens appearing in the completion.  |
@@ -284,6 +297,7 @@ Ask GPT a question about an image
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -291,9 +305,18 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| {STRING(name), {}(arguments)} | OBJECT_BUILDER  |
+| {STRING\(name), {}\(arguments)} | OBJECT_BUILDER  |
 
 
 
 
 
+
+<hr />
+
+# Additional instructions
+<hr />
+
+## CONNECTION
+
+[Getting API key](https://help.openai.com/en/articles/4936850-where-do-i-find-my-openai-api-key)

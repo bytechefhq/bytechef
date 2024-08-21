@@ -8,11 +8,24 @@ description: "Component description."
 Component description.
 
 
+Categories: [HELPERS]
+
 
 Version: 1
 
 <hr />
 
+
+
+## Connections
+
+Version: 1
+
+
+
+
+
+<hr />
 
 
 
@@ -37,11 +50,7 @@ Description
 
 Type: STRING
 
-#### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-null
 
 
 

@@ -82,12 +82,14 @@ Adds a record into an Airtable table.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | DATE_TIME | DATE_TIME  |
 | {} | OBJECT_BUILDER  |
+
 
 
 

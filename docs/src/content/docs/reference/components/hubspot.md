@@ -81,11 +81,13 @@ ___Sample Output:___
 
 Type: ARRAY
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-null
+| {{INTEGER\(objectId), STRING\(propertyName), STRING\(propertyValue), STRING\(changeSource), INTEGER\(eventId), INTEGER\(subscriptionId), INTEGER\(portalId), INTEGER\(appId), INTEGER\(occurredAt), STRING\(eventType), INTEGER\(attemptNumber), INTEGER\(messageId), STRING\(messageType)}\(data)} | OBJECT_BUILDER  |
+
 
 
 
@@ -99,14 +101,14 @@ null
 ## Actions
 
 
-### Create
-Create a contact with the given properties and return a copy of the object, including the ID. Documentation and examples for creating standard contacts is provided.
+### Create Contact
+Create a contact with the given properties.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Simple Public Object Input For Create | {{STRING(company), STRING(email), STRING(firstname), STRING(lastname), STRING(phone), STRING(website)}(properties), [{{STRING(id)}(to), [{STRING(associationCategory), INTEGER(associationTypeId)}](types)}](associations)} | OBJECT_BUILDER  |  |
+| Contact | {{STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)}\(properties)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -115,31 +117,38 @@ Create a contact with the given properties and return a copy of the object, incl
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| Id | STRING | TEXT  |  |
-| Properties | {} | OBJECT_BUILDER  |  |
-| Properties With History | {} | OBJECT_BUILDER  |  |
-| Created At | DATE_TIME | DATE_TIME  |  |
-| Updated At | DATE_TIME | DATE_TIME  |  |
-| Archived | BOOLEAN | SELECT  |  |
-| Archived At | DATE_TIME | DATE_TIME  |  |
+| {STRING\(id), {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)}\(properties)} | OBJECT_BUILDER  |
 
 
 
 
 
-### Update
-Perform a partial update of an Object identified by `{contactId}`. `{contactId}` refers to the internal object ID. Provided property values will be overwritten. Read-only and non-existent properties will be ignored. Properties values can be cleared by passing an empty string.
+
+### Delete Contact
+Move Contact to the recycling bin.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Contact Id | STRING | TEXT  |  |
-| Simple Public Object Input | {{STRING(company), STRING(email), STRING(firstname), STRING(lastname), STRING(phone), STRING(website)}(properties)} | OBJECT_BUILDER  |  |
+| Contact | STRING | SELECT  |  |
+
+
+
+
+### Get Contact
+Get contact details.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Contact | STRING | SELECT  |  |
 
 
 ### Output
@@ -148,17 +157,70 @@ Perform a partial update of an Object identified by `{contactId}`. `{contactId}`
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| Id | STRING | TEXT  |  |
-| Properties | {} | OBJECT_BUILDER  |  |
-| Properties With History | {} | OBJECT_BUILDER  |  |
-| Created At | DATE_TIME | DATE_TIME  |  |
-| Updated At | DATE_TIME | DATE_TIME  |  |
-| Archived | BOOLEAN | SELECT  |  |
-| Archived At | DATE_TIME | DATE_TIME  |  |
+| {STRING\(id), {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)}\(properties)} | OBJECT_BUILDER  |
+
+
+
+
+
+
+### Update Contact
+Update Contact properties.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Contact   To   Update . | STRING | SELECT  |  |
+| Contact | {{STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)}\(properties)} | OBJECT_BUILDER  |  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| {STRING\(id), {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)}\(properties)} | OBJECT_BUILDER  |
+
+
+
+
+
+
+### Create Deal
+Creates a new deal.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Deal | {{STRING\(dealname), NUMBER\(amount), DATE\(closedate), STRING\(pipeline), STRING\(dealstage), STRING\(hubspot_owner_id)}\(properties)} | OBJECT_BUILDER  |  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| {STRING\(id), {STRING\(dealname), NUMBER\(amount), DATE\(closedate), STRING\(pipeline), STRING\(dealstage), STRING\(hubspot_owner_id)}\(properties)} | OBJECT_BUILDER  |
+
 
 
 

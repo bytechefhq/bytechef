@@ -19,7 +19,17 @@ Version: 1
 
 Version: 1
 
-null
+
+### null
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Username | STRING | TEXT  |  |
+| Password | STRING | PASSWORD  |  |
+
+
 
 
 
@@ -54,8 +64,8 @@ Insert rows in database.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Schema | STRING | TEXT  |  Name of the schema the table belongs to.  |
 | Table | STRING | TEXT  |  Name of the table in which to insert data to.  |
-| Columns | [STRING] | ARRAY_BUILDER  |  The list of the properties which should used as columns for the new rows.  |
-| Rows | [{}] | ARRAY_BUILDER  |  List of rows.  |
+| Fields | [STRING] | ARRAY_BUILDER  |  The list of the table field names where corresponding values would be inserted.  |
+| Values | [{}] | ARRAY_BUILDER  |  List of field values for corresponding field names  |
 
 
 
@@ -69,9 +79,9 @@ Update rows in database.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Schema | STRING | TEXT  |  Name of the schema the table belongs to.  |
 | Table | STRING | TEXT  |  Name of the table in which to update data in.  |
-| Columns | [STRING] | ARRAY_BUILDER  |  The list of the properties which should used as columns for the updated rows.  |
-| Update Key | STRING | TEXT  |  The name of the property which decides which rows in the database should be updated.  |
-| Rows | [{}] | ARRAY_BUILDER  |  List of rows.  |
+| Fields | [STRING] | ARRAY_BUILDER  |  The list of the table field names whose values would be updated.  |
+| Update Key | STRING | TEXT  |  The field name used as criteria to decide which rows in the database should be updated.  |
+| Values | [{}] | ARRAY_BUILDER  |  List of field values for corresponding field names.  |
 
 
 
@@ -85,8 +95,8 @@ Delete rows from database.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Schema | STRING | TEXT  |  Name of the schema the table belongs to.  |
 | Table | STRING | TEXT  |  Name of the table in which to update data in.  |
-| Update Key | STRING | TEXT  |  Name of the property which decides which rows in the database should be deleted.  |
-| Rows | [{}] | ARRAY_BUILDER  |  List of rows.  |
+| Delete Key | STRING | TEXT  |  Name of the field which decides which rows in the database should be deleted.  |
+| Criteria Values | [{}] | ARRAY_BUILDER  |  List of values that are used to test delete key.  |
 
 
 
@@ -99,8 +109,8 @@ Execute an SQL DML or DML statement.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Execute | STRING | TEXT  |  The raw DML or DDL statement to execute. You can use :property1 and :property2 in conjunction with parameters.  |
-| Rows | [{}] | ARRAY_BUILDER  |  List of rows.  |
-| Parameters | {} | OBJECT_BUILDER  |  The list of properties which should be used as parameters.  |
+| Fields to select | [{}] | ARRAY_BUILDER  |  List of fields to select from.  |
+| Parameters | {} | OBJECT_BUILDER  |  The list of values which should be used to replace corresponding criteria parameters.  |
 
 
 

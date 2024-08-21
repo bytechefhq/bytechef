@@ -64,12 +64,14 @@ Creates a new company
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING(id), STRING(name)} | OBJECT_BUILDER  |
-| {STRING(more_info), STRING(status), STRING(message)} | OBJECT_BUILDER  |
+| {STRING\(id), STRING\(name)} | OBJECT_BUILDER  |
+| {STRING\(more_info), STRING\(status), STRING\(message)} | OBJECT_BUILDER  |
+
 
 
 
@@ -96,12 +98,14 @@ Creates a new contact
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING(id), STRING(firstname), STRING(surname), STRING(email)} | OBJECT_BUILDER  |
-| {STRING(more_info), STRING(status), STRING(message)} | OBJECT_BUILDER  |
+| {STRING\(id), STRING\(firstname), STRING\(surname), STRING\(email)} | OBJECT_BUILDER  |
+| {STRING\(more_info), STRING\(status), STRING\(message)} | OBJECT_BUILDER  |
+
 
 
 
@@ -126,12 +130,14 @@ Creates a new task
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING(id), STRING(title)} | OBJECT_BUILDER  |
-| {STRING(more_info), STRING(status), STRING(message)} | OBJECT_BUILDER  |
+| {STRING\(id), STRING\(title)} | OBJECT_BUILDER  |
+| {STRING\(more_info), STRING\(status), STRING\(message)} | OBJECT_BUILDER  |
+
 
 
 
