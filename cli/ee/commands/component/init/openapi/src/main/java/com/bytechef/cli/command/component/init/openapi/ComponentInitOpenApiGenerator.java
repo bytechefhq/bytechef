@@ -118,8 +118,9 @@ public class ComponentInitOpenApiGenerator {
     private final String basePackageName;
     private final String componentName;
     private final GeneratorConfig generatorConfig;
+    private final String libsPathname;
     private final OpenAPI openAPI;
-    private final String outputPath;
+    private final String outputPathname;
     private final Set<String> schemas = new HashSet<>();
     private final boolean internalComponent;
     private final int version;
@@ -127,15 +128,16 @@ public class ComponentInitOpenApiGenerator {
 
     @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     public ComponentInitOpenApiGenerator(
-        String basePackageName, String componentName, int version, boolean internalComponent, String openApiPath,
-        String outputPath) throws IOException {
+        String basePackageName, String componentName, int version, boolean internalComponent,
+        String openApiPath, String outputPathname, String libsPathname) throws IOException {
 
         this.basePackageName = basePackageName;
         this.componentName = componentName;
-        this.version = version;
+        this.libsPathname = libsPathname;
         this.internalComponent = internalComponent;
         this.openAPI = parseOpenAPIFile(openApiPath);
-        this.outputPath = outputPath;
+        this.outputPathname = outputPathname;
+        this.version = version;
 
         File directory = new File(openApiPath).getParentFile();
 
@@ -317,7 +319,8 @@ public class ComponentInitOpenApiGenerator {
 
         javacOpts.add("-classpath");
 
-        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Path.of("libs/"))) {
+        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(
+            Path.of(this.libsPathname == null ? "libs" : this.libsPathname))) {
             javacOpts.add(
                 StreamSupport.stream(directoryStream.spliterator(), false)
                     .map(Path::toAbsolutePath)
@@ -434,7 +437,7 @@ public class ComponentInitOpenApiGenerator {
     }
 
     private String getAbsolutePathname(String subPath) {
-        return outputPath + File.separator + componentName + File.separator + subPath;
+        return outputPathname + File.separator + componentName + File.separator + subPath;
     }
 
     private CodeBlock getActionCodeBlock(OperationItem operationItem, OpenAPI openAPI) {
@@ -999,6 +1002,12 @@ public class ComponentInitOpenApiGenerator {
 
         Info info = openAPI.getInfo();
 
+        String title = info.getTitle();
+
+        if (StringUtils.isEmpty(title)) {
+            title = getComponentClassName(componentName);
+        }
+
         builder.add(
             """
                 modifyComponent(
@@ -1008,8 +1017,7 @@ public class ComponentInitOpenApiGenerator {
                     )
                     .actions(modifyActions($L))
                 """,
-            componentName, getComponentClassName(componentName), info.getDescription(),
-            getActionsCodeBlock(componentHandlerDirPath, openAPI));
+            componentName, title, info.getDescription(), getActionsCodeBlock(componentHandlerDirPath, openAPI));
 
         CodeBlock codeBlock = getConnectionCodeBlock(openAPI, componentHandlerDirPath);
 
@@ -1784,7 +1792,7 @@ public class ComponentInitOpenApiGenerator {
         return openAPI;
     }
 
-    private OpenApiComponentHandler runComponentHandlerClass(Path classPath, String className) throws Exception {
+    private OpenApiComponentHandler createComponentHandler(Path classPath, String className) throws Exception {
         File classFile = classPath.toFile();
 
         URI classURI = classFile.toURI();
@@ -1793,7 +1801,8 @@ public class ComponentInitOpenApiGenerator {
             classURI.toURL()
         };
 
-        URLClassLoader classLoader = URLClassLoader.newInstance(classUrls);
+        URLClassLoader classLoader = URLClassLoader.newInstance(
+            classUrls, OpenApiComponentHandler.class.getClassLoader());
 
         @SuppressWarnings("unchecked")
         Class<OpenApiComponentHandler> clazz = (Class<OpenApiComponentHandler>) Class.forName(
@@ -1979,10 +1988,9 @@ public class ComponentInitOpenApiGenerator {
     private void writeComponentHandlerDefinition(
         Path componentHandlerSourcePath, String packageName, int version) throws Exception {
 
-        Path definitionDirPath = Files.createDirectories(
-            Paths.get(
-                getAbsolutePathname("src" + File.separator + "test" + File.separator + "resources") + File.separator +
-                    "definition"));
+        String resourcesPathname = getAbsolutePathname("src" + File.separator + "test" + File.separator + "resources");
+
+        Path definitionDirPath = Files.createDirectories(Paths.get(resourcesPathname + File.separator + "definition"));
 
         Path defintionFilePath = definitionDirPath.resolve(componentName + "_v" + version + ".json");
 
@@ -1991,7 +1999,7 @@ public class ComponentInitOpenApiGenerator {
         if (!definitionFile.exists()) {
             Path classPath = compileComponentHandlerSource(componentHandlerSourcePath);
 
-            OpenApiComponentHandler openApiComponentHandler = runComponentHandlerClass(
+            OpenApiComponentHandler openApiComponentHandler = createComponentHandler(
                 classPath, packageName + "." + getComponentHandlerClassName(componentName));
 
             OBJECT_MAPPER.writeValue(definitionFile, openApiComponentHandler.getDefinition());
