@@ -18,7 +18,6 @@ sonarProperties.forEach { key, value ->
 }
 
 subprojects {
-    apply(plugin = "io.spring.dependency-management")
     apply(plugin = "org.sonarqube")
 
     configure<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension> {
@@ -39,7 +38,5 @@ subprojects {
 
     dependencies {
         implementation(platform("io.awspring.cloud:spring-cloud-aws-dependencies:${rootProject.libs.versions.spring.cloud.aws.get()}"))
-
-        testImplementation("org.springframework.boot:spring-boot-starter-test")
     }
 }

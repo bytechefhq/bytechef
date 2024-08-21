@@ -7,16 +7,19 @@ plugins {
 
 versionCatalogUpdate {
     keep {
-        versions.addAll("checkstyle", "gradle-git-properties", "jacoco", "java", "jib-gradle-plugin", "org-springframework-cloud-dependencies", "pmd", "spotbugs", "spotless-plugin-gradle", "spotbugs-gradle-plugin", "spring-boot")
+        versions.addAll("checkstyle", "gradle-git-properties", "jackson", "jacoco", "java", "jib-gradle-plugin", "org-springframework-cloud-dependencies", "pmd", "spotbugs", "spotless-plugin-gradle", "spotbugs-gradle-plugin", "spring-boot", "spring-cloud-aws", "spring-shell")
     }
 }
 
 subprojects {
     apply(plugin = "com.bytechef.java-common-conventions")
+    apply(plugin = "io.spring.dependency-management")
 
     dependencies {
         implementation(platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES))
         implementation(rootProject.libs.com.github.spotbugs.spotbugs.annotations)
+
+        testImplementation("org.springframework.boot:spring-boot-starter-test")
     }
 }
 
@@ -32,6 +35,5 @@ reporting {
                     .forEach { jacocoAggregation(it) }
             }
         }
-
     }
 }
