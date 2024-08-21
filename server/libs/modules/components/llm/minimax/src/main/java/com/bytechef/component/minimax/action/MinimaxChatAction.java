@@ -71,13 +71,13 @@ public class MinimaxChatAction {
                         .collect(Collectors.toMap(
                             MiniMaxApi.ChatModel::getValue, MiniMaxApi.ChatModel::getValue, (f,s)->f)))),
             MESSAGE_PROPERTY,
+            MAX_TOKENS_PROPERTY,
             N_PROPERTY,
+            TEMPERATURE_PROPERTY,
+            TOP_P_PROPERTY,
             FREQUENCY_PENALTY_PROPERTY,
             PRESENCE_PENALTY_PROPERTY,
-            MAX_TOKENS_PROPERTY,
-            TEMPERATURE_PROPERTY,
             STOP_PROPERTY,
-            TOP_P_PROPERTY,
             SEED_PROPERTY)
         .outputSchema(string())
         .perform(MinimaxChatAction::perform);
@@ -90,7 +90,7 @@ public class MinimaxChatAction {
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }
 
-    public static final Chat CHAT = new Chat() {
+    private static final Chat CHAT = new Chat() {
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
             return MiniMaxChatOptions.builder()

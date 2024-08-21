@@ -33,14 +33,14 @@ import static constants.LLMConstants.MAX_TOKENS;
 import static constants.LLMConstants.MAX_TOKENS_PROPERTY;
 import static constants.LLMConstants.MESSAGE_PROPERTY;
 import static constants.LLMConstants.MODEL;
-import static constants.LLMConstants.N;
-import static constants.LLMConstants.N_PROPERTY;
 import static constants.LLMConstants.SEED;
 import static constants.LLMConstants.SEED_PROPERTY;
 import static constants.LLMConstants.STOP;
 import static constants.LLMConstants.STOP_PROPERTY;
 import static constants.LLMConstants.TEMPERATURE;
 import static constants.LLMConstants.TEMPERATURE_PROPERTY;
+import static constants.LLMConstants.TOP_K;
+import static constants.LLMConstants.TOP_K_PROPERTY;
 import static constants.LLMConstants.TOP_P;
 import static constants.LLMConstants.TOP_P_PROPERTY;
 import static constants.LLMConstants.URL;
@@ -66,28 +66,28 @@ public class WatsonxChatAction {
         .properties(
             string(MODEL)
                 .label("Model")
-                .description("google/flan-ul2")
-                .exampleValue("")
+                .description("Model is the identifier of the LLM Model to be used.")
+                .exampleValue("google/flan-ul2")
                 .required(false),
+            MESSAGE_PROPERTY,
             string(DECODING_METHOD)
                 .label("Decoding method")
                 .description("Decoding is the process that a model uses to choose the tokens in the generated output.")
                 .exampleValue("greedy")
-                .required(false),
+                .advancedOption(true),
             number(REPETITION_PENALTY)
                 .label("Repetition penalty")
                 .description("Sets how strongly to penalize repetitions. A higher value (e.g., 1.8) will penalize repetitions more strongly, while a lower value (e.g., 1.1) will be more lenient.")
-                .required(false),
-            MESSAGE_PROPERTY,
-            N_PROPERTY,
+                .advancedOption(true),
             integer(MIN_TOKENS)
                 .label("Min tokens")
                 .description("Sets how many tokens must the LLM generate.")
-                .required(false),
+                .advancedOption(true),
             MAX_TOKENS_PROPERTY,
             TEMPERATURE_PROPERTY,
-            STOP_PROPERTY,
             TOP_P_PROPERTY,
+            TOP_K_PROPERTY,
+            STOP_PROPERTY,
             SEED_PROPERTY)
         .outputSchema(string())
         .perform(WatsonxChatAction::perform);
@@ -100,7 +100,7 @@ public class WatsonxChatAction {
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }
 
-    public static final Chat CHAT = new Chat() {
+    private static final Chat CHAT = new Chat() {
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
             return WatsonxAiChatOptions.builder()
@@ -109,7 +109,7 @@ public class WatsonxChatAction {
                 .withMaxNewTokens(inputParameters.getInteger(MAX_TOKENS))
                 .withTopP(inputParameters.getFloat(TOP_P))
                 .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .withTopK(inputParameters.getInteger(N))
+                .withTopK(inputParameters.getInteger(TOP_K))
                 .withMinNewTokens(inputParameters.getInteger(MIN_TOKENS))
                 .withRandomSeed(inputParameters.getInteger(SEED))
                 .withRepetitionPenalty(inputParameters.getFloat(REPETITION_PENALTY))

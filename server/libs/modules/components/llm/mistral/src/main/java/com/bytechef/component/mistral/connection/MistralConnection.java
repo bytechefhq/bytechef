@@ -30,7 +30,7 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 public final class MistralConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-//        .baseUri((connectionParameters, context) -> "https://api-inference.huggingface.co")
+        .baseUri((connectionParameters, context) -> "https://api.mistral.ai/")
         .authorizations(
             authorization(BEARER_TOKEN)
                 .title("Bearer Token")

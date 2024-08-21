@@ -23,9 +23,6 @@ public final class VertexGeminiConstants {
     public static final String VERTEX_GEMINI = "vertexGemini";
     public static final String PROJECT_ID = "projectId";
     public static final String LOCATION = "location";
-    public static final String CANDIDATE_COUNT = "candidateCount";
-//    public static final String TOP_P = "topP";
-
 
     private VertexGeminiConstants() {
     }

@@ -30,7 +30,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefini
 public final class AnthropicConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-//        .baseUri((connectionParameters, context) -> "https://api-inference.huggingface.co")
+        .baseUri((connectionParameters, context) -> "https://api.anthropic.com/")
         .authorizations(
             authorization(BEARER_TOKEN)
                 .title("Bearer Token")

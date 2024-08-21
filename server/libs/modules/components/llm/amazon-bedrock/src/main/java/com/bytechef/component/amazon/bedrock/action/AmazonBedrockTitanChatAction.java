@@ -64,8 +64,8 @@ public class AmazonBedrockTitanChatAction {
             MESSAGE_PROPERTY,
             MAX_TOKENS_PROPERTY,
             TEMPERATURE_PROPERTY,
-            STOP_PROPERTY,
-            TOP_P_PROPERTY)
+            TOP_P_PROPERTY,
+            STOP_PROPERTY)
         .outputSchema(string())
         .perform(AmazonBedrockTitanChatAction::perform);
 
@@ -77,7 +77,7 @@ public class AmazonBedrockTitanChatAction {
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }
 
-    public static final Chat CHAT = new Chat() {
+    private static final Chat CHAT = new Chat() {
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
             return BedrockTitanChatOptions.builder()

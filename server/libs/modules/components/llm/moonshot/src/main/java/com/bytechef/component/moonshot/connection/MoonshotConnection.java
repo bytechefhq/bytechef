@@ -30,7 +30,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefini
 public final class MoonshotConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-//        .baseUri((connectionParameters, context) -> "https://api-inference.huggingface.co")
+        .baseUri((connectionParameters, context) -> "https://api.moonshot.cn")
         .authorizations(
             authorization(BEARER_TOKEN)
                 .title("Bearer Token")
