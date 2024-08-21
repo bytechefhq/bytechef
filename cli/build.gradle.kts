@@ -18,7 +18,6 @@ sonarProperties.forEach { key, value ->
 }
 
 subprojects {
-    apply(plugin = "io.spring.dependency-management")
     apply(plugin = "org.sonarqube")
 
     dependencies {
