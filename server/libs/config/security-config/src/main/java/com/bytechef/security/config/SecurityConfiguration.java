@@ -209,8 +209,8 @@ public class SecurityConfiguration {
         MvcRequestMatcher.Builder mvc) {
 
         for (AuthenticatedRequestMatcherContributor authenticatedRequestMatcherContributor : authenticatedRequestMatcherContributors) {
-            authz.requestMatchers(authenticatedRequestMatcherContributor.getRequestMatcher(mvc))
-                .authenticated();
+
+            authenticatedRequestMatcherContributor.requestMatchers(authz, mvc);
         }
 
         return authz;
