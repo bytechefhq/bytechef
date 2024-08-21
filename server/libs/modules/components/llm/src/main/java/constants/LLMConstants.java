@@ -37,6 +37,7 @@ public class LLMConstants {
     public static final String STYLE = "style";
     public static final String TEMPERATURE = "temperature";
     public static final String TOP_P = "topP";
+    public static final String TOP_K = "topK";
     public static final String USER = "user";
     public static final String URL = "url";
     public static final String SEED = "seed";
@@ -52,24 +53,30 @@ public class LLMConstants {
         .defaultValue(0)
         .minValue(-2)
         .maxValue(2)
-        .required(false);
+        .advancedOption(true);
 
     public static final ComponentDSL.ModifiableObjectProperty LOGIT_BIAS_PROPERTY = object(LOGIT_BIAS)
         .label("Logit bias")
         .description("Modify the likelihood of specified tokens appearing in the completion.")
         .additionalProperties(number())
-        .required(false);
+        .advancedOption(true);
 
     public static final ComponentDSL.ModifiableIntegerProperty MAX_TOKENS_PROPERTY = integer(MAX_TOKENS)
         .label("Max tokens")
         .description("The maximum number of tokens to generate in the chat completion.")
-        .required(false);
+        .advancedOption(true);
 
     public static final ComponentDSL.ModifiableIntegerProperty N_PROPERTY = integer(N)
         .label("Number of chat completion choices")
         .description("How many chat completion choices to generate for each input message.")
         .defaultValue(1)
-        .required(false);
+        .advancedOption(true);
+
+    public static final ComponentDSL.ModifiableIntegerProperty TOP_K_PROPERTY = integer(TOP_K)
+        .label("Top K")
+        .description("Specify the number of token choices the generative uses to generate the next token.")
+        .defaultValue(1)
+        .advancedOption(true);
 
     public static final ComponentDSL.ModifiableNumberProperty PRESENCE_PENALTY_PROPERTY = number(PRESENCE_PENALTY)
         .label("Presence penalty")
@@ -79,13 +86,13 @@ public class LLMConstants {
         .defaultValue(0)
         .minValue(-2)
         .maxValue(2)
-        .required(false);
+        .advancedOption(true);
 
     public static final ComponentDSL.ModifiableArrayProperty STOP_PROPERTY = array(STOP)
         .label("Stop")
         .description("Up to 4 sequences where the API will stop generating further tokens.")
         .items(string())
-        .required(false);
+        .advancedOption(true);
 
     public static final ComponentDSL.ModifiableNumberProperty TEMPERATURE_PROPERTY = number(TEMPERATURE)
         .label("Temperature")
@@ -95,16 +102,16 @@ public class LLMConstants {
         .defaultValue(1)
         .minValue(0)
         .maxValue(2)
-        .required(false);
+        .advancedOption(true);
 
     public static final ComponentDSL.ModifiableNumberProperty TOP_P_PROPERTY = number(TOP_P)
-        .label("Top p")
+        .label("Top P")
         .description(
             "An alternative to sampling with temperature, called nucleus sampling,  where the model considers the " +
                 "results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top " +
                 "10% probability mass are considered.")
         .defaultValue(1)
-        .required(false);
+        .advancedOption(true);
 
     public static final ComponentDSL.ModifiableStringProperty USER_PROPERTY = string(USER)
         .label("User")
@@ -116,7 +123,7 @@ public class LLMConstants {
     public static final ComponentDSL.ModifiableIntegerProperty SEED_PROPERTY = integer(SEED)
         .label("Seed")
         .description("Keeping the same seed would output the same response.")
-        .required(false);
+        .advancedOption(true);
 
     public static final ComponentDSL.ModifiableArrayProperty MESSAGE_PROPERTY = array(MESSAGES)
         .label("Messages")
@@ -217,5 +224,5 @@ public class LLMConstants {
                 option("Welsh", "cy")))
         .required(false);
 
-    private LLMConstants() {};
+    private LLMConstants() {}
 }

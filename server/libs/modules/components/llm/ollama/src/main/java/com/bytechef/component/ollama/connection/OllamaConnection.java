@@ -30,7 +30,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefini
 public final class OllamaConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-//        .baseUri((connectionParameters, context) -> "https://api-inference.huggingface.co")
+        .baseUri((connectionParameters, context) -> "http://localhost:11434/")
         .authorizations(
             authorization(BEARER_TOKEN)
                 .title("Bearer Token")

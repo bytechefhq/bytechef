@@ -34,6 +34,8 @@ public final class AmazonBedrockConstants {
     public static final String TRUNCATE = "truncate";
     public static final String MIN_TOKENS = "truncate";
     public static final String COUNT_PENALTY = "countPenalty";
+    public static final String BIAS_TOKEN = "biasToken";
+    public static final String BIAS_VALUE = "biasValue";
 
 
     private AmazonBedrockConstants() {

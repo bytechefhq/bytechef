@@ -21,6 +21,8 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
+import static com.bytechef.component.zhipu.constant.ZhiPuConstants.DO_SAMPLE;
+import static com.bytechef.component.zhipu.constant.ZhiPuConstants.REQUEST_ID;
 import static constants.LLMConstants.ASK;
 import static constants.LLMConstants.MAX_TOKENS;
 import static constants.LLMConstants.MAX_TOKENS_PROPERTY;
@@ -43,7 +45,6 @@ import com.bytechef.component.definition.Parameters;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import com.bytechef.component.zhipu.constant.ZhiPuConstants;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
@@ -66,20 +67,20 @@ public class ZhiPuChatAction {
                     Arrays.stream(ZhiPuAiApi.ChatModel.values())
                         .collect(Collectors.toMap(
                             ZhiPuAiApi.ChatModel::getValue, ZhiPuAiApi.ChatModel::getValue, (f,s)->f)))),
-            string(ZhiPuConstants.REQUEST_ID)
-                .label("Request Id")
-                .description("The parameter is passed by the client and must ensure uniqueness. It is used to distinguish the unique identifier for each request. If the client does not provide it, the platform will generate it by default.")
-                .required(false),
-            bool(ZhiPuConstants.DO_SAMPLE)
-                .label("Do sample")
-                .description("When do_sample is set to true, the sampling strategy is enabled. If do_sample is false, the sampling strategy parameters temperature and top_p will not take effect.")
-                .required(false),
             MESSAGE_PROPERTY,
             MAX_TOKENS_PROPERTY,
             TEMPERATURE_PROPERTY,
-            STOP_PROPERTY,
             TOP_P_PROPERTY,
-            USER_PROPERTY)
+            STOP_PROPERTY,
+            USER_PROPERTY,
+            string(REQUEST_ID)
+                .label("Request Id")
+                .description("The parameter is passed by the client and must ensure uniqueness. It is used to distinguish the unique identifier for each request. If the client does not provide it, the platform will generate it by default.")
+                .advancedOption(true),
+            bool(DO_SAMPLE)
+                .label("Do sample")
+                .description("When do_sample is set to true, the sampling strategy is enabled. If do_sample is false, the sampling strategy parameters temperature and top_p will not take effect.")
+                .advancedOption(true))
         .outputSchema(string())
         .perform(ZhiPuChatAction::perform);
 
@@ -91,7 +92,7 @@ public class ZhiPuChatAction {
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }
 
-    public static final Chat CHAT = new Chat() {
+    private static final Chat CHAT = new Chat() {
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
             return ZhiPuAiChatOptions.builder()
@@ -101,8 +102,8 @@ public class ZhiPuChatAction {
                 .withTopP(inputParameters.getFloat(TOP_P))
                 .withStop(inputParameters.getList(STOP, new TypeReference<>() {}))
                 .withUser(inputParameters.getString(USER))
-                .withRequestId(inputParameters.getString(ZhiPuConstants.REQUEST_ID))
-                .withDoSample(inputParameters.getBoolean(ZhiPuConstants.DO_SAMPLE))
+                .withRequestId(inputParameters.getString(REQUEST_ID))
+                .withDoSample(inputParameters.getBoolean(DO_SAMPLE))
                 .build();
         }
 
