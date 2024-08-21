@@ -7,7 +7,7 @@ import {Outlet, useLocation} from 'react-router-dom';
 
 interface SettingsProps {
     sidebarNavItems: {
-        href: string;
+        href?: string;
         title: string;
     }[];
     title?: string;
@@ -37,7 +37,10 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
                                 toLink={navItem.href}
                             />
                         ) : (
-                            <h3 className="px-2 py-1 text-sm font-semibold text-muted-foreground" key={navItem.title}>
+                            <h3
+                                className="px-2 pb-1 pt-4 text-sm font-semibold text-muted-foreground"
+                                key={navItem.title}
+                            >
                                 {navItem.title}
                             </h3>
                         )
