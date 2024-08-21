@@ -3,4 +3,4 @@
 
 [Setting up OAuth2](https://developers.dropbox.com/oauth-guide)
 
-[Guidejar](https://guidejar.com/guides/756fb792-9de7-4ac9-b58a-c8c8a95fab66) tutorial.
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(52.81250000% + 32px)"><iframe src="https://www.guidejar.com/embed/756fb792-9de7-4ac9-b58a-c8c8a95fab66?type=1&controls=on" width="100%" height="100%" style="position:absolute;inset:0" allowfullscreen frameborder="0"></iframe></div>
