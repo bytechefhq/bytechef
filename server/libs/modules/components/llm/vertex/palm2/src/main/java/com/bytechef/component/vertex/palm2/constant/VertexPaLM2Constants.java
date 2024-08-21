@@ -21,7 +21,6 @@ package com.bytechef.component.vertex.palm2.constant;
  */
 public final class VertexPaLM2Constants {
     public static final String VERTEX_PALM2 = "vertexPalm2";
-    public static final String CANDIDATE_COUNT = "candidateCount";
 
     private VertexPaLM2Constants() {
     }

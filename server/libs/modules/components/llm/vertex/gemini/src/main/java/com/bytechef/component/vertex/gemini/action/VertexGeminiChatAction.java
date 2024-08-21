@@ -16,7 +16,6 @@
 
 package com.bytechef.component.vertex.gemini.action;
 
-import static com.bytechef.component.vertex.gemini.constant.VertexGeminiConstants.CANDIDATE_COUNT;
 import static com.bytechef.component.vertex.gemini.constant.VertexGeminiConstants.LOCATION;
 import static com.bytechef.component.vertex.gemini.constant.VertexGeminiConstants.PROJECT_ID;
 import static com.bytechef.component.definition.ComponentDSL.action;
@@ -29,11 +28,12 @@ import static constants.LLMConstants.MAX_TOKENS_PROPERTY;
 import static constants.LLMConstants.MESSAGE_PROPERTY;
 import static constants.LLMConstants.MODEL;
 import static constants.LLMConstants.N;
-import static constants.LLMConstants.N_PROPERTY;
 import static constants.LLMConstants.STOP;
 import static constants.LLMConstants.STOP_PROPERTY;
 import static constants.LLMConstants.TEMPERATURE;
 import static constants.LLMConstants.TEMPERATURE_PROPERTY;
+import static constants.LLMConstants.TOP_K;
+import static constants.LLMConstants.TOP_K_PROPERTY;
 import static constants.LLMConstants.TOP_P;
 import static constants.LLMConstants.TOP_P_PROPERTY;
 
@@ -67,18 +67,18 @@ public class VertexGeminiChatAction {
                     Arrays.stream(VertexAiGeminiChatModel.ChatModel.values())
                         .collect(Collectors.toMap(
                             VertexAiGeminiChatModel.ChatModel::getValue, VertexAiGeminiChatModel.ChatModel::getValue, (f,s)->f)))),
-            integer(CANDIDATE_COUNT)
+            MESSAGE_PROPERTY,
+            MAX_TOKENS_PROPERTY,
+            integer(N)
                 .label("Candidate Count")
                 .description("The number of generated response messages to return. This value must be between [1, 8], inclusive. Defaults to 1.")
                 .minValue(0)
                 .maxValue(8)
-                .required(false),
-            MESSAGE_PROPERTY,
-            N_PROPERTY,
-            MAX_TOKENS_PROPERTY,
+                .advancedOption(true),
             TEMPERATURE_PROPERTY,
-            STOP_PROPERTY,
-            TOP_P_PROPERTY)
+            TOP_P_PROPERTY,
+            TOP_K_PROPERTY,
+            STOP_PROPERTY)
         .outputSchema(string())
         .perform(VertexGeminiChatAction::perform);
 
@@ -90,7 +90,7 @@ public class VertexGeminiChatAction {
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }
 
-    public static final Chat CHAT = new Chat() {
+    private static final Chat CHAT = new Chat() {
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
             return VertexAiGeminiChatOptions.builder()
@@ -99,8 +99,8 @@ public class VertexGeminiChatAction {
                 .withMaxOutputTokens(inputParameters.getInteger(MAX_TOKENS))
                 .withTopP(inputParameters.getFloat(TOP_P))
                 .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .withTopK(inputParameters.getFloat(N))
-                .withCandidateCount(inputParameters.getInteger(CANDIDATE_COUNT))
+                .withTopK(inputParameters.getFloat(TOP_K))
+                .withCandidateCount(inputParameters.getInteger(N))
                 .build();
         }
 

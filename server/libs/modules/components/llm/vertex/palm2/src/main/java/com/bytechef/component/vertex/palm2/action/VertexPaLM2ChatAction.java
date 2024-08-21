@@ -17,7 +17,6 @@
 package com.bytechef.component.vertex.palm2.action;
 
 import static com.bytechef.component.definition.Authorization.TOKEN;
-import static com.bytechef.component.vertex.palm2.constant.VertexPaLM2Constants.CANDIDATE_COUNT;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.string;
@@ -25,9 +24,10 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import static constants.LLMConstants.ASK;
 import static constants.LLMConstants.MESSAGE_PROPERTY;
 import static constants.LLMConstants.N;
-import static constants.LLMConstants.N_PROPERTY;
 import static constants.LLMConstants.TEMPERATURE;
 import static constants.LLMConstants.TEMPERATURE_PROPERTY;
+import static constants.LLMConstants.TOP_K;
+import static constants.LLMConstants.TOP_K_PROPERTY;
 import static constants.LLMConstants.TOP_P;
 import static constants.LLMConstants.TOP_P_PROPERTY;
 
@@ -48,16 +48,16 @@ public class VertexPaLM2ChatAction {
         .title("Ask Gemini")
         .description("Ask anything you want.")
         .properties(
-            integer(CANDIDATE_COUNT)
+            MESSAGE_PROPERTY,
+            integer(N)
                 .label("Candidate Count")
                 .description("The number of generated response messages to return. This value must be between [1, 8], inclusive. Defaults to 1.")
                 .minValue(0)
                 .maxValue(8)
-                .required(false),
-            MESSAGE_PROPERTY,
-            N_PROPERTY,
+                .advancedOption(true),
             TEMPERATURE_PROPERTY,
-            TOP_P_PROPERTY)
+            TOP_P_PROPERTY,
+            TOP_K_PROPERTY)
         .outputSchema(string())
         .perform(VertexPaLM2ChatAction::perform);
 
@@ -69,14 +69,14 @@ public class VertexPaLM2ChatAction {
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }
 
-    public static final Chat CHAT = new Chat() {
+    private static final Chat CHAT = new Chat() {
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
             return VertexAiPaLm2ChatOptions.builder()
                 .withTemperature(inputParameters.getFloat(TEMPERATURE))
                 .withTopP(inputParameters.getFloat(TOP_P))
-                .withTopK(inputParameters.getInteger(N))
-                .withCandidateCount(inputParameters.getInteger(CANDIDATE_COUNT))
+                .withTopK(inputParameters.getInteger(TOP_K))
+                .withCandidateCount(inputParameters.getInteger(N))
                 .build();
         }
 

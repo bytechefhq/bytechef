@@ -74,14 +74,14 @@ public class OpenAIChatAction {
                         .collect(Collectors.toMap(
                             OpenAiApi.ChatModel::getValue, OpenAiApi.ChatModel::getValue, (f,s)->f)))),
             MESSAGE_PROPERTY,
-            FREQUENCY_PENALTY_PROPERTY,
-            LOGIT_BIAS_PROPERTY,
             MAX_TOKENS_PROPERTY,
             N_PROPERTY,
-            PRESENCE_PENALTY_PROPERTY,
-            STOP_PROPERTY,
             TEMPERATURE_PROPERTY,
             TOP_P_PROPERTY,
+            FREQUENCY_PENALTY_PROPERTY,
+            PRESENCE_PENALTY_PROPERTY,
+            LOGIT_BIAS_PROPERTY,
+            STOP_PROPERTY,
             USER_PROPERTY)
         .outputSchema(string())
         .perform(OpenAIChatAction::perform);
@@ -94,7 +94,7 @@ public class OpenAIChatAction {
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }
 
-    public static final Chat CHAT = new Chat() {
+    private static final Chat CHAT = new Chat() {
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
             return OpenAiChatOptions.builder()

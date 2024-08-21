@@ -66,17 +66,17 @@ public class MistralChatAction {
                     Arrays.stream(MistralAiApi.ChatModel.values())
                         .collect(Collectors.toMap(
                             MistralAiApi.ChatModel::getValue, MistralAiApi.ChatModel::getValue, (f,s)->f)))),
+            MESSAGE_PROPERTY,
+            MAX_TOKENS_PROPERTY,
+            TEMPERATURE_PROPERTY,
+            TOP_P_PROPERTY,
+            STOP_PROPERTY,
+            SEED_PROPERTY,
             bool(SAFE_PROMPT)
                 .label("Safe prompt")
                 .description("Should the prompt be safe for work?")
                 .defaultValue(true)
-                .required(false),
-            SEED_PROPERTY,
-            MESSAGE_PROPERTY,
-            MAX_TOKENS_PROPERTY,
-            TEMPERATURE_PROPERTY,
-            STOP_PROPERTY,
-            TOP_P_PROPERTY)
+                .advancedOption(true))
         .outputSchema(string())
         .perform(MistralChatAction::perform);
 
@@ -88,7 +88,7 @@ public class MistralChatAction {
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }
 
-    public static final Chat CHAT = new Chat() {
+    private static final Chat CHAT = new Chat() {
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
             return MistralAiChatOptions.builder()

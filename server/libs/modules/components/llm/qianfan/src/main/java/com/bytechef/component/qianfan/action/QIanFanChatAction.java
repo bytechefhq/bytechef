@@ -70,10 +70,10 @@ public class QIanFanChatAction {
             MESSAGE_PROPERTY,
             MAX_TOKENS_PROPERTY,
             TEMPERATURE_PROPERTY,
-            STOP_PROPERTY,
             TOP_P_PROPERTY,
             PRESENCE_PENALTY_PROPERTY,
-            FREQUENCY_PENALTY_PROPERTY)
+            FREQUENCY_PENALTY_PROPERTY,
+            STOP_PROPERTY)
         .outputSchema(string())
         .perform(QIanFanChatAction::perform);
 
@@ -85,7 +85,7 @@ public class QIanFanChatAction {
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }
 
-    public static final Chat CHAT = new Chat() {
+    private static final Chat CHAT = new Chat() {
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
             return QianFanChatOptions.builder()
