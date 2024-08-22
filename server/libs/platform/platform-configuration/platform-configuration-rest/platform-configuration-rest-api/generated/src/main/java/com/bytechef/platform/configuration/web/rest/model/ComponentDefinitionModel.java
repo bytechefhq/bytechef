@@ -29,14 +29,14 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinition", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-13T09:30:20.552769+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-22T17:45:01.063657+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class ComponentDefinitionModel {
 
   @Valid
   private List<@Valid ActionDefinitionBasicModel> actions = new ArrayList<>();
 
   @Valid
-  private List<ComponentCategoryModel> categories = new ArrayList<>();
+  private List<@Valid ComponentCategoryModel> categories = new ArrayList<>();
 
   private ConnectionDefinitionBasicModel connection;
 
@@ -101,7 +101,7 @@ public class ComponentDefinitionModel {
     this.actions = actions;
   }
 
-  public ComponentDefinitionModel categories(List<ComponentCategoryModel> categories) {
+  public ComponentDefinitionModel categories(List<@Valid ComponentCategoryModel> categories) {
     this.categories = categories;
     return this;
   }
@@ -121,11 +121,11 @@ public class ComponentDefinitionModel {
   @Valid 
   @Schema(name = "categories", description = "The list of categories the component belongs to.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("categories")
-  public List<ComponentCategoryModel> getCategories() {
+  public List<@Valid ComponentCategoryModel> getCategories() {
     return categories;
   }
 
-  public void setCategories(List<ComponentCategoryModel> categories) {
+  public void setCategories(List<@Valid ComponentCategoryModel> categories) {
     this.categories = categories;
   }
 

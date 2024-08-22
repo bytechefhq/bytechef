@@ -2,7 +2,9 @@ package com.bytechef.platform.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -13,80 +15,107 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.*;
 import jakarta.annotation.Generated;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
-
 /**
  * A category of component.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-13T09:30:20.552769+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
-public enum ComponentCategoryModel {
-  
-  ACCOUNTING("accounting"),
-  
-  ADVERTISING("advertising"),
-  
-  ANALYTICS("analytics"),
-  
-  ARTIFICIAL_INTELLIGENCE("artificial-intelligence"),
-  
-  ATS("ats"),
-  
-  CALENDARS_AND_SCHEDULING("calendars-and-scheduling"),
-  
-  COMMUNICATION("communication"),
-  
-  CRM("crm"),
-  
-  CUSTOMER_SUPPORT("customer-support"),
-  
-  DEVELOPER_TOOLS("developer-tools"),
-  
-  E_COMMERCE("e-commerce"),
-  
-  FILE_STORAGE("file-storage"),
-  
-  HELPERS("helpers"),
-  
-  HRIS("hris"),
-  
-  MARKETING_AUTOMATION("marketing-automation"),
-  
-  PAYMENT_PROCESSING("payment-processing"),
-  
-  PRODUCTIVITY_AND_COLLABORATION("productivity-and-collaboration"),
-  
-  PROJECT_MANAGEMENT("project-management"),
-  
-  SOCIAL_MEDIA("social-media"),
-  
-  SURVEYS_AND_FEEDBACK("surveys-and-feedback");
+@Schema(name = "ComponentCategory", description = "A category of component.")
+@JsonTypeName("ComponentCategory")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-22T17:45:01.063657+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+public class ComponentCategoryModel {
 
-  private String value;
+  private String key;
 
-  ComponentCategoryModel(String value) {
-    this.value = value;
+  private String label;
+
+  public ComponentCategoryModel() {
+    super();
   }
 
-  @JsonValue
-  public String getValue() {
-    return value;
+  /**
+   * Constructor with only required parameters
+   */
+  public ComponentCategoryModel(String key) {
+    this.key = key;
+  }
+
+  public ComponentCategoryModel key(String key) {
+    this.key = key;
+    return this;
+  }
+
+  /**
+   * The key of a category.
+   * @return key
+  */
+  @NotNull 
+  @Schema(name = "key", description = "The key of a category.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("key")
+  public String getKey() {
+    return key;
+  }
+
+  public void setKey(String key) {
+    this.key = key;
+  }
+
+  public ComponentCategoryModel label(String label) {
+    this.label = label;
+    return this;
+  }
+
+  /**
+   * The label of a category.
+   * @return label
+  */
+  
+  @Schema(name = "label", description = "The label of a category.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("label")
+  public String getLabel() {
+    return label;
+  }
+
+  public void setLabel(String label) {
+    this.label = label;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    ComponentCategoryModel componentCategory = (ComponentCategoryModel) o;
+    return Objects.equals(this.key, componentCategory.key) &&
+        Objects.equals(this.label, componentCategory.label);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(key, label);
   }
 
   @Override
   public String toString() {
-    return String.valueOf(value);
+    StringBuilder sb = new StringBuilder();
+    sb.append("class ComponentCategoryModel {\n");
+    sb.append("    key: ").append(toIndentedString(key)).append("\n");
+    sb.append("    label: ").append(toIndentedString(label)).append("\n");
+    sb.append("}");
+    return sb.toString();
   }
 
-  @JsonCreator
-  public static ComponentCategoryModel fromValue(String value) {
-    for (ComponentCategoryModel b : ComponentCategoryModel.values()) {
-      if (b.value.equals(value)) {
-        return b;
-      }
+  /**
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
+   */
+  private String toIndentedString(Object o) {
+    if (o == null) {
+      return "null";
     }
-    throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    return o.toString().replace("\n", "\n    ");
   }
 }
 
