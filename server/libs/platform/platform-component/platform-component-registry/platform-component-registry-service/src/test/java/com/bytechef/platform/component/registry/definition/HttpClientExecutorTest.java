@@ -16,8 +16,6 @@
 
 package com.bytechef.platform.component.registry.definition;
 
-import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Context;
@@ -27,7 +25,6 @@ import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.MediaType;
 import com.github.mizosoft.methanol.MultipartBodyPublisher;
@@ -50,7 +47,6 @@ import java.util.Map;
 import java.util.Optional;
 import javax.net.ssl.SSLSession;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -69,26 +65,6 @@ public class HttpClientExecutorTest {
     private final HttpClientExecutor httpClientExecutor =
         new HttpClientExecutor(
             Mockito.mock(ConnectionDefinitionService.class), Mockito.mock(FileStorageService.class), objectMapper);
-
-    @BeforeAll
-    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT")
-    public static void beforeAll() {
-        class JsonUtilsMock extends JsonUtils {
-            static {
-                objectMapper = HttpClientExecutorTest.objectMapper;
-            }
-        }
-
-        new JsonUtilsMock();
-
-        class XmlUtilsMock extends XmlUtils {
-            static {
-                xmlMapper = new XmlMapper();
-            }
-        }
-
-        new XmlUtilsMock();
-    }
 
     @Test
     public void testCreateBodyHandler() {

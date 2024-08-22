@@ -34,8 +34,6 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
-import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.commons.util.MapUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
@@ -45,7 +43,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -68,7 +65,6 @@ import org.springframework.core.io.support.ResourcePatternResolver;
     })
 @EnableConfigurationProperties(ApplicationProperties.class)
 @Configuration
-@SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
 public class TaskDispatcherIntTestConfiguration {
 
     @Bean
@@ -91,24 +87,6 @@ public class TaskDispatcherIntTestConfiguration {
     @Bean
     JobService jobService(ObjectMapper objectMapper) {
         return new JobServiceImpl(new InMemoryJobRepository(taskExecutionRepository(), objectMapper));
-    }
-
-    @Bean
-    JsonUtils jsonUtils() {
-        return new JsonUtils() {
-            {
-                objectMapper = objectMapper();
-            }
-        };
-    }
-
-    @Bean
-    MapUtils mapUtils() {
-        return new MapUtils() {
-            {
-                objectMapper = objectMapper();
-            }
-        };
     }
 
     @Bean

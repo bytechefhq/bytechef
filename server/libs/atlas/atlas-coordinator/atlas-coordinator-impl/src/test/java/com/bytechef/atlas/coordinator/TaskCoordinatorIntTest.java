@@ -47,8 +47,6 @@ import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
-import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
@@ -87,7 +85,6 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
         "bytechef.workflow.repository.classpath.enabled=true"
     })
 @Import(PostgreSQLContainerConfiguration.class)
-@SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
 public class TaskCoordinatorIntTest {
 
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
@@ -156,24 +153,6 @@ public class TaskCoordinatorIntTest {
         @Bean
         JobService jobService(JdbcJobRepository jdbcJobRepository) {
             return new JobServiceImpl(jdbcJobRepository);
-        }
-
-        @Bean
-        JsonUtils jsonUtils() {
-            return new JsonUtils() {
-                {
-                    objectMapper = objectMapper();
-                }
-            };
-        }
-
-        @Bean
-        MapUtils mapUtils() {
-            return new MapUtils() {
-                {
-                    objectMapper = objectMapper();
-                }
-            };
         }
 
         @Bean

@@ -16,8 +16,6 @@
 
 package com.bytechef.platform.component.registry.config;
 
-import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.commons.util.MapUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,7 +32,6 @@ import org.springframework.context.annotation.Bean;
  * @author Ivica Cardic
  */
 @TestConfiguration
-@SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
 public class JacksonConfiguration {
 
     private final JsonComponentModule jsonComponentModule;
@@ -42,26 +39,6 @@ public class JacksonConfiguration {
     @SuppressFBWarnings("EI")
     public JacksonConfiguration(JsonComponentModule jsonComponentModule) {
         this.jsonComponentModule = jsonComponentModule;
-    }
-
-    @Bean
-    @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
-    JsonUtils jsonUtils() {
-        return new JsonUtils() {
-            {
-                objectMapper = objectMapper();
-            }
-        };
-    }
-
-    @Bean
-    @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
-    MapUtils mapUtils() {
-        return new MapUtils() {
-            {
-                objectMapper = objectMapper();
-            }
-        };
     }
 
     @Bean

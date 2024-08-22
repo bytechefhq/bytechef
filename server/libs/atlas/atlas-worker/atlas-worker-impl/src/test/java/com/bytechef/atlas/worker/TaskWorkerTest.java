@@ -37,7 +37,6 @@ import com.bytechef.atlas.worker.event.CancelControlTaskEvent;
 import com.bytechef.atlas.worker.event.TaskExecutionEvent;
 import com.bytechef.atlas.worker.exception.TaskExecutionException;
 import com.bytechef.commons.util.FileSystemUtils;
-import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
@@ -46,7 +45,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +54,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -77,26 +74,6 @@ public class TaskWorkerTest {
 
     private final TaskFileStorage taskFileStorage = new TaskFileStorageImpl(
         new Base64FileStorageService());
-
-    @BeforeAll
-    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT")
-    public static void beforeAll() {
-        class JsonUtilsMock extends JsonUtils {
-            static {
-                objectMapper = OBJECT_MAPPER;
-            }
-        }
-
-        new JsonUtilsMock();
-
-        class MapUtilsMock extends MapUtils {
-            static {
-                objectMapper = new ObjectMapper();
-            }
-        }
-
-        new MapUtilsMock();
-    }
 
     @Test
     public void test1() {

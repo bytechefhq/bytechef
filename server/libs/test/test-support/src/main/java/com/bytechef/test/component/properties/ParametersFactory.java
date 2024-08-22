@@ -16,13 +16,8 @@
 
 package com.bytechef.test.component.properties;
 
-import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.registry.definition.ParametersImpl;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.util.Map;
 
 /**
@@ -36,17 +31,5 @@ public class ParametersFactory {
         } catch (Exception exception) {
             throw new RuntimeException("Unable to instantiate Parameters", exception);
         }
-    }
-
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper() {
-        {
-            disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-            registerModule(new JavaTimeModule());
-            registerModule(new Jdk8Module());
-        }
-    };
-
-    static {
-        MapUtils.initObjectMapper(OBJECT_MAPPER);
     }
 }

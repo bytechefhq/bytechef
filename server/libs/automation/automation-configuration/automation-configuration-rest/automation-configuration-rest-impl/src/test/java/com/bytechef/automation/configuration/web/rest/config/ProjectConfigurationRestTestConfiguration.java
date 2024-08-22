@@ -16,11 +16,6 @@
 
 package com.bytechef.automation.configuration.web.rest.config;
 
-import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.commons.util.MapUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
@@ -32,31 +27,6 @@ import org.springframework.context.annotation.Configuration;
     "com.bytechef.platform.configuration.web.rest.mapper"
 })
 @Configuration
-@SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
 public class ProjectConfigurationRestTestConfiguration {
 
-    private final ObjectMapper objectMapper;
-
-    @SuppressFBWarnings("EI")
-    public ProjectConfigurationRestTestConfiguration(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
-
-    @Bean
-    JsonUtils jsonUtils() {
-        return new JsonUtils() {
-            {
-                objectMapper = ProjectConfigurationRestTestConfiguration.this.objectMapper;
-            }
-        };
-    }
-
-    @Bean
-    MapUtils mapUtils() {
-        return new MapUtils() {
-            {
-                objectMapper = ProjectConfigurationRestTestConfiguration.this.objectMapper;
-            }
-        };
-    }
 }

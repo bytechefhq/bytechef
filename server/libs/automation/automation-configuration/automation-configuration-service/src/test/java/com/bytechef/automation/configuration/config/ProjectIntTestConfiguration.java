@@ -22,7 +22,6 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
-import com.bytechef.commons.util.MapUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
@@ -70,7 +69,6 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 @EnableConfigurationProperties(ApplicationProperties.class)
 @Import(LiquibaseConfiguration.class)
 @Configuration
-@SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
 public class ProjectIntTestConfiguration {
 
     @MockBean
@@ -121,15 +119,6 @@ public class ProjectIntTestConfiguration {
     @Bean
     WorkflowFacade workflowFacade(WorkflowService workflowService) {
         return new WorkflowFacadeImpl(workflowConnectionFacade, workflowService);
-    }
-
-    @Bean
-    MapUtils mapUtils() {
-        return new MapUtils() {
-            {
-                objectMapper = objectMapper();
-            }
-        };
     }
 
     @Bean

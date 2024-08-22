@@ -36,9 +36,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.atlas.worker.task.factory.TaskHandlerFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
@@ -81,7 +79,6 @@ import org.springframework.core.io.support.ResourcePatternResolver;
     })
 @EnableConfigurationProperties(ApplicationProperties.class)
 @Configuration
-@SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
 public class ComponentTestIntConfiguration {
 
     @MockBean(name = "connectionService")
@@ -150,24 +147,6 @@ public class ComponentTestIntConfiguration {
     }
 
     @Bean
-    JsonUtils jsonUtils() {
-        return new JsonUtils() {
-            {
-                objectMapper = objectMapper();
-            }
-        };
-    }
-
-    @Bean
-    MapUtils mapUtils() {
-        return new MapUtils() {
-            {
-                objectMapper = objectMapper();
-            }
-        };
-    }
-
-    @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper()
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
@@ -193,16 +172,6 @@ public class ComponentTestIntConfiguration {
         return XmlMapper.xmlBuilder()
             .serializationInclusion(JsonInclude.Include.NON_NULL)
             .build();
-    }
-
-    @Bean
-    @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
-    XmlUtils xmlUtils() {
-        return new XmlUtils() {
-            {
-                xmlMapper = xmlMapper();
-            }
-        };
     }
 
     @Bean

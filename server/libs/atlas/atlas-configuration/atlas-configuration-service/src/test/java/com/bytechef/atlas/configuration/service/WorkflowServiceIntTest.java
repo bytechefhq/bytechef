@@ -19,13 +19,11 @@ package com.bytechef.atlas.configuration.service;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
-import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.Assertions;
@@ -110,21 +108,11 @@ public class WorkflowServiceIntTest {
     @EnableAutoConfiguration
     @Import(LiquibaseConfiguration.class)
     @Configuration
-    @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     public static class WorkflowConfigurationIntTestConfiguration {
 
         @Bean
         ObjectMapper objectMapper() {
             return new ObjectMapper();
-        }
-
-        @Bean
-        MapUtils mapUtils() {
-            return new MapUtils() {
-                {
-                    objectMapper = objectMapper();
-                }
-            };
         }
 
         @Bean
