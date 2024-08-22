@@ -16,22 +16,15 @@
 
 package com.bytechef.commons.util;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
 public class JsonUtilsTest {
-
-    @BeforeAll
-    public static void beforeAll() {
-        new JsonUtils().setObjectMapper(new ObjectMapper());
-    }
 
     @Test
     public void testRead() {

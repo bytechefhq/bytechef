@@ -19,8 +19,6 @@
 package com.bytechef.evaluator;
 
 import com.bytechef.commons.util.MapUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -29,25 +27,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Arik Cohen
  */
 public class EvaluatorTest {
-
-    @BeforeAll
-    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT")
-    public static void beforeAll() {
-        class MapUtilsMock extends MapUtils {
-            static {
-                objectMapper = new ObjectMapper();
-            }
-        }
-
-        new MapUtilsMock();
-    }
 
     @Test
     public void test1() {

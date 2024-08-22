@@ -23,8 +23,6 @@ import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
@@ -90,26 +88,7 @@ public class JdbcWorkflowRepositoryIntTest {
     @EnableCaching
     @Configuration
     @Import(LiquibaseConfiguration.class)
-    @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     public static class WorkflowConfigurationRepositoryIntTestConfiguration {
-
-        @Bean
-        JsonUtils jsonUtils() {
-            return new JsonUtils() {
-                {
-                    objectMapper = objectMapper();
-                }
-            };
-        }
-
-        @Bean
-        MapUtils mapUtils() {
-            return new MapUtils() {
-                {
-                    objectMapper = objectMapper();
-                }
-            };
-        }
 
         @Bean
         ObjectMapper objectMapper() {
