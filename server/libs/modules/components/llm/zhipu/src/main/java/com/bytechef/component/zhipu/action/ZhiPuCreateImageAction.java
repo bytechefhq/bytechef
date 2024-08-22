@@ -26,8 +26,8 @@ import org.springframework.ai.zhipuai.ZhiPuAiImageModel;
 import org.springframework.ai.zhipuai.ZhiPuAiImageOptions;
 import org.springframework.ai.zhipuai.api.ZhiPuAiImageApi;
 import org.springframework.retry.support.RetryTemplate;
-import util.LLMUtils;
-import util.interfaces.Image;
+import com.bytechef.component.llm.util.LLMUtils;
+import com.bytechef.component.llm.util.interfaces.Image;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -38,11 +38,11 @@ import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static constants.LLMConstants.CREATE_IMAGE;
-import static constants.LLMConstants.IMAGE_MESSAGE_PROPERTY;
-import static constants.LLMConstants.MODEL;
-import static constants.LLMConstants.USER;
-import static constants.LLMConstants.USER_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.CREATE_IMAGE;
+import static com.bytechef.component.llm.constants.LLMConstants.IMAGE_MESSAGE_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
+import static com.bytechef.component.llm.constants.LLMConstants.USER;
+import static com.bytechef.component.llm.constants.LLMConstants.USER_PROPERTY;
 
 /**
  * @author Monika Domiter

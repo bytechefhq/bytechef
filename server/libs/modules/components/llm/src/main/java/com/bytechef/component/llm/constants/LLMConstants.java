@@ -1,4 +1,4 @@
-package constants;
+package com.bytechef.component.llm.constants;
 
 import com.bytechef.component.definition.ComponentDSL;
 

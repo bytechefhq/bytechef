@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.watsonx.constant.WatsonxConstants.PROJECT_ID;
 import static com.bytechef.component.watsonx.constant.WatsonxConstants.STREAM_ENDPOINT;
 import static com.bytechef.component.watsonx.constant.WatsonxConstants.TEXT_ENDPOINT;
-import static constants.LLMConstants.URL;
+import static com.bytechef.component.llm.constants.LLMConstants.URL;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 

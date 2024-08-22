@@ -24,15 +24,15 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.openai.constant.OpenAIConstants.QUALITY;
-import static constants.LLMConstants.CREATE_IMAGE;
-import static constants.LLMConstants.IMAGE_MESSAGE_PROPERTY;
-import static constants.LLMConstants.MODEL;
-import static constants.LLMConstants.N;
-import static constants.LLMConstants.RESPONSE_FORMAT;
-import static constants.LLMConstants.SIZE;
-import static constants.LLMConstants.STYLE;
-import static constants.LLMConstants.USER;
-import static constants.LLMConstants.USER_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.CREATE_IMAGE;
+import static com.bytechef.component.llm.constants.LLMConstants.IMAGE_MESSAGE_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
+import static com.bytechef.component.llm.constants.LLMConstants.N;
+import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.llm.constants.LLMConstants.SIZE;
+import static com.bytechef.component.llm.constants.LLMConstants.STYLE;
+import static com.bytechef.component.llm.constants.LLMConstants.USER;
+import static com.bytechef.component.llm.constants.LLMConstants.USER_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -47,8 +47,8 @@ import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.OpenAiImageOptions;
 import org.springframework.ai.openai.api.OpenAiImageApi;
 import org.springframework.retry.support.RetryTemplate;
-import util.LLMUtils;
-import util.interfaces.Image;
+import com.bytechef.component.llm.util.LLMUtils;
+import com.bytechef.component.llm.util.interfaces.Image;
 
 /**
  * @author Monika Domiter

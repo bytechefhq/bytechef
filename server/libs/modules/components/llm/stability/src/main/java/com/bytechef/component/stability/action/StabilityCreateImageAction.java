@@ -26,8 +26,8 @@ import org.springframework.ai.stabilityai.StabilityAiImageModel;
 import org.springframework.ai.stabilityai.StyleEnum;
 import org.springframework.ai.stabilityai.api.StabilityAiApi;
 import org.springframework.ai.stabilityai.api.StabilityAiImageOptions;
-import util.LLMUtils;
-import util.interfaces.Image;
+import com.bytechef.component.llm.util.LLMUtils;
+import com.bytechef.component.llm.util.interfaces.Image;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -46,13 +46,13 @@ import static com.bytechef.component.stability.constant.StabilityConstants.HEIGH
 import static com.bytechef.component.stability.constant.StabilityConstants.SAMPLER;
 import static com.bytechef.component.stability.constant.StabilityConstants.STEPS;
 import static com.bytechef.component.stability.constant.StabilityConstants.WIDTH;
-import static constants.LLMConstants.CREATE_IMAGE;
-import static constants.LLMConstants.IMAGE_MESSAGE_PROPERTY;
-import static constants.LLMConstants.MODEL;
-import static constants.LLMConstants.N;
-import static constants.LLMConstants.RESPONSE_FORMAT;
-import static constants.LLMConstants.SEED;
-import static constants.LLMConstants.STYLE;
+import static com.bytechef.component.llm.constants.LLMConstants.CREATE_IMAGE;
+import static com.bytechef.component.llm.constants.LLMConstants.IMAGE_MESSAGE_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
+import static com.bytechef.component.llm.constants.LLMConstants.N;
+import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.llm.constants.LLMConstants.SEED;
+import static com.bytechef.component.llm.constants.LLMConstants.STYLE;
 import static org.springframework.ai.stabilityai.api.StabilityAiApi.DEFAULT_IMAGE_MODEL;
 
 /**

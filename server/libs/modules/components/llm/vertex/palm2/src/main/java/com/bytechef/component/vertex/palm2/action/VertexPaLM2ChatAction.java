@@ -21,15 +21,15 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
-import static constants.LLMConstants.ASK;
-import static constants.LLMConstants.MESSAGE_PROPERTY;
-import static constants.LLMConstants.N;
-import static constants.LLMConstants.TEMPERATURE;
-import static constants.LLMConstants.TEMPERATURE_PROPERTY;
-import static constants.LLMConstants.TOP_K;
-import static constants.LLMConstants.TOP_K_PROPERTY;
-import static constants.LLMConstants.TOP_P;
-import static constants.LLMConstants.TOP_P_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.ASK;
+import static com.bytechef.component.llm.constants.LLMConstants.MESSAGE_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.N;
+import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE;
+import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.TOP_K;
+import static com.bytechef.component.llm.constants.LLMConstants.TOP_K_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.TOP_P;
+import static com.bytechef.component.llm.constants.LLMConstants.TOP_P_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -40,7 +40,7 @@ import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.vertexai.palm2.VertexAiPaLm2ChatModel;
 import org.springframework.ai.vertexai.palm2.VertexAiPaLm2ChatOptions;
 import org.springframework.ai.vertexai.palm2.api.VertexAiPaLm2Api;
-import util.interfaces.Chat;
+import com.bytechef.component.llm.util.interfaces.Chat;
 
 public class VertexPaLM2ChatAction {
 

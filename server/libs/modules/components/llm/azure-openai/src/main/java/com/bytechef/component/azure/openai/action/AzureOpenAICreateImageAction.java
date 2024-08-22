@@ -23,16 +23,16 @@ import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static constants.LLMConstants.CREATE_IMAGE;
-import static constants.LLMConstants.ENDPOINT;
-import static constants.LLMConstants.IMAGE_MESSAGE_PROPERTY;
-import static constants.LLMConstants.MODEL;
-import static constants.LLMConstants.N;
-import static constants.LLMConstants.RESPONSE_FORMAT;
-import static constants.LLMConstants.SIZE;
-import static constants.LLMConstants.STYLE;
-import static constants.LLMConstants.USER;
-import static constants.LLMConstants.USER_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.CREATE_IMAGE;
+import static com.bytechef.component.llm.constants.LLMConstants.ENDPOINT;
+import static com.bytechef.component.llm.constants.LLMConstants.IMAGE_MESSAGE_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
+import static com.bytechef.component.llm.constants.LLMConstants.N;
+import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.llm.constants.LLMConstants.SIZE;
+import static com.bytechef.component.llm.constants.LLMConstants.STYLE;
+import static com.bytechef.component.llm.constants.LLMConstants.USER;
+import static com.bytechef.component.llm.constants.LLMConstants.USER_PROPERTY;
 
 import com.azure.ai.openai.OpenAIClient;
 import com.azure.ai.openai.OpenAIClientBuilder;
@@ -49,8 +49,8 @@ import org.springframework.ai.azure.openai.AzureOpenAiImageModel;
 import org.springframework.ai.azure.openai.AzureOpenAiImageOptions;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImageOptions;
-import util.LLMUtils;
-import util.interfaces.Image;
+import com.bytechef.component.llm.util.LLMUtils;
+import com.bytechef.component.llm.util.interfaces.Image;
 
 /**
  * @author Monika Domiter

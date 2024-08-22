@@ -28,24 +28,24 @@ import org.springframework.ai.bedrock.titan.api.TitanChatBedrockApi;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
-import util.LLMUtils;
-import util.interfaces.Chat;
+import com.bytechef.component.llm.util.LLMUtils;
+import com.bytechef.component.llm.util.interfaces.Chat;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static constants.LLMConstants.MAX_TOKENS;
-import static constants.LLMConstants.MAX_TOKENS_PROPERTY;
-import static constants.LLMConstants.MESSAGE_PROPERTY;
-import static constants.LLMConstants.MODEL;
-import static constants.LLMConstants.STOP;
-import static constants.LLMConstants.STOP_PROPERTY;
-import static constants.LLMConstants.TEMPERATURE;
-import static constants.LLMConstants.TEMPERATURE_PROPERTY;
-import static constants.LLMConstants.TOP_P;
-import static constants.LLMConstants.TOP_P_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
+import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.MESSAGE_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
+import static com.bytechef.component.llm.constants.LLMConstants.STOP;
+import static com.bytechef.component.llm.constants.LLMConstants.STOP_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE;
+import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.TOP_P;
+import static com.bytechef.component.llm.constants.LLMConstants.TOP_P_PROPERTY;
 
 public class AmazonBedrockTitanChatAction {
 

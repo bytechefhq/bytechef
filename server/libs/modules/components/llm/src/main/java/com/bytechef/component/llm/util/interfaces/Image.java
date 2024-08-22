@@ -1,17 +1,17 @@
-package util.interfaces;
+package com.bytechef.component.llm.util.interfaces;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.llm.util.records.ImageMessageRecord;
 import org.springframework.ai.image.ImageMessage;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImageOptions;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
-import util.records.ImageMessageRecord;
 
 import java.util.List;
 
-import static constants.LLMConstants.IMAGE_MESSAGES;
+import static com.bytechef.component.llm.constants.LLMConstants.IMAGE_MESSAGES;
 
 public interface Image {
 
