@@ -41,7 +41,7 @@ export const Connections = () => {
 
     const allComponentNames = allConnections?.map((connection) => connection.componentName);
 
-    const {data: components, isLoading: componentsLoading} = useGetComponentDefinitionsQuery(
+    const {data: componentDefinitions, isLoading: componentsLoading} = useGetComponentDefinitionsQuery(
         {include: allComponentNames ? allComponentNames : ['e']},
         allComponentNames !== undefined
     );
@@ -66,7 +66,7 @@ export const Connections = () => {
     let pageTitle: string | undefined;
 
     if (filterData.type === Type.Component) {
-        pageTitle = components?.find((component) => component.name === filterData.id)?.title;
+        pageTitle = componentDefinitions?.find((component) => component.name === filterData.id)?.title;
     } else {
         pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
     }
@@ -173,7 +173,7 @@ export const Connections = () => {
                                 />
 
                                 {!componentsLoading &&
-                                    components?.map((item) => (
+                                    componentDefinitions?.map((item) => (
                                         <LeftSidebarNavItem
                                             item={{
                                                 current:
