@@ -2,4 +2,9 @@
     <Match>
         <Source name="~.*generated.*"/>
     </Match>
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP"/>
+        <Package name="~com\.bytechef\.component.*" />
+        <Method name="getDefinition"/>
+    </Match>
 </FindBugsFilter>
