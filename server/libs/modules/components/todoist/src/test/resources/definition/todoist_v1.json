@@ -1,5 +1,8 @@
 {
-  "categories" : [ "PRODUCTIVITY_AND_COLLABORATION" ],
+  "categories" : [ {
+    "key" : "productivity-and-collaboration",
+    "label" : "productivity-and-collaboration"
+  } ],
   "customAction" : true,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -62,7 +65,6 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "authorizationCallback" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -72,7 +74,8 @@
       "tokenUrl" : { },
       "authorizationUrl" : { },
       "clientSecret" : null,
-      "refreshToken" : null
+      "refreshToken" : null,
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -215,8 +218,6 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Task",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "output" : null,
     "perform" : null,
     "outputResponse" : {
@@ -363,7 +364,9 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : null
-    }
+    },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "dynamicOutput" : false,
@@ -402,11 +405,11 @@
       }
     } ],
     "title" : "Mark Task as Completed",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "output" : null,
     "perform" : null,
-    "outputResponse" : null
+    "outputResponse" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -588,8 +591,6 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Project",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "output" : null,
     "perform" : null,
     "outputResponse" : {
@@ -737,7 +738,9 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : null
-    }
+    },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
   "triggers" : [ ]
 }

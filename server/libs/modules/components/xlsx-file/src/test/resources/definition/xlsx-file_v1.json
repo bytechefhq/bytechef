@@ -1,5 +1,8 @@
 {
-  "categories" : [ "HELPERS" ],
+  "categories" : [ {
+    "key" : "helpers",
+    "label" : "helpers"
+  } ],
   "customAction" : null,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -249,11 +252,11 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Read from file",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "outputResponse" : null,
+    "output" : null,
     "perform" : { },
-    "output" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -496,8 +499,6 @@
       "optionsDataSource" : null
     } ],
     "title" : "Write to file",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -598,8 +599,10 @@
       },
       "sampleOutput" : null
     },
+    "output" : null,
     "perform" : { },
-    "output" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
   "triggers" : null
 }

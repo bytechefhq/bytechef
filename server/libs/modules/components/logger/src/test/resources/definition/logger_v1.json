@@ -1,5 +1,8 @@
 {
-  "categories" : [ "HELPERS" ],
+  "categories" : [ {
+    "key" : "helpers",
+    "label" : "helpers"
+  } ],
   "customAction" : null,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -43,11 +46,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Debug",
-    "perform" : { },
-    "output" : null,
-    "outputResponse" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "outputResponse" : null,
+    "output" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "dynamicOutput" : false,
@@ -78,11 +81,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Error",
-    "perform" : { },
-    "output" : null,
-    "outputResponse" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "outputResponse" : null,
+    "output" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "dynamicOutput" : false,
@@ -113,11 +116,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Info",
-    "perform" : { },
-    "output" : null,
-    "outputResponse" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "outputResponse" : null,
+    "output" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "dynamicOutput" : false,
@@ -148,11 +151,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Warn",
-    "perform" : { },
-    "output" : null,
-    "outputResponse" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "outputResponse" : null,
+    "output" : null,
+    "perform" : { }
   } ],
   "triggers" : null
 }

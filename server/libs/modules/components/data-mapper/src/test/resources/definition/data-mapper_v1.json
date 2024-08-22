@@ -1,5 +1,8 @@
 {
-  "categories" : [ "HELPERS" ],
+  "categories" : [ {
+    "key" : "helpers",
+    "label" : "helpers"
+  } ],
   "customAction" : null,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -39,8 +42,8 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "An array of objects that contains properties 'From Path' and 'To'.",
@@ -113,22 +116,22 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "Rename keys",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
+    "outputResponse" : null,
     "perform" : { },
-    "output" : null,
-    "outputResponse" : null
+    "output" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -190,8 +193,8 @@
         "label" : "Time",
         "value" : 10
       } ],
-      "controlType" : "SELECT",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "SELECT"
     }, {
       "advancedOption" : null,
       "description" : "The value you want to replace.",
@@ -211,8 +214,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "The value you want to replace.",
@@ -252,8 +255,8 @@
       "label" : "Value",
       "placeholder" : null,
       "options" : null,
-      "controlType" : "DATE",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "DATE"
     }, {
       "advancedOption" : null,
       "description" : "The value you want to replace.",
@@ -269,8 +272,8 @@
       "label" : "Value",
       "placeholder" : null,
       "options" : null,
-      "controlType" : "DATE_TIME",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "DATE_TIME"
     }, {
       "advancedOption" : null,
       "description" : "The value you want to replace.",
@@ -288,8 +291,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "The value you want to replace.",
@@ -310,8 +313,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     }, {
       "advancedOption" : null,
       "description" : "The value you want to replace.",
@@ -345,8 +348,8 @@
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "controlType" : "ARRAY_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "ARRAY_BUILDER"
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -386,8 +389,8 @@
         "label" : null,
         "placeholder" : null,
         "options" : null,
-        "controlType" : "DATE",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "DATE"
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -403,8 +406,8 @@
         "label" : null,
         "placeholder" : null,
         "options" : null,
-        "controlType" : "DATE_TIME",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "DATE_TIME"
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -422,8 +425,8 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "controlType" : "INTEGER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "INTEGER"
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -459,8 +462,8 @@
         "minValue" : null,
         "numberPrecision" : null,
         "options" : null,
-        "controlType" : "NUMBER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "NUMBER"
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -479,8 +482,8 @@
         "multipleValues" : null,
         "options" : null,
         "properties" : null,
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -516,14 +519,14 @@
         "label" : null,
         "placeholder" : null,
         "options" : null,
-        "controlType" : "TIME",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "TIME"
       } ],
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "The value you want to replace.",
@@ -559,8 +562,8 @@
       "label" : "Value",
       "placeholder" : null,
       "options" : null,
-      "controlType" : "TIME",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "TIME"
     }, {
       "advancedOption" : null,
       "description" : "If there is no existing mapping, assign this value as default.",
@@ -580,8 +583,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "If there is no existing mapping, assign this value as default.",
@@ -621,8 +624,8 @@
       "label" : "Default value",
       "placeholder" : null,
       "options" : null,
-      "controlType" : "DATE",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "DATE"
     }, {
       "advancedOption" : null,
       "description" : "If there is no existing mapping, assign this value as default.",
@@ -638,8 +641,8 @@
       "label" : "Default value",
       "placeholder" : null,
       "options" : null,
-      "controlType" : "DATE_TIME",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "DATE_TIME"
     }, {
       "advancedOption" : null,
       "description" : "If there is no existing mapping, assign this value as default.",
@@ -657,8 +660,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "If there is no existing mapping, assign this value as default.",
@@ -694,8 +697,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     }, {
       "advancedOption" : null,
       "description" : "If there is no existing mapping, assign this value as default.",
@@ -714,8 +717,8 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "If there is no existing mapping, assign this value as default.",
@@ -751,8 +754,8 @@
       "label" : "Default value",
       "placeholder" : null,
       "options" : null,
-      "controlType" : "TIME",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "TIME"
     }, {
       "advancedOption" : null,
       "description" : "An array of objects that contains properties 'from' and 'to'.",
@@ -803,8 +806,8 @@
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         }, {
           "advancedOption" : null,
           "description" : "Defines what you want to change the property value to.",
@@ -824,18 +827,18 @@
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "An array of objects that contains properties 'from' and 'to'.",
@@ -916,15 +919,15 @@
           } ],
           "controlType" : "SELECT"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "An array of objects that contains properties 'from' and 'to'.",
@@ -971,8 +974,8 @@
           "label" : "Value from",
           "placeholder" : null,
           "options" : null,
-          "controlType" : "DATE",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "DATE"
         }, {
           "advancedOption" : null,
           "description" : "Defines what you want to change the property value to.",
@@ -988,18 +991,18 @@
           "label" : "Value to",
           "placeholder" : null,
           "options" : null,
-          "controlType" : "DATE",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "DATE"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "An array of objects that contains properties 'from' and 'to'.",
@@ -1046,8 +1049,8 @@
           "label" : "Value from",
           "placeholder" : null,
           "options" : null,
-          "controlType" : "DATE_TIME",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "DATE_TIME"
         }, {
           "advancedOption" : null,
           "description" : "Defines what you want to change the property value to.",
@@ -1063,18 +1066,18 @@
           "label" : "Value to",
           "placeholder" : null,
           "options" : null,
-          "controlType" : "DATE_TIME",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "DATE_TIME"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "An array of objects that contains properties 'from' and 'to'.",
@@ -1123,8 +1126,8 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "controlType" : "INTEGER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "INTEGER"
         }, {
           "advancedOption" : null,
           "description" : "Defines what you want to change the property value to.",
@@ -1142,18 +1145,18 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "controlType" : "INTEGER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "INTEGER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "An array of objects that contains properties 'from' and 'to'.",
@@ -1205,8 +1208,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "controlType" : "NUMBER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "NUMBER"
         }, {
           "advancedOption" : null,
           "description" : "Defines what you want to change the property value to.",
@@ -1227,18 +1230,18 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "controlType" : "NUMBER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "NUMBER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "An array of objects that contains properties 'from' and 'to'.",
@@ -1288,8 +1291,8 @@
           "multipleValues" : null,
           "options" : null,
           "properties" : null,
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         }, {
           "advancedOption" : null,
           "description" : "Defines what you want to change the property value to.",
@@ -1308,18 +1311,18 @@
           "multipleValues" : null,
           "options" : null,
           "properties" : null,
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "An array of objects that contains properties 'from' and 'to'.",
@@ -1392,15 +1395,15 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "An array of objects that contains properties 'from' and 'to'.",
@@ -1447,8 +1450,8 @@
           "label" : "Value from",
           "placeholder" : null,
           "options" : null,
-          "controlType" : "TIME",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "TIME"
         }, {
           "advancedOption" : null,
           "description" : "Defines what you want to change the property value to.",
@@ -1464,25 +1467,25 @@
           "label" : "Value to",
           "placeholder" : null,
           "options" : null,
-          "controlType" : "TIME",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "TIME"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "Replace value",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
+    "outputResponse" : null,
     "perform" : { },
-    "output" : null,
-    "outputResponse" : null
+    "output" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -1516,8 +1519,8 @@
         "label" : "Array",
         "value" : 2
       } ],
-      "controlType" : "SELECT",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "SELECT"
     }, {
       "advancedOption" : null,
       "description" : "An object containing one or more properties.",
@@ -1536,8 +1539,8 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "An array containing one or more objects.",
@@ -1570,15 +1573,15 @@
         "multipleValues" : null,
         "options" : null,
         "properties" : null,
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "The value type of 'from' and 'to' property values.",
@@ -1632,8 +1635,8 @@
         "label" : "Time",
         "value" : 10
       } ],
-      "controlType" : "SELECT",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "SELECT"
     }, {
       "advancedOption" : null,
       "description" : "An array of objects that contains properties 'from' and 'to'.",
@@ -1684,8 +1687,8 @@
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         }, {
           "advancedOption" : null,
           "description" : "Defines what you want to change the property value to.",
@@ -1705,18 +1708,18 @@
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "An array of objects that contains properties 'from' and 'to'.",
@@ -1797,15 +1800,15 @@
           } ],
           "controlType" : "SELECT"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "An array of objects that contains properties 'from' and 'to'.",
@@ -1852,8 +1855,8 @@
           "label" : "Value from",
           "placeholder" : null,
           "options" : null,
-          "controlType" : "DATE",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "DATE"
         }, {
           "advancedOption" : null,
           "description" : "Defines what you want to change the property value to.",
@@ -1869,18 +1872,18 @@
           "label" : "Value to",
           "placeholder" : null,
           "options" : null,
-          "controlType" : "DATE",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "DATE"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "An array of objects that contains properties 'from' and 'to'.",
@@ -1927,8 +1930,8 @@
           "label" : "Value from",
           "placeholder" : null,
           "options" : null,
-          "controlType" : "DATE_TIME",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "DATE_TIME"
         }, {
           "advancedOption" : null,
           "description" : "Defines what you want to change the property value to.",
@@ -1944,18 +1947,18 @@
           "label" : "Value to",
           "placeholder" : null,
           "options" : null,
-          "controlType" : "DATE_TIME",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "DATE_TIME"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "An array of objects that contains properties 'from' and 'to'.",
@@ -2004,8 +2007,8 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "controlType" : "INTEGER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "INTEGER"
         }, {
           "advancedOption" : null,
           "description" : "Defines what you want to change the property value to.",
@@ -2023,18 +2026,18 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "controlType" : "INTEGER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "INTEGER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "An array of objects that contains properties 'from' and 'to'.",
@@ -2086,8 +2089,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "controlType" : "NUMBER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "NUMBER"
         }, {
           "advancedOption" : null,
           "description" : "Defines what you want to change the property value to.",
@@ -2108,18 +2111,18 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "controlType" : "NUMBER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "NUMBER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "An array of objects that contains properties 'from' and 'to'.",
@@ -2169,8 +2172,8 @@
           "multipleValues" : null,
           "options" : null,
           "properties" : null,
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         }, {
           "advancedOption" : null,
           "description" : "Defines what you want to change the property value to.",
@@ -2189,18 +2192,18 @@
           "multipleValues" : null,
           "options" : null,
           "properties" : null,
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "An array of objects that contains properties 'from' and 'to'.",
@@ -2273,15 +2276,15 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "An array of objects that contains properties 'from' and 'to'.",
@@ -2328,8 +2331,8 @@
           "label" : "Value from",
           "placeholder" : null,
           "options" : null,
-          "controlType" : "TIME",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "TIME"
         }, {
           "advancedOption" : null,
           "description" : "Defines what you want to change the property value to.",
@@ -2345,25 +2348,25 @@
           "label" : "Value to",
           "placeholder" : null,
           "options" : null,
-          "controlType" : "TIME",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "TIME"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "Replace all specified values",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
+    "outputResponse" : null,
     "perform" : { },
-    "output" : null,
-    "outputResponse" : null
+    "output" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -2390,8 +2393,8 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "An object containing one or more properties.",
@@ -2410,8 +2413,8 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "Object that contains properties 'from' and 'to'.",
@@ -2484,22 +2487,22 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "Replace multiple values by key",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
+    "outputResponse" : null,
     "perform" : { },
-    "output" : null,
-    "outputResponse" : null
+    "output" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -2533,8 +2536,8 @@
         "label" : "Array",
         "value" : 2
       } ],
-      "controlType" : "SELECT",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "SELECT"
     }, {
       "advancedOption" : null,
       "description" : "An object containing one or more properties.",
@@ -2553,8 +2556,8 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "An array containing one or more objects.",
@@ -2587,15 +2590,15 @@
         "multipleValues" : null,
         "options" : null,
         "properties" : null,
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "An array of objects that contains properties 'from', 'to' and 'requiredField'. For nested keys, it supports dot notation, where the new mapped path can be used for nested mapping.",
@@ -2692,15 +2695,15 @@
           } ],
           "controlType" : "SELECT"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "Should fields from the original object that do not have mappings be included in the new object?",
@@ -2775,11 +2778,11 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Map objects to object",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
+    "outputResponse" : null,
     "perform" : { },
-    "output" : null,
-    "outputResponse" : null
+    "output" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -2813,8 +2816,8 @@
         "label" : "Array",
         "value" : 2
       } ],
-      "controlType" : "SELECT",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "SELECT"
     }, {
       "advancedOption" : null,
       "description" : "An input object containing one or more properties.",
@@ -2833,8 +2836,8 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "An input array containing one or more objects.",
@@ -2867,15 +2870,15 @@
         "multipleValues" : null,
         "options" : null,
         "properties" : null,
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "Property key of each newly created object in the array. Its property value will be a property key from the input.",
@@ -2918,11 +2921,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Map objects to array",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
+    "outputResponse" : null,
     "perform" : { },
-    "output" : null,
-    "outputResponse" : null
+    "output" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -2963,15 +2966,15 @@
         "multipleValues" : null,
         "options" : null,
         "properties" : null,
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "The key of the newly created object.",
@@ -3014,11 +3017,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Merge and pivot properties by key",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
+    "outputResponse" : null,
     "perform" : { },
-    "output" : null,
-    "outputResponse" : null
+    "output" : null
   } ],
   "triggers" : null
 }

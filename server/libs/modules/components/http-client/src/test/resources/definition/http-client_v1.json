@@ -1,5 +1,8 @@
 {
-  "categories" : [ "HELPERS" ],
+  "categories" : [ {
+    "key" : "helpers",
+    "label" : "helpers"
+  } ],
   "customAction" : null,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -1037,8 +1040,8 @@
     "title" : "GET",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "output" : null,
     "perform" : { },
+    "output" : null,
     "outputResponse" : null
   }, {
     "batch" : null,
@@ -1997,8 +2000,8 @@
     "title" : "POST",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "output" : null,
     "perform" : { },
+    "output" : null,
     "outputResponse" : null
   }, {
     "batch" : null,
@@ -3481,8 +3484,8 @@
     "title" : "PUT",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "output" : null,
     "perform" : { },
+    "output" : null,
     "outputResponse" : null
   }, {
     "batch" : null,
@@ -4965,8 +4968,8 @@
     "title" : "PATCH",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "output" : null,
     "perform" : { },
+    "output" : null,
     "outputResponse" : null
   }, {
     "batch" : null,
@@ -5337,8 +5340,8 @@
     "title" : "DELETE",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "output" : null,
     "perform" : { },
+    "output" : null,
     "outputResponse" : null
   }, {
     "batch" : null,
@@ -5709,8 +5712,8 @@
     "title" : "HEAD",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "output" : null,
     "perform" : { },
+    "output" : null,
     "outputResponse" : null
   } ],
   "triggers" : null

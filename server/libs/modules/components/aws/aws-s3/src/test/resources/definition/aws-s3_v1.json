@@ -1,5 +1,11 @@
 {
-  "categories" : [ "DEVELOPER_TOOLS", "FILE_STORAGE" ],
+  "categories" : [ {
+    "key" : "developer-tools",
+    "label" : "developer-tools"
+  }, {
+    "key" : "file-storage",
+    "label" : "file-storage"
+  } ],
   "customAction" : null,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -218,6 +224,9 @@
       "title" : null,
       "type" : "CUSTOM",
       "acquire" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -225,9 +234,6 @@
       "refreshUrl" : null,
       "scopes" : null,
       "tokenUrl" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null,
       "authorizationCallback" : null
     } ],
     "properties" : null,
@@ -286,8 +292,6 @@
       "optionsDataSource" : null
     } ],
     "title" : "Get Object",
-    "perform" : { },
-    "output" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -388,6 +392,8 @@
       },
       "sampleOutput" : null
     },
+    "perform" : { },
+    "output" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
@@ -420,8 +426,6 @@
       "optionsDataSource" : null
     } ],
     "title" : "Get URL",
-    "perform" : { },
-    "output" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -446,6 +450,8 @@
       },
       "sampleOutput" : null
     },
+    "perform" : { },
+    "output" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
@@ -478,8 +484,6 @@
       "optionsDataSource" : null
     } ],
     "title" : "List Objects",
-    "perform" : { },
-    "output" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -573,18 +577,20 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "controlType" : "ARRAY_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "ARRAY_BUILDER"
       },
       "sampleOutput" : null
     },
+    "perform" : { },
+    "output" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
@@ -637,8 +643,6 @@
       "optionsDataSource" : null
     } ],
     "title" : "Get Pre-signed Object",
-    "perform" : { },
-    "output" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -663,6 +667,8 @@
       },
       "sampleOutput" : null
     },
+    "perform" : { },
+    "output" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
@@ -839,8 +845,6 @@
       "optionsDataSource" : null
     } ],
     "title" : "Put Object",
-    "perform" : { },
-    "output" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -865,6 +869,8 @@
       },
       "sampleOutput" : null
     },
+    "perform" : { },
+    "output" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],

@@ -1,5 +1,8 @@
 {
-  "categories" : [ "HELPERS" ],
+  "categories" : [ {
+    "key" : "helpers",
+    "label" : "helpers"
+  } ],
   "customAction" : null,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,

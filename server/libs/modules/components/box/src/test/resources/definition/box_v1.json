@@ -1,5 +1,8 @@
 {
-  "categories" : [ "FILE_STORAGE" ],
+  "categories" : [ {
+    "key" : "file-storage",
+    "label" : "file-storage"
+  } ],
   "customAction" : null,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,

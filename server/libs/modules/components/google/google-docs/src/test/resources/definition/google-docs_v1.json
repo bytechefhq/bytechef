@@ -1,5 +1,8 @@
 {
-  "categories" : [ "FILE_STORAGE" ],
+  "categories" : [ {
+    "key" : "file-storage",
+    "label" : "file-storage"
+  } ],
   "customAction" : null,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -62,6 +65,7 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
+      "authorizationCallback" : null,
       "authorizationUrl" : { },
       "clientSecret" : null,
       "refreshToken" : null,
@@ -71,8 +75,7 @@
       "refresh" : null,
       "refreshUrl" : { },
       "scopes" : { },
-      "tokenUrl" : { },
-      "authorizationCallback" : null
+      "tokenUrl" : { }
     } ],
     "properties" : null,
     "version" : 1,
@@ -130,11 +133,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create document",
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "outputResponse" : null,
     "output" : null,
-    "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "dynamicOutput" : false,
@@ -245,11 +248,11 @@
       "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Edit template file",
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "outputResponse" : null,
     "output" : null,
-    "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "dynamicOutput" : false,
@@ -280,11 +283,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Read document",
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "outputResponse" : null,
     "output" : null,
-    "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "perform" : { }
   } ],
   "triggers" : null
 }

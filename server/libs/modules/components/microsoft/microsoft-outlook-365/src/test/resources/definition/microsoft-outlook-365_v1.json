@@ -1,5 +1,11 @@
 {
-  "categories" : [ "COMMUNICATION", "CALENDARS_AND_SCHEDULING" ],
+  "categories" : [ {
+    "key" : "communication",
+    "label" : "communication"
+  }, {
+    "key" : "calendars-and-scheduling",
+    "label" : "calendars-and-scheduling"
+  } ],
   "customAction" : null,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,

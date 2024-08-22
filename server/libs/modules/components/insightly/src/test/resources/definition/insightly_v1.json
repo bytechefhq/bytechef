@@ -1,5 +1,8 @@
 {
-  "categories" : [ "CRM" ],
+  "categories" : [ {
+    "key" : "crm",
+    "label" : "crm"
+  } ],
   "customAction" : true,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -62,7 +65,9 @@
       "title" : "Basic Auth",
       "type" : "BASIC_AUTH",
       "acquire" : null,
-      "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -70,9 +75,7 @@
       "refreshUrl" : null,
       "scopes" : null,
       "tokenUrl" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -213,14 +216,10 @@
         "options" : null,
         "optionsDataSource" : null
       } ],
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Create contact",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "output" : null,
-    "perform" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -258,8 +257,8 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "controlType" : "INTEGER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "INTEGER"
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -361,11 +360,15 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
-    }
+    },
+    "output" : null,
+    "perform" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -459,14 +462,10 @@
         "options" : null,
         "optionsDataSource" : null
       } ],
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Create organization",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "output" : null,
-    "perform" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -504,8 +503,8 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "controlType" : "INTEGER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "INTEGER"
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -567,11 +566,15 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
-    }
+    },
+    "output" : null,
+    "perform" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -665,14 +668,10 @@
         } ],
         "optionsDataSource" : null
       } ],
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Create task",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "output" : null,
-    "perform" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -710,8 +709,8 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "controlType" : "INTEGER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "INTEGER"
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -753,11 +752,15 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
-    }
+    },
+    "output" : null,
+    "perform" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
   "triggers" : [ ]
 }

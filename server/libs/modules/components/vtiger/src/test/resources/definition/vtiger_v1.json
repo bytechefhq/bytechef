@@ -1,5 +1,8 @@
 {
-  "categories" : [ "CRM" ],
+  "categories" : [ {
+    "key" : "crm",
+    "label" : "crm"
+  } ],
   "customAction" : null,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -83,16 +86,16 @@
       "type" : "BASIC_AUTH",
       "acquire" : null,
       "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
-      "tokenUrl" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null
+      "tokenUrl" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -172,8 +175,6 @@
     "title" : "Create a contact",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "output" : null,
-    "perform" : { },
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -290,14 +291,16 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
-    }
+    },
+    "perform" : { },
+    "output" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -358,8 +361,6 @@
     "title" : "Create a Product",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "output" : null,
-    "perform" : { },
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -516,14 +517,16 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
-    }
+    },
+    "perform" : { },
+    "output" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -536,8 +539,6 @@
     "title" : "Get Me",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "output" : null,
-    "perform" : { },
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -914,14 +915,16 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
-    }
+    },
+    "perform" : { },
+    "output" : null
   } ],
   "triggers" : null
 }

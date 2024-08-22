@@ -1,5 +1,8 @@
 {
-  "categories" : [ "HELPERS" ],
+  "categories" : [ {
+    "key" : "helpers",
+    "label" : "helpers"
+  } ],
   "customAction" : null,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -43,11 +46,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Convert from JSON string",
-    "perform" : { },
-    "output" : null,
-    "outputResponse" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "outputResponse" : null,
+    "output" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -81,8 +84,8 @@
         "label" : "Array",
         "value" : 2
       } ],
-      "controlType" : "SELECT",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "SELECT"
     }, {
       "advancedOption" : null,
       "description" : "The data to convert to JSON string.",
@@ -101,8 +104,8 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "The data to convert to JSON string.",
@@ -122,15 +125,15 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "Convert to JSON string",
-    "perform" : { },
-    "output" : null,
-    "outputResponse" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "outputResponse" : null,
+    "output" : null,
+    "perform" : { }
   } ],
   "triggers" : null
 }

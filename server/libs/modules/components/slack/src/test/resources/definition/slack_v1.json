@@ -1,5 +1,11 @@
 {
-  "categories" : [ "COMMUNICATION", "DEVELOPER_TOOLS" ],
+  "categories" : [ {
+    "key" : "communication",
+    "label" : "communication"
+  }, {
+    "key" : "developer-tools",
+    "label" : "developer-tools"
+  } ],
   "customAction" : null,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -62,7 +68,6 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "authorizationCallback" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -70,9 +75,10 @@
       "refreshUrl" : null,
       "scopes" : { },
       "tokenUrl" : { },
-      "authorizationUrl" : { },
       "clientSecret" : null,
-      "refreshToken" : null
+      "authorizationUrl" : { },
+      "refreshToken" : null,
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -133,10 +139,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Send message",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { },
     "output" : null,
+    "perform" : { },
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -445,7 +449,9 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : null
-    }
+    },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -499,10 +505,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Send direct message",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { },
     "output" : null,
+    "perform" : { },
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -811,7 +815,9 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : null
-    }
+    },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
   "triggers" : null
 }

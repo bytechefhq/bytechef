@@ -1,5 +1,8 @@
 {
-  "categories" : [ "PRODUCTIVITY_AND_COLLABORATION" ],
+  "categories" : [ {
+    "key" : "productivity-and-collaboration",
+    "label" : "productivity-and-collaboration"
+  } ],
   "customAction" : true,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -12,6 +15,74 @@
   "resources" : null,
   "version" : 1,
   "title" : "Trello",
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "custom",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "key",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Key",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "token",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Token",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : null,
+      "type" : "CUSTOM",
+      "acquire" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
+      "apply" : { },
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "tokenUrl" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
     "dynamicOutput" : false,
@@ -62,11 +133,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Board",
-    "output" : null,
-    "perform" : { },
-    "outputResponse" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "outputResponse" : null,
+    "perform" : { },
+    "output" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -163,8 +234,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Card",
-    "output" : null,
-    "perform" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -289,8 +360,8 @@
       },
       "sampleOutput" : null
     },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "perform" : { },
+    "output" : null
   } ],
   "triggers" : [ {
     "batch" : null,
@@ -352,14 +423,10 @@
     "workflowSyncExecution" : null,
     "workflowSyncValidation" : null,
     "workflowSyncOnEnableValidation" : null,
-    "output" : null,
-    "poll" : null,
-    "deduplicate" : null,
-    "webhookDisable" : { },
-    "webhookEnable" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "dynamicWebhookRefresh" : null,
-    "dwebhookRequest" : { },
-    "listenerDisable" : null,
+    "webhookValidateOnEnable" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -484,78 +551,14 @@
       },
       "sampleOutput" : null
     },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
+    "webhookDisable" : { },
+    "webhookEnable" : { },
+    "dwebhookRequest" : { },
+    "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
-    "webhookValidateOnEnable" : null
-  } ],
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "custom",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "key",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Key",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "token",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Token",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : null,
-      "type" : "CUSTOM",
-      "acquire" : null,
-      "apply" : { },
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientId" : null,
-      "clientSecret" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  }
+    "deduplicate" : null,
+    "poll" : null,
+    "output" : null
+  } ]
 }

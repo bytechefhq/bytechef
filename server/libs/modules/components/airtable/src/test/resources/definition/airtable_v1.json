@@ -1,5 +1,8 @@
 {
-  "categories" : [ "PRODUCTIVITY_AND_COLLABORATION" ],
+  "categories" : [ {
+    "key" : "productivity-and-collaboration",
+    "label" : "productivity-and-collaboration"
+  } ],
   "customAction" : true,
   "customActionHelp" : null,
   "dataStreamItemReader" : { },
@@ -42,6 +45,9 @@
       "title" : "Bearer Token",
       "type" : "BEARER_TOKEN",
       "acquire" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -49,9 +55,6 @@
       "refreshUrl" : null,
       "scopes" : null,
       "tokenUrl" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null,
       "authorizationCallback" : null
     } ],
     "properties" : null,
@@ -142,8 +145,6 @@
       }
     } ],
     "title" : "Creates a record",
-    "perform" : null,
-    "output" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -179,8 +180,8 @@
           "label" : null,
           "placeholder" : null,
           "options" : null,
-          "controlType" : "DATE_TIME",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "DATE_TIME"
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -214,8 +215,8 @@
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -255,8 +256,8 @@
             "label" : null,
             "placeholder" : null,
             "options" : null,
-            "controlType" : "DATE",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "DATE"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -272,8 +273,8 @@
             "label" : null,
             "placeholder" : null,
             "options" : null,
-            "controlType" : "DATE_TIME",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "DATE_TIME"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -291,8 +292,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -328,8 +329,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "controlType" : "NUMBER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "NUMBER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -348,8 +349,8 @@
             "multipleValues" : null,
             "options" : null,
             "properties" : null,
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -385,20 +386,22 @@
             "label" : null,
             "placeholder" : null,
             "options" : null,
-            "controlType" : "TIME",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "TIME"
           } ],
           "multipleValues" : null,
           "options" : null,
           "properties" : null,
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
+    "output" : null,
+    "perform" : null,
     "processErrorResponse" : { },
     "workflowNodeDescription" : null
   } ],
@@ -482,19 +485,19 @@
     "workflowSyncExecution" : null,
     "workflowSyncValidation" : null,
     "workflowSyncOnEnableValidation" : null,
-    "deduplicate" : null,
-    "poll" : { },
-    "output" : { },
+    "outputResponse" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "dwebhookRequest" : null,
     "webhookValidate" : null,
-    "outputResponse" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
+    "output" : { },
+    "deduplicate" : null,
+    "poll" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null
   } ]
 }

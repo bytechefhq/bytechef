@@ -149,11 +149,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Send Message",
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "perform" : { },
     "output" : null,
-    "outputResponse" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "outputResponse" : null
   } ],
   "triggers" : [ {
     "batch" : null,
@@ -189,6 +189,10 @@
     "workflowSyncExecution" : null,
     "workflowSyncValidation" : null,
     "workflowSyncOnEnableValidation" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null,
     "deduplicate" : null,
     "poll" : null,
     "output" : null,
@@ -198,10 +202,6 @@
     "dwebhookRequest" : null,
     "listenerDisable" : { },
     "listenerEnable" : { },
-    "webhookValidate" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null
+    "webhookValidate" : null
   } ]
 }

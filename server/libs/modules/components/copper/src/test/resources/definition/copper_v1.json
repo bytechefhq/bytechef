@@ -1,5 +1,8 @@
 {
-  "categories" : [ "CRM" ],
+  "categories" : [ {
+    "key" : "crm",
+    "label" : "crm"
+  } ],
   "customAction" : null,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -62,6 +65,7 @@
       "title" : "API Key",
       "type" : "API_KEY",
       "acquire" : null,
+      "authorizationCallback" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
       "refreshToken" : null,
@@ -71,8 +75,7 @@
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
-      "tokenUrl" : null,
-      "authorizationCallback" : null
+      "tokenUrl" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -192,6 +195,8 @@
       }
     } ],
     "title" : "Create activity",
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -377,9 +382,7 @@
       "sampleOutput" : null
     },
     "output" : null,
-    "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -963,6 +966,8 @@
       "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "Create company",
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -1512,9 +1517,7 @@
       "sampleOutput" : null
     },
     "output" : null,
-    "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -2214,6 +2217,8 @@
       "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "Create person",
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -2864,9 +2869,7 @@
       "sampleOutput" : null
     },
     "output" : null,
-    "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "perform" : { }
   } ],
   "triggers" : null
 }

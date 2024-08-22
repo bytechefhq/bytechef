@@ -1,5 +1,11 @@
 {
-  "categories" : [ "CRM", "PROJECT_MANAGEMENT" ],
+  "categories" : [ {
+    "key" : "crm",
+    "label" : "crm"
+  }, {
+    "key" : "project-management",
+    "label" : "project-management"
+  } ],
   "customAction" : true,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -62,7 +68,6 @@
       "title" : "Basic Auth",
       "type" : "BASIC_AUTH",
       "acquire" : null,
-      "authorizationCallback" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -72,7 +77,8 @@
       "tokenUrl" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
-      "refreshToken" : null
+      "refreshToken" : null,
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -217,8 +223,6 @@
       "optionsDataSource" : null
     } ],
     "title" : "Creates a company",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "output" : null,
     "perform" : null,
     "outputResponse" : {
@@ -346,7 +350,9 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : null
-    }
+    },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -485,8 +491,6 @@
       "optionsDataSource" : null
     } ],
     "title" : "Creates a task",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "output" : null,
     "perform" : null,
     "outputResponse" : {
@@ -594,7 +598,9 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : null
-    }
+    },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
   "triggers" : [ ]
 }

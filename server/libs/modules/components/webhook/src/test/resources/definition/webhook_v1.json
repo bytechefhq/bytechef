@@ -1,5 +1,8 @@
 {
-  "categories" : [ "HELPERS" ],
+  "categories" : [ {
+    "key" : "helpers",
+    "label" : "helpers"
+  } ],
   "customAction" : null,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -32,16 +35,16 @@
     "processErrorResponse" : null,
     "webhookValidateOnEnable" : null,
     "workflowNodeDescription" : null,
+    "output" : { },
+    "deduplicate" : null,
+    "poll" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "dwebhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
     "outputResponse" : null,
-    "webhookValidate" : null,
-    "deduplicate" : null,
-    "poll" : null,
-    "output" : { }
+    "webhookValidate" : null
   }, {
     "batch" : null,
     "dynamicOutput" : false,
@@ -80,16 +83,16 @@
     "processErrorResponse" : null,
     "webhookValidateOnEnable" : null,
     "workflowNodeDescription" : null,
+    "output" : { },
+    "deduplicate" : null,
+    "poll" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "dwebhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
     "outputResponse" : null,
-    "webhookValidate" : { },
-    "deduplicate" : null,
-    "poll" : null,
-    "output" : { }
+    "webhookValidate" : { }
   }, {
     "batch" : null,
     "dynamicOutput" : false,
@@ -134,8 +137,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     } ],
     "title" : "Await workflow and respond",
     "type" : "STATIC_WEBHOOK",
@@ -147,15 +150,15 @@
     "processErrorResponse" : null,
     "webhookValidateOnEnable" : null,
     "workflowNodeDescription" : null,
+    "output" : { },
+    "deduplicate" : null,
+    "poll" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "dwebhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
     "outputResponse" : null,
-    "webhookValidate" : { },
-    "deduplicate" : null,
-    "poll" : null,
-    "output" : { }
+    "webhookValidate" : { }
   } ]
 }

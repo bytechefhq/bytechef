@@ -1,5 +1,8 @@
 {
-  "categories" : [ "HELPERS" ],
+  "categories" : [ {
+    "key" : "helpers",
+    "label" : "helpers"
+  } ],
   "customAction" : null,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -30,8 +33,6 @@
     "name" : "dummy",
     "properties" : [ ],
     "title" : "Title",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -57,7 +58,9 @@
       "sampleOutput" : null
     },
     "perform" : { },
-    "output" : null
+    "output" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
   "triggers" : null
 }
