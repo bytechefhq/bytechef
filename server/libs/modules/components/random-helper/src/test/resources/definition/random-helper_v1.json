@@ -1,5 +1,8 @@
 {
-  "categories" : [ "HELPERS" ],
+  "categories" : [ {
+    "key" : "helpers",
+    "label" : "helpers"
+  } ],
   "customAction" : null,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -61,6 +64,8 @@
       "controlType" : "INTEGER"
     } ],
     "title" : "Int",
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -84,10 +89,8 @@
       },
       "sampleOutput" : null
     },
-    "perform" : { },
     "output" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -136,6 +139,8 @@
       "controlType" : "INTEGER"
     } ],
     "title" : "Float",
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -162,10 +167,8 @@
       },
       "sampleOutput" : null
     },
-    "perform" : { },
     "output" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "perform" : { }
   } ],
   "triggers" : null
 }

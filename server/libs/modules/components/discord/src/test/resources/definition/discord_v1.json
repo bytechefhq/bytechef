@@ -1,5 +1,8 @@
 {
-  "categories" : [ "COMMUNICATION" ],
+  "categories" : [ {
+    "key" : "communication",
+    "label" : "communication"
+  } ],
   "customAction" : true,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -42,7 +45,6 @@
       "title" : "Bearer Token",
       "type" : "BEARER_TOKEN",
       "acquire" : null,
-      "authorizationCallback" : null,
       "apply" : { },
       "clientId" : null,
       "pkce" : null,
@@ -52,7 +54,8 @@
       "tokenUrl" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
-      "refreshToken" : null
+      "refreshToken" : null,
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -189,10 +192,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Send channel message",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null,
     "output" : null,
+    "perform" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -302,7 +303,9 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : null
-    }
+    },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -416,10 +419,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create channel",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null,
     "output" : null,
+    "perform" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -524,7 +525,9 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : null
-    }
+    },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -625,10 +628,8 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Send direct message",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { },
     "output" : null,
+    "perform" : { },
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -692,7 +693,9 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : null
-    }
+    },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
   "triggers" : [ ]
 }

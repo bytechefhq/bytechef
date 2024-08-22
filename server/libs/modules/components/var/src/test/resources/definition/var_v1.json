@@ -1,5 +1,8 @@
 {
-  "categories" : [ "HELPERS" ],
+  "categories" : [ {
+    "key" : "helpers",
+    "label" : "helpers"
+  } ],
   "customAction" : null,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -466,11 +469,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Set value",
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "perform" : { },
     "output" : null,
-    "outputResponse" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "outputResponse" : null
   } ],
   "triggers" : null
 }

@@ -243,9 +243,9 @@
     } ],
     "title" : "JavaScript",
     "perform" : { },
+    "output" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "output" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -490,9 +490,9 @@
     } ],
     "title" : "Python",
     "perform" : { },
+    "output" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "output" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -737,11 +737,17 @@
     } ],
     "title" : "Ruby",
     "perform" : { },
+    "output" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "output" : null
+    "workflowNodeDescription" : null
   } ],
-  "categories" : [ "HELPERS", "DEVELOPER_TOOLS" ],
+  "categories" : [ {
+    "key" : "helpers",
+    "label" : "helpers"
+  }, {
+    "key" : "developer-tools",
+    "label" : "developer-tools"
+  } ],
   "connection" : null,
   "customAction" : null,
   "customActionHelp" : null,

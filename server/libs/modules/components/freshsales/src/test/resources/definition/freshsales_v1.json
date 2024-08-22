@@ -1,5 +1,8 @@
 {
-  "categories" : [ "CRM" ],
+  "categories" : [ {
+    "key" : "crm",
+    "label" : "crm"
+  } ],
   "customAction" : null,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -62,6 +65,9 @@
       "title" : "API Key",
       "type" : "API_KEY",
       "acquire" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
       "apply" : { },
       "clientId" : null,
       "pkce" : null,
@@ -69,9 +75,6 @@
       "refreshUrl" : null,
       "scopes" : null,
       "tokenUrl" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null,
       "authorizationCallback" : null
     } ],
     "properties" : null,
@@ -150,8 +153,6 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create account",
-    "output" : null,
-    "perform" : { },
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -190,8 +191,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "controlType" : "NUMBER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "NUMBER"
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -253,11 +254,13 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
+    "output" : null,
+    "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
@@ -570,8 +573,6 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create contact",
-    "output" : null,
-    "perform" : { },
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -610,8 +611,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "controlType" : "NUMBER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "NUMBER"
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -913,11 +914,13 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
+    "output" : null,
+    "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
@@ -990,8 +993,6 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create lead",
-    "output" : null,
-    "perform" : { },
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -1030,8 +1031,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "controlType" : "NUMBER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "NUMBER"
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -1093,11 +1094,13 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
+    "output" : null,
+    "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],

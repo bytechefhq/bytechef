@@ -1,6 +1,9 @@
 {
   "actions" : [ ],
-  "categories" : [ "HELPERS" ],
+  "categories" : [ {
+    "key" : "helpers",
+    "label" : "helpers"
+  } ],
   "connection" : null,
   "customAction" : null,
   "customActionHelp" : null,
@@ -382,9 +385,13 @@
     "workflowSyncExecution" : null,
     "workflowSyncValidation" : null,
     "workflowSyncOnEnableValidation" : null,
+    "dynamicWebhookRefresh" : null,
+    "processErrorResponse" : null,
+    "webhookValidateOnEnable" : null,
+    "workflowNodeDescription" : null,
+    "output" : null,
     "deduplicate" : null,
     "poll" : null,
-    "output" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "dwebhookRequest" : null,
@@ -680,11 +687,7 @@
       },
       "sampleOutput" : null
     },
-    "webhookValidate" : null,
-    "dynamicWebhookRefresh" : null,
-    "processErrorResponse" : null,
-    "webhookValidateOnEnable" : null,
-    "workflowNodeDescription" : null
+    "webhookValidate" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -912,9 +915,13 @@
     "workflowSyncExecution" : null,
     "workflowSyncValidation" : null,
     "workflowSyncOnEnableValidation" : null,
+    "dynamicWebhookRefresh" : null,
+    "processErrorResponse" : null,
+    "webhookValidateOnEnable" : null,
+    "workflowNodeDescription" : null,
+    "output" : null,
     "deduplicate" : null,
     "poll" : null,
-    "output" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "dwebhookRequest" : null,
@@ -1041,11 +1048,7 @@
       },
       "sampleOutput" : null
     },
-    "webhookValidate" : null,
-    "dynamicWebhookRefresh" : null,
-    "processErrorResponse" : null,
-    "webhookValidateOnEnable" : null,
-    "workflowNodeDescription" : null
+    "webhookValidate" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -1245,9 +1248,13 @@
     "workflowSyncExecution" : null,
     "workflowSyncValidation" : null,
     "workflowSyncOnEnableValidation" : null,
+    "dynamicWebhookRefresh" : null,
+    "processErrorResponse" : null,
+    "webhookValidateOnEnable" : null,
+    "workflowNodeDescription" : null,
+    "output" : null,
     "deduplicate" : null,
     "poll" : null,
-    "output" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "dwebhookRequest" : null,
@@ -1374,11 +1381,7 @@
       },
       "sampleOutput" : null
     },
-    "webhookValidate" : null,
-    "dynamicWebhookRefresh" : null,
-    "processErrorResponse" : null,
-    "webhookValidateOnEnable" : null,
-    "workflowNodeDescription" : null
+    "webhookValidate" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -1447,9 +1450,13 @@
     "workflowSyncExecution" : null,
     "workflowSyncValidation" : null,
     "workflowSyncOnEnableValidation" : null,
+    "dynamicWebhookRefresh" : null,
+    "processErrorResponse" : null,
+    "webhookValidateOnEnable" : null,
+    "workflowNodeDescription" : null,
+    "output" : null,
     "deduplicate" : null,
     "poll" : null,
-    "output" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "dwebhookRequest" : null,
@@ -1537,11 +1544,7 @@
       },
       "sampleOutput" : null
     },
-    "webhookValidate" : null,
-    "dynamicWebhookRefresh" : null,
-    "processErrorResponse" : null,
-    "webhookValidateOnEnable" : null,
-    "workflowNodeDescription" : null
+    "webhookValidate" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -1704,9 +1707,13 @@
     "workflowSyncExecution" : null,
     "workflowSyncValidation" : null,
     "workflowSyncOnEnableValidation" : null,
+    "dynamicWebhookRefresh" : null,
+    "processErrorResponse" : null,
+    "webhookValidateOnEnable" : null,
+    "workflowNodeDescription" : null,
+    "output" : null,
     "deduplicate" : null,
     "poll" : null,
-    "output" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "dwebhookRequest" : null,
@@ -1796,10 +1803,6 @@
       },
       "sampleOutput" : null
     },
-    "webhookValidate" : null,
-    "dynamicWebhookRefresh" : null,
-    "processErrorResponse" : null,
-    "webhookValidateOnEnable" : null,
-    "workflowNodeDescription" : null
+    "webhookValidate" : null
   } ]
 }

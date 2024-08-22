@@ -1,5 +1,8 @@
 {
-  "categories" : [ "CUSTOMER_SUPPORT" ],
+  "categories" : [ {
+    "key" : "customer-support",
+    "label" : "customer-support"
+  } ],
   "customAction" : true,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -62,6 +65,7 @@
       "title" : "Basic Auth",
       "type" : "BASIC_AUTH",
       "acquire" : null,
+      "authorizationCallback" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -71,8 +75,7 @@
       "tokenUrl" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
-      "refreshToken" : null,
-      "authorizationCallback" : null
+      "refreshToken" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -177,6 +180,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create company",
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "output" : null,
     "perform" : null,
     "outputResponse" : {
@@ -306,9 +311,7 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : null
-    },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    }
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -466,6 +469,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create contact",
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "output" : null,
     "perform" : null,
     "outputResponse" : {
@@ -595,9 +600,7 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : null
-    },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    }
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -765,6 +768,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create ticket",
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "output" : null,
     "perform" : null,
     "outputResponse" : {
@@ -910,9 +915,7 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : null
-    },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    }
   } ],
   "triggers" : [ ]
 }

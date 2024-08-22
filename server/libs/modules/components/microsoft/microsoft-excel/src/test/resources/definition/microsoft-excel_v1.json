@@ -1,5 +1,8 @@
 {
-  "categories" : [ "PRODUCTIVITY_AND_COLLABORATION" ],
+  "categories" : [ {
+    "key" : "productivity-and-collaboration",
+    "label" : "productivity-and-collaboration"
+  } ],
   "customAction" : null,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -197,8 +200,8 @@
     "title" : "Append row",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
     "output" : null,
+    "perform" : { },
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -371,8 +374,8 @@
     "title" : "Clear worksheet",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
     "output" : null,
+    "perform" : { },
     "outputResponse" : null
   }, {
     "batch" : null,
@@ -451,8 +454,8 @@
     "title" : "Delete row",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
     "output" : null,
+    "perform" : { },
     "outputResponse" : null
   }, {
     "batch" : null,
@@ -555,8 +558,8 @@
     "title" : "Find row by number",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
     "output" : null,
+    "perform" : { },
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -763,8 +766,8 @@
     "title" : "Update row",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
     "output" : null,
+    "perform" : { },
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,

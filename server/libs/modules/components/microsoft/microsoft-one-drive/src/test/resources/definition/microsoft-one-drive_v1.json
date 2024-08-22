@@ -1,5 +1,8 @@
 {
-  "categories" : [ "FILE_STORAGE" ],
+  "categories" : [ {
+    "key" : "file-storage",
+    "label" : "file-storage"
+  } ],
   "customAction" : null,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -82,7 +85,9 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "authorizationCallback" : null,
+      "authorizationUrl" : { },
+      "clientSecret" : null,
+      "refreshToken" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -90,9 +95,7 @@
       "refreshUrl" : null,
       "scopes" : { },
       "tokenUrl" : { },
-      "authorizationUrl" : { },
-      "clientSecret" : null,
-      "refreshToken" : null
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -156,10 +159,6 @@
       }
     } ],
     "title" : "Download file",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { },
-    "output" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -259,7 +258,11 @@
         "controlType" : "FILE_ENTRY"
       },
       "sampleOutput" : null
-    }
+    },
+    "perform" : { },
+    "output" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -293,10 +296,6 @@
       }
     } ],
     "title" : "List Files",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { },
-    "output" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -370,18 +369,22 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "controlType" : "ARRAY_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "ARRAY_BUILDER"
       },
       "sampleOutput" : null
-    }
+    },
+    "perform" : { },
+    "output" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -415,10 +418,6 @@
       }
     } ],
     "title" : "List Folders",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { },
-    "output" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -492,18 +491,22 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "controlType" : "ARRAY_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "ARRAY_BUILDER"
       },
       "sampleOutput" : null
-    }
+    },
+    "perform" : { },
+    "output" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -633,10 +636,6 @@
       "controlType" : "FILE_ENTRY"
     } ],
     "title" : "Upload file",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { },
-    "output" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -696,11 +695,15 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
-    }
+    },
+    "perform" : { },
+    "output" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
   "triggers" : null
 }

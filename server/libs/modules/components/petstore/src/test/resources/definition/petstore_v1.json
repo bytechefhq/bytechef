@@ -430,8 +430,8 @@
     "title" : "Add a new pet to the store",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : null,
     "output" : null,
+    "perform" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -999,8 +999,8 @@
     "title" : "Update an existing pet",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : null,
     "output" : null,
+    "perform" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -1327,8 +1327,8 @@
     "title" : "Finds Pets by status",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : null,
     "output" : null,
+    "perform" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -1685,8 +1685,8 @@
     "title" : "Finds Pets by tags",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : null,
     "output" : null,
+    "perform" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -2043,8 +2043,8 @@
     "title" : "Deletes a pet",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : null,
     "output" : null,
+    "perform" : null,
     "outputResponse" : null
   }, {
     "batch" : null,
@@ -2082,8 +2082,8 @@
     "title" : "Find pet by ID",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : null,
     "output" : null,
+    "perform" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -2441,8 +2441,8 @@
     "title" : "Updates a pet in the store with form data",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : null,
     "output" : null,
+    "perform" : null,
     "outputResponse" : null
   }, {
     "batch" : null,
@@ -2602,8 +2602,8 @@
     "title" : "uploads an image",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : null,
     "output" : null,
+    "perform" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -2704,8 +2704,8 @@
     "title" : "Returns pet inventories by status",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : null,
     "output" : null,
+    "perform" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -2920,8 +2920,8 @@
     "title" : "Place an order for a pet",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : null,
     "output" : null,
+    "perform" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -3114,8 +3114,8 @@
     "title" : "Delete purchase order by ID",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : null,
     "output" : null,
+    "perform" : null,
     "outputResponse" : null
   }, {
     "batch" : null,
@@ -3153,8 +3153,8 @@
     "title" : "Find purchase order by ID",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : null,
     "output" : null,
+    "perform" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -3508,8 +3508,8 @@
     "title" : "Create user",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : null,
     "output" : null,
+    "perform" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -3912,8 +3912,8 @@
     "title" : "Creates list of users with given input array",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : null,
     "output" : null,
+    "perform" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -4156,8 +4156,8 @@
     "title" : "Delete user",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : null,
     "output" : null,
+    "perform" : null,
     "outputResponse" : null
   }, {
     "batch" : null,
@@ -4196,8 +4196,8 @@
     "title" : "Get user by user name",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : null,
     "output" : null,
+    "perform" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -4601,8 +4601,8 @@
     "title" : "Update user",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : null,
     "output" : null,
+    "perform" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,

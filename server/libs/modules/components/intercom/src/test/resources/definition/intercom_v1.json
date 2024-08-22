@@ -1,5 +1,8 @@
 {
-  "categories" : [ "CUSTOMER_SUPPORT" ],
+  "categories" : [ {
+    "key" : "customer-support",
+    "label" : "customer-support"
+  } ],
   "customAction" : null,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -62,7 +65,9 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "authorizationCallback" : null,
+      "authorizationUrl" : { },
+      "clientSecret" : null,
+      "refreshToken" : null,
       "apply" : { },
       "clientId" : null,
       "pkce" : null,
@@ -70,9 +75,7 @@
       "refreshUrl" : null,
       "scopes" : { },
       "tokenUrl" : { },
-      "authorizationUrl" : { },
-      "clientSecret" : null,
-      "refreshToken" : null
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -198,10 +201,6 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Contact",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { },
-    "output" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -341,11 +340,15 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
-    }
+    },
+    "perform" : { },
+    "output" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -379,10 +382,6 @@
       }
     } ],
     "title" : "Get Contact",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { },
-    "output" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -522,11 +521,15 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
-    }
+    },
+    "perform" : { },
+    "output" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -656,10 +659,6 @@
       }
     } ],
     "title" : "Send Message",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { },
-    "output" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -679,11 +678,15 @@
         "multipleValues" : null,
         "options" : null,
         "properties" : null,
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
-    }
+    },
+    "perform" : { },
+    "output" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
   "triggers" : null
 }

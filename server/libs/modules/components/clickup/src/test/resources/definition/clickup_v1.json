@@ -1,5 +1,8 @@
 {
-  "categories" : [ "PROJECT_MANAGEMENT" ],
+  "categories" : [ {
+    "key" : "project-management",
+    "label" : "project-management"
+  } ],
   "customAction" : true,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -62,7 +65,6 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "authorizationCallback" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -72,7 +74,8 @@
       "tokenUrl" : { },
       "authorizationUrl" : { },
       "clientSecret" : null,
-      "refreshToken" : null
+      "refreshToken" : null,
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -214,10 +217,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create List",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null,
     "output" : null,
+    "perform" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -423,7 +424,9 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : null
-    }
+    },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -603,10 +606,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Task",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null,
     "output" : null,
+    "perform" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -892,7 +893,9 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : null
-    }
+    },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -1002,10 +1005,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Folder",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null,
     "output" : null,
+    "perform" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -1151,7 +1152,9 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : null
-    }
+    },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
   "triggers" : [ {
     "batch" : null,
@@ -1190,13 +1193,9 @@
     "workflowSyncExecution" : null,
     "workflowSyncValidation" : null,
     "workflowSyncOnEnableValidation" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
+    "output" : null,
     "deduplicate" : null,
     "poll" : null,
-    "output" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
     "listenerDisable" : null,
@@ -1386,7 +1385,11 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : null
-    }
+    },
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -1424,13 +1427,9 @@
     "workflowSyncExecution" : null,
     "workflowSyncValidation" : null,
     "workflowSyncOnEnableValidation" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
+    "output" : null,
     "deduplicate" : null,
     "poll" : null,
-    "output" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
     "listenerDisable" : null,
@@ -1720,6 +1719,10 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : null
-    }
+    },
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ]
 }

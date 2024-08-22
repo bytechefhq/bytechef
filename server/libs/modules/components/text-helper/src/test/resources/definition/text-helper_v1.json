@@ -1,5 +1,8 @@
 {
-  "categories" : [ "HELPERS" ],
+  "categories" : [ {
+    "key" : "helpers",
+    "label" : "helpers"
+  } ],
   "customAction" : null,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -141,9 +144,9 @@
     "title" : "Extract Content from HTML",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
+    "outputResponse" : null,
     "output" : null,
-    "perform" : { },
-    "outputResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -204,9 +207,9 @@
     "title" : "Base64 Decode",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
+    "outputResponse" : null,
     "output" : null,
-    "perform" : { },
-    "outputResponse" : null
+    "perform" : { }
   } ],
   "triggers" : null
 }

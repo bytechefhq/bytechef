@@ -1,5 +1,8 @@
 {
-  "categories" : [ "COMMUNICATION" ],
+  "categories" : [ {
+    "key" : "communication",
+    "label" : "communication"
+  } ],
   "customAction" : null,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -82,6 +85,7 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
+      "authorizationCallback" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -91,8 +95,7 @@
       "tokenUrl" : { },
       "authorizationUrl" : { },
       "clientSecret" : null,
-      "refreshToken" : null,
-      "authorizationCallback" : null
+      "refreshToken" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -173,6 +176,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create channel",
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "perform" : { },
     "output" : null,
     "outputResponse" : {
@@ -258,9 +263,7 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : null
-    },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    }
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -365,6 +368,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Send channel message",
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "perform" : { },
     "output" : null,
     "outputResponse" : {
@@ -530,9 +535,7 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : null
-    },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    }
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -614,6 +617,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Send chat message",
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "perform" : { },
     "output" : null,
     "outputResponse" : {
@@ -739,9 +744,7 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : null
-    },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    }
   } ],
   "triggers" : null
 }

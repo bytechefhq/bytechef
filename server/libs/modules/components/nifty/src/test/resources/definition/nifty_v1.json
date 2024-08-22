@@ -1,5 +1,8 @@
 {
-  "categories" : [ "PROJECT_MANAGEMENT" ],
+  "categories" : [ {
+    "key" : "project-management",
+    "label" : "project-management"
+  } ],
   "customAction" : null,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,

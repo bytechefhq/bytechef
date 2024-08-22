@@ -1,5 +1,8 @@
 {
-  "categories" : [ "FILE_STORAGE" ],
+  "categories" : [ {
+    "key" : "file-storage",
+    "label" : "file-storage"
+  } ],
   "customAction" : null,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -62,17 +65,17 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : { },
+      "clientSecret" : null,
+      "refreshToken" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : { },
       "scopes" : { },
-      "tokenUrl" : { },
-      "authorizationUrl" : { },
-      "clientSecret" : null,
-      "refreshToken" : null,
-      "authorizationCallback" : null
+      "tokenUrl" : { }
     } ],
     "properties" : null,
     "version" : 1,
@@ -209,8 +212,8 @@
       }
     } ],
     "title" : "Upload file",
-    "perform" : { },
-    "output" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -290,17 +293,17 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : {
-        "mimeType" : "plain/text",
         "name" : "new-file.txt",
-        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+        "mimeType" : "plain/text"
       }
     },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "perform" : { },
+    "output" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -334,8 +337,8 @@
       }
     } ],
     "title" : "Read file",
-    "perform" : { },
-    "output" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -436,8 +439,8 @@
       },
       "sampleOutput" : null
     },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "perform" : { },
+    "output" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -491,8 +494,8 @@
       }
     } ],
     "title" : "Create new folder",
-    "perform" : { },
-    "output" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -572,17 +575,17 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : {
-        "mimeType" : "plain/text",
         "name" : "new-file.txt",
-        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+        "mimeType" : "plain/text"
       }
     },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "perform" : { },
+    "output" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -688,8 +691,8 @@
       }
     } ],
     "title" : "Create new text file",
-    "perform" : { },
-    "output" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -769,17 +772,17 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : {
-        "mimeType" : "plain/text",
         "name" : "new-file.txt",
-        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+        "mimeType" : "plain/text"
       }
     },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "perform" : { },
+    "output" : null
   } ],
   "triggers" : null
 }

@@ -1,5 +1,8 @@
 {
-  "categories" : [ "CRM" ],
+  "categories" : [ {
+    "key" : "crm",
+    "label" : "crm"
+  } ],
   "customAction" : true,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -240,8 +243,8 @@
     "title" : "Create account",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "output" : null,
     "perform" : null,
+    "output" : null,
     "outputResponse" : null
   }, {
     "batch" : null,
@@ -484,8 +487,8 @@
     "title" : "Create contacts",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "output" : null,
     "perform" : null,
+    "output" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -669,8 +672,8 @@
     "title" : "Create tasks",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "output" : null,
     "perform" : null,
+    "output" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,

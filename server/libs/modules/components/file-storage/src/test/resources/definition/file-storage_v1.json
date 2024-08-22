@@ -1,5 +1,11 @@
 {
-  "categories" : [ "FILE_STORAGE", "HELPERS" ],
+  "categories" : [ {
+    "key" : "file-storage",
+    "label" : "file-storage"
+  }, {
+    "key" : "helpers",
+    "label" : "helpers"
+  } ],
   "customAction" : null,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -121,6 +127,8 @@
     "title" : "Read from file as string",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
+    "perform" : { },
+    "output" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -144,9 +152,7 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : "Sample content"
-    },
-    "output" : null,
-    "perform" : { }
+    }
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -199,6 +205,8 @@
     "title" : "Write to file",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
+    "perform" : { },
+    "output" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -298,9 +306,7 @@
         "controlType" : "FILE_ENTRY"
       },
       "sampleOutput" : null
-    },
-    "output" : null,
-    "perform" : { }
+    }
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -353,6 +359,8 @@
     "title" : "Download file",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
+    "perform" : { },
+    "output" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -452,9 +460,7 @@
         "controlType" : "FILE_ENTRY"
       },
       "sampleOutput" : null
-    },
-    "output" : null,
-    "perform" : { }
+    }
   } ],
   "triggers" : null
 }

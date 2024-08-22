@@ -1,5 +1,8 @@
 {
-  "categories" : [ "DEVELOPER_TOOLS" ],
+  "categories" : [ {
+    "key" : "developer-tools",
+    "label" : "developer-tools"
+  } ],
   "customAction" : true,
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
@@ -62,7 +65,6 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "authorizationCallback" : null,
       "authorizationUrl" : { },
       "clientSecret" : null,
       "refreshToken" : null,
@@ -72,7 +74,8 @@
       "refresh" : null,
       "refreshUrl" : { },
       "scopes" : null,
-      "tokenUrl" : { }
+      "tokenUrl" : { },
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -162,8 +165,6 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Issue",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -327,8 +328,10 @@
       },
       "sampleOutput" : null
     },
+    "output" : null,
     "perform" : null,
-    "output" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -413,8 +416,6 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Comment on Issue",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -500,8 +501,10 @@
       },
       "sampleOutput" : null
     },
+    "output" : null,
     "perform" : null,
-    "output" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
   "triggers" : [ {
     "batch" : null,
@@ -540,10 +543,6 @@
     "workflowSyncExecution" : null,
     "workflowSyncValidation" : null,
     "workflowSyncOnEnableValidation" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -671,8 +670,12 @@
     "listenerEnable" : null,
     "dwebhookRequest" : { },
     "webhookValidate" : null,
+    "output" : null,
     "deduplicate" : null,
     "poll" : null,
-    "output" : null
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ]
 }
