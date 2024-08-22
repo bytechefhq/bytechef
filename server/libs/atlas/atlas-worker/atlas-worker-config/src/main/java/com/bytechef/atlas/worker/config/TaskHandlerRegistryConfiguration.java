@@ -17,7 +17,7 @@
 package com.bytechef.atlas.worker.config;
 
 import com.bytechef.atlas.worker.task.factory.DynamicTaskHandlerFactory;
-import com.bytechef.atlas.worker.task.factory.TaskHandlerMapFactory;
+import com.bytechef.atlas.worker.task.factory.TaskHandlerFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.commons.util.MapUtils;
@@ -34,12 +34,12 @@ public class TaskHandlerRegistryConfiguration {
     @Bean
     TaskHandlerRegistry taskHandlerRegistry(
         Map<String, TaskHandler<?>> taskHandlerMap,
-        @Autowired(required = false) TaskHandlerMapFactory taskHandlerMapFactory,
+        @Autowired(required = false) TaskHandlerFactory taskHandlerFactory,
         @Autowired(required = false) List<DynamicTaskHandlerFactory> dynamicTaskHandlerFactories) {
 
         Map<String, TaskHandler<?>> mergedTaskHandlerMap = MapUtils.concat(
             taskHandlerMap,
-            taskHandlerMapFactory == null ? Map.of() : taskHandlerMapFactory.getTaskHandlerMap());
+            taskHandlerFactory == null ? Map.of() : taskHandlerFactory.getTaskHandlerMap());
 
         return new TaskHandlerRegistryImpl(
             mergedTaskHandlerMap, dynamicTaskHandlerFactories == null ? List.of() : dynamicTaskHandlerFactories);

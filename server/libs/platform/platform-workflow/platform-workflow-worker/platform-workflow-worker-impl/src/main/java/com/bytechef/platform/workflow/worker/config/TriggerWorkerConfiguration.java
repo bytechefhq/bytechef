@@ -21,7 +21,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.worker.TriggerWorker;
 import com.bytechef.platform.workflow.worker.executor.TriggerWorkerExecutor;
-import com.bytechef.platform.workflow.worker.trigger.factory.TriggerHandlerMapFactory;
+import com.bytechef.platform.workflow.worker.trigger.factory.TriggerHandlerFactory;
 import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandler;
 import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandlerRegistry;
 import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandlerResolver;
@@ -41,12 +41,12 @@ public class TriggerWorkerConfiguration {
     @Bean
     TriggerHandlerRegistry triggerHandlerRegistry(
         Map<String, TriggerHandler> triggerHandlerMap,
-        @Autowired(required = false) TriggerHandlerMapFactory triggerHandlerMapFactory) {
+        @Autowired(required = false) TriggerHandlerFactory triggerHandlerFactory) {
 
         return MapUtils.concat(
             triggerHandlerMap,
-            triggerHandlerMapFactory.getTriggerHandlerMap() == null
-                ? Map.of() : triggerHandlerMapFactory.getTriggerHandlerMap())::get;
+            triggerHandlerFactory.getTriggerHandlerMap() == null
+                ? Map.of() : triggerHandlerFactory.getTriggerHandlerMap())::get;
     }
 
     @Bean
