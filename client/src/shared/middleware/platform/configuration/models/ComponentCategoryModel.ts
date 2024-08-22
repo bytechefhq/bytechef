@@ -12,38 +12,33 @@
  * Do not edit the class manually.
  */
 
-
+import { mapValues } from '../runtime';
 /**
  * A category of component.
  * @export
+ * @interface ComponentCategoryModel
  */
-export const ComponentCategoryModel = {
-    Accounting: 'accounting',
-    Advertising: 'advertising',
-    Analytics: 'analytics',
-    ArtificialIntelligence: 'artificial-intelligence',
-    Ats: 'ats',
-    CalendarsAndScheduling: 'calendars-and-scheduling',
-    Communication: 'communication',
-    Crm: 'crm',
-    CustomerSupport: 'customer-support',
-    DeveloperTools: 'developer-tools',
-    ECommerce: 'e-commerce',
-    FileStorage: 'file-storage',
-    Helpers: 'helpers',
-    Hris: 'hris',
-    MarketingAutomation: 'marketing-automation',
-    PaymentProcessing: 'payment-processing',
-    ProductivityAndCollaboration: 'productivity-and-collaboration',
-    ProjectManagement: 'project-management',
-    SocialMedia: 'social-media',
-    SurveysAndFeedback: 'surveys-and-feedback'
-} as const;
-export type ComponentCategoryModel = typeof ComponentCategoryModel[keyof typeof ComponentCategoryModel];
+export interface ComponentCategoryModel {
+    /**
+     * The key of a category.
+     * @type {string}
+     * @memberof ComponentCategoryModel
+     */
+    key: string;
+    /**
+     * The label of a category.
+     * @type {string}
+     * @memberof ComponentCategoryModel
+     */
+    label?: string;
+}
 
-
-export function instanceOfComponentCategoryModel(value: any): boolean {
-    return Object.values(ComponentCategoryModel).includes(value);
+/**
+ * Check if a given object implements the ComponentCategoryModel interface.
+ */
+export function instanceOfComponentCategoryModel(value: object): boolean {
+    if (!('key' in value)) return false;
+    return true;
 }
 
 export function ComponentCategoryModelFromJSON(json: any): ComponentCategoryModel {
@@ -51,10 +46,24 @@ export function ComponentCategoryModelFromJSON(json: any): ComponentCategoryMode
 }
 
 export function ComponentCategoryModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): ComponentCategoryModel {
-    return json as ComponentCategoryModel;
+    if (json == null) {
+        return json;
+    }
+    return {
+        
+        'key': json['key'],
+        'label': json['label'] == null ? undefined : json['label'],
+    };
 }
 
 export function ComponentCategoryModelToJSON(value?: ComponentCategoryModel | null): any {
-    return value as any;
+    if (value == null) {
+        return value;
+    }
+    return {
+        
+        'key': value['key'],
+        'label': value['label'],
+    };
 }
 
