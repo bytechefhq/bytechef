@@ -25,17 +25,18 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.CATEGORY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FROM;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.INCLUDE_SPAM_TRASH;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.LABEL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.LABEL_IDS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MAX_RESULTS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MESSAGES;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MESSAGE_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.NEXT_PAGE_TOKEN;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.PAGE_TOKEN;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.RESULT_SIZE_ESTIMATE;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SEARCH_EMAIL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SUBJECT;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.THREAD_ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TO;
 
 import com.bytechef.component.definition.ActionContext;
@@ -93,7 +94,6 @@ public class GoogleMailSearchEmailAction {
                 .required(false),
             string(LABEL)
                 .label("Label")
-                .description("")
                 .options((ActionOptionsFunction<String>) GoogleMailUtils::getLabelIdOptions)
                 .required(false),
             array(LABEL_IDS)
@@ -111,7 +111,11 @@ public class GoogleMailSearchEmailAction {
             object()
                 .properties(
                     array(MESSAGES)
-                        .items(MESSAGE_PROPERTY),
+                        .items(
+                            object()
+                                .properties(
+                                    string(ID),
+                                    string(THREAD_ID))),
                     string(NEXT_PAGE_TOKEN),
                     number(RESULT_SIZE_ESTIMATE)))
         .perform(GoogleMailSearchEmailAction::perform);
