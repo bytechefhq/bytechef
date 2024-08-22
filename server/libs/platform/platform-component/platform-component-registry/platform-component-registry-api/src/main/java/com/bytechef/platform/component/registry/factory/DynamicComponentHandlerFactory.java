@@ -23,7 +23,7 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public interface DynamicComponentHandlerListFactory {
+public interface DynamicComponentHandlerFactory {
 
     List<? extends ComponentHandler> getComponentHandlers();
 

@@ -34,7 +34,7 @@ import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Component.Registry;
 import com.bytechef.platform.component.factory.ComponentHandlerFactory;
-import com.bytechef.platform.component.registry.factory.DynamicComponentHandlerListFactory;
+import com.bytechef.platform.component.registry.factory.DynamicComponentHandlerFactory;
 import com.bytechef.platform.registry.util.PropertyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
@@ -71,12 +71,12 @@ public class ComponentDefinitionRegistry {
             .title("Missing Action"));
 
     private final List<ComponentDefinition> componentDefinitions;
-    private final List<DynamicComponentHandlerListFactory> dynamicComponentHandlerListFactories;
+    private final List<DynamicComponentHandlerFactory> dynamicComponentHandlerListFactories;
 
     public ComponentDefinitionRegistry(
         ApplicationProperties applicationProperties, List<ComponentHandler> componentHandlers,
         List<ComponentHandlerFactory> componentHandlerFactories,
-        @Autowired(required = false) List<DynamicComponentHandlerListFactory> dynamicComponentHandlerListFactories) {
+        @Autowired(required = false) List<DynamicComponentHandlerFactory> dynamicComponentHandlerListFactories) {
 
         @SuppressWarnings("unchecked")
         List<ComponentHandler> mergedComponentHandlers = CollectionUtils.concat(
@@ -171,7 +171,7 @@ public class ComponentDefinitionRegistry {
             if (componentDefinition == null) {
                 componentDefinition = dynamicComponentHandlerListFactories.stream()
                     .map(
-                        dynamicComponentHandlerListFactory -> dynamicComponentHandlerListFactory.fetchComponentHandler(
+                        dynamicComponentHandlerFactory -> dynamicComponentHandlerFactory.fetchComponentHandler(
                             name, version))
                     .filter(Optional::isPresent)
                     .map(Optional::get)
@@ -197,8 +197,8 @@ public class ComponentDefinitionRegistry {
             CollectionUtils.concat(
                 componentDefinitions,
                 dynamicComponentHandlerListFactories.stream()
-                    .flatMap(dynamicComponentHandlerListFactory -> CollectionUtils.stream(
-                        dynamicComponentHandlerListFactory.getComponentHandlers()))
+                    .flatMap(dynamicComponentHandlerFactory -> CollectionUtils.stream(
+                        dynamicComponentHandlerFactory.getComponentHandlers()))
                     .map(ComponentHandler::getDefinition)
                     .toList()),
             this::compare);
@@ -211,8 +211,8 @@ public class ComponentDefinitionRegistry {
 
         if (filteredComponentDefinitions.isEmpty()) {
             filteredComponentDefinitions = dynamicComponentHandlerListFactories.stream()
-                .flatMap(dynamicComponentHandlerListFactory -> CollectionUtils.stream(
-                    dynamicComponentHandlerListFactory.getComponentHandlers()))
+                .flatMap(dynamicComponentHandlerFactory -> CollectionUtils.stream(
+                    dynamicComponentHandlerFactory.getComponentHandlers()))
                 .map(ComponentHandler::getDefinition)
                 .filter(componentDefinition -> Objects.equals(componentDefinition.getName(), name))
                 .toList();
