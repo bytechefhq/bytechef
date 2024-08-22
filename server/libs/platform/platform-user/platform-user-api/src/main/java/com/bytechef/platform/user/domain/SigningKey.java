@@ -216,7 +216,7 @@ public class SigningKey {
         }
 
         public static TenantKeyId parse(String keyId) {
-            keyId = EncodingUtils.decodeBase64ToString(keyId);
+            keyId = EncodingUtils.base64DecodeToString(keyId);
 
             String[] items = keyId.split(":");
 
@@ -229,8 +229,8 @@ public class SigningKey {
 
         @Override
         public String toString() {
-            return EncodingUtils.encodeBase64ToString(
-                tenantId + ":" + EncodingUtils.encodeToString(RandomUtils.nextBytes(24)));
+            return EncodingUtils.base64EncodeToString(
+                tenantId + ":" + EncodingUtils.base64EncodeToString(RandomUtils.nextBytes(24)));
         }
     }
 }

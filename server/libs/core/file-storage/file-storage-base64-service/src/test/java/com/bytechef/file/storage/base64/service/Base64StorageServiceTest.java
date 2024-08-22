@@ -38,7 +38,7 @@ public class Base64StorageServiceTest {
     @Test
     public void testOpenInputStream() throws IOException {
         InputStream inputStream = base64StorageService.getFileStream(
-            DATA, new FileEntry("file.text", "base64://" + EncodingUtils.encodeBase64ToString(STRING)));
+            DATA, new FileEntry("file.text", "base64://" + EncodingUtils.base64EncodeToString(STRING)));
 
         Assertions.assertThat(
             new String(inputStream.readAllBytes(), StandardCharsets.UTF_8))
@@ -49,7 +49,7 @@ public class Base64StorageServiceTest {
     public void testRead() {
         Assertions.assertThat(
             base64StorageService.readFileToString(
-                DATA, new FileEntry("file.text", "base64://" + EncodingUtils.encodeBase64ToString(STRING))))
+                DATA, new FileEntry("file.text", "base64://" + EncodingUtils.base64EncodeToString(STRING))))
             .isEqualTo(STRING);
     }
 
@@ -59,6 +59,6 @@ public class Base64StorageServiceTest {
             DATA, "fileEntry", new ByteArrayInputStream(STRING.getBytes(StandardCharsets.UTF_8)));
 
         Assertions.assertThat(fileEntry.getUrl())
-            .isEqualTo("base64://" + EncodingUtils.encodeBase64ToString(STRING));
+            .isEqualTo("base64://" + EncodingUtils.base64EncodeToString(STRING));
     }
 }

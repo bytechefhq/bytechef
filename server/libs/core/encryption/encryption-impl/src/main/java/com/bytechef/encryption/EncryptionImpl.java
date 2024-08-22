@@ -41,7 +41,7 @@ public class EncryptionImpl implements Encryption {
         try {
             Cipher cipher = getCipher(Cipher.DECRYPT_MODE);
 
-            return new String(cipher.doFinal(EncodingUtils.decodeBase64(encryptedString)), StandardCharsets.UTF_8);
+            return new String(cipher.doFinal(EncodingUtils.base64Decode(encryptedString)), StandardCharsets.UTF_8);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -52,7 +52,7 @@ public class EncryptionImpl implements Encryption {
         try {
             Cipher cipher = getCipher(Cipher.ENCRYPT_MODE);
 
-            return EncodingUtils.encodeBase64ToString(cipher.doFinal(content.getBytes(StandardCharsets.UTF_8)));
+            return EncodingUtils.base64EncodeToString(cipher.doFinal(content.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -61,7 +61,7 @@ public class EncryptionImpl implements Encryption {
     private Cipher getCipher(int encryptMode) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
 
-        byte[] decodedKey = EncodingUtils.decodeBase64(encryptionKey.getKey());
+        byte[] decodedKey = EncodingUtils.base64Decode(encryptionKey.getKey());
 
         Key secretKey = new SecretKeySpec(Arrays.copyOf(decodedKey, 16), "AES");
 

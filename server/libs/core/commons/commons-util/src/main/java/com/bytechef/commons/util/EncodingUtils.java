@@ -28,35 +28,35 @@ public class EncodingUtils {
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
     private static final Base64.Encoder URL_ENCODER = Base64.getUrlEncoder();
 
-    public static byte[] decodeBase64(final byte[] bytes) {
+    public static byte[] base64Decode(final byte[] bytes) {
         return DECODER.decode(bytes);
     }
 
-    public static byte[] decodeBase64(final String data) {
+    public static byte[] base64Decode(final String data) {
         return DECODER.decode(data);
     }
 
-    public static String decodeBase64ToString(final String data) {
-        return new String(decodeBase64(data), StandardCharsets.UTF_8);
+    public static String base64DecodeToString(final String data) {
+        return new String(base64Decode(data), StandardCharsets.UTF_8);
     }
 
-    public static byte[] encodeBase64(final byte[] bytes) {
+    public static byte[] base64Encode(final byte[] bytes) {
         return ENCODER.encode(bytes);
     }
 
-    public static byte[] encodeBase64(final String data) {
+    public static byte[] base64Encode(final String data) {
         return ENCODER.encode(data.getBytes(StandardCharsets.UTF_8));
     }
 
-    public static String encodeBase64ToString(final byte[] bytes) {
+    public static String base64EncodeToString(final byte[] bytes) {
         return ENCODER.encodeToString(bytes);
     }
 
-    public static String encodeBase64ToString(final String data) {
+    public static String base64EncodeToString(final String data) {
         return ENCODER.encodeToString(data.getBytes(StandardCharsets.UTF_8));
     }
 
-    public static String encodeToString(byte[] token) {
+    public static String urlEncodeBase64ToString(byte[] token) {
         return URL_ENCODER.withoutPadding()
             .encodeToString(token);
     }

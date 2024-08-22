@@ -204,7 +204,7 @@ public class ApiKey {
         }
 
         public static TenantSecretKey parse(String secretKey) {
-            secretKey = EncodingUtils.decodeBase64ToString(secretKey);
+            secretKey = EncodingUtils.base64DecodeToString(secretKey);
 
             String[] items = secretKey.split(":");
 
@@ -217,8 +217,8 @@ public class ApiKey {
 
         @Override
         public String toString() {
-            return EncodingUtils.encodeBase64ToString(
-                tenantId + ":" + EncodingUtils.encodeToString(RandomUtils.nextBytes(24)));
+            return EncodingUtils.base64EncodeToString(
+                tenantId + ":" + EncodingUtils.base64EncodeToString(RandomUtils.nextBytes(24)));
         }
     }
 }

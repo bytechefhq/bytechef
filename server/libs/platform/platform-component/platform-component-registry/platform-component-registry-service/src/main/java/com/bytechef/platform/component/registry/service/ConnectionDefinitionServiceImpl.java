@@ -371,7 +371,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                         "Authorization",
                         List.of(
                             "Basic " +
-                                EncodingUtils.encodeBase64ToString(valueToEncode.getBytes(StandardCharsets.UTF_8)))));
+                                EncodingUtils.base64EncodeToString(valueToEncode.getBytes(StandardCharsets.UTF_8)))));
             };
             case BEARER_TOKEN -> (Parameters connectionParameters, Context context) -> ApplyResponse.ofHeaders(
                 Map.of(
