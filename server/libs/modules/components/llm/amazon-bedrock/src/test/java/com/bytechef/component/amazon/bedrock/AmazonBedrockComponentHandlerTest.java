@@ -16,7 +16,6 @@
 
 package com.bytechef.component.amazon.bedrock;
 
-import com.bytechef.component.amazon.bedrock.AmazonBedrockComponentHandler;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
