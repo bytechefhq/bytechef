@@ -92,7 +92,7 @@ public abstract class AbstractResourceWorkflowRepository implements WorkflowRepo
 
         return readWorkflow(
             new WorkflowResource(
-                EncodingUtils.encodeBase64ToString(substring), Map.of(WorkflowConstants.PATH, uri), resource,
+                EncodingUtils.base64EncodeToString(substring), Map.of(WorkflowConstants.PATH, uri), resource,
                 Workflow.Format.parse(uri)));
     }
 

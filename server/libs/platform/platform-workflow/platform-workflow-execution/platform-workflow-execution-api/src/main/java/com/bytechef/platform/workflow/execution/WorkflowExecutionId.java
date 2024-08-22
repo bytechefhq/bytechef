@@ -57,7 +57,7 @@ public class WorkflowExecutionId implements Serializable {
     }
 
     public static WorkflowExecutionId parse(String id) {
-        id = EncodingUtils.decodeBase64ToString(id);
+        id = EncodingUtils.base64DecodeToString(id);
 
         String[] items = id.split(":");
 
@@ -87,7 +87,7 @@ public class WorkflowExecutionId implements Serializable {
 
     @Override
     public String toString() {
-        return EncodingUtils.encodeBase64ToString(
+        return EncodingUtils.base64EncodeToString(
             tenantId +
                 ":" +
                 type.ordinal() +

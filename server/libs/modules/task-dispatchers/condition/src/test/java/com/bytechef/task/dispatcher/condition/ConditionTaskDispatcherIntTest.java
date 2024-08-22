@@ -66,7 +66,7 @@ public class ConditionTaskDispatcherIntTest {
     @Test
     public void testDispatchBoolean() {
         taskDispatcherJobTestExecutor.execute(
-            EncodingUtils.encodeBase64ToString("condition_v1-conditions-boolean".getBytes(StandardCharsets.UTF_8)),
+            EncodingUtils.base64EncodeToString("condition_v1-conditions-boolean".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", "true", "value2", "false"),
             this::getTaskCompletionHandlerFactories,
             this::getTaskDispatcherResolverFactories,
@@ -79,7 +79,7 @@ public class ConditionTaskDispatcherIntTest {
     @Test
     public void testDispatchDateTime() {
         taskDispatcherJobTestExecutor.execute(
-            EncodingUtils.encodeBase64ToString("condition_v1-conditions-dateTime".getBytes(StandardCharsets.UTF_8)),
+            EncodingUtils.base64EncodeToString("condition_v1-conditions-dateTime".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", "2022-01-01T00:00:00", "value2", "2022-01-01T00:00:01"),
             this::getTaskCompletionHandlerFactories,
             this::getTaskDispatcherResolverFactories,
@@ -92,7 +92,7 @@ public class ConditionTaskDispatcherIntTest {
     @Test
     public void testDispatchExpression() {
         taskDispatcherJobTestExecutor.execute(
-            EncodingUtils.encodeBase64ToString("condition_v1-conditions-expression".getBytes(StandardCharsets.UTF_8)),
+            EncodingUtils.base64EncodeToString("condition_v1-conditions-expression".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", 100, "value2", 200),
             this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories,
             this::getTaskHandlerMap);
@@ -103,7 +103,7 @@ public class ConditionTaskDispatcherIntTest {
     @Test
     public void testDispatchNumber() {
         taskDispatcherJobTestExecutor.execute(
-            EncodingUtils.encodeBase64ToString("condition_v1-conditions-number".getBytes(StandardCharsets.UTF_8)),
+            EncodingUtils.base64EncodeToString("condition_v1-conditions-number".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", 100, "value2", 200),
             this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories,
             this::getTaskHandlerMap);
@@ -119,7 +119,7 @@ public class ConditionTaskDispatcherIntTest {
     @Test
     public void testDispatchString() {
         taskDispatcherJobTestExecutor.execute(
-            EncodingUtils.encodeBase64ToString("condition_v1-conditions-string".getBytes(StandardCharsets.UTF_8)),
+            EncodingUtils.base64EncodeToString("condition_v1-conditions-string".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", "Hello World", "value2", "Hello"),
             this::getTaskCompletionHandlerFactories,
             this::getTaskDispatcherResolverFactories,

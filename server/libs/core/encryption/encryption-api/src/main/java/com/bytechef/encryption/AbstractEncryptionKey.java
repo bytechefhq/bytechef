@@ -52,6 +52,6 @@ public abstract class AbstractEncryptionKey implements EncryptionKey {
         // Creating/Generating a key
         Key key = keyGenerator.generateKey();
 
-        return EncodingUtils.encodeBase64ToString(key.getEncoded());
+        return EncodingUtils.base64EncodeToString(key.getEncoded());
     }
 }

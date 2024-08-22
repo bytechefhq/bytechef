@@ -74,7 +74,7 @@ public class LoopTaskDispatcherIntTest {
     @Test
     public void testDispatch1() {
         assertNoTaskErrors(taskDispatcherJobTestExecutor.execute(
-            EncodingUtils.encodeBase64ToString("loop_v1_1"),
+            EncodingUtils.base64EncodeToString("loop_v1_1"),
             this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap()));
 
         Assertions.assertEquals(
@@ -116,7 +116,7 @@ public class LoopTaskDispatcherIntTest {
     @Test
     public void testDispatch2() {
         taskDispatcherJobTestExecutor.execute(
-            EncodingUtils.encodeBase64ToString("loop_v1_2"),
+            EncodingUtils.base64EncodeToString("loop_v1_2"),
             this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
         Assertions.assertEquals(
@@ -132,7 +132,7 @@ public class LoopTaskDispatcherIntTest {
     public void testDispatch3() {
         assertNoTaskErrors(
             taskDispatcherJobTestExecutor.execute(
-                EncodingUtils.encodeBase64ToString("loop_v1_3"),
+                EncodingUtils.base64EncodeToString("loop_v1_3"),
                 this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories,
                 getTaskHandlerMap()));
 
@@ -146,7 +146,7 @@ public class LoopTaskDispatcherIntTest {
     @Test
     public void testDispatch4() {
         taskDispatcherJobTestExecutor.execute(
-            EncodingUtils.encodeBase64ToString("loop_v1_4"),
+            EncodingUtils.base64EncodeToString("loop_v1_4"),
             this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
         Assertions.assertEquals(
@@ -159,7 +159,7 @@ public class LoopTaskDispatcherIntTest {
     @Test
     public void testDispatch5() {
         taskDispatcherJobTestExecutor.execute(
-            EncodingUtils.encodeBase64ToString("loop_v1_5"),
+            EncodingUtils.base64EncodeToString("loop_v1_5"),
             this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
         Assertions.assertEquals(
@@ -172,7 +172,7 @@ public class LoopTaskDispatcherIntTest {
     @Test
     public void testDispatch6() {
         taskDispatcherJobTestExecutor.execute(
-            EncodingUtils.encodeBase64ToString("loop_v1_6"),
+            EncodingUtils.base64EncodeToString("loop_v1_6"),
             this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
         Assertions.assertEquals(

@@ -105,7 +105,7 @@ public class GitWorkflowRepository implements WorkflowRepository {
 
     private static String decode(String str) {
         try {
-            return EncodingUtils.decodeBase64ToString(str);
+            return EncodingUtils.base64DecodeToString(str);
         } catch (IllegalArgumentException e) {
             if (logger.isDebugEnabled()) {
                 logger.debug(e.getMessage());
@@ -116,6 +116,6 @@ public class GitWorkflowRepository implements WorkflowRepository {
     }
 
     private static String encode(String id) {
-        return EncodingUtils.encodeBase64ToString(id);
+        return EncodingUtils.base64EncodeToString(id);
     }
 }

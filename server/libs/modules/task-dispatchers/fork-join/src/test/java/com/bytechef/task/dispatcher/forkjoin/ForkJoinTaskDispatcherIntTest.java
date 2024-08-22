@@ -60,7 +60,7 @@ public class ForkJoinTaskDispatcherIntTest {
     @Test
     public void testDispatch() {
         taskDispatcherJobTestExecutor.execute(
-            EncodingUtils.encodeBase64ToString("fork-join_v1"),
+            EncodingUtils.base64EncodeToString("fork-join_v1"),
             (
                 counterService, taskExecutionService) -> List.of(
                     (taskCompletionHandler, taskDispatcher) -> new ForkJoinTaskCompletionHandler(

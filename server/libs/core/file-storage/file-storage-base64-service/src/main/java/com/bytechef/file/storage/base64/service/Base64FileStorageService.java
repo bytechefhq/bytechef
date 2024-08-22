@@ -49,7 +49,7 @@ public class Base64FileStorageService implements FileStorageService {
     public InputStream getFileStream(String directoryPath, FileEntry fileEntry) {
         String url = fileEntry.getUrl();
 
-        return new ByteArrayInputStream(EncodingUtils.decodeBase64(url.replace(BASE_64, "")));
+        return new ByteArrayInputStream(EncodingUtils.base64Decode(url.replace(BASE_64, "")));
     }
 
     @Override
@@ -61,20 +61,20 @@ public class Base64FileStorageService implements FileStorageService {
     public byte[] readFileToBytes(String directoryPath, FileEntry fileEntry) throws FileStorageException {
         String url = fileEntry.getUrl();
 
-        return EncodingUtils.decodeBase64(url.replace(BASE_64, ""));
+        return EncodingUtils.base64Decode(url.replace(BASE_64, ""));
     }
 
     @Override
     public String readFileToString(String directoryPath, FileEntry fileEntry) throws FileStorageException {
         String url = fileEntry.getUrl();
 
-        return EncodingUtils.decodeBase64ToString(url.replace(BASE_64, ""));
+        return EncodingUtils.base64DecodeToString(url.replace(BASE_64, ""));
     }
 
     @Override
     public FileEntry storeFileContent(String directoryPath, String fileName, byte[] data) throws FileStorageException {
-        return new FileEntry(
-            fileName, BASE_64 + EncodingUtils.encodeBase64ToString(data));
+        return new FileEntry(fileName, BASE_64 + EncodingUtils.base64EncodeToString(data));
+    }
 
     @Override
     public FileEntry storeFileContent(
@@ -85,13 +85,13 @@ public class Base64FileStorageService implements FileStorageService {
 
     @Override
     public FileEntry storeFileContent(String directoryPath, String fileName, String data) throws FileStorageException {
-        return new FileEntry(fileName, BASE_64 + EncodingUtils.encodeBase64ToString(data));
+        return new FileEntry(fileName, BASE_64 + EncodingUtils.base64EncodeToString(data));
     }
 
     @Override
     public FileEntry storeFileContent(String directoryPath, String fileName, InputStream inputStream) {
         try {
-            return new FileEntry(fileName, BASE_64 + EncodingUtils.encodeBase64ToString(toByteArray(inputStream)));
+            return new FileEntry(fileName, BASE_64 + EncodingUtils.base64EncodeToString(toByteArray(inputStream)));
         } catch (IOException ioe) {
             throw new FileStorageException("Failed to store file", ioe);
         }

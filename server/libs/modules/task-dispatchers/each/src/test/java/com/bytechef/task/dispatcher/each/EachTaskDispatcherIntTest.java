@@ -56,7 +56,7 @@ public class EachTaskDispatcherIntTest {
     @Test
     public void testEachTaskDispatcher() {
         taskDispatcherJobTestExecutor.execute(
-            EncodingUtils.encodeBase64ToString("each_v1"),
+            EncodingUtils.base64EncodeToString("each_v1"),
             (counterService, taskExecutionService) -> List.of(
                 (taskCompletionHandler, taskDispatcher) -> new EachTaskCompletionHandler(
                     counterService, taskCompletionHandler, taskExecutionService)),
