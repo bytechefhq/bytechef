@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public interface TriggerHandlerMapFactory {
+public interface TriggerHandlerFactory {
 
     Map<String, TriggerHandler> getTriggerHandlerMap();
 }

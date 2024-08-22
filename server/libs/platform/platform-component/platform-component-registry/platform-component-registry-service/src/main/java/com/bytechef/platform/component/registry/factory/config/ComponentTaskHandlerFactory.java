@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.component.registry.factory.config;
 
-import com.bytechef.atlas.worker.task.factory.TaskHandlerMapFactory;
+import com.bytechef.atlas.worker.task.factory.TaskHandlerFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
@@ -34,10 +34,10 @@ import java.util.stream.Collectors;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record ComponentTaskHandlerMapFactory(
+public record ComponentTaskHandlerFactory(
     List<ComponentHandlerLoader.ComponentHandlerEntry> componentHandlerEntries,
     ActionDefinitionFacade actionDefinitionFacade)
-    implements TaskHandlerMapFactory {
+    implements TaskHandlerFactory {
 
     @Override
     @SuppressWarnings({

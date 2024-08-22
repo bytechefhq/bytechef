@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public interface TaskHandlerMapFactory {
+public interface TaskHandlerFactory {
 
     Map<String, TaskHandler<?>> getTaskHandlerMap();
 }
