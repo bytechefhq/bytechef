@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.component.registry.jackson;
 
+import com.bytechef.commons.util.constant.ObjectMapperConstants;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.platform.component.registry.definition.FileEntryImpl;
 import com.fasterxml.jackson.core.JsonParser;
@@ -23,6 +24,7 @@ import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import java.io.IOException;
 import org.springframework.boot.jackson.JsonComponent;
 
@@ -31,6 +33,14 @@ import org.springframework.boot.jackson.JsonComponent;
  */
 @JsonComponent
 public class FileEntryDeserializer extends JsonDeserializer<FileEntry> {
+
+    static {
+        SimpleModule module = new SimpleModule();
+
+        module.addDeserializer(FileEntry.class, new FileEntryDeserializer());
+
+        ObjectMapperConstants.OBJECT_MAPPER.registerModule(module);
+    }
 
     @Override
     public FileEntry deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {

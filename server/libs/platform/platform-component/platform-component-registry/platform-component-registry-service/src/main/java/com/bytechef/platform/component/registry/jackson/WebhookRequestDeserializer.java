@@ -18,6 +18,7 @@ package com.bytechef.platform.component.registry.jackson;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.commons.util.constant.ObjectMapperConstants;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody.ContentType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.file.storage.domain.FileEntry;
@@ -28,6 +29,7 @@ import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +40,14 @@ import org.springframework.boot.jackson.JsonComponent;
  */
 @JsonComponent
 public class WebhookRequestDeserializer extends JsonDeserializer<WebhookRequest> {
+
+    static {
+        SimpleModule module = new SimpleModule();
+
+        module.addDeserializer(WebhookRequest.class, new WebhookRequestDeserializer());
+
+        ObjectMapperConstants.OBJECT_MAPPER.registerModule(module);
+    }
 
     private static final String BODY = "body";
     private static final String CONTENT = "content";

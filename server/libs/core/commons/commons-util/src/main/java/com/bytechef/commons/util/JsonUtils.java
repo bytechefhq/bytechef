@@ -16,6 +16,8 @@
 
 package com.bytechef.commons.util;
 
+import static com.bytechef.commons.util.constant.ObjectMapperConstants.OBJECT_MAPPER;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -30,7 +32,6 @@ import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.TypeRef;
 import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
@@ -38,24 +39,26 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ResolvableType;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-@Component
 public class JsonUtils {
 
-    @SuppressFBWarnings("MS_PKGPROTECT")
-    protected static ObjectMapper objectMapper;
+    private static final Configuration CONFIGURATION;
 
-    private static Configuration configuration;
+    static {
+        CONFIGURATION = Configuration.builder()
+            .jsonProvider(new JacksonJsonProvider(OBJECT_MAPPER))
+            .mappingProvider(new JacksonMappingProvider(OBJECT_MAPPER))
+            .options(EnumSet.noneOf(Option.class))
+            .build();
+    }
 
     public static Object read(InputStream inputStream) {
         try {
-            return objectMapper.readValue(inputStream, Object.class);
+            return OBJECT_MAPPER.readValue(inputStream, Object.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -63,17 +66,17 @@ public class JsonUtils {
 
     public static <T> T read(InputStream inputStream, Class<T> valueType) {
         try {
-            return objectMapper.readValue(inputStream, valueType);
+            return OBJECT_MAPPER.readValue(inputStream, valueType);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     public static <T> T read(InputStream inputStream, Type type) {
-        TypeFactory typeFactory = objectMapper.getTypeFactory();
+        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
 
         try {
-            return objectMapper.readValue(inputStream, typeFactory.constructType(type));
+            return OBJECT_MAPPER.readValue(inputStream, typeFactory.constructType(type));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -81,39 +84,39 @@ public class JsonUtils {
 
     public static <T> T read(InputStream inputStream, TypeReference<T> typeReference) {
         try {
-            return objectMapper.readValue(inputStream, typeReference);
+            return OBJECT_MAPPER.readValue(inputStream, typeReference);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     public static Object read(InputStream inputStream, String path) {
-        DocumentContext documentContext = JsonPath.parse(inputStream, configuration);
+        DocumentContext documentContext = JsonPath.parse(inputStream, CONFIGURATION);
 
         return documentContext.read(path, Object.class);
     }
 
     public static <T> T read(InputStream inputStream, String path, Class<T> valueType) {
-        DocumentContext documentContext = JsonPath.parse(inputStream, configuration);
+        DocumentContext documentContext = JsonPath.parse(inputStream, CONFIGURATION);
 
         return documentContext.read(path, valueType);
     }
 
     public static <T> T read(InputStream inputStream, String path, Type type) {
-        DocumentContext documentContext = JsonPath.parse(inputStream, configuration);
+        DocumentContext documentContext = JsonPath.parse(inputStream, CONFIGURATION);
 
         return documentContext.read(path, new TypeTypeRef<>(type));
     }
 
     public static <T> T read(InputStream inputStream, String path, TypeRef<T> typeRef) {
-        DocumentContext documentContext = JsonPath.parse(inputStream, configuration);
+        DocumentContext documentContext = JsonPath.parse(inputStream, CONFIGURATION);
 
         return documentContext.read(path, typeRef);
     }
 
     public static Object read(String json) {
         try {
-            return objectMapper.readValue(json, Object.class);
+            return OBJECT_MAPPER.readValue(json, Object.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -121,7 +124,7 @@ public class JsonUtils {
 
     public static <T> T read(String json, Class<T> valueType) {
         try {
-            return objectMapper.readValue(json, valueType);
+            return OBJECT_MAPPER.readValue(json, valueType);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -129,42 +132,42 @@ public class JsonUtils {
 
     public static <T> T read(String json, TypeReference<T> typeReference) {
         try {
-            return objectMapper.readValue(json, typeReference);
+            return OBJECT_MAPPER.readValue(json, typeReference);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
     public static <T> T read(String json, Type type) {
-        TypeFactory typeFactory = objectMapper.getTypeFactory();
+        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
 
         try {
-            return objectMapper.readValue(json, typeFactory.constructType(type));
+            return OBJECT_MAPPER.readValue(json, typeFactory.constructType(type));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
     public static Object read(String json, String path) {
-        DocumentContext documentContext = JsonPath.parse(json, configuration);
+        DocumentContext documentContext = JsonPath.parse(json, CONFIGURATION);
 
         return documentContext.read(path, Object.class);
     }
 
     public static <T> T read(String json, String path, Class<T> valueType) {
-        DocumentContext documentContext = JsonPath.parse(json, configuration);
+        DocumentContext documentContext = JsonPath.parse(json, CONFIGURATION);
 
         return documentContext.read(path, valueType);
     }
 
     public static <T> T read(String json, String path, Type type) {
-        DocumentContext documentContext = JsonPath.parse(json, configuration);
+        DocumentContext documentContext = JsonPath.parse(json, CONFIGURATION);
 
         return documentContext.read(path, new TypeTypeRef<>(type));
     }
 
     public static <T> T read(String json, String path, TypeRef<T> typeRef) {
-        DocumentContext documentContext = JsonPath.parse(json, configuration);
+        DocumentContext documentContext = JsonPath.parse(json, CONFIGURATION);
 
         return documentContext.read(path, typeRef);
     }
@@ -174,17 +177,17 @@ public class JsonUtils {
     }
 
     public static <T> List<T> readList(InputStream inputStream, Class<T> elementType) {
-        TypeFactory typeFactory = objectMapper.getTypeFactory();
+        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
 
         try {
-            return objectMapper.readValue(inputStream, typeFactory.constructCollectionType(List.class, elementType));
+            return OBJECT_MAPPER.readValue(inputStream, typeFactory.constructCollectionType(List.class, elementType));
         } catch (Exception exception) {
             throw new RuntimeException(exception);
         }
     }
 
     public static List<?> readList(InputStream inputStream, String path) {
-        DocumentContext documentContext = JsonPath.parse(inputStream, configuration);
+        DocumentContext documentContext = JsonPath.parse(inputStream, CONFIGURATION);
 
         return documentContext.read(path, new TypeRef<>() {});
     }
@@ -192,7 +195,7 @@ public class JsonUtils {
     public static <T> List<T> readList(
         InputStream inputStream, String path, Class<T> elementType) {
 
-        DocumentContext documentContext = JsonPath.parse(inputStream, configuration);
+        DocumentContext documentContext = JsonPath.parse(inputStream, CONFIGURATION);
 
         return documentContext.read(
             path, new ResolvableTypeTypeRef<>(ResolvableType.forClassWithGenerics(List.class, elementType)));
@@ -203,33 +206,33 @@ public class JsonUtils {
     }
 
     public static <T> List<T> readList(String json, Class<T> elementType) {
-        TypeFactory typeFactory = objectMapper.getTypeFactory();
+        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
 
         try {
-            return objectMapper.readValue(json, typeFactory.constructCollectionType(List.class, elementType));
+            return OBJECT_MAPPER.readValue(json, typeFactory.constructCollectionType(List.class, elementType));
         } catch (Exception exception) {
             throw new RuntimeException(exception);
         }
     }
 
     public static List<?> readList(String json, String path) {
-        DocumentContext documentContext = JsonPath.parse(json, configuration);
+        DocumentContext documentContext = JsonPath.parse(json, CONFIGURATION);
 
         return documentContext.read(path, new TypeRef<>() {});
     }
 
     public static <T> List<T> readList(String json, String path, Class<T> elementType) {
-        DocumentContext documentContext = JsonPath.parse(json, configuration);
+        DocumentContext documentContext = JsonPath.parse(json, CONFIGURATION);
 
         return documentContext.read(
             path, new ResolvableTypeTypeRef<>(ResolvableType.forClassWithGenerics(List.class, elementType)));
     }
 
     public static <V> Map<String, V> readMap(InputStream inputStream, Class<V> valueType) {
-        TypeFactory typeFactory = objectMapper.getTypeFactory();
+        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
 
         try {
-            return objectMapper.readValue(
+            return OBJECT_MAPPER.readValue(
                 inputStream, typeFactory.constructMapType(Map.class, String.class, valueType));
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -237,7 +240,7 @@ public class JsonUtils {
     }
 
     public static Map<String, ?> readMap(InputStream inputStream, String path) {
-        DocumentContext documentContext = JsonPath.parse(inputStream, configuration);
+        DocumentContext documentContext = JsonPath.parse(inputStream, CONFIGURATION);
 
         return documentContext.read(
             path, new ResolvableTypeTypeRef<>(ResolvableType.forClassWithGenerics(
@@ -247,17 +250,17 @@ public class JsonUtils {
     public static <V> Map<String, V> readMap(
         InputStream inputStream, String path, Class<V> valueType) {
 
-        DocumentContext documentContext = JsonPath.parse(inputStream, configuration);
+        DocumentContext documentContext = JsonPath.parse(inputStream, CONFIGURATION);
 
         return documentContext.read(
             path, new ResolvableTypeTypeRef<>(ResolvableType.forClassWithGenerics(Map.class, String.class, valueType)));
     }
 
     public static Map<String, ?> readMap(String json) {
-        TypeFactory typeFactory = objectMapper.getTypeFactory();
+        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
 
         try {
-            return objectMapper.readValue(
+            return OBJECT_MAPPER.readValue(
                 json, typeFactory.constructMapType(
                     Map.class, typeFactory.constructType(String.class), typeFactory.constructType(Object.class)));
         } catch (JsonProcessingException e) {
@@ -266,10 +269,10 @@ public class JsonUtils {
     }
 
     public static <V> Map<String, V> readMap(String json, Class<V> valueType) {
-        TypeFactory typeFactory = objectMapper.getTypeFactory();
+        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
 
         try {
-            return objectMapper.readValue(
+            return OBJECT_MAPPER.readValue(
                 json,
                 typeFactory.constructMapType(
                     Map.class, typeFactory.constructType(String.class), typeFactory.constructType(valueType)));
@@ -279,7 +282,7 @@ public class JsonUtils {
     }
 
     public static Map<String, ?> readMap(String json, String path) {
-        DocumentContext documentContext = JsonPath.parse(json, configuration);
+        DocumentContext documentContext = JsonPath.parse(json, CONFIGURATION);
 
         return documentContext.read(
             path, new ResolvableTypeTypeRef<>(ResolvableType.forClassWithGenerics(
@@ -287,7 +290,7 @@ public class JsonUtils {
     }
 
     public static <V> Map<String, V> readMap(String json, String path, Class<V> valueType) {
-        DocumentContext documentContext = JsonPath.parse(json, configuration);
+        DocumentContext documentContext = JsonPath.parse(json, CONFIGURATION);
 
         return documentContext.read(
             path, new ResolvableTypeTypeRef<>(ResolvableType.forClassWithGenerics(Map.class, String.class, valueType)));
@@ -295,7 +298,7 @@ public class JsonUtils {
 
     public static Stream<Map<String, ?>> stream(InputStream inputStream) {
         try {
-            return new JsonParserStream(inputStream, objectMapper);
+            return new JsonParserStream(inputStream, OBJECT_MAPPER);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -303,14 +306,14 @@ public class JsonUtils {
 
     public static String write(Object object) {
         try {
-            return objectMapper.writeValueAsString(object);
+            return OBJECT_MAPPER.writeValueAsString(object);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     public static String write(Object object, boolean includeNulls) {
-        ObjectMapper currentObjectMapper = objectMapper;
+        ObjectMapper currentObjectMapper = OBJECT_MAPPER;
 
         if (includeNulls) {
             currentObjectMapper = currentObjectMapper.copy()
@@ -329,7 +332,7 @@ public class JsonUtils {
             DefaultPrettyPrinter printer = new DefaultPrettyPrinter()
                 .withObjectIndenter(new DefaultIndenter("    ", "\n"));
 
-            return objectMapper.writer(printer)
+            return OBJECT_MAPPER.writer(printer)
                 .writeValueAsString(object);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -337,7 +340,7 @@ public class JsonUtils {
     }
 
     public static String writeWithDefaultPrettyPrinter(Object object, boolean includeNulls) {
-        ObjectMapper currentObjectMapper = objectMapper;
+        ObjectMapper currentObjectMapper = OBJECT_MAPPER;
 
         if (includeNulls) {
             currentObjectMapper = currentObjectMapper.copy()
@@ -353,22 +356,6 @@ public class JsonUtils {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Autowired
-    @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
-    void setObjectMapper(ObjectMapper objectMapper) {
-        JsonUtils.objectMapper = objectMapper;
-
-        configuration = createConfiguration(objectMapper);
-    }
-
-    private static Configuration createConfiguration(ObjectMapper objectMapper) {
-        return Configuration.builder()
-            .jsonProvider(new JacksonJsonProvider(objectMapper))
-            .mappingProvider(new JacksonMappingProvider(objectMapper))
-            .options(EnumSet.noneOf(Option.class))
-            .build();
     }
 
     private static class ResolvableTypeTypeRef<L> extends TypeRef<L> {
