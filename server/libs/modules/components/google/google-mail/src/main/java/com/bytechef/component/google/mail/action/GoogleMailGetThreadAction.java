@@ -17,19 +17,16 @@
 package com.bytechef.component.google.mail.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT_PROPERTY;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FULL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.GET_THREAD;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.HISTORY_ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MESSAGES;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MESSAGE_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA_HEADERS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA_HEADERS_PROPERTY;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SNIPPET;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MINIMAL;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.RAW;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -55,16 +52,21 @@ public class GoogleMailGetThreadAction {
                 .description("The ID of the thread to retrieve.")
                 .options((ActionOptionsFunction<String>) GoogleMailUtils::getThreadIdOptions)
                 .required(true),
-            FORMAT_PROPERTY,
+            string(FORMAT)
+                .label("Format")
+                .description("The format to return the message in.")
+                .options(
+                    option("Minimal", MINIMAL,
+                        "Returns only email message ID and labels; does not return the email headers, body, or payload."),
+                    option("Full", FULL,
+                        "Returns the full email message data with body content parsed in the payload field; the raw field is not used. Format cannot be used when accessing the api using the gmail.metadata scope."),
+                    option("Raw", RAW,
+                        "Returns the full email message data with body content in the raw field as a base64url encoded string; the payload field is not used. Format cannot be used when accessing the api using the gmail.metadata scope."),
+                    option("Metadata", "metadata", "Returns only email message ID, labels, and email headers."))
+                .defaultValue(FULL)
+                .required(false),
             METADATA_HEADERS_PROPERTY)
-        .outputSchema(
-            object()
-                .properties(
-                    string(ID),
-                    string(SNIPPET),
-                    string(HISTORY_ID),
-                    array(MESSAGES)
-                        .items(MESSAGE_PROPERTY)))
+        .output(GoogleMailUtils.getOutput())
         .perform(GoogleMailGetThreadAction::perform);
 
     private GoogleMailGetThreadAction() {
