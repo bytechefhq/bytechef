@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package util;
+package com.bytechef.component.llm.util;
 
 import static com.bytechef.component.definition.ComponentDSL.option;
 

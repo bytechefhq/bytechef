@@ -22,15 +22,15 @@ import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static constants.LLMConstants.CREATE_TRANSCRIPTION;
-import static constants.LLMConstants.ENDPOINT;
-import static constants.LLMConstants.FILE;
-import static constants.LLMConstants.LANGUAGE;
-import static constants.LLMConstants.LANGUAGE_PROPERTY;
-import static constants.LLMConstants.MODEL;
-import static constants.LLMConstants.PROMPT;
-import static constants.LLMConstants.RESPONSE_FORMAT;
-import static constants.LLMConstants.TEMPERATURE;
+import static com.bytechef.component.llm.constants.LLMConstants.CREATE_TRANSCRIPTION;
+import static com.bytechef.component.llm.constants.LLMConstants.ENDPOINT;
+import static com.bytechef.component.llm.constants.LLMConstants.FILE;
+import static com.bytechef.component.llm.constants.LLMConstants.LANGUAGE;
+import static com.bytechef.component.llm.constants.LLMConstants.LANGUAGE_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
+import static com.bytechef.component.llm.constants.LLMConstants.PROMPT;
+import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE;
 
 import com.azure.ai.openai.OpenAIClient;
 import com.azure.ai.openai.OpenAIClientBuilder;
@@ -48,7 +48,7 @@ import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
 import org.springframework.ai.azure.openai.AzureOpenAiAudioTranscriptionModel;
 import org.springframework.ai.azure.openai.AzureOpenAiAudioTranscriptionOptions;
 import org.springframework.core.io.UrlResource;
-import util.LLMUtils;
+import com.bytechef.component.llm.util.LLMUtils;
 
 /**
  * @author Monika Domiter

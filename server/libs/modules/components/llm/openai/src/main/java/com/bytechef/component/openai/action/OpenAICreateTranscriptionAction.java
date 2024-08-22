@@ -22,14 +22,14 @@ import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static constants.LLMConstants.CREATE_TRANSCRIPTION;
-import static constants.LLMConstants.FILE;
-import static constants.LLMConstants.LANGUAGE;
-import static constants.LLMConstants.LANGUAGE_PROPERTY;
-import static constants.LLMConstants.MODEL;
-import static constants.LLMConstants.PROMPT;
-import static constants.LLMConstants.RESPONSE_FORMAT;
-import static constants.LLMConstants.TEMPERATURE;
+import static com.bytechef.component.llm.constants.LLMConstants.CREATE_TRANSCRIPTION;
+import static com.bytechef.component.llm.constants.LLMConstants.FILE;
+import static com.bytechef.component.llm.constants.LLMConstants.LANGUAGE;
+import static com.bytechef.component.llm.constants.LLMConstants.LANGUAGE_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
+import static com.bytechef.component.llm.constants.LLMConstants.PROMPT;
+import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -45,7 +45,7 @@ import org.springframework.ai.openai.OpenAiAudioTranscriptionModel;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionOptions;
 import org.springframework.ai.openai.api.OpenAiAudioApi;
 import org.springframework.core.io.UrlResource;
-import util.LLMUtils;
+import com.bytechef.component.llm.util.LLMUtils;
 
 /**
  * @author Monika Domiter

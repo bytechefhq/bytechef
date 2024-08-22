@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package util.records;
+package com.bytechef.component.llm.util.records;
 
-public class MessageRecord {
+public class ImageMessageRecord {
     private String content;
-    private String role;
+    private Float weight;
 
-    public MessageRecord() {
+    public ImageMessageRecord() {
     }
 
-    public MessageRecord(String content, String role) {
+    public ImageMessageRecord(String content, Float weight) {
         this.content = content;
-        this.role = role;
+        this.weight = weight;
     }
 
     public String getContent() {
@@ -36,11 +36,11 @@ public class MessageRecord {
         this.content = content;
     }
 
-    public String getRole() {
-        return role;
+    public Float getWeight() {
+        return weight;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setWeight(Float weight) {
+        this.weight = weight;
     }
 }

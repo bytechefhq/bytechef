@@ -21,8 +21,8 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import static com.bytechef.component.hugging.face.constant.HuggingFaceConstants.URL;
-import static constants.LLMConstants.ASK;
-import static constants.LLMConstants.MESSAGE_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.ASK;
+import static com.bytechef.component.llm.constants.LLMConstants.MESSAGE_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -31,7 +31,7 @@ import com.bytechef.component.definition.Parameters;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.huggingface.HuggingfaceChatModel;
-import util.interfaces.Chat;
+import com.bytechef.component.llm.util.interfaces.Chat;
 
 public class HuggingFaceChatAction {
 

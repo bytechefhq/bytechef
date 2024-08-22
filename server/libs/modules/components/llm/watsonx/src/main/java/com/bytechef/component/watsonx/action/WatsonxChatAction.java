@@ -28,22 +28,22 @@ import static com.bytechef.component.watsonx.constant.WatsonxConstants.PROJECT_I
 import static com.bytechef.component.watsonx.constant.WatsonxConstants.REPETITION_PENALTY;
 import static com.bytechef.component.watsonx.constant.WatsonxConstants.STREAM_ENDPOINT;
 import static com.bytechef.component.watsonx.constant.WatsonxConstants.TEXT_ENDPOINT;
-import static constants.LLMConstants.ASK;
-import static constants.LLMConstants.MAX_TOKENS;
-import static constants.LLMConstants.MAX_TOKENS_PROPERTY;
-import static constants.LLMConstants.MESSAGE_PROPERTY;
-import static constants.LLMConstants.MODEL;
-import static constants.LLMConstants.SEED;
-import static constants.LLMConstants.SEED_PROPERTY;
-import static constants.LLMConstants.STOP;
-import static constants.LLMConstants.STOP_PROPERTY;
-import static constants.LLMConstants.TEMPERATURE;
-import static constants.LLMConstants.TEMPERATURE_PROPERTY;
-import static constants.LLMConstants.TOP_K;
-import static constants.LLMConstants.TOP_K_PROPERTY;
-import static constants.LLMConstants.TOP_P;
-import static constants.LLMConstants.TOP_P_PROPERTY;
-import static constants.LLMConstants.URL;
+import static com.bytechef.component.llm.constants.LLMConstants.ASK;
+import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
+import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.MESSAGE_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
+import static com.bytechef.component.llm.constants.LLMConstants.SEED;
+import static com.bytechef.component.llm.constants.LLMConstants.SEED_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.STOP;
+import static com.bytechef.component.llm.constants.LLMConstants.STOP_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE;
+import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.TOP_K;
+import static com.bytechef.component.llm.constants.LLMConstants.TOP_K_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.TOP_P;
+import static com.bytechef.component.llm.constants.LLMConstants.TOP_P_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.URL;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -56,7 +56,7 @@ import org.springframework.ai.watsonx.WatsonxAiChatModel;
 import org.springframework.ai.watsonx.WatsonxAiChatOptions;
 import org.springframework.ai.watsonx.api.WatsonxAiApi;
 import org.springframework.web.client.RestClient;
-import util.interfaces.Chat;
+import com.bytechef.component.llm.util.interfaces.Chat;
 
 public class WatsonxChatAction {
 

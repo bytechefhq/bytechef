@@ -27,8 +27,8 @@ import org.springframework.ai.qianfan.QianFanImageModel;
 import org.springframework.ai.qianfan.QianFanImageOptions;
 import org.springframework.ai.qianfan.api.QianFanImageApi;
 import org.springframework.retry.support.RetryTemplate;
-import util.LLMUtils;
-import util.interfaces.Image;
+import com.bytechef.component.llm.util.LLMUtils;
+import com.bytechef.component.llm.util.interfaces.Image;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -40,14 +40,14 @@ import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static constants.LLMConstants.CREATE_IMAGE;
-import static constants.LLMConstants.IMAGE_MESSAGE_PROPERTY;
-import static constants.LLMConstants.MODEL;
-import static constants.LLMConstants.N;
-import static constants.LLMConstants.SIZE;
-import static constants.LLMConstants.STYLE;
-import static constants.LLMConstants.USER;
-import static constants.LLMConstants.USER_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.CREATE_IMAGE;
+import static com.bytechef.component.llm.constants.LLMConstants.IMAGE_MESSAGE_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
+import static com.bytechef.component.llm.constants.LLMConstants.N;
+import static com.bytechef.component.llm.constants.LLMConstants.SIZE;
+import static com.bytechef.component.llm.constants.LLMConstants.STYLE;
+import static com.bytechef.component.llm.constants.LLMConstants.USER;
+import static com.bytechef.component.llm.constants.LLMConstants.USER_PROPERTY;
 
 /**
  * @author Monika Domiter
