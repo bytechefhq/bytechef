@@ -20,19 +20,19 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
-import static constants.LLMConstants.ASK;
-import static constants.LLMConstants.MAX_TOKENS;
-import static constants.LLMConstants.MAX_TOKENS_PROPERTY;
-import static constants.LLMConstants.MESSAGE_PROPERTY;
-import static constants.LLMConstants.MODEL;
-import static constants.LLMConstants.STOP;
-import static constants.LLMConstants.STOP_PROPERTY;
-import static constants.LLMConstants.TEMPERATURE;
-import static constants.LLMConstants.TEMPERATURE_PROPERTY;
-import static constants.LLMConstants.TOP_K;
-import static constants.LLMConstants.TOP_K_PROPERTY;
-import static constants.LLMConstants.TOP_P;
-import static constants.LLMConstants.TOP_P_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.ASK;
+import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
+import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.MESSAGE_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
+import static com.bytechef.component.llm.constants.LLMConstants.STOP;
+import static com.bytechef.component.llm.constants.LLMConstants.STOP_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE;
+import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.TOP_K;
+import static com.bytechef.component.llm.constants.LLMConstants.TOP_K_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.TOP_P;
+import static com.bytechef.component.llm.constants.LLMConstants.TOP_P_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -47,8 +47,8 @@ import org.springframework.ai.anthropic.AnthropicChatOptions;
 import org.springframework.ai.anthropic.api.AnthropicApi;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
-import util.LLMUtils;
-import util.interfaces.Chat;
+import com.bytechef.component.llm.util.LLMUtils;
+import com.bytechef.component.llm.util.interfaces.Chat;
 
 public class AnthropicChatAction {
 

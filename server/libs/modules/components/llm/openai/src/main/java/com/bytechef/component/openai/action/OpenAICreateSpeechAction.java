@@ -22,12 +22,12 @@ import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static constants.LLMConstants.CREATE_SPEECH;
-import static constants.LLMConstants.INPUT;
-import static constants.LLMConstants.MODEL;
-import static constants.LLMConstants.RESPONSE_FORMAT;
-import static constants.LLMConstants.SPEED;
-import static constants.LLMConstants.VOICE;
+import static com.bytechef.component.llm.constants.LLMConstants.CREATE_SPEECH;
+import static com.bytechef.component.llm.constants.LLMConstants.INPUT;
+import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
+import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.llm.constants.LLMConstants.SPEED;
+import static com.bytechef.component.llm.constants.LLMConstants.VOICE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -42,7 +42,7 @@ import org.springframework.ai.openai.api.OpenAiAudioApi;
 import org.springframework.ai.openai.audio.speech.SpeechModel;
 import org.springframework.ai.openai.audio.speech.SpeechPrompt;
 import org.springframework.ai.openai.audio.speech.SpeechResponse;
-import util.LLMUtils;
+import com.bytechef.component.llm.util.LLMUtils;
 
 /**
  * @author Monika Domiter
