@@ -33,8 +33,8 @@ import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Component.Registry;
+import com.bytechef.platform.component.factory.ComponentHandlerFactory;
 import com.bytechef.platform.component.registry.factory.DynamicComponentHandlerListFactory;
-import com.bytechef.platform.component.registry.factory.config.ComponentHandlerListFactory;
 import com.bytechef.platform.registry.util.PropertyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
@@ -75,14 +75,14 @@ public class ComponentDefinitionRegistry {
 
     public ComponentDefinitionRegistry(
         ApplicationProperties applicationProperties, List<ComponentHandler> componentHandlers,
-        List<ComponentHandlerListFactory> componentHandlerListFactories,
+        List<ComponentHandlerFactory> componentHandlerFactories,
         @Autowired(required = false) List<DynamicComponentHandlerListFactory> dynamicComponentHandlerListFactories) {
 
         @SuppressWarnings("unchecked")
         List<ComponentHandler> mergedComponentHandlers = CollectionUtils.concat(
             componentHandlers,
             CollectionUtils.flatMap(
-                componentHandlerListFactories,
+                componentHandlerFactories,
                 componentHandlerListFactory -> (List<ComponentHandler>) componentHandlerListFactory
                     .getComponentHandlers()));
 

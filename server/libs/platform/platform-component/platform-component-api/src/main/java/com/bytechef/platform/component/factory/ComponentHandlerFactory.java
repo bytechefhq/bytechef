@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.registry.factory.config;
+package com.bytechef.platform.component.factory;
 
 import com.bytechef.component.ComponentHandler;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
-public record ComponentHandlerListFactory(List<? extends ComponentHandler> componentHandlers) {
+public interface ComponentHandlerFactory {
 
-    public List<? extends ComponentHandler> getComponentHandlers() {
-        return componentHandlers;
-    }
+    List<? extends ComponentHandler> getComponentHandlers();
 }

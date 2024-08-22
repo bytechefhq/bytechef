@@ -48,7 +48,7 @@ public class ComponentHandlerBeanFactoryPostProcessor implements BeanFactoryPost
             CollectionUtils.flatMap(COMPONENT_HANDLER_LOADERS, ComponentHandlerLoader::loadComponentHandlers);
 
         beanFactory.registerSingleton(
-            "componentHandlerListFactory", new ComponentHandlerListFactory(
+            "componentHandlerServiceLoaderFactory", new ComponentHandlerServiceLoaderFactory(
                 CollectionUtils.map(
                     componentHandlerEntries, ComponentHandlerLoader.ComponentHandlerEntry::componentHandler)));
 
@@ -56,14 +56,14 @@ public class ComponentHandlerBeanFactoryPostProcessor implements BeanFactoryPost
 
         beanDefinitionRegistry.registerBeanDefinition(
             "componentTaskHandlerMapFactory",
-            BeanDefinitionBuilder.genericBeanDefinition(ComponentTaskHandlerMapFactory.class)
+            BeanDefinitionBuilder.genericBeanDefinition(ComponentTaskHandlerFactory.class)
                 .addConstructorArgValue(componentHandlerEntries)
                 .addConstructorArgReference("actionDefinitionFacade")
                 .getBeanDefinition());
 
         beanDefinitionRegistry.registerBeanDefinition(
             "componentTriggerHandlerMapFactory",
-            BeanDefinitionBuilder.genericBeanDefinition(ComponentTriggerHandlerMapFactory.class)
+            BeanDefinitionBuilder.genericBeanDefinition(ComponentTriggerHandlerFactory.class)
                 .addConstructorArgValue(componentHandlerEntries)
                 .addConstructorArgReference("instanceAccessorRegistry")
                 .addConstructorArgReference("triggerDefinitionFacade")
