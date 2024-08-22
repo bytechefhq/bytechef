@@ -1309,28 +1309,16 @@ components:
           type: "integer"
     ComponentCategory:
       description: "A category of component."
-      type: "string"
-      enum:
-        - "accounting"
-        - "advertising"
-        - "analytics"
-        - "artificial-intelligence"
-        - "ats"
-        - "calendars-and-scheduling"
-        - "communication"
-        - "crm"
-        - "customer-support"
-        - "developer-tools"
-        - "e-commerce"
-        - "file-storage"
-        - "helpers"
-        - "hris"
-        - "marketing-automation"
-        - "payment-processing"
-        - "productivity-and-collaboration"
-        - "project-management"
-        - "social-media"
-        - "surveys-and-feedback"
+      type: "object"
+      required:
+        - "key"
+      properties:
+        key:
+          description: "The key of a category."
+          type: "string"
+        label:
+          description: "The label of a category."
+          type: "string"
     ConnectionDefinitionBasic:
       description: "Definition of a connection to an outside service."
       type: "object"
