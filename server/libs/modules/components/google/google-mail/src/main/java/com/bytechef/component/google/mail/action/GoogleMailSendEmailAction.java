@@ -27,6 +27,7 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BO
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.CC;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.EMAIL_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.LABEL_IDS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.REPLY_TO;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SEND_EMAIL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SUBJECT;
@@ -101,6 +102,8 @@ public class GoogleMailSendEmailAction {
             object()
                 .properties(
                     string(ID),
+                    array(LABEL_IDS)
+                        .items(string()),
                     string(THREAD_ID)))
         .perform(GoogleMailSendEmailAction::perform);
 
