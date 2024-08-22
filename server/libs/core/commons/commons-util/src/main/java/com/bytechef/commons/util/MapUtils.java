@@ -16,10 +16,10 @@
 
 package com.bytechef.commons.util;
 
+import static com.bytechef.commons.util.constant.ObjectMapperConstants.OBJECT_MAPPER;
+
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.time.Duration;
@@ -41,21 +41,15 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 
 /**
  * @author Ivica Cardic
  */
-@Component
 public class MapUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(MapUtils.class);
-
-    @SuppressFBWarnings("MS_PKGPROTECT")
-    protected static ObjectMapper objectMapper;
 
     public static <K> Map<K, ?> append(Map<K, ?> map, K key, Map<K, ?> values) {
         Validate.notNull(key, "'key' must not be null");
@@ -774,11 +768,11 @@ public class MapUtils {
     }
 
     private static <T> T convert(Object value, Class<T> elementType) {
-        return objectMapper.convertValue(value, elementType);
+        return OBJECT_MAPPER.convertValue(value, elementType);
     }
 
     private static <T> T convert(Object value, TypeReference<T> elementTypeRef) {
-        return objectMapper.convertValue(value, elementTypeRef);
+        return OBJECT_MAPPER.convertValue(value, elementTypeRef);
     }
 
     private static Object convert(Object value, List<Class<?>> elementTypes) {
@@ -797,17 +791,6 @@ public class MapUtils {
         }
 
         return value;
-    }
-
-    @Autowired
-    @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
-    void setObjectMapper(ObjectMapper objectMapper) {
-        MapUtils.objectMapper = objectMapper;
-    }
-
-    @SuppressFBWarnings("EI_EXPOSE_STATIC_REP2")
-    public static void initObjectMapper(ObjectMapper objectMapper) {
-        MapUtils.objectMapper = objectMapper;
     }
 
     private static Object[] getArray(Object value) {

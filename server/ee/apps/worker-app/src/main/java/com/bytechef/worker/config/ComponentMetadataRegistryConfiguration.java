@@ -26,9 +26,7 @@ import org.springframework.context.annotation.DependsOn;
  * @author Ivica Cardic
  */
 @Configuration
-@DependsOn({
-    "jsonUtils", "taskWorkerConfiguration"
-})
+@DependsOn("taskWorkerConfiguration")
 public class ComponentMetadataRegistryConfiguration {
 
     private final ComponentDefinitionService componentDefinitionService;

@@ -16,25 +16,19 @@
 
 package com.bytechef.commons.util;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static com.bytechef.commons.util.constant.ObjectMapperConstants.OBJECT_MAPPER;
+
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Type;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-@Component
 public class ConvertUtils {
-
-    @SuppressFBWarnings("MS_PKGPROTECT")
-    protected static ObjectMapper objectMapper;
 
     public static boolean canConvert(Object fromValue, Class<?> toValueType) {
         try {
-            objectMapper.convertValue(fromValue, toValueType);
+            OBJECT_MAPPER.convertValue(fromValue, toValueType);
         } catch (Exception e) {
             // ignore
             return false;
@@ -44,18 +38,12 @@ public class ConvertUtils {
     }
 
     public static <T> T convertValue(Object fromValue, Class<T> toValueType) {
-        return objectMapper.convertValue(fromValue, toValueType);
+        return OBJECT_MAPPER.convertValue(fromValue, toValueType);
     }
 
     public static <T> T convertValue(Object fromValue, Type type) {
-        TypeFactory typeFactory = objectMapper.getTypeFactory();
+        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
 
-        return objectMapper.convertValue(fromValue, typeFactory.constructType(type));
-    }
-
-    @Autowired
-    @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
-    void setObjectMapper(ObjectMapper objectMapper) {
-        ConvertUtils.objectMapper = objectMapper;
+        return OBJECT_MAPPER.convertValue(fromValue, typeFactory.constructType(type));
     }
 }

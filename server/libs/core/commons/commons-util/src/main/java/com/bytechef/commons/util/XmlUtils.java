@@ -16,10 +16,10 @@
 
 package com.bytechef.commons.util;
 
+import static com.bytechef.commons.util.constant.ObjectMapperConstants.XML_MAPPER;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -38,8 +38,6 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 import org.apache.commons.lang3.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -47,21 +45,17 @@ import org.w3c.dom.NodeList;
 /**
  * @author Ivica Cardic
  */
-@Component
 public class XmlUtils {
 
     private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
     private static final XPathFactory X_PATH_FACTORY = XPathFactory.newInstance();
     private static final TransformerFactory TRANSFORMER_FACTORY = TransformerFactory.newInstance();
 
-    @SuppressFBWarnings("MS_PKGPROTECT")
-    protected static XmlMapper xmlMapper;
-
     public static Map<String, ?> read(InputStream inputStream) {
-        TypeFactory typeFactory = xmlMapper.getTypeFactory();
+        TypeFactory typeFactory = XML_MAPPER.getTypeFactory();
 
         try {
-            return xmlMapper.readValue(
+            return XML_MAPPER.readValue(
                 inputStream, typeFactory.constructMapType(Map.class, String.class, Object.class));
         } catch (IOException ioException) {
             throw new RuntimeException(ioException);
@@ -69,20 +63,20 @@ public class XmlUtils {
     }
 
     public static <T> Map<String, T> read(InputStream inputStream, Class<T> valueType) {
-        TypeFactory typeFactory = xmlMapper.getTypeFactory();
+        TypeFactory typeFactory = XML_MAPPER.getTypeFactory();
 
         try {
-            return xmlMapper.readValue(inputStream, typeFactory.constructMapType(Map.class, String.class, valueType));
+            return XML_MAPPER.readValue(inputStream, typeFactory.constructMapType(Map.class, String.class, valueType));
         } catch (Exception exception) {
             throw new RuntimeException(exception);
         }
     }
 
     public static <T> Map<String, T> read(InputStream inputStream, Type type) {
-        TypeFactory typeFactory = xmlMapper.getTypeFactory();
+        TypeFactory typeFactory = XML_MAPPER.getTypeFactory();
 
         try {
-            return xmlMapper.readValue(inputStream, typeFactory.constructType(type));
+            return XML_MAPPER.readValue(inputStream, typeFactory.constructType(type));
         } catch (Exception exception) {
             throw new RuntimeException(exception);
         }
@@ -91,10 +85,10 @@ public class XmlUtils {
     public static <T> Map<String, T> read(
         InputStream inputStream, TypeReference<T> typeReference) {
 
-        TypeFactory typeFactory = xmlMapper.getTypeFactory();
+        TypeFactory typeFactory = XML_MAPPER.getTypeFactory();
 
         try {
-            return xmlMapper.readValue(
+            return XML_MAPPER.readValue(
                 inputStream,
                 typeFactory.constructMapType(
                     Map.class, typeFactory.constructType(String.class), typeFactory.constructType(typeReference)));
@@ -104,40 +98,40 @@ public class XmlUtils {
     }
 
     public static Map<String, ?> read(String xml) {
-        TypeFactory typeFactory = xmlMapper.getTypeFactory();
+        TypeFactory typeFactory = XML_MAPPER.getTypeFactory();
 
         try {
-            return xmlMapper.readValue(xml, typeFactory.constructMapType(Map.class, String.class, Object.class));
+            return XML_MAPPER.readValue(xml, typeFactory.constructMapType(Map.class, String.class, Object.class));
         } catch (Exception exception) {
             throw new RuntimeException(exception);
         }
     }
 
     public static <T> Map<String, T> read(String xml, Class<T> valueType) {
-        TypeFactory typeFactory = xmlMapper.getTypeFactory();
+        TypeFactory typeFactory = XML_MAPPER.getTypeFactory();
 
         try {
-            return xmlMapper.readValue(xml, typeFactory.constructMapType(Map.class, String.class, valueType));
+            return XML_MAPPER.readValue(xml, typeFactory.constructMapType(Map.class, String.class, valueType));
         } catch (Exception exception) {
             throw new RuntimeException(exception);
         }
     }
 
     public static <T> Map<String, T> read(String xml, Type type) {
-        TypeFactory typeFactory = xmlMapper.getTypeFactory();
+        TypeFactory typeFactory = XML_MAPPER.getTypeFactory();
 
         try {
-            return xmlMapper.readValue(xml, typeFactory.constructType(type));
+            return XML_MAPPER.readValue(xml, typeFactory.constructType(type));
         } catch (Exception exception) {
             throw new RuntimeException(exception);
         }
     }
 
     public static <T> Map<String, T> read(String xml, TypeReference<T> typeReference) {
-        TypeFactory typeFactory = xmlMapper.getTypeFactory();
+        TypeFactory typeFactory = XML_MAPPER.getTypeFactory();
 
         try {
-            return xmlMapper.readValue(
+            return XML_MAPPER.readValue(
                 xml,
                 typeFactory.constructMapType(
                     Map.class, typeFactory.constructType(String.class), typeFactory.constructType(typeReference)));
@@ -152,10 +146,10 @@ public class XmlUtils {
 
     public static <T> List<T> readList(InputStream inputStream, String path, Class<T> elementType) {
 
-        TypeFactory typeFactory = xmlMapper.getTypeFactory();
+        TypeFactory typeFactory = XML_MAPPER.getTypeFactory();
 
         try {
-            return xmlMapper.readValue(
+            return XML_MAPPER.readValue(
                 parse(inputStream, path), typeFactory.constructCollectionType(List.class, elementType));
         } catch (Exception exception) {
             throw new RuntimeException(exception);
@@ -163,10 +157,10 @@ public class XmlUtils {
     }
 
     public static <T> List<T> readList(InputStream inputStream, String path, Type type) {
-        TypeFactory typeFactory = xmlMapper.getTypeFactory();
+        TypeFactory typeFactory = XML_MAPPER.getTypeFactory();
 
         try {
-            return xmlMapper.readValue(
+            return XML_MAPPER.readValue(
                 parse(inputStream, path),
                 typeFactory.constructCollectionType(List.class, typeFactory.constructType(type)));
         } catch (Exception exception) {
@@ -178,7 +172,7 @@ public class XmlUtils {
         Validate.notNull(inputStream, "Non null stream reference expected");
 
         try {
-            return new XmlStreamReaderStream(inputStream, xmlMapper);
+            return new XmlStreamReaderStream(inputStream, XML_MAPPER);
         } catch (Exception exception) {
             throw new RuntimeException(exception);
         }
@@ -190,18 +184,12 @@ public class XmlUtils {
 
     public static String write(Object object, String rootName) {
         try {
-            return xmlMapper.writer()
+            return XML_MAPPER.writer()
                 .withRootName(rootName)
                 .writeValueAsString(object);
         } catch (Exception exception) {
             throw new RuntimeException(exception);
         }
-    }
-
-    @Autowired
-    @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
-    void setXmlMapper(XmlMapper xmlMapper) {
-        XmlUtils.xmlMapper = xmlMapper;
     }
 
     private static String parse(InputStream inputStream, String path) {
