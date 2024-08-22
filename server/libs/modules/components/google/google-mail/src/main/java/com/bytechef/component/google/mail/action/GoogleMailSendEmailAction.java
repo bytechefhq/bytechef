@@ -19,17 +19,18 @@ package com.bytechef.component.google.mail.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ATTACHMENTS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BCC;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BODY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.CC;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.EMAIL_PROPERTY;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FROM;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MESSAGE_PROPERTY;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.REPLY_TO;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SEND_EMAIL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SUBJECT;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.THREAD_ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TO;
 
 import com.bytechef.component.definition.ActionContext;
@@ -64,10 +65,6 @@ public class GoogleMailSendEmailAction {
         .title("Send Email")
         .description("Sends the specified message to the recipients in the To, Cc, and Bcc headers.")
         .properties(
-            string(FROM)
-                .label("From")
-                .description("Email address of the sender, the mailbox account.")
-                .required(true),
             array(TO)
                 .label("To")
                 .description("Recipients email addresses.")
@@ -100,7 +97,11 @@ public class GoogleMailSendEmailAction {
                 .label("Attachments")
                 .description("A list of attachments to send with the email.")
                 .items(fileEntry()))
-        .outputSchema(MESSAGE_PROPERTY)
+        .outputSchema(
+            object()
+                .properties(
+                    string(ID),
+                    string(THREAD_ID)))
         .perform(GoogleMailSendEmailAction::perform);
 
     private GoogleMailSendEmailAction() {
@@ -118,7 +119,6 @@ public class GoogleMailSendEmailAction {
 
         MimeMessage mimeMessage = new MimeMessage(session);
 
-        mimeMessage.setFrom(new InternetAddress(inputParameters.getRequiredString(FROM)));
         mimeMessage.setRecipients(
             RecipientType.TO,
             InternetAddress.parse(String.join(",", inputParameters.getRequiredList(TO, String.class))));
