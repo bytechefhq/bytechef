@@ -16,9 +16,16 @@
 
 package com.bytechef.component.google.mail.action;
 
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ATTACHMENTS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FROM;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FULL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA_HEADERS;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MINIMAL;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SIMPLE;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SUBJECT;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -27,14 +34,18 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.test.component.properties.ParametersFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
+import com.google.api.services.gmail.model.MessagePart;
+import com.google.api.services.gmail.model.MessagePartBody;
+import com.google.api.services.gmail.model.MessagePartHeader;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 class GoogleMailGetMailActionTest extends AbstractGoogleMailActionTest {
 
@@ -50,7 +61,7 @@ class GoogleMailGetMailActionTest extends AbstractGoogleMailActionTest {
     @Test
     void testPerform() throws IOException {
         Parameters parameters = ParametersFactory.createParameters(
-            Map.of(ID, "id", FORMAT, "minimal", METADATA_HEADERS, List.of("metadata")));
+            Map.of(ID, "id", FORMAT, MINIMAL, METADATA_HEADERS, List.of("metadata")));
 
         when(mockedGmail.users())
             .thenReturn(mockedUsers);
@@ -65,12 +76,56 @@ class GoogleMailGetMailActionTest extends AbstractGoogleMailActionTest {
         when(mockedGet.execute())
             .thenReturn(mockedMessage);
 
-        Message message = GoogleMailGetMailAction.perform(parameters, parameters, mockedContext);
+        Map<String, Object> perform = GoogleMailGetMailAction.perform(parameters, parameters, mockedContext);
 
-        assertEquals(mockedMessage, message);
+        assertEquals(mockedMessage, perform);
         assertEquals("me", userIdArgumentCaptor.getValue());
         assertEquals("id", idArgumentCaptor.getValue());
-        assertEquals("minimal", formatArgumentCaptor.getValue());
+        assertEquals(MINIMAL, formatArgumentCaptor.getValue());
+        assertEquals(parameters.getList(METADATA_HEADERS), metadataArgumentCaptor.getValue());
+    }
+
+    @Test
+    void testPerformForParsedFormat() throws IOException {
+        Parameters parameters = ParametersFactory.createParameters(
+            Map.of(ID, "id", FORMAT, SIMPLE, METADATA_HEADERS, List.of("metadata")));
+
+        Message message = new Message().setPayload(
+            new MessagePart()
+                .setBody(new MessagePartBody().setData("ZW1haWwgYm9keQ=="))
+                .setHeaders(List.of(new MessagePartHeader().setName("Subject")
+                    .setValue("email subject")))
+                .setParts(List.of(new MessagePart()
+                    .setMimeType("text/plain"))));
+
+        when(mockedGmail.users())
+            .thenReturn(mockedUsers);
+        when(mockedUsers.messages())
+            .thenReturn(mockedMessages);
+        when(mockedMessages.get(userIdArgumentCaptor.capture(), idArgumentCaptor.capture()))
+            .thenReturn(mockedGet);
+        when(mockedGet.setFormat(formatArgumentCaptor.capture()))
+            .thenReturn(mockedGet);
+        when(mockedGet.setMetadataHeaders(metadataArgumentCaptor.capture()))
+            .thenReturn(mockedGet);
+        when(mockedGet.execute())
+            .thenReturn(message);
+
+        Map<String, Object> result = GoogleMailGetMailAction.perform(parameters, parameters, mockedContext);
+
+        Map<String, Object> expectedResponse = new LinkedHashMap<>();
+
+        expectedResponse.put(SUBJECT, "email subject");
+        expectedResponse.put(FROM, "");
+        expectedResponse.put(TO, "");
+        expectedResponse.put("body_plain", "email body");
+        expectedResponse.put("body_html", "");
+        expectedResponse.put(ATTACHMENTS, List.of());
+
+        assertEquals(expectedResponse, result);
+        assertEquals("me", userIdArgumentCaptor.getValue());
+        assertEquals("id", idArgumentCaptor.getValue());
+        assertEquals(FULL, formatArgumentCaptor.getValue());
         assertEquals(parameters.getList(METADATA_HEADERS), metadataArgumentCaptor.getValue());
     }
 }
