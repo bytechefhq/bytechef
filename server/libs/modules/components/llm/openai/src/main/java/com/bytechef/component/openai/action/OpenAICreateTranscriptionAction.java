@@ -33,18 +33,19 @@ import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
+
+import com.bytechef.component.llm.util.interfaces.Transcript;
 import org.springframework.ai.audio.transcription.AudioTranscriptionOptions;
 import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
+import org.springframework.ai.model.Model;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionModel;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionOptions;
 import org.springframework.ai.openai.api.OpenAiAudioApi;
-import org.springframework.core.io.UrlResource;
 import com.bytechef.component.llm.util.LLMUtils;
 
 /**
@@ -100,24 +101,27 @@ public class OpenAICreateTranscriptionAction {
     }
 
     public static String perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context)
-        throws MalformedURLException {
-
-        AudioTranscriptionOptions transcriptionOptions = OpenAiAudioTranscriptionOptions.builder()
-            .withModel(inputParameters.getRequiredString(MODEL))
-            .withPrompt(inputParameters.getString(PROMPT))
-            .withLanguage(inputParameters.getString(LANGUAGE))
-            .withResponseFormat(inputParameters.get(RESPONSE_FORMAT, OpenAiAudioApi.TranscriptResponseFormat.class))
-            .withTemperature(inputParameters.getFloat(TEMPERATURE))
-            .build();
-        OpenAiAudioTranscriptionModel transcriptionModel =
-            new OpenAiAudioTranscriptionModel(new OpenAiAudioApi(connectionParameters.getString(TOKEN)),
-                (OpenAiAudioTranscriptionOptions) transcriptionOptions);
-
-        FileEntry fileEntry = inputParameters.getFileEntry(FILE);
-        AudioTranscriptionPrompt audio = new AudioTranscriptionPrompt(new UrlResource(fileEntry.getUrl()));
-        AudioTranscriptionResponse response = transcriptionModel.call(audio);
-        return response.getResult()
-            .getOutput();
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws MalformedURLException {
+        return Transcript.getResponse(TRANSCRIPT, inputParameters, connectionParameters);
     }
+
+    private static final Transcript TRANSCRIPT = new Transcript() {
+
+        @Override
+        public AudioTranscriptionOptions createTranscriptOptions(Parameters inputParameters) {
+            return OpenAiAudioTranscriptionOptions.builder()
+                .withModel(inputParameters.getRequiredString(MODEL))
+                .withPrompt(inputParameters.getString(PROMPT))
+                .withLanguage(inputParameters.getString(LANGUAGE))
+                .withResponseFormat(inputParameters.get(RESPONSE_FORMAT, OpenAiAudioApi.TranscriptResponseFormat.class))
+                .withTemperature(inputParameters.getFloat(TEMPERATURE))
+                .build();
+        }
+
+        @Override
+        public Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> createTranscriptionModel(Parameters inputParameters, Parameters connectionParameters) {
+            return new OpenAiAudioTranscriptionModel(new OpenAiAudioApi(connectionParameters.getString(TOKEN)),
+                (OpenAiAudioTranscriptionOptions) createTranscriptOptions(inputParameters));
+        }
+    };
 }
