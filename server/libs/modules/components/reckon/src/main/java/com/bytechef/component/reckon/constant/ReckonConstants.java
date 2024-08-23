@@ -22,6 +22,8 @@ package com.bytechef.component.reckon.constant;
 public class ReckonConstants {
 
     public static final String BOOK_ID = "bookId";
+    public static final String ID = "id";
+    public static final String LAST_TIME_CHECKED = "lastTimeChecked";
     public static final String NAME = "name";
 
     private ReckonConstants() {
