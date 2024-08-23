@@ -16,13 +16,13 @@
 
 package com.bytechef.component.mistral.connection;
 
-import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
-
 import static com.bytechef.component.definition.Authorization.AuthorizationType.BEARER_TOKEN;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.connection;
 import static com.bytechef.component.definition.ComponentDSL.string;
+
+import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 
 /**
  * @author Monika Domiter

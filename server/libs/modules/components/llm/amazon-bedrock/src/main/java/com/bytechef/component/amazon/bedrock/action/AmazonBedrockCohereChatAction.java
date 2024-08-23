@@ -16,24 +16,6 @@
 
 package com.bytechef.component.amazon.bedrock.action;
 
-import com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants;
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context.TypeReference;
-import com.bytechef.component.definition.Parameters;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.ai.bedrock.cohere.BedrockCohereChatModel;
-import org.springframework.ai.bedrock.cohere.BedrockCohereChatOptions;
-import org.springframework.ai.bedrock.cohere.api.CohereChatBedrockApi;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.prompt.ChatOptions;
-import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
-import com.bytechef.component.llm.util.LLMUtils;
-import com.bytechef.component.llm.util.interfaces.Chat;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.BIAS_TOKEN;
 import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.BIAS_VALUE;
 import static com.bytechef.component.definition.ComponentDSL.action;
@@ -56,6 +38,23 @@ import static com.bytechef.component.llm.constants.LLMConstants.TOP_K_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.TOP_P;
 import static com.bytechef.component.llm.constants.LLMConstants.TOP_P_PROPERTY;
 
+import com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.llm.util.LLMUtils;
+import com.bytechef.component.llm.util.interfaces.Chat;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+import org.springframework.ai.bedrock.cohere.BedrockCohereChatModel;
+import org.springframework.ai.bedrock.cohere.BedrockCohereChatOptions;
+import org.springframework.ai.bedrock.cohere.api.CohereChatBedrockApi;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.prompt.ChatOptions;
+import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
+
 public class AmazonBedrockCohereChatAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(AmazonBedrockConstants.ASK_COHERE)
@@ -69,7 +68,8 @@ public class AmazonBedrockCohereChatAction {
                 .options(LLMUtils.getEnumOptions(
                     Arrays.stream(CohereChatBedrockApi.CohereChatModel.values())
                         .collect(Collectors.toMap(
-                            CohereChatBedrockApi.CohereChatModel::getName, CohereChatBedrockApi.CohereChatModel::getName, (f,s)->f)))),
+                            CohereChatBedrockApi.CohereChatModel::getName,
+                            CohereChatBedrockApi.CohereChatModel::getName, (f, s) -> f)))),
             MESSAGE_PROPERTY,
             MAX_TOKENS_PROPERTY,
             N_PROPERTY,
@@ -93,7 +93,8 @@ public class AmazonBedrockCohereChatAction {
                 .options(LLMUtils.getEnumOptions(
                     Arrays.stream(CohereChatBedrockApi.CohereChatRequest.ReturnLikelihoods.values())
                         .collect(Collectors.toMap(
-                            CohereChatBedrockApi.CohereChatRequest.ReturnLikelihoods::name, clas -> clas, (f,s)->f)))),
+                            CohereChatBedrockApi.CohereChatRequest.ReturnLikelihoods::name, clas -> clas,
+                            (f, s) -> f)))),
             object(AmazonBedrockConstants.TRUNCATE)
                 .label("Truncate")
                 .description("Specifies how the API handles inputs longer than the maximum token length")
@@ -101,7 +102,7 @@ public class AmazonBedrockCohereChatAction {
                 .options(LLMUtils.getEnumOptions(
                     Arrays.stream(CohereChatBedrockApi.CohereChatRequest.Truncate.values())
                         .collect(Collectors.toMap(
-                            CohereChatBedrockApi.CohereChatRequest.Truncate::name, clas -> clas, (f,s)->f)))))
+                            CohereChatBedrockApi.CohereChatRequest.Truncate::name, clas -> clas, (f, s) -> f)))))
         .outputSchema(string())
         .perform(AmazonBedrockCohereChatAction::perform);
 
@@ -122,17 +123,21 @@ public class AmazonBedrockCohereChatAction {
                 .withTopP(inputParameters.getFloat(TOP_P))
                 .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
                 .withTopK(inputParameters.getInteger(TOP_K))
-                .withLogitBias(new CohereChatBedrockApi.CohereChatRequest.LogitBias(inputParameters.getString(BIAS_TOKEN), inputParameters.getFloat(BIAS_VALUE)))
+                .withLogitBias(new CohereChatBedrockApi.CohereChatRequest.LogitBias(
+                    inputParameters.getString(BIAS_TOKEN), inputParameters.getFloat(BIAS_VALUE)))
                 .withNumGenerations(inputParameters.getInteger(N))
-                .withReturnLikelihoods(inputParameters.get(AmazonBedrockConstants.RETURN_LIKELIHOODS, CohereChatBedrockApi.CohereChatRequest.ReturnLikelihoods.class))
-                .withTruncate(inputParameters.get(AmazonBedrockConstants.TRUNCATE, CohereChatBedrockApi.CohereChatRequest.Truncate.class))
+                .withReturnLikelihoods(inputParameters.get(AmazonBedrockConstants.RETURN_LIKELIHOODS,
+                    CohereChatBedrockApi.CohereChatRequest.ReturnLikelihoods.class))
+                .withTruncate(inputParameters.get(AmazonBedrockConstants.TRUNCATE,
+                    CohereChatBedrockApi.CohereChatRequest.Truncate.class))
                 .build();
         }
 
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
             return new BedrockCohereChatModel(new CohereChatBedrockApi(inputParameters.getRequiredString(MODEL),
-                EnvironmentVariableCredentialsProvider.create(), connectionParameters.getRequiredString(AmazonBedrockConstants.REGION), new ObjectMapper()),
+                EnvironmentVariableCredentialsProvider.create(),
+                connectionParameters.getRequiredString(AmazonBedrockConstants.REGION), new ObjectMapper()),
                 (BedrockCohereChatOptions) createChatOptions(inputParameters));
         }
     };

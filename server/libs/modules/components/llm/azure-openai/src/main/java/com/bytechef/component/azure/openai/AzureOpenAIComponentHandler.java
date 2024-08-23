@@ -37,7 +37,8 @@ public class AzureOpenAIComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component(AzureOpenAIConstants.AZURE_OPENAI)
         .title("Azure OpenAI")
         .description(
-            "Azure OpenAI is a research organization that aims to develop and direct artificial intelligence (AI) in ways " +
+            "Azure OpenAI is a research organization that aims to develop and direct artificial intelligence (AI) in ways "
+                +
                 "that benefit humanity as a whole.")
         .icon("path:assets/openai.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)

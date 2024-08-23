@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.string;
-
 import static com.bytechef.component.llm.constants.LLMConstants.ASK;
 import static com.bytechef.component.llm.constants.LLMConstants.MESSAGE_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.N;
@@ -34,13 +33,12 @@ import static com.bytechef.component.llm.constants.LLMConstants.TOP_P_PROPERTY;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-
+import com.bytechef.component.llm.util.interfaces.Chat;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.vertexai.palm2.VertexAiPaLm2ChatModel;
 import org.springframework.ai.vertexai.palm2.VertexAiPaLm2ChatOptions;
 import org.springframework.ai.vertexai.palm2.api.VertexAiPaLm2Api;
-import com.bytechef.component.llm.util.interfaces.Chat;
 
 public class VertexPaLM2ChatAction {
 
@@ -51,7 +49,8 @@ public class VertexPaLM2ChatAction {
             MESSAGE_PROPERTY,
             integer(N)
                 .label("Candidate Count")
-                .description("The number of generated response messages to return. This value must be between [1, 8], inclusive. Defaults to 1.")
+                .description(
+                    "The number of generated response messages to return. This value must be between [1, 8], inclusive. Defaults to 1.")
                 .minValue(0)
                 .maxValue(8)
                 .advancedOption(true),
@@ -82,7 +81,8 @@ public class VertexPaLM2ChatAction {
 
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new VertexAiPaLm2ChatModel(new VertexAiPaLm2Api(connectionParameters.getString(TOKEN)), (VertexAiPaLm2ChatOptions) createChatOptions(inputParameters));
+            return new VertexAiPaLm2ChatModel(new VertexAiPaLm2Api(connectionParameters.getString(TOKEN)),
+                (VertexAiPaLm2ChatOptions) createChatOptions(inputParameters));
         }
     };
 }

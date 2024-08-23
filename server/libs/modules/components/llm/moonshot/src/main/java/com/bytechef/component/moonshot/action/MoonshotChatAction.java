@@ -19,7 +19,6 @@ package com.bytechef.component.moonshot.action;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.string;
-
 import static com.bytechef.component.llm.constants.LLMConstants.ASK;
 import static com.bytechef.component.llm.constants.LLMConstants.FREQUENCY_PENALTY;
 import static com.bytechef.component.llm.constants.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
@@ -44,17 +43,15 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
-
+import com.bytechef.component.llm.util.LLMUtils;
+import com.bytechef.component.llm.util.interfaces.Chat;
 import java.util.Arrays;
 import java.util.stream.Collectors;
-
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.moonshot.MoonshotChatModel;
 import org.springframework.ai.moonshot.MoonshotChatOptions;
 import org.springframework.ai.moonshot.api.MoonshotApi;
-import com.bytechef.component.llm.util.LLMUtils;
-import com.bytechef.component.llm.util.interfaces.Chat;
 
 public class MoonshotChatAction {
 
@@ -69,7 +66,7 @@ public class MoonshotChatAction {
                 .options(LLMUtils.getEnumOptions(
                     Arrays.stream(MoonshotApi.ChatModel.values())
                         .collect(Collectors.toMap(
-                            MoonshotApi.ChatModel::getValue, MoonshotApi.ChatModel::getValue, (f,s)->f)))),
+                            MoonshotApi.ChatModel::getValue, MoonshotApi.ChatModel::getValue, (f, s) -> f)))),
             MESSAGE_PROPERTY,
             MAX_TOKENS_PROPERTY,
             N_PROPERTY,
@@ -108,7 +105,8 @@ public class MoonshotChatAction {
 
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new MoonshotChatModel(new MoonshotApi(connectionParameters.getString(TOKEN)), (MoonshotChatOptions) createChatOptions(inputParameters));
+            return new MoonshotChatModel(new MoonshotApi(connectionParameters.getString(TOKEN)),
+                (MoonshotChatOptions) createChatOptions(inputParameters));
         }
     };
 }

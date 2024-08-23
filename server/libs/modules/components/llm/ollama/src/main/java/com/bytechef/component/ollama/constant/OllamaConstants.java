@@ -47,7 +47,6 @@ public final class OllamaConstants {
     public static final String PENALIZE_NEW_LINE = "penalizeNewLine";
     public static final String TRUNCATE = "truncate";
 
-
     private OllamaConstants() {
     }
 }

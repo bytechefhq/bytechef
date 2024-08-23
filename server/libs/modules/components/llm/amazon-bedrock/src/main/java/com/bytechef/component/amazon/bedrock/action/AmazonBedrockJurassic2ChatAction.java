@@ -16,24 +16,6 @@
 
 package com.bytechef.component.amazon.bedrock.action;
 
-import com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants;
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context.TypeReference;
-import com.bytechef.component.definition.Parameters;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.ai.bedrock.jurassic2.BedrockAi21Jurassic2ChatModel;
-import org.springframework.ai.bedrock.jurassic2.BedrockAi21Jurassic2ChatOptions;
-import org.springframework.ai.bedrock.jurassic2.api.Ai21Jurassic2ChatBedrockApi;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.prompt.ChatOptions;
-import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
-import com.bytechef.component.llm.util.LLMUtils;
-import com.bytechef.component.llm.util.interfaces.Chat;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.COUNT_PENALTY;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
@@ -59,6 +41,23 @@ import static com.bytechef.component.llm.constants.LLMConstants.TOP_K_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.TOP_P;
 import static com.bytechef.component.llm.constants.LLMConstants.TOP_P_PROPERTY;
 
+import com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.llm.util.LLMUtils;
+import com.bytechef.component.llm.util.interfaces.Chat;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+import org.springframework.ai.bedrock.jurassic2.BedrockAi21Jurassic2ChatModel;
+import org.springframework.ai.bedrock.jurassic2.BedrockAi21Jurassic2ChatOptions;
+import org.springframework.ai.bedrock.jurassic2.api.Ai21Jurassic2ChatBedrockApi;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.prompt.ChatOptions;
+import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
+
 public class AmazonBedrockJurassic2ChatAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(AmazonBedrockConstants.ASK_JURASSIC2)
@@ -72,7 +71,8 @@ public class AmazonBedrockJurassic2ChatAction {
                 .options(LLMUtils.getEnumOptions(
                     Arrays.stream(Ai21Jurassic2ChatBedrockApi.Ai21Jurassic2ChatModel.values())
                         .collect(Collectors.toMap(
-                            Ai21Jurassic2ChatBedrockApi.Ai21Jurassic2ChatModel::getName, Ai21Jurassic2ChatBedrockApi.Ai21Jurassic2ChatModel::getName, (f,s)->f)))),
+                            Ai21Jurassic2ChatBedrockApi.Ai21Jurassic2ChatModel::getName,
+                            Ai21Jurassic2ChatBedrockApi.Ai21Jurassic2ChatModel::getName, (f, s) -> f)))),
             MESSAGE_PROPERTY,
             integer(AmazonBedrockConstants.MIN_TOKENS)
                 .label("Min tokens")
@@ -117,16 +117,24 @@ public class AmazonBedrockJurassic2ChatAction {
                 .withMinTokens(inputParameters.getInteger(AmazonBedrockConstants.MIN_TOKENS))
                 .withNumResults(inputParameters.getInteger(N))
                 .withPrompt(inputParameters.getString(PROMPT))
-                .withCountPenaltyOptions(BedrockAi21Jurassic2ChatOptions.Penalty.builder().scale(inputParameters.getFloat(COUNT_PENALTY)).build())
-                .withFrequencyPenaltyOptions(BedrockAi21Jurassic2ChatOptions.Penalty.builder().scale(inputParameters.getFloat(FREQUENCY_PENALTY)).build())
-                .withPresencePenaltyOptions(BedrockAi21Jurassic2ChatOptions.Penalty.builder().scale(inputParameters.getFloat(PRESENCE_PENALTY)).build())
+                .withCountPenaltyOptions(BedrockAi21Jurassic2ChatOptions.Penalty.builder()
+                    .scale(inputParameters.getFloat(COUNT_PENALTY))
+                    .build())
+                .withFrequencyPenaltyOptions(BedrockAi21Jurassic2ChatOptions.Penalty.builder()
+                    .scale(inputParameters.getFloat(FREQUENCY_PENALTY))
+                    .build())
+                .withPresencePenaltyOptions(BedrockAi21Jurassic2ChatOptions.Penalty.builder()
+                    .scale(inputParameters.getFloat(PRESENCE_PENALTY))
+                    .build())
                 .build();
         }
 
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new BedrockAi21Jurassic2ChatModel(new Ai21Jurassic2ChatBedrockApi(inputParameters.getRequiredString(MODEL),
-                EnvironmentVariableCredentialsProvider.create(), connectionParameters.getRequiredString(AmazonBedrockConstants.REGION), new ObjectMapper()),
+            return new BedrockAi21Jurassic2ChatModel(
+                new Ai21Jurassic2ChatBedrockApi(inputParameters.getRequiredString(MODEL),
+                    EnvironmentVariableCredentialsProvider.create(),
+                    connectionParameters.getRequiredString(AmazonBedrockConstants.REGION), new ObjectMapper()),
                 (BedrockAi21Jurassic2ChatOptions) createChatOptions(inputParameters));
         }
     };

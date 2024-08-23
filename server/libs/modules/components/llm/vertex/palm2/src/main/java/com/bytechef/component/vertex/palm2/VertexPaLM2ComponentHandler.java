@@ -16,8 +16,8 @@
 
 package com.bytechef.component.vertex.palm2;
 
-import static com.bytechef.component.vertex.palm2.constant.VertexPaLM2Constants.VERTEX_PALM2;
 import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.vertex.palm2.constant.VertexPaLM2Constants.VERTEX_PALM2;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;

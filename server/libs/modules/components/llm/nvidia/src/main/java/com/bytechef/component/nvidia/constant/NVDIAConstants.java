@@ -22,7 +22,6 @@ package com.bytechef.component.nvidia.constant;
 public final class NVDIAConstants {
     public static final String NVIDIA = "nvidia";
 
-
     private NVDIAConstants() {
     }
 }

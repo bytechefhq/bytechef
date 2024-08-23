@@ -16,18 +16,11 @@
 
 package com.bytechef.component.moonshot.constant;
 
-import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.number;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.string;
-
 /**
  * @author Monika Domiter
  */
 public final class MoonshotConstants {
     public static final String MOONSHOT = "moonshot";
-
 
     private MoonshotConstants() {
     }

@@ -23,7 +23,6 @@ import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.openai.constant.OpenAIConstants.QUALITY;
 import static com.bytechef.component.llm.constants.LLMConstants.CREATE_IMAGE;
 import static com.bytechef.component.llm.constants.LLMConstants.IMAGE_MESSAGE_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
@@ -33,22 +32,22 @@ import static com.bytechef.component.llm.constants.LLMConstants.SIZE;
 import static com.bytechef.component.llm.constants.LLMConstants.STYLE;
 import static com.bytechef.component.llm.constants.LLMConstants.USER;
 import static com.bytechef.component.llm.constants.LLMConstants.USER_PROPERTY;
+import static com.bytechef.component.openai.constant.OpenAIConstants.QUALITY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
+import com.bytechef.component.llm.util.LLMUtils;
+import com.bytechef.component.llm.util.interfaces.Image;
 import java.util.Arrays;
 import java.util.stream.Collectors;
-
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImageOptions;
 import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.OpenAiImageOptions;
 import org.springframework.ai.openai.api.OpenAiImageApi;
 import org.springframework.retry.support.RetryTemplate;
-import com.bytechef.component.llm.util.LLMUtils;
-import com.bytechef.component.llm.util.interfaces.Image;
 
 /**
  * @author Monika Domiter
@@ -65,22 +64,33 @@ public class OpenAICreateImageAction {
                 .options(LLMUtils.getEnumOptions(
                     Arrays.stream(OpenAiImageApi.ImageModel.values())
                         .collect(Collectors.toMap(
-                            OpenAiImageApi.ImageModel::getValue, OpenAiImageApi.ImageModel::getValue, (f,s)->f))))
+                            OpenAiImageApi.ImageModel::getValue, OpenAiImageApi.ImageModel::getValue, (f, s) -> f))))
                 .required(true),
             IMAGE_MESSAGE_PROPERTY,
             object(SIZE)
                 .label("Size")
                 .description("The size of the generated images.")
                 .options(
-                    option("Dall-e-2 256x256", new Integer[]{256, 256}),
-                    option("Dall-e-2 512x512", new Integer[]{512, 512}),
-                    option("1024x1024", new Integer[]{1024, 1024}),
-                    option("Dall-e-3 1792x1024", new Integer[]{1792, 1024}),
-                    option("Dall-e-3 1024x1792", new Integer[]{1024, 1792}))
+                    option("Dall-e-2 256x256", new Integer[] {
+                        256, 256
+                    }),
+                    option("Dall-e-2 512x512", new Integer[] {
+                        512, 512
+                    }),
+                    option("1024x1024", new Integer[] {
+                        1024, 1024
+                    }),
+                    option("Dall-e-3 1792x1024", new Integer[] {
+                        1792, 1024
+                    }),
+                    option("Dall-e-3 1024x1792", new Integer[] {
+                        1024, 1792
+                    }))
                 .required(true),
             integer(N)
                 .label("Number of responses")
-                .description("The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported.")
+                .description(
+                    "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported.")
                 .defaultValue(1)
                 .minValue(1)
                 .maxValue(10)
@@ -102,7 +112,8 @@ public class OpenAICreateImageAction {
                 .advancedOption(true),
             string(STYLE)
                 .label("Style")
-                .description("The style of the generated images. Must be one of vivid or natural. Vivid causes the model to lean towards generating hyper-real and dramatic images. Natural causes the model to produce more natural, less hyper-real looking images. This parameter is only supported for dall-e-3.")
+                .description(
+                    "The style of the generated images. Must be one of vivid or natural. Vivid causes the model to lean towards generating hyper-real and dramatic images. Natural causes the model to produce more natural, less hyper-real looking images. This parameter is only supported for dall-e-3.")
                 .options(
                     option("vivid", "vivid"),
                     option("natural", "natural"))

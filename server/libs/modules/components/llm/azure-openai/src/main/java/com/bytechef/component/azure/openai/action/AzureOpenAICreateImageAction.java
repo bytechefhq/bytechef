@@ -41,16 +41,14 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
-
+import com.bytechef.component.llm.util.LLMUtils;
+import com.bytechef.component.llm.util.interfaces.Image;
 import java.util.Arrays;
 import java.util.stream.Collectors;
-
 import org.springframework.ai.azure.openai.AzureOpenAiImageModel;
 import org.springframework.ai.azure.openai.AzureOpenAiImageOptions;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImageOptions;
-import com.bytechef.component.llm.util.LLMUtils;
-import com.bytechef.component.llm.util.interfaces.Image;
 
 /**
  * @author Monika Domiter
@@ -67,22 +65,34 @@ public class AzureOpenAICreateImageAction {
                 .options(LLMUtils.getEnumOptions(
                     Arrays.stream(AzureOpenAiImageOptions.ImageModel.values())
                         .collect(Collectors.toMap(
-                            AzureOpenAiImageOptions.ImageModel::getValue, AzureOpenAiImageOptions.ImageModel::getValue, (f,s)->f))))
+                            AzureOpenAiImageOptions.ImageModel::getValue, AzureOpenAiImageOptions.ImageModel::getValue,
+                            (f, s) -> f))))
                 .required(true),
             IMAGE_MESSAGE_PROPERTY,
             object(SIZE)
                 .label("Size")
                 .description("The size of the generated images.")
                 .options(
-                    option("Dall-e-2 256x256", new Integer[]{256, 256}),
-                    option("Dall-e-2 512x512", new Integer[]{512, 512}),
-                    option("1024x1024", new Integer[]{1024, 1024}),
-                    option("Dall-e-3 1792x1024", new Integer[]{1792, 1024}),
-                    option("Dall-e-3 1024x1792", new Integer[]{1024, 1792}))
+                    option("Dall-e-2 256x256", new Integer[] {
+                        256, 256
+                    }),
+                    option("Dall-e-2 512x512", new Integer[] {
+                        512, 512
+                    }),
+                    option("1024x1024", new Integer[] {
+                        1024, 1024
+                    }),
+                    option("Dall-e-3 1792x1024", new Integer[] {
+                        1792, 1024
+                    }),
+                    option("Dall-e-3 1024x1792", new Integer[] {
+                        1024, 1792
+                    }))
                 .required(true),
             integer(N)
                 .label("Number of responses")
-                .description("The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported..")
+                .description(
+                    "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported..")
                 .defaultValue(1)
                 .minValue(1)
                 .maxValue(10)
@@ -97,7 +107,8 @@ public class AzureOpenAICreateImageAction {
                 .advancedOption(true),
             string(STYLE)
                 .label("Style")
-                .description("The style of the generated images. Must be one of vivid or natural. Vivid causes the model to lean towards generating hyper-real and dramatic images. Natural causes the model to produce more natural, less hyper-real looking images. This parameter is only supported for dall-e-3.")
+                .description(
+                    "The style of the generated images. Must be one of vivid or natural. Vivid causes the model to lean towards generating hyper-real and dramatic images. Natural causes the model to produce more natural, less hyper-real looking images. This parameter is only supported for dall-e-3.")
                 .options(
                     option("vivid", "vivid"),
                     option("natural", "natural"))
@@ -148,7 +159,8 @@ public class AzureOpenAICreateImageAction {
                 .endpoint(connectionParameters.getString(ENDPOINT))
                 .buildClient();
 
-            return new AzureOpenAiImageModel(openAIClient, (AzureOpenAiImageOptions) createImageOptions(inputParameters));
+            return new AzureOpenAiImageModel(openAIClient,
+                (AzureOpenAiImageOptions) createImageOptions(inputParameters));
         }
     };
 }

@@ -20,9 +20,6 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.string;
-
-import static com.bytechef.component.zhipu.constant.ZhiPuConstants.DO_SAMPLE;
-import static com.bytechef.component.zhipu.constant.ZhiPuConstants.REQUEST_ID;
 import static com.bytechef.component.llm.constants.LLMConstants.ASK;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS_PROPERTY;
@@ -36,22 +33,22 @@ import static com.bytechef.component.llm.constants.LLMConstants.TOP_P;
 import static com.bytechef.component.llm.constants.LLMConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.USER;
 import static com.bytechef.component.llm.constants.LLMConstants.USER_PROPERTY;
+import static com.bytechef.component.zhipu.constant.ZhiPuConstants.DO_SAMPLE;
+import static com.bytechef.component.zhipu.constant.ZhiPuConstants.REQUEST_ID;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
-
+import com.bytechef.component.llm.util.LLMUtils;
+import com.bytechef.component.llm.util.interfaces.Chat;
 import java.util.Arrays;
 import java.util.stream.Collectors;
-
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
 import org.springframework.ai.zhipuai.ZhiPuAiChatOptions;
 import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
-import com.bytechef.component.llm.util.LLMUtils;
-import com.bytechef.component.llm.util.interfaces.Chat;
 
 public class ZhiPuChatAction {
 
@@ -66,7 +63,7 @@ public class ZhiPuChatAction {
                 .options(LLMUtils.getEnumOptions(
                     Arrays.stream(ZhiPuAiApi.ChatModel.values())
                         .collect(Collectors.toMap(
-                            ZhiPuAiApi.ChatModel::getValue, ZhiPuAiApi.ChatModel::getValue, (f,s)->f)))),
+                            ZhiPuAiApi.ChatModel::getValue, ZhiPuAiApi.ChatModel::getValue, (f, s) -> f)))),
             MESSAGE_PROPERTY,
             MAX_TOKENS_PROPERTY,
             TEMPERATURE_PROPERTY,
@@ -75,11 +72,13 @@ public class ZhiPuChatAction {
             USER_PROPERTY,
             string(REQUEST_ID)
                 .label("Request Id")
-                .description("The parameter is passed by the client and must ensure uniqueness. It is used to distinguish the unique identifier for each request. If the client does not provide it, the platform will generate it by default.")
+                .description(
+                    "The parameter is passed by the client and must ensure uniqueness. It is used to distinguish the unique identifier for each request. If the client does not provide it, the platform will generate it by default.")
                 .advancedOption(true),
             bool(DO_SAMPLE)
                 .label("Do sample")
-                .description("When do_sample is set to true, the sampling strategy is enabled. If do_sample is false, the sampling strategy parameters temperature and top_p will not take effect.")
+                .description(
+                    "When do_sample is set to true, the sampling strategy is enabled. If do_sample is false, the sampling strategy parameters temperature and top_p will not take effect.")
                 .advancedOption(true))
         .outputSchema(string())
         .perform(ZhiPuChatAction::perform);
@@ -109,7 +108,8 @@ public class ZhiPuChatAction {
 
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new ZhiPuAiChatModel(new ZhiPuAiApi(connectionParameters.getString(TOKEN)), (ZhiPuAiChatOptions) createChatOptions(inputParameters));
+            return new ZhiPuAiChatModel(new ZhiPuAiApi(connectionParameters.getString(TOKEN)),
+                (ZhiPuAiChatOptions) createChatOptions(inputParameters));
         }
     };
 }

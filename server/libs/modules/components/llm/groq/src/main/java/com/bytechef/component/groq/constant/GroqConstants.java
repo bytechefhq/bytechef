@@ -22,7 +22,6 @@ package com.bytechef.component.groq.constant;
 public final class GroqConstants {
     public static final String GROQ = "groq";
 
-
     private GroqConstants() {
     }
 }

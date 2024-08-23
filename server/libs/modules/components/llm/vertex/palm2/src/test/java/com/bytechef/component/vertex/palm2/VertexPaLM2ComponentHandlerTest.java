@@ -16,7 +16,6 @@
 
 package com.bytechef.component.vertex.palm2;
 
-import com.bytechef.component.vertex.palm2.VertexPaLM2ComponentHandler;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
@@ -27,6 +26,7 @@ public class VertexPaLM2ComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/vertex-palm2_v1.json", new VertexPaLM2ComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/vertex-palm2_v1.json",
+            new VertexPaLM2ComponentHandler().getDefinition());
     }
 }

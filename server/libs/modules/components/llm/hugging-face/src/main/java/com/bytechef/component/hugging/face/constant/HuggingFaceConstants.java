@@ -16,25 +16,12 @@
 
 package com.bytechef.component.hugging.face.constant;
 
-import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.number;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.string;
-
-import com.bytechef.component.definition.ComponentDSL.ModifiableArrayProperty;
-import com.bytechef.component.definition.ComponentDSL.ModifiableIntegerProperty;
-import com.bytechef.component.definition.ComponentDSL.ModifiableNumberProperty;
-import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
-import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
-
 /**
  * @author Monika Domiter
  */
 public final class HuggingFaceConstants {
     public static final String URL = "url";
     public static final String HUGGING_FACE = "hugging-face";
-
 
     private HuggingFaceConstants() {
     }

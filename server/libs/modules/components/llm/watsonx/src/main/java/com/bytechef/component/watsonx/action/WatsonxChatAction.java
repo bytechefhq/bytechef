@@ -21,13 +21,6 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.string;
-
-import static com.bytechef.component.watsonx.constant.WatsonxConstants.DECODING_METHOD;
-import static com.bytechef.component.watsonx.constant.WatsonxConstants.MIN_TOKENS;
-import static com.bytechef.component.watsonx.constant.WatsonxConstants.PROJECT_ID;
-import static com.bytechef.component.watsonx.constant.WatsonxConstants.REPETITION_PENALTY;
-import static com.bytechef.component.watsonx.constant.WatsonxConstants.STREAM_ENDPOINT;
-import static com.bytechef.component.watsonx.constant.WatsonxConstants.TEXT_ENDPOINT;
 import static com.bytechef.component.llm.constants.LLMConstants.ASK;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS_PROPERTY;
@@ -44,19 +37,24 @@ import static com.bytechef.component.llm.constants.LLMConstants.TOP_K_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.TOP_P;
 import static com.bytechef.component.llm.constants.LLMConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.URL;
+import static com.bytechef.component.watsonx.constant.WatsonxConstants.DECODING_METHOD;
+import static com.bytechef.component.watsonx.constant.WatsonxConstants.MIN_TOKENS;
+import static com.bytechef.component.watsonx.constant.WatsonxConstants.PROJECT_ID;
+import static com.bytechef.component.watsonx.constant.WatsonxConstants.REPETITION_PENALTY;
+import static com.bytechef.component.watsonx.constant.WatsonxConstants.STREAM_ENDPOINT;
+import static com.bytechef.component.watsonx.constant.WatsonxConstants.TEXT_ENDPOINT;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
-
+import com.bytechef.component.llm.util.interfaces.Chat;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.watsonx.WatsonxAiChatModel;
 import org.springframework.ai.watsonx.WatsonxAiChatOptions;
 import org.springframework.ai.watsonx.api.WatsonxAiApi;
 import org.springframework.web.client.RestClient;
-import com.bytechef.component.llm.util.interfaces.Chat;
 
 public class WatsonxChatAction {
 
@@ -77,7 +75,8 @@ public class WatsonxChatAction {
                 .advancedOption(true),
             number(REPETITION_PENALTY)
                 .label("Repetition penalty")
-                .description("Sets how strongly to penalize repetitions. A higher value (e.g., 1.8) will penalize repetitions more strongly, while a lower value (e.g., 1.1) will be more lenient.")
+                .description(
+                    "Sets how strongly to penalize repetitions. A higher value (e.g., 1.8) will penalize repetitions more strongly, while a lower value (e.g., 1.1) will be more lenient.")
                 .advancedOption(true),
             integer(MIN_TOKENS)
                 .label("Min tokens")
@@ -121,7 +120,8 @@ public class WatsonxChatAction {
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
             return new WatsonxAiChatModel(new WatsonxAiApi(connectionParameters.getString(URL),
                 connectionParameters.getString(STREAM_ENDPOINT), connectionParameters.getString(TEXT_ENDPOINT),
-                connectionParameters.getString(PROJECT_ID), connectionParameters.getString(TOKEN), RestClient.builder()),
+                connectionParameters.getString(PROJECT_ID), connectionParameters.getString(TOKEN),
+                RestClient.builder()),
                 (WatsonxAiChatOptions) createChatOptions(inputParameters));
         }
     };

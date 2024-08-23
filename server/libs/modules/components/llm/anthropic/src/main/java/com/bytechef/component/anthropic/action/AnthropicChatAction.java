@@ -19,7 +19,6 @@ package com.bytechef.component.anthropic.action;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.string;
-
 import static com.bytechef.component.llm.constants.LLMConstants.ASK;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS_PROPERTY;
@@ -38,17 +37,15 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
-
+import com.bytechef.component.llm.util.LLMUtils;
+import com.bytechef.component.llm.util.interfaces.Chat;
 import java.util.Arrays;
 import java.util.stream.Collectors;
-
 import org.springframework.ai.anthropic.AnthropicChatModel;
 import org.springframework.ai.anthropic.AnthropicChatOptions;
 import org.springframework.ai.anthropic.api.AnthropicApi;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
-import com.bytechef.component.llm.util.LLMUtils;
-import com.bytechef.component.llm.util.interfaces.Chat;
 
 public class AnthropicChatAction {
 
@@ -63,7 +60,7 @@ public class AnthropicChatAction {
                 .options(LLMUtils.getEnumOptions(
                     Arrays.stream(AnthropicApi.ChatModel.values())
                         .collect(Collectors.toMap(
-                            AnthropicApi.ChatModel::getValue, AnthropicApi.ChatModel::getValue, (f,s)->f)))),
+                            AnthropicApi.ChatModel::getValue, AnthropicApi.ChatModel::getValue, (f, s) -> f)))),
             MESSAGE_PROPERTY,
             MAX_TOKENS_PROPERTY,
             TEMPERATURE_PROPERTY,
@@ -96,7 +93,8 @@ public class AnthropicChatAction {
 
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new AnthropicChatModel(new AnthropicApi(connectionParameters.getString(TOKEN)), (AnthropicChatOptions) createChatOptions(inputParameters));
+            return new AnthropicChatModel(new AnthropicApi(connectionParameters.getString(TOKEN)),
+                (AnthropicChatOptions) createChatOptions(inputParameters));
         }
     };
 }

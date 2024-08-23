@@ -19,16 +19,16 @@ package com.bytechef.component.amazon.bedrock;
 import static com.bytechef.component.definition.ComponentDSL.component;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.amazon.bedrock.action.AmazonBedrockAnthropic2ChatAction;
+import com.bytechef.component.amazon.bedrock.action.AmazonBedrockAnthropic3ChatAction;
+import com.bytechef.component.amazon.bedrock.action.AmazonBedrockCohereChatAction;
 import com.bytechef.component.amazon.bedrock.action.AmazonBedrockJurassic2ChatAction;
 import com.bytechef.component.amazon.bedrock.action.AmazonBedrockLlamaChatAction;
 import com.bytechef.component.amazon.bedrock.action.AmazonBedrockTitanChatAction;
 import com.bytechef.component.amazon.bedrock.connection.AmazonBedrockConnection;
 import com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants;
-import com.bytechef.component.amazon.bedrock.action.AmazonBedrockAnthropic2ChatAction;
-import com.bytechef.component.amazon.bedrock.action.AmazonBedrockCohereChatAction;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.amazon.bedrock.action.AmazonBedrockAnthropic3ChatAction;
 import com.google.auto.service.AutoService;
 
 /**

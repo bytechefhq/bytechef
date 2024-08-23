@@ -21,10 +21,10 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.connection;
 import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.llm.constants.LLMConstants.URL;
 import static com.bytechef.component.watsonx.constant.WatsonxConstants.PROJECT_ID;
 import static com.bytechef.component.watsonx.constant.WatsonxConstants.STREAM_ENDPOINT;
 import static com.bytechef.component.watsonx.constant.WatsonxConstants.TEXT_ENDPOINT;
-import static com.bytechef.component.llm.constants.LLMConstants.URL;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 
@@ -60,8 +60,7 @@ public final class WatsonxConnection {
                     string(TOKEN)
                         .label("IAM Token")
                         .description("The IBM Cloud account IAM token.")
-                        .required(true)
-                    ));
+                        .required(true)));
 
     private WatsonxConnection() {
     }
