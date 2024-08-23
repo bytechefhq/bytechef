@@ -62,7 +62,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     }
 
     @Override
-    public Optional<ApiKey> fetchApiKey(Environment environment, String secretKey) {
+    public Optional<ApiKey> fetchApiKey(@NonNull Environment environment, @NonNull String secretKey) {
         return apiKeyRepository.findByEnvironmentAndSecretKey(environment.ordinal(), secretKey);
     }
 

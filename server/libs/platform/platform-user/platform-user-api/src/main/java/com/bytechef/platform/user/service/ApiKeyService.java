@@ -32,7 +32,7 @@ public interface ApiKeyService {
 
     void delete(long id);
 
-    Optional<ApiKey> fetchApiKey(Environment environment, String secretKey);
+    Optional<ApiKey> fetchApiKey(@NonNull Environment environment, @NonNull String secretKey);
 
     ApiKey getApiKey(long id);
 
