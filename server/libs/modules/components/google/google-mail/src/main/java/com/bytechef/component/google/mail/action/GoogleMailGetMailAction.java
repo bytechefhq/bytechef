@@ -29,8 +29,8 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA_HEADERS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA_HEADERS_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MINIMAL;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.PARSED;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.RAW;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SIMPLE;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SUBJECT;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TO;
 
@@ -72,7 +72,7 @@ public class GoogleMailGetMailAction {
                 .label("Format")
                 .description("The format to return the message in.")
                 .options(
-                    option("Parsed", PARSED, "Returns email message's from, to, subject, body and attachments."),
+                    option("Simple", SIMPLE, "Returns email message's from, to, subject, body and attachments."),
                     option("Minimal", MINIMAL,
                         "Returns only email message ID and labels; does not return the email headers, body, or payload."),
                     option("Full", FULL,
@@ -80,7 +80,7 @@ public class GoogleMailGetMailAction {
                     option("Raw", RAW,
                         "Returns the full email message data with body content in the raw field as a base64url encoded string; the payload field is not used. Format cannot be used when accessing the api using the gmail.metadata scope."),
                     option("Metadata", METADATA, "Returns only email message ID, labels, and email headers."))
-                .defaultValue(PARSED)
+                .defaultValue(SIMPLE)
                 .required(true),
             METADATA_HEADERS_PROPERTY)
         .output(GoogleMailUtils.getOutput())
@@ -95,7 +95,7 @@ public class GoogleMailGetMailAction {
 
         String format = inputParameters.getRequiredString(FORMAT);
 
-        if (format.equals(PARSED)) {
+        if (format.equals(SIMPLE)) {
             Message message = getMessage(inputParameters, service);
             MessagePart payload = message.getPayload();
             List<MessagePart> parts = payload.getParts();
@@ -152,7 +152,7 @@ public class GoogleMailGetMailAction {
         return service.users()
             .messages()
             .get("me", inputParameters.getRequiredString(ID))
-            .setFormat(format.equals(PARSED) ? FULL : format)
+            .setFormat(format.equals(SIMPLE) ? FULL : format)
             .setMetadataHeaders(inputParameters.getList(METADATA_HEADERS, String.class, List.of()))
             .execute();
     }

@@ -42,7 +42,7 @@ import java.util.Map;
  */
 public class GoogleMailNewEmailPollingTrigger {
 
-    private static final String LAST_TIME_CHECKED = "lastTimeChecked";
+    protected static final String LAST_TIME_CHECKED = "lastTimeChecked";
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newEmailPolling")
         .title("New Email Polling")
