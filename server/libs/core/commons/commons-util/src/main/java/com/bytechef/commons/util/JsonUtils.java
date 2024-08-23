@@ -39,7 +39,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.springframework.core.ResolvableType;
 
 /**
  * @author Ivica Cardic
@@ -196,9 +195,10 @@ public class JsonUtils {
         InputStream inputStream, String path, Class<T> elementType) {
 
         DocumentContext documentContext = JsonPath.parse(inputStream, CONFIGURATION);
+        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
 
         return documentContext.read(
-            path, new ResolvableTypeTypeRef<>(ResolvableType.forClassWithGenerics(List.class, elementType)));
+            path, new TypeTypeRef<>(typeFactory.constructCollectionType(List.class, elementType)));
     }
 
     public static List<?> readList(String json) {
@@ -223,9 +223,10 @@ public class JsonUtils {
 
     public static <T> List<T> readList(String json, String path, Class<T> elementType) {
         DocumentContext documentContext = JsonPath.parse(json, CONFIGURATION);
+        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
 
         return documentContext.read(
-            path, new ResolvableTypeTypeRef<>(ResolvableType.forClassWithGenerics(List.class, elementType)));
+            path, new TypeTypeRef<>(typeFactory.constructCollectionType(List.class, elementType)));
     }
 
     public static <V> Map<String, V> readMap(InputStream inputStream, Class<V> valueType) {
@@ -241,19 +242,20 @@ public class JsonUtils {
 
     public static Map<String, ?> readMap(InputStream inputStream, String path) {
         DocumentContext documentContext = JsonPath.parse(inputStream, CONFIGURATION);
+        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
 
         return documentContext.read(
-            path, new ResolvableTypeTypeRef<>(ResolvableType.forClassWithGenerics(
-                Map.class, String.class, Object.class)));
+            path, new TypeTypeRef<>(typeFactory.constructMapType(Map.class, String.class, Object.class)));
     }
 
     public static <V> Map<String, V> readMap(
         InputStream inputStream, String path, Class<V> valueType) {
 
         DocumentContext documentContext = JsonPath.parse(inputStream, CONFIGURATION);
+        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
 
         return documentContext.read(
-            path, new ResolvableTypeTypeRef<>(ResolvableType.forClassWithGenerics(Map.class, String.class, valueType)));
+            path, new TypeTypeRef<>(typeFactory.constructMapType(Map.class, String.class, valueType)));
     }
 
     public static Map<String, ?> readMap(String json) {
@@ -283,17 +285,22 @@ public class JsonUtils {
 
     public static Map<String, ?> readMap(String json, String path) {
         DocumentContext documentContext = JsonPath.parse(json, CONFIGURATION);
+        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
 
         return documentContext.read(
-            path, new ResolvableTypeTypeRef<>(ResolvableType.forClassWithGenerics(
-                Map.class, String.class, Object.class)));
+            path, new TypeTypeRef<>(
+                typeFactory.constructMapType(
+                    Map.class, typeFactory.constructType(String.class), typeFactory.constructType(Object.class))));
     }
 
     public static <V> Map<String, V> readMap(String json, String path, Class<V> valueType) {
         DocumentContext documentContext = JsonPath.parse(json, CONFIGURATION);
+        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
 
         return documentContext.read(
-            path, new ResolvableTypeTypeRef<>(ResolvableType.forClassWithGenerics(Map.class, String.class, valueType)));
+            path, new TypeTypeRef<>(
+                typeFactory.constructMapType(
+                    Map.class, typeFactory.constructType(String.class), typeFactory.constructType(valueType))));
     }
 
     public static Stream<Map<String, ?>> stream(InputStream inputStream) {
@@ -355,20 +362,6 @@ public class JsonUtils {
                 .writeValueAsString(object);
         } catch (Exception e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    private static class ResolvableTypeTypeRef<L> extends TypeRef<L> {
-
-        private final ResolvableType resolvableType;
-
-        ResolvableTypeTypeRef(ResolvableType resolvableType) {
-            this.resolvableType = resolvableType;
-        }
-
-        @Override
-        public Type getType() {
-            return resolvableType.getType();
         }
     }
 
