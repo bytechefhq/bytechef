@@ -8,7 +8,7 @@ description: "HubSpot is a CRM platform with all the software, integrations, and
 HubSpot is a CRM platform with all the software, integrations, and resources you need to connect marketing, sales, content management, and customer service.
 
 
-Categories: [MARKETING_AUTOMATION]
+Categories: [marketing-automation]
 
 
 Version: 1

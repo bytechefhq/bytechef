@@ -8,7 +8,7 @@ description: "Object Helper allows you to do various operations on objects."
 Object Helper allows you to do various operations on objects.
 
 
-Categories: [HELPERS]
+Categories: [helpers]
 
 
 Version: 1

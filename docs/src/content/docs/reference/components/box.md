@@ -8,7 +8,7 @@ description: "Box is a cloud content management and file sharing service that en
 Box is a cloud content management and file sharing service that enables businesses to securely store, manage, and collaborate on documents.
 
 
-Categories: [FILE_STORAGE]
+Categories: [file-storage]
 
 
 Version: 1

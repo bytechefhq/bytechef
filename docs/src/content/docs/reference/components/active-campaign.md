@@ -8,7 +8,7 @@ description: "ActiveCampaign is a customer experience automation platform that o
 ActiveCampaign is a customer experience automation platform that offers email marketing, marketing automation, sales automation, and CRM tools.
 
 
-Categories: [CRM, MARKETING_AUTOMATION]
+Categories: [crm, marketing-automation]
 
 
 Version: 1

@@ -8,7 +8,7 @@ description: "Freshsales is a customer relationship management (CRM) software de
 Freshsales is a customer relationship management (CRM) software designed to help businesses streamline sales processes and manage customer interactions effectively.
 
 
-Categories: [CRM]
+Categories: [crm]
 
 
 Version: 1

@@ -8,7 +8,7 @@ description: "Affinity is a customer relationship management (CRM) platform that
 Affinity is a customer relationship management (CRM) platform that leverages relationship intelligence to help businesses strengthen connections and drive engagement with client and prospects.
 
 
-Categories: [CRM]
+Categories: [crm]
 
 
 Version: 1

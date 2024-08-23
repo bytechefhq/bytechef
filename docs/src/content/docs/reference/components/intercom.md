@@ -8,7 +8,7 @@ description: "Intercom is the complete AI-first customer service solution, givin
 Intercom is the complete AI-first customer service solution, giving exceptional experiences for support teams with AI agent, AI copilot, tickets, ...
 
 
-Categories: [CUSTOMER_SUPPORT]
+Categories: [customer-support]
 
 
 Version: 1

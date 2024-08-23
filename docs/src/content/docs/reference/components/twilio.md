@@ -8,7 +8,7 @@ description: "Twilio is a cloud communications platform that enables developers 
 Twilio is a cloud communications platform that enables developers to integrate messaging, voice, and video capabilities into their applications.
 
 
-Categories: [COMMUNICATION]
+Categories: [communication]
 
 
 Version: 1

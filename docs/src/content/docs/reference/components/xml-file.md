@@ -8,7 +8,7 @@ description: "Reads and writes data from a XML file."
 Reads and writes data from a XML file.
 
 
-Categories: [HELPERS]
+Categories: [helpers]
 
 
 Version: 1
