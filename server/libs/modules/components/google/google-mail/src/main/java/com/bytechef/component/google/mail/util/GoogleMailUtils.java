@@ -26,18 +26,18 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ATTACHMENTS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FROM;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FULL_MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.HEADERS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.HISTORY_ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.INTERNAL_DATE;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.LABEL_IDS;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MESSAGE_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MINIMAL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.NAME;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.PARSED;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.PAYLOAD;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.RAW;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SIMPLE;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SIZE_ESTIMATE;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SNIPPET;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SUBJECT;
@@ -64,6 +64,55 @@ import java.util.Map;
  * @author Monika Domiter
  */
 public class GoogleMailUtils {
+
+    protected static final ModifiableObjectProperty PARSED_MESSAGE_OUTPUT_PROPERTY = object()
+        .properties(
+            string(SUBJECT),
+            string(FROM),
+            string(TO),
+            string("body_plain"),
+            string("body_html"),
+            array(ATTACHMENTS).items(fileEntry()));
+
+    protected static final ModifiableObjectProperty RAW_MESSAGE_OUTPUT_PROPERTY = object()
+        .properties(
+            string(HISTORY_ID),
+            string(ID),
+            number(INTERNAL_DATE),
+            array(LABEL_IDS)
+                .items(string()),
+            string(RAW),
+            integer(SIZE_ESTIMATE),
+            string(SNIPPET),
+            string(THREAD_ID));
+
+    protected static final ModifiableObjectProperty MINIMAL_MESSAGE_OUTPUT_PROPERTY = object()
+        .properties(
+            string(HISTORY_ID),
+            string(ID),
+            number(INTERNAL_DATE),
+            array(LABEL_IDS).items(string()),
+            integer(SIZE_ESTIMATE),
+            string(SNIPPET),
+            string(THREAD_ID));
+
+    protected static final ModifiableObjectProperty METADATA_MESSAGE_OUTPUT_PROPERTY = object()
+        .properties(
+            string(HISTORY_ID),
+            string(ID),
+            number(INTERNAL_DATE),
+            array(LABEL_IDS).items(string()),
+            object(PAYLOAD)
+                .properties(
+                    array(HEADERS)
+                        .items(
+                            object()
+                                .properties(
+                                    string(NAME),
+                                    string(VALUE)))),
+            integer(SIZE_ESTIMATE),
+            string(SNIPPET),
+            string(THREAD_ID));
 
     private GoogleMailUtils() {
     }
@@ -136,52 +185,11 @@ public class GoogleMailUtils {
             String format = inputParameters.getRequiredString(FORMAT);
 
             ModifiableObjectProperty bodyPlain = switch (format) {
-                case PARSED -> object()
-                    .properties(
-                        string(SUBJECT),
-                        string(FROM),
-                        string(TO),
-                        string("body_plain"),
-                        string("body_html"),
-                        array(ATTACHMENTS).items(fileEntry()));
-                case RAW -> object()
-                    .properties(
-                        string(HISTORY_ID),
-                        string(ID),
-                        number(INTERNAL_DATE),
-                        array(LABEL_IDS)
-                            .items(string()),
-                        string(RAW),
-                        integer(SIZE_ESTIMATE),
-                        string(SNIPPET),
-                        string(THREAD_ID));
-                case MINIMAL -> object()
-                    .properties(
-                        string(HISTORY_ID),
-                        string(ID),
-                        number(INTERNAL_DATE),
-                        array(LABEL_IDS).items(string()),
-                        integer(SIZE_ESTIMATE),
-                        string(SNIPPET),
-                        string(THREAD_ID));
-                case METADATA -> object()
-                    .properties(
-                        string(HISTORY_ID),
-                        string(ID),
-                        number(INTERNAL_DATE),
-                        array(LABEL_IDS).items(string()),
-                        object(PAYLOAD)
-                            .properties(
-                                array(HEADERS)
-                                    .items(
-                                        object()
-                                            .properties(
-                                                string(NAME),
-                                                string(VALUE)))),
-                        integer(SIZE_ESTIMATE),
-                        string(SNIPPET),
-                        string(THREAD_ID));
-                default -> MESSAGE_PROPERTY;
+                case SIMPLE -> PARSED_MESSAGE_OUTPUT_PROPERTY;
+                case RAW -> RAW_MESSAGE_OUTPUT_PROPERTY;
+                case MINIMAL -> MINIMAL_MESSAGE_OUTPUT_PROPERTY;
+                case METADATA -> METADATA_MESSAGE_OUTPUT_PROPERTY;
+                default -> FULL_MESSAGE_OUTPUT_PROPERTY;
             };
 
             return new OutputResponse(bodyPlain);

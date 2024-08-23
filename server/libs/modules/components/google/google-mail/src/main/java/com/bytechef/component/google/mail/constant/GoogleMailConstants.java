@@ -63,7 +63,7 @@ public class GoogleMailConstants {
     public static final String NEW_EMAIL = "newEmail";
     public static final String NEXT_PAGE_TOKEN = "nextPageToken";
     public static final String PAGE_TOKEN = "pageToken";
-    public static final String PARSED = "parsed";
+    public static final String SIMPLE = "parsed";
     public static final String PAYLOAD = "payload";
     public static final String RAW = "raw";
     public static final String REPLY_TO = "replyTo";
@@ -82,7 +82,7 @@ public class GoogleMailConstants {
         .label("Email address")
         .controlType(Property.ControlType.EMAIL);
 
-    public static final ModifiableObjectProperty MESSAGE_PROPERTY = object()
+    public static final ModifiableObjectProperty FULL_MESSAGE_OUTPUT_PROPERTY = object()
         .properties(
             string(ID),
             string(THREAD_ID),

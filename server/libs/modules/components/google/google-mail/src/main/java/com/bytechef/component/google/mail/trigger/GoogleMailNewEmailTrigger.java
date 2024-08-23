@@ -21,9 +21,9 @@ import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 import static com.bytechef.component.definition.TriggerContext.Data.Scope.WORKFLOW;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FULL_MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.HISTORY_ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MESSAGE_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.NEW_EMAIL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TOPIC_NAME;
 
@@ -73,7 +73,7 @@ public class GoogleMailNewEmailTrigger {
                 .required(true))
         .outputSchema(
             array()
-                .items(MESSAGE_PROPERTY))
+                .items(FULL_MESSAGE_OUTPUT_PROPERTY))
         .webhookEnable(GoogleMailNewEmailTrigger::webhookEnable)
         .webhookDisable(GoogleMailNewEmailTrigger::webhookDisable)
         .webhookRequest(GoogleMailNewEmailTrigger::webhookRequest);
