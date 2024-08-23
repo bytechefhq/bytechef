@@ -20,10 +20,10 @@ import static com.bytechef.component.anthropic.constant.AnthropicConstants.ANTHR
 import static com.bytechef.component.definition.ComponentDSL.component;
 
 import com.bytechef.component.ComponentHandler;
-import com.bytechef.component.definition.ComponentCategory;
-import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.anthropic.action.AnthropicChatAction;
 import com.bytechef.component.anthropic.connection.AnthropicConnection;
+import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**

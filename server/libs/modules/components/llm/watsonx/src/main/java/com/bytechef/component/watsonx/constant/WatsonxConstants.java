@@ -16,12 +16,6 @@
 
 package com.bytechef.component.watsonx.constant;
 
-import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.number;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.string;
-
 /**
  * @author Monika Domiter
  */
@@ -33,7 +27,6 @@ public final class WatsonxConstants {
     public static final String REPETITION_PENALTY = "repetitionPenalty";
     public static final String MIN_TOKENS = "minTokens";
     public static final String DECODING_METHOD = "decodingMethod";
-
 
     private WatsonxConstants() {
     }

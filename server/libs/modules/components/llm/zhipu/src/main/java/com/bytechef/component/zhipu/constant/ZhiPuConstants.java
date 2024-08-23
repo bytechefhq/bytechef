@@ -24,7 +24,6 @@ public final class ZhiPuConstants {
     public static final String REQUEST_ID = "requestId";
     public static final String DO_SAMPLE = "doSample";
 
-
     private ZhiPuConstants() {
     }
 }

@@ -26,6 +26,7 @@ public class AmazonBedrockComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/anthropic_v1.json", new AmazonBedrockComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/anthropic_v1.json",
+            new AmazonBedrockComponentHandler().getDefinition());
     }
 }

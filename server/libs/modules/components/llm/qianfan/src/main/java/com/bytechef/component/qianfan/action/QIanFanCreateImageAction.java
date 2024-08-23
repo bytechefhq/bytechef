@@ -16,23 +16,6 @@
 
 package com.bytechef.component.qianfan.action;
 
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
-import com.bytechef.component.qianfan.constant.QIanFanConstants;
-import org.springframework.ai.image.ImageModel;
-import org.springframework.ai.image.ImageOptions;
-import org.springframework.ai.qianfan.QianFanImageModel;
-import org.springframework.ai.qianfan.QianFanImageOptions;
-import org.springframework.ai.qianfan.api.QianFanImageApi;
-import org.springframework.retry.support.RetryTemplate;
-import com.bytechef.component.llm.util.LLMUtils;
-import com.bytechef.component.llm.util.interfaces.Image;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
@@ -49,6 +32,22 @@ import static com.bytechef.component.llm.constants.LLMConstants.STYLE;
 import static com.bytechef.component.llm.constants.LLMConstants.USER;
 import static com.bytechef.component.llm.constants.LLMConstants.USER_PROPERTY;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
+import com.bytechef.component.llm.util.LLMUtils;
+import com.bytechef.component.llm.util.interfaces.Image;
+import com.bytechef.component.qianfan.constant.QIanFanConstants;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+import org.springframework.ai.image.ImageModel;
+import org.springframework.ai.image.ImageOptions;
+import org.springframework.ai.qianfan.QianFanImageModel;
+import org.springframework.ai.qianfan.QianFanImageOptions;
+import org.springframework.ai.qianfan.api.QianFanImageApi;
+import org.springframework.retry.support.RetryTemplate;
+
 /**
  * @author Monika Domiter
  */
@@ -64,25 +63,49 @@ public class QIanFanCreateImageAction {
                 .options(LLMUtils.getEnumOptions(
                     Arrays.stream(QianFanImageApi.ImageModel.values())
                         .collect(Collectors.toMap(
-                            QianFanImageApi.ImageModel::getValue, QianFanImageApi.ImageModel::getValue, (f,s)->f))))
+                            QianFanImageApi.ImageModel::getValue, QianFanImageApi.ImageModel::getValue, (f, s) -> f))))
                 .required(true),
             IMAGE_MESSAGE_PROPERTY,
             object(SIZE)
                 .label("Size")
                 .description("The size of the generated images.")
                 .options(
-                    option("Avatars: 768x768", new Integer[]{768, 768}),
-                    option("Avatars: 1024x1024", new Integer[]{1024, 1024}),
-                    option("Avatars: 1536x1536", new Integer[]{1536, 1536}),
-                    option("Avatars: 2048x2048", new Integer[]{2048, 2048}),
-                    option("Article illustrations: 1024x768", new Integer[]{1024, 768}),
-                    option("Article illustrations: 2048x1536", new Integer[]{2048, 1536}),
-                    option("Posters and flyers: 576x1024", new Integer[]{576, 1024}),
-                    option("Posters and flyers: 1152x2048", new Integer[]{1152, 2048}),
-                    option("Posters and flyers: 768x1024", new Integer[]{768, 1024}),
-                    option("Posters and flyers: 1536x2048", new Integer[]{1536, 2048}),
-                    option("Computer wallpapers: 1024x576", new Integer[]{1024, 576}),
-                    option("Computer wallpapers: 2048x1152", new Integer[]{2048, 1152}))
+                    option("Avatars: 768x768", new Integer[] {
+                        768, 768
+                    }),
+                    option("Avatars: 1024x1024", new Integer[] {
+                        1024, 1024
+                    }),
+                    option("Avatars: 1536x1536", new Integer[] {
+                        1536, 1536
+                    }),
+                    option("Avatars: 2048x2048", new Integer[] {
+                        2048, 2048
+                    }),
+                    option("Article illustrations: 1024x768", new Integer[] {
+                        1024, 768
+                    }),
+                    option("Article illustrations: 2048x1536", new Integer[] {
+                        2048, 1536
+                    }),
+                    option("Posters and flyers: 576x1024", new Integer[] {
+                        576, 1024
+                    }),
+                    option("Posters and flyers: 1152x2048", new Integer[] {
+                        1152, 2048
+                    }),
+                    option("Posters and flyers: 768x1024", new Integer[] {
+                        768, 1024
+                    }),
+                    option("Posters and flyers: 1536x2048", new Integer[] {
+                        1536, 2048
+                    }),
+                    option("Computer wallpapers: 1024x576", new Integer[] {
+                        1024, 576
+                    }),
+                    option("Computer wallpapers: 2048x1152", new Integer[] {
+                        2048, 1152
+                    }))
                 .required(true),
             integer(N)
                 .label("Number of responses")
@@ -155,7 +178,9 @@ public class QIanFanCreateImageAction {
 
         @Override
         public ImageModel createImageModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new QianFanImageModel(new QianFanImageApi(connectionParameters.getString(TOKEN), connectionParameters.getString(QIanFanConstants.SECRET_KEY)),
+            return new QianFanImageModel(
+                new QianFanImageApi(connectionParameters.getString(TOKEN),
+                    connectionParameters.getString(QIanFanConstants.SECRET_KEY)),
                 (QianFanImageOptions) createImageOptions(inputParameters), new RetryTemplate());
         }
     };

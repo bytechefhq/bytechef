@@ -19,7 +19,6 @@ package com.bytechef.component.qianfan.action;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.string;
-
 import static com.bytechef.component.llm.constants.LLMConstants.ASK;
 import static com.bytechef.component.llm.constants.LLMConstants.FREQUENCY_PENALTY;
 import static com.bytechef.component.llm.constants.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
@@ -40,18 +39,16 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
-
+import com.bytechef.component.llm.util.LLMUtils;
+import com.bytechef.component.llm.util.interfaces.Chat;
+import com.bytechef.component.qianfan.constant.QIanFanConstants;
 import java.util.Arrays;
 import java.util.stream.Collectors;
-
-import com.bytechef.component.qianfan.constant.QIanFanConstants;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.qianfan.QianFanChatModel;
 import org.springframework.ai.qianfan.QianFanChatOptions;
 import org.springframework.ai.qianfan.api.QianFanApi;
-import com.bytechef.component.llm.util.LLMUtils;
-import com.bytechef.component.llm.util.interfaces.Chat;
 
 public class QIanFanChatAction {
 
@@ -66,7 +63,7 @@ public class QIanFanChatAction {
                 .options(LLMUtils.getEnumOptions(
                     Arrays.stream(QianFanApi.ChatModel.values())
                         .collect(Collectors.toMap(
-                            QianFanApi.ChatModel::getValue, QianFanApi.ChatModel::getValue, (f,s)->f)))),
+                            QianFanApi.ChatModel::getValue, QianFanApi.ChatModel::getValue, (f, s) -> f)))),
             MESSAGE_PROPERTY,
             MAX_TOKENS_PROPERTY,
             TEMPERATURE_PROPERTY,
@@ -101,7 +98,10 @@ public class QIanFanChatAction {
 
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new QianFanChatModel(new QianFanApi(connectionParameters.getString(TOKEN), connectionParameters.getString(QIanFanConstants.SECRET_KEY)), (QianFanChatOptions) createChatOptions(inputParameters));
+            return new QianFanChatModel(
+                new QianFanApi(connectionParameters.getString(TOKEN),
+                    connectionParameters.getString(QIanFanConstants.SECRET_KEY)),
+                (QianFanChatOptions) createChatOptions(inputParameters));
         }
     };
 }

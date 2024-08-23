@@ -16,7 +16,6 @@
 
 package com.bytechef.component.minimax;
 
-import com.bytechef.component.minimax.MinimaxComponentHandler;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 

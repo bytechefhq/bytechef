@@ -18,7 +18,6 @@ package com.bytechef.component.amazon.bedrock.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.string;
-
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MESSAGE_PROPERTY;
@@ -37,19 +36,17 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
-
+import com.bytechef.component.llm.util.LLMUtils;
+import com.bytechef.component.llm.util.interfaces.Chat;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.ai.bedrock.anthropic3.Anthropic3ChatOptions;
 import org.springframework.ai.bedrock.anthropic3.BedrockAnthropic3ChatModel;
 import org.springframework.ai.bedrock.anthropic3.api.Anthropic3ChatBedrockApi;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
-import com.bytechef.component.llm.util.LLMUtils;
-import com.bytechef.component.llm.util.interfaces.Chat;
 
 public class AmazonBedrockAnthropic3ChatAction {
 
@@ -64,7 +61,8 @@ public class AmazonBedrockAnthropic3ChatAction {
                 .options(LLMUtils.getEnumOptions(
                     Arrays.stream(Anthropic3ChatBedrockApi.AnthropicChatModel.values())
                         .collect(Collectors.toMap(
-                            Anthropic3ChatBedrockApi.AnthropicChatModel::getName, Anthropic3ChatBedrockApi.AnthropicChatModel::getName, (f,s)->f)))),
+                            Anthropic3ChatBedrockApi.AnthropicChatModel::getName,
+                            Anthropic3ChatBedrockApi.AnthropicChatModel::getName, (f, s) -> f)))),
             MESSAGE_PROPERTY,
             MAX_TOKENS_PROPERTY,
             TEMPERATURE_PROPERTY,
@@ -97,7 +95,8 @@ public class AmazonBedrockAnthropic3ChatAction {
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
             return new BedrockAnthropic3ChatModel(new Anthropic3ChatBedrockApi(inputParameters.getRequiredString(MODEL),
-                EnvironmentVariableCredentialsProvider.create(), connectionParameters.getRequiredString(AmazonBedrockConstants.REGION), new ObjectMapper()),
+                EnvironmentVariableCredentialsProvider.create(),
+                connectionParameters.getRequiredString(AmazonBedrockConstants.REGION), new ObjectMapper()),
                 (Anthropic3ChatOptions) createChatOptions(inputParameters));
         }
     };

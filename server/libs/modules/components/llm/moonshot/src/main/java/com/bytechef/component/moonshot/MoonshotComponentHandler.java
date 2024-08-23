@@ -16,8 +16,8 @@
 
 package com.bytechef.component.moonshot;
 
-import static com.bytechef.component.moonshot.constant.MoonshotConstants.MOONSHOT;
 import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.moonshot.constant.MoonshotConstants.MOONSHOT;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;

@@ -24,7 +24,6 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.stability.action.StabilityCreateImageAction;
 import com.bytechef.component.stability.connection.StabilityConnection;
-import com.bytechef.component.stability.constant.StabilityConstants;
 import com.google.auto.service.AutoService;
 
 /**

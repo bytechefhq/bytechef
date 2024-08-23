@@ -19,12 +19,8 @@ package com.bytechef.component.llm.util;
 import static com.bytechef.component.definition.ComponentDSL.option;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableOption;
-
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-
-import com.bytechef.component.definition.Property;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
