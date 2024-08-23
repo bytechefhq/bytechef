@@ -30,5 +30,9 @@ public interface ApiKeyRepository extends ListCrudRepository<ApiKey, Long> {
 
     List<ApiKey> findAllByType(int type);
 
+    List<ApiKey> findAllByTypeIsNull();
+
     Optional<ApiKey> findByEnvironmentAndSecretKey(int environment, String apiKey);
+
+    Optional<ApiKey> findBySecretKeyAndEnvironmentIsNull(String secretKey);
 }

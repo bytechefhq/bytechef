@@ -43,7 +43,7 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade {
     }
 
     @Override
-    public String create(@NonNull ApiKey apiKey, @NonNull AppType type) {
+    public String create(@NonNull ApiKey apiKey, AppType type) {
         User user = userService.getCurrentUser();
 
         apiKey.setType(type);

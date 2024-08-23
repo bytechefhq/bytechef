@@ -25,5 +25,5 @@ import org.springframework.lang.NonNull;
  */
 public interface ApiKeyFacade {
 
-    String create(@NonNull ApiKey apiKey, @NonNull AppType type);
+    String create(@NonNull ApiKey apiKey, AppType type);
 }
