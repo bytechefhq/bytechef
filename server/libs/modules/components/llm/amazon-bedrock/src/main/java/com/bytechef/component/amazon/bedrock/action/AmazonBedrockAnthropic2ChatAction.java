@@ -75,12 +75,12 @@ public class AmazonBedrockAnthropic2ChatAction {
     private AmazonBedrockAnthropic2ChatAction() {
     }
 
-    private static String perform(
+    public static String perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }
 
-    public static final Chat CHAT = new Chat() {
+    private static final Chat CHAT = new Chat() {
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
             return AnthropicChatOptions.builder()

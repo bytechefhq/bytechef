@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Monika Domiter
  */
-public class StabilityComponentHandlerTest {
+class StabilityComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {

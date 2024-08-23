@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Monika Domiter
  */
-public class MinimaxComponentHandlerTest {
+class MinimaxComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {

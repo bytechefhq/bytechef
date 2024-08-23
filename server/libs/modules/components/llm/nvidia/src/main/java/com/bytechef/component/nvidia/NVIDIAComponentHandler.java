@@ -33,7 +33,7 @@ import com.google.auto.service.AutoService;
 public class NVIDIAComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(NVDIAConstants.NVIDIA)
-        .title("NVIDIA")
+        .title("NVIDIA LLM")
         .description(
             "Generative AI and digitalization are reshaping the $3 trillion automotive industry, from design and engineering to manufacturing, autonomous driving, and customer experience. NVIDIA is at the epicenter of this industrial transformation.")
         .icon("path:assets/nvidia.svg")
