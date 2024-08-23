@@ -39,7 +39,7 @@ public interface Transcript {
         Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> transcriptionModel =
             transcript.createTranscriptionModel(inputParameters, connectionParameters);
 
-        AudioTranscriptionPrompt transcriptionPrompt = Transcript.getTranscriptionPrompt(inputParameters);
+        AudioTranscriptionPrompt transcriptionPrompt = getTranscriptionPrompt(inputParameters);
 
         AudioTranscriptionResponse response = transcriptionModel.call(transcriptionPrompt);
         return response.getResult()

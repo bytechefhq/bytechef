@@ -7,14 +7,14 @@
   "customActionHelp" : null,
   "dataStreamItemReader" : null,
   "dataStreamItemWriter" : null,
-  "description" : "百度智能云 云智一体深入产业. 全栈自研的AI大底座，满足产业对智算基础设施的需求.",
-  "icon" : "path:assets/qianfan.svg",
+  "description" : "Zhipu AI is an artificial intelligence company with the mission of teaching machines to think like humans.",
+  "icon" : "path:assets/zhipu.svg",
   "tags" : null,
   "metadata" : null,
-  "name" : "qianfan",
+  "name" : "zhipu",
   "resources" : null,
   "version" : 1,
-  "title" : "QIanFan",
+  "title" : "ZhiPu AI",
   "actions" : [ {
     "batch" : null,
     "dynamicOutput" : true,
@@ -43,76 +43,28 @@
       "minLength" : null,
       "options" : [ {
         "description" : null,
-        "label" : "ernie-4.0-8k-0104",
-        "value" : "ernie-4.0-8k-0104"
+        "label" : "glm-4v",
+        "value" : "glm-4v"
       }, {
         "description" : null,
-        "label" : "ernie-3.5-8k-preview",
-        "value" : "ernie-3.5-8k-preview"
+        "label" : "GLM-4",
+        "value" : "GLM-4"
       }, {
         "description" : null,
-        "label" : "ernie-4.0-8k-preview",
-        "value" : "ernie-4.0-8k-preview"
+        "label" : "glm-4-flash",
+        "value" : "glm-4-flash"
       }, {
         "description" : null,
-        "label" : "ernie-4.0-8k-0329",
-        "value" : "ernie-4.0-8k-0329"
+        "label" : "glm-4-air",
+        "value" : "glm-4-air"
       }, {
         "description" : null,
-        "label" : "completions_pro",
-        "value" : "completions_pro"
+        "label" : "glm-4-airx",
+        "value" : "glm-4-airx"
       }, {
         "description" : null,
-        "label" : "ernie-lite-8k",
-        "value" : "ernie-lite-8k"
-      }, {
-        "description" : null,
-        "label" : "ernie-func-8k",
-        "value" : "ernie-func-8k"
-      }, {
-        "description" : null,
-        "label" : "ernie_speed",
-        "value" : "ernie_speed"
-      }, {
-        "description" : null,
-        "label" : "completions",
-        "value" : "completions"
-      }, {
-        "description" : null,
-        "label" : "ernie-3.5-4k-0205",
-        "value" : "ernie-3.5-4k-0205"
-      }, {
-        "description" : null,
-        "label" : "ernie-3.5-8k-0329",
-        "value" : "ernie-3.5-8k-0329"
-      }, {
-        "description" : null,
-        "label" : "ernie-speed-128k",
-        "value" : "ernie-speed-128k"
-      }, {
-        "description" : null,
-        "label" : "ernie-3.5-128k",
-        "value" : "ernie-3.5-128k"
-      }, {
-        "description" : null,
-        "label" : "completions_adv_pro",
-        "value" : "completions_adv_pro"
-      }, {
-        "description" : null,
-        "label" : "ernie-3.5-8k-1222",
-        "value" : "ernie-3.5-8k-1222"
-      }, {
-        "description" : null,
-        "label" : "ernie-3.5-8k-0205",
-        "value" : "ernie-3.5-8k-0205"
-      }, {
-        "description" : null,
-        "label" : "ernie-tiny-8k",
-        "value" : "ernie-tiny-8k"
-      }, {
-        "description" : null,
-        "label" : "eb-instant",
-        "value" : "eb-instant"
+        "label" : "GLM-3-Turbo",
+        "value" : "GLM-3-Turbo"
       } ],
       "optionsDataSource" : null
     }, {
@@ -277,50 +229,6 @@
       "controlType" : "NUMBER"
     }, {
       "advancedOption" : true,
-      "description" : "Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : null,
-      "name" : "presencePenalty",
-      "type" : "NUMBER",
-      "defaultValue" : 0.0,
-      "exampleValue" : null,
-      "label" : "Presence penalty",
-      "placeholder" : null,
-      "maxNumberPrecision" : null,
-      "maxValue" : 2.0,
-      "minNumberPrecision" : null,
-      "minValue" : -2.0,
-      "numberPrecision" : null,
-      "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
-    }, {
-      "advancedOption" : true,
-      "description" : "Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : null,
-      "name" : "frequencyPenalty",
-      "type" : "NUMBER",
-      "defaultValue" : 0.0,
-      "exampleValue" : null,
-      "label" : "Frequency penalty",
-      "placeholder" : null,
-      "maxNumberPrecision" : null,
-      "maxValue" : 2.0,
-      "minNumberPrecision" : null,
-      "minValue" : -2.0,
-      "numberPrecision" : null,
-      "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
-    }, {
-      "advancedOption" : true,
       "description" : "Up to 4 sequences where the API will stop generating further tokens.",
       "displayCondition" : null,
       "expressionEnabled" : null,
@@ -360,6 +268,70 @@
       "options" : null,
       "optionsDataSource" : null,
       "controlType" : "ARRAY_BUILDER"
+    }, {
+      "advancedOption" : true,
+      "description" : "A unique identifier representing your end-user, which can help admins to monitor and detect abuse.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "user",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "User",
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : true,
+      "description" : "The parameter is passed by the client and must ensure uniqueness. It is used to distinguish the unique identifier for each request. If the client does not provide it, the platform will generate it by default.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : "requestId",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Request Id",
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : true,
+      "description" : "When do_sample is set to true, the sampling strategy is enabled. If do_sample is false, the sampling strategy parameters temperature and top_p will not take effect.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : "doSample",
+      "type" : "BOOLEAN",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Do sample",
+      "placeholder" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "True",
+        "value" : true
+      }, {
+        "description" : null,
+        "label" : "False",
+        "value" : false
+      } ],
+      "controlType" : "SELECT"
     } ],
     "title" : "Ask",
     "output" : null,
@@ -418,8 +390,8 @@
       "minLength" : null,
       "options" : [ {
         "description" : null,
-        "label" : "sd_xl",
-        "value" : "sd_xl"
+        "label" : "cogview-3",
+        "value" : "cogview-3"
       } ],
       "optionsDataSource" : null
     }, {
@@ -505,189 +477,6 @@
       "options" : null,
       "optionsDataSource" : null,
       "controlType" : "ARRAY_BUILDER"
-    }, {
-      "advancedOption" : null,
-      "description" : "The size of the generated images.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "size",
-      "type" : "OBJECT",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Size",
-      "placeholder" : null,
-      "additionalProperties" : null,
-      "multipleValues" : null,
-      "options" : [ {
-        "description" : null,
-        "label" : "Avatars: 768x768",
-        "value" : [ 768, 768 ]
-      }, {
-        "description" : null,
-        "label" : "Avatars: 1024x1024",
-        "value" : [ 1024, 1024 ]
-      }, {
-        "description" : null,
-        "label" : "Avatars: 1536x1536",
-        "value" : [ 1536, 1536 ]
-      }, {
-        "description" : null,
-        "label" : "Avatars: 2048x2048",
-        "value" : [ 2048, 2048 ]
-      }, {
-        "description" : null,
-        "label" : "Article illustrations: 1024x768",
-        "value" : [ 1024, 768 ]
-      }, {
-        "description" : null,
-        "label" : "Article illustrations: 2048x1536",
-        "value" : [ 2048, 1536 ]
-      }, {
-        "description" : null,
-        "label" : "Posters and flyers: 576x1024",
-        "value" : [ 576, 1024 ]
-      }, {
-        "description" : null,
-        "label" : "Posters and flyers: 1152x2048",
-        "value" : [ 1152, 2048 ]
-      }, {
-        "description" : null,
-        "label" : "Posters and flyers: 768x1024",
-        "value" : [ 768, 1024 ]
-      }, {
-        "description" : null,
-        "label" : "Posters and flyers: 1536x2048",
-        "value" : [ 1536, 2048 ]
-      }, {
-        "description" : null,
-        "label" : "Computer wallpapers: 1024x576",
-        "value" : [ 1024, 576 ]
-      }, {
-        "description" : null,
-        "label" : "Computer wallpapers: 2048x1152",
-        "value" : [ 2048, 1152 ]
-      } ],
-      "properties" : null,
-      "optionsDataSource" : null,
-      "controlType" : "SELECT"
-    }, {
-      "advancedOption" : true,
-      "description" : "The number of images to generate. Must be between 1 and 4.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : null,
-      "name" : "n",
-      "type" : "INTEGER",
-      "defaultValue" : 1,
-      "exampleValue" : null,
-      "label" : "Number of responses",
-      "placeholder" : null,
-      "maxValue" : 4,
-      "minValue" : 1,
-      "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
-    }, {
-      "advancedOption" : true,
-      "description" : "The style of the generated images. The default style is Base.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : null,
-      "name" : "style",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Style",
-      "placeholder" : null,
-      "controlType" : "SELECT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : [ {
-        "description" : null,
-        "label" : "3D Model",
-        "value" : "3D Model"
-      }, {
-        "description" : null,
-        "label" : "Abstract",
-        "value" : "Abstract"
-      }, {
-        "description" : null,
-        "label" : "Analog Film",
-        "value" : "Analog Film"
-      }, {
-        "description" : null,
-        "label" : "Anime",
-        "value" : "Anime"
-      }, {
-        "description" : null,
-        "label" : "Base",
-        "value" : "Base"
-      }, {
-        "description" : null,
-        "label" : "Cinematic",
-        "value" : "Cinematic"
-      }, {
-        "description" : null,
-        "label" : "Comic Book",
-        "value" : "Comic Book"
-      }, {
-        "description" : null,
-        "label" : "Craft Clay",
-        "value" : "Craft Clay"
-      }, {
-        "description" : null,
-        "label" : "Digital Art",
-        "value" : "Digital Art"
-      }, {
-        "description" : null,
-        "label" : "Enhance",
-        "value" : "Enhance"
-      }, {
-        "description" : null,
-        "label" : "Fantasy Art",
-        "value" : "Fantasy Art"
-      }, {
-        "description" : null,
-        "label" : "Isometric",
-        "value" : "Isometric"
-      }, {
-        "description" : null,
-        "label" : "Line Art",
-        "value" : "Line Art"
-      }, {
-        "description" : null,
-        "label" : "Lowpoly",
-        "value" : "Lowpoly"
-      }, {
-        "description" : null,
-        "label" : "Neonpunk",
-        "value" : "Neonpunk"
-      }, {
-        "description" : null,
-        "label" : "Origami",
-        "value" : "Origami"
-      }, {
-        "description" : null,
-        "label" : "Photographic",
-        "value" : "Photographic"
-      }, {
-        "description" : null,
-        "label" : "Pixel Art",
-        "value" : "Pixel Art"
-      }, {
-        "description" : null,
-        "label" : "Texture",
-        "value" : "Texture"
-      } ],
-      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "A unique identifier representing your end-user, which can help admins to monitor and detect abuse.",
@@ -859,6 +648,7 @@
     },
     "workflowNodeDescription" : null
   } ],
+  "triggers" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -876,27 +666,7 @@
         "type" : "STRING",
         "defaultValue" : null,
         "exampleValue" : null,
-        "label" : "API Key",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "secretKey",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Secret Key",
+        "label" : "Token",
         "placeholder" : null,
         "controlType" : "TEXT",
         "languageId" : null,
@@ -910,14 +680,14 @@
       "type" : "BEARER_TOKEN",
       "acquire" : null,
       "apply" : null,
-      "scopes" : null,
-      "refresh" : null,
-      "pkce" : null,
       "authorizationCallback" : null,
       "authorizationUrl" : null,
       "clientId" : null,
       "clientSecret" : null,
+      "pkce" : null,
+      "refresh" : null,
       "refreshUrl" : null,
+      "scopes" : null,
       "refreshToken" : null,
       "tokenUrl" : null
     } ],
@@ -926,6 +696,5 @@
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  },
-  "triggers" : null
+  }
 }

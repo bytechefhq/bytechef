@@ -37,7 +37,8 @@ import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
 
 public abstract class ImageActionTest extends AbstractLLMActionTest {
-    private final org.springframework.ai.image.Image answer = new org.springframework.ai.image.Image("url", "b64JSON");
+    private static final org.springframework.ai.image.Image answer =
+        new org.springframework.ai.image.Image("url", "b64JSON");
 
     protected void performTest(ActionDefinition.SingleConnectionPerformFunction perform) {
         try (MockedStatic<Image> mockedImage = Mockito.mockStatic(Image.class)) {

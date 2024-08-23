@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Monika Domiter
  */
-public class VertexPaLM2ComponentHandlerTest {
+class VertexPaLM2ComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {

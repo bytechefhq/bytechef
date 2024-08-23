@@ -42,7 +42,7 @@ public interface Image {
     static Object getResponse(Image image, Parameters inputParameters, Parameters connectionParameters) {
         ImageModel imageModel = image.createImageModel(inputParameters, connectionParameters);
 
-        List<ImageMessage> messages = Image.getMessages(inputParameters);
+        List<ImageMessage> messages = getMessages(inputParameters);
 
         ImageResponse response = imageModel.call(new ImagePrompt(messages));
         return response.getResult()

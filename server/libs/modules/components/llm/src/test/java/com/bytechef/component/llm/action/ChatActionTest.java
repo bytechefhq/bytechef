@@ -38,7 +38,7 @@ import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 
 public abstract class ChatActionTest extends AbstractLLMActionTest {
-    private final String answer = "ANSWER";
+    private static final String answer = "ANSWER";
 
     protected void performTest(ActionDefinition.SingleConnectionPerformFunction perform) {
         try (MockedStatic<Chat> mockedChat = Mockito.mockStatic(Chat.class)) {
