@@ -22,11 +22,10 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Security;
 import com.bytechef.config.ApplicationProperties.Security.RememberMe;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.web.authentication.AuthenticationProviderContributor;
 import com.bytechef.platform.security.web.filter.FilterAfterContributor;
 import com.bytechef.platform.security.web.filter.FilterBeforeContributor;
-import com.bytechef.platform.security.web.matcher.AuthenticatedRequestMatcherContributor;
-import com.bytechef.platform.user.constant.AuthorityConstants;
 import com.bytechef.security.web.filter.CookieCsrfFilter;
 import com.bytechef.security.web.filter.SpaWebFilter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -42,7 +41,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -61,6 +59,7 @@ import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
@@ -75,19 +74,16 @@ public class SecurityConfiguration {
     private final AuthenticationSuccessHandler authenticationSuccessHandler;
     private final RememberMeServices rememberMeServices;
     private final Security security;
-    private final List<AuthenticatedRequestMatcherContributor> authenticatedRequestMatcherContributors;
 
     @SuppressFBWarnings("EI")
     public SecurityConfiguration(
         ApplicationProperties applicationProperties, AuthenticationFailureHandler authenticationFailureHandler,
-        AuthenticationSuccessHandler authenticationSuccessHandler, RememberMeServices rememberMeServices,
-        List<AuthenticatedRequestMatcherContributor> authenticatedRequestMatcherContributors) {
+        AuthenticationSuccessHandler authenticationSuccessHandler, RememberMeServices rememberMeServices) {
 
         this.authenticationFailureHandler = authenticationFailureHandler;
         this.authenticationSuccessHandler = authenticationSuccessHandler;
         this.rememberMeServices = rememberMeServices;
         this.security = applicationProperties.getSecurity();
-        this.authenticatedRequestMatcherContributors = authenticatedRequestMatcherContributors;
     }
 
     @Bean
@@ -115,6 +111,8 @@ public class SecurityConfiguration {
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 // See https://stackoverflow.com/q/74447118/65681
                 .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
+                .ignoringRequestMatchers(
+                    RegexRequestMatcher.regexMatcher("^/api/(automation|embedded|platform)/v[0-9]+/.+"))
                 .ignoringRequestMatchers("/webhooks/**"));
 
         for (AuthenticationProviderContributor authenticationProviderContributor : authenticationProviderContributors) {
@@ -139,7 +137,7 @@ public class SecurityConfiguration {
                     permissions -> permissions.policy(
                         "camera=(), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), sync-xhr=()")))
             .authorizeHttpRequests(
-                authz -> requestMatchers(authz, mvc)
+                authz -> authz
                     .requestMatchers(mvc.pattern("/*.ico"), mvc.pattern("/*.png"), mvc.pattern("/*.svg"))
                     .permitAll()
                     .requestMatchers(mvc.pattern("/actuator/health"))
@@ -202,18 +200,6 @@ public class SecurityConfiguration {
         http.with(filterBeforeContributorConfigurer(filterBeforeContributors), withDefaults());
 
         return http.build();
-    }
-
-    private AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry requestMatchers(
-        AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authz,
-        MvcRequestMatcher.Builder mvc) {
-
-        for (AuthenticatedRequestMatcherContributor authenticatedRequestMatcherContributor : authenticatedRequestMatcherContributors) {
-
-            authenticatedRequestMatcherContributor.requestMatchers(authz, mvc);
-        }
-
-        return authz;
     }
 
     @Bean

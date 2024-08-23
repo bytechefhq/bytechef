@@ -20,8 +20,8 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.user.domain.ApiKey;
-import com.bytechef.platform.user.domain.ApiKey.TenantSecretKey;
 import com.bytechef.platform.user.repository.ApiKeyRepository;
+import com.bytechef.tenant.TenantKey;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
@@ -48,7 +48,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
         Validate.isTrue(apiKey.getId() == null, "'id' must be null");
         Validate.notNull(apiKey.getName(), "'name' must not be null");
 
-        apiKey.setSecretKey(String.valueOf(TenantSecretKey.of()));
+        apiKey.setSecretKey(String.valueOf(TenantKey.of()));
 
         apiKey = apiKeyRepository.save(apiKey);
 

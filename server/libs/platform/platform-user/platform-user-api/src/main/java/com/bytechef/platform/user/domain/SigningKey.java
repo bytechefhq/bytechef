@@ -16,11 +16,8 @@
 
 package com.bytechef.platform.user.domain;
 
-import com.bytechef.commons.util.EncodingUtils;
-import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.constant.Environment;
-import com.bytechef.tenant.TenantContext;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import org.springframework.data.annotation.CreatedBy;
@@ -203,34 +200,4 @@ public class SigningKey {
             '}';
     }
 
-    public static class TenantKeyId {
-
-        private final String tenantId;
-
-        private TenantKeyId(String tenantId) {
-            this.tenantId = tenantId;
-        }
-
-        public static TenantKeyId of() {
-            return new TenantKeyId(TenantContext.getCurrentTenantId());
-        }
-
-        public static TenantKeyId parse(String keyId) {
-            keyId = EncodingUtils.base64DecodeToString(keyId);
-
-            String[] items = keyId.split(":");
-
-            return new TenantKeyId(items[0]);
-        }
-
-        public String getTenantId() {
-            return tenantId;
-        }
-
-        @Override
-        public String toString() {
-            return EncodingUtils.base64EncodeToString(
-                tenantId + ":" + EncodingUtils.base64EncodeToString(RandomUtils.nextBytes(24)));
-        }
-    }
 }
