@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.security.util;
 
-import com.bytechef.platform.user.constant.AuthorityConstants;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;

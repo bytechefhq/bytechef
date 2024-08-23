@@ -17,7 +17,7 @@
 package com.bytechef.platform.user.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.platform.user.constant.AuthorityConstants;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;

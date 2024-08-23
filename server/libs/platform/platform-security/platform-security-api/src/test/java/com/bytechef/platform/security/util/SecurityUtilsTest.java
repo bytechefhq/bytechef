@@ -18,7 +18,7 @@ package com.bytechef.platform.security.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.bytechef.platform.user.constant.AuthorityConstants;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
