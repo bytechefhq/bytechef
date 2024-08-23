@@ -29,25 +29,27 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
  */
 public class ObjectMapperConstants {
 
-    public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper() {
-        {
-            disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-            disable(SerializationFeature.INDENT_OUTPUT);
-            disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-            setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            registerModule(new JavaTimeModule());
-            registerModule(new Jdk8Module());
-        }
-    };
+    public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    public static final XmlMapper XML_MAPPER = new XmlMapper() {
+    static {
         {
-            disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-            disable(SerializationFeature.INDENT_OUTPUT);
-            disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-            setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            registerModule(new JavaTimeModule());
-            registerModule(new Jdk8Module());
+            OBJECT_MAPPER.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+            OBJECT_MAPPER.disable(SerializationFeature.INDENT_OUTPUT);
+            OBJECT_MAPPER.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+            OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            OBJECT_MAPPER.registerModule(new JavaTimeModule());
+            OBJECT_MAPPER.registerModule(new Jdk8Module());
         }
-    };
+    }
+
+    public static final XmlMapper XML_MAPPER = new XmlMapper();
+
+    static {
+        XML_MAPPER.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        XML_MAPPER.disable(SerializationFeature.INDENT_OUTPUT);
+        XML_MAPPER.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        XML_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        XML_MAPPER.registerModule(new JavaTimeModule());
+        XML_MAPPER.registerModule(new Jdk8Module());
+    }
 }
