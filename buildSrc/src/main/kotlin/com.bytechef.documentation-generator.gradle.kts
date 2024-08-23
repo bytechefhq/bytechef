@@ -239,9 +239,19 @@ ${authorizations?.joinToString("\n")}
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
+    class Category {
+        var key: String? = null
+        var label: String? = null
+
+        override fun toString(): String {
+            return "" + label
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
     class Component {
         var actions: Array<Action>? = null
-        var categories: Array<String>? = null
+        var categories: Array<Category>? = null
         var connection: Connection? = null
         var description: String? = null
         var icon: String? = null
