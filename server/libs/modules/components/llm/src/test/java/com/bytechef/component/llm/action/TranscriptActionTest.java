@@ -36,7 +36,7 @@ import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
 import org.springframework.ai.model.Model;
 
 public abstract class TranscriptActionTest extends AbstractLLMActionTest {
-    private final String answer = "ANSWER";
+    private static final String answer = "ANSWER";
 
     protected void performTest(ActionDefinition.SingleConnectionPerformFunction perform) {
         try (MockedStatic<Transcript> mockedTranscript = Mockito.mockStatic(Transcript.class)) {

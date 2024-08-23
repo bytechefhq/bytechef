@@ -61,7 +61,7 @@ class OpenAICreateSpeechActionTest extends AbstractLLMActionTest {
     };
 
     @Test
-    void testPerform() {
+    public void testPerform() {
         when(mockedParameters.getRequiredString(INPUT)).thenReturn("Input");
         when(mockedParameters.get(RESPONSE_FORMAT, OpenAiAudioApi.SpeechRequest.AudioResponseFormat.class))
             .thenReturn(OpenAiAudioApi.SpeechRequest.AudioResponseFormat.MP3);
@@ -71,7 +71,7 @@ class OpenAICreateSpeechActionTest extends AbstractLLMActionTest {
         when(mockedParameters.getFloat(SPEED)).thenReturn(1f);
 
 
-        try (MockedConstruction<OpenAiAudioSpeechModel> mockedModel = Mockito.mockConstruction(OpenAiAudioSpeechModel.class, (mock, context) -> {
+        try (MockedConstruction<OpenAiAudioSpeechModel> ignored = Mockito.mockConstruction(OpenAiAudioSpeechModel.class, (mock, context) -> {
             SpeechResponse mockedSpeechResponse = mock(SpeechResponse.class);
             when(mock.call(any(SpeechPrompt.class))).thenReturn(mockedSpeechResponse);
             when(mockedSpeechResponse.getResult()).thenReturn(new Speech(new byte[0]));

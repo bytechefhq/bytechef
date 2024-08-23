@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Monika Domiter
  */
-public class WatsonxComponentHandlerTest {
+class WatsonxComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {

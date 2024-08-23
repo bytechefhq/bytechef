@@ -40,7 +40,7 @@ public interface Chat {
     static String getResponse(Chat chat, Parameters inputParameters, Parameters connectionParameters) {
         ChatModel chatModel = chat.createChatModel(inputParameters, connectionParameters);
 
-        List<Message> messages = Chat.getMessages(inputParameters);
+        List<Message> messages = getMessages(inputParameters);
 
         ChatResponse response = chatModel.call(new Prompt(messages));
         return response.getResult()

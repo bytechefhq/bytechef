@@ -22,11 +22,11 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Monika Domiter
  */
-public class AmazonBedrockComponentHandlerTest {
+class AmazonBedrockComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/anthropic_v1.json",
+        JsonFileAssert.assertEquals("definition/amazon-bedrock_v1.json",
             new AmazonBedrockComponentHandler().getDefinition());
     }
 }
