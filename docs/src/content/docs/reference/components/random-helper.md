@@ -8,7 +8,7 @@ description: "The Random Helper allows you to generate random values."
 The Random Helper allows you to generate random values.
 
 
-Categories: [HELPERS]
+Categories: [helpers]
 
 
 Version: 1
@@ -40,11 +40,7 @@ Generates a random integer value.
 
 Type: INTEGER
 
-#### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-null
 
 
 
@@ -67,11 +63,7 @@ Generates a random float value.
 
 Type: NUMBER
 
-#### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-null
 
 
 

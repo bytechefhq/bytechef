@@ -8,7 +8,7 @@ description: "Copper is a customer relationship management (CRM) software design
 Copper is a customer relationship management (CRM) software designed to streamline and optimize sales processes, providing tools for managing contact, leads, opportunities, and communications in one centralized platform.
 
 
-Categories: [CRM]
+Categories: [crm]
 
 
 Version: 1
@@ -63,14 +63,16 @@ Creates a new Activity
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | STRING | TEXT  |
-| {STRING(category), STRING(id)} | OBJECT_BUILDER  |
+| {STRING\(category), STRING\(id)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
-| {STRING(type), STRING(id)} | OBJECT_BUILDER  |
+| {STRING\(type), STRING\(id)} | OBJECT_BUILDER  |
+
 
 
 
@@ -88,10 +90,10 @@ Creates a new Company
 | Email domain | STRING | TEXT  |  The domain to which email addresses for the Company belong.  |
 | Contact type | STRING | SELECT  |  Contact Type of the Company.  |
 | Details | STRING | TEXT  |  Description of the Company.  |
-| Phone numbers | [{STRING(number), STRING(category)}] | ARRAY_BUILDER  |  Phone numbers belonging to the Company.  |
-| Socials | [{STRING(url), STRING(category)}] | ARRAY_BUILDER  |  Social profiles belonging to the Company.  |
-| Websites | [{STRING(url), STRING(category)}] | ARRAY_BUILDER  |  Websites belonging to the Company.  |
-| Address | {STRING(street), STRING(city), STRING(state), STRING(postal_code), STRING(country)} | OBJECT_BUILDER  |  Company's street, city, state, postal code, and country.  |
+| Phone numbers | [{STRING\(number), STRING\(category)}] | ARRAY_BUILDER  |  Phone numbers belonging to the Company.  |
+| Socials | [{STRING\(url), STRING\(category)}] | ARRAY_BUILDER  |  Social profiles belonging to the Company.  |
+| Websites | [{STRING\(url), STRING\(category)}] | ARRAY_BUILDER  |  Websites belonging to the Company.  |
+| Address | {STRING\(street), STRING\(city), STRING\(state), STRING\(postal_code), STRING\(country)} | OBJECT_BUILDER  |  Company's street, city, state, postal code, and country.  |
 | Tags | [STRING] | ARRAY_BUILDER  |  Tags associated with the Company  |
 
 
@@ -101,21 +103,23 @@ Creates a new Company
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | STRING | TEXT  |
 | STRING | TEXT  |
-| {STRING(street), STRING(city), STRING(state), STRING(postal_code), STRING(country)} | OBJECT_BUILDER  |
+| {STRING\(street), STRING\(city), STRING\(state), STRING\(postal_code), STRING\(country)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| [{STRING(number), STRING(category)}] | ARRAY_BUILDER  |
-| [{STRING(url), STRING(category)}] | ARRAY_BUILDER  |
+| [{STRING\(number), STRING\(category)}] | ARRAY_BUILDER  |
+| [{STRING\(url), STRING\(category)}] | ARRAY_BUILDER  |
 | [STRING] | ARRAY_BUILDER  |
-| [{STRING(url), STRING(category)}] | ARRAY_BUILDER  |
+| [{STRING\(url), STRING\(category)}] | ARRAY_BUILDER  |
+
 
 
 
@@ -129,16 +133,16 @@ Creates a new Person
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Name | STRING | TEXT  |  The first and last name of the Person.  |
-| Emails | [{STRING(email), STRING(category)}($Email)] | ARRAY_BUILDER  |  Email addresses belonging to the Person.  |
+| Emails | [{STRING\(email), STRING\(category)}\($Email)] | ARRAY_BUILDER  |  Email addresses belonging to the Person.  |
 | Assignee | STRING | SELECT  |  User that will be the owner of the Person.  |
 | Title | STRING | TEXT  |  The professional title of the Person.  |
 | Company | STRING | SELECT  |  Primary Company with which the Person is associated.  |
 | Contact type | STRING | SELECT  |  The unique identifier of the Contact Type of the Person.  |
 | Details | STRING | TEXT  |  Description of the person.  |
-| Phone numbers | [{STRING(number), STRING(category)}] | ARRAY_BUILDER  |  Phone numbers belonging to the person.  |
-| Socials | [{STRING(url), STRING(category)}] | ARRAY_BUILDER  |  Social profiles belonging to the Person.  |
-| Websites | [{STRING(url), STRING(category)}] | ARRAY_BUILDER  |  Websites belonging to the Person.  |
-| Address | {STRING(street), STRING(city), STRING(state), STRING(postal_code), STRING(country)} | OBJECT_BUILDER  |  Person's street, city, state, postal code, and country.  |
+| Phone numbers | [{STRING\(number), STRING\(category)}] | ARRAY_BUILDER  |  Phone numbers belonging to the person.  |
+| Socials | [{STRING\(url), STRING\(category)}] | ARRAY_BUILDER  |  Social profiles belonging to the Person.  |
+| Websites | [{STRING\(url), STRING\(category)}] | ARRAY_BUILDER  |  Websites belonging to the Person.  |
+| Address | {STRING\(street), STRING\(city), STRING\(state), STRING\(postal_code), STRING\(country)} | OBJECT_BUILDER  |  Person's street, city, state, postal code, and country.  |
 | Tags | [STRING] | ARRAY_BUILDER  |  Tags associated with the Person.  |
 
 
@@ -148,23 +152,25 @@ Creates a new Person
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | STRING | TEXT  |
 | STRING | TEXT  |
-| {STRING(street), STRING(city), STRING(state), STRING(postal_code), STRING(country)} | OBJECT_BUILDER  |
+| {STRING\(street), STRING\(city), STRING\(state), STRING\(postal_code), STRING\(country)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| [{STRING(email), STRING(category)}] | ARRAY_BUILDER  |
-| [{STRING(number), STRING(category)}] | ARRAY_BUILDER  |
-| [{STRING(url), STRING(category)}] | ARRAY_BUILDER  |
+| [{STRING\(email), STRING\(category)}] | ARRAY_BUILDER  |
+| [{STRING\(number), STRING\(category)}] | ARRAY_BUILDER  |
+| [{STRING\(url), STRING\(category)}] | ARRAY_BUILDER  |
 | [STRING] | ARRAY_BUILDER  |
 | STRING | TEXT  |
-| [{STRING(url), STRING(category)}] | ARRAY_BUILDER  |
+| [{STRING\(url), STRING\(category)}] | ARRAY_BUILDER  |
+
 
 
 

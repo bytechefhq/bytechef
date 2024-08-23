@@ -8,7 +8,7 @@ description: "Freshdesk is a cloud-based customer support software that helps bu
 Freshdesk is a cloud-based customer support software that helps businesses manage customer queries and tickets efficiently.
 
 
-Categories: [CUSTOMER_SUPPORT]
+Categories: [customer-support]
 
 
 Version: 1
@@ -57,7 +57,7 @@ Creates a new company
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Company | {STRING(name), STRING(description), STRING(note)} | OBJECT_BUILDER  |  |
+| Company | {STRING\(name), STRING\(description), STRING\(note)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -66,11 +66,13 @@ Creates a new company
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {NUMBER(id), STRING(name), STRING(description), STRING(note)} | OBJECT_BUILDER  |
+| {NUMBER\(id), STRING\(name), STRING\(description), STRING\(note)} | OBJECT_BUILDER  |
+
 
 
 
@@ -83,7 +85,7 @@ Creates a new contact
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Contact | {STRING(name), STRING(email), STRING(phone), STRING(mobile), STRING(description), STRING(job_title)} | OBJECT_BUILDER  |  |
+| Contact | {STRING\(name), STRING\(email), STRING\(phone), STRING\(mobile), STRING\(description), STRING\(job_title)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -92,11 +94,13 @@ Creates a new contact
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING(description), STRING(email), NUMBER(id), STRING(job_title)} | OBJECT_BUILDER  |
+| {STRING\(description), STRING\(email), NUMBER\(id), STRING\(job_title)} | OBJECT_BUILDER  |
+
 
 
 
@@ -109,7 +113,7 @@ Creates a new ticket
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Ticket | {STRING(subject), STRING(email), STRING(description), INTEGER(priority), INTEGER(status)} | OBJECT_BUILDER  |  |
+| Ticket | {STRING\(subject), STRING\(email), STRING\(description), INTEGER\(priority), INTEGER\(status)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -118,11 +122,13 @@ Creates a new ticket
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING(subject), STRING(email), STRING(description), INTEGER(priority), INTEGER(status)} | OBJECT_BUILDER  |
+| {STRING\(subject), STRING\(email), STRING\(description), INTEGER\(priority), INTEGER\(status)} | OBJECT_BUILDER  |
+
 
 
 

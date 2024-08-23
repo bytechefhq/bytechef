@@ -8,7 +8,7 @@ description: "Discord is a communication platform designed for creating communit
 Discord is a communication platform designed for creating communities, chatting with friends, and connecting with others through text, voice, and video channels.
 
 
-Categories: [COMMUNICATION]
+Categories: [communication]
 
 
 Version: 1
@@ -58,7 +58,7 @@ Post a new message to a specific #channel you choose.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Guild | STRING | SELECT  |  |
 | Channel | STRING | SELECT  |  Channel where to send the message  |
-| Message | {STRING(content), BOOLEAN(tts)} | OBJECT_BUILDER  |  |
+| Message | {STRING\(content), BOOLEAN\(tts)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -67,11 +67,13 @@ Post a new message to a specific #channel you choose.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING(id), STRING(content), BOOLEAN(tts)} | OBJECT_BUILDER  |
+| {STRING\(id), STRING\(content), BOOLEAN\(tts)} | OBJECT_BUILDER  |
+
 
 
 
@@ -85,7 +87,7 @@ Create a new channel
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Guild | STRING | SELECT  |  |
-| Channel | {STRING(name), INTEGER(type)} | OBJECT_BUILDER  |  |
+| Channel | {STRING\(name), INTEGER\(type)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -94,11 +96,13 @@ Create a new channel
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING(id), INTEGER(type), STRING(name)} | OBJECT_BUILDER  |
+| {STRING\(id), INTEGER\(type), STRING\(name)} | OBJECT_BUILDER  |
+
 
 
 
@@ -123,11 +127,13 @@ Send direct message guild member
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING(id)} | OBJECT_BUILDER  |
+| {STRING\(id)} | OBJECT_BUILDER  |
+
 
 
 

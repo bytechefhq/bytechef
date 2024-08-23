@@ -8,7 +8,7 @@ description: "Encharge is a marketing automation platform that helps businesses 
 Encharge is a marketing automation platform that helps businesses automate their customer communication and marketing campaigns.
 
 
-Categories: [MARKETING_AUTOMATION]
+Categories: [marketing-automation]
 
 
 Version: 1
@@ -57,7 +57,7 @@ Create email template
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Email   Template | {STRING(name), STRING(subject), STRING(fromEmail), STRING(replyEmail)} | OBJECT_BUILDER  |  |
+| Email   Template | {STRING\(name), STRING\(subject), STRING\(fromEmail), STRING\(replyEmail)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -66,11 +66,13 @@ Create email template
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {{INTEGER(id), STRING(name), STRING(subject), STRING(fromEmail), STRING(replyEmail)}(email)} | OBJECT_BUILDER  |
+| {{INTEGER\(id), STRING\(name), STRING\(subject), STRING\(fromEmail), STRING\(replyEmail)}\(email)} | OBJECT_BUILDER  |
+
 
 
 
@@ -83,7 +85,7 @@ Creates new People
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| People | [{STRING(email), STRING(firstName), STRING(lastName), STRING(website), STRING(title), STRING(phone)}] | ARRAY_BUILDER  |  |
+| People | [{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(website), STRING\(title), STRING\(phone)}] | ARRAY_BUILDER  |  |
 
 
 ### Output
@@ -92,11 +94,13 @@ Creates new People
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {[{STRING(email), STRING(firstName), STRING(lastName), STRING(website), STRING(title), STRING(id), STRING(phone)}](users)} | OBJECT_BUILDER  |
+| {[{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(website), STRING\(title), STRING\(id), STRING\(phone)}]\(users)} | OBJECT_BUILDER  |
+
 
 
 
@@ -109,7 +113,7 @@ Add tag(s) to an existing user.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Tag | {STRING(tag), STRING(email)} | OBJECT_BUILDER  |  |
+| Tag | {STRING\(tag), STRING\(email)} | OBJECT_BUILDER  |  |
 
 
 

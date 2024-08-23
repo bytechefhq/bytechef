@@ -8,7 +8,7 @@ description: "Intercom is the complete AI-first customer service solution, givin
 Intercom is the complete AI-first customer service solution, giving exceptional experiences for support teams with AI agent, AI copilot, tickets, ...
 
 
-Categories: [CUSTOMER_SUPPORT]
+Categories: [customer-support]
 
 
 Version: 1
@@ -64,6 +64,7 @@ Create new contact
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -74,6 +75,7 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
+
 
 
 
@@ -95,6 +97,7 @@ Get a single Contact
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -105,6 +108,7 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
+
 
 
 
@@ -130,11 +134,7 @@ Send a new message
 
 Type: OBJECT
 
-#### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-null
 
 
 

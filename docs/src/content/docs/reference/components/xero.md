@@ -8,7 +8,7 @@ description: "Xero is an online accounting software platform designed for small 
 Xero is an online accounting software platform designed for small businesses and accountants to manage finances efficiently.
 
 
-Categories: [ACCOUNTING]
+Categories: [accounting]
 
 
 Version: 1
@@ -59,19 +59,21 @@ Trigger off whenever a new bill is added.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | STRING | TEXT  |
 | STRING | TEXT  |
-| {STRING(ContactID), STRING(Name), STRING(EmailAddress)} | OBJECT_BUILDER  |
+| {STRING\(ContactID), STRING\(Name), STRING\(EmailAddress)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| [{STRING(Description), INTEGER(Quantity), NUMBER(UnitAmount)}] | ARRAY_BUILDER  |
+| [{STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount)}] | ARRAY_BUILDER  |
 | STRING | TEXT  |
+
 
 
 
@@ -95,6 +97,7 @@ Triggers when a contact is created.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -109,8 +112,9 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| [{STRING(AddressType), STRING(City), STRING(Region), STRING(PostalCode), STRING(Country)}] | ARRAY_BUILDER  |
-| [{STRING(PhoneType), STRING(PhoneNumber), STRING(PhoneAreaCode), STRING(PhoneCountryCode)}] | ARRAY_BUILDER  |
+| [{STRING\(AddressType), STRING\(City), STRING\(Region), STRING\(PostalCode), STRING\(Country)}] | ARRAY_BUILDER  |
+| [{STRING\(PhoneType), STRING\(PhoneNumber), STRING\(PhoneAreaCode), STRING\(PhoneCountryCode)}] | ARRAY_BUILDER  |
+
 
 
 
@@ -134,19 +138,21 @@ Trigger off whenever a new invoice is added.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | STRING | TEXT  |
 | STRING | TEXT  |
-| {STRING(ContactID), STRING(Name), STRING(EmailAddress)} | OBJECT_BUILDER  |
+| {STRING\(ContactID), STRING\(Name), STRING\(EmailAddress)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| [{STRING(Description), INTEGER(Quantity), NUMBER(UnitAmount)}] | ARRAY_BUILDER  |
+| [{STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount)}] | ARRAY_BUILDER  |
 | STRING | TEXT  |
+
 
 
 
@@ -171,7 +177,7 @@ Creates draft bill (Accounts Payable).
 | Date | DATE | DATE  |  Date of the bill. If no date is specified, the current date will be used.  |
 | Due Date | DATE | DATE  |  Date bill is due.If no date is specified, the current date will be used.   |
 | Line amount type | STRING | SELECT  |  |
-| Line items | [{STRING(Description), NUMBER(Quantity), NUMBER(UnitAmount), STRING(AccountCode)}($LineItem)] | ARRAY_BUILDER  |  Line items on the bill.  |
+| Line items | [{STRING\(Description), NUMBER\(Quantity), NUMBER\(UnitAmount), STRING\(AccountCode)}\($LineItem)] | ARRAY_BUILDER  |  Line items on the bill.  |
 | Currency | STRING | SELECT  |  Currency that bill is raised in.  |
 | Invoice Reference | STRING | TEXT  |  Reference number of the bill.  |
 
@@ -182,19 +188,21 @@ Creates draft bill (Accounts Payable).
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | STRING | TEXT  |
 | STRING | TEXT  |
-| {STRING(ContactID), STRING(Name), STRING(EmailAddress)} | OBJECT_BUILDER  |
+| {STRING\(ContactID), STRING\(Name), STRING\(EmailAddress)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| [{STRING(Description), INTEGER(Quantity), NUMBER(UnitAmount)}] | ARRAY_BUILDER  |
+| [{STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount)}] | ARRAY_BUILDER  |
 | STRING | TEXT  |
+
 
 
 
@@ -216,8 +224,8 @@ Creates a new contact.
 | Email address | STRING | EMAIL  |  Email address of contact person.  |
 | Bank account number | STRING | TEXT  |  Bank account number of contact.  |
 | Tax number | STRING | TEXT  |  Tax number of contact – this is also known as the ABN (Australia), GST Number (New Zealand), VAT Number (UK) or Tax ID Number (US and global) in the Xero UI depending on which regionalized version of Xero you are using.  |
-| Phones | [{STRING(PhoneType), STRING(PhoneNumber), STRING(PhoneAreaCode), STRING(PhoneCountryCode)}] | ARRAY_BUILDER  |  |
-| Addresses | [{STRING(AddressType), STRING(City), STRING(Region), STRING(PostalCode), STRING(Country)}] | ARRAY_BUILDER  |  |
+| Phones | [{STRING\(PhoneType), STRING\(PhoneNumber), STRING\(PhoneAreaCode), STRING\(PhoneCountryCode)}] | ARRAY_BUILDER  |  |
+| Addresses | [{STRING\(AddressType), STRING\(City), STRING\(Region), STRING\(PostalCode), STRING\(Country)}] | ARRAY_BUILDER  |  |
 
 
 ### Output
@@ -225,6 +233,7 @@ Creates a new contact.
 
 
 Type: OBJECT
+
 
 #### Properties
 
@@ -240,8 +249,9 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| [{STRING(AddressType), STRING(City), STRING(Region), STRING(PostalCode), STRING(Country)}] | ARRAY_BUILDER  |
-| [{STRING(PhoneType), STRING(PhoneNumber), STRING(PhoneAreaCode), STRING(PhoneCountryCode)}] | ARRAY_BUILDER  |
+| [{STRING\(AddressType), STRING\(City), STRING\(Region), STRING\(PostalCode), STRING\(Country)}] | ARRAY_BUILDER  |
+| [{STRING\(PhoneType), STRING\(PhoneNumber), STRING\(PhoneAreaCode), STRING\(PhoneCountryCode)}] | ARRAY_BUILDER  |
+
 
 
 
@@ -258,7 +268,7 @@ Creates draft invoice (Acount Receivable).
 | Date | DATE | DATE  |  Date invoice was issued. If no date is specified, the current date will be used.  |
 | Due Date | DATE | DATE  |  Date invoice is due. If no date is specified, the current date will be used.  |
 | Line amount type | STRING | SELECT  |  |
-| Line items | [{STRING(Description), INTEGER(Quantity), NUMBER(UnitAmount), NUMBER(DiscountRate)}] | ARRAY_BUILDER  |  Line items on the invoice.  |
+| Line items | [{STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount), NUMBER\(DiscountRate)}] | ARRAY_BUILDER  |  Line items on the invoice.  |
 | Currency | STRING | SELECT  |  Currency that invoice is raised in.  |
 | Invoice Reference | STRING | TEXT  |  Reference number of the invoice.  |
 
@@ -269,19 +279,21 @@ Creates draft invoice (Acount Receivable).
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | STRING | TEXT  |
 | STRING | TEXT  |
-| {STRING(ContactID), STRING(Name), STRING(EmailAddress)} | OBJECT_BUILDER  |
+| {STRING\(ContactID), STRING\(Name), STRING\(EmailAddress)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| [{STRING(Description), INTEGER(Quantity), NUMBER(UnitAmount)}] | ARRAY_BUILDER  |
+| [{STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount)}] | ARRAY_BUILDER  |
 | STRING | TEXT  |
+
 
 
 
@@ -296,7 +308,7 @@ Creates a new quote draft.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Contact | STRING | SELECT  |  Full name of a contact or organisation.  |
 | Date | DATE | DATE  |  Date quote was issued.  |
-| Line items | [{STRING(Description), INTEGER(Quantity), NUMBER(UnitAmount), NUMBER(DiscountRate)}] | ARRAY_BUILDER  |  Line items on the invoice.  |
+| Line items | [{STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount), NUMBER\(DiscountRate)}] | ARRAY_BUILDER  |  Line items on the invoice.  |
 | Line amount type | STRING | SELECT  |  |
 | Expiry date | DATE | DATE  |  Date quote expires  |
 | Currency | STRING | SELECT  |  The currency that quote has been raised in.  |
@@ -314,6 +326,7 @@ Creates a new quote draft.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -322,8 +335,8 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| {STRING(ContactID), STRING(Name), STRING(EmailAddress)} | OBJECT_BUILDER  |
-| [{STRING(LineItemID), STRING(Description), NUMBER(UnitAmount), INTEGER(DiscountRate), INTEGER(Quantity)}] | ARRAY_BUILDER  |
+| {STRING\(ContactID), STRING\(Name), STRING\(EmailAddress)} | OBJECT_BUILDER  |
+| [{STRING\(LineItemID), STRING\(Description), NUMBER\(UnitAmount), INTEGER\(DiscountRate), INTEGER\(Quantity)}] | ARRAY_BUILDER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
@@ -332,6 +345,7 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
+
 
 
 

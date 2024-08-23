@@ -8,7 +8,7 @@ description: "Google Contacts is a cloud-based address book service provided by 
 Google Contacts is a cloud-based address book service provided by Google, allowing users to store, manage, and synchronize their contact information across multiple devices and platforms.
 
 
-Categories: [CRM]
+Categories: [crm]
 
 
 Version: 1
@@ -66,14 +66,16 @@ Creates a new contact
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| [{STRING(firstName), STRING(middleName), STRING(lastName)}] | ARRAY_BUILDER  |
-| [{STRING(company), STRING(jobTitle)}] | ARRAY_BUILDER  |
-| [{STRING(value)}] | ARRAY_BUILDER  |
-| [{STRING(value)}] | ARRAY_BUILDER  |
+| [{STRING\(firstName), STRING\(middleName), STRING\(lastName)}] | ARRAY_BUILDER  |
+| [{STRING\(company), STRING\(jobTitle)}] | ARRAY_BUILDER  |
+| [{STRING\(value)}] | ARRAY_BUILDER  |
+| [{STRING\(value)}] | ARRAY_BUILDER  |
+
 
 
 
@@ -95,11 +97,13 @@ Creates a new group
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | STRING | TEXT  |
+
 
 
 

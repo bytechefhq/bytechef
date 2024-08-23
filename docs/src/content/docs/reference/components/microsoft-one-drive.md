@@ -8,7 +8,7 @@ description: "Microsoft OneDrive is a cloud storage service provided by Microsof
 Microsoft OneDrive is a cloud storage service provided by Microsoft for storing, accessing, and sharing files online.
 
 
-Categories: [FILE_STORAGE]
+Categories: [file-storage]
 
 
 Version: 1
@@ -62,6 +62,7 @@ Download a file from your Microsoft OneDrive
 
 Type: FILE_ENTRY
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -70,6 +71,7 @@ Type: FILE_ENTRY
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
+
 
 
 
@@ -91,11 +93,13 @@ List files in a OneDrive folder
 
 Type: ARRAY
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-null
+| {STRING\(id), STRING\(name)} | OBJECT_BUILDER  |
+
 
 
 
@@ -117,11 +121,13 @@ List folders in a OneDrive folder
 
 Type: ARRAY
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-null
+| {STRING\(id), STRING\(name)} | OBJECT_BUILDER  |
+
 
 
 
@@ -144,12 +150,14 @@ Upload a file to your Microsoft OneDrive
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | STRING | TEXT  |
 | STRING | TEXT  |
+
 
 
 

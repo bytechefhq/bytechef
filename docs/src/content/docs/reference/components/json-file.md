@@ -8,7 +8,7 @@ description: "Reads and writes data from a JSON file."
 Reads and writes data from a JSON file.
 
 
-Categories: [HELPERS]
+Categories: [helpers]
 
 
 Version: 1
@@ -60,6 +60,7 @@ Writes the data to a JSON file.
 
 Type: FILE_ENTRY
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -68,6 +69,7 @@ Type: FILE_ENTRY
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
+
 
 
 

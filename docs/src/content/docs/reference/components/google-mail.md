@@ -8,7 +8,7 @@ description: "Google Mail, commonly known as Gmail, is a widely used email servi
 Google Mail, commonly known as Gmail, is a widely used email service by Google, offering free and feature-rich communication, organization, and storage capabilities accessible through web browsers and mobile apps.
 
 
-Categories: [COMMUNICATION]
+Categories: [communication]
 
 
 Version: 1
@@ -50,7 +50,9 @@ Triggers when new mail is found in your Gmail inbox.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Topic name | STRING | TEXT  |  |
+| Topic name | STRING | TEXT  |  Must be 3-255 characters, start with a letter, and contain only the following characters:
+letters, numbers, dashes (-), periods (.), underscores (_), tildes (~), percents (%) or
+plus signs (+). Cannot start with goog.  |
 
 
 ### Output
@@ -59,11 +61,13 @@ Triggers when new mail is found in your Gmail inbox.
 
 Type: ARRAY
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-null
+| {STRING\(id), STRING\(threadId), [STRING]\(labelIds), STRING\(snippet), STRING\(historyId), NUMBER\(internalDate), {STRING\(partId), STRING\(mimeType), STRING\(filename), [{STRING\(name), STRING\(value)}]\(headers), {STRING\(attachmentId), INTEGER\(size), STRING\(data)}\(body), []\(parts)}\(payload), INTEGER\(sizeEstimate), STRING\(raw)} | OBJECT_BUILDER  |
+
 
 
 
@@ -95,6 +99,7 @@ Get an email from your Gmail account via Id
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -105,9 +110,10 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | NUMBER | NUMBER  |
-| {STRING(partId), STRING(mimeType), STRING(filename), [{STRING(name), STRING(value)}](headers), {STRING(attachmentId), INTEGER(size), STRING(data)}(body), [](parts)} | OBJECT_BUILDER  |
+| {STRING\(partId), STRING\(mimeType), STRING\(filename), [{STRING\(name), STRING\(value)}]\(headers), {STRING\(attachmentId), INTEGER\(size), STRING\(data)}\(body), []\(parts)} | OBJECT_BUILDER  |
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
+
 
 
 
@@ -131,6 +137,7 @@ Gets the specified thread.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -138,7 +145,8 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| [{STRING(id), STRING(threadId), [STRING](labelIds), STRING(snippet), STRING(historyId), NUMBER(internalDate), {STRING(partId), STRING(mimeType), STRING(filename), [{STRING(name), STRING(value)}](headers), {STRING(attachmentId), INTEGER(size), STRING(data)}(body), [](parts)}(payload), INTEGER(sizeEstimate), STRING(raw)}] | ARRAY_BUILDER  |
+| [{STRING\(id), STRING\(threadId), [STRING]\(labelIds), STRING\(snippet), STRING\(historyId), NUMBER\(internalDate), {STRING\(partId), STRING\(mimeType), STRING\(filename), [{STRING\(name), STRING\(value)}]\(headers), {STRING\(attachmentId), INTEGER\(size), STRING\(data)}\(body), []\(parts)}\(payload), INTEGER\(sizeEstimate), STRING\(raw)}] | ARRAY_BUILDER  |
+
 
 
 
@@ -168,13 +176,15 @@ Lists the messages in the user's mailbox.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| [{STRING(id), STRING(threadId), [STRING](labelIds), STRING(snippet), STRING(historyId), NUMBER(internalDate), {STRING(partId), STRING(mimeType), STRING(filename), [{STRING(name), STRING(value)}](headers), {STRING(attachmentId), INTEGER(size), STRING(data)}(body), [](parts)}(payload), INTEGER(sizeEstimate), STRING(raw)}] | ARRAY_BUILDER  |
+| [{STRING\(id), STRING\(threadId), [STRING]\(labelIds), STRING\(snippet), STRING\(historyId), NUMBER\(internalDate), {STRING\(partId), STRING\(mimeType), STRING\(filename), [{STRING\(name), STRING\(value)}]\(headers), {STRING\(attachmentId), INTEGER\(size), STRING\(data)}\(body), []\(parts)}\(payload), INTEGER\(sizeEstimate), STRING\(raw)}] | ARRAY_BUILDER  |
 | STRING | TEXT  |
 | NUMBER | NUMBER  |
+
 
 
 
@@ -188,11 +198,11 @@ Sends the specified message to the recipients in the To, Cc, and Bcc headers.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | From | STRING | TEXT  |  Email address of the sender, the mailbox account.  |
-| To | [STRING($email)] | ARRAY_BUILDER  |  Recipients email addresses.  |
+| To | [STRING\($email)] | ARRAY_BUILDER  |  Recipients email addresses.  |
 | Subject | STRING | TEXT  |  Subject of the email.  |
-| Bcc | [STRING($email)] | ARRAY_BUILDER  |  Bcc recipients email addresses.  |
-| Cc | [STRING($email)] | ARRAY_BUILDER  |  Cc recipients email addresses.  |
-| Reply to | [STRING($email)] | ARRAY_BUILDER  |  Reply-to email addresses.  |
+| Bcc | [STRING\($email)] | ARRAY_BUILDER  |  Bcc recipients email addresses.  |
+| Cc | [STRING\($email)] | ARRAY_BUILDER  |  Cc recipients email addresses.  |
+| Reply to | [STRING\($email)] | ARRAY_BUILDER  |  Reply-to email addresses.  |
 | Body | STRING | TEXT  |  Body text of the email  |
 | Attachments | [FILE_ENTRY] | ARRAY_BUILDER  |  A list of attachments to send with the email.  |
 
@@ -202,6 +212,7 @@ Sends the specified message to the recipients in the To, Cc, and Bcc headers.
 
 
 Type: OBJECT
+
 
 #### Properties
 
@@ -213,9 +224,10 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | NUMBER | NUMBER  |
-| {STRING(partId), STRING(mimeType), STRING(filename), [{STRING(name), STRING(value)}](headers), {STRING(attachmentId), INTEGER(size), STRING(data)}(body), [](parts)} | OBJECT_BUILDER  |
+| {STRING\(partId), STRING\(mimeType), STRING\(filename), [{STRING\(name), STRING\(value)}]\(headers), {STRING\(attachmentId), INTEGER\(size), STRING\(data)}\(body), []\(parts)} | OBJECT_BUILDER  |
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
+
 
 
 

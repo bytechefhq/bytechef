@@ -8,7 +8,7 @@ description: "Google Sheets is a cloud-based spreadsheet software that allows us
 Google Sheets is a cloud-based spreadsheet software that allows users to create, edit, and collaborate on spreadsheets in real-time.
 
 
-Categories: [PRODUCTIVITY_AND_COLLABORATION]
+Categories: [productivity-and-collaboration]
 
 
 Version: 1
@@ -61,11 +61,13 @@ Triggers when you add a row in google sheets. Refresh the page when you're done 
 
 Type: ARRAY
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-null
+| {} | OBJECT_BUILDER  |
+
 
 
 
@@ -129,11 +131,7 @@ Get a row in a Google Sheet by row number
 
 Type: OBJECT
 
-#### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-null
 
 
 
@@ -160,11 +158,7 @@ Append a row of values to an existing sheet
 
 Type: OBJECT
 
-#### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-null
 
 
 
@@ -191,11 +185,7 @@ Overwrite values in an existing row
 
 Type: OBJECT
 
-#### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-null
 
 
 

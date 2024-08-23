@@ -8,7 +8,7 @@ description: "With the Scheduled trigger, you can initiate customized workflows 
 With the Scheduled trigger, you can initiate customized workflows at specific time intervals.
 
 
-Categories: [HELPERS]
+Categories: [helpers]
 
 
 Version: 1
@@ -31,7 +31,7 @@ Trigger off at a specific time either on a daily basis or selected days of the w
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Hour | INTEGER | INTEGER  |  The hour at which a workflow will be triggered.  |
 | Minute | INTEGER | INTEGER  |  The minute at which a workflow will be triggered.  |
-| Day of week | {BOOLEAN(1), BOOLEAN(2), BOOLEAN(3), BOOLEAN(4), BOOLEAN(5), BOOLEAN(6), BOOLEAN(7)} | OBJECT_BUILDER  |  Days at which a workflow will be triggered.  |
+| Day of week | {BOOLEAN\(1), BOOLEAN\(2), BOOLEAN\(3), BOOLEAN\(4), BOOLEAN\(5), BOOLEAN\(6), BOOLEAN\(7)} | OBJECT_BUILDER  |  Days at which a workflow will be triggered.  |
 | Timezone | STRING | SELECT  |  The timezone at which the cron expression will be scheduled.  |
 
 
@@ -41,6 +41,7 @@ Trigger off at a specific time either on a daily basis or selected days of the w
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -48,8 +49,9 @@ Type: OBJECT
 | STRING | TEXT  |
 | INTEGER | INTEGER  |
 | INTEGER | INTEGER  |
-| {BOOLEAN(1), BOOLEAN(2), BOOLEAN(3), BOOLEAN(4), BOOLEAN(5), BOOLEAN(6), BOOLEAN(7)} | OBJECT_BUILDER  |
+| {BOOLEAN\(1), BOOLEAN\(2), BOOLEAN\(3), BOOLEAN\(4), BOOLEAN\(5), BOOLEAN\(6), BOOLEAN\(7)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
+
 
 
 
@@ -76,6 +78,7 @@ Trigger off at a specific day of the week.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -85,6 +88,7 @@ Type: OBJECT
 | INTEGER | INTEGER  |
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
+
 
 
 
@@ -111,6 +115,7 @@ Trigger off at a specific time in month.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -120,6 +125,7 @@ Type: OBJECT
 | INTEGER | INTEGER  |
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
+
 
 
 
@@ -144,6 +150,7 @@ Trigger off periodically, for example every minute or day, based on a set interv
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -151,6 +158,7 @@ Type: OBJECT
 | STRING | TEXT  |
 | INTEGER | INTEGER  |
 | INTEGER | INTEGER  |
+
 
 
 
@@ -175,6 +183,7 @@ Trigger off based on a custom schedule.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -182,6 +191,7 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
+
 
 
 

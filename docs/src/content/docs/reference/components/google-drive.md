@@ -8,7 +8,7 @@ description: "Google Drive is a cloud storage service by Google that enables use
 Google Drive is a cloud storage service by Google that enables users to store, sync, share files, and collaborate online.
 
 
-Categories: [FILE_STORAGE]
+Categories: [file-storage]
 
 
 Version: 1
@@ -60,11 +60,12 @@ Uploads a file in your Google Drive
 
 ___Sample Output:___
 
-```{mimeType=plain/text, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, name=new-file.txt}```
+```{name=new-file.txt, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, mimeType=plain/text}```
 
 
 
 Type: OBJECT
+
 
 #### Properties
 
@@ -73,6 +74,7 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
+
 
 
 
@@ -94,6 +96,7 @@ Read a selected file from Google Drive file.
 
 Type: FILE_ENTRY
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -102,6 +105,7 @@ Type: FILE_ENTRY
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
+
 
 
 
@@ -123,11 +127,12 @@ Creates a new empty folder in Google Drive.
 
 ___Sample Output:___
 
-```{mimeType=plain/text, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, name=new-file.txt}```
+```{name=new-file.txt, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, mimeType=plain/text}```
 
 
 
 Type: OBJECT
+
 
 #### Properties
 
@@ -136,6 +141,7 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
+
 
 
 
@@ -159,11 +165,12 @@ Creates a new text file in Google Drive.
 
 ___Sample Output:___
 
-```{mimeType=plain/text, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, name=new-file.txt}```
+```{name=new-file.txt, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, mimeType=plain/text}```
 
 
 
 Type: OBJECT
+
 
 #### Properties
 
@@ -172,6 +179,7 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
+
 
 
 

@@ -8,7 +8,7 @@ description: "Zendesk Sell is a sales CRM software that helps businesses manage 
 Zendesk Sell is a sales CRM software that helps businesses manage leads, contacts, and deals efficiently.
 
 
-Categories: [CRM]
+Categories: [crm]
 
 
 Version: 1
@@ -65,12 +65,14 @@ Creates new contact. A contact may represent a single individual or an organizat
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING(id), BOOLEAN(is_organization), STRING(title), STRING(website), STRING(email)} | OBJECT_BUILDER  |
-| {INTEGER(version), STRING(type)} | OBJECT_BUILDER  |
+| {STRING\(id), BOOLEAN\(is_organization), STRING\(title), STRING\(website), STRING\(email)} | OBJECT_BUILDER  |
+| {INTEGER\(version), STRING\(type)} | OBJECT_BUILDER  |
+
 
 
 
@@ -93,12 +95,14 @@ Creates new Task
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {INTEGER(id), STRING(content), DATE(due_date)} | OBJECT_BUILDER  |
-| {STRING(type)} | OBJECT_BUILDER  |
+| {INTEGER\(id), STRING\(content), DATE\(due_date)} | OBJECT_BUILDER  |
+| {STRING\(type)} | OBJECT_BUILDER  |
+
 
 
 

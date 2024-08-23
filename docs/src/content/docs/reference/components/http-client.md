@@ -8,7 +8,7 @@ description: "Makes an HTTP request and returns the response data."
 Makes an HTTP request and returns the response data.
 
 
-Categories: [HELPERS]
+Categories: [helpers]
 
 
 Version: 1

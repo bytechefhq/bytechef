@@ -8,7 +8,7 @@ description: "Microsoft SharePoint is a web-based collaborative platform that in
 Microsoft SharePoint is a web-based collaborative platform that integrates with Microsoft Office, providing document management, intranet, and content management features for organizations.
 
 
-Categories: [FILE_STORAGE, COMMUNICATION]
+Categories: [file-storage, communication]
 
 
 Version: 1
@@ -63,12 +63,14 @@ Creates a new folder at path you specify.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | STRING | TEXT  |
 | STRING | TEXT  |
+
 
 
 
@@ -92,6 +94,7 @@ Creates a new list
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -99,6 +102,7 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
+
 
 
 
@@ -122,11 +126,13 @@ Creates a new item in a list.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | STRING | TEXT  |
+
 
 
 
@@ -150,11 +156,13 @@ Upload file to Microsoft SharePoint folder.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | STRING | TEXT  |
+
 
 
 

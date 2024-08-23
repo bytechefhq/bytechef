@@ -8,7 +8,7 @@ description: "Shopify is an e-commerce platform that allows businesses to create
 Shopify is an e-commerce platform that allows businesses to create online stores and sell products.
 
 
-Categories: [E_COMMERCE]
+Categories: [e-commerce]
 
 
 Version: 1
@@ -43,6 +43,116 @@ Version: 1
 ## Triggers
 
 
+### New Cancelled Order
+Triggers when order is cancelled.
+
+#### Type: DYNAMIC_WEBHOOK
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+null
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| Id | INTEGER | INTEGER  |  |
+| Currency | STRING | TEXT  |  |
+| Note | STRING | TEXT  |  |
+| Email | STRING | TEXT  |  |
+| Name | STRING | TEXT  |  |
+| Phone | STRING | TEXT  |  |
+| Tags | STRING | TEXT  |  |
+| Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  |
+
+
+
+
+
+
+
+### New Order
+Triggers when new order is created.
+
+#### Type: DYNAMIC_WEBHOOK
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+null
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| Id | INTEGER | INTEGER  |  |
+| Currency | STRING | TEXT  |  |
+| Note | STRING | TEXT  |  |
+| Email | STRING | TEXT  |  |
+| Name | STRING | TEXT  |  |
+| Phone | STRING | TEXT  |  |
+| Tags | STRING | TEXT  |  |
+| Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  |
+
+
+
+
+
+
+
+### New Paid Order
+Triggers when paid order is created.
+
+#### Type: DYNAMIC_WEBHOOK
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+null
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| Id | INTEGER | INTEGER  |  |
+| Currency | STRING | TEXT  |  |
+| Note | STRING | TEXT  |  |
+| Email | STRING | TEXT  |  |
+| Name | STRING | TEXT  |  |
+| Phone | STRING | TEXT  |  |
+| Tags | STRING | TEXT  |  |
+| Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  |
+
+
+
+
+
+
 
 <hr />
 
@@ -58,7 +168,7 @@ Adds an order into a Shopify store.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Order | {{[{STRING(fulfillment_status), STRING(grams), NUMBER(price), INTEGER(product_id), INTEGER(variant_id), INTEGER(quantity), STRING(title)}](line_items), STRING(total_tax), STRING(currency)}(order)} | OBJECT_BUILDER  |  |
+| Order | {{[{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}]\(line_items), STRING\(total_tax), STRING\(currency)}\(order)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -66,6 +176,7 @@ Adds an order into a Shopify store.
 
 
 Type: OBJECT
+
 
 #### Properties
 
@@ -78,7 +189,8 @@ Type: OBJECT
 | Name | STRING | TEXT  |  |
 | Phone | STRING | TEXT  |  |
 | Tags | STRING | TEXT  |  |
-| Line Items | [{STRING(fulfillment_status), STRING(grams), NUMBER(price), INTEGER(product_id), INTEGER(variant_id), INTEGER(quantity), STRING(title)}] | ARRAY_BUILDER  |  |
+| Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  |
+
 
 
 
@@ -112,6 +224,7 @@ Cancels an order. Orders that are paid and have fulfillments can't be canceled.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -123,7 +236,8 @@ Type: OBJECT
 | Name | STRING | TEXT  |  |
 | Phone | STRING | TEXT  |  |
 | Tags | STRING | TEXT  |  |
-| Line Items | [{STRING(fulfillment_status), STRING(grams), NUMBER(price), INTEGER(product_id), INTEGER(variant_id), INTEGER(quantity), STRING(title)}] | ARRAY_BUILDER  |  |
+| Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  |
+
 
 
 
@@ -137,7 +251,7 @@ Update an existing order.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Order Id | INTEGER | SELECT  |  The order id.  |
-| Order | {{STRING(note), STRING(email), STRING(phone), STRING(tags)}(order)} | OBJECT_BUILDER  |  |
+| Order | {{STRING\(note), STRING\(email), STRING\(phone), STRING\(tags)}\(order)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -145,6 +259,7 @@ Update an existing order.
 
 
 Type: OBJECT
+
 
 #### Properties
 
@@ -157,7 +272,8 @@ Type: OBJECT
 | Name | STRING | TEXT  |  |
 | Phone | STRING | TEXT  |  |
 | Tags | STRING | TEXT  |  |
-| Line Items | [{STRING(fulfillment_status), STRING(grams), NUMBER(price), INTEGER(product_id), INTEGER(variant_id), INTEGER(quantity), STRING(title)}] | ARRAY_BUILDER  |  |
+| Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  |
+
 
 
 
@@ -179,6 +295,7 @@ Closes an order. A closed order is one that has no more work to be done. All ite
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -190,7 +307,8 @@ Type: OBJECT
 | Name | STRING | TEXT  |  |
 | Phone | STRING | TEXT  |  |
 | Tags | STRING | TEXT  |  |
-| Line Items | [{STRING(fulfillment_status), STRING(grams), NUMBER(price), INTEGER(product_id), INTEGER(variant_id), INTEGER(quantity), STRING(title)}] | ARRAY_BUILDER  |  |
+| Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  |
+
 
 
 

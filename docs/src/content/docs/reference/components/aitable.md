@@ -8,7 +8,7 @@ description: "AITable is an AI-powered platform that enables users to create int
 AITable is an AI-powered platform that enables users to create interactive and dynamic tables for data visualization and analysis without requiring coding skills.
 
 
-Categories: [PRODUCTIVITY_AND_COLLABORATION]
+Categories: [productivity-and-collaboration]
 
 
 Version: 1
@@ -63,14 +63,16 @@ Find records in datasheet
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | INTEGER | INTEGER  |
 | BOOLEAN | SELECT  |
-| {[{STRING(recordId), {}(fields)}](records)} | OBJECT_BUILDER  |
+| {[{STRING\(recordId), {}\(fields)}]\(records)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
+
 
 
 
@@ -95,14 +97,16 @@ Update record in datasheet
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | INTEGER | INTEGER  |
 | BOOLEAN | SELECT  |
-| {[{STRING(recordId), {}(fields)}](records)} | OBJECT_BUILDER  |
+| {[{STRING\(recordId), {}\(fields)}]\(records)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
+
 
 
 
@@ -126,14 +130,16 @@ Creates a new record in datasheet.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | INTEGER | INTEGER  |
 | BOOLEAN | SELECT  |
-| {[{STRING(recordId), {}(fields)}](records)} | OBJECT_BUILDER  |
+| {[{STRING\(recordId), {}\(fields)}]\(records)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
+
 
 
 

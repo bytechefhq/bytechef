@@ -8,7 +8,7 @@ description: "Helper component for converting technical date values to human fri
 Helper component for converting technical date values to human friendly formatted expressions.
 
 
-Categories: [HELPERS]
+Categories: [helpers]
 
 
 Version: 1
@@ -40,11 +40,7 @@ Converts UNIX timestamp to ISO8601 format.
 
 Type: STRING
 
-#### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-null
 
 
 

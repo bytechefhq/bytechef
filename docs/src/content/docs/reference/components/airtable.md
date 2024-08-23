@@ -8,7 +8,7 @@ description: "Airtable is a user-friendly and flexible cloud-based database mana
 Airtable is a user-friendly and flexible cloud-based database management tool.
 
 
-Categories: [PRODUCTIVITY_AND_COLLABORATION]
+Categories: [productivity-and-collaboration]
 
 
 Version: 1
@@ -82,12 +82,14 @@ Adds a record into an Airtable table.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | DATE_TIME | DATE_TIME  |
 | {} | OBJECT_BUILDER  |
+
 
 
 

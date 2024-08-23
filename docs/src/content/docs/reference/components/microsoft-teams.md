@@ -8,7 +8,7 @@ description: "Microsoft Teams is a collaboration platform that combines workplac
 Microsoft Teams is a collaboration platform that combines workplace chat, video meetings, file storage, and application integration.
 
 
-Categories: [COMMUNICATION]
+Categories: [communication]
 
 
 Version: 1
@@ -63,6 +63,7 @@ Creates a new channel within a team.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -70,6 +71,7 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
+
 
 
 
@@ -94,13 +96,15 @@ Sends a message to a channel.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | STRING | TEXT  |
-| {STRING(contentType), STRING(content)} | OBJECT_BUILDER  |
-| {STRING(teamId), STRING(channelId)} | OBJECT_BUILDER  |
+| {STRING\(contentType), STRING\(content)} | OBJECT_BUILDER  |
+| {STRING\(teamId), STRING\(channelId)} | OBJECT_BUILDER  |
+
 
 
 
@@ -124,13 +128,15 @@ Sends a message in an existing chat.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | STRING | TEXT  |
 | STRING | TEXT  |
-| {STRING(contentType), STRING(content)} | OBJECT_BUILDER  |
+| {STRING\(contentType), STRING\(content)} | OBJECT_BUILDER  |
+
 
 
 

@@ -8,7 +8,7 @@ description: "Affinity is a customer relationship management (CRM) platform that
 Affinity is a customer relationship management (CRM) platform that leverages relationship intelligence to help businesses strengthen connections and drive engagement with client and prospects.
 
 
-Categories: [CRM]
+Categories: [crm]
 
 
 Version: 1
@@ -59,12 +59,14 @@ Creates a new opportunity
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
+
 
 
 
@@ -87,6 +89,7 @@ Creates a new organization
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -94,6 +97,7 @@ Type: OBJECT
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
+
 
 
 
@@ -117,6 +121,7 @@ Creates a new person
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -125,6 +130,7 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | [STRING] | ARRAY_BUILDER  |
+
 
 
 

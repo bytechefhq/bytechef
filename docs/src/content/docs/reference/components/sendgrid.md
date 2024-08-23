@@ -8,7 +8,7 @@ description: "Trusted for reliable email delivery at scale."
 Trusted for reliable email delivery at scale.
 
 
-Categories: [COMMUNICATION, MARKETING_AUTOMATION]
+Categories: [communication, marketing-automation]
 
 
 Version: 1
@@ -65,10 +65,17 @@ Sends an email.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
+| STRING | TEXT  |
+| STRING | TEXT  |
+| [STRING] | ARRAY_BUILDER  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| [FILE_ENTRY] | ARRAY_BUILDER  |
 
 
 

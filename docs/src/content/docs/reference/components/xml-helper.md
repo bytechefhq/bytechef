@@ -8,7 +8,7 @@ description: "Converts between XML string and object/array."
 Converts between XML string and object/array.
 
 
-Categories: [HELPERS]
+Categories: [helpers]
 
 
 Version: 1
@@ -39,11 +39,7 @@ Converts the XML string to object/array.
 
 Type: OBJECT
 
-#### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-null
 
 
 
@@ -67,11 +63,7 @@ Writes the object/array to a XML string.
 
 Type: STRING
 
-#### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-null
 
 
 

@@ -66,7 +66,7 @@ Add a new pet to the store
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Pet | {INTEGER(id), STRING(name), {INTEGER(id), STRING(name)}(category), [STRING](photoUrls), [{INTEGER(id), STRING(name)}](tags), STRING(status)} | OBJECT_BUILDER  |  |
+| Pet | {INTEGER\(id), STRING\(name), {INTEGER\(id), STRING\(name)}\(category), [STRING]\(photoUrls), [{INTEGER\(id), STRING\(name)}]\(tags), STRING\(status)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -75,16 +75,18 @@ Add a new pet to the store
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | Id | INTEGER | INTEGER  |  |
 | Name | STRING | TEXT  |  |
-| Category | {INTEGER(id), STRING(name)} | OBJECT_BUILDER  |  |
+| Category | {INTEGER\(id), STRING\(name)} | OBJECT_BUILDER  |  |
 | Photo Urls | [STRING] | ARRAY_BUILDER  |  |
-| Tags | [{INTEGER(id), STRING(name)}] | ARRAY_BUILDER  |  |
+| Tags | [{INTEGER\(id), STRING\(name)}] | ARRAY_BUILDER  |  |
 | Status | STRING | SELECT  |  pet status in the store  |
+
 
 
 
@@ -97,7 +99,7 @@ Update an existing pet by Id
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Pet | {INTEGER(id), STRING(name), {INTEGER(id), STRING(name)}(category), [STRING](photoUrls), [{INTEGER(id), STRING(name)}](tags), STRING(status)} | OBJECT_BUILDER  |  |
+| Pet | {INTEGER\(id), STRING\(name), {INTEGER\(id), STRING\(name)}\(category), [STRING]\(photoUrls), [{INTEGER\(id), STRING\(name)}]\(tags), STRING\(status)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -106,16 +108,18 @@ Update an existing pet by Id
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | Id | INTEGER | INTEGER  |  |
 | Name | STRING | TEXT  |  |
-| Category | {INTEGER(id), STRING(name)} | OBJECT_BUILDER  |  |
+| Category | {INTEGER\(id), STRING\(name)} | OBJECT_BUILDER  |  |
 | Photo Urls | [STRING] | ARRAY_BUILDER  |  |
-| Tags | [{INTEGER(id), STRING(name)}] | ARRAY_BUILDER  |  |
+| Tags | [{INTEGER\(id), STRING\(name)}] | ARRAY_BUILDER  |  |
 | Status | STRING | SELECT  |  pet status in the store  |
+
 
 
 
@@ -137,11 +141,13 @@ Multiple status values can be provided with comma separated strings
 
 Type: ARRAY
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-null
+| {INTEGER\(id), STRING\(name), {INTEGER\(id), STRING\(name)}\(category), [STRING]\(photoUrls), [{INTEGER\(id), STRING\(name)}]\(tags), STRING\(status)} | OBJECT_BUILDER  |
+
 
 
 
@@ -163,11 +169,13 @@ Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3
 
 Type: ARRAY
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-null
+| {INTEGER\(id), STRING\(name), {INTEGER\(id), STRING\(name)}\(category), [STRING]\(photoUrls), [{INTEGER\(id), STRING\(name)}]\(tags), STRING\(status)} | OBJECT_BUILDER  |
+
 
 
 
@@ -202,16 +210,18 @@ Returns a single pet
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | Id | INTEGER | INTEGER  |  |
 | Name | STRING | TEXT  |  |
-| Category | {INTEGER(id), STRING(name)} | OBJECT_BUILDER  |  |
+| Category | {INTEGER\(id), STRING\(name)} | OBJECT_BUILDER  |  |
 | Photo Urls | [STRING] | ARRAY_BUILDER  |  |
-| Tags | [{INTEGER(id), STRING(name)}] | ARRAY_BUILDER  |  |
+| Tags | [{INTEGER\(id), STRING\(name)}] | ARRAY_BUILDER  |  |
 | Status | STRING | SELECT  |  pet status in the store  |
+
 
 
 
@@ -249,6 +259,7 @@ Type: OBJECT
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -256,6 +267,7 @@ Type: OBJECT
 | Code | INTEGER | INTEGER  |  |
 | Type | STRING | TEXT  |  |
 | Message | STRING | TEXT  |  |
+
 
 
 
@@ -277,11 +289,7 @@ Returns a map of status codes to quantities
 
 Type: OBJECT
 
-#### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-null
 
 
 
@@ -294,7 +302,7 @@ Place a new order in the store
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Order | {INTEGER(id), INTEGER(petId), INTEGER(quantity), DATE_TIME(shipDate), STRING(status), BOOLEAN(complete)} | OBJECT_BUILDER  |  |
+| Order | {INTEGER\(id), INTEGER\(petId), INTEGER\(quantity), DATE_TIME\(shipDate), STRING\(status), BOOLEAN\(complete)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -302,6 +310,7 @@ Place a new order in the store
 
 
 Type: OBJECT
+
 
 #### Properties
 
@@ -313,6 +322,7 @@ Type: OBJECT
 | Ship Date | DATE_TIME | DATE_TIME  |  |
 | Status | STRING | SELECT  |  Order Status  |
 | Complete | BOOLEAN | SELECT  |  |
+
 
 
 
@@ -346,6 +356,7 @@ For valid response try integer IDs with value <= 5 or > 10. Other values will ge
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -361,6 +372,7 @@ Type: OBJECT
 
 
 
+
 ### Create user
 This can only be done by the logged in user.
 
@@ -368,7 +380,7 @@ This can only be done by the logged in user.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| User | {INTEGER(id), STRING(username), STRING(firstName), STRING(lastName), STRING(email), STRING(password), STRING(phone), INTEGER(userStatus)} | OBJECT_BUILDER  |  |
+| User | {INTEGER\(id), STRING\(username), STRING\(firstName), STRING\(lastName), STRING\(email), STRING\(password), STRING\(phone), INTEGER\(userStatus)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -376,6 +388,7 @@ This can only be done by the logged in user.
 
 
 Type: OBJECT
+
 
 #### Properties
 
@@ -394,6 +407,7 @@ Type: OBJECT
 
 
 
+
 ### Creates list of users with given input array
 Creates list of users with given input array
 
@@ -401,7 +415,7 @@ Creates list of users with given input array
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Items | [{INTEGER(id), STRING(username), STRING(firstName), STRING(lastName), STRING(email), STRING(password), STRING(phone), INTEGER(userStatus)}] | ARRAY_BUILDER  |  |
+| Items | [{INTEGER\(id), STRING\(username), STRING\(firstName), STRING\(lastName), STRING\(email), STRING\(password), STRING\(phone), INTEGER\(userStatus)}] | ARRAY_BUILDER  |  |
 
 
 ### Output
@@ -410,11 +424,13 @@ Creates list of users with given input array
 
 Type: ARRAY
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-null
+| {INTEGER\(id), STRING\(username), STRING\(firstName), STRING\(lastName), STRING\(email), STRING\(password), STRING\(phone), INTEGER\(userStatus)} | OBJECT_BUILDER  |
+
 
 
 
@@ -448,6 +464,7 @@ This can only be done by the logged in user.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -460,6 +477,7 @@ Type: OBJECT
 | Password | STRING | TEXT  |  |
 | Phone | STRING | TEXT  |  |
 | User Status | INTEGER | INTEGER  |  User Status  |
+
 
 
 
@@ -473,7 +491,7 @@ This can only be done by the logged in user.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Username | STRING | TEXT  |  name that need to be deleted  |
-| User | {INTEGER(id), STRING(username), STRING(firstName), STRING(lastName), STRING(email), STRING(password), STRING(phone), INTEGER(userStatus)} | OBJECT_BUILDER  |  |
+| User | {INTEGER\(id), STRING\(username), STRING\(firstName), STRING\(lastName), STRING\(email), STRING\(password), STRING\(phone), INTEGER\(userStatus)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -481,6 +499,7 @@ This can only be done by the logged in user.
 
 
 Type: OBJECT
+
 
 #### Properties
 
@@ -494,6 +513,7 @@ Type: OBJECT
 | Password | STRING | TEXT  |  |
 | Phone | STRING | TEXT  |  |
 | User Status | INTEGER | INTEGER  |  User Status  |
+
 
 
 

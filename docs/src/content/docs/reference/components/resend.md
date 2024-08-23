@@ -8,7 +8,7 @@ description: "Resend is the email API for developers."
 Resend is the email API for developers.
 
 
-Categories: [MARKETING_AUTOMATION]
+Categories: [marketing-automation]
 
 
 Version: 1
@@ -44,24 +44,24 @@ Version: 1
 
 
 ### Send Email
-Description
+Send an email
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | From | STRING | EMAIL  |  Sender email address.  |
-| To | [STRING($email)] | ARRAY_BUILDER  |  Recipients email addresses.  |
+| To | [STRING\($email)] | ARRAY_BUILDER  |  Recipients email addresses.  |
 | Subject | STRING | TEXT  |  Email subject.  |
-| Bcc | [STRING($email)] | ARRAY_BUILDER  |  Bcc recipients email addresses.  |
-| Cc | [STRING($email)] | ARRAY_BUILDER  |  Cc recipients email addresses.  |
-| Reply to | [STRING($email)] | ARRAY_BUILDER  |  Reply-to email addresses.  |
+| Bcc | [STRING\($email)] | ARRAY_BUILDER  |  Bcc recipients email addresses.  |
+| Cc | [STRING\($email)] | ARRAY_BUILDER  |  Cc recipients email addresses.  |
+| Reply to | [STRING\($email)] | ARRAY_BUILDER  |  Reply-to email addresses.  |
 | Content type | INTEGER | SELECT  |  |
 | HTML | STRING | TEXT  |  The HTML version of the message.  |
 | Text | STRING | TEXT  |  The plain text version of the message.  |
 | Headers | {} | OBJECT_BUILDER  |  Custom headers to add to the email.  |
 | Attachments | [FILE_ENTRY] | ARRAY_BUILDER  |  A list of attachments to send with the email.  |
-| [{STRING(name), STRING(value)}] | ARRAY_BUILDER  |
+| [{STRING\(name), STRING\(value)}] | ARRAY_BUILDER  |
 
 
 ### Output
@@ -69,6 +69,7 @@ Description
 
 
 Type: OBJECT
+
 
 #### Properties
 
@@ -80,3 +81,12 @@ Type: OBJECT
 
 
 
+
+<hr />
+
+# Additional instructions
+<hr />
+
+## CONNECTION
+
+[API key location](https://resend.com/api-keys)

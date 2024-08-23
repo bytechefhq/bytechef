@@ -8,7 +8,7 @@ description: "Box is a cloud content management and file sharing service that en
 Box is a cloud content management and file sharing service that enables businesses to securely store, manage, and collaborate on documents.
 
 
-Categories: [FILE_STORAGE]
+Categories: [file-storage]
 
 
 Version: 1
@@ -39,6 +39,77 @@ Version: 1
 
 
 
+## Triggers
+
+
+### New File
+Triggers when file is uploaded to folder.
+
+#### Type: DYNAMIC_WEBHOOK
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Folder | STRING | SELECT  |  Folder in which file uploads will trigger this webhook.  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| {STRING\(type), STRING\(id), STRING\(name)} | OBJECT_BUILDER  |
+
+
+
+
+
+
+
+### New Folder
+Triggers when folder is created.
+
+#### Type: DYNAMIC_WEBHOOK
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Folder | STRING | SELECT  |  Folder in which new folder will trigger this webhook.  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| {STRING\(type), STRING\(id), STRING\(name)} | OBJECT_BUILDER  |
+
+
+
+
+
+
+
+<hr />
+
 
 
 ## Actions
@@ -61,13 +132,16 @@ Creates a new empty folder within the specified parent folder.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | STRING | TEXT  |
 | STRING | TEXT  |
-| {STRING(type), STRING(id), STRING(name)} | OBJECT_BUILDER  |
+| STRING | TEXT  |
+| {STRING\(type), STRING\(id), STRING\(name)} | OBJECT_BUILDER  |
+
 
 
 
@@ -90,6 +164,7 @@ Download a selected file.
 
 Type: FILE_ENTRY
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -98,6 +173,7 @@ Type: FILE_ENTRY
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
+
 
 
 
@@ -120,11 +196,13 @@ Uploads a small file to Box.
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| [{STRING(type), STRING(id), STRING(name), {STRING(type), STRING(id), STRING(name)}(parent)}] | ARRAY_BUILDER  |
+| [{STRING\(type), STRING\(id), STRING\(name), {STRING\(type), STRING\(id), STRING\(name)}\(parent)}] | ARRAY_BUILDER  |
+
 
 
 

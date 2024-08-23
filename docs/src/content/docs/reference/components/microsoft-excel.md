@@ -8,7 +8,7 @@ description: "Microsoft Excel is a spreadsheet program used for organizing, anal
 Microsoft Excel is a spreadsheet program used for organizing, analyzing, and visualizing data in tabular form.
 
 
-Categories: [PRODUCTIVITY_AND_COLLABORATION]
+Categories: [productivity-and-collaboration]
 
 
 Version: 1
@@ -64,11 +64,7 @@ Append a row of values to an existing worksheet
 
 Type: OBJECT
 
-#### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-null
 
 
 
@@ -121,11 +117,7 @@ Get row values from the worksheet by the row number
 
 Type: OBJECT
 
-#### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-null
 
 
 
@@ -151,11 +143,7 @@ Update a row in a worksheet
 
 Type: OBJECT
 
-#### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-null
 
 
 

@@ -8,7 +8,7 @@ description: "The Data Mapper enables you to configure data mappings."
 The Data Mapper enables you to configure data mappings.
 
 
-Categories: [HELPERS]
+Categories: [helpers]
 
 
 Version: 1
@@ -31,7 +31,7 @@ The action renames keys of an input object defined by mappings.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Input | {} | OBJECT_BUILDER  |  The input object that contains property keys and values.  |
-| Mappings | [{STRING(from), STRING(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'From Path' and 'To'.  |
+| Mappings | [{STRING\(from), STRING\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'From Path' and 'To'.  |
 
 
 
@@ -63,15 +63,15 @@ Replaces a given value with the specified value defined in mappings. In case the
 | Default value | {} | OBJECT_BUILDER  |  If there is no existing mapping, assign this value as default.  |
 | Default value | STRING | TEXT  |  If there is no existing mapping, assign this value as default.  |
 | Default value | TIME | TIME  |  If there is no existing mapping, assign this value as default.  |
-| Mappings | [{[](from), [](to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
-| Mappings | [{BOOLEAN(from), BOOLEAN(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
-| Mappings | [{DATE(from), DATE(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
-| Mappings | [{DATE_TIME(from), DATE_TIME(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
-| Mappings | [{INTEGER(from), INTEGER(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
-| Mappings | [{NUMBER(from), NUMBER(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
-| Mappings | [{{}(from), {}(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
-| Mappings | [{STRING(from), STRING(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
-| Mappings | [{TIME(from), TIME(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
+| Mappings | [{[]\(from), []\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
+| Mappings | [{BOOLEAN\(from), BOOLEAN\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
+| Mappings | [{DATE\(from), DATE\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
+| Mappings | [{DATE_TIME\(from), DATE_TIME\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
+| Mappings | [{INTEGER\(from), INTEGER\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
+| Mappings | [{NUMBER\(from), NUMBER\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
+| Mappings | [{{}\(from), {}\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
+| Mappings | [{STRING\(from), STRING\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
+| Mappings | [{TIME\(from), TIME\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
 
 
 
@@ -87,15 +87,15 @@ Goes through all object parameters and replaces all specified input parameter va
 | Input | {} | OBJECT_BUILDER  |  An object containing one or more properties.  |
 | Input | [{}] | ARRAY_BUILDER  |  An array containing one or more objects.  |
 | Value type | INTEGER | SELECT  |  The value type of 'from' and 'to' property values.  |
-| Mappings | [{[](from), [](to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
-| Mappings | [{BOOLEAN(from), BOOLEAN(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
-| Mappings | [{DATE(from), DATE(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
-| Mappings | [{DATE_TIME(from), DATE_TIME(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
-| Mappings | [{INTEGER(from), INTEGER(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
-| Mappings | [{NUMBER(from), NUMBER(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
-| Mappings | [{{}(from), {}(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
-| Mappings | [{STRING(from), STRING(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
-| Mappings | [{TIME(from), TIME(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
+| Mappings | [{[]\(from), []\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
+| Mappings | [{BOOLEAN\(from), BOOLEAN\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
+| Mappings | [{DATE\(from), DATE\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
+| Mappings | [{DATE_TIME\(from), DATE_TIME\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
+| Mappings | [{INTEGER\(from), INTEGER\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
+| Mappings | [{NUMBER\(from), NUMBER\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
+| Mappings | [{{}\(from), {}\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
+| Mappings | [{STRING\(from), STRING\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
+| Mappings | [{TIME\(from), TIME\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
 
 
 
@@ -109,7 +109,7 @@ Replaces all values specified by the keys in the input object with the values sp
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Input | {} | OBJECT_BUILDER  |  An object containing one or more properties.  |
 | Output | {} | OBJECT_BUILDER  |  An object containing one or more properties.  |
-| Mappings | [{STRING(from), STRING(to)}] | ARRAY_BUILDER  |  Object that contains properties 'from' and 'to'.  |
+| Mappings | [{STRING\(from), STRING\(to)}] | ARRAY_BUILDER  |  Object that contains properties 'from' and 'to'.  |
 
 
 
@@ -124,7 +124,7 @@ Creates a new object with the chosen input properties. You can also rename the p
 | Input type | INTEGER | SELECT  |  The input type.  |
 | Input | {} | OBJECT_BUILDER  |  An object containing one or more properties.  |
 | Input | [{}] | ARRAY_BUILDER  |  An array containing one or more objects.  |
-| Mapping | [{STRING(from), STRING(to), BOOLEAN(requiredField)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from', 'to' and 'requiredField'. For nested keys, it supports dot notation, where the new mapped path can be used for nested mapping.  |
+| Mapping | [{STRING\(from), STRING\(to), BOOLEAN\(requiredField)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from', 'to' and 'requiredField'. For nested keys, it supports dot notation, where the new mapped path can be used for nested mapping.  |
 | Include Unmapped | BOOLEAN | SELECT  |  Should fields from the original object that do not have mappings be included in the new object?  |
 | Include Nulls | BOOLEAN | SELECT  |  Should fields that have null values be included in the new object?  |
 | Include Empty strings | BOOLEAN | SELECT  |  Should fields with empty string values be included in the new object?  |

@@ -22,13 +22,13 @@ Version: 1
 
 
 ### Execute
-Executes the script.
+Creates a temporary script that executes bash commands. The script is afterwards deleted.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Script | STRING | TEXT  |  Script written in bash.  |
+| Script | STRING | TEXT  |  Script written in bash. Multiple commands are possible with the ';' separator.  |
 
 
 ### Output
@@ -42,11 +42,7 @@ ___Sample Output:___
 
 Type: STRING
 
-#### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-null
 
 
 

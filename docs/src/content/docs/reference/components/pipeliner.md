@@ -8,7 +8,7 @@ description: "Pipeliner CRM is a comprehensive sales management tool that helps 
 Pipeliner CRM is a comprehensive sales management tool that helps streamline sales processes through visual pipline management, contact organization, sales forecasting, and reporting.
 
 
-Categories: [CRM]
+Categories: [crm]
 
 
 Version: 1
@@ -59,7 +59,7 @@ Creates new account
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Account | {STRING(owner_id), STRING(name)} | OBJECT_BUILDER  |  |
+| Account | {STRING\(owner_id), STRING\(name)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -68,12 +68,14 @@ Creates new account
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | BOOLEAN | SELECT  |
-| {STRING(id), STRING(owner_id), STRING(name)} | OBJECT_BUILDER  |
+| {STRING\(id), STRING\(owner_id), STRING\(name)} | OBJECT_BUILDER  |
+
 
 
 
@@ -86,7 +88,7 @@ Creates new Contact
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Contact | {STRING(owner_id), STRING(first_name), STRING(last_name)} | OBJECT_BUILDER  |  |
+| Contact | {STRING\(owner_id), STRING\(first_name), STRING\(last_name)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -95,12 +97,14 @@ Creates new Contact
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | BOOLEAN | SELECT  |
-| {STRING(id), STRING(owner_id), STRING(first_name), STRING(last_name)} | OBJECT_BUILDER  |
+| {STRING\(id), STRING\(owner_id), STRING\(first_name), STRING\(last_name)} | OBJECT_BUILDER  |
+
 
 
 
@@ -113,7 +117,7 @@ Creates new Task
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Task | {STRING(subject), STRING(activity_type_id), STRING(unit_id), STRING(owner_id)} | OBJECT_BUILDER  |  |
+| Task | {STRING\(subject), STRING\(activity_type_id), STRING\(unit_id), STRING\(owner_id)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -122,12 +126,14 @@ Creates new Task
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | BOOLEAN | SELECT  |
-| {STRING(id), STRING(subject), STRING(activity_type_id), STRING(unit_id), STRING(owner_id)} | OBJECT_BUILDER  |
+| {STRING\(id), STRING\(subject), STRING\(activity_type_id), STRING\(unit_id), STRING\(owner_id)} | OBJECT_BUILDER  |
+
 
 
 

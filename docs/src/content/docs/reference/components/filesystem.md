@@ -8,7 +8,7 @@ description: "Allows multiple operations over files on the filesystem."
 Allows multiple operations over files on the filesystem.
 
 
-Categories: [HELPERS]
+Categories: [helpers]
 
 
 Version: 1
@@ -23,14 +23,14 @@ Version: 1
 ## Actions
 
 
-### Read from file
-null
+### Read File
+Reads all data from a specified file path and outputs it in file entry format.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Filename | STRING | TEXT  |  The path of the file to read.  |
+| File path | STRING | TEXT  |  The path of the file to read.  |
 
 
 ### Output
@@ -38,6 +38,7 @@ null
 
 
 Type: FILE_ENTRY
+
 
 #### Properties
 
@@ -52,6 +53,7 @@ Type: FILE_ENTRY
 
 
 
+
 ### Write to file
 null
 
@@ -59,8 +61,8 @@ null
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| File | FILE_ENTRY | FILE_ENTRY  |  The object property which contains a reference to the file to be written.  |
-| Filename | STRING | TEXT  |  The path to which the file should be written.  |
+| File | FILE_ENTRY | FILE_ENTRY  |  File entry object to be written.  |
+| File path | STRING | TEXT  |  The path to which the file should be written.  |
 
 
 ### Output
@@ -74,6 +76,7 @@ ___Sample Output:___
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -84,8 +87,9 @@ Type: OBJECT
 
 
 
+
 ### Create Temp Directory
-Creates a temporary directory on the filesystem.
+Creates a file in the temporary directory on the filesystem. Returns the created directory's full path.
 
 #### Properties
 
@@ -105,24 +109,20 @@ ___Sample Output:___
 
 Type: STRING
 
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-null
 
 
 
 
 
-### File Path
-Gets the full path from a full filename, which is the prefix + path, and also excluding the final directory separator.
+
+### Get parent folder
+Gets the path of the parent folder of the file. If the file doesn't exist, it throws an error.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Filename | STRING | TEXT  |  The path to full filename.  |
+| File path | STRING | TEXT  |  The path to full filename.  |
 
 
 ### Output
@@ -136,25 +136,21 @@ ___Sample Output:___
 
 Type: STRING
 
-#### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-null
 
 
 
 
 
 ### List
-Lists a content of directory for the given path.
+Lists the content of a directory for the given path.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Path | STRING | TEXT  |  The path of a directory.  |
-| Recursive | BOOLEAN | SELECT  |  Should subdirectories be included.  |
+| Recursive | BOOLEAN | SELECT  |  Should the subdirectories be included?  |
 
 
 ### Output
@@ -163,11 +159,13 @@ Lists a content of directory for the given path.
 
 Type: ARRAY
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-null
+| {STRING\(fileName), STRING\(relativePath), INTEGER\(size)} | OBJECT_BUILDER  |
+
 
 
 
@@ -194,18 +192,14 @@ ___Sample Output:___
 
 Type: STRING
 
-#### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-null
 
 
 
 
 
 ### Remove
-Removes the content of a directory.
+Permanently removes the content of a directory.
 
 #### Properties
 
@@ -225,11 +219,7 @@ ___Sample Output:___
 
 Type: BOOLEAN
 
-#### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-null
 
 
 

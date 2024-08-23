@@ -8,7 +8,7 @@ description: "A toolbox with all the things you need to get your project to succ
 A toolbox with all the things you need to get your project to success:  Image resize and CDN, PDF and Screenshots generation, Currency Exchange and Discounts, Email Validation, QR codes, and much more!
 
 
-Categories: [DEVELOPER_TOOLS]
+Categories: [developer-tools]
 
 
 Version: 1
@@ -61,6 +61,7 @@ Convert your currency into any other
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -69,6 +70,7 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
+
 
 
 
@@ -90,12 +92,14 @@ Shorten your desired URL
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | STRING | TEXT  |
 | STRING | TEXT  |
+
 
 
 
@@ -117,13 +121,15 @@ Get information about a certain webpage
 
 Type: OBJECT
 
+
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING(title), STRING(description), STRING(canonical)} | OBJECT_BUILDER  |
-| {STRING(site), STRING(title), STRING(description)} | OBJECT_BUILDER  |
-| {STRING(title), STRING(url), STRING(image), STRING(description), STRING(type)} | OBJECT_BUILDER  |
+| {STRING\(title), STRING\(description), STRING\(canonical)} | OBJECT_BUILDER  |
+| {STRING\(site), STRING\(title), STRING\(description)} | OBJECT_BUILDER  |
+| {STRING\(title), STRING\(url), STRING\(image), STRING\(description), STRING\(type)} | OBJECT_BUILDER  |
+
 
 
 
