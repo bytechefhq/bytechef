@@ -1,11 +1,18 @@
 package com.bytechef.embedded.connectivity.public_web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -13,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("executeAction_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-13T09:30:17.660877+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-23T06:56:44.096203+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class ExecuteAction200ResponseModel {
 
   private Object output;
@@ -27,7 +34,7 @@ public class ExecuteAction200ResponseModel {
    * The result of the action call.
    * @return output
   */
-
+  
   @Schema(name = "output", description = "The result of the action call.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("output")
   public Object getOutput() {

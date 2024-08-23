@@ -7,11 +7,15 @@ package com.bytechef.embedded.connectivity.public_web.rest;
 
 import com.bytechef.embedded.connectivity.public_web.rest.model.ExecuteAction200ResponseModel;
 import com.bytechef.embedded.connectivity.public_web.rest.model.ExecuteActionRequestModel;
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springframework.http.HttpStatus;
@@ -20,15 +24,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.Valid;
-
+import jakarta.validation.constraints.*;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-13T09:30:17.660877+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-23T06:56:44.096203+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 @Validated
-@Tag(name = "action", description = "The Embedded Connector Action Public API")
+@Tag(name = "action", description = "The Embedded Component Action Public API")
 public interface ActionApi {
 
     default Optional<NativeWebRequest> getRequest() {
@@ -36,14 +43,14 @@ public interface ActionApi {
     }
 
     /**
-     * POST /connectors/{componentName}/versions/{componentVersion}/actions/{actionName} : Executes an action of a connector and returns the result as the response
-     * Executes an action of a connector and returns the result as the response.
+     * POST /components/{componentName}/versions/{componentVersion}/actions/{actionName} : Executes an action of a component and returns the result as the response
+     * Executes an action of a component and returns the result as the response.
      *
      * @param componentName The component name. (required)
      * @param componentVersion The component version. (required)
      * @param actionName The name of the action to call. (required)
      * @param executeActionRequestModel  (optional)
-     * @return The list of connector action objects. (status code 200)
+     * @return The list of component action objects. (status code 200)
      *         or Invalid Input (status code 400)
      *         or Unauthorized (status code 401)
      *         or Forbidden (status code 403)
@@ -53,11 +60,11 @@ public interface ActionApi {
      */
     @Operation(
         operationId = "executeAction",
-        summary = "Executes an action of a connector and returns the result as the response",
-        description = "Executes an action of a connector and returns the result as the response.",
+        summary = "Executes an action of a component and returns the result as the response",
+        description = "Executes an action of a component and returns the result as the response.",
         tags = { "action" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The list of connector action objects.", content = {
+            @ApiResponse(responseCode = "200", description = "The list of component action objects.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ExecuteAction200ResponseModel.class))
             }),
             @ApiResponse(responseCode = "400", description = "Invalid Input"),
@@ -70,11 +77,11 @@ public interface ActionApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/connectors/{componentName}/versions/{componentVersion}/actions/{actionName}",
+        value = "/components/{componentName}/versions/{componentVersion}/actions/{actionName}",
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-
+    
     default ResponseEntity<ExecuteAction200ResponseModel> executeAction(
         @Parameter(name = "componentName", description = "The component name.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
         @Parameter(name = "componentVersion", description = "The component version.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
