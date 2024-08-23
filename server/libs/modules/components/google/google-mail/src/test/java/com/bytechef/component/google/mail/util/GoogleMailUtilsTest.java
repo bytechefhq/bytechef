@@ -17,6 +17,17 @@
 package com.bytechef.component.google.mail.util;
 
 import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FULL;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FULL_MESSAGE_OUTPUT_PROPERTY;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MINIMAL;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.RAW;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SIMPLE;
+import static com.bytechef.component.google.mail.util.GoogleMailUtils.METADATA_MESSAGE_OUTPUT_PROPERTY;
+import static com.bytechef.component.google.mail.util.GoogleMailUtils.MINIMAL_MESSAGE_OUTPUT_PROPERTY;
+import static com.bytechef.component.google.mail.util.GoogleMailUtils.PARSED_MESSAGE_OUTPUT_PROPERTY;
+import static com.bytechef.component.google.mail.util.GoogleMailUtils.RAW_MESSAGE_OUTPUT_PROPERTY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -26,7 +37,9 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.SingleConnectionOutputFunction;
 import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.OutputResponse;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.google.commons.GoogleServices;
 import com.bytechef.test.component.properties.ParametersFactory;
@@ -47,7 +60,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 class GoogleMailUtilsTest {
 
@@ -71,8 +84,6 @@ class GoogleMailUtilsTest {
         googleServicesMockedStatic
             .when(() -> GoogleServices.getMail(any(Parameters.class)))
             .thenReturn(mockedGmail);
-
-        parameters = ParametersFactory.createParameters(Map.of(ACCESS_TOKEN, "id"));
     }
 
     @AfterEach
@@ -82,6 +93,7 @@ class GoogleMailUtilsTest {
 
     @Test
     void testGetLabelIdOptions() throws IOException {
+        parameters = ParametersFactory.createParameters(Map.of(ACCESS_TOKEN, "id"));
 
         List<Label> labels = List.of(new Label().setName("label1"), new Label().setName("label2"));
 
@@ -115,6 +127,8 @@ class GoogleMailUtilsTest {
 
     @Test
     void testGetMessageIdOptions() throws IOException {
+        parameters = ParametersFactory.createParameters(Map.of(ACCESS_TOKEN, "id"));
+
         List<Message> messages = List.of(new Message().setId("id1"), new Message().setId("id2"));
 
         when(mockedGmail.users())
@@ -147,6 +161,8 @@ class GoogleMailUtilsTest {
 
     @Test
     void testGetThreadIdOptions() throws IOException {
+        parameters = ParametersFactory.createParameters(Map.of(ACCESS_TOKEN, "id"));
+
         List<Thread> threads = List.of(new Thread().setId("id1"), new Thread().setId("id2"));
 
         when(mockedGmail.users())
@@ -175,5 +191,60 @@ class GoogleMailUtilsTest {
 
         assertEquals("id2", option.getLabel());
         assertEquals("id2", option.getValue());
+    }
+
+    @Test
+    void testGetOutputForParsedFormat() throws Exception {
+        parameters = ParametersFactory.createParameters(Map.of(FORMAT, SIMPLE));
+
+        SingleConnectionOutputFunction output = GoogleMailUtils.getOutput();
+
+        OutputResponse outputResponse = output.apply(parameters, parameters, mockedContext);
+
+        assertEquals(PARSED_MESSAGE_OUTPUT_PROPERTY, outputResponse.getOutputSchema());
+    }
+
+    @Test
+    void testGetOutputForRaqFormat() throws Exception {
+        parameters = ParametersFactory.createParameters(Map.of(FORMAT, RAW));
+
+        SingleConnectionOutputFunction output = GoogleMailUtils.getOutput();
+
+        OutputResponse outputResponse = output.apply(parameters, parameters, mockedContext);
+
+        assertEquals(RAW_MESSAGE_OUTPUT_PROPERTY, outputResponse.getOutputSchema());
+    }
+
+    @Test
+    void testGetOutputForMinimalFormat() throws Exception {
+        parameters = ParametersFactory.createParameters(Map.of(FORMAT, MINIMAL));
+
+        SingleConnectionOutputFunction output = GoogleMailUtils.getOutput();
+
+        OutputResponse outputResponse = output.apply(parameters, parameters, mockedContext);
+
+        assertEquals(MINIMAL_MESSAGE_OUTPUT_PROPERTY, outputResponse.getOutputSchema());
+    }
+
+    @Test
+    void testGetOutputForMetadataFormat() throws Exception {
+        parameters = ParametersFactory.createParameters(Map.of(FORMAT, METADATA));
+
+        SingleConnectionOutputFunction output = GoogleMailUtils.getOutput();
+
+        OutputResponse outputResponse = output.apply(parameters, parameters, mockedContext);
+
+        assertEquals(METADATA_MESSAGE_OUTPUT_PROPERTY, outputResponse.getOutputSchema());
+    }
+
+    @Test
+    void testGetOutputForFullFormat() throws Exception {
+        parameters = ParametersFactory.createParameters(Map.of(FORMAT, FULL));
+
+        SingleConnectionOutputFunction output = GoogleMailUtils.getOutput();
+
+        OutputResponse outputResponse = output.apply(parameters, parameters, mockedContext);
+
+        assertEquals(FULL_MESSAGE_OUTPUT_PROPERTY, outputResponse.getOutputSchema());
     }
 }
