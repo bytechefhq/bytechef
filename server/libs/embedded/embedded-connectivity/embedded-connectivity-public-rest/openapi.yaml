@@ -7,30 +7,30 @@ servers:
 - url: "/api/embedded/v1"
 tags:
 - name: "action"
-  description: "The Embedded Connector Action Public API"
-- name: "connector"
-  description: "The Embedded Connector Public API"
+  description: "The Embedded Component Action Public API"
+- name: "component"
+  description: "The Embedded Component Public API"
 - name: "trigger"
-  description: "The Embedded Connector Trigger Public API"
+  description: "The Embedded Component Trigger Public API"
 - name: "trigger-subscription"
-  description: "The Embedded Connector Trigger Subscription Public API"
+  description: "The Embedded Component Trigger Subscription Public API"
 paths:
-#  /connectors:
+#  /components:
 #    get:
-#      description: "Returns a list with all the available connectors from the connector library."
-#      summary: "Returns a list with all the available connectors from the connector library"
+#      description: "Returns a list with all the available components from the component library."
+#      summary: "Returns a list with all the available components from the component library"
 #      tags:
-#      - "connector"
-#      operationId: "getConnectors"
+#      - "component"
+#      operationId: "getComponents"
 #      responses:
 #        "200":
-#          description: "The list of connector objects."
+#          description: "The list of component objects."
 #          content:
 #            application/json:
 #              schema:
 #                type: "array"
 #                items:
-#                  $ref: '#/components/schemas/Connector'
+#                  $ref: '#/components/schemas/Component'
 #        "400":
 #          description: "Invalid Input"
 #        "401":
@@ -43,13 +43,13 @@ paths:
 #          description: "Limit Exceeded"
 #        "500":
 #          description: "Internal Error"
-#  /connectors/{componentName}/versions/{componentVersion}/actions:
+#  /components/{componentName}/versions/{componentVersion}/actions:
 #    get:
-#      description: "Returns a list with all the available actions for a given connector."
-#      summary: "Returns a list with all the available actions for a given connector"
+#      description: "Returns a list with all the available actions for a given component."
+#      summary: "Returns a list with all the available actions for a given component"
 #      tags:
 #        - "action"
-#      operationId: "getConnectorActions"
+#      operationId: "getComponentActions"
 #      parameters:
 #        - name: "componentName"
 #          description: "The component name"
@@ -65,7 +65,7 @@ paths:
 #            type: "integer"
 #      responses:
 #        "200":
-#          description: "The list of connector action objects."
+#          description: "The list of component action objects."
 #          content:
 #            application/json:
 #              schema:
@@ -84,10 +84,10 @@ paths:
 #          description: "Limit Exceeded"
 #        "500":
 #          description: "Internal Error"
-  /connectors/{componentName}/versions/{componentVersion}/actions/{actionName}:
+  /components/{componentName}/versions/{componentVersion}/actions/{actionName}:
     post:
-      description: "Executes an action of a connector and returns the result as the response."
-      summary: "Executes an action of a connector and returns the result as the response"
+      description: "Executes an action of a component and returns the result as the response."
+      summary: "Executes an action of a component and returns the result as the response"
       tags:
         - "action"
       operationId: "executeAction"
@@ -124,7 +124,7 @@ paths:
                   additionalProperties: true
       responses:
         "200":
-          description: "The list of connector action objects."
+          description: "The list of component action objects."
           content:
             application/json:
               schema:
@@ -145,13 +145,13 @@ paths:
           description: "Limit Exceeded"
         "500":
           description: "Internal Error"
-#  /connectors/{componentName}/versions/{componentVersion}/triggers:
+#  /components/{componentName}/versions/{componentVersion}/triggers:
 #    get:
-#      description: "Returns a list with all the available triggers for a given connector."
-#      summary: "Returns a list with all the available triggers for a given connector"
+#      description: "Returns a list with all the available triggers for a given component."
+#      summary: "Returns a list with all the available triggers for a given component"
 #      tags:
 #        - "trigger"
-#      operationId: "getConnectorTriggers"
+#      operationId: "getComponentTriggers"
 #      parameters:
 #        - name: "componentName"
 #          description: "The component name"
@@ -167,7 +167,7 @@ paths:
 #            type: "integer"
 #      responses:
 #        "200":
-#          description: "The list of connector trigger objects."
+#          description: "The list of component trigger objects."
 #          content:
 #            application/json:
 #              schema:
@@ -188,14 +188,14 @@ paths:
 #          description: "Internal Error"
 #  /subscriptions:
 #    get:
-#      description: "Returns a list with all the available triggers for a given connector."
-#      summary: "Returns a list with all the available triggers for a given connector"
+#      description: "Returns a list with all the available triggers for a given component."
+#      summary: "Returns a list with all the available triggers for a given component"
 #      tags:
 #        - "trigger-subscription"
 #      operationId: "getTriggerSubscriptions"
 #      responses:
 #        "200":
-#          description: "The list of connector trigger objects."
+#          description: "The list of component trigger objects."
 #          content:
 #            application/json:
 #              schema:
@@ -367,12 +367,12 @@ paths:
 #        outputSchema:
 #          $ref: "#/components/schemas/Property"
 #        name:
-#          description: The programmatic name of the action to be used as input for Call connector.
+#          description: The programmatic name of the action to be used as input for Call component.
 #          type: "string"
 #        title:
 #          description: The full title of the action.
 #          type: "string"
-#    Connector:
+#    Component:
 #      type: "object"
 #      required:
 #        - description
@@ -381,16 +381,16 @@ paths:
 #        - version
 #      properties:
 #        description:
-#          description: The connector description
+#          description: The component description
 #          type: "string"
 #        name:
-#          description: The programmatic name of the connector
+#          description: The programmatic name of the component
 #          type: "string"
 #        title:
-#          description: The title of the connector
+#          description: The title of the component
 #          type: "string"
 #        version:
-#          description: The version of the connector
+#          description: The version of the component
 #          type: "integer"
 #    AnyValue:
 #      description: "Can be anything: string, number, array, object, etc. (except `null`)"
