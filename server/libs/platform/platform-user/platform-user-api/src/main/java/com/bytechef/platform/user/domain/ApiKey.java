@@ -47,7 +47,7 @@ public class ApiKey {
     private LocalDateTime createdDate;
 
     @Column
-    private int environment;
+    private Integer environment;
 
     @Id
     private Long id;
@@ -70,7 +70,7 @@ public class ApiKey {
     private String secretKey;
 
     @Column
-    private int type;
+    private Integer type;
 
     @Column
     private AggregateReference<User, Long> userId;
@@ -97,6 +97,10 @@ public class ApiKey {
     }
 
     public Environment getEnvironment() {
+        if (environment == null) {
+            return null;
+        }
+
         return Environment.values()[environment];
     }
 
@@ -133,6 +137,10 @@ public class ApiKey {
     }
 
     public AppType getType() {
+        if (type == null) {
+            return null;
+        }
+
         return AppType.values()[type];
     }
 
@@ -153,7 +161,9 @@ public class ApiKey {
     }
 
     public void setEnvironment(Environment environment) {
-        this.environment = environment.ordinal();
+        if (environment != null) {
+            this.environment = environment.ordinal();
+        }
     }
 
     public void setLastUsedDate(LocalDateTime lastUsedDate) {
@@ -169,7 +179,9 @@ public class ApiKey {
     }
 
     public void setType(AppType type) {
-        this.type = type.ordinal();
+        if (type != null) {
+            this.type = type.ordinal();
+        }
     }
 
     public void setUserId(Long userId) {

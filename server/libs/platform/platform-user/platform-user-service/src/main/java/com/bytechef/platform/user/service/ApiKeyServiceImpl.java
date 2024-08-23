@@ -47,7 +47,6 @@ public class ApiKeyServiceImpl implements ApiKeyService {
         Validate.notNull(apiKey, "'apiKey' must not be null");
         Validate.isTrue(apiKey.getId() == null, "'id' must be null");
         Validate.notNull(apiKey.getName(), "'name' must not be null");
-        Validate.notNull(apiKey.getType(), "'type' must not be null");
 
         apiKey.setSecretKey(String.valueOf(TenantSecretKey.of()));
 
@@ -62,8 +61,12 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     }
 
     @Override
-    public Optional<ApiKey> fetchApiKey(@NonNull Environment environment, @NonNull String secretKey) {
-        return apiKeyRepository.findByEnvironmentAndSecretKey(environment.ordinal(), secretKey);
+    public Optional<ApiKey> fetchApiKey(@NonNull String secretKey, Environment environment) {
+        if (environment == null) {
+            return apiKeyRepository.findBySecretKeyAndEnvironmentIsNull(secretKey);
+        } else {
+            return apiKeyRepository.findByEnvironmentAndSecretKey(environment.ordinal(), secretKey);
+        }
     }
 
     @Override
@@ -75,7 +78,11 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     @Override
     @Transactional(readOnly = true)
     public List<ApiKey> getApiKeys(AppType type) {
-        return apiKeyRepository.findAllByType(type.ordinal());
+        if (type == null) {
+            return apiKeyRepository.findAllByTypeIsNull();
+        } else {
+            return apiKeyRepository.findAllByType(type.ordinal());
+        }
     }
 
     @Override
