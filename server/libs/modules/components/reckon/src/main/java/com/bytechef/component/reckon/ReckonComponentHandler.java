@@ -25,8 +25,11 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinit
 import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Property.ValueProperty;
+import com.bytechef.component.reckon.trigger.ReckonNewInvoiceTrigger;
+import com.bytechef.component.reckon.trigger.ReckonNewPaymentTrigger;
 import com.bytechef.component.reckon.util.ReckonUtils;
 import com.bytechef.definition.BaseProperty;
 import com.google.auto.service.AutoService;
@@ -39,6 +42,13 @@ import java.util.Optional;
  */
 @AutoService(OpenApiComponentHandler.class)
 public class ReckonComponentHandler extends AbstractReckonComponentHandler {
+
+    @Override
+    public List<ModifiableTriggerDefinition> getTriggers() {
+        return List.of(
+            ReckonNewInvoiceTrigger.TRIGGER_DEFINITION,
+            ReckonNewPaymentTrigger.TRIGGER_DEFINITION);
+    }
 
     @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {

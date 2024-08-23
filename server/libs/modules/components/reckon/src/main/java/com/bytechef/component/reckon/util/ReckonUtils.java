@@ -18,6 +18,8 @@ package com.bytechef.component.reckon.util;
 
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.reckon.constant.ReckonConstants.BOOK_ID;
+import static com.bytechef.component.reckon.constant.ReckonConstants.ID;
+import static com.bytechef.component.reckon.constant.ReckonConstants.LAST_TIME_CHECKED;
 import static com.bytechef.component.reckon.constant.ReckonConstants.NAME;
 
 import com.bytechef.component.definition.Context;
@@ -25,6 +27,12 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.definition.TriggerDefinition.PollOutput;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +55,7 @@ public class ReckonUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return getOptions(body, "id");
+        return getOptions(body, ID);
 
     }
 
@@ -87,5 +95,27 @@ public class ReckonUtils {
         }
 
         return options;
+    }
+
+    public static PollOutput getPollOutput(
+        Parameters inputParameters, Parameters closureParameters, TriggerContext context, String path) {
+
+        LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, LocalDateTime.now());
+        LocalDateTime endDate = LocalDateTime.now();
+
+        // TODO check filter queryParameter and add orderBy if needed
+
+        Http.Response response = context
+            .http(http -> http.get("/" + inputParameters.getRequiredString(BOOK_ID) + "/" + path))
+            .queryParameter("filter",
+                URLEncoder.encode(
+                    "createdDateTime ge " + startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                    StandardCharsets.UTF_8))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute();
+
+        Map<String, List<?>> body = response.getBody(new TypeReference<>() {});
+
+        return new PollOutput(body.get("list"), Map.of(LAST_TIME_CHECKED, endDate), false);
     }
 }
