@@ -38,18 +38,17 @@ import com.azure.core.credential.KeyCredential;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.llm.util.LLMUtils;
+import com.bytechef.component.llm.util.interfaces.Transcript;
 import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
-
-import com.bytechef.component.llm.util.interfaces.Transcript;
 import org.springframework.ai.audio.transcription.AudioTranscriptionOptions;
 import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
 import org.springframework.ai.azure.openai.AzureOpenAiAudioTranscriptionModel;
 import org.springframework.ai.azure.openai.AzureOpenAiAudioTranscriptionOptions;
 import org.springframework.ai.model.Model;
-import com.bytechef.component.llm.util.LLMUtils;
 
 /**
  * @author Monika Domiter
@@ -70,9 +69,10 @@ public class AzureOpenAICreateTranscriptionAction {
                 .description("ID of the model to use.")
                 .required(true)
                 .options(LLMUtils.getEnumOptions(
-                        Arrays.stream(AzureOpenAiAudioTranscriptionOptions.WhisperModel.values())
-                            .collect(Collectors.toMap(
-                                AzureOpenAiAudioTranscriptionOptions.WhisperModel::getValue, AzureOpenAiAudioTranscriptionOptions.WhisperModel::getValue, (f,s)->f)))),
+                    Arrays.stream(AzureOpenAiAudioTranscriptionOptions.WhisperModel.values())
+                        .collect(Collectors.toMap(
+                            AzureOpenAiAudioTranscriptionOptions.WhisperModel::getValue,
+                            AzureOpenAiAudioTranscriptionOptions.WhisperModel::getValue, (f, s) -> f)))),
             LANGUAGE_PROPERTY,
             string(PROMPT)
                 .label("Prompt")
@@ -86,7 +86,9 @@ public class AzureOpenAICreateTranscriptionAction {
                 .options(LLMUtils.getEnumOptions(
                     Arrays.stream(AzureOpenAiAudioTranscriptionOptions.TranscriptResponseFormat.values())
                         .collect(Collectors.toMap(
-                             clas -> clas.getValue().toString(), AzureOpenAiAudioTranscriptionOptions.TranscriptResponseFormat::getValue, (f,s)->f))))
+                            clas -> clas.getValue()
+                                .toString(),
+                            AzureOpenAiAudioTranscriptionOptions.TranscriptResponseFormat::getValue, (f, s) -> f))))
                 .required(true),
             number(TEMPERATURE)
                 .label("Temperature")
@@ -118,18 +120,21 @@ public class AzureOpenAICreateTranscriptionAction {
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withPrompt(inputParameters.getString(PROMPT))
                 .withLanguage(inputParameters.getString(LANGUAGE))
-                .withResponseFormat(inputParameters.get(RESPONSE_FORMAT, AzureOpenAiAudioTranscriptionOptions.TranscriptResponseFormat.class))
+                .withResponseFormat(inputParameters.get(RESPONSE_FORMAT,
+                    AzureOpenAiAudioTranscriptionOptions.TranscriptResponseFormat.class))
                 .withTemperature(inputParameters.getFloat(TEMPERATURE))
                 .build();
         }
 
         @Override
-        public Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> createTranscriptionModel(Parameters inputParameters, Parameters connectionParameters) {
+        public Model<AudioTranscriptionPrompt, AudioTranscriptionResponse>
+            createTranscriptionModel(Parameters inputParameters, Parameters connectionParameters) {
             OpenAIClient openAIClient = new OpenAIClientBuilder()
                 .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
                 .endpoint(connectionParameters.getString(ENDPOINT))
                 .buildClient();
-            return new AzureOpenAiAudioTranscriptionModel(openAIClient, (AzureOpenAiAudioTranscriptionOptions) createTranscriptOptions(inputParameters));
+            return new AzureOpenAiAudioTranscriptionModel(openAIClient,
+                (AzureOpenAiAudioTranscriptionOptions) createTranscriptOptions(inputParameters));
         }
     };
 }

@@ -16,8 +16,8 @@
 
 package com.bytechef.component.vertex.palm2.connection;
 
-import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.Authorization.AuthorizationType.BEARER_TOKEN;
+import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.connection;
 import static com.bytechef.component.definition.ComponentDSL.string;

@@ -16,9 +16,30 @@
 
 package com.bytechef.component.ollama.action;
 
+import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
+import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.llm.constants.LLMConstants.ASK;
+import static com.bytechef.component.llm.constants.LLMConstants.FREQUENCY_PENALTY;
+import static com.bytechef.component.llm.constants.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
+import static com.bytechef.component.llm.constants.LLMConstants.MESSAGE_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
+import static com.bytechef.component.llm.constants.LLMConstants.PRESENCE_PENALTY;
+import static com.bytechef.component.llm.constants.LLMConstants.PRESENCE_PENALTY_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.SEED;
+import static com.bytechef.component.llm.constants.LLMConstants.SEED_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.STOP;
+import static com.bytechef.component.llm.constants.LLMConstants.STOP_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE;
+import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.TOP_K;
+import static com.bytechef.component.llm.constants.LLMConstants.TOP_K_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.TOP_P;
+import static com.bytechef.component.llm.constants.LLMConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.ollama.constant.OllamaConstants.F16KV;
 import static com.bytechef.component.ollama.constant.OllamaConstants.FORMAT;
 import static com.bytechef.component.ollama.constant.OllamaConstants.KEEP_ALIVE;
@@ -40,49 +61,25 @@ import static com.bytechef.component.ollama.constant.OllamaConstants.TFSZ;
 import static com.bytechef.component.ollama.constant.OllamaConstants.TRUNCATE;
 import static com.bytechef.component.ollama.constant.OllamaConstants.TYPICAL_P;
 import static com.bytechef.component.ollama.constant.OllamaConstants.URL;
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.definition.ComponentDSL.string;
-
 import static com.bytechef.component.ollama.constant.OllamaConstants.USE_MLOCK;
 import static com.bytechef.component.ollama.constant.OllamaConstants.USE_MMAP;
 import static com.bytechef.component.ollama.constant.OllamaConstants.USE_NUMA;
 import static com.bytechef.component.ollama.constant.OllamaConstants.VOCAB_ONLY;
-import static com.bytechef.component.llm.constants.LLMConstants.ASK;
-import static com.bytechef.component.llm.constants.LLMConstants.FREQUENCY_PENALTY;
-import static com.bytechef.component.llm.constants.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
-import static com.bytechef.component.llm.constants.LLMConstants.MESSAGE_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
-import static com.bytechef.component.llm.constants.LLMConstants.PRESENCE_PENALTY;
-import static com.bytechef.component.llm.constants.LLMConstants.PRESENCE_PENALTY_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.SEED;
-import static com.bytechef.component.llm.constants.LLMConstants.SEED_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.STOP;
-import static com.bytechef.component.llm.constants.LLMConstants.STOP_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE;
-import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.TOP_K;
-import static com.bytechef.component.llm.constants.LLMConstants.TOP_K_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.TOP_P;
-import static com.bytechef.component.llm.constants.LLMConstants.TOP_P_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
-
+import com.bytechef.component.llm.util.LLMUtils;
+import com.bytechef.component.llm.util.interfaces.Chat;
 import java.util.Arrays;
 import java.util.stream.Collectors;
-
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.ollama.api.OllamaModel;
 import org.springframework.ai.ollama.api.OllamaOptions;
-import com.bytechef.component.llm.util.LLMUtils;
-import com.bytechef.component.llm.util.interfaces.Chat;
 
 public class OllamaChatAction {
 
@@ -97,7 +94,7 @@ public class OllamaChatAction {
                 .options(LLMUtils.getEnumOptions(
                     Arrays.stream(OllamaModel.values())
                         .collect(Collectors.toMap(
-                            OllamaModel::getName, OllamaModel::getName, (f,s)->f)))),
+                            OllamaModel::getName, OllamaModel::getName, (f, s) -> f)))),
             MESSAGE_PROPERTY,
             string(FORMAT)
                 .label("Format")
@@ -110,7 +107,8 @@ public class OllamaChatAction {
                 .exampleValue("5m"),
             integer(MAX_TOKENS)
                 .label("Num predict")
-                .description("Maximum number of tokens to predict when generating text. (-1 = infinite generation, -2 = fill context)")
+                .description(
+                    "Maximum number of tokens to predict when generating text. (-1 = infinite generation, -2 = fill context)")
                 .advancedOption(true),
             TEMPERATURE_PROPERTY,
             TOP_P_PROPERTY,
@@ -133,11 +131,13 @@ public class OllamaChatAction {
                 .advancedOption(true),
             integer(NUM_GPU)
                 .label("Num GPU")
-                .description("The number of layers to send to the GPU(s). On macOS it defaults to 1 to enable metal support, 0 to disable. 1 here indicates that NumGPU should be set dynamically")
+                .description(
+                    "The number of layers to send to the GPU(s). On macOS it defaults to 1 to enable metal support, 0 to disable. 1 here indicates that NumGPU should be set dynamically")
                 .advancedOption(true),
             integer(MAIN_GPU)
                 .label("Main GPU")
-                .description("When using multiple GPUs this option controls which GPU is used for small tensors for which the overhead of splitting the computation across all GPUs is not worthwhile. The GPU in question will use slightly more VRAM to store a scratch buffer for temporary results.")
+                .description(
+                    "When using multiple GPUs this option controls which GPU is used for small tensors for which the overhead of splitting the computation across all GPUs is not worthwhile. The GPU in question will use slightly more VRAM to store a scratch buffer for temporary results.")
                 .advancedOption(true),
             bool(LOW_VRAM)
                 .label("Low VRAM")
@@ -147,7 +147,8 @@ public class OllamaChatAction {
                 .advancedOption(true),
             bool(LOGTS_ALL)
                 .label("Logits all")
-                .description("Return logits for all the tokens, not just the last one. To enable completions to return logprobs, this must be true.")
+                .description(
+                    "Return logits for all the tokens, not just the last one. To enable completions to return logprobs, this must be true.")
                 .advancedOption(true),
             bool(VOCAB_ONLY)
                 .label("Vocab only")
@@ -155,53 +156,61 @@ public class OllamaChatAction {
                 .advancedOption(true),
             bool(USE_MMAP)
                 .label("Use MMap")
-                .description("By default, models are mapped into memory, which allows the system to load only the necessary parts of the model as needed. However, if the model is larger than your total amount of RAM or if your system is low on available memory, using mmap might increase the risk of pageouts, negatively impacting performance. Disabling mmap results in slower load times but may reduce pageouts if you’re not using mlock. Note that if the model is larger than the total amount of RAM, turning off mmap would prevent the model from loading at all.")
+                .description(
+                    "By default, models are mapped into memory, which allows the system to load only the necessary parts of the model as needed. However, if the model is larger than your total amount of RAM or if your system is low on available memory, using mmap might increase the risk of pageouts, negatively impacting performance. Disabling mmap results in slower load times but may reduce pageouts if you’re not using mlock. Note that if the model is larger than the total amount of RAM, turning off mmap would prevent the model from loading at all.")
                 .advancedOption(true),
             bool(USE_MLOCK)
                 .label("Use MLock")
-                .description("Lock the model in memory, preventing it from being swapped out when memory-mapped. This can improve performance but trades away some of the advantages of memory-mapping by requiring more RAM to run and potentially slowing down load times as the model loads into RAM.")
+                .description(
+                    "Lock the model in memory, preventing it from being swapped out when memory-mapped. This can improve performance but trades away some of the advantages of memory-mapping by requiring more RAM to run and potentially slowing down load times as the model loads into RAM.")
                 .advancedOption(true),
             integer(NUM_THREAD)
                 .label("Num thread")
-                .description("Sets the number of threads to use during computation. By default, Ollama will detect this for optimal performance. It is recommended to set this value to the number of physical CPU cores your system has (as opposed to the logical number of cores). 0 = let the runtime decide")
+                .description(
+                    "Sets the number of threads to use during computation. By default, Ollama will detect this for optimal performance. It is recommended to set this value to the number of physical CPU cores your system has (as opposed to the logical number of cores). 0 = let the runtime decide")
                 .advancedOption(true),
             integer(NUM_KEEP)
                 .label("Nul keep")
                 .advancedOption(true),
             number(TFSZ)
                 .label("Tfs Z")
-                .description("Tail-free sampling is used to reduce the impact of less probable tokens from the output. A higher value (e.g., 2.0) will reduce the impact more, while a value of 1.0 disables this setting.")
+                .description(
+                    "Tail-free sampling is used to reduce the impact of less probable tokens from the output. A higher value (e.g., 2.0) will reduce the impact more, while a value of 1.0 disables this setting.")
                 .advancedOption(true),
             number(TYPICAL_P)
                 .label("Typical P")
                 .advancedOption(true),
             integer(REPEAT_LAST_N)
                 .label("Repeat last N")
-                .description("Sets how far back for the model to look back to prevent repetition. (Default: 64, 0 = disabled, -1 = num_ctx)")
+                .description(
+                    "Sets how far back for the model to look back to prevent repetition. (Default: 64, 0 = disabled, -1 = num_ctx)")
                 .advancedOption(true),
             number(REPEAT_PENALTY)
                 .label("Repeat penalty")
-                .description("Sets how strongly to penalize repetitions. A higher value (e.g., 1.5) will penalize repetitions more strongly, while a lower value (e.g., 0.9) will be more lenient.")
+                .description(
+                    "Sets how strongly to penalize repetitions. A higher value (e.g., 1.5) will penalize repetitions more strongly, while a lower value (e.g., 0.9) will be more lenient.")
                 .advancedOption(true),
             integer(MIROSTAT)
                 .label("Mirostat")
-                .description("Enable Mirostat sampling for controlling perplexity. (default: 0, 0 = disabled, 1 = Mirostat, 2 = Mirostat 2.0)")
+                .description(
+                    "Enable Mirostat sampling for controlling perplexity. (default: 0, 0 = disabled, 1 = Mirostat, 2 = Mirostat 2.0)")
                 .advancedOption(true),
             number(MIROSTAT_TAU)
                 .label("Mirostat Tau")
-                .description("Controls the balance between coherence and diversity of the output. A lower value will result in more focused and coherent text.")
+                .description(
+                    "Controls the balance between coherence and diversity of the output. A lower value will result in more focused and coherent text.")
                 .advancedOption(true),
             number(MIROSTAT_ETA)
                 .label("Mirostat Eta")
-                .description("Influences how quickly the algorithm responds to feedback from the generated text. A lower learning rate will result in slower adjustments, while a higher learning rate will make the algorithm more responsive.")
+                .description(
+                    "Influences how quickly the algorithm responds to feedback from the generated text. A lower learning rate will result in slower adjustments, while a higher learning rate will make the algorithm more responsive.")
                 .advancedOption(true),
             bool(PENALIZE_NEW_LINE)
                 .label("Penalize new line")
                 .advancedOption(true),
             bool(TRUNCATE)
                 .label("Truncate")
-                .advancedOption(true)
-            )
+                .advancedOption(true))
         .outputSchema(string())
         .perform(OllamaChatAction::perform);
 
@@ -256,7 +265,7 @@ public class OllamaChatAction {
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
             String url = connectionParameters.getString(URL);
-            OllamaApi ollamaApi = url==null?new OllamaApi():new OllamaApi(url);
+            OllamaApi ollamaApi = url == null ? new OllamaApi() : new OllamaApi(url);
             return new OllamaChatModel(ollamaApi, (OllamaOptions) createChatOptions(inputParameters));
         }
     };

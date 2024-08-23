@@ -16,8 +16,8 @@
 
 package com.bytechef.component.minimax;
 
-import static com.bytechef.component.minimax.constant.MinimaxConstants.MINIMAX;
 import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.minimax.constant.MinimaxConstants.MINIMAX;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;

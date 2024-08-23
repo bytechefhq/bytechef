@@ -23,7 +23,6 @@ public final class QIanFanConstants {
     public static final String QIANFAN = "qianfan";
     public static final String SECRET_KEY = "secretKey";
 
-
     private QIanFanConstants() {
     }
 }

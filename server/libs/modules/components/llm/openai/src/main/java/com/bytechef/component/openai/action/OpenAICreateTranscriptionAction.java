@@ -34,11 +34,11 @@ import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.llm.util.LLMUtils;
+import com.bytechef.component.llm.util.interfaces.Transcript;
 import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
-
-import com.bytechef.component.llm.util.interfaces.Transcript;
 import org.springframework.ai.audio.transcription.AudioTranscriptionOptions;
 import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
@@ -46,7 +46,6 @@ import org.springframework.ai.model.Model;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionModel;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionOptions;
 import org.springframework.ai.openai.api.OpenAiAudioApi;
-import com.bytechef.component.llm.util.LLMUtils;
 
 /**
  * @author Monika Domiter
@@ -67,9 +66,10 @@ public class OpenAICreateTranscriptionAction {
                 .description("ID of the model to use.")
                 .required(true)
                 .options(LLMUtils.getEnumOptions(
-                        Arrays.stream(OpenAiAudioApi.WhisperModel.values())
-                            .collect(Collectors.toMap(
-                                OpenAiAudioApi.WhisperModel::getValue, OpenAiAudioApi.WhisperModel::getValue, (f,s)->f)))),
+                    Arrays.stream(OpenAiAudioApi.WhisperModel.values())
+                        .collect(Collectors.toMap(
+                            OpenAiAudioApi.WhisperModel::getValue, OpenAiAudioApi.WhisperModel::getValue,
+                            (f, s) -> f)))),
             LANGUAGE_PROPERTY,
             string(PROMPT)
                 .label("Prompt")
@@ -83,7 +83,7 @@ public class OpenAICreateTranscriptionAction {
                 .options(LLMUtils.getEnumOptions(
                     Arrays.stream(OpenAiAudioApi.TranscriptResponseFormat.values())
                         .collect(Collectors.toMap(
-                            OpenAiAudioApi.TranscriptResponseFormat::getValue, clas -> clas, (f,s)->f))))
+                            OpenAiAudioApi.TranscriptResponseFormat::getValue, clas -> clas, (f, s) -> f))))
                 .required(true),
             number(TEMPERATURE)
                 .label("Temperature")
@@ -101,7 +101,8 @@ public class OpenAICreateTranscriptionAction {
     }
 
     public static String perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws MalformedURLException {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context)
+        throws MalformedURLException {
         return Transcript.getResponse(TRANSCRIPT, inputParameters, connectionParameters);
     }
 
@@ -119,7 +120,8 @@ public class OpenAICreateTranscriptionAction {
         }
 
         @Override
-        public Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> createTranscriptionModel(Parameters inputParameters, Parameters connectionParameters) {
+        public Model<AudioTranscriptionPrompt, AudioTranscriptionResponse>
+            createTranscriptionModel(Parameters inputParameters, Parameters connectionParameters) {
             return new OpenAiAudioTranscriptionModel(new OpenAiAudioApi(connectionParameters.getString(TOKEN)),
                 (OpenAiAudioTranscriptionOptions) createTranscriptOptions(inputParameters));
         }

@@ -20,8 +20,6 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.string;
-
-import static com.bytechef.component.mistral.constant.MistralConstants.SAFE_PROMPT;
 import static com.bytechef.component.llm.constants.LLMConstants.ASK;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS_PROPERTY;
@@ -35,22 +33,21 @@ import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE;
 import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.TOP_P;
 import static com.bytechef.component.llm.constants.LLMConstants.TOP_P_PROPERTY;
+import static com.bytechef.component.mistral.constant.MistralConstants.SAFE_PROMPT;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
-
+import com.bytechef.component.llm.util.LLMUtils;
+import com.bytechef.component.llm.util.interfaces.Chat;
 import java.util.Arrays;
 import java.util.stream.Collectors;
-
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.mistralai.MistralAiChatModel;
 import org.springframework.ai.mistralai.MistralAiChatOptions;
 import org.springframework.ai.mistralai.api.MistralAiApi;
-import com.bytechef.component.llm.util.LLMUtils;
-import com.bytechef.component.llm.util.interfaces.Chat;
 
 public class MistralChatAction {
 
@@ -65,7 +62,7 @@ public class MistralChatAction {
                 .options(LLMUtils.getEnumOptions(
                     Arrays.stream(MistralAiApi.ChatModel.values())
                         .collect(Collectors.toMap(
-                            MistralAiApi.ChatModel::getValue, MistralAiApi.ChatModel::getValue, (f,s)->f)))),
+                            MistralAiApi.ChatModel::getValue, MistralAiApi.ChatModel::getValue, (f, s) -> f)))),
             MESSAGE_PROPERTY,
             MAX_TOKENS_PROPERTY,
             TEMPERATURE_PROPERTY,
@@ -104,7 +101,8 @@ public class MistralChatAction {
 
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new MistralAiChatModel(new MistralAiApi(connectionParameters.getString(TOKEN)), (MistralAiChatOptions) createChatOptions(inputParameters));
+            return new MistralAiChatModel(new MistralAiApi(connectionParameters.getString(TOKEN)),
+                (MistralAiChatOptions) createChatOptions(inputParameters));
         }
     };
 }

@@ -16,7 +16,6 @@
 
 package com.bytechef.component.stability;
 
-import com.bytechef.component.stability.StabilityComponentHandler;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 

@@ -16,22 +16,6 @@
 
 package com.bytechef.component.zhipu.action;
 
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
-import org.springframework.ai.image.ImageModel;
-import org.springframework.ai.image.ImageOptions;
-import org.springframework.ai.zhipuai.ZhiPuAiImageModel;
-import org.springframework.ai.zhipuai.ZhiPuAiImageOptions;
-import org.springframework.ai.zhipuai.api.ZhiPuAiImageApi;
-import org.springframework.retry.support.RetryTemplate;
-import com.bytechef.component.llm.util.LLMUtils;
-import com.bytechef.component.llm.util.interfaces.Image;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
@@ -43,6 +27,21 @@ import static com.bytechef.component.llm.constants.LLMConstants.IMAGE_MESSAGE_PR
 import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
 import static com.bytechef.component.llm.constants.LLMConstants.USER;
 import static com.bytechef.component.llm.constants.LLMConstants.USER_PROPERTY;
+
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
+import com.bytechef.component.llm.util.LLMUtils;
+import com.bytechef.component.llm.util.interfaces.Image;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+import org.springframework.ai.image.ImageModel;
+import org.springframework.ai.image.ImageOptions;
+import org.springframework.ai.zhipuai.ZhiPuAiImageModel;
+import org.springframework.ai.zhipuai.ZhiPuAiImageOptions;
+import org.springframework.ai.zhipuai.api.ZhiPuAiImageApi;
+import org.springframework.retry.support.RetryTemplate;
 
 /**
  * @author Monika Domiter
@@ -59,7 +58,7 @@ public class ZhiPuCreateImageAction {
                 .options(LLMUtils.getEnumOptions(
                     Arrays.stream(ZhiPuAiImageApi.ImageModel.values())
                         .collect(Collectors.toMap(
-                            ZhiPuAiImageApi.ImageModel::getValue, ZhiPuAiImageApi.ImageModel::getValue, (f,s)->f))))
+                            ZhiPuAiImageApi.ImageModel::getValue, ZhiPuAiImageApi.ImageModel::getValue, (f, s) -> f))))
                 .required(true),
             IMAGE_MESSAGE_PROPERTY,
             USER_PROPERTY)

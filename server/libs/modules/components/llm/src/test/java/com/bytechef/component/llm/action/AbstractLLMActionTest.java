@@ -16,13 +16,13 @@
 
 package com.bytechef.component.llm.action;
 
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Parameters;
-import org.junit.jupiter.api.BeforeEach;
-
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Parameters;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * @author Monika Domiter

@@ -16,23 +16,6 @@
 
 package com.bytechef.component.amazon.bedrock.action;
 
-import com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants;
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Parameters;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.ai.bedrock.llama.BedrockLlamaChatModel;
-import org.springframework.ai.bedrock.llama.BedrockLlamaChatOptions;
-import org.springframework.ai.bedrock.llama.api.LlamaChatBedrockApi;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.prompt.ChatOptions;
-import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
-import com.bytechef.component.llm.util.LLMUtils;
-import com.bytechef.component.llm.util.interfaces.Chat;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
@@ -43,6 +26,22 @@ import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE;
 import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.TOP_P;
 import static com.bytechef.component.llm.constants.LLMConstants.TOP_P_PROPERTY;
+
+import com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.llm.util.LLMUtils;
+import com.bytechef.component.llm.util.interfaces.Chat;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+import org.springframework.ai.bedrock.llama.BedrockLlamaChatModel;
+import org.springframework.ai.bedrock.llama.BedrockLlamaChatOptions;
+import org.springframework.ai.bedrock.llama.api.LlamaChatBedrockApi;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.prompt.ChatOptions;
+import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
 
 public class AmazonBedrockLlamaChatAction {
 
@@ -57,7 +56,8 @@ public class AmazonBedrockLlamaChatAction {
                 .options(LLMUtils.getEnumOptions(
                     Arrays.stream(LlamaChatBedrockApi.LlamaChatModel.values())
                         .collect(Collectors.toMap(
-                            LlamaChatBedrockApi.LlamaChatModel::getName, LlamaChatBedrockApi.LlamaChatModel::getName, (f,s)->f)))),
+                            LlamaChatBedrockApi.LlamaChatModel::getName, LlamaChatBedrockApi.LlamaChatModel::getName,
+                            (f, s) -> f)))),
             MESSAGE_PROPERTY,
             MAX_TOKENS_PROPERTY,
             TEMPERATURE_PROPERTY,
@@ -86,7 +86,8 @@ public class AmazonBedrockLlamaChatAction {
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
             return new BedrockLlamaChatModel(new LlamaChatBedrockApi(inputParameters.getRequiredString(MODEL),
-                EnvironmentVariableCredentialsProvider.create(), connectionParameters.getRequiredString(AmazonBedrockConstants.REGION), new ObjectMapper()),
+                EnvironmentVariableCredentialsProvider.create(),
+                connectionParameters.getRequiredString(AmazonBedrockConstants.REGION), new ObjectMapper()),
                 (BedrockLlamaChatOptions) createChatOptions(inputParameters));
         }
     };

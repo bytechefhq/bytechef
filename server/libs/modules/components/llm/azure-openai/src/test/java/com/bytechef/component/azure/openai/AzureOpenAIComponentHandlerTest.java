@@ -16,7 +16,6 @@
 
 package com.bytechef.component.azure.openai;
 
-import com.bytechef.component.azure.openai.AzureOpenAIComponentHandler;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
@@ -27,6 +26,7 @@ public class AzureOpenAIComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/azure-openai_v1.json", new AzureOpenAIComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/azure-openai_v1.json",
+            new AzureOpenAIComponentHandler().getDefinition());
     }
 }

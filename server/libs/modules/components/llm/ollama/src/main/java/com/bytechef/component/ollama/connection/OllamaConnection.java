@@ -16,11 +16,11 @@
 
 package com.bytechef.component.ollama.connection;
 
-import static com.bytechef.component.ollama.constant.OllamaConstants.URL;
 import static com.bytechef.component.definition.Authorization.AuthorizationType.BEARER_TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.connection;
 import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.ollama.constant.OllamaConstants.URL;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 

@@ -16,18 +16,11 @@
 
 package com.bytechef.component.anthropic.constant;
 
-import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.number;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.string;
-
 /**
  * @author Monika Domiter
  */
 public final class AnthropicConstants {
     public static final String ANTHROPIC = "anthropic";
-
 
     private AnthropicConstants() {
     }

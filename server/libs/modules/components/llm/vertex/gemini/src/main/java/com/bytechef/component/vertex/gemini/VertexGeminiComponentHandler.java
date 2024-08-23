@@ -16,8 +16,8 @@
 
 package com.bytechef.component.vertex.gemini;
 
-import static com.bytechef.component.vertex.gemini.constant.VertexGeminiConstants.VERTEX_GEMINI;
 import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.vertex.gemini.constant.VertexGeminiConstants.VERTEX_GEMINI;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;

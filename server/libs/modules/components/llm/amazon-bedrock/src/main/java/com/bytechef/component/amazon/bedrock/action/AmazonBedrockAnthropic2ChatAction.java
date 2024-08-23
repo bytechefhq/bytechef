@@ -16,24 +16,6 @@
 
 package com.bytechef.component.amazon.bedrock.action;
 
-import com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants;
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context.TypeReference;
-import com.bytechef.component.definition.Parameters;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.ai.bedrock.anthropic.AnthropicChatOptions;
-import org.springframework.ai.bedrock.anthropic.BedrockAnthropicChatModel;
-import org.springframework.ai.bedrock.anthropic.api.AnthropicChatBedrockApi;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.prompt.ChatOptions;
-import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
-import com.bytechef.component.llm.util.LLMUtils;
-import com.bytechef.component.llm.util.interfaces.Chat;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
@@ -49,6 +31,23 @@ import static com.bytechef.component.llm.constants.LLMConstants.TOP_K_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.TOP_P;
 import static com.bytechef.component.llm.constants.LLMConstants.TOP_P_PROPERTY;
 
+import com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.llm.util.LLMUtils;
+import com.bytechef.component.llm.util.interfaces.Chat;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+import org.springframework.ai.bedrock.anthropic.AnthropicChatOptions;
+import org.springframework.ai.bedrock.anthropic.BedrockAnthropicChatModel;
+import org.springframework.ai.bedrock.anthropic.api.AnthropicChatBedrockApi;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.prompt.ChatOptions;
+import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
+
 public class AmazonBedrockAnthropic2ChatAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(AmazonBedrockConstants.ASK_ANTHROPIC2)
@@ -62,7 +61,8 @@ public class AmazonBedrockAnthropic2ChatAction {
                 .options(LLMUtils.getEnumOptions(
                     Arrays.stream(AnthropicChatBedrockApi.AnthropicChatModel.values())
                         .collect(Collectors.toMap(
-                            AnthropicChatBedrockApi.AnthropicChatModel::getName, AnthropicChatBedrockApi.AnthropicChatModel::getName, (f,s)->f)))),
+                            AnthropicChatBedrockApi.AnthropicChatModel::getName,
+                            AnthropicChatBedrockApi.AnthropicChatModel::getName, (f, s) -> f)))),
             MESSAGE_PROPERTY,
             MAX_TOKENS_PROPERTY,
             TEMPERATURE_PROPERTY,
@@ -95,7 +95,8 @@ public class AmazonBedrockAnthropic2ChatAction {
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
             return new BedrockAnthropicChatModel(new AnthropicChatBedrockApi(inputParameters.getRequiredString(MODEL),
-                EnvironmentVariableCredentialsProvider.create(), connectionParameters.getRequiredString(AmazonBedrockConstants.REGION), new ObjectMapper()),
+                EnvironmentVariableCredentialsProvider.create(),
+                connectionParameters.getRequiredString(AmazonBedrockConstants.REGION), new ObjectMapper()),
                 (AnthropicChatOptions) createChatOptions(inputParameters));
         }
     };
