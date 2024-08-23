@@ -8,7 +8,7 @@ description: "Google Docs is a cloud-based collaborative word processing platfor
 Google Docs is a cloud-based collaborative word processing platform that allows multiple users to create, edit, and share documents in real-time.
 
 
-Categories: [FILE_STORAGE]
+Categories: [file-storage]
 
 
 Version: 1

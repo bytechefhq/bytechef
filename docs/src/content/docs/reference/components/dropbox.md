@@ -8,7 +8,7 @@ description: "Dropbox is a file hosting service that offers cloud storage, file 
 Dropbox is a file hosting service that offers cloud storage, file synchronization, personal cloud, and client software.
 
 
-Categories: [FILE_STORAGE]
+Categories: [file-storage]
 
 
 Version: 1

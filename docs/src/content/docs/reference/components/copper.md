@@ -8,7 +8,7 @@ description: "Copper is a customer relationship management (CRM) software design
 Copper is a customer relationship management (CRM) software designed to streamline and optimize sales processes, providing tools for managing contact, leads, opportunities, and communications in one centralized platform.
 
 
-Categories: [CRM]
+Categories: [crm]
 
 
 Version: 1

@@ -8,7 +8,7 @@ description: "Google Mail, commonly known as Gmail, is a widely used email servi
 Google Mail, commonly known as Gmail, is a widely used email service by Google, offering free and feature-rich communication, organization, and storage capabilities accessible through web browsers and mobile apps.
 
 
-Categories: [COMMUNICATION]
+Categories: [communication]
 
 
 Version: 1

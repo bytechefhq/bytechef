@@ -8,7 +8,7 @@ description: "Accelo is a cloud-based platform designed to streamline operations
 Accelo is a cloud-based platform designed to streamline operations for service businesses by integrating project management, CRM, and billing functionalities into one unified system.
 
 
-Categories: [CRM, PROJECT_MANAGEMENT]
+Categories: [crm, project-management]
 
 
 Version: 1

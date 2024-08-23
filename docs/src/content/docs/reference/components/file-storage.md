@@ -8,7 +8,7 @@ description: "Reads and writes data from a file stored inside the file storage."
 Reads and writes data from a file stored inside the file storage.
 
 
-Categories: [FILE_STORAGE, HELPERS]
+Categories: [file-storage, helpers]
 
 
 Version: 1

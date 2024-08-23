@@ -8,7 +8,7 @@ description: "Converts between XML string and object/array."
 Converts between XML string and object/array.
 
 
-Categories: [HELPERS]
+Categories: [helpers]
 
 
 Version: 1

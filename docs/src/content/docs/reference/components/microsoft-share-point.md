@@ -8,7 +8,7 @@ description: "Microsoft SharePoint is a web-based collaborative platform that in
 Microsoft SharePoint is a web-based collaborative platform that integrates with Microsoft Office, providing document management, intranet, and content management features for organizations.
 
 
-Categories: [FILE_STORAGE, COMMUNICATION]
+Categories: [file-storage, communication]
 
 
 Version: 1

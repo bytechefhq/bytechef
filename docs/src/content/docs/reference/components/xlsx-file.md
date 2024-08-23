@@ -8,7 +8,7 @@ description: "Reads and writes data from a XLS/XLSX file."
 Reads and writes data from a XLS/XLSX file.
 
 
-Categories: [HELPERS]
+Categories: [helpers]
 
 
 Version: 1

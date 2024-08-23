@@ -8,7 +8,7 @@ description: "Allows multiple operations over files on the filesystem."
 Allows multiple operations over files on the filesystem.
 
 
-Categories: [HELPERS]
+Categories: [helpers]
 
 
 Version: 1

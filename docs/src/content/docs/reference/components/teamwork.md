@@ -8,7 +8,7 @@ description: "Teamwork is a project management software that helps teams collabo
 Teamwork is a project management software that helps teams collaborate, organize tasks, and track progress efficiently.
 
 
-Categories: [CRM, PROJECT_MANAGEMENT]
+Categories: [crm, project-management]
 
 
 Version: 1
