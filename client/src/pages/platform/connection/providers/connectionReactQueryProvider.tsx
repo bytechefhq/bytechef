@@ -1,6 +1,32 @@
-import {ConnectionModel, TagModel} from '@/shared/middleware/platform/connection';
+import {TagModel} from '@/shared/middleware/platform/connection';
 import {UseMutationResult, UseQueryResult} from '@tanstack/react-query';
 import {createContext, useContext} from 'react';
+
+import type {ConnectionEnvironmentModel, CredentialStatusModel} from '@/shared/middleware/automation/connection';
+
+export interface ConnectionModelI {
+    readonly active?: boolean;
+    authorizationName?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    readonly authorizationParameters?: {[key: string]: any};
+    componentName: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    readonly connectionParameters?: {[key: string]: any};
+    connectionVersion?: number;
+    readonly createdBy?: string;
+    readonly createdDate?: Date;
+    credentialStatus?: CredentialStatusModel;
+    environment?: ConnectionEnvironmentModel;
+    readonly id?: number;
+    readonly lastModifiedBy?: string;
+    readonly lastModifiedDate?: Date;
+    name: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    parameters: {[key: string]: any};
+    tags?: Array<TagModel>;
+    version?: number;
+    workspaceId?: number;
+}
 
 export interface RequestI {
     componentName?: string;
@@ -16,17 +42,17 @@ export interface ConnectionKeysI {
 }
 
 export interface CreateConnectionMutationProps {
-    onSuccess?: (result: ConnectionModel, variables: ConnectionModel) => void;
-    onError?: (error: Error, variables: ConnectionModel) => void;
+    onSuccess?: (result: ConnectionModelI, variables: ConnectionModelI) => void;
+    onError?: (error: Error, variables: ConnectionModelI) => void;
 }
 
 export interface ConnectionQueryStateI {
     ConnectionKeys: ConnectionKeysI;
     useCreateConnectionMutation: (
         props?: CreateConnectionMutationProps
-    ) => UseMutationResult<ConnectionModel, Error, ConnectionModel, unknown>;
+    ) => UseMutationResult<ConnectionModelI, Error, ConnectionModelI, unknown>;
     useGetConnectionTagsQuery: () => UseQueryResult<TagModel[], Error>;
-    useGetConnectionsQuery: (request: RequestI, enabled?: boolean) => UseQueryResult<ConnectionModel[], Error>;
+    useGetConnectionsQuery: (request: RequestI, enabled?: boolean) => UseQueryResult<ConnectionModelI[], Error>;
 }
 
 interface ConnectionReactQueryProviderProps {

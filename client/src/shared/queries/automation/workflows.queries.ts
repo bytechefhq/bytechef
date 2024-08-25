@@ -1,5 +1,4 @@
-import {WorkflowApi} from '@/shared/middleware/automation/configuration';
-import {WorkflowModel} from '@/shared/middleware/platform/configuration';
+import {WorkflowApi, WorkflowModel} from '@/shared/middleware/automation/configuration';
 
 /* eslint-disable sort-keys */
 import {useQuery} from '@tanstack/react-query';
