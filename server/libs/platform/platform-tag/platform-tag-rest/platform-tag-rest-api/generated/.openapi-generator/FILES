@@ -1,0 +1,5 @@
+README.md
+pom.xml
+src/main/java/com/bytechef/platform/tag/web/rest/ApiUtil.java
+src/main/java/com/bytechef/platform/tag/web/rest/model/TagModel.java
+src/main/java/com/bytechef/platform/tag/web/rest/model/UpdateTagsRequestModel.java

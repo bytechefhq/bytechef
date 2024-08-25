@@ -10,7 +10,6 @@ src/main/java/com/bytechef/embedded/configuration/web/rest/IntegrationInstanceCo
 src/main/java/com/bytechef/embedded/configuration/web/rest/IntegrationTagApi.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/WorkflowApi.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/AppEventModel.java
-src/main/java/com/bytechef/embedded/configuration/web/rest/model/CategoryModel.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/CreateIntegrationInstanceConfigurationWorkflowJob200ResponseModel.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/EnvironmentModel.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/IntegrationBasicModel.java
@@ -25,8 +24,6 @@ src/main/java/com/bytechef/embedded/configuration/web/rest/model/IntegrationMode
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/IntegrationStatusModel.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/IntegrationVersionModel.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/PublishIntegrationRequestModel.java
-src/main/java/com/bytechef/embedded/configuration/web/rest/model/TagModel.java
-src/main/java/com/bytechef/embedded/configuration/web/rest/model/UpdateTagsRequestModel.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/Workflow1Model.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/WorkflowBasic1Model.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/WorkflowBasicModel.java

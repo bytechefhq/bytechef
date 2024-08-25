@@ -1,8 +1,10 @@
-package com.bytechef.automation.connection.web.rest.model;
+package com.bytechef.embedded.connection.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.platform.connection.web.rest.model.TagModel;
+import com.bytechef.embedded.connection.web.rest.model.ConnectionEnvironmentModel;
+import com.bytechef.embedded.connection.web.rest.model.CredentialStatusModel;
+import com.bytechef.platform.tag.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -28,10 +30,10 @@ import jakarta.annotation.Generated;
  * Contains all required information to open a connection to a service defined by componentName parameter.
  */
 
-@Schema(name = "Connection_1", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
-@JsonTypeName("Connection_1")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-09T17:58:10.189796+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
-public class Connection1Model {
+@Schema(name = "Connection", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
+@JsonTypeName("Connection")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:40.020411+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+public class ConnectionModel {
 
   private Boolean active;
 
@@ -52,9 +54,9 @@ public class Connection1Model {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime createdDate;
 
-  private com.bytechef.platform.connection.web.rest.model.CredentialStatusModel credentialStatus;
+  private CredentialStatusModel credentialStatus;
 
-  private com.bytechef.platform.connection.web.rest.model.ConnectionEnvironmentModel environment;
+  private ConnectionEnvironmentModel environment;
 
   private Long id;
 
@@ -73,20 +75,20 @@ public class Connection1Model {
 
   private Integer version;
 
-  public Connection1Model() {
+  public ConnectionModel() {
     super();
   }
 
   /**
    * Constructor with only required parameters
    */
-  public Connection1Model(String componentName, String name, Map<String, Object> parameters) {
+  public ConnectionModel(String componentName, String name, Map<String, Object> parameters) {
     this.componentName = componentName;
     this.name = name;
     this.parameters = parameters;
   }
 
-  public Connection1Model active(Boolean active) {
+  public ConnectionModel active(Boolean active) {
     this.active = active;
     return this;
   }
@@ -106,7 +108,7 @@ public class Connection1Model {
     this.active = active;
   }
 
-  public Connection1Model authorizationName(String authorizationName) {
+  public ConnectionModel authorizationName(String authorizationName) {
     this.authorizationName = authorizationName;
     return this;
   }
@@ -126,12 +128,12 @@ public class Connection1Model {
     this.authorizationName = authorizationName;
   }
 
-  public Connection1Model authorizationParameters(Map<String, Object> authorizationParameters) {
+  public ConnectionModel authorizationParameters(Map<String, Object> authorizationParameters) {
     this.authorizationParameters = authorizationParameters;
     return this;
   }
 
-  public Connection1Model putAuthorizationParametersItem(String key, Object authorizationParametersItem) {
+  public ConnectionModel putAuthorizationParametersItem(String key, Object authorizationParametersItem) {
     if (this.authorizationParameters == null) {
       this.authorizationParameters = new HashMap<>();
     }
@@ -154,7 +156,7 @@ public class Connection1Model {
     this.authorizationParameters = authorizationParameters;
   }
 
-  public Connection1Model componentName(String componentName) {
+  public ConnectionModel componentName(String componentName) {
     this.componentName = componentName;
     return this;
   }
@@ -174,12 +176,12 @@ public class Connection1Model {
     this.componentName = componentName;
   }
 
-  public Connection1Model connectionParameters(Map<String, Object> connectionParameters) {
+  public ConnectionModel connectionParameters(Map<String, Object> connectionParameters) {
     this.connectionParameters = connectionParameters;
     return this;
   }
 
-  public Connection1Model putConnectionParametersItem(String key, Object connectionParametersItem) {
+  public ConnectionModel putConnectionParametersItem(String key, Object connectionParametersItem) {
     if (this.connectionParameters == null) {
       this.connectionParameters = new HashMap<>();
     }
@@ -202,7 +204,7 @@ public class Connection1Model {
     this.connectionParameters = connectionParameters;
   }
 
-  public Connection1Model connectionVersion(Integer connectionVersion) {
+  public ConnectionModel connectionVersion(Integer connectionVersion) {
     this.connectionVersion = connectionVersion;
     return this;
   }
@@ -222,7 +224,7 @@ public class Connection1Model {
     this.connectionVersion = connectionVersion;
   }
 
-  public Connection1Model createdBy(String createdBy) {
+  public ConnectionModel createdBy(String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -242,7 +244,7 @@ public class Connection1Model {
     this.createdBy = createdBy;
   }
 
-  public Connection1Model createdDate(LocalDateTime createdDate) {
+  public ConnectionModel createdDate(LocalDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -262,7 +264,7 @@ public class Connection1Model {
     this.createdDate = createdDate;
   }
 
-  public Connection1Model credentialStatus(com.bytechef.platform.connection.web.rest.model.CredentialStatusModel credentialStatus) {
+  public ConnectionModel credentialStatus(CredentialStatusModel credentialStatus) {
     this.credentialStatus = credentialStatus;
     return this;
   }
@@ -274,15 +276,15 @@ public class Connection1Model {
   @Valid 
   @Schema(name = "credentialStatus", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("credentialStatus")
-  public com.bytechef.platform.connection.web.rest.model.CredentialStatusModel getCredentialStatus() {
+  public CredentialStatusModel getCredentialStatus() {
     return credentialStatus;
   }
 
-  public void setCredentialStatus(com.bytechef.platform.connection.web.rest.model.CredentialStatusModel credentialStatus) {
+  public void setCredentialStatus(CredentialStatusModel credentialStatus) {
     this.credentialStatus = credentialStatus;
   }
 
-  public Connection1Model environment(com.bytechef.platform.connection.web.rest.model.ConnectionEnvironmentModel environment) {
+  public ConnectionModel environment(ConnectionEnvironmentModel environment) {
     this.environment = environment;
     return this;
   }
@@ -294,15 +296,15 @@ public class Connection1Model {
   @Valid 
   @Schema(name = "environment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("environment")
-  public com.bytechef.platform.connection.web.rest.model.ConnectionEnvironmentModel getEnvironment() {
+  public ConnectionEnvironmentModel getEnvironment() {
     return environment;
   }
 
-  public void setEnvironment(com.bytechef.platform.connection.web.rest.model.ConnectionEnvironmentModel environment) {
+  public void setEnvironment(ConnectionEnvironmentModel environment) {
     this.environment = environment;
   }
 
-  public Connection1Model id(Long id) {
+  public ConnectionModel id(Long id) {
     this.id = id;
     return this;
   }
@@ -322,7 +324,7 @@ public class Connection1Model {
     this.id = id;
   }
 
-  public Connection1Model lastModifiedBy(String lastModifiedBy) {
+  public ConnectionModel lastModifiedBy(String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -342,7 +344,7 @@ public class Connection1Model {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public Connection1Model lastModifiedDate(LocalDateTime lastModifiedDate) {
+  public ConnectionModel lastModifiedDate(LocalDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -362,7 +364,7 @@ public class Connection1Model {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public Connection1Model name(String name) {
+  public ConnectionModel name(String name) {
     this.name = name;
     return this;
   }
@@ -382,12 +384,12 @@ public class Connection1Model {
     this.name = name;
   }
 
-  public Connection1Model parameters(Map<String, Object> parameters) {
+  public ConnectionModel parameters(Map<String, Object> parameters) {
     this.parameters = parameters;
     return this;
   }
 
-  public Connection1Model putParametersItem(String key, Object parametersItem) {
+  public ConnectionModel putParametersItem(String key, Object parametersItem) {
     if (this.parameters == null) {
       this.parameters = new HashMap<>();
     }
@@ -410,12 +412,12 @@ public class Connection1Model {
     this.parameters = parameters;
   }
 
-  public Connection1Model tags(List<@Valid TagModel> tags) {
+  public ConnectionModel tags(List<@Valid TagModel> tags) {
     this.tags = tags;
     return this;
   }
 
-  public Connection1Model addTagsItem(TagModel tagsItem) {
+  public ConnectionModel addTagsItem(TagModel tagsItem) {
     if (this.tags == null) {
       this.tags = new ArrayList<>();
     }
@@ -438,7 +440,7 @@ public class Connection1Model {
     this.tags = tags;
   }
 
-  public Connection1Model version(Integer version) {
+  public ConnectionModel version(Integer version) {
     this.version = version;
     return this;
   }
@@ -466,24 +468,24 @@ public class Connection1Model {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Connection1Model connection1 = (Connection1Model) o;
-    return Objects.equals(this.active, connection1.active) &&
-        Objects.equals(this.authorizationName, connection1.authorizationName) &&
-        Objects.equals(this.authorizationParameters, connection1.authorizationParameters) &&
-        Objects.equals(this.componentName, connection1.componentName) &&
-        Objects.equals(this.connectionParameters, connection1.connectionParameters) &&
-        Objects.equals(this.connectionVersion, connection1.connectionVersion) &&
-        Objects.equals(this.createdBy, connection1.createdBy) &&
-        Objects.equals(this.createdDate, connection1.createdDate) &&
-        Objects.equals(this.credentialStatus, connection1.credentialStatus) &&
-        Objects.equals(this.environment, connection1.environment) &&
-        Objects.equals(this.id, connection1.id) &&
-        Objects.equals(this.lastModifiedBy, connection1.lastModifiedBy) &&
-        Objects.equals(this.lastModifiedDate, connection1.lastModifiedDate) &&
-        Objects.equals(this.name, connection1.name) &&
-        Objects.equals(this.parameters, connection1.parameters) &&
-        Objects.equals(this.tags, connection1.tags) &&
-        Objects.equals(this.version, connection1.version);
+    ConnectionModel connection = (ConnectionModel) o;
+    return Objects.equals(this.active, connection.active) &&
+        Objects.equals(this.authorizationName, connection.authorizationName) &&
+        Objects.equals(this.authorizationParameters, connection.authorizationParameters) &&
+        Objects.equals(this.componentName, connection.componentName) &&
+        Objects.equals(this.connectionParameters, connection.connectionParameters) &&
+        Objects.equals(this.connectionVersion, connection.connectionVersion) &&
+        Objects.equals(this.createdBy, connection.createdBy) &&
+        Objects.equals(this.createdDate, connection.createdDate) &&
+        Objects.equals(this.credentialStatus, connection.credentialStatus) &&
+        Objects.equals(this.environment, connection.environment) &&
+        Objects.equals(this.id, connection.id) &&
+        Objects.equals(this.lastModifiedBy, connection.lastModifiedBy) &&
+        Objects.equals(this.lastModifiedDate, connection.lastModifiedDate) &&
+        Objects.equals(this.name, connection.name) &&
+        Objects.equals(this.parameters, connection.parameters) &&
+        Objects.equals(this.tags, connection.tags) &&
+        Objects.equals(this.version, connection.version);
   }
 
   @Override
@@ -494,7 +496,7 @@ public class Connection1Model {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class Connection1Model {\n");
+    sb.append("class ConnectionModel {\n");
     sb.append("    active: ").append(toIndentedString(active)).append("\n");
     sb.append("    authorizationName: ").append(toIndentedString(authorizationName)).append("\n");
     sb.append("    authorizationParameters: ").append(toIndentedString(authorizationParameters)).append("\n");

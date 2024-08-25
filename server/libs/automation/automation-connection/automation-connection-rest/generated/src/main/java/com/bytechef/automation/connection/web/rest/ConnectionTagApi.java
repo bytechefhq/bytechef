@@ -5,7 +5,7 @@
  */
 package com.bytechef.automation.connection.web.rest;
 
-import com.bytechef.platform.connection.web.rest.model.TagModel;
+import com.bytechef.platform.tag.web.rest.model.TagModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-09T17:58:10.189796+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:39.811895+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 @Validated
 @Tag(name = "connection-tag", description = "The Automation Connection Tag Internal API")
 public interface ConnectionTagApi {
@@ -86,7 +86,7 @@ public interface ConnectionTagApi {
      * Updates tags of an existing connection.
      *
      * @param id The id of the connection. (required)
-     * @param comBytechefPlatformConnectionWebRestModelUpdateTagsRequestModel  (required)
+     * @param comBytechefPlatformTagWebRestModelUpdateTagsRequestModel  (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -106,7 +106,7 @@ public interface ConnectionTagApi {
     
     default ResponseEntity<Void> updateConnectionTags(
         @Parameter(name = "id", description = "The id of the connection.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "com.bytechef.platform.connection.web.rest.model.UpdateTagsRequestModel", description = "", required = true) @Valid @RequestBody com.bytechef.platform.connection.web.rest.model.UpdateTagsRequestModel comBytechefPlatformConnectionWebRestModelUpdateTagsRequestModel
+        @Parameter(name = "com.bytechef.platform.tag.web.rest.model.UpdateTagsRequestModel", description = "", required = true) @Valid @RequestBody com.bytechef.platform.tag.web.rest.model.UpdateTagsRequestModel comBytechefPlatformTagWebRestModelUpdateTagsRequestModel
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 

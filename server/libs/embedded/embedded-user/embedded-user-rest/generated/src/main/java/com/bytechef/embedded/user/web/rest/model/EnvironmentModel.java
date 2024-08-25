@@ -1,4 +1,4 @@
-package com.bytechef.embedded.workflow.execution.web.rest.model;
+package com.bytechef.embedded.user.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -17,11 +17,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * The environment of an integration.
+ * The environment of a project.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-13T09:30:20.286039+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
-public enum Environment1Model {
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:40.125623+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+public enum EnvironmentModel {
   
   TEST("TEST"),
   
@@ -29,7 +29,7 @@ public enum Environment1Model {
 
   private String value;
 
-  Environment1Model(String value) {
+  EnvironmentModel(String value) {
     this.value = value;
   }
 
@@ -44,8 +44,8 @@ public enum Environment1Model {
   }
 
   @JsonCreator
-  public static Environment1Model fromValue(String value) {
-    for (Environment1Model b : Environment1Model.values()) {
+  public static EnvironmentModel fromValue(String value) {
+    for (EnvironmentModel b : EnvironmentModel.values()) {
       if (b.value.equals(value)) {
         return b;
       }

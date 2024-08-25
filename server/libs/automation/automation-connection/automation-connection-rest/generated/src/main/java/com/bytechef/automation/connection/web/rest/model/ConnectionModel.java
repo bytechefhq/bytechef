@@ -2,7 +2,9 @@ package com.bytechef.automation.connection.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.platform.connection.web.rest.model.TagModel;
+import com.bytechef.automation.connection.web.rest.model.ConnectionEnvironmentModel;
+import com.bytechef.automation.connection.web.rest.model.CredentialStatusModel;
+import com.bytechef.platform.tag.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -30,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-09T17:58:10.189796+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:39.811895+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class ConnectionModel {
 
   private Boolean active;
@@ -52,9 +54,9 @@ public class ConnectionModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime createdDate;
 
-  private com.bytechef.platform.connection.web.rest.model.CredentialStatusModel credentialStatus;
+  private CredentialStatusModel credentialStatus;
 
-  private com.bytechef.platform.connection.web.rest.model.ConnectionEnvironmentModel environment;
+  private ConnectionEnvironmentModel environment;
 
   private Long id;
 
@@ -264,7 +266,7 @@ public class ConnectionModel {
     this.createdDate = createdDate;
   }
 
-  public ConnectionModel credentialStatus(com.bytechef.platform.connection.web.rest.model.CredentialStatusModel credentialStatus) {
+  public ConnectionModel credentialStatus(CredentialStatusModel credentialStatus) {
     this.credentialStatus = credentialStatus;
     return this;
   }
@@ -276,15 +278,15 @@ public class ConnectionModel {
   @Valid 
   @Schema(name = "credentialStatus", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("credentialStatus")
-  public com.bytechef.platform.connection.web.rest.model.CredentialStatusModel getCredentialStatus() {
+  public CredentialStatusModel getCredentialStatus() {
     return credentialStatus;
   }
 
-  public void setCredentialStatus(com.bytechef.platform.connection.web.rest.model.CredentialStatusModel credentialStatus) {
+  public void setCredentialStatus(CredentialStatusModel credentialStatus) {
     this.credentialStatus = credentialStatus;
   }
 
-  public ConnectionModel environment(com.bytechef.platform.connection.web.rest.model.ConnectionEnvironmentModel environment) {
+  public ConnectionModel environment(ConnectionEnvironmentModel environment) {
     this.environment = environment;
     return this;
   }
@@ -296,11 +298,11 @@ public class ConnectionModel {
   @Valid 
   @Schema(name = "environment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("environment")
-  public com.bytechef.platform.connection.web.rest.model.ConnectionEnvironmentModel getEnvironment() {
+  public ConnectionEnvironmentModel getEnvironment() {
     return environment;
   }
 
-  public void setEnvironment(com.bytechef.platform.connection.web.rest.model.ConnectionEnvironmentModel environment) {
+  public void setEnvironment(ConnectionEnvironmentModel environment) {
     this.environment = environment;
   }
 

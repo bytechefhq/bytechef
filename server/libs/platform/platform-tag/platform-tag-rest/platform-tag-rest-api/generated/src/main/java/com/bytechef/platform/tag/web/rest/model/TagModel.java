@@ -1,4 +1,4 @@
-package com.bytechef.platform.connection.web.rest.model;
+package com.bytechef.platform.tag.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Tag", description = "A tag.")
 @JsonTypeName("Tag")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-13T09:30:21.594518+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:42.031261+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class TagModel {
 
   private String createdBy;

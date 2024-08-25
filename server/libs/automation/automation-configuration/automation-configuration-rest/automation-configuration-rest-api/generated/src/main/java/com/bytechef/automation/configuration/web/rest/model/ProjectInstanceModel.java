@@ -4,7 +4,7 @@ import java.net.URI;
 import java.util.Objects;
 import com.bytechef.automation.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.automation.configuration.web.rest.model.ProjectInstanceWorkflowModel;
-import com.bytechef.automation.configuration.web.rest.model.TagModel;
+import com.bytechef.platform.tag.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -30,7 +30,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstance", description = "Contains configurations and connections required for the execution of project workflows.")
 @JsonTypeName("ProjectInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-10T22:10:52.891162+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:40.306014+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class ProjectInstanceModel {
 
   private String createdBy;

@@ -1,10 +1,10 @@
-package com.bytechef.platform.connection.web.rest.model;
+package com.bytechef.embedded.connection.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.platform.connection.web.rest.model.ConnectionEnvironmentModel;
-import com.bytechef.platform.connection.web.rest.model.CredentialStatusModel;
-import com.bytechef.platform.connection.web.rest.model.TagModel;
+import com.bytechef.embedded.connection.web.rest.model.ConnectionEnvironmentModel;
+import com.bytechef.embedded.connection.web.rest.model.CredentialStatusModel;
+import com.bytechef.platform.tag.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -30,10 +30,10 @@ import jakarta.annotation.Generated;
  * Contains all required information to open a connection to a service defined by componentName parameter.
  */
 
-@Schema(name = "Connection", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
-@JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-07-13T09:30:21.594518+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
-public class ConnectionModel {
+@Schema(name = "connection_base", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
+@JsonTypeName("connection_base")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:40.020411+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+public class ConnectionBaseModel {
 
   private Boolean active;
 
@@ -75,20 +75,20 @@ public class ConnectionModel {
 
   private Integer version;
 
-  public ConnectionModel() {
+  public ConnectionBaseModel() {
     super();
   }
 
   /**
    * Constructor with only required parameters
    */
-  public ConnectionModel(String componentName, String name, Map<String, Object> parameters) {
+  public ConnectionBaseModel(String componentName, String name, Map<String, Object> parameters) {
     this.componentName = componentName;
     this.name = name;
     this.parameters = parameters;
   }
 
-  public ConnectionModel active(Boolean active) {
+  public ConnectionBaseModel active(Boolean active) {
     this.active = active;
     return this;
   }
@@ -108,7 +108,7 @@ public class ConnectionModel {
     this.active = active;
   }
 
-  public ConnectionModel authorizationName(String authorizationName) {
+  public ConnectionBaseModel authorizationName(String authorizationName) {
     this.authorizationName = authorizationName;
     return this;
   }
@@ -128,12 +128,12 @@ public class ConnectionModel {
     this.authorizationName = authorizationName;
   }
 
-  public ConnectionModel authorizationParameters(Map<String, Object> authorizationParameters) {
+  public ConnectionBaseModel authorizationParameters(Map<String, Object> authorizationParameters) {
     this.authorizationParameters = authorizationParameters;
     return this;
   }
 
-  public ConnectionModel putAuthorizationParametersItem(String key, Object authorizationParametersItem) {
+  public ConnectionBaseModel putAuthorizationParametersItem(String key, Object authorizationParametersItem) {
     if (this.authorizationParameters == null) {
       this.authorizationParameters = new HashMap<>();
     }
@@ -156,7 +156,7 @@ public class ConnectionModel {
     this.authorizationParameters = authorizationParameters;
   }
 
-  public ConnectionModel componentName(String componentName) {
+  public ConnectionBaseModel componentName(String componentName) {
     this.componentName = componentName;
     return this;
   }
@@ -176,12 +176,12 @@ public class ConnectionModel {
     this.componentName = componentName;
   }
 
-  public ConnectionModel connectionParameters(Map<String, Object> connectionParameters) {
+  public ConnectionBaseModel connectionParameters(Map<String, Object> connectionParameters) {
     this.connectionParameters = connectionParameters;
     return this;
   }
 
-  public ConnectionModel putConnectionParametersItem(String key, Object connectionParametersItem) {
+  public ConnectionBaseModel putConnectionParametersItem(String key, Object connectionParametersItem) {
     if (this.connectionParameters == null) {
       this.connectionParameters = new HashMap<>();
     }
@@ -204,7 +204,7 @@ public class ConnectionModel {
     this.connectionParameters = connectionParameters;
   }
 
-  public ConnectionModel connectionVersion(Integer connectionVersion) {
+  public ConnectionBaseModel connectionVersion(Integer connectionVersion) {
     this.connectionVersion = connectionVersion;
     return this;
   }
@@ -224,7 +224,7 @@ public class ConnectionModel {
     this.connectionVersion = connectionVersion;
   }
 
-  public ConnectionModel createdBy(String createdBy) {
+  public ConnectionBaseModel createdBy(String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -244,7 +244,7 @@ public class ConnectionModel {
     this.createdBy = createdBy;
   }
 
-  public ConnectionModel createdDate(LocalDateTime createdDate) {
+  public ConnectionBaseModel createdDate(LocalDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -264,7 +264,7 @@ public class ConnectionModel {
     this.createdDate = createdDate;
   }
 
-  public ConnectionModel credentialStatus(CredentialStatusModel credentialStatus) {
+  public ConnectionBaseModel credentialStatus(CredentialStatusModel credentialStatus) {
     this.credentialStatus = credentialStatus;
     return this;
   }
@@ -284,7 +284,7 @@ public class ConnectionModel {
     this.credentialStatus = credentialStatus;
   }
 
-  public ConnectionModel environment(ConnectionEnvironmentModel environment) {
+  public ConnectionBaseModel environment(ConnectionEnvironmentModel environment) {
     this.environment = environment;
     return this;
   }
@@ -304,7 +304,7 @@ public class ConnectionModel {
     this.environment = environment;
   }
 
-  public ConnectionModel id(Long id) {
+  public ConnectionBaseModel id(Long id) {
     this.id = id;
     return this;
   }
@@ -324,7 +324,7 @@ public class ConnectionModel {
     this.id = id;
   }
 
-  public ConnectionModel lastModifiedBy(String lastModifiedBy) {
+  public ConnectionBaseModel lastModifiedBy(String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -344,7 +344,7 @@ public class ConnectionModel {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public ConnectionModel lastModifiedDate(LocalDateTime lastModifiedDate) {
+  public ConnectionBaseModel lastModifiedDate(LocalDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -364,7 +364,7 @@ public class ConnectionModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public ConnectionModel name(String name) {
+  public ConnectionBaseModel name(String name) {
     this.name = name;
     return this;
   }
@@ -384,12 +384,12 @@ public class ConnectionModel {
     this.name = name;
   }
 
-  public ConnectionModel parameters(Map<String, Object> parameters) {
+  public ConnectionBaseModel parameters(Map<String, Object> parameters) {
     this.parameters = parameters;
     return this;
   }
 
-  public ConnectionModel putParametersItem(String key, Object parametersItem) {
+  public ConnectionBaseModel putParametersItem(String key, Object parametersItem) {
     if (this.parameters == null) {
       this.parameters = new HashMap<>();
     }
@@ -412,12 +412,12 @@ public class ConnectionModel {
     this.parameters = parameters;
   }
 
-  public ConnectionModel tags(List<@Valid TagModel> tags) {
+  public ConnectionBaseModel tags(List<@Valid TagModel> tags) {
     this.tags = tags;
     return this;
   }
 
-  public ConnectionModel addTagsItem(TagModel tagsItem) {
+  public ConnectionBaseModel addTagsItem(TagModel tagsItem) {
     if (this.tags == null) {
       this.tags = new ArrayList<>();
     }
@@ -440,7 +440,7 @@ public class ConnectionModel {
     this.tags = tags;
   }
 
-  public ConnectionModel version(Integer version) {
+  public ConnectionBaseModel version(Integer version) {
     this.version = version;
     return this;
   }
@@ -468,24 +468,24 @@ public class ConnectionModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ConnectionModel connection = (ConnectionModel) o;
-    return Objects.equals(this.active, connection.active) &&
-        Objects.equals(this.authorizationName, connection.authorizationName) &&
-        Objects.equals(this.authorizationParameters, connection.authorizationParameters) &&
-        Objects.equals(this.componentName, connection.componentName) &&
-        Objects.equals(this.connectionParameters, connection.connectionParameters) &&
-        Objects.equals(this.connectionVersion, connection.connectionVersion) &&
-        Objects.equals(this.createdBy, connection.createdBy) &&
-        Objects.equals(this.createdDate, connection.createdDate) &&
-        Objects.equals(this.credentialStatus, connection.credentialStatus) &&
-        Objects.equals(this.environment, connection.environment) &&
-        Objects.equals(this.id, connection.id) &&
-        Objects.equals(this.lastModifiedBy, connection.lastModifiedBy) &&
-        Objects.equals(this.lastModifiedDate, connection.lastModifiedDate) &&
-        Objects.equals(this.name, connection.name) &&
-        Objects.equals(this.parameters, connection.parameters) &&
-        Objects.equals(this.tags, connection.tags) &&
-        Objects.equals(this.version, connection.version);
+    ConnectionBaseModel connectionBase = (ConnectionBaseModel) o;
+    return Objects.equals(this.active, connectionBase.active) &&
+        Objects.equals(this.authorizationName, connectionBase.authorizationName) &&
+        Objects.equals(this.authorizationParameters, connectionBase.authorizationParameters) &&
+        Objects.equals(this.componentName, connectionBase.componentName) &&
+        Objects.equals(this.connectionParameters, connectionBase.connectionParameters) &&
+        Objects.equals(this.connectionVersion, connectionBase.connectionVersion) &&
+        Objects.equals(this.createdBy, connectionBase.createdBy) &&
+        Objects.equals(this.createdDate, connectionBase.createdDate) &&
+        Objects.equals(this.credentialStatus, connectionBase.credentialStatus) &&
+        Objects.equals(this.environment, connectionBase.environment) &&
+        Objects.equals(this.id, connectionBase.id) &&
+        Objects.equals(this.lastModifiedBy, connectionBase.lastModifiedBy) &&
+        Objects.equals(this.lastModifiedDate, connectionBase.lastModifiedDate) &&
+        Objects.equals(this.name, connectionBase.name) &&
+        Objects.equals(this.parameters, connectionBase.parameters) &&
+        Objects.equals(this.tags, connectionBase.tags) &&
+        Objects.equals(this.version, connectionBase.version);
   }
 
   @Override
@@ -496,7 +496,7 @@ public class ConnectionModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ConnectionModel {\n");
+    sb.append("class ConnectionBaseModel {\n");
     sb.append("    active: ").append(toIndentedString(active)).append("\n");
     sb.append("    authorizationName: ").append(toIndentedString(authorizationName)).append("\n");
     sb.append("    authorizationParameters: ").append(toIndentedString(authorizationParameters)).append("\n");
