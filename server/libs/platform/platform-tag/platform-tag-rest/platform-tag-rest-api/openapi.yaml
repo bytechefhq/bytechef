@@ -1,0 +1,50 @@
+---
+openapi: "3.0.1"
+info:
+  title: "The Platform Tag Internal API"
+  version: "1"
+servers:
+  - url: "/api/platform/internal"
+paths: {}
+components:
+  schemas:
+    Tag:
+      description: "A tag."
+      required:
+        - "name"
+      properties:
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        id:
+          description: "The id of the tag."
+          type: "integer"
+          format: "int64"
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        name:
+          description: "The name of the tag."
+          type: "string"
+        __version:
+          type: "integer"
+    UpdateTagsRequest:
+      description: "The request object that contains the array of tags."
+      type: "object"
+      properties:
+        tags:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Tag"

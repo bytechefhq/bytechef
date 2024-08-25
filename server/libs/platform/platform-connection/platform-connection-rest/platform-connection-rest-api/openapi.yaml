@@ -1,0 +1,18 @@
+---
+openapi: "3.0.1"
+info:
+  title: "The Platform Connection Internal API"
+  version: "1"
+servers:
+  - url: "/api/platform/internal"
+paths: {}
+components:
+  schemas:
+    ConnectionEnvironment:
+      $ref: "../../../../platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/connection_environment.yaml"
+    CredentialStatus:
+      $ref: "../../../../platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/credential_status.yaml"
+    UpdateTagsRequest:
+      $ref: "../../../../platform/platform-tag/platform-tag-rest/platform-tag-rest-api/openapi.yaml#/components/schemas/UpdateTagsRequest"
+    Tag:
+      $ref: "../../../../platform/platform-tag/platform-tag-rest/platform-tag-rest-api/openapi.yaml#/components/schemas/Tag"

@@ -1,0 +1,6 @@
+description: "The environment of a connection."
+type: "string"
+enum:
+  - "DEVELOPMENT"
+  - "TEST"
+  - "PRODUCTION"

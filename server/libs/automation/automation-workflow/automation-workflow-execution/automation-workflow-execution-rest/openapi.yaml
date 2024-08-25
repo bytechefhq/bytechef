@@ -109,36 +109,9 @@ paths:
 components:
   schemas:
     Environment:
-      description: "The environment of a project."
-      type: "string"
-      enum:
-        - "TEST"
-        - "PRODUCTION"
+      $ref: "../../../../platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
     Page:
-      description: "A sublist of a list of objects. It allows gain information about\
-        \ the position of it in the containing entire list."
-      type: "object"
-      properties:
-        number:
-          description: "The current page."
-          type: "integer"
-        size:
-          description: "The size of the page."
-          type: "integer"
-        numberOfElements:
-          description: "The number of elements."
-          type: "integer"
-        totalPages:
-          description: "The total number of pages."
-          type: "integer"
-        totalElements:
-          description: "The total number of elements."
-          type: "integer"
-        content:
-          description: "The list of elements."
-          type: "array"
-          items:
-            type: "object"
+      $ref: "../../../../platform/platform-rest/openapi/components/schemas/objects/page.yaml"
     WorkflowExecution:
       description: "Contains information about execution of a project workflow."
       type: "object"
