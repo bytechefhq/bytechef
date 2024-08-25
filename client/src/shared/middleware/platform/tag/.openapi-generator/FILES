@@ -1,6 +1,4 @@
 index.ts
-models/ConnectionEnvironmentModel.ts
-models/CredentialStatusModel.ts
 models/TagModel.ts
 models/UpdateTagsRequestModel.ts
 runtime.ts

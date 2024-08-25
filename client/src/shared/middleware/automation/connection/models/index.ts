@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-export * from './Connection1Model';
+export * from './ConnectionBaseModel';
 export * from './ConnectionEnvironmentModel';
 export * from './ConnectionModel';
 export * from './CredentialStatusModel';

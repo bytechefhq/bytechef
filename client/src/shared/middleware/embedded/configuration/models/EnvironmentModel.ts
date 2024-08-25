@@ -14,7 +14,7 @@
 
 
 /**
- * The environment of an integration.
+ * The environment of a project.
  * @export
  */
 export const EnvironmentModel = {
