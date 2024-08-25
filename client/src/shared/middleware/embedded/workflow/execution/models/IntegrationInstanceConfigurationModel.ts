@@ -13,18 +13,12 @@
  */
 
 import { mapValues } from '../runtime';
-import type { Environment1Model } from './Environment1Model';
+import type { EnvironmentModel } from './EnvironmentModel';
 import {
-    Environment1ModelFromJSON,
-    Environment1ModelFromJSONTyped,
-    Environment1ModelToJSON,
-} from './Environment1Model';
-import type { IntegrationInstanceConfigurationIntegrationModel } from './IntegrationInstanceConfigurationIntegrationModel';
-import {
-    IntegrationInstanceConfigurationIntegrationModelFromJSON,
-    IntegrationInstanceConfigurationIntegrationModelFromJSONTyped,
-    IntegrationInstanceConfigurationIntegrationModelToJSON,
-} from './IntegrationInstanceConfigurationIntegrationModel';
+    EnvironmentModelFromJSON,
+    EnvironmentModelFromJSONTyped,
+    EnvironmentModelToJSON,
+} from './EnvironmentModel';
 import type { IntegrationInstanceConfigurationWorkflowModel } from './IntegrationInstanceConfigurationWorkflowModel';
 import {
     IntegrationInstanceConfigurationWorkflowModelFromJSON,
@@ -45,24 +39,6 @@ import {
  */
 export interface IntegrationInstanceConfigurationModel {
     /**
-     * The authorization parameters of a connection.
-     * @type {{ [key: string]: any; }}
-     * @memberof IntegrationInstanceConfigurationModel
-     */
-    readonly connectionAuthorizationParameters?: { [key: string]: any; };
-    /**
-     * The authorization parameters of a connection.
-     * @type {{ [key: string]: any; }}
-     * @memberof IntegrationInstanceConfigurationModel
-     */
-    readonly connectionConnectionParameters?: { [key: string]: any; };
-    /**
-     * The parameters of an integration connection, usually oauth2 related data.
-     * @type {{ [key: string]: any; }}
-     * @memberof IntegrationInstanceConfigurationModel
-     */
-    connectionParameters?: { [key: string]: any; };
-    /**
      * The created by.
      * @type {string}
      * @memberof IntegrationInstanceConfigurationModel
@@ -75,7 +51,7 @@ export interface IntegrationInstanceConfigurationModel {
      */
     readonly createdDate?: Date;
     /**
-     * The description of an integration instance configuration.
+     * The description of an integration configuration.
      * @type {string}
      * @memberof IntegrationInstanceConfigurationModel
      */
@@ -88,10 +64,10 @@ export interface IntegrationInstanceConfigurationModel {
     enabled?: boolean;
     /**
      * 
-     * @type {Environment1Model}
+     * @type {EnvironmentModel}
      * @memberof IntegrationInstanceConfigurationModel
      */
-    environment?: Environment1Model;
+    environment?: EnvironmentModel;
     /**
      * The id of an integration instance configuration.
      * @type {number}
@@ -99,23 +75,11 @@ export interface IntegrationInstanceConfigurationModel {
      */
     readonly id?: number;
     /**
-     * 
-     * @type {IntegrationInstanceConfigurationIntegrationModel}
-     * @memberof IntegrationInstanceConfigurationModel
-     */
-    integration?: IntegrationInstanceConfigurationIntegrationModel;
-    /**
      * Th id of an integration.
      * @type {number}
      * @memberof IntegrationInstanceConfigurationModel
      */
     integrationId?: number;
-    /**
-     * The array of integration instance configuration workflows.
-     * @type {Array<IntegrationInstanceConfigurationWorkflowModel>}
-     * @memberof IntegrationInstanceConfigurationModel
-     */
-    integrationInstanceConfigurationWorkflows?: Array<IntegrationInstanceConfigurationWorkflowModel>;
     /**
      * The version of an integration.
      * @type {number}
@@ -146,6 +110,36 @@ export interface IntegrationInstanceConfigurationModel {
      * @memberof IntegrationInstanceConfigurationModel
      */
     name: string;
+    /**
+     * The authorization parameters of a connection.
+     * @type {{ [key: string]: any; }}
+     * @memberof IntegrationInstanceConfigurationModel
+     */
+    readonly connectionAuthorizationParameters?: { [key: string]: any; };
+    /**
+     * The authorization parameters of a connection.
+     * @type {{ [key: string]: any; }}
+     * @memberof IntegrationInstanceConfigurationModel
+     */
+    readonly connectionConnectionParameters?: { [key: string]: any; };
+    /**
+     * The parameters of an integration connection, usually oauth2 related data.
+     * @type {{ [key: string]: any; }}
+     * @memberof IntegrationInstanceConfigurationModel
+     */
+    connectionParameters?: { [key: string]: any; };
+    /**
+     * 
+     * @type {object}
+     * @memberof IntegrationInstanceConfigurationModel
+     */
+    readonly integration?: object;
+    /**
+     * The array of integration instance configuration workflows.
+     * @type {Array<IntegrationInstanceConfigurationWorkflowModel>}
+     * @memberof IntegrationInstanceConfigurationModel
+     */
+    integrationInstanceConfigurationWorkflows?: Array<IntegrationInstanceConfigurationWorkflowModel>;
     /**
      * The array of tags.
      * @type {Array<TagModel>}
@@ -178,43 +172,42 @@ export function IntegrationInstanceConfigurationModelFromJSONTyped(json: any, ig
     }
     return {
         
-        'connectionAuthorizationParameters': json['connectionAuthorizationParameters'] == null ? undefined : json['connectionAuthorizationParameters'],
-        'connectionConnectionParameters': json['connectionConnectionParameters'] == null ? undefined : json['connectionConnectionParameters'],
-        'connectionParameters': json['connectionParameters'] == null ? undefined : json['connectionParameters'],
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'description': json['description'] == null ? undefined : json['description'],
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
-        'environment': json['environment'] == null ? undefined : Environment1ModelFromJSON(json['environment']),
+        'environment': json['environment'] == null ? undefined : EnvironmentModelFromJSON(json['environment']),
         'id': json['id'] == null ? undefined : json['id'],
-        'integration': json['integration'] == null ? undefined : IntegrationInstanceConfigurationIntegrationModelFromJSON(json['integration']),
         'integrationId': json['integrationId'] == null ? undefined : json['integrationId'],
-        'integrationInstanceConfigurationWorkflows': json['integrationInstanceConfigurationWorkflows'] == null ? undefined : ((json['integrationInstanceConfigurationWorkflows'] as Array<any>).map(IntegrationInstanceConfigurationWorkflowModelFromJSON)),
         'integrationVersion': json['integrationVersion'] == null ? undefined : json['integrationVersion'],
         'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (new Date(json['lastExecutionDate'])),
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'name': json['name'],
+        'connectionAuthorizationParameters': json['connectionAuthorizationParameters'] == null ? undefined : json['connectionAuthorizationParameters'],
+        'connectionConnectionParameters': json['connectionConnectionParameters'] == null ? undefined : json['connectionConnectionParameters'],
+        'connectionParameters': json['connectionParameters'] == null ? undefined : json['connectionParameters'],
+        'integration': json['integration'] == null ? undefined : json['integration'],
+        'integrationInstanceConfigurationWorkflows': json['integrationInstanceConfigurationWorkflows'] == null ? undefined : ((json['integrationInstanceConfigurationWorkflows'] as Array<any>).map(IntegrationInstanceConfigurationWorkflowModelFromJSON)),
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
         'version': json['__version'] == null ? undefined : json['__version'],
     };
 }
 
-export function IntegrationInstanceConfigurationModelToJSON(value?: Omit<IntegrationInstanceConfigurationModel, 'connectionAuthorizationParameters'|'connectionConnectionParameters'|'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'> | null): any {
+export function IntegrationInstanceConfigurationModelToJSON(value?: Omit<IntegrationInstanceConfigurationModel, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'connectionAuthorizationParameters'|'connectionConnectionParameters'|'integration'> | null): any {
     if (value == null) {
         return value;
     }
     return {
         
-        'connectionParameters': value['connectionParameters'],
         'description': value['description'],
         'enabled': value['enabled'],
-        'environment': Environment1ModelToJSON(value['environment']),
-        'integration': IntegrationInstanceConfigurationIntegrationModelToJSON(value['integration']),
+        'environment': EnvironmentModelToJSON(value['environment']),
         'integrationId': value['integrationId'],
-        'integrationInstanceConfigurationWorkflows': value['integrationInstanceConfigurationWorkflows'] == null ? undefined : ((value['integrationInstanceConfigurationWorkflows'] as Array<any>).map(IntegrationInstanceConfigurationWorkflowModelToJSON)),
         'integrationVersion': value['integrationVersion'],
         'name': value['name'],
+        'connectionParameters': value['connectionParameters'],
+        'integrationInstanceConfigurationWorkflows': value['integrationInstanceConfigurationWorkflows'] == null ? undefined : ((value['integrationInstanceConfigurationWorkflows'] as Array<any>).map(IntegrationInstanceConfigurationWorkflowModelToJSON)),
         'tags': value['tags'] == null ? undefined : ((value['tags'] as Array<any>).map(TagModelToJSON)),
         '__version': value['version'],
     };

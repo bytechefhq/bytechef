@@ -79,7 +79,7 @@ export interface ApiKeyModel {
      * @type {string}
      * @memberof ApiKeyModel
      */
-    secretKey?: string;
+    readonly secretKey: string;
 }
 
 /**
@@ -87,6 +87,7 @@ export interface ApiKeyModel {
  */
 export function instanceOfApiKeyModel(value: object): boolean {
     if (!('name' in value)) return false;
+    if (!('secretKey' in value)) return false;
     return true;
 }
 
@@ -108,11 +109,11 @@ export function ApiKeyModelFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'lastUsedDate': json['lastUsedDate'] == null ? undefined : (new Date(json['lastUsedDate'])),
         'name': json['name'],
-        'secretKey': json['secretKey'] == null ? undefined : json['secretKey'],
+        'secretKey': json['secretKey'],
     };
 }
 
-export function ApiKeyModelToJSON(value?: Omit<ApiKeyModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'> | null): any {
+export function ApiKeyModelToJSON(value?: Omit<ApiKeyModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'|'secretKey'> | null): any {
     if (value == null) {
         return value;
     }
@@ -120,7 +121,6 @@ export function ApiKeyModelToJSON(value?: Omit<ApiKeyModel, 'createdBy'|'created
         
         'environment': EnvironmentModelToJSON(value['environment']),
         'name': value['name'],
-        'secretKey': value['secretKey'],
     };
 }
 

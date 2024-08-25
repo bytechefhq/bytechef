@@ -2,13 +2,11 @@
 /* eslint-disable */
 export * from './ComponentDefinitionBasicModel';
 export * from './DataStreamComponentModel';
-export * from './Environment1Model';
 export * from './EnvironmentModel';
 export * from './ExecutionErrorModel';
 export * from './IntegrationBasicModel';
 export * from './IntegrationInstanceBasicModel';
 export * from './IntegrationInstanceConfigurationBasicModel';
-export * from './IntegrationInstanceConfigurationIntegrationModel';
 export * from './IntegrationInstanceConfigurationModel';
 export * from './IntegrationInstanceConfigurationWorkflowConnectionModel';
 export * from './IntegrationInstanceConfigurationWorkflowModel';
