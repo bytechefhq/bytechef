@@ -4,8 +4,8 @@ import {
     ConnectionModel,
     ConnectionTagApi,
     GetWorkspaceConnectionsRequest,
+    TagModel,
 } from '@/shared/middleware/automation/connection';
-import {TagModel} from '@/shared/middleware/platform/connection';
 import {useQuery} from '@tanstack/react-query';
 
 export const ConnectionKeys = {

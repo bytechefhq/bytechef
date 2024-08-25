@@ -18,13 +18,14 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ConnectionParameters from '@/pages/platform/connection/components/ConnectionParameters';
 import {TokenPayloadI} from '@/pages/platform/connection/components/oauth2/useOAuth2';
+import {ConnectionModelI} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
 import Properties from '@/pages/platform/workflow-editor/components/Properties/Properties';
 import {
     AuthorizationModel,
     ComponentDefinitionBasicModel,
     ComponentDefinitionModel,
 } from '@/shared/middleware/platform/configuration';
-import {ConnectionEnvironmentModel, ConnectionModel, TagModel} from '@/shared/middleware/platform/connection';
+import {ConnectionEnvironmentModel, TagModel} from '@/shared/middleware/platform/connection';
 import {
     ComponentDefinitionKeys,
     useGetComponentDefinitionsQuery,
@@ -50,19 +51,19 @@ import OAuth2Button from './OAuth2Button';
 
 interface ConnectionDialogProps {
     componentDefinition?: ComponentDefinitionModel;
-    connection?: ConnectionModel | undefined;
+    connection?: ConnectionModelI | undefined;
     connectionTagsQueryKey: QueryKey;
     connectionsQueryKey: QueryKey;
     onClose?: () => void;
     useCreateConnectionMutation?: (mutationProps: {
-        onSuccess?: (result: ConnectionModel, variables: ConnectionModel) => void;
-        onError?: (error: Error, variables: ConnectionModel) => void;
-    }) => UseMutationResult<ConnectionModel, Error, ConnectionModel, unknown>;
+        onSuccess?: (result: ConnectionModelI, variables: ConnectionModelI) => void;
+        onError?: (error: Error, variables: ConnectionModelI) => void;
+    }) => UseMutationResult<ConnectionModelI, Error, ConnectionModelI, unknown>;
     useGetConnectionTagsQuery: () => UseQueryResult<TagModel[], Error>;
     useUpdateConnectionMutation?: (mutationProps: {
-        onSuccess?: (result: ConnectionModel, variables: ConnectionModel) => void;
-        onError?: (error: Error, variables: ConnectionModel) => void;
-    }) => UseMutationResult<ConnectionModel, Error, ConnectionModel, unknown>;
+        onSuccess?: (result: ConnectionModelI, variables: ConnectionModelI) => void;
+        onError?: (error: Error, variables: ConnectionModelI) => void;
+    }) => UseMutationResult<ConnectionModelI, Error, ConnectionModelI, unknown>;
     triggerNode?: ReactNode;
 }
 
@@ -282,7 +283,7 @@ const ConnectionDialog = ({
                 ...additionalParameters,
             },
             tags: tags,
-        } as ConnectionModel;
+        } as ConnectionModelI;
     }
 
     function getNewOAuth2AuthorizationParameters() {
@@ -342,7 +343,7 @@ const ConnectionDialog = ({
                 name,
                 tags,
                 version: connection?.version,
-            } as ConnectionModel);
+            } as ConnectionModelI);
         } else {
             return connectionMutation.mutateAsync(getNewConnection(additionalParameters));
         }
