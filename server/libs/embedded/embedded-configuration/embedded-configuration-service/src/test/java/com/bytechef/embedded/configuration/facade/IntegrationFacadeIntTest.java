@@ -111,8 +111,8 @@ public class IntegrationFacadeIntTest {
             Validate.notNull(integration.getId(), "id"),
             "{\"label\": \"New Workflow\", \"description\": \"Description\", \"tasks\": []}");
 
-        assertThat(workflow.description()).isEqualTo("Description");
-        assertThat(workflow.label()).isEqualTo("New Workflow");
+        assertThat(workflow.getDescription()).isEqualTo("Description");
+        assertThat(workflow.getLabel()).isEqualTo("New Workflow");
     }
 
     @Test
@@ -294,7 +294,7 @@ public class IntegrationFacadeIntTest {
 
         assertThat(
             workflows.stream()
-                .map(WorkflowDTO::id)
+                .map(WorkflowDTO::getId)
                 .toList())
                     .contains(workflow.getId());
     }

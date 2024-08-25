@@ -802,44 +802,9 @@ paths:
 components:
   schemas:
     Category:
-      description: "A category."
-      required:
-      - "name"
-      properties:
-        createdBy:
-          description: "The created by."
-          type: "string"
-          readOnly: true
-        createdDate:
-          description: "The created date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        id:
-          description: "The id of the category."
-          type: "integer"
-          format: "int64"
-        name:
-          description: "The name of the category."
-          type: "string"
-        lastModifiedBy:
-          description: "The last modified by."
-          type: "string"
-          readOnly: true
-        lastModifiedDate:
-          description: "The last modified date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        __version:
-          type: "integer"
-          format: "int32"
+      $ref: "../../../../platform/platform-category/platform-category-rest/platform-category-rest-api/openapi.yaml#/components/schemas/Category"
     Environment:
-      description: "The environment of a project."
-      type: "string"
-      enum:
-        - "TEST"
-        - "PRODUCTION"
+      $ref: "../../../../platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
     Project:
       description: "A group of workflows that make one logical project."
       allOf:
@@ -1096,45 +1061,9 @@ components:
         status:
           $ref: '#/components/schemas/ProjectStatus'
     Tag:
-      description: "A tag."
-      required:
-      - "name"
-      properties:
-        createdBy:
-          description: "The created by."
-          type: "string"
-          readOnly: true
-        createdDate:
-          description: "The created date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        id:
-          description: "The id of the tag."
-          type: "integer"
-          format: "int64"
-        lastModifiedBy:
-          description: "The last modified by."
-          type: "string"
-          readOnly: true
-        lastModifiedDate:
-          description: "The last modified date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        name:
-          description: "The name of the tag."
-          type: "string"
-        __version:
-          type: "integer"
+      $ref: "../../../../platform/platform-tag/platform-tag-rest/platform-tag-rest-api/openapi.yaml#/components/schemas/Tag"
     UpdateTagsRequest:
-      description: "The request object that contains the array of tags."
-      type: "object"
-      properties:
-        tags:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/Tag"
+      $ref: "../../../../platform/platform-tag/platform-tag-rest/platform-tag-rest-api/openapi.yaml#/components/schemas/UpdateTagsRequest"
     Workflow:
       description: "The blueprint that describe the execution of a job."
       x-implements: ['com.bytechef.platform.configuration.web.rest.model.WorkflowModelAware']

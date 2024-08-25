@@ -32,7 +32,7 @@ paths:
               schema:
                 type: "array"
                 items:
-                  $ref: "../../../../../libs/automation/automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/Workspace"
+                  $ref: "#/components/schemas/Workspace"
   /workspaces:
     get:
       description: "Get workspaces."
@@ -48,7 +48,7 @@ paths:
               schema:
                 type: "array"
                 items:
-                  $ref: "../../../../../libs/automation/automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/Workspace"
+                  $ref: "#/components/schemas/Workspace"
     post:
       description: "Create a workspace event."
       summary: "Create a new workspace"
@@ -59,7 +59,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "../../../../../libs/automation/automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/Workspace"
+              $ref: "#/components/schemas/Workspace"
         required: true
       responses:
         "200":
@@ -67,7 +67,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "../../../../../libs/automation/automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/Workspace"
+                $ref: "#/components/schemas/Workspace"
   /workspaces/{id}:
     delete:
       description: "Delete a workspace."
@@ -106,7 +106,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "../../../../../libs/automation/automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/Workspace"
+                $ref: "#/components/schemas/Workspace"
     put:
       description: "Update an existing workspace."
       summary: "Update an existing workspace"
@@ -125,7 +125,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "../../../../../libs/automation/automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/Workspace"
+              $ref: "#/components/schemas/Workspace"
         required: true
       responses:
         "200":
@@ -133,4 +133,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "../../../../../libs/automation/automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/Workspace"
+                $ref: "#/components/schemas/Workspace"
+components:
+  schemas:
+    Workspace:
+      $ref: "../../../../../libs/automation/automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/Workspace"

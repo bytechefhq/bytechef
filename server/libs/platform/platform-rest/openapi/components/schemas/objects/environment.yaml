@@ -1,0 +1,5 @@
+description: "The environment of a project."
+type: "string"
+enum:
+  - "TEST"
+  - "PRODUCTION"

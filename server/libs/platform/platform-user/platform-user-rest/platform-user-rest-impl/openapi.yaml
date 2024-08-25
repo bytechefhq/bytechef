@@ -44,7 +44,7 @@ components:
           format: "date-time"
           readOnly: true
         environment:
-          $ref: '#/components/schemas/Environment'
+          $ref: "../../../../platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
         id:
           description: "The id of an API key."
           type: "integer"
@@ -96,7 +96,7 @@ components:
           format: "date-time"
           readOnly: true
         environment:
-          $ref: '#/components/schemas/Environment'
+          $ref: "../../../../platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
         id:
           description: "The id of a public key."
           type: "integer"
@@ -123,9 +123,3 @@ components:
         name:
           description: "The name of a public key."
           type: "string"
-    Environment:
-      description: "The environment of a project."
-      type: "string"
-      enum:
-        - "TEST"
-        - "PRODUCTION"

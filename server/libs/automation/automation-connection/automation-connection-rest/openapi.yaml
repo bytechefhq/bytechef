@@ -47,7 +47,7 @@ paths:
                 description: "The response object that contains the array of tags."
                 type: "array"
                 items:
-                  $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Tag"
+                  $ref: "#/components/schemas/Tag"
   /connections/{id}:
     delete:
       description: "Delete a connection."
@@ -133,7 +133,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/UpdateTagsRequest"
+              $ref: "#/components/schemas/UpdateTagsRequest"
         required: true
       responses:
         "200":
@@ -170,7 +170,7 @@ paths:
           in: "query"
           required: false
           schema:
-            $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/ConnectionEnvironment"
+            $ref: "#/components/schemas/ConnectionEnvironment"
         - name: "tagId"
           description: "The tag id of used for filtering connections."
           in: "query"
@@ -193,9 +193,15 @@ components:
       description: "Contains all required information to open a connection to a service\
         \ defined by componentName parameter."
       allOf:
-        - $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
+        - $ref: "../../../platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/connection_base.yaml"
         - type: object
           properties:
             workspaceId:
               type: integer
               format: int64
+    ConnectionEnvironment:
+      $ref: "../../../platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/connection_environment.yaml"
+    Tag:
+      $ref: "../../../platform/platform-tag/platform-tag-rest/platform-tag-rest-api/openapi.yaml#/components/schemas/Tag"
+    UpdateTagsRequest:
+      $ref: "../../../platform/platform-tag/platform-tag-rest/platform-tag-rest-api/openapi.yaml#/components/schemas/UpdateTagsRequest"

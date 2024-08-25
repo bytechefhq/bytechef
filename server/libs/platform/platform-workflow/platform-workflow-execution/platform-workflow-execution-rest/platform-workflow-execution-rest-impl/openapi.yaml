@@ -132,7 +132,6 @@ paths:
       responses:
         "200":
           description: "Successful operation."
-
   /trigger-executions:
     get:
       description: "Get a page of trigger execution."
@@ -418,30 +417,7 @@ components:
           description: "The task name to which a connection belongs."
           type: "string"
     Page:
-      description: "A sublist of a list of objects. It allows gain information about\
-        \ the position of it in the containing entire list."
-      type: "object"
-      properties:
-        number:
-          description: "The current page."
-          type: "integer"
-        size:
-          description: "The size of the page."
-          type: "integer"
-        numberOfElements:
-          description: "The number of elements."
-          type: "integer"
-        totalPages:
-          description: "The total number of pages."
-          type: "integer"
-        totalElements:
-          description: "The total number of elements."
-          type: "integer"
-        content:
-          description: "The list of elements."
-          type: "array"
-          items:
-            type: "object"
+      $ref: "../../../../../platform/platform-rest/openapi/components/schemas/objects/page.yaml"
     TaskExecution:
       description: "Adds execution semantics to a task."
       type: "object"
