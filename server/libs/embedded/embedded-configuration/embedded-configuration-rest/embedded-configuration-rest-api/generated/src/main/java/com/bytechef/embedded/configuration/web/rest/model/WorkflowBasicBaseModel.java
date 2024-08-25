@@ -18,42 +18,33 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * A tag.
+ * The blueprint that describe the execution of a job.
  */
 
-@Schema(name = "Tag", description = "A tag.")
-@JsonTypeName("Tag")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-11T18:41:40.272221+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
-public class TagModel {
+@Schema(name = "workflow_basic_base", description = "The blueprint that describe the execution of a job.")
+@JsonTypeName("workflow_basic_base")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-25T08:26:29.699895+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
+public class WorkflowBasicBaseModel {
 
   private String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime createdDate;
 
-  private Long id;
+  private String description;
+
+  private String id;
+
+  private String label;
 
   private String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
 
-  private String name;
-
   private Integer version;
 
-  public TagModel() {
-    super();
-  }
-
-  /**
-   * Constructor with only required parameters
-   */
-  public TagModel(String name) {
-    this.name = name;
-  }
-
-  public TagModel createdBy(String createdBy) {
+  public WorkflowBasicBaseModel createdBy(String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -61,7 +52,7 @@ public class TagModel {
   /**
    * The created by.
    * @return createdBy
-  */
+   */
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
@@ -73,7 +64,7 @@ public class TagModel {
     this.createdBy = createdBy;
   }
 
-  public TagModel createdDate(LocalDateTime createdDate) {
+  public WorkflowBasicBaseModel createdDate(LocalDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -81,7 +72,7 @@ public class TagModel {
   /**
    * The created date.
    * @return createdDate
-  */
+   */
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
@@ -93,27 +84,67 @@ public class TagModel {
     this.createdDate = createdDate;
   }
 
-  public TagModel id(Long id) {
+  public WorkflowBasicBaseModel description(String description) {
+    this.description = description;
+    return this;
+  }
+
+  /**
+   * The description of a workflow.
+   * @return description
+   */
+  
+  @Schema(name = "description", description = "The description of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("description")
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public WorkflowBasicBaseModel id(String id) {
     this.id = id;
     return this;
   }
 
   /**
-   * The id of the tag.
+   * The id of a workflow.
    * @return id
-  */
+   */
   
-  @Schema(name = "id", description = "The id of the tag.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
-  public Long getId() {
+  public String getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(String id) {
     this.id = id;
   }
 
-  public TagModel lastModifiedBy(String lastModifiedBy) {
+  public WorkflowBasicBaseModel label(String label) {
+    this.label = label;
+    return this;
+  }
+
+  /**
+   * The descriptive name for the workflow
+   * @return label
+   */
+  
+  @Schema(name = "label", accessMode = Schema.AccessMode.READ_ONLY, description = "The descriptive name for the workflow", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("label")
+  public String getLabel() {
+    return label;
+  }
+
+  public void setLabel(String label) {
+    this.label = label;
+  }
+
+  public WorkflowBasicBaseModel lastModifiedBy(String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -121,7 +152,7 @@ public class TagModel {
   /**
    * The last modified by.
    * @return lastModifiedBy
-  */
+   */
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
@@ -133,7 +164,7 @@ public class TagModel {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public TagModel lastModifiedDate(LocalDateTime lastModifiedDate) {
+  public WorkflowBasicBaseModel lastModifiedDate(LocalDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -141,7 +172,7 @@ public class TagModel {
   /**
    * The last modified date.
    * @return lastModifiedDate
-  */
+   */
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
@@ -153,27 +184,7 @@ public class TagModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public TagModel name(String name) {
-    this.name = name;
-    return this;
-  }
-
-  /**
-   * The name of the tag.
-   * @return name
-  */
-  @NotNull 
-  @Schema(name = "name", description = "The name of the tag.", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("name")
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public TagModel version(Integer version) {
+  public WorkflowBasicBaseModel version(Integer version) {
     this.version = version;
     return this;
   }
@@ -181,7 +192,7 @@ public class TagModel {
   /**
    * Get version
    * @return version
-  */
+   */
   
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("__version")
@@ -201,31 +212,33 @@ public class TagModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    TagModel tag = (TagModel) o;
-    return Objects.equals(this.createdBy, tag.createdBy) &&
-        Objects.equals(this.createdDate, tag.createdDate) &&
-        Objects.equals(this.id, tag.id) &&
-        Objects.equals(this.lastModifiedBy, tag.lastModifiedBy) &&
-        Objects.equals(this.lastModifiedDate, tag.lastModifiedDate) &&
-        Objects.equals(this.name, tag.name) &&
-        Objects.equals(this.version, tag.version);
+    WorkflowBasicBaseModel workflowBasicBase = (WorkflowBasicBaseModel) o;
+    return Objects.equals(this.createdBy, workflowBasicBase.createdBy) &&
+        Objects.equals(this.createdDate, workflowBasicBase.createdDate) &&
+        Objects.equals(this.description, workflowBasicBase.description) &&
+        Objects.equals(this.id, workflowBasicBase.id) &&
+        Objects.equals(this.label, workflowBasicBase.label) &&
+        Objects.equals(this.lastModifiedBy, workflowBasicBase.lastModifiedBy) &&
+        Objects.equals(this.lastModifiedDate, workflowBasicBase.lastModifiedDate) &&
+        Objects.equals(this.version, workflowBasicBase.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, id, lastModifiedBy, lastModifiedDate, name, version);
+    return Objects.hash(createdBy, createdDate, description, id, label, lastModifiedBy, lastModifiedDate, version);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class TagModel {\n");
+    sb.append("class WorkflowBasicBaseModel {\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
+    sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
-    sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();

@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("executeAction_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-23T06:56:44.096203+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:40.093184+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class ExecuteActionRequestModel {
 
   @Valid

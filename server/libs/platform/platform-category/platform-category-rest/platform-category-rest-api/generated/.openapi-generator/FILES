@@ -1,0 +1,4 @@
+README.md
+pom.xml
+src/main/java/com/bytechef/platform/category/web/rest/ApiUtil.java
+src/main/java/com/bytechef/platform/category/web/rest/model/CategoryModel.java

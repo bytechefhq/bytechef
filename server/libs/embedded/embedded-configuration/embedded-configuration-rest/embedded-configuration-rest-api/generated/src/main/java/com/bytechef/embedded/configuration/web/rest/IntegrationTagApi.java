@@ -5,8 +5,7 @@
  */
 package com.bytechef.embedded.configuration.web.rest;
 
-import com.bytechef.embedded.configuration.web.rest.model.TagModel;
-import com.bytechef.embedded.configuration.web.rest.model.UpdateTagsRequestModel;
+import com.bytechef.platform.tag.web.rest.model.TagModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-11T18:41:40.272221+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:40.820234+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 @Validated
 @Tag(name = "integration-tag", description = "The Embedded Tag Internal API")
 public interface IntegrationTagApi {
@@ -87,7 +86,7 @@ public interface IntegrationTagApi {
      * Updates tags of an existing integration.
      *
      * @param id The id of an integration. (required)
-     * @param updateTagsRequestModel  (required)
+     * @param comBytechefPlatformTagWebRestModelUpdateTagsRequestModel  (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -107,7 +106,7 @@ public interface IntegrationTagApi {
     
     default ResponseEntity<Void> updateIntegrationTags(
         @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "UpdateTagsRequestModel", description = "", required = true) @Valid @RequestBody UpdateTagsRequestModel updateTagsRequestModel
+        @Parameter(name = "com.bytechef.platform.tag.web.rest.model.UpdateTagsRequestModel", description = "", required = true) @Valid @RequestBody com.bytechef.platform.tag.web.rest.model.UpdateTagsRequestModel comBytechefPlatformTagWebRestModelUpdateTagsRequestModel
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 

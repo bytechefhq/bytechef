@@ -2,7 +2,7 @@ package com.bytechef.automation.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.automation.configuration.web.rest.model.TagModel;
+import com.bytechef.platform.tag.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -23,9 +23,9 @@ import jakarta.annotation.Generated;
  * The request object that contains the array of tags.
  */
 
-@Schema(name = "UpdateTagsRequest", description = "The request object that contains the array of tags.")
-@JsonTypeName("UpdateTagsRequest")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-10T22:10:52.891162+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Schema(name = "update_tags_request", description = "The request object that contains the array of tags.")
+@JsonTypeName("update_tags_request")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-25T11:19:12.259328+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class UpdateTagsRequestModel {
 
   @Valid
@@ -47,7 +47,7 @@ public class UpdateTagsRequestModel {
   /**
    * Get tags
    * @return tags
-  */
+   */
   @Valid 
   @Schema(name = "tags", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("tags")
