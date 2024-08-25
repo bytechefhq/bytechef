@@ -18,10 +18,10 @@ package com.bytechef.automation.connection.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.connection.web.rest.model.TagModel;
-import com.bytechef.platform.connection.web.rest.model.UpdateTagsRequestModel;
-import com.bytechef.platform.connection.web.rest.util.ConnectionTagApiControllerUtils;
+import com.bytechef.platform.connection.web.rest.AbstractConnectionTagApiController;
 import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.tag.web.rest.model.TagModel;
+import com.bytechef.platform.tag.web.rest.model.UpdateTagsRequestModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -35,29 +35,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController("com.bytechef.automation.connection.web.rest.ConnectionTagApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}/internal")
 @ConditionalOnCoordinator
-public class ConnectionTagApiController implements ConnectionTagApi {
-
-    private final ConnectionFacade connectionFacade;
-    private final ConversionService conversionService;
+public class ConnectionTagApiController extends AbstractConnectionTagApiController implements ConnectionTagApi {
 
     @SuppressFBWarnings("EI")
     public ConnectionTagApiController(ConnectionFacade connectionFacade, ConversionService conversionService) {
-        this.connectionFacade = connectionFacade;
-        this.conversionService = conversionService;
+        super(connectionFacade, conversionService, AppType.AUTOMATION);
     }
 
     @Override
     public ResponseEntity<List<TagModel>> getConnectionTags() {
-        return ResponseEntity.ok(
-            connectionFacade.getConnectionTags(AppType.AUTOMATION)
-                .stream()
-                .map(tag -> conversionService.convert(tag, TagModel.class))
-                .toList());
+        return doGetConnectionTags();
     }
 
     @Override
     public ResponseEntity<Void> updateConnectionTags(Long id, UpdateTagsRequestModel updateTagsRequestModel) {
-        return ConnectionTagApiControllerUtils.updateConnectionTags(
-            id, updateTagsRequestModel, connectionFacade, conversionService);
+        return doUpdateConnectionTags(id, updateTagsRequestModel);
     }
 }

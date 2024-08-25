@@ -21,8 +21,10 @@ import com.bytechef.embedded.configuration.dto.IntegrationInstanceDTO;
 import com.bytechef.embedded.configuration.web.rest.mapper.config.EmbeddedConfigurationMapperSpringConfig;
 import com.bytechef.embedded.configuration.web.rest.model.IntegrationInstanceBasicModel;
 import com.bytechef.embedded.configuration.web.rest.model.IntegrationInstanceModel;
+import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.extensions.spring.DelegatingConverter;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -49,6 +51,10 @@ public class IntegrationInstanceMapper {
         @Mapping(target = "lastExecutionDate", ignore = true)
         @Mapping(target = "integrationInstanceConfiguration", ignore = true)
         IntegrationInstanceModel convert(IntegrationInstance integrationInstance);
+
+        @InheritInverseConfiguration
+        @DelegatingConverter
+        IntegrationInstance invertConvert(IntegrationInstanceModel integrationInstanceModel);
     }
 
     @Mapper(config = EmbeddedConfigurationMapperSpringConfig.class)

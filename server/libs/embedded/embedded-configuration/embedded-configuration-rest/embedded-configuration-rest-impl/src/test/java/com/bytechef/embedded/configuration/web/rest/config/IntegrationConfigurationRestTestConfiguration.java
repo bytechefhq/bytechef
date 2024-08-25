@@ -29,8 +29,12 @@ import org.springframework.context.annotation.Configuration;
     "com.bytechef.embedded.configuration.web.rest",
     "com.bytechef.embedded.configuration.web.rest.adapter",
     "com.bytechef.embedded.configuration.web.rest.mapper",
+    "com.bytechef.platform.category.web.rest.adapter",
+    "com.bytechef.platform.category.web.rest.mapper",
     "com.bytechef.platform.configuration.web.rest.adapter",
     "com.bytechef.platform.configuration.web.rest.mapper",
+    "com.bytechef.platform.tag.web.rest.adapter",
+    "com.bytechef.platform.tag.web.rest.mapper"
 })
 @Configuration
 public class IntegrationConfigurationRestTestConfiguration {

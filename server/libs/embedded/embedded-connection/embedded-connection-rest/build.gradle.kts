@@ -23,12 +23,12 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
             "CredentialStatus" to "com.bytechef.platform.connection.web.rest.model.CredentialStatusModel",
             "Page" to "org.springframework.data.domain.Page",
             "Tag" to "TagModel",
-            "UpdateTagsRequest" to "com.bytechef.platform.connection.web.rest.model.UpdateTagsRequestModel",
+            "UpdateTagsRequest" to "com.bytechef.platform.tag.web.rest.model.UpdateTagsRequestModel",
         )
     )
     importMappings.set(
         mapOf(
-            "TagModel" to "com.bytechef.platform.connection.web.rest.model.TagModel"
+            "TagModel" to "com.bytechef.platform.tag.web.rest.model.TagModel"
         )
     )
 }

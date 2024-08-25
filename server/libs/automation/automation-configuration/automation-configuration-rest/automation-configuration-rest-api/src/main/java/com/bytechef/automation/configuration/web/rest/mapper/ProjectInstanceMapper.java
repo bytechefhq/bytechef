@@ -21,8 +21,10 @@ import com.bytechef.automation.configuration.dto.ProjectInstanceDTO;
 import com.bytechef.automation.configuration.web.rest.mapper.config.AutomationConfigurationMapperSpringConfig;
 import com.bytechef.automation.configuration.web.rest.model.ProjectInstanceBasicModel;
 import com.bytechef.automation.configuration.web.rest.model.ProjectInstanceModel;
+import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.extensions.spring.DelegatingConverter;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -57,5 +59,10 @@ public class ProjectInstanceMapper {
 
         @Override
         ProjectInstanceModel convert(ProjectInstanceDTO projectInstanceDTO);
+
+        @InheritInverseConfiguration
+        @DelegatingConverter
+        @Mapping(target = "project", ignore = true)
+        ProjectInstanceDTO invertConvert(ProjectInstanceModel projectInstanceModel);
     }
 }

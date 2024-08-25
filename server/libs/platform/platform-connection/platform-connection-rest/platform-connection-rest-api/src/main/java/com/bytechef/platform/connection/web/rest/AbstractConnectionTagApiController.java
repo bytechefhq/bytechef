@@ -17,10 +17,10 @@
 package com.bytechef.platform.connection.web.rest;
 
 import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.connection.web.rest.model.TagModel;
-import com.bytechef.platform.connection.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.platform.tag.web.rest.model.TagModel;
+import com.bytechef.platform.tag.web.rest.model.UpdateTagsRequestModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -33,22 +33,26 @@ public abstract class AbstractConnectionTagApiController {
 
     private final ConnectionFacade connectionFacade;
     private final ConversionService conversionService;
+    private final AppType type;
 
     @SuppressFBWarnings("EI")
-    public AbstractConnectionTagApiController(ConnectionFacade connectionFacade, ConversionService conversionService) {
+    public AbstractConnectionTagApiController(
+        ConnectionFacade connectionFacade, ConversionService conversionService, AppType type) {
+
         this.connectionFacade = connectionFacade;
         this.conversionService = conversionService;
+        this.type = type;
     }
 
-    public ResponseEntity<List<TagModel>> getConnectionTags() {
+    protected ResponseEntity<List<TagModel>> doGetConnectionTags() {
         return ResponseEntity.ok(
-            connectionFacade.getConnectionTags(AppType.AUTOMATION)
+            connectionFacade.getConnectionTags(type)
                 .stream()
                 .map(tag -> conversionService.convert(tag, TagModel.class))
                 .toList());
     }
 
-    public ResponseEntity<Void> updateConnectionTags(Long id, UpdateTagsRequestModel updateTagsRequestModel) {
+    protected ResponseEntity<Void> doUpdateConnectionTags(Long id, UpdateTagsRequestModel updateTagsRequestModel) {
         connectionFacade.update(
             id,
             updateTagsRequestModel.getTags()

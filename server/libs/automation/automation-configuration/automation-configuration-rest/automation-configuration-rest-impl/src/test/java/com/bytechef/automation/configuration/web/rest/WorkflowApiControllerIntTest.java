@@ -22,17 +22,17 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
-import com.bytechef.automation.configuration.dto.WorkflowDTO;
+import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectInstanceFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.WorkspaceService;
 import com.bytechef.automation.configuration.web.rest.config.ProjectConfigurationRestTestConfiguration;
+import com.bytechef.automation.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
-import com.bytechef.platform.configuration.web.rest.model.WorkflowModel;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.Assertions;
@@ -127,12 +127,12 @@ public class WorkflowApiControllerIntTest {
             .definition(DEFINITION)
             .version(0);
 
-        WorkflowDTO workflowDTO = getWorkflowDTO();
+        ProjectWorkflowDTO workflowDTO = getWorkflowDTO();
 
         when(projectFacade.updateWorkflow("1", DEFINITION, 0))
             .thenReturn(workflowDTO);
 
-        Workflow.Format format = workflowDTO.format();
+        Workflow.Format format = workflowDTO.getFormat();
 
         try {
             this.webTestClient
@@ -148,9 +148,9 @@ public class WorkflowApiControllerIntTest {
                 .jsonPath("$.format")
                 .isEqualTo(format.toString())
                 .jsonPath("$.id")
-                .isEqualTo(Validate.notNull(workflowDTO.id(), "id"))
+                .isEqualTo(Validate.notNull(workflowDTO.getId(), "id"))
                 .jsonPath("$.label")
-                .isEqualTo(workflowDTO.label())
+                .isEqualTo(workflowDTO.getLabel())
                 .jsonPath("$.tasks")
                 .isArray()
                 .jsonPath("$.tasks[0].name")
@@ -162,12 +162,12 @@ public class WorkflowApiControllerIntTest {
         }
     }
 
-    private WorkflowDTO getWorkflowDTO() {
+    private ProjectWorkflowDTO getWorkflowDTO() {
         Workflow workflow = new Workflow("1", DEFINITION, Workflow.Format.JSON);
 
         List<WorkflowTask> tasks = workflow.getTasks();
 
-        return new WorkflowDTO(
+        return new ProjectWorkflowDTO(
             new com.bytechef.platform.configuration.dto.WorkflowDTO(
                 workflow, List.of(new WorkflowTaskDTO(tasks.getFirst(), List.of(), null)), List.of()),
             new ProjectWorkflow(1));

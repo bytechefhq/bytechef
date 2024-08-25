@@ -9,7 +9,7 @@ package com.bytechef.ee.embedded.configuration.remote.client.facade;
 
 import com.bytechef.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.embedded.configuration.dto.IntegrationDTO;
-import com.bytechef.embedded.configuration.dto.WorkflowDTO;
+import com.bytechef.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.embedded.configuration.facade.IntegrationFacade;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.constant.Environment;
@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 public class RemoteIntegrationFacadeClient implements IntegrationFacade {
 
     @Override
-    public WorkflowDTO addWorkflow(long id, @NonNull String definition) {
+    public IntegrationWorkflowDTO addWorkflow(long id, @NonNull String definition) {
         throw new UnsupportedOperationException();
     }
 
@@ -67,27 +67,27 @@ public class RemoteIntegrationFacadeClient implements IntegrationFacade {
     }
 
     @Override
-    public List<WorkflowDTO> getIntegrationVersionWorkflows(long id, int integrationVersion) {
+    public List<IntegrationWorkflowDTO> getIntegrationVersionWorkflows(long id, int integrationVersion) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public WorkflowDTO getIntegrationWorkflow(String workflowId) {
+    public IntegrationWorkflowDTO getIntegrationWorkflow(String workflowId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public WorkflowDTO getIntegrationWorkflow(long integrationWorkflowId) {
+    public IntegrationWorkflowDTO getIntegrationWorkflow(long integrationWorkflowId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<WorkflowDTO> getIntegrationWorkflows() {
+    public List<IntegrationWorkflowDTO> getIntegrationWorkflows() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<WorkflowDTO> getIntegrationWorkflows(long id) {
+    public List<IntegrationWorkflowDTO> getIntegrationWorkflows(long id) {
         return List.of();
     }
 
@@ -114,7 +114,7 @@ public class RemoteIntegrationFacadeClient implements IntegrationFacade {
     }
 
     @Override
-    public WorkflowDTO updateWorkflow(String workflowId, String definition, int version) {
+    public IntegrationWorkflowDTO updateWorkflow(String workflowId, String definition, int version) {
         throw new UnsupportedOperationException();
     }
 }

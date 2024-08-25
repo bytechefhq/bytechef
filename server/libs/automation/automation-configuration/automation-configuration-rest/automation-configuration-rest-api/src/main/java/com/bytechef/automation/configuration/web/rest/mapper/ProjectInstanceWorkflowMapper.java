@@ -20,8 +20,10 @@ import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectInstanceWorkflowDTO;
 import com.bytechef.automation.configuration.web.rest.mapper.config.AutomationConfigurationMapperSpringConfig;
 import com.bytechef.automation.configuration.web.rest.model.ProjectInstanceWorkflowModel;
+import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.extensions.spring.DelegatingConverter;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -38,6 +40,10 @@ public class ProjectInstanceWorkflowMapper {
         @Mapping(target = "staticWebhookUrl", ignore = true)
         @Mapping(target = "workflowReferenceCode", ignore = true)
         ProjectInstanceWorkflowModel convert(ProjectInstanceWorkflow projectInstanceWorkflow);
+
+        @InheritInverseConfiguration
+        @DelegatingConverter
+        ProjectInstanceWorkflow invertConvert(ProjectInstanceWorkflowModel projectInstanceWorkflowModel);
     }
 
     @Mapper(config = AutomationConfigurationMapperSpringConfig.class)
@@ -46,5 +52,9 @@ public class ProjectInstanceWorkflowMapper {
 
         @Override
         ProjectInstanceWorkflowModel convert(ProjectInstanceWorkflowDTO projectInstanceWorkflowDTO);
+
+        @InheritInverseConfiguration
+        @DelegatingConverter
+        ProjectInstanceWorkflowDTO invertConvert(ProjectInstanceWorkflowModel projectInstanceWorkflowModel);
     }
 }

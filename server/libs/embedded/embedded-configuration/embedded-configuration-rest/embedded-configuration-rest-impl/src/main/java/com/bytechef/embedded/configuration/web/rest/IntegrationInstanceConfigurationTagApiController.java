@@ -18,9 +18,9 @@ package com.bytechef.embedded.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.embedded.configuration.facade.IntegrationInstanceConfigurationFacade;
-import com.bytechef.embedded.configuration.web.rest.model.TagModel;
-import com.bytechef.embedded.configuration.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.platform.tag.web.rest.model.TagModel;
+import com.bytechef.platform.tag.web.rest.model.UpdateTagsRequestModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;

@@ -20,8 +20,10 @@ import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfigurati
 import com.bytechef.embedded.configuration.dto.IntegrationInstanceConfigurationWorkflowDTO;
 import com.bytechef.embedded.configuration.web.rest.mapper.config.EmbeddedConfigurationMapperSpringConfig;
 import com.bytechef.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationWorkflowModel;
+import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.extensions.spring.DelegatingConverter;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -39,6 +41,11 @@ public class IntegrationInstanceConfigurationWorkflowMapper {
         @Mapping(target = "workflowReferenceCode", ignore = true)
         IntegrationInstanceConfigurationWorkflowModel convert(
             IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow);
+
+        @InheritInverseConfiguration
+        @DelegatingConverter
+        IntegrationInstanceConfigurationWorkflow invertConvert(
+            IntegrationInstanceConfigurationWorkflowModel integrationInstanceConfigurationWorkflowModel);
     }
 
     @Mapper(config = EmbeddedConfigurationMapperSpringConfig.class)
@@ -48,5 +55,10 @@ public class IntegrationInstanceConfigurationWorkflowMapper {
         @Override
         IntegrationInstanceConfigurationWorkflowModel convert(
             IntegrationInstanceConfigurationWorkflowDTO integrationInstanceWorkflow);
+
+        @InheritInverseConfiguration
+        @DelegatingConverter
+        IntegrationInstanceConfigurationWorkflowDTO invertConvert(
+            IntegrationInstanceConfigurationWorkflowModel integrationInstanceConfigurationWorkflowModel);
     }
 }

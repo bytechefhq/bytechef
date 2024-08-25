@@ -19,7 +19,14 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     outputDir.set("$projectDir/generated")
     schemaMappings.set(
         mapOf(
-            "Page" to "org.springframework.data.domain.Page"
+            "Page" to "org.springframework.data.domain.Page",
+            "Tag" to "TagModel",
+            "UpdateTagsRequest" to "com.bytechef.platform.tag.web.rest.model.UpdateTagsRequestModel",
+        )
+    )
+    importMappings.set(
+        mapOf(
+            "TagModel" to "com.bytechef.platform.tag.web.rest.model.TagModel"
         )
     )
 }
@@ -47,6 +54,7 @@ dependencies {
     annotationProcessor(libs.org.mapstruct.extensions.spring.mapstruct.spring.extensions)
 
     api(project(":server:libs:platform:platform-connection:platform-connection-api"))
+    api(project(":server:libs:platform:platform-tag:platform-tag-rest:platform-tag-rest-api"))
 
     compileOnly("jakarta.servlet:jakarta.servlet-api")
 

@@ -24,7 +24,7 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
  * @author Ivica Cardic
  */
 @MapperConfig(componentModel = "spring", uses = {
-    AutomationConnectionConversionServiceAdapter.class
+    AutomationConnectionConversionServiceAdapter.class,
 })
 @SpringMapperConfig(
     conversionServiceAdapterPackage = "com.bytechef.automation.connection.web.rest.adapter",
