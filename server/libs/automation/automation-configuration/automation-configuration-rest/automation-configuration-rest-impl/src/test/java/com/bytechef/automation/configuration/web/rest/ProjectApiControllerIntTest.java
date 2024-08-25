@@ -26,19 +26,19 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
-import com.bytechef.automation.configuration.dto.WorkflowDTO;
+import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectInstanceFacade;
 import com.bytechef.automation.configuration.web.rest.config.ProjectConfigurationRestTestConfiguration;
 import com.bytechef.automation.configuration.web.rest.mapper.ProjectMapper;
-import com.bytechef.automation.configuration.web.rest.model.CategoryModel;
 import com.bytechef.automation.configuration.web.rest.model.ProjectModel;
-import com.bytechef.automation.configuration.web.rest.model.TagModel;
-import com.bytechef.automation.configuration.web.rest.model.UpdateTagsRequestModel;
+import com.bytechef.automation.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
-import com.bytechef.platform.configuration.web.rest.model.WorkflowModel;
+import com.bytechef.platform.category.web.rest.model.CategoryModel;
 import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.platform.tag.web.rest.model.TagModel;
+import com.bytechef.platform.tag.web.rest.model.UpdateTagsRequestModel;
 import java.util.Iterator;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
@@ -179,7 +179,8 @@ public class ProjectApiControllerIntTest {
     @Test
     public void testGetProjectWorkflows() {
         try {
-            WorkflowDTO workflow = new WorkflowDTO(new Workflow("workflow1", "{}", Format.JSON), new ProjectWorkflow());
+            ProjectWorkflowDTO workflow =
+                new ProjectWorkflowDTO(new Workflow("workflow1", "{}", Format.JSON), new ProjectWorkflow());
 
             when(projectFacade.getProjectWorkflows(1L))
                 .thenReturn(List.of(workflow));
@@ -304,7 +305,8 @@ public class ProjectApiControllerIntTest {
         String definition = "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}";
 
         WorkflowModel workflowModel = new WorkflowModel().definition(definition);
-        WorkflowDTO workflow = new WorkflowDTO(new Workflow("id", definition, Format.JSON), new ProjectWorkflow());
+        ProjectWorkflowDTO workflow =
+            new ProjectWorkflowDTO(new Workflow("id", definition, Format.JSON), new ProjectWorkflow());
 
         when(projectFacade.addWorkflow(anyLong(), any()))
             .thenReturn(workflow);
@@ -323,7 +325,7 @@ public class ProjectApiControllerIntTest {
                 .jsonPath("$.description")
                 .isEqualTo("My description")
                 .jsonPath("$.id")
-                .isEqualTo(Validate.notNull(workflow.id(), "id"))
+                .isEqualTo(Validate.notNull(workflow.getId(), "id"))
                 .jsonPath("$.label")
                 .isEqualTo("New Workflow");
         } catch (Exception exception) {

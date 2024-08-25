@@ -32,7 +32,7 @@ import com.bytechef.embedded.configuration.domain.Integration;
 import com.bytechef.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
-import com.bytechef.embedded.configuration.dto.WorkflowDTO;
+import com.bytechef.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.embedded.configuration.facade.IntegrationFacade;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
@@ -157,7 +157,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
             workflowIds.addAll(getWorkflowIds(integration));
         } else {
             workflowIds.addAll(
-                CollectionUtils.map(integrationFacade.getIntegrationWorkflows(), WorkflowDTO::id));
+                CollectionUtils.map(integrationFacade.getIntegrationWorkflows(), IntegrationWorkflowDTO::getId));
         }
 
         if (workflowIds.isEmpty()) {

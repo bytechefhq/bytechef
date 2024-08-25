@@ -29,7 +29,7 @@ import com.bytechef.embedded.configuration.config.IntegrationIntTestConfiguratio
 import com.bytechef.embedded.configuration.domain.Integration;
 import com.bytechef.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.embedded.configuration.dto.IntegrationDTO;
-import com.bytechef.embedded.configuration.dto.WorkflowDTO;
+import com.bytechef.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.embedded.configuration.repository.IntegrationRepository;
 import com.bytechef.embedded.configuration.repository.IntegrationWorkflowRepository;
 import com.bytechef.platform.category.domain.Category;
@@ -107,7 +107,7 @@ public class IntegrationFacadeIntTest {
                     Workflow.Format.JSON),
                 List.of(), List.of()));
 
-        WorkflowDTO workflow = integrationFacade.addWorkflow(
+        IntegrationWorkflowDTO workflow = integrationFacade.addWorkflow(
             Validate.notNull(integration.getId(), "id"),
             "{\"label\": \"New Workflow\", \"description\": \"Description\", \"tasks\": []}");
 
@@ -289,12 +289,12 @@ public class IntegrationFacadeIntTest {
         Mockito.when(workflowFacade.getWorkflow(Mockito.anyString()))
             .thenReturn(new com.bytechef.platform.configuration.dto.WorkflowDTO(workflow, List.of(), List.of()));
 
-        List<WorkflowDTO> workflows = integrationFacade.getIntegrationWorkflows(
+        List<IntegrationWorkflowDTO> workflows = integrationFacade.getIntegrationWorkflows(
             Validate.notNull(integration.getId(), "id"));
 
         assertThat(
             workflows.stream()
-                .map(WorkflowDTO::getId)
+                .map(IntegrationWorkflowDTO::getId)
                 .toList())
                     .contains(workflow.getId());
     }

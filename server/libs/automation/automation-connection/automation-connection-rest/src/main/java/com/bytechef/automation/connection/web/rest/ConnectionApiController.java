@@ -80,14 +80,13 @@ public class ConnectionApiController implements ConnectionApi {
 
     @Override
     public ResponseEntity<List<ConnectionModel>> getWorkspaceConnections(
-        Long id, String componentName, Integer connectionVersion, ConnectionEnvironmentModel connectionEnvironment,
-        Long tagId) {
+        Long id, String componentName, Integer connectionVersion, ConnectionEnvironmentModel environment, Long tagId) {
 
         return ResponseEntity.ok(
             workspaceConnectionFacade
                 .getConnections(
                     id, componentName, connectionVersion,
-                    connectionEnvironment == null ? null : ConnectionEnvironment.valueOf(connectionEnvironment.name()),
+                    environment == null ? null : ConnectionEnvironment.valueOf(environment.name()),
                     tagId)
                 .stream()
                 .map(this::toConnectionModel)
@@ -95,7 +94,9 @@ public class ConnectionApiController implements ConnectionApi {
     }
 
     @Override
-    public ResponseEntity<ConnectionModel> updateConnection(Long id, ConnectionModel connectionModel) {
+    public ResponseEntity<ConnectionModel> updateConnection(
+        Long id, ConnectionModel connectionModel) {
+
         return ResponseEntity.ok(
             toConnectionModel(
                 connectionFacade.update(conversionService.convert(connectionModel.id(id), ConnectionDTO.class))));

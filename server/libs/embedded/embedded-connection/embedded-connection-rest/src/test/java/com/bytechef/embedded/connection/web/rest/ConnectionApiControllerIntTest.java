@@ -22,14 +22,14 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.embedded.connection.web.rest.mapper.ConnectionMapper;
+import com.bytechef.embedded.connection.web.rest.model.ConnectionModel;
+import com.bytechef.embedded.connection.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.connection.web.rest.mapper.ConnectionMapper;
-import com.bytechef.platform.connection.web.rest.model.ConnectionModel;
-import com.bytechef.platform.connection.web.rest.model.TagModel;
-import com.bytechef.platform.connection.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.platform.tag.web.rest.model.TagModel;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;

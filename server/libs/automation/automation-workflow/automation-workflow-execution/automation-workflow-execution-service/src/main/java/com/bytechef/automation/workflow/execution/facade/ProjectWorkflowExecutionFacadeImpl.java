@@ -29,7 +29,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectInstance;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
-import com.bytechef.automation.configuration.dto.WorkflowDTO;
+import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.service.ProjectInstanceService;
 import com.bytechef.automation.configuration.service.ProjectInstanceWorkflowService;
@@ -148,7 +148,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
             workflowIds.addAll(projectWorkflowService.getWorkflowIds(projectId));
         } else {
             workflowIds.addAll(
-                CollectionUtils.map(projectFacade.getProjectWorkflows(), WorkflowDTO::id));
+                CollectionUtils.map(projectFacade.getProjectWorkflows(), ProjectWorkflowDTO::getId));
         }
 
         Page<WorkflowExecution> workflowExecutionPage;

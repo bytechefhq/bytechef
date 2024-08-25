@@ -132,6 +132,7 @@ include("server:libs:embedded:embedded-workflow:embedded-workflow-execution:embe
 
 include("server:libs:platform:platform-api")
 include("server:libs:platform:platform-category:platform-category-api")
+include("server:libs:platform:platform-category:platform-category-rest:platform-category-rest-api")
 include("server:libs:platform:platform-category:platform-category-service")
 include("server:libs:platform:platform-component:platform-component-api")
 include("server:libs:platform:platform-component:platform-component-registry:platform-component-registry-api")
@@ -162,6 +163,7 @@ include("server:libs:platform:platform-security:platform-security-web:platform-s
 include("server:libs:platform:platform-security:platform-security-web:platform-security-web-impl")
 include("server:libs:platform:platform-swagger")
 include("server:libs:platform:platform-tag:platform-tag-api")
+include("server:libs:platform:platform-tag:platform-tag-rest:platform-tag-rest-api")
 include("server:libs:platform:platform-tag:platform-tag-service")
 include("server:libs:platform:platform-user:platform-user-api")
 include("server:libs:platform:platform-user:platform-user-rest:platform-user-rest-api")

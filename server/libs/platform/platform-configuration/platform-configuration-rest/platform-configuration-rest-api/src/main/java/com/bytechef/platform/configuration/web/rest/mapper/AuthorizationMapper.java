@@ -26,12 +26,9 @@ import org.springframework.lang.NonNull;
 /**
  * @author Ivica Cardic
  */
-public class AuthorizationMapper {
+@Mapper(config = PlatformConfigurationMapperSpringConfig.class)
+public interface AuthorizationMapper extends Converter<Authorization, AuthorizationModel> {
 
-    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
-    public interface AuthorizationToAuthorizationModelMapper extends Converter<Authorization, AuthorizationModel> {
-
-        @Override
-        AuthorizationModel convert(@NonNull Authorization authorization);
-    }
+    @Override
+    AuthorizationModel convert(@NonNull Authorization authorization);
 }

@@ -56,8 +56,9 @@ public abstract class WorkflowMapper {
         public abstract WorkflowModel convert(WorkflowDTO workflowDTO);
 
         @AfterMapping
-        public void afterMapping(WorkflowDTO workflow, @MappingTarget WorkflowModel workflowModel) {
-            WorkflowMapperUtils.afterMapping(workflow.inputs(), workflow.tasks(), workflow.triggers(), workflowModel);
+        public void afterMapping(WorkflowDTO workflowDTO, @MappingTarget WorkflowModel workflowModel) {
+            WorkflowMapperUtils.afterMapping(
+                workflowDTO.getInputs(), workflowDTO.getTasks(), workflowDTO.getTriggers(), workflowModel);
         }
     }
 

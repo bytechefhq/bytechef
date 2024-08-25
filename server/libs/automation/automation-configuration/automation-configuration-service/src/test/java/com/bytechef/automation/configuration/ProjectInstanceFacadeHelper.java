@@ -22,7 +22,7 @@ import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectInstanceDTO;
 import com.bytechef.automation.configuration.dto.ProjectInstanceWorkflowDTO;
-import com.bytechef.automation.configuration.dto.WorkflowDTO;
+import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectInstanceFacade;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
@@ -86,9 +86,9 @@ public class ProjectInstanceFacadeHelper {
     }
 
     public ProjectInstanceDTO createProjectInstance(long workspaceId, ProjectDTO projectDTO) {
-        WorkflowDTO workflowDTO = addTestWorkflow(projectDTO);
+        ProjectWorkflowDTO workflowDTO = addTestWorkflow(projectDTO);
 
-        ProjectWorkflow projectWorkflow = projectWorkflowRepository.findById(workflowDTO.projectWorkflowId())
+        ProjectWorkflow projectWorkflow = projectWorkflowRepository.findById(workflowDTO.getProjectWorkflowId())
             .get();
 
         projectFacade.publishProject(projectDTO.id(), "Published for test");
@@ -97,7 +97,7 @@ public class ProjectInstanceFacadeHelper {
 
         ProjectInstanceWorkflowDTO projectInstanceWorkflowDTO =
             new ProjectInstanceWorkflowDTO(List.of(), null, null, Map.of(), true, null, null, null, null, null, null, 0,
-                workflowDTO.id(), projectWorkflow.getWorkflowReferenceCode());
+                workflowDTO.getId(), projectWorkflow.getWorkflowReferenceCode());
 
         Project dbProject = projectRepository.findById(publishedProject.id())
             .orElseThrow();
@@ -120,7 +120,7 @@ public class ProjectInstanceFacadeHelper {
         return projectInstanceFacade.createProjectInstance(projectInstanceDTO);
     }
 
-    public WorkflowDTO addTestWorkflow(ProjectDTO projectDTO) {
+    public ProjectWorkflowDTO addTestWorkflow(ProjectDTO projectDTO) {
         Project project = projectDTO.toProject();
 
         return projectFacade.addWorkflow(

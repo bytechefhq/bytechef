@@ -26,18 +26,18 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.embedded.configuration.dto.IntegrationDTO;
-import com.bytechef.embedded.configuration.dto.WorkflowDTO;
+import com.bytechef.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.embedded.configuration.facade.IntegrationFacade;
 import com.bytechef.embedded.configuration.web.rest.config.IntegrationConfigurationRestTestConfiguration;
 import com.bytechef.embedded.configuration.web.rest.mapper.IntegrationMapper;
-import com.bytechef.embedded.configuration.web.rest.model.CategoryModel;
 import com.bytechef.embedded.configuration.web.rest.model.IntegrationModel;
-import com.bytechef.embedded.configuration.web.rest.model.TagModel;
 import com.bytechef.embedded.configuration.web.rest.model.UpdateTagsRequestModel;
+import com.bytechef.embedded.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
-import com.bytechef.platform.configuration.web.rest.model.WorkflowModel;
+import com.bytechef.platform.category.web.rest.model.CategoryModel;
 import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.platform.tag.web.rest.model.TagModel;
 import java.util.Iterator;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
@@ -172,7 +172,7 @@ public class IntegrationApiControllerIntTest {
     @Test
     public void testGetIntegrationWorkflows() {
         try {
-            WorkflowDTO workflow = new WorkflowDTO(
+            IntegrationWorkflowDTO workflow = new IntegrationWorkflowDTO(
                 new Workflow("workflow1", "{}", Format.JSON), new IntegrationWorkflow());
 
             when(integrationFacade.getIntegrationWorkflows(1L)).thenReturn(
@@ -287,7 +287,8 @@ public class IntegrationApiControllerIntTest {
         String definition = "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}";
 
         WorkflowModel workflowModel = new WorkflowModel().definition(definition);
-        WorkflowDTO workflow = new WorkflowDTO(new Workflow("id", definition, Format.JSON), new IntegrationWorkflow());
+        IntegrationWorkflowDTO workflow =
+            new IntegrationWorkflowDTO(new Workflow("id", definition, Format.JSON), new IntegrationWorkflow());
 
         when(integrationFacade.addWorkflow(anyLong(), any()))
             .thenReturn(workflow);
@@ -306,7 +307,7 @@ public class IntegrationApiControllerIntTest {
                 .jsonPath("$.description")
                 .isEqualTo("My description")
                 .jsonPath("$.id")
-                .isEqualTo(Validate.notNull(workflow.id(), "id"))
+                .isEqualTo(Validate.notNull(workflow.getId(), "id"))
                 .jsonPath("$.label")
                 .isEqualTo("New Workflow");
         } catch (Exception exception) {

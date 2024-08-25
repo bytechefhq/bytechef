@@ -19,7 +19,10 @@ package com.bytechef.platform.configuration.web.rest.mapper;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowTestConfigurationModel;
+import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.extensions.spring.DelegatingConverter;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -31,4 +34,9 @@ public interface WorkflowTestConfigurationMapper
 
     @Override
     WorkflowTestConfigurationModel convert(WorkflowTestConfiguration workflowTestConfiguration);
+
+    @InheritInverseConfiguration
+    @DelegatingConverter
+    @Mapping(target = "id", ignore = true)
+    WorkflowTestConfiguration convert(WorkflowTestConfigurationModel workflowTestConfigurationModel);
 }

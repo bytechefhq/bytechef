@@ -19,7 +19,9 @@ package com.bytechef.embedded.configuration.web.rest.mapper;
 import com.bytechef.embedded.configuration.domain.AppEvent;
 import com.bytechef.embedded.configuration.web.rest.mapper.config.EmbeddedConfigurationMapperSpringConfig;
 import com.bytechef.embedded.configuration.web.rest.model.AppEventModel;
+import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
+import org.mapstruct.extensions.spring.DelegatingConverter;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -28,5 +30,10 @@ import org.springframework.core.convert.converter.Converter;
 @Mapper(config = EmbeddedConfigurationMapperSpringConfig.class)
 public interface AppEventMapper extends Converter<AppEvent, AppEventModel> {
 
+    @Override
     AppEventModel convert(AppEvent appEvent);
+
+    @InheritInverseConfiguration
+    @DelegatingConverter
+    AppEvent invertConvert(AppEventModel appEventModel);
 }

@@ -32,7 +32,7 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
-import com.bytechef.automation.configuration.dto.WorkflowDTO;
+import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
@@ -131,10 +131,10 @@ public class ProjectFacadeIntTest {
     public void testAddWorkflow() {
         ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
 
-        WorkflowDTO workflowDTO = projectFacadeInstanceHelper.addTestWorkflow(projectDTO);
+        ProjectWorkflowDTO workflowDTO = projectFacadeInstanceHelper.addTestWorkflow(projectDTO);
 
         ProjectWorkflow projectWorkflow =
-            projectWorkflowServiceImpl.getProjectWorkflow(workflowDTO.projectWorkflowId());
+            projectWorkflowServiceImpl.getProjectWorkflow(workflowDTO.getProjectWorkflowId());
 
         Optional<Workflow> workflowOptional = workflowRepository.findById(projectWorkflow.getWorkflowId());
 
@@ -142,8 +142,8 @@ public class ProjectFacadeIntTest {
 
         Workflow workflow = workflowOptional.get();
 
-        assertThat(workflowDTO.description()).isEqualTo(workflow.getDescription());
-        assertThat(workflowDTO.label()).isEqualTo(workflow.getLabel());
+        assertThat(workflowDTO.getDescription()).isEqualTo(workflow.getDescription());
+        assertThat(workflowDTO.getLabel()).isEqualTo(workflow.getLabel());
     }
 
     @Test
@@ -297,10 +297,10 @@ public class ProjectFacadeIntTest {
                 project.getId(), project.getLastProjectVersion(), Validate.notNull(workflow.getId(), "id"),
                 "workflowReferenceCode"));
 
-        List<WorkflowDTO> workflows = projectFacade.getProjectWorkflows(Validate.notNull(project.getId(), "id"));
+        List<ProjectWorkflowDTO> workflows = projectFacade.getProjectWorkflows(Validate.notNull(project.getId(), "id"));
 
         List<String> ids = workflows.stream()
-            .map(WorkflowDTO::id)
+            .map(ProjectWorkflowDTO::getId)
             .toList();
 
         assertThat(ids).contains(workflow.getId());

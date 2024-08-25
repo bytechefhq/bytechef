@@ -43,5 +43,4 @@ public class WorkflowExecutionMapper {
         @Override
         WorkflowExecutionBasicModel convert(WorkflowExecution workflowExecution);
     }
-
 }

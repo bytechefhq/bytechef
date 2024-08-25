@@ -22,14 +22,14 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.connection.web.rest.mapper.WorkspaceConnectionMapper;
+import com.bytechef.automation.connection.web.rest.model.ConnectionModel;
+import com.bytechef.automation.connection.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.connection.web.rest.mapper.ConnectionMapper;
-import com.bytechef.platform.connection.web.rest.model.ConnectionModel;
-import com.bytechef.platform.connection.web.rest.model.TagModel;
-import com.bytechef.platform.connection.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.platform.tag.web.rest.model.TagModel;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +60,7 @@ public class ConnectionApiControllerIntTest {
     private ConnectionFacade connectionFacade;
 
     @Autowired
-    private ConnectionMapper connectionMapper;
+    private WorkspaceConnectionMapper workspaceConnectionMapper;
 
     @Autowired
     private MockMvc mockMvc;
@@ -110,7 +110,7 @@ public class ConnectionApiControllerIntTest {
                 .expectStatus()
                 .isOk()
                 .expectBody(ConnectionModel.class)
-                .isEqualTo(Validate.notNull(connectionMapper.convert(connectionDTO), "connectionModel")
+                .isEqualTo(Validate.notNull(workspaceConnectionMapper.convert(connectionDTO), "connectionModel")
                     .parameters(null));
         } catch (Exception exception) {
             Assertions.fail(exception);
@@ -158,7 +158,7 @@ public class ConnectionApiControllerIntTest {
             .expectStatus()
             .isOk()
             .expectBodyList(ConnectionModel.class)
-            .contains(Validate.notNull(connectionMapper.convert(connectionDTO), "connectionMapper")
+            .contains(Validate.notNull(workspaceConnectionMapper.convert(connectionDTO), "connectionMapper")
                 .parameters(null))
             .hasSize(1);
 

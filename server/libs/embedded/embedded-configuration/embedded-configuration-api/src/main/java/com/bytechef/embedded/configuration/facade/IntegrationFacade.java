@@ -18,7 +18,7 @@ package com.bytechef.embedded.configuration.facade;
 
 import com.bytechef.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.embedded.configuration.dto.IntegrationDTO;
-import com.bytechef.embedded.configuration.dto.WorkflowDTO;
+import com.bytechef.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.tag.domain.Tag;
@@ -30,7 +30,7 @@ import org.springframework.lang.NonNull;
  */
 public interface IntegrationFacade {
 
-    WorkflowDTO addWorkflow(long id, @NonNull String definition);
+    IntegrationWorkflowDTO addWorkflow(long id, @NonNull String definition);
 
     IntegrationDTO createIntegration(@NonNull IntegrationDTO integrationDTO);
 
@@ -46,15 +46,15 @@ public interface IntegrationFacade {
 
     List<Tag> getIntegrationTags();
 
-    List<WorkflowDTO> getIntegrationVersionWorkflows(long id, int integrationVersion);
+    List<IntegrationWorkflowDTO> getIntegrationVersionWorkflows(long id, int integrationVersion);
 
-    WorkflowDTO getIntegrationWorkflow(String workflowId);
+    IntegrationWorkflowDTO getIntegrationWorkflow(String workflowId);
 
-    WorkflowDTO getIntegrationWorkflow(long integrationWorkflowId);
+    IntegrationWorkflowDTO getIntegrationWorkflow(long integrationWorkflowId);
 
-    List<WorkflowDTO> getIntegrationWorkflows();
+    List<IntegrationWorkflowDTO> getIntegrationWorkflows();
 
-    List<WorkflowDTO> getIntegrationWorkflows(long id);
+    List<IntegrationWorkflowDTO> getIntegrationWorkflows(long id);
 
     List<IntegrationDTO> getIntegrations(
         Long categoryId, boolean integrationInstanceConfigurations, Long tagId, Status status);
@@ -65,5 +65,5 @@ public interface IntegrationFacade {
 
     void updateIntegrationTags(long id, @NonNull List<Tag> tags);
 
-    WorkflowDTO updateWorkflow(String workflowId, String definition, int version);
+    IntegrationWorkflowDTO updateWorkflow(String workflowId, String definition, int version);
 }

@@ -19,11 +19,11 @@ package com.bytechef.embedded.connection.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.StringUtils;
+import com.bytechef.embedded.connection.web.rest.model.ConnectionModel;
 import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.web.rest.model.ConnectionEnvironmentModel;
-import com.bytechef.platform.connection.web.rest.model.ConnectionModel;
 import com.bytechef.platform.constant.AppType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -74,14 +74,14 @@ public class ConnectionApiController implements ConnectionApi {
 
     @Override
     public ResponseEntity<List<ConnectionModel>> getConnections(
-        String componentName, Integer connectionVersion, ConnectionEnvironmentModel connectionEnvironment,
+        String componentName, Integer connectionVersion, ConnectionEnvironmentModel environment,
         Long tagId) {
 
         return ResponseEntity.ok(
             connectionFacade
                 .getConnections(
                     componentName, connectionVersion,
-                    connectionEnvironment == null ? null : ConnectionEnvironment.valueOf(connectionEnvironment.name()),
+                    environment == null ? null : ConnectionEnvironment.valueOf(environment.name()),
                     tagId, AppType.EMBEDDED)
                 .stream()
                 .map(this::toConnectionModel)

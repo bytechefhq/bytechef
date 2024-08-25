@@ -28,7 +28,7 @@ import com.bytechef.embedded.configuration.domain.IntegrationVersion;
 import com.bytechef.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.embedded.configuration.dto.IntegrationDTO;
-import com.bytechef.embedded.configuration.dto.WorkflowDTO;
+import com.bytechef.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.embedded.configuration.service.IntegrationService;
@@ -99,7 +99,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    public WorkflowDTO addWorkflow(long id, @NonNull String definition) {
+    public IntegrationWorkflowDTO addWorkflow(long id, @NonNull String definition) {
         Integration integration = integrationService.getIntegration(id);
 
         Workflow workflow = workflowService.create(definition, Format.JSON, SourceType.JDBC);
@@ -107,7 +107,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         IntegrationWorkflow integrationWorkflow = integrationWorkflowService.addWorkflow(
             id, integration.getLastIntegrationVersion(), workflow.getId());
 
-        return new WorkflowDTO(workflowFacade.getWorkflow(workflow.getId()), integrationWorkflow);
+        return new IntegrationWorkflowDTO(workflowFacade.getWorkflow(workflow.getId()), integrationWorkflow);
     }
 
     @Override
@@ -271,46 +271,46 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    public List<WorkflowDTO> getIntegrationVersionWorkflows(long id, int integrationVersion) {
+    public List<IntegrationWorkflowDTO> getIntegrationVersionWorkflows(long id, int integrationVersion) {
         List<IntegrationWorkflow> integrationWorkflows = integrationWorkflowService.getIntegrationWorkflows(
             id, integrationVersion);
 
         return CollectionUtils.map(
             integrationWorkflows,
-            integrationWorkflow -> new WorkflowDTO(
+            integrationWorkflow -> new IntegrationWorkflowDTO(
                 workflowFacade.getWorkflow(integrationWorkflow.getWorkflowId()), integrationWorkflow));
     }
 
     @Override
-    public WorkflowDTO getIntegrationWorkflow(String workflowId) {
+    public IntegrationWorkflowDTO getIntegrationWorkflow(String workflowId) {
         IntegrationWorkflow integrationWorkflow = integrationWorkflowService.getWorkflowIntegrationWorkflow(workflowId);
 
-        return new WorkflowDTO(workflowFacade.getWorkflow(workflowId), integrationWorkflow);
+        return new IntegrationWorkflowDTO(workflowFacade.getWorkflow(workflowId), integrationWorkflow);
     }
 
     @Override
-    public WorkflowDTO getIntegrationWorkflow(long integrationWorkflowId) {
+    public IntegrationWorkflowDTO getIntegrationWorkflow(long integrationWorkflowId) {
         IntegrationWorkflow integrationWorkflow = integrationWorkflowService.getIntegrationWorkflow(
             integrationWorkflowId);
 
-        return new WorkflowDTO(
+        return new IntegrationWorkflowDTO(
             workflowFacade.getWorkflow(integrationWorkflow.getWorkflowId()), integrationWorkflow);
     }
 
     @Override
-    public List<WorkflowDTO> getIntegrationWorkflows() {
+    public List<IntegrationWorkflowDTO> getIntegrationWorkflows() {
         List<IntegrationWorkflow> integrationWorkflows = integrationWorkflowService.getIntegrationWorkflows();
 
         return CollectionUtils.map(
             integrationWorkflows,
-            integrationWorkflow -> new WorkflowDTO(
+            integrationWorkflow -> new IntegrationWorkflowDTO(
                 workflowFacade.getWorkflow(integrationWorkflow.getWorkflowId()), integrationWorkflow));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<WorkflowDTO> getIntegrationWorkflows(long id) {
-        List<WorkflowDTO> workflowDTOs = List.of();
+    public List<IntegrationWorkflowDTO> getIntegrationWorkflows(long id) {
+        List<IntegrationWorkflowDTO> workflowDTOs = List.of();
 
         Integration integration = integrationService.getIntegration(id);
 
@@ -320,7 +320,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         if (!integrationWorkflows.isEmpty()) {
             workflowDTOs = CollectionUtils.map(
                 integrationWorkflows,
-                integrationWorkflow -> new WorkflowDTO(
+                integrationWorkflow -> new IntegrationWorkflowDTO(
                     workflowFacade.getWorkflow(integrationWorkflow.getWorkflowId()), integrationWorkflow));
         }
 
@@ -397,10 +397,10 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    public WorkflowDTO updateWorkflow(String workflowId, String definition, int version) {
+    public IntegrationWorkflowDTO updateWorkflow(String workflowId, String definition, int version) {
         IntegrationWorkflow integrationWorkflow = integrationWorkflowService.getWorkflowIntegrationWorkflow(workflowId);
 
-        return new WorkflowDTO(workflowFacade.update(workflowId, definition, version), integrationWorkflow);
+        return new IntegrationWorkflowDTO(workflowFacade.update(workflowId, definition, version), integrationWorkflow);
     }
 
     private void checkIntegrationStatus(Integration integration) {

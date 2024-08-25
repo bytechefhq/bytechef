@@ -18,7 +18,7 @@ package com.bytechef.automation.configuration.facade;
 
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
-import com.bytechef.automation.configuration.dto.WorkflowDTO;
+import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
@@ -29,7 +29,7 @@ import org.springframework.lang.NonNull;
  */
 public interface ProjectFacade {
 
-    WorkflowDTO addWorkflow(long id, @NonNull String definition);
+    ProjectWorkflowDTO addWorkflow(long id, @NonNull String definition);
 
     ProjectDTO createProject(@NonNull ProjectDTO projectDTO);
 
@@ -47,15 +47,15 @@ public interface ProjectFacade {
 
     List<Tag> getProjectTags();
 
-    WorkflowDTO getProjectWorkflow(String workflowId);
+    ProjectWorkflowDTO getProjectWorkflow(String workflowId);
 
-    WorkflowDTO getProjectWorkflow(long projectWorkflowId);
+    ProjectWorkflowDTO getProjectWorkflow(long projectWorkflowId);
 
-    List<WorkflowDTO> getProjectWorkflows();
+    List<ProjectWorkflowDTO> getProjectWorkflows();
 
-    List<WorkflowDTO> getProjectWorkflows(long id);
+    List<ProjectWorkflowDTO> getProjectWorkflows(long id);
 
-    List<WorkflowDTO> getProjectVersionWorkflows(long id, int projectVersion);
+    List<ProjectWorkflowDTO> getProjectVersionWorkflows(long id, int projectVersion);
 
     List<ProjectDTO> getProjects(Long categoryId, boolean projectInstances, Long tagId, Status status);
 
@@ -68,5 +68,5 @@ public interface ProjectFacade {
 
     void updateProjectTags(long id, @NonNull List<Tag> tags);
 
-    WorkflowDTO updateWorkflow(String workflowId, String definition, int version);
+    ProjectWorkflowDTO updateWorkflow(String workflowId, String definition, int version);
 }

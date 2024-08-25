@@ -21,6 +21,7 @@ import com.bytechef.platform.workflow.execution.web.rest.mapper.config.PlatformW
 import com.bytechef.platform.workflow.execution.web.rest.model.TriggerExecutionModel;
 import java.util.Optional;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -30,6 +31,7 @@ import org.springframework.core.convert.converter.Converter;
 public interface TriggerExecutionMapper extends Converter<TriggerExecutionDTO, TriggerExecutionModel> {
 
     @Override
+    @Mapping(target = "workflowTrigger.connections", ignore = true)
     TriggerExecutionModel convert(TriggerExecutionDTO triggerExecutionDTO);
 
     default String map(Optional<String> optional) {

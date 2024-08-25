@@ -19,7 +19,9 @@ package com.bytechef.automation.configuration.web.rest.mapper;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.web.rest.mapper.config.AutomationConfigurationMapperSpringConfig;
 import com.bytechef.automation.configuration.web.rest.model.WorkspaceModel;
+import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
+import org.mapstruct.extensions.spring.DelegatingConverter;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -30,4 +32,8 @@ public interface WorkspaceMapper extends Converter<Workspace, WorkspaceModel> {
 
     @Override
     WorkspaceModel convert(Workspace workspace);
+
+    @InheritInverseConfiguration
+    @DelegatingConverter
+    Workspace invertConvert(WorkspaceModel workspaceModel);
 }
