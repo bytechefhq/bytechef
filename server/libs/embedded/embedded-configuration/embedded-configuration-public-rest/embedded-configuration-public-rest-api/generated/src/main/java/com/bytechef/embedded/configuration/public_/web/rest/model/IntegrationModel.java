@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:40.749522+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T17:59:20.075746+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class IntegrationModel {
 
   private Boolean allowMultipleInstances = false;
