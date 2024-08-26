@@ -131,8 +131,8 @@ const ProjectWorkflowListItem = ({
             <div className="flex justify-end gap-x-6">
                 <Tooltip>
                     <TooltipTrigger className="flex items-center text-sm text-gray-500">
-                        <span>
-                            {`Modified at ${workflow.lastModifiedDate?.toLocaleDateString()} ${workflow.lastModifiedDate?.toLocaleTimeString()}`}
+                        <span className="text-xs">
+                            {`Updated at ${workflow.lastModifiedDate?.toLocaleDateString()} ${workflow.lastModifiedDate?.toLocaleTimeString()}`}
                         </span>
                     </TooltipTrigger>
 

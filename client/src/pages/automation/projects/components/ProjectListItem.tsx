@@ -194,11 +194,11 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                                 <TooltipTrigger>
                                     <div className="flex items-center text-sm text-gray-500 sm:mt-0">
                                         {project.lastPublishedDate ? (
-                                            <span>
+                                            <span className="text-xs">
                                                 {`Published at ${project.lastPublishedDate?.toLocaleDateString()} ${project.lastPublishedDate?.toLocaleTimeString()}`}
                                             </span>
                                         ) : (
-                                            '-'
+                                            <span className="text-xs">Not yet published</span>
                                         )}
                                     </div>
                                 </TooltipTrigger>

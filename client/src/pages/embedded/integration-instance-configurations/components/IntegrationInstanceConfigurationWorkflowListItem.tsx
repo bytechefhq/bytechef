@@ -119,7 +119,7 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
                 {integrationInstanceConfigurationWorkflow?.lastExecutionDate ? (
                     <Tooltip>
                         <TooltipTrigger className="flex items-center text-sm text-gray-500">
-                            <span>
+                            <span className="text-xs">
                                 {`Executed at ${integrationInstanceConfigurationWorkflow.lastExecutionDate?.toLocaleDateString()} ${integrationInstanceConfigurationWorkflow.lastExecutionDate?.toLocaleTimeString()}`}
                             </span>
                         </TooltipTrigger>
@@ -127,7 +127,7 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
                         <TooltipContent>Last Execution Date</TooltipContent>
                     </Tooltip>
                 ) : (
-                    '-'
+                    'No executions'
                 )}
 
                 {integrationInstanceConfigurationWorkflow && (

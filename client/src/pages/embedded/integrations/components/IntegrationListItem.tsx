@@ -212,11 +212,11 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                                     <TooltipTrigger>
                                         <div className="flex items-center text-sm text-gray-500 sm:mt-0">
                                             {integration.lastPublishedDate ? (
-                                                <span>
+                                                <span className="text-xs">
                                                     {`Published at ${integration.lastPublishedDate?.toLocaleDateString()} ${integration.lastPublishedDate?.toLocaleTimeString()}`}
                                                 </span>
                                             ) : (
-                                                '-'
+                                                <span className="text-xs">Not yet published</span>
                                             )}
                                         </div>
                                     </TooltipTrigger>
