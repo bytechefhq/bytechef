@@ -13,7 +13,7 @@ const defaultNodes: Node[] = [
             trigger: true,
             type: 'manual/v1/manual',
         },
-        id: 'manual',
+        id: 'trigger_1',
         position: {x: 0, y: 0},
         type: 'workflow',
     },

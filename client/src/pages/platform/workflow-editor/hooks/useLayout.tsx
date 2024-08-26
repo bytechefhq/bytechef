@@ -1,3 +1,4 @@
+import defaultNodes from '@/shared/defaultNodes';
 import {WorkflowTaskModel} from '@/shared/middleware/automation/configuration';
 import {
     ComponentDefinitionBasicModel,
@@ -23,13 +24,6 @@ const TASK_DISPATCHER_NAMES = [
     'parallel',
     'subflow',
 ];
-
-const MANUAL_TRIGGER_NODE: Node = {
-    data: {label: 'Manual'},
-    id: 'manual',
-    position: {x: 0, y: 0},
-    type: 'workflow',
-};
 
 const PLACEHOLDER_NODE_ID = getRandomId();
 
@@ -111,13 +105,13 @@ export default function useLayout({
     const {workflow} = useWorkflowDataStore();
 
     const triggerDefinition = componentDefinitions.find(
-        (definition) => definition.name === workflow.triggers?.[0].name
+        (definition) => definition.name === workflow.triggers?.[0]?.name
     );
 
     const triggerNode =
         triggerDefinition && workflow.triggers?.[0]
             ? convertTaskToNode(workflow.triggers[0], triggerDefinition, 0)
-            : MANUAL_TRIGGER_NODE;
+            : defaultNodes[0];
 
     let taskNodes: Array<Node> = [];
 
