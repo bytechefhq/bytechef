@@ -19,8 +19,8 @@ package com.bytechef.component.postgresql;
 import static com.bytechef.component.definition.ComponentDSL.jdbcComponent;
 import static com.bytechef.component.postgresql.constant.PostgreSQLConstants.POSTGRESQL;
 
-import com.bytechef.component.JdbcComponentHandler;
 import com.bytechef.component.definition.JdbcComponentDefinition;
+import com.bytechef.platform.component.definition.JdbcComponentHandler;
 import com.google.auto.service.AutoService;
 
 /**
