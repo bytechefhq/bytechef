@@ -147,11 +147,11 @@ const ProjectInstanceListItem = ({projectInstance, remainingTags}: ProjectInstan
                             <Tooltip>
                                 <TooltipTrigger className="flex items-center text-sm text-gray-500">
                                     {projectInstance.lastExecutionDate ? (
-                                        <span>
+                                        <span className="text-xs">
                                             {`Executed at ${projectInstance.lastExecutionDate?.toLocaleDateString()} ${projectInstance.lastExecutionDate?.toLocaleTimeString()}`}
                                         </span>
                                     ) : (
-                                        '-'
+                                        <span className="text-xs">No executions</span>
                                     )}
                                 </TooltipTrigger>
 

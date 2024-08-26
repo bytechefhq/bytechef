@@ -146,7 +146,7 @@ const ProjectInstanceWorkflowListItem = ({
                 {projectInstanceWorkflow?.lastExecutionDate && (
                     <Tooltip>
                         <TooltipTrigger className="flex items-center text-sm text-gray-500">
-                            <span>
+                            <span className="text-xs">
                                 {`Executed at ${projectInstanceWorkflow.lastExecutionDate?.toLocaleDateString()} ${projectInstanceWorkflow.lastExecutionDate?.toLocaleTimeString()}`}
                             </span>
                         </TooltipTrigger>

@@ -130,7 +130,7 @@ const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps
                             {connection.createdDate && (
                                 <Tooltip>
                                     <TooltipTrigger className="flex items-center text-sm text-gray-500">
-                                        <span>
+                                        <span className="text-xs">
                                             {`Created at ${connection.createdDate?.toLocaleDateString()} ${connection.createdDate?.toLocaleTimeString()}`}
                                         </span>
                                     </TooltipTrigger>

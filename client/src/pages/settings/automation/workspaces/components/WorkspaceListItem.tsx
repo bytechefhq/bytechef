@@ -70,8 +70,8 @@ const WorkspaceListItem = ({workspace}: WorkspaceListItemProps) => {
                 {workspace.createdDate && (
                     <Tooltip>
                         <TooltipTrigger className="flex items-center text-sm text-gray-500">
-                            <span>
-                                {`${workspace.createdDate?.toLocaleDateString()} ${workspace.createdDate?.toLocaleTimeString()}`}
+                            <span className="text-xs">
+                                {`Created at ${workspace.createdDate?.toLocaleDateString()} ${workspace.createdDate?.toLocaleTimeString()}`}
                             </span>
                         </TooltipTrigger>
 
