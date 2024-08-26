@@ -1,4 +1,46 @@
+plugins {
+    alias(libs.plugins.org.openapi.generator)
+}
+
+val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
+    apiPackage.set("com.bytechef.platform.connection.web.rest")
+    configOptions.set(
+        mapOf(
+            "dateLibrary" to "java8-localdatetime",
+            "interfaceOnly" to "true",
+            "useSpringBoot3" to "true",
+            "useTags" to "true"
+        )
+    )
+    generatorName.set("spring")
+    inputSpec.set( "$projectDir/openapi.yaml")
+    modelNameSuffix.set("Model")
+    modelPackage.set("com.bytechef.platform.connection.web.rest.model")
+    outputDir.set("$projectDir/generated")
+    schemaMappings.set(
+        mapOf(
+            "Page" to "org.springframework.data.domain.Page"
+        )
+    )
+}
+
 sourceSets.main.get().java.srcDir("$projectDir/generated/src/main/java")
+
+val generateOpenAPITypeScriptFetch by tasks.registering(org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
+    generatorName.set("typescript-fetch")
+    inputSpec.set("$projectDir/openapi.yaml")
+    modelNameSuffix.set("Model")
+    outputDir.set("$rootDir/client/src/shared/middleware/platform/connection")
+    typeMappings.set(
+        mapOf(
+            "DateTime" to "Date"
+        )
+    )
+}
+
+tasks.register("generateOpenAPI") {
+    dependsOn(generateOpenAPISpring, generateOpenAPITypeScriptFetch)
+}
 
 dependencies {
     annotationProcessor(libs.org.mapstruct.mapstruct.processor)
