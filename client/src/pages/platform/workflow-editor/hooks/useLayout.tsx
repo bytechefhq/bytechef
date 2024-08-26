@@ -102,21 +102,21 @@ export default function useLayout({
 
     const {getEdges, getNodes, setEdges, setNodes} = useReactFlow();
 
-    const {workflow} = useWorkflowDataStore();
+    const {
+        workflow: {componentNames, tasks, triggers},
+    } = useWorkflowDataStore();
 
-    const triggerDefinition = componentDefinitions.find(
-        (definition) => definition.name === workflow.triggers?.[0]?.name
-    );
+    const triggerComponentName = triggers?.[0]?.type.split('/')[0];
+
+    const triggerDefinition = componentDefinitions.find((definition) => definition.name === triggerComponentName);
 
     const triggerNode =
-        triggerDefinition && workflow.triggers?.[0]
-            ? convertTaskToNode(workflow.triggers[0], triggerDefinition, 0)
-            : defaultNodes[0];
+        triggerDefinition && triggers?.[0] ? convertTaskToNode(triggers[0], triggerDefinition, 0) : defaultNodes[0];
 
     let taskNodes: Array<Node> = [];
 
-    if (workflow.tasks) {
-        taskNodes = workflow.tasks?.map((task, index) => {
+    if (tasks) {
+        taskNodes = tasks?.map((task, index) => {
             const componentName = task.type.split('/')[0];
 
             const combinedDefinitions = [...componentDefinitions, ...taskDispatcherDefinitions];
@@ -193,5 +193,5 @@ export default function useLayout({
 
         setNodes(targetNodes);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [nodeCount, getEdges, getNodes, setNodes, triggerAndTaskNodes]);
+    }, [nodeCount, getEdges, getNodes, setNodes, triggerAndTaskNodes, componentNames]);
 }
