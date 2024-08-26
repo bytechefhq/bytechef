@@ -10,7 +10,6 @@ Component description.
 
 Categories: [helpers]
 
-
 Version: 1
 
 <hr />

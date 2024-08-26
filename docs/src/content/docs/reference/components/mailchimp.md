@@ -101,7 +101,6 @@ ___Sample Output:___
 ```{web_id=0, member_rating=0, vip=true, last_changed=2019-08-24T14:15:22, source=string, consents_to_one_to_one_messaging=true, email_client=string, unique_email_id=string, tags_count=0, list_id=string, full_name=string, merge_fields={property1=, property2=}, stats={avg_open_rate=0, ecommerce_data={currency_code=USD, total_revenue=0, number_of_orders=0}, avg_click_rate=0}, contact_id=string, last_note={note_id=0, created_at=2019-08-24T14:15:22, note=string, created_by=string}, email_address=string, status=subscribed, unsubscribe_reason=string, timestamp_opt=2019-08-24T14:15:22, ip_opt=string, location={dstoff=0, timezone=string, country_code=string, gmtoff=0, longitude=0, region=string, latitude=0}, ip_signup=string, tags=[{name=string, id=0}], marketing_permissions=[{text=string, marketing_permission_id=string, enabled=true}], email_type=string, language=string, interests={property1=true, property2=true}, timestamp_signup=2019-08-24T14:15:22, id=string, _links=[{href=string, rel=string, method=GET, targetSchema=string, schema=string}]}```
 
 
-
 Type: OBJECT
 
 

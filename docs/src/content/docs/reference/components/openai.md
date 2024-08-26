@@ -75,6 +75,7 @@ Type: STRING
 
 
 
+
 ### Create image
 Create an image using text-to-image models
 

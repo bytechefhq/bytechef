@@ -92,6 +92,7 @@ null
 Type: ARRAY
 
 
+
 #### Properties
 
 |     Type     |     Control Type     |
@@ -127,6 +128,7 @@ Get an email from your Gmail account via Id
 
 ### Get Thread
 Gets the specified thread.
+
 
 #### Properties
 
