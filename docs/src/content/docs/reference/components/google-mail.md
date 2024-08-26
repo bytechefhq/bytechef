@@ -45,7 +45,7 @@ Version: 1
 ### New Email
 Triggers when new mail is found in your Gmail inbox.
 
-#### Type: DYNAMIC_WEBHOOK
+#### Type: STATIC_WEBHOOK
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
@@ -74,6 +74,36 @@ Type: ARRAY
 
 
 
+### New Email Polling
+Periodically checks your Gmail inbox for any new incoming emails.
+
+#### Type: POLLING
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+null
+
+
+### Output
+
+
+
+Type: ARRAY
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| {STRING\(id), STRING\(threadId)} | OBJECT_BUILDER  |
+
+
+
+
+
+
+
 <hr />
 
 
@@ -93,30 +123,6 @@ Get an email from your Gmail account via Id
 | Metadata headers | [STRING] | ARRAY_BUILDER  |  When given and format is METADATA, only include headers specified.  |
 
 
-### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| [STRING] | ARRAY_BUILDER  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| NUMBER | NUMBER  |
-| {STRING\(partId), STRING\(mimeType), STRING\(filename), [{STRING\(name), STRING\(value)}]\(headers), {STRING\(attachmentId), INTEGER\(size), STRING\(data)}\(body), []\(parts)} | OBJECT_BUILDER  |
-| INTEGER | INTEGER  |
-| STRING | TEXT  |
-
-
-
-
 
 
 ### Get Thread
@@ -129,25 +135,6 @@ Gets the specified thread.
 | Thread ID | STRING | SELECT  |  The ID of the thread to retrieve.  |
 | Format | STRING | SELECT  |  The format to return the message in.  |
 | Metadata headers | [STRING] | ARRAY_BUILDER  |  When given and format is METADATA, only include headers specified.  |
-
-
-### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| [{STRING\(id), STRING\(threadId), [STRING]\(labelIds), STRING\(snippet), STRING\(historyId), NUMBER\(internalDate), {STRING\(partId), STRING\(mimeType), STRING\(filename), [{STRING\(name), STRING\(value)}]\(headers), {STRING\(attachmentId), INTEGER\(size), STRING\(data)}\(body), []\(parts)}\(payload), INTEGER\(sizeEstimate), STRING\(raw)}] | ARRAY_BUILDER  |
-
-
 
 
 
@@ -165,7 +152,7 @@ Lists the messages in the user's mailbox.
 | To | STRING | TEXT  |  The address receiving the new mail  |
 | Subject | STRING | TEXT  |  Words in the subject line  |
 | Category | STRING | SELECT  |  Messages in a certain category  |
-| Label | STRING | SELECT  |    |
+| Label | STRING | SELECT  |  |
 | Label IDs | [STRING] | ARRAY_BUILDER  |  Only return messages with labels that match all of the specified label IDs. Messages in a thread might have labels that other messages in the same thread don't have.  |
 | Include spam trash | BOOLEAN | SELECT  |  Include messages from SPAM and TRASH in the results.  |
 
@@ -181,7 +168,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| [{STRING\(id), STRING\(threadId), [STRING]\(labelIds), STRING\(snippet), STRING\(historyId), NUMBER\(internalDate), {STRING\(partId), STRING\(mimeType), STRING\(filename), [{STRING\(name), STRING\(value)}]\(headers), {STRING\(attachmentId), INTEGER\(size), STRING\(data)}\(body), []\(parts)}\(payload), INTEGER\(sizeEstimate), STRING\(raw)}] | ARRAY_BUILDER  |
+| [{STRING\(id), STRING\(threadId)}] | ARRAY_BUILDER  |
 | STRING | TEXT  |
 | NUMBER | NUMBER  |
 
@@ -197,7 +184,6 @@ Sends the specified message to the recipients in the To, Cc, and Bcc headers.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| From | STRING | TEXT  |  Email address of the sender, the mailbox account.  |
 | To | [STRING\($email)] | ARRAY_BUILDER  |  Recipients email addresses.  |
 | Subject | STRING | TEXT  |  Subject of the email.  |
 | Bcc | [STRING\($email)] | ARRAY_BUILDER  |  Bcc recipients email addresses.  |
@@ -219,13 +205,7 @@ Type: OBJECT
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | STRING | TEXT  |
-| STRING | TEXT  |
 | [STRING] | ARRAY_BUILDER  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| NUMBER | NUMBER  |
-| {STRING\(partId), STRING\(mimeType), STRING\(filename), [{STRING\(name), STRING\(value)}]\(headers), {STRING\(attachmentId), INTEGER\(size), STRING\(data)}\(body), []\(parts)} | OBJECT_BUILDER  |
-| INTEGER | INTEGER  |
 | STRING | TEXT  |
 
 
