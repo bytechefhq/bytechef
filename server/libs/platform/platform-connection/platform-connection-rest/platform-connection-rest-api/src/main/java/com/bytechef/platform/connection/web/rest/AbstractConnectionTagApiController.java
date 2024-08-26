@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.connection.web.rest.util;
+package com.bytechef.platform.connection.web.rest;
 
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.web.rest.model.TagModel;
 import com.bytechef.platform.connection.web.rest.model.UpdateTagsRequestModel;
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.tag.domain.Tag;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -27,17 +29,30 @@ import org.springframework.http.ResponseEntity;
 /**
  * @author Ivica Cardic
  */
-public class ConnectionTagApiControllerUtils {
+public abstract class AbstractConnectionTagApiController {
 
-    public static ResponseEntity<Void> updateConnectionTags(
-        Long id, UpdateTagsRequestModel updateTagsRequestModel, ConnectionFacade connectionFacade,
-        ConversionService conversionService) {
+    private final ConnectionFacade connectionFacade;
+    private final ConversionService conversionService;
 
-        List<TagModel> tagModels = updateTagsRequestModel.getTags();
+    @SuppressFBWarnings("EI")
+    public AbstractConnectionTagApiController(ConnectionFacade connectionFacade, ConversionService conversionService) {
+        this.connectionFacade = connectionFacade;
+        this.conversionService = conversionService;
+    }
 
+    public ResponseEntity<List<TagModel>> getConnectionTags() {
+        return ResponseEntity.ok(
+            connectionFacade.getConnectionTags(AppType.AUTOMATION)
+                .stream()
+                .map(tag -> conversionService.convert(tag, TagModel.class))
+                .toList());
+    }
+
+    public ResponseEntity<Void> updateConnectionTags(Long id, UpdateTagsRequestModel updateTagsRequestModel) {
         connectionFacade.update(
             id,
-            tagModels.stream()
+            updateTagsRequestModel.getTags()
+                .stream()
                 .map(tagModel -> conversionService.convert(tagModel, Tag.class))
                 .toList());
 

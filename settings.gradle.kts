@@ -145,7 +145,6 @@ include("server:libs:platform:platform-configuration:platform-configuration-rest
 include("server:libs:platform:platform-configuration:platform-configuration-service")
 include("server:libs:platform:platform-connection:platform-connection-api")
 include("server:libs:platform:platform-connection:platform-connection-rest:platform-connection-rest-api")
-include("server:libs:platform:platform-connection:platform-connection-rest:platform-connection-rest-impl")
 include("server:libs:platform:platform-connection:platform-connection-service")
 include("server:libs:platform:platform-data-storage:platform-data-storage-api")
 include("server:libs:platform:platform-data-storage:platform-data-storage-jdbc:platform-data-storage-jdbc-api")
