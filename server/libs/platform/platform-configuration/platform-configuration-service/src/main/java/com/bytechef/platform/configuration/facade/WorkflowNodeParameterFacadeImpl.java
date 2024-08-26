@@ -414,6 +414,10 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             return null;
         }
 
+        if (Objects.equals(workflowNodeName, "manual")) {
+            return Map.of("type", "manual/v1/manual", "parameters", Map.of());
+        }
+
         for (Map<String, ?> triggerMap : triggerMaps) {
             if (Objects.equals(triggerMap.get(WorkflowConstants.NAME), workflowNodeName)) {
                 if (!triggerMap.containsKey(WorkflowConstants.PARAMETERS)) {
