@@ -6,9 +6,116 @@ info:
 servers:
 - url: "/api/platform/internal"
 tags:
+  - name: "admin-api-key"
+    description: "The Platform User Admin API Key Internal API"
   - name: "authority"
     description: "The Platform User Authority Internal API"
 paths:
+  /admin-api-keys:
+    get:
+      description: "Get admin API keys."
+      summary: "Get admin api keys"
+      tags:
+        - "admin-api-key"
+      operationId: "getAdminApiKeys"
+      responses:
+        "200":
+          description: "The list of admin API keys."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/AdminApiKey"
+    post:
+      description: "Create a new admin API key."
+      summary: "Create a new admin API key"
+      tags:
+        - "admin-api-key"
+      operationId: "createAdminApiKey"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminApiKey"
+        required: true
+      responses:
+        "200":
+          description: "The secret admin API key object."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  secretKey:
+                    description: "The secret admin API key."
+                    type: "string"
+  /admin-api-keys/{id}:
+    delete:
+      description: "Delete an admin API key."
+      summary: "Delete an admin API key"
+      tags:
+        - "admin-api-key"
+      operationId: "deleteAdminApiKey"
+      parameters:
+        - name: "id"
+          description: "The id of an admin API key."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "Successful operation."
+    get:
+      description: "Get an admin API key by id."
+      summary: "Get an admin API key by id"
+      tags:
+        - "admin-api-key"
+      operationId: "getAdminApiKey"
+      parameters:
+        - name: "id"
+          description: "The id of an admin API key."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The admin API key object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminApiKey"
+    put:
+      description: "Update an existing admin API key."
+      summary: "Update an existing admin API key"
+      tags:
+        - "admin-api-key"
+      operationId: "updateAdminApiKey"
+      parameters:
+        - name: "id"
+          description: "The id of an admin API key."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminApiKey"
+        required: true
+      responses:
+        "200":
+          description: "The updated admin API key object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminApiKey"
   /authorities:
     get:
       description: "Get all authorities."
@@ -27,6 +134,56 @@ paths:
                   $ref: "#/components/schemas/Authority"
 components:
   schemas:
+    AdminApiKey:
+      description: "Contains generated key required for calling public Platform API."
+      type: "object"
+      required:
+        - name
+        - secretKey
+      properties:
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        id:
+          description: "The id of an admin api key."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        lastUsedDate:
+          description: "The last used date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        name:
+          description: "The name of an admin api key."
+          type: "string"
+        secretKey:
+          description: "The preview of secret admin api key."
+          type: "string"
+          readOnly: true
+    Authority:
+      description: "A user authority."
+      required:
+        - "name"
+      properties:
+        name:
+          description: "The name of an authority."
+          type: "string"
     ApiKey:
       description: "Contains generated key required for calling API."
       type: "object"
