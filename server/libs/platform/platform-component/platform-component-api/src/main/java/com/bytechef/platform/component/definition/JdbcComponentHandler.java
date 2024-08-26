@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component;
+package com.bytechef.platform.component.definition;
 
 import com.bytechef.component.definition.JdbcComponentDefinition;
 
