@@ -45,7 +45,7 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ScriptComponentDefinition;
-import com.bytechef.platform.component.exception.ComponentExecutionException;
+import com.bytechef.platform.component.exception.ComponentConfigurationException;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.registry.definition.ParametersImpl;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
@@ -96,7 +96,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             return OptionalUtils.get(authorization.getAcquire())
                 .apply(new ParametersImpl(connectionParameters), context);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, ConnectionDefinitionErrorType.EXECUTE_ACQUIRE);
+            throw new ComponentConfigurationException(e, ConnectionDefinitionErrorType.EXECUTE_ACQUIRE);
         }
     }
 
@@ -114,7 +114,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         try {
             return applyFunction.apply(new ParametersImpl(connectionParameters), context);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, ConnectionDefinitionErrorType.EXECUTE_AUTHORIZATION_APPLY);
+            throw new ComponentConfigurationException(e, ConnectionDefinitionErrorType.EXECUTE_AUTHORIZATION_APPLY);
         }
     }
 
@@ -137,7 +137,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             try {
                 pkce = pkceFunction.apply(null, null, "SHA256", context);
             } catch (Exception e) {
-                throw new ComponentExecutionException(e, ConnectionDefinitionErrorType.EXECUTE_AUTHORIZATION_CALLBACK);
+                throw new ComponentConfigurationException(
+                    e, ConnectionDefinitionErrorType.EXECUTE_AUTHORIZATION_CALLBACK);
             }
 
             verifier = pkce.verifier();
@@ -164,7 +165,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 new ParametersImpl(connectionParameters), MapUtils.getString(connectionParameters, CODE),
                 redirectUri, verifier, context);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, ConnectionDefinitionErrorType.EXECUTE_AUTHORIZATION_CALLBACK);
+            throw new ComponentConfigurationException(
+                e, ConnectionDefinitionErrorType.EXECUTE_AUTHORIZATION_CALLBACK);
         }
     }
 
@@ -216,7 +218,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             return refreshFunction.apply(new ParametersImpl(connectionParameters), context);
 
         } catch (Exception exception) {
-            throw new ComponentExecutionException("Unable to perform oauth token refresh", exception,
+            throw new ComponentConfigurationException(
+                "Unable to perform oauth token refresh", exception,
                 ConnectionDefinitionErrorType.EXECUTE_AUTHORIZATION_REFRESH);
         }
     }
@@ -311,7 +314,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 clientIdFunction.apply(connectionParameters, context), Map.of("access_type", "offline"),
                 scopesFunction.apply(connectionParameters, context));
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, ConnectionDefinitionErrorType.GET_OAUTH2_AUTHORIZATION_PARAMETERS);
+            throw new ComponentConfigurationException(
+                e, ConnectionDefinitionErrorType.GET_OAUTH2_AUTHORIZATION_PARAMETERS);
         }
     }
 
@@ -423,12 +427,12 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                     HttpResponse.BodyHandlers.ofString());
 
                 if (httpResponse.statusCode() < 200 || httpResponse.statusCode() > 299) {
-                    throw new ComponentExecutionException(
+                    throw new ComponentConfigurationException(
                         "Invalid claim", ConnectionDefinitionErrorType.GET_DEFAULT_AUTHORIZATION_CALLBACK_FUNCTION);
                 }
 
                 if (httpResponse.body() == null) {
-                    throw new ComponentExecutionException(
+                    throw new ComponentConfigurationException(
                         "Invalid claim", ConnectionDefinitionErrorType.GET_DEFAULT_AUTHORIZATION_CALLBACK_FUNCTION);
                 }
 
@@ -470,13 +474,13 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                     HttpResponse.BodyHandlers.ofString());
 
                 if (httpResponse.statusCode() < 200 || httpResponse.statusCode() > 299) {
-                    throw new ComponentExecutionException(
+                    throw new ComponentConfigurationException(
                         "OAuth provider rejected token refresh request",
                         ConnectionDefinitionErrorType.GET_DEFAULT_REFRESH_URL);
                 }
 
                 if (httpResponse.body() == null) {
-                    throw new ComponentExecutionException(
+                    throw new ComponentConfigurationException(
                         "Unable to locate access_token, body content misses",
                         ConnectionDefinitionErrorType.GET_DEFAULT_AUTHORIZATION_CALLBACK_FUNCTION);
                 }
@@ -531,7 +535,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         try {
             return tokenUrlFunction.apply(connectionParameters, context);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, ConnectionDefinitionErrorType.GET_DEFAULT_REFRESH_URL);
+            throw new ComponentConfigurationException(e, ConnectionDefinitionErrorType.GET_DEFAULT_REFRESH_URL);
         }
     }
 

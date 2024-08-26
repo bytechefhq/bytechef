@@ -21,34 +21,35 @@ import java.util.Map;
 
 /**
  * @author Igor Beslic
+ * @author Ivica Cardic
  */
-public class ComponentExecutionException extends AbstractComponentException {
+public class ComponentConfigurationException extends AbstractComponentException {
 
-    public ComponentExecutionException(String message, ErrorType errorType) {
+    public ComponentConfigurationException(String message, ErrorType errorType) {
         super(message, errorType);
     }
 
-    public ComponentExecutionException(
+    public ComponentConfigurationException(
         String message, Map<String, ?> inputParameters, ErrorType errorType) {
 
         super(message, inputParameters, errorType);
     }
 
-    public ComponentExecutionException(Throwable cause, ErrorType errorType) {
+    public ComponentConfigurationException(Throwable cause, ErrorType errorType) {
         super(cause, errorType);
     }
 
-    public ComponentExecutionException(
+    public ComponentConfigurationException(
         Throwable cause, Map<String, ?> inputParameters, ErrorType errorType) {
 
         super(cause, inputParameters, errorType);
     }
 
-    public ComponentExecutionException(String message, Throwable cause, ErrorType errorType) {
+    public ComponentConfigurationException(String message, Throwable cause, ErrorType errorType) {
         super(message, cause, errorType);
     }
 
-    public ComponentExecutionException(
+    public ComponentConfigurationException(
         String message, Throwable cause, Map<String, ?> inputParameters, ErrorType errorType) {
 
         super(message, cause, inputParameters, errorType);
@@ -56,7 +57,7 @@ public class ComponentExecutionException extends AbstractComponentException {
 
     @Override
     public String toString() {
-        return "ComponentExecutionException{" +
+        return "ComponentConfigurationException{" +
             "inputParameters=" + getInputParameters() +
             "} " + super.toString();
     }

@@ -52,7 +52,7 @@ public interface ActionDefinitionService {
      * @param connection           connection used to connect to outer source
      * @param context              additional technical data required by some actions
      * @return list of dynamically resolved properties
-     * @throws {@link com.bytechef.platform.component.exception.ComponentExecutionException} - if procession breaks
+     * @throws {@link com.bytechef.platform.component.exception.ComponentConfigurationException} - if procession breaks
      *                within ByteChef system or {@link com.bytechef.component.exception.ProviderException} - if external
      *                system is unavailable or call to it results in errors
      */

@@ -16,9 +16,8 @@
 
 package com.bytechef.platform.component.web.rest.error;
 
-import com.bytechef.platform.component.exception.ComponentExecutionException;
+import com.bytechef.platform.component.exception.AbstractComponentException;
 import com.bytechef.platform.web.rest.error.AbstractResponseEntityExceptionHandler;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -37,11 +36,8 @@ import org.springframework.web.context.request.WebRequest;
 public class ComponentResponseEntityExceptionHandler extends AbstractResponseEntityExceptionHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(ComponentExecutionException.class)
-    @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
-    public ResponseEntity<Object> handleComponentExecutionException(
-        final ComponentExecutionException exception, final WebRequest request) {
-
+    @ExceptionHandler(AbstractComponentException.class)
+    public ResponseEntity<Object> handleComponentException(AbstractComponentException exception, WebRequest request) {
         logger.error(exception.getMessage(), exception);
 
         return ResponseEntity

@@ -26,7 +26,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.exception.ComponentConfigurationException;
 import com.bytechef.component.file.storage.constant.FileStorageConstants;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -41,7 +40,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -118,7 +116,7 @@ public class FileStorageDownloadAction {
 
             return uri.toURL();
         } catch (URISyntaxException | MalformedURLException e) {
-            throw new ComponentConfigurationException("Unable to create URL", e, Map.of("URL", fileUrl));
+            throw new IllegalArgumentException("Unable to create URL=%s".formatted(fileUrl), e);
         }
     }
 

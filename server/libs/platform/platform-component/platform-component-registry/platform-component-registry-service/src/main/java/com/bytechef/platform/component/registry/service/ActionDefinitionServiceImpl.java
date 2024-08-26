@@ -37,6 +37,7 @@ import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
+import com.bytechef.platform.component.exception.ComponentConfigurationException;
 import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.registry.definition.ParametersImpl;
@@ -91,7 +92,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 throw (ProviderException) e;
             }
 
-            throw new ComponentExecutionException(
+            throw new ComponentConfigurationException(
                 e, inputParameters, ActionDefinitionErrorType.EXECUTE_DYNAMIC_PROPERTIES);
         }
     }
@@ -118,7 +119,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 (property, sampleOutput) -> new Output(
                     Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput));
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
+            throw new ComponentConfigurationException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
         }
     }
 
@@ -165,7 +166,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 throw (ProviderException) e;
             }
 
-            throw new ComponentExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_OPTIONS);
+            throw new ComponentConfigurationException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_OPTIONS);
         }
     }
 
@@ -216,7 +217,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 throw (ProviderException) e;
             }
 
-            throw new ComponentExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
+            throw new ComponentConfigurationException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
         }
     }
 
@@ -256,7 +257,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         try {
             return workflowNodeDescriptionFunction.apply(new ParametersImpl(inputParameters), context);
         } catch (Exception e) {
-            throw new ComponentExecutionException(
+            throw new ComponentConfigurationException(
                 e, inputParameters, ActionDefinitionErrorType.EXECUTE_WORKFLOW_NODE_DESCRIPTION);
         }
     }

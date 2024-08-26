@@ -23,6 +23,7 @@ import static com.bytechef.component.definition.Authorization.REFRESH_TOKEN;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.exception.ProviderException;
+import com.bytechef.platform.component.exception.ComponentConfigurationException;
 import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
@@ -90,7 +91,13 @@ public class TokenRefreshHelper {
             }
 
             if (exception instanceof ProviderException) {
-                throw new ComponentExecutionException(exception, errorType);
+                throw new ComponentConfigurationException(exception, errorType);
+            }
+
+            if (exception instanceof ComponentConfigurationException ||
+                exception instanceof ComponentExecutionException) {
+
+                throw exception;
             }
 
             throw exception;

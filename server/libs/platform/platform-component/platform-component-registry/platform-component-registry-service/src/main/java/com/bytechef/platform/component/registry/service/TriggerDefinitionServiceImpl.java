@@ -41,6 +41,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookRequestFunctio
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.component.definition.TriggerWorkflowNodeDescriptionFunction;
 import com.bytechef.component.exception.ProviderException;
+import com.bytechef.platform.component.exception.ComponentConfigurationException;
 import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.registry.definition.HttpHeadersImpl;
@@ -110,7 +111,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                     context),
                 valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty));
         } catch (Exception e) {
-            throw new ComponentExecutionException(
+            throw new ComponentConfigurationException(
                 e, inputParameters, TriggerDefinitionErrorType.EXECUTE_DYNAMIC_PROPERTIES);
         }
     }
@@ -195,7 +196,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                     searchText, context),
                 Option::new);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, inputParameters, TriggerDefinitionErrorType.EXECUTE_OPTIONS);
+            throw new ComponentConfigurationException(e, inputParameters, TriggerDefinitionErrorType.EXECUTE_OPTIONS);
         }
     }
 
@@ -326,7 +327,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         try {
             return workflowNodeDescriptionFunction.apply(new ParametersImpl(inputParameters), context);
         } catch (Exception e) {
-            throw new ComponentExecutionException(
+            throw new ComponentConfigurationException(
                 e, inputParameters, TriggerDefinitionErrorType.EXECUTE_WORKFLOW_NODE_DESCRIPTION);
         }
     }
