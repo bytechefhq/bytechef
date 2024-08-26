@@ -81,7 +81,9 @@ export default async function saveWorkflowDefinition(
         return;
     }
 
-    const {componentName, description, label, metadata, name, parameters, taskDispatcher, type, version} = nodeData;
+    const {componentName, description, label, metadata, name, parameters, taskDispatcher, type} = nodeData;
+
+    let {version} = nodeData;
 
     let {operationName} = nodeData;
 
@@ -92,7 +94,7 @@ export default async function saveWorkflowDefinition(
             queryFn: () =>
                 new TaskDispatcherDefinitionApi().getTaskDispatcherDefinition({
                     taskDispatcherName: componentName,
-                    taskDispatcherVersion: version,
+                    taskDispatcherVersion: version!,
                 }),
             queryKey: TaskDispatcherKeys.taskDispatcherDefinition({
                 taskDispatcherName: componentName,
@@ -110,6 +112,10 @@ export default async function saveWorkflowDefinition(
             queryFn: () => new ComponentDefinitionApi().getComponentDefinition({componentName}),
             queryKey: ComponentDefinitionKeys.componentDefinition({componentName}),
         });
+
+        if (!version) {
+            version = newNodeComponentDefinition?.version;
+        }
 
         if (!newNodeComponentDefinition) {
             return;
