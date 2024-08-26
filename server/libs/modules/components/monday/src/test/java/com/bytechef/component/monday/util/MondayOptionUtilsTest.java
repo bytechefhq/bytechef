@@ -40,8 +40,6 @@ import com.bytechef.component.monday.constant.MondayColumnType;
 import com.bytechef.test.component.properties.ParametersFactory;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
@@ -52,34 +50,25 @@ class MondayOptionUtilsTest {
 
     private final List<Option<String>> expectedOptions = List.of(option("name", "123"));
     private final Context mockedContext = mock(Context.class);
-    private MockedStatic<MondayUtils> mondayUtilsMockedStatic;
-    private final Parameters parameters =
-        ParametersFactory.createParameters(Map.of(WORKSPACE_ID, "abc", BOARD_ID, "abc"));
-
-    @BeforeEach
-    void beforeEach() {
-        mondayUtilsMockedStatic = mockStatic(MondayUtils.class);
-    }
-
-    @AfterEach
-    public void afterEach() {
-        mondayUtilsMockedStatic.close();
-    }
+    private final Parameters parameters = ParametersFactory.createParameters(
+        Map.of(WORKSPACE_ID, "abc", BOARD_ID, "abc"));
 
     @Test
     void testGetBoardIdOptions() {
         Map<String, Object> body = Map.of(DATA, Map.of(BOARDS, List.of(Map.of(ID, "123", NAME, "name"))));
 
-        mondayUtilsMockedStatic.when(() -> MondayUtils.executeGraphQLQuery(any(Context.class), anyString()))
-            .thenReturn(body);
+        try (MockedStatic<MondayUtils> mondayUtilsMockedStatic = mockStatic(MondayUtils.class)) {
+            mondayUtilsMockedStatic.when(() -> MondayUtils.executeGraphQLQuery(any(Context.class), anyString()))
+                .thenReturn(body);
 
-        List<Option<String>> boardIdOptions =
-            MondayOptionUtils.getBoardIdOptions(parameters, parameters, Map.of(), "", mockedContext);
+            List<Option<String>> boardIdOptions =
+                MondayOptionUtils.getBoardIdOptions(parameters, parameters, Map.of(), "", mockedContext);
 
-        mondayUtilsMockedStatic.verify(() -> MondayUtils.executeGraphQLQuery(mockedContext,
-            "query{boards(workspace_ids: [abc], order_by: created_at){id name}}"));
+            mondayUtilsMockedStatic.verify(() -> MondayUtils.executeGraphQLQuery(
+                mockedContext, "query{boards(workspace_ids: [abc], order_by: created_at){id name}}"));
 
-        assertEquals(expectedOptions, boardIdOptions);
+            assertEquals(expectedOptions, boardIdOptions);
+        }
     }
 
     @Test
@@ -91,43 +80,45 @@ class MondayOptionUtilsTest {
 
         for (MondayColumnType type : MondayColumnType.values()) {
             Option<String> expectedOption = option(type.getDisplayValue(), type.getName());
-            assertTrue(options.contains(expectedOption),
-                "Expected option not found: " + expectedOption);
+
+            assertTrue(options.contains(expectedOption), "Expected option not found: " + expectedOption);
         }
     }
 
     @Test
     void testGetGroupIdOptions() {
-        Map<String, Object> body =
-            Map.of(DATA, Map.of(BOARDS, List.of(Map.of("groups", List.of(Map.of(ID, "123", TITLE, "name"))))));
+        Map<String, Object> body = Map.of(
+            DATA, Map.of(BOARDS, List.of(Map.of("groups", List.of(Map.of(ID, "123", TITLE, "name"))))));
 
-        mondayUtilsMockedStatic.when(() -> MondayUtils.executeGraphQLQuery(any(Context.class), anyString()))
-            .thenReturn(body);
+        try (MockedStatic<MondayUtils> mondayUtilsMockedStatic = mockStatic(MondayUtils.class)) {
+            mondayUtilsMockedStatic.when(() -> MondayUtils.executeGraphQLQuery(any(Context.class), anyString()))
+                .thenReturn(body);
 
-        List<Option<String>> groupIdOptions =
-            MondayOptionUtils.getGroupIdOptions(parameters, parameters, Map.of(), "", mockedContext);
+            List<Option<String>> groupIdOptions =
+                MondayOptionUtils.getGroupIdOptions(parameters, parameters, Map.of(), "", mockedContext);
 
-        mondayUtilsMockedStatic
-            .verify(
+            mondayUtilsMockedStatic.verify(
                 () -> MondayUtils.executeGraphQLQuery(mockedContext, "query{boards(ids: [abc]){groups{id title}}}"));
 
-        assertEquals(expectedOptions, groupIdOptions);
+            assertEquals(expectedOptions, groupIdOptions);
+        }
     }
 
     @Test
     void testGetWorkspaceIdOptions() {
         Map<String, Object> body = Map.of(DATA, Map.of("workspaces", List.of(Map.of(ID, "123", NAME, "name"))));
 
-        mondayUtilsMockedStatic.when(() -> MondayUtils.executeGraphQLQuery(any(Context.class), anyString()))
-            .thenReturn(body);
+        try (MockedStatic<MondayUtils> mondayUtilsMockedStatic = mockStatic(MondayUtils.class)) {
+            mondayUtilsMockedStatic.when(() -> MondayUtils.executeGraphQLQuery(any(Context.class), anyString()))
+                .thenReturn(body);
 
-        List<Option<String>> workspaceIdOptions =
-            MondayOptionUtils.getWorkspaceIdOptions(parameters, parameters, Map.of(), "", mockedContext);
+            List<Option<String>> workspaceIdOptions = MondayOptionUtils.getWorkspaceIdOptions(
+                parameters, parameters, Map.of(), "", mockedContext);
 
-        mondayUtilsMockedStatic
-            .verify(() -> MondayUtils.executeGraphQLQuery(mockedContext, "query{workspaces{id name}}"));
+            mondayUtilsMockedStatic.verify(
+                () -> MondayUtils.executeGraphQLQuery(mockedContext, "query{workspaces{id name}}"));
 
-        assertEquals(expectedOptions, workspaceIdOptions);
+            assertEquals(expectedOptions, workspaceIdOptions);
+        }
     }
-
 }

@@ -64,8 +64,9 @@ class MondayUtilsTest {
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
-        assertEquals(Map.of("query", "query{boards(ids: board){columns{id title type settings_str description}}}"), body.getContent());
-
+        assertEquals(
+            Map.of("query", "query{boards(ids: board){columns{id title type settings_str description}}}"),
+            body.getContent());
     }
 
     @Test
@@ -91,5 +92,4 @@ class MondayUtilsTest {
 
         assertEquals(Map.of("query", "test query"), body.getContent());
     }
-
 }

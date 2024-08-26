@@ -60,8 +60,9 @@ import org.mockito.MockedStatic;
  */
 class MondayPropertiesUtilsTest {
 
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
     private static final String LABEL = "label";
+
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Parameters parameters = ParametersFactory.createParameters(Map.of(BOARD_ID, "board"));
 
     @Test
@@ -104,6 +105,7 @@ class MondayPropertiesUtilsTest {
 
     private static List<? extends ModifiableValueProperty<?, ? extends ModifiableValueProperty<?, ?>>>
         getExpectedProperties() {
+
         return List.of(
             bool(NAME)
                 .label(LABEL)
