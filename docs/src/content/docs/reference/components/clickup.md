@@ -8,7 +8,7 @@ description: "ClickUp is a cloud-based collaboration tool that offers task manag
 ClickUp is a cloud-based collaboration tool that offers task management, document sharing, goal tracking, and other productivity features for teams.
 
 
-Categories: [PROJECT_MANAGEMENT]
+Categories: [project-management]
 
 
 Version: 1

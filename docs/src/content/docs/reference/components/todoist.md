@@ -8,7 +8,7 @@ description: "Todoist is a task management application that helps users organize
 Todoist is a task management application that helps users organize and prioritize their to-do lists.
 
 
-Categories: [PRODUCTIVITY_AND_COLLABORATION]
+Categories: [productivity-and-collaboration]
 
 
 Version: 1

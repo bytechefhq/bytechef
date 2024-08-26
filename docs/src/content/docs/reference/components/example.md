@@ -8,7 +8,7 @@ description: "Component description."
 Component description.
 
 
-Categories: [HELPERS]
+Categories: [helpers]
 
 
 Version: 1
