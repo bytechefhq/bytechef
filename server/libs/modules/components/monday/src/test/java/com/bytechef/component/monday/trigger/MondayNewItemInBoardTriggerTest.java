@@ -46,8 +46,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
@@ -61,36 +59,24 @@ class MondayNewItemInBoardTriggerTest {
     private final HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
     private final HttpParameters mockedHttpParameters = mock(HttpParameters.class);
     private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
-    private MockedStatic<MondayUtils> mondayUtilsMockedStatic;
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    private static final String TEST_WORKFLOW_EXECUTION_ID = "testWorkflowExecutionId";
     private final Parameters parameters = ParametersFactory.createParameters(Map.of(BOARD_ID, "board"));
-
-    @BeforeEach
-    void beforeEach() {
-        mondayUtilsMockedStatic = mockStatic(MondayUtils.class);
-    }
-
-    @AfterEach
-    public void afterEach() {
-        mondayUtilsMockedStatic.close();
-    }
 
     @Test
     void testWebhookEnable() {
-        String webhookUrl = "testWebhookUrl";
+        try (MockedStatic<MondayUtils> mondayUtilsMockedStatic = mockStatic(MondayUtils.class)) {
+            mondayUtilsMockedStatic.when(() -> MondayUtils.executeGraphQLQuery(any(Context.class), anyString()))
+                .thenReturn(Map.of(DATA, Map.of("create_webhook", Map.of(ID, "123"))));
 
-        mondayUtilsMockedStatic.when(() -> MondayUtils.executeGraphQLQuery(any(Context.class), anyString()))
-            .thenReturn(Map.of(DATA, Map.of("create_webhook", Map.of(ID, "123"))));
+            WebhookEnableOutput dynamicWebhookEnableOutput = MondayNewItemInBoardTrigger.webhookEnable(
+                parameters, parameters, "testWebhookUrl", "testWorkflowExecutionId", mockedTriggerContext);
 
-        WebhookEnableOutput dynamicWebhookEnableOutput = MondayNewItemInBoardTrigger.webhookEnable(
-            parameters, parameters, webhookUrl, TEST_WORKFLOW_EXECUTION_ID, mockedTriggerContext);
+            Map<String, ?> outputParameters = dynamicWebhookEnableOutput.parameters();
+            LocalDateTime webhookExpirationDate = dynamicWebhookEnableOutput.webhookExpirationDate();
 
-        Map<String, ?> outputParameters = dynamicWebhookEnableOutput.parameters();
-        LocalDateTime webhookExpirationDate = dynamicWebhookEnableOutput.webhookExpirationDate();
-
-        assertEquals(Map.of(ID, "123"), outputParameters);
-        assertNull(webhookExpirationDate);
+            assertEquals(Map.of(ID, "123"), outputParameters);
+            assertNull(webhookExpirationDate);
+        }
     }
 
     @Test
@@ -103,19 +89,33 @@ class MondayNewItemInBoardTriggerTest {
         when(mockedWebhookBody.getContent(any(TypeReference.class)))
             .thenReturn(Map.of("event", eventMap));
 
-        mondayUtilsMockedStatic.when(() -> MondayUtils.executeGraphQLQuery(any(Context.class), anyString()))
-            .thenReturn(Map.of(DATA, Map.of(BOARDS, List.of(Map.of("items_page", Map.of("items", List.of(Map.of(
-                "column_values",
-                List.of(Map.of(TYPE, "date", TEXT, "2024-05-05", "column", Map.of(ID, "date_id")))))))))));
+        try (MockedStatic<MondayUtils> mondayUtilsMockedStatic = mockStatic(MondayUtils.class)) {
+            mondayUtilsMockedStatic.when(() -> MondayUtils.executeGraphQLQuery(any(Context.class), anyString()))
+                .thenReturn(
+                    Map.of(
+                        DATA,
+                        Map.of(
+                            BOARDS, List.of(
+                                Map.of(
+                                    "items_page",
+                                    Map.of(
+                                        "items",
+                                        List.of(
+                                            Map.of(
+                                                "column_values",
+                                                List.of(
+                                                    Map.of(
+                                                        TYPE, "date",
+                                                        TEXT, "2024-05-05", "column", Map.of(ID, "date_id")))))))))));
 
-        Map<String, Object> result = MondayNewItemInBoardTrigger.webhookRequest(
-            parameters, parameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedDynamicWebhookEnableOutput, mockedTriggerContext);
+            Map<String, Object> result = MondayNewItemInBoardTrigger.webhookRequest(
+                parameters, parameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
+                mockedWebhookMethod, mockedDynamicWebhookEnableOutput, mockedTriggerContext);
 
-        Map<String, Object> expectedResult = Map.of(
-            "boardId", 345, "pulseId", 123,
-            "columnValues", Map.of("date_id", LocalDate.of(2024, 5, 5)));
+            Map<String, Object> expectedResult = Map.of(
+                "boardId", 345, "pulseId", 123, "columnValues", Map.of("date_id", LocalDate.of(2024, 5, 5)));
 
-        assertEquals(expectedResult, result);
+            assertEquals(expectedResult, result);
+        }
     }
 }
