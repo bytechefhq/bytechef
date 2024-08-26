@@ -90,6 +90,10 @@ repositories {
     maven {
         url = uri("https://repo.spring.io/artifactory/snapshot/")
     }
+
+    maven {
+        url = uri("https://repo.spring.io/artifactory/milestone/")
+    }
 }
 
 spotbugs {
