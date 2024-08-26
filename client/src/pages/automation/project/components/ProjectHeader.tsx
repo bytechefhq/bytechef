@@ -209,7 +209,7 @@ const ProjectHeader = ({
                                             <PlusIcon className="mx-2 size-5" />
                                         </TooltipTrigger>
 
-                                        <TooltipContent>Create new workflow</TooltipContent>
+                                        <TooltipContent>New workflow</TooltipContent>
                                     </Tooltip>
                                 </Button>
                             }
