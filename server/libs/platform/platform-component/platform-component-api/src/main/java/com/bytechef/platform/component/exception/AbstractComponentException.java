@@ -16,48 +16,56 @@
 
 package com.bytechef.platform.component.exception;
 
+import com.bytechef.platform.exception.AbstractException;
 import com.bytechef.platform.exception.ErrorType;
+import java.util.Collections;
 import java.util.Map;
 
 /**
  * @author Igor Beslic
+ * @author Ivica Cardic
  */
-public class ComponentExecutionException extends AbstractComponentException {
+public abstract class AbstractComponentException extends AbstractException {
 
-    public ComponentExecutionException(String message, ErrorType errorType) {
+    private Map<String, ?> inputParameters;
+
+    public AbstractComponentException(String message, ErrorType errorType) {
         super(message, errorType);
     }
 
-    public ComponentExecutionException(
+    public AbstractComponentException(
         String message, Map<String, ?> inputParameters, ErrorType errorType) {
 
-        super(message, inputParameters, errorType);
+        super(message, errorType);
+
+        this.inputParameters = Collections.unmodifiableMap(inputParameters);
     }
 
-    public ComponentExecutionException(Throwable cause, ErrorType errorType) {
+    public AbstractComponentException(Throwable cause, ErrorType errorType) {
         super(cause, errorType);
     }
 
-    public ComponentExecutionException(
+    public AbstractComponentException(
         Throwable cause, Map<String, ?> inputParameters, ErrorType errorType) {
 
-        super(cause, inputParameters, errorType);
+        super(cause, errorType);
+
+        this.inputParameters = Collections.unmodifiableMap(inputParameters);
     }
 
-    public ComponentExecutionException(String message, Throwable cause, ErrorType errorType) {
+    public AbstractComponentException(String message, Throwable cause, ErrorType errorType) {
         super(message, cause, errorType);
     }
 
-    public ComponentExecutionException(
+    public AbstractComponentException(
         String message, Throwable cause, Map<String, ?> inputParameters, ErrorType errorType) {
 
-        super(message, cause, inputParameters, errorType);
+        super(message, cause, errorType);
+
+        this.inputParameters = Collections.unmodifiableMap(inputParameters);
     }
 
-    @Override
-    public String toString() {
-        return "ComponentExecutionException{" +
-            "inputParameters=" + getInputParameters() +
-            "} " + super.toString();
+    public Map<String, ?> getInputParameters() {
+        return inputParameters == null ? Collections.emptyMap() : Collections.unmodifiableMap(inputParameters);
     }
 }
