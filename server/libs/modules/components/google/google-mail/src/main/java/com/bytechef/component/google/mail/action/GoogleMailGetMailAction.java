@@ -216,5 +216,4 @@ public class GoogleMailGetMailAction {
 
         return responseMap;
     }
-
 }
