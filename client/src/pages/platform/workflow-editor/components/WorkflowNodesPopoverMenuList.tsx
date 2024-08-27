@@ -125,7 +125,7 @@ const WorkflowNodesPopoverMenuList = memo(
                                     operationName: clickedComponentDefinition.triggers?.[0].name,
                                     parameters: undefined,
                                     trigger: true,
-                                    type: `${clickedItem.name}/v1/${clickedComponentDefinition.triggers?.[0].name}`,
+                                    type: `${clickedItem.name}/v${clickedComponentDefinition.version}/${clickedComponentDefinition.triggers?.[0].name}`,
                                 },
                                 id: getFormattedName(clickedItem.name!, nodes),
                                 type: 'workflow',
@@ -363,7 +363,7 @@ const WorkflowNodesPopoverMenuList = memo(
                                             properties:
                                                 clickedComponentActionDefinition?.properties as Array<PropertyType>,
                                         }),
-                                        type: `${clickedComponentDefinition.name}/${clickedComponentDefinition.version}/${clickedComponentDefinition.actions?.[0].name}`,
+                                        type: `${clickedComponentDefinition.name}/v${clickedComponentDefinition.version}/${clickedComponentDefinition.actions?.[0].name}`,
                                     },
                                     workflow!,
                                     updateWorkflowMutation,
