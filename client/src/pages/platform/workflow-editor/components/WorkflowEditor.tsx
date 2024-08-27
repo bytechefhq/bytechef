@@ -180,6 +180,7 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [projectId, projectWorkflowId]);
+
     // Set workflowComponentWithAlias when latestComponentDefinition is changed
     useEffect(() => {
         if (!latestComponentDefinition || !componentNames?.length || !latestComponentName) {
@@ -212,7 +213,7 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
             });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [setWorkflow]);
+    }, [setWorkflow, componentNames]);
 
     // Set latest component name when component names change
     useEffect(() => {
