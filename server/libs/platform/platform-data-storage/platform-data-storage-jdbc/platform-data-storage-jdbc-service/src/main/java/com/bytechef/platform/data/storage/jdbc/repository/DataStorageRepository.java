@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.data.storage.jdbc.repository;
 
-import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.jdbc.domain.DataEntry;
 import java.util.List;
 import java.util.Optional;
@@ -35,9 +34,9 @@ public interface DataStorageRepository
 
     @Lock(LockMode.PESSIMISTIC_WRITE)
     Optional<DataEntry> findByComponentNameAndScopeAndScopeIdAndKeyAndType(
-        String componentName, DataStorageScope scope, String scopeId, String key, int type);
+        String componentName, int scope, String scopeId, String key, int type);
 
     @Lock(LockMode.PESSIMISTIC_WRITE)
     Optional<List<DataEntry>> findByComponentNameAndScopeAndScopeIdAndType(
-        String componentName, DataStorageScope scope, String scopeId, int type);
+        String componentName, int scope, String scopeId, int type);
 }

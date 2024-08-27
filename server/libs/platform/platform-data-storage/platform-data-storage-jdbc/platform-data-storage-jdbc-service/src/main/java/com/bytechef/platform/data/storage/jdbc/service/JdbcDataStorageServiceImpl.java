@@ -44,7 +44,8 @@ public class JdbcDataStorageServiceImpl implements DataStorageService, JdbcDataS
     @Override
     public void delete(String componentName, DataStorageScope scope, String scopeId, String key, AppType type) {
         dataStorageRepository
-            .findByComponentNameAndScopeAndScopeIdAndKeyAndType(componentName, scope, scopeId, key, type.ordinal())
+            .findByComponentNameAndScopeAndScopeIdAndKeyAndType(componentName, scope.ordinal(), scopeId, key,
+                type.ordinal())
             .ifPresentOrElse(dataStorageRepository::delete, null);
     }
 
@@ -54,7 +55,8 @@ public class JdbcDataStorageServiceImpl implements DataStorageService, JdbcDataS
     public <T> Optional<T>
         fetch(String componentName, DataStorageScope scope, String scopeId, String key, AppType type) {
         return dataStorageRepository
-            .findByComponentNameAndScopeAndScopeIdAndKeyAndType(componentName, scope, scopeId, key, type.ordinal())
+            .findByComponentNameAndScopeAndScopeIdAndKeyAndType(
+                componentName, scope.ordinal(), scopeId, key, type.ordinal())
             .map(dataEntry -> (T) dataEntry.getValue());
     }
 
@@ -68,7 +70,7 @@ public class JdbcDataStorageServiceImpl implements DataStorageService, JdbcDataS
     public <T> Map<String, T> getAll(String componentName, DataStorageScope scope, String scopeId, AppType type) {
         return OptionalUtils.get(
             dataStorageRepository
-                .findByComponentNameAndScopeAndScopeIdAndType(componentName, scope, scopeId, type.ordinal()))
+                .findByComponentNameAndScopeAndScopeIdAndType(componentName, scope.ordinal(), scopeId, type.ordinal()))
             .stream()
             .collect(Collectors.toMap(dataEntry -> String.valueOf(dataEntry.getKey()),
                 dataEntry -> (T) dataEntry.getValue()));
@@ -78,7 +80,8 @@ public class JdbcDataStorageServiceImpl implements DataStorageService, JdbcDataS
     public void
         put(String componentName, DataStorageScope scope, String scopeId, String key, AppType type, Object value) {
         dataStorageRepository
-            .findByComponentNameAndScopeAndScopeIdAndKeyAndType(componentName, scope, scopeId, key, type.ordinal())
+            .findByComponentNameAndScopeAndScopeIdAndKeyAndType(
+                componentName, scope.ordinal(), scopeId, key, type.ordinal())
             .ifPresentOrElse(
                 dataEntry -> {
                     dataEntry.setValue(value);
