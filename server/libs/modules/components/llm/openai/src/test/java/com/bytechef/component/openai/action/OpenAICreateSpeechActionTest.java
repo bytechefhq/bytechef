@@ -27,7 +27,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.FileEntry;
-import com.bytechef.component.llm.action.AbstractLLMActionTest;
+import com.bytechef.component.llm.test.AbstractLLMActionTest;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
 import org.mockito.Mockito;

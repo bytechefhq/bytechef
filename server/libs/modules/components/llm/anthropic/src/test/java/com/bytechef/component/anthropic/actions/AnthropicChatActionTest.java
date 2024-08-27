@@ -20,7 +20,7 @@ import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.anthropic.action.AnthropicChatAction;
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.llm.action.ChatActionTest;
+import com.bytechef.component.llm.test.ChatActionTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.anthropic.AnthropicChatModel;
 

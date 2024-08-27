@@ -19,7 +19,7 @@ package com.bytechef.component.openai.action;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.llm.action.TranscriptActionTest;
+import com.bytechef.component.llm.test.TranscriptActionTest;
 import java.net.MalformedURLException;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionModel;
