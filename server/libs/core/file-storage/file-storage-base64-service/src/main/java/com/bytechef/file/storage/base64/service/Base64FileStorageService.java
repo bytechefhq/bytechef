@@ -25,6 +25,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Set;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -43,6 +45,26 @@ public class Base64FileStorageService implements FileStorageService {
     @Override
     public boolean fileExists(String directoryPath, FileEntry fileEntry) throws FileStorageException {
         return true;
+    }
+
+    @Override
+    public boolean fileExists(String directoryPath, String nonRandomFilename) throws FileStorageException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public FileEntry getFileEntry(String directoryPath, String nonRandomFilename) throws FileStorageException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Set<FileEntry> getFileEntries(@NonNull String directoryPath) throws FileStorageException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Set<FileEntry> getFileEntries(@NonNull String directoryPath, String startWith) throws FileStorageException {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -89,6 +111,10 @@ public class Base64FileStorageService implements FileStorageService {
     }
 
     @Override
+    public FileEntry storeFileContent(String directoryPath, String filename, String data, boolean randomFilename)
+        throws FileStorageException {
+
+        return storeFileContent(directoryPath, filename, data);
     }
 
     @Override
@@ -98,6 +124,14 @@ public class Base64FileStorageService implements FileStorageService {
         } catch (IOException ioe) {
             throw new FileStorageException("Failed to store file", ioe);
         }
+    }
+
+    @Override
+    public FileEntry storeFileContent(
+        String directoryPath, String filename, InputStream inputStream, boolean randomFilename)
+        throws FileStorageException {
+
+        return storeFileContent(directoryPath, filename, inputStream);
     }
 
     private byte[] toByteArray(InputStream inputStream) throws FileStorageException, IOException {

@@ -20,6 +20,8 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.exception.FileStorageException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Set;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -29,6 +31,14 @@ public interface FileStorageService {
     void deleteFile(String directoryPath, FileEntry fileEntry);
 
     boolean fileExists(String directoryPath, FileEntry fileEntry) throws FileStorageException;
+
+    boolean fileExists(String directoryPath, String nonRandomFilename) throws FileStorageException;
+
+    FileEntry getFileEntry(String directoryPath, String nonRandomFilename) throws FileStorageException;
+
+    Set<FileEntry> getFileEntries(@NonNull String directoryPath) throws FileStorageException;
+
+    Set<FileEntry> getFileEntries(@NonNull String directoryPath, String contains) throws FileStorageException;
 
     InputStream getFileStream(String directoryPath, FileEntry fileEntry) throws FileStorageException;
 
@@ -45,8 +55,12 @@ public interface FileStorageService {
 
     FileEntry storeFileContent(String directoryPath, String filename, String data) throws FileStorageException;
 
+    FileEntry storeFileContent(String directoryPath, String filename, String data, boolean randomFilename)
+        throws FileStorageException;
+
     FileEntry storeFileContent(String directoryPath, String filename, InputStream inputStream)
         throws FileStorageException;
 
+    FileEntry storeFileContent(String directoryPath, String filename, InputStream inputStream, boolean randomFilename)
         throws FileStorageException;
 }
