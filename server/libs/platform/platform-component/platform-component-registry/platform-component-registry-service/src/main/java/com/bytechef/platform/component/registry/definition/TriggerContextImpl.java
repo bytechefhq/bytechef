@@ -19,12 +19,11 @@ package com.bytechef.platform.component.registry.definition;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.service.DataStorageService;
-import com.bytechef.platform.workflow.execution.constants.FileEntryConstants;
+import com.bytechef.platform.file.storage.FilesFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,13 +46,13 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
     public TriggerContextImpl(
         String componentName, int componentVersion, String triggerName, AppType type,
         String workflowReferenceCode, ComponentConnection connection, DataStorageService dataStorageService,
-        FileStorageService fileStorageService, HttpClientExecutor httpClientExecutor) {
+        FilesFileStorage filesFileStorage, HttpClientExecutor httpClientExecutor) {
 
         super(componentName, componentVersion, triggerName, connection, httpClientExecutor);
 
         this.data = type == null ? new NoOpDataImpl() : new DataImpl(
             componentName, componentVersion, triggerName, type, workflowReferenceCode, dataStorageService);
-        this.file = new FileImpl(fileStorageService);
+        this.file = new FileImpl(filesFileStorage);
     }
 
     @Override
@@ -127,24 +126,21 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
         }
     }
 
-    private record FileImpl(FileStorageService fileStorageService) implements File {
+    private record FileImpl(FilesFileStorage filesFileStorage) implements File {
 
         @Override
         public InputStream getStream(FileEntry fileEntry) {
-            return fileStorageService.getFileStream(
-                FileEntryConstants.FILES_DIR, ((FileEntryImpl) fileEntry).getFileEntry());
+            return filesFileStorage.getFileStream(((FileEntryImpl) fileEntry).getFileEntry());
         }
 
         @Override
         public String readToString(FileEntry fileEntry) {
-            return fileStorageService.readFileToString(
-                FileEntryConstants.FILES_DIR, ((FileEntryImpl) fileEntry).getFileEntry());
+            return filesFileStorage.readFileToString(((FileEntryImpl) fileEntry).getFileEntry());
         }
 
         @Override
         public FileEntry storeContent(String fileName, String data) {
-            return new FileEntryImpl(
-                fileStorageService.storeFileContent(FileEntryConstants.FILES_DIR, fileName, data));
+            return new FileEntryImpl(filesFileStorage.storeFileContent(fileName, data));
         }
 
         @Override
@@ -162,7 +158,7 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
                 tempFilePath = Files.createTempFile("trigger_context_", fileEntry.getName());
 
                 Files.copy(
-                    fileStorageService.getFileStream(FileEntryConstants.FILES_DIR, toFileEntry(fileEntry)),
+                    filesFileStorage.getFileStream(toFileEntry(fileEntry)),
                     tempFilePath,
                     StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
@@ -182,8 +178,7 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
         @Override
         public FileEntry storeContent(String fileName, InputStream inputStream) {
             try {
-                return new FileEntryImpl(
-                    fileStorageService.storeFileContent(FileEntryConstants.FILES_DIR, fileName, inputStream));
+                return new FileEntryImpl(filesFileStorage.storeFileContent(fileName, inputStream));
             } catch (Exception exception) {
                 throw new RuntimeException("Unable to store file " + fileName);
             }

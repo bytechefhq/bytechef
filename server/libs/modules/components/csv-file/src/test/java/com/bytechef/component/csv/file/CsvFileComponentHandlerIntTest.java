@@ -23,10 +23,9 @@ import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.component.csv.file.constant.CsvFileConstants;
-import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.test.ComponentJobTestExecutor;
 import com.bytechef.platform.component.test.annotation.ComponentIntTest;
-import com.bytechef.platform.workflow.execution.constants.FileEntryConstants;
+import com.bytechef.platform.file.storage.FilesFileStorage;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -47,7 +46,7 @@ class CsvFileComponentHandlerIntTest {
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
     @Autowired
-    private FileStorageService fileStorageService;
+    private FilesFileStorage filesFileStorage;
 
     @Autowired
     private ComponentJobTestExecutor componentJobTestExecutor;
@@ -63,9 +62,8 @@ class CsvFileComponentHandlerIntTest {
             ENCODER.encodeToString("csv-file_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 CsvFileConstants.FILE_ENTRY,
-                fileStorageService.storeFileContent(
-                    FileEntryConstants.FILES_DIR, sampleFile.getAbsolutePath(),
-                    Files.contentOf(sampleFile, StandardCharsets.UTF_8)),
+                filesFileStorage.storeFileContent(
+                    sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, StandardCharsets.UTF_8)),
                 CsvFileConstants.DELIMITER, ",", CsvFileConstants.HEADER_ROW, false,
                 CsvFileConstants.INCLUDE_EMPTY_CELLS, true));
 
@@ -90,9 +88,8 @@ class CsvFileComponentHandlerIntTest {
             ENCODER.encodeToString("csv-file_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 CsvFileConstants.FILE_ENTRY,
-                fileStorageService.storeFileContent(
-                    FileEntryConstants.FILES_DIR, sampleFile.getAbsolutePath(),
-                    Files.contentOf(sampleFile, StandardCharsets.UTF_8)),
+                filesFileStorage.storeFileContent(
+                    sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, StandardCharsets.UTF_8)),
                 CsvFileConstants.DELIMITER, ",",
                 CsvFileConstants.HEADER_ROW, true,
                 CsvFileConstants.INCLUDE_EMPTY_CELLS, true));
@@ -115,9 +112,8 @@ class CsvFileComponentHandlerIntTest {
             ENCODER.encodeToString("csv-file_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 CsvFileConstants.FILE_ENTRY,
-                fileStorageService.storeFileContent(
-                    FileEntryConstants.FILES_DIR, sampleFile.getAbsolutePath(),
-                    Files.contentOf(sampleFile, StandardCharsets.UTF_8)),
+                filesFileStorage.storeFileContent(
+                    sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, StandardCharsets.UTF_8)),
                 CsvFileConstants.DELIMITER, ",",
                 CsvFileConstants.HEADER_ROW, true,
                 CsvFileConstants.INCLUDE_EMPTY_CELLS, true,
@@ -141,9 +137,8 @@ class CsvFileComponentHandlerIntTest {
             ENCODER.encodeToString("csv-file_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 CsvFileConstants.FILE_ENTRY,
-                fileStorageService.storeFileContent(
-                    FileEntryConstants.FILES_DIR, sampleFile.getAbsolutePath(),
-                    Files.contentOf(sampleFile, StandardCharsets.UTF_8)),
+                filesFileStorage.storeFileContent(
+                    sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, StandardCharsets.UTF_8)),
                 CsvFileConstants.INCLUDE_EMPTY_CELLS, true, CsvFileConstants.DELIMITER, "|",
                 CsvFileConstants.HEADER_ROW, true));
 
@@ -178,9 +173,8 @@ class CsvFileComponentHandlerIntTest {
             ENCODER.encodeToString("csv-file_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 CsvFileConstants.FILE_ENTRY,
-                fileStorageService.storeFileContent(
-                    FileEntryConstants.FILES_DIR, sampleFile.getName(),
-                    Files.contentOf(sampleFile, StandardCharsets.UTF_8))));
+                filesFileStorage.storeFileContent(
+                    sampleFile.getName(), Files.contentOf(sampleFile, StandardCharsets.UTF_8))));
 
         outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 

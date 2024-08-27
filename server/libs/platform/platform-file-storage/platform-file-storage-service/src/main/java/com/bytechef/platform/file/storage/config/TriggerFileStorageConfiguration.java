@@ -23,6 +23,8 @@ import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.file.storage.base64.service.NoopFileStorageService;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
+import com.bytechef.platform.file.storage.FilesFileStorage;
+import com.bytechef.platform.file.storage.FilesFileStorageImpl;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.file.storage.TriggerFileStorageImpl;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -47,13 +49,26 @@ public class TriggerFileStorageConfiguration {
     }
 
     @Bean
-    TriggerFileStorage triggerFileStorage(ApplicationProperties applicationProperties) {
+    FilesFileStorage filesFileStorage(ApplicationProperties applicationProperties) {
         Provider provider = applicationProperties.getWorkflow()
             .getOutputStorage()
             .getProvider();
 
         if (logger.isInfoEnabled()) {
             logger.info("Workflow trigger output storage provider type enabled: %s".formatted(provider));
+        }
+
+        return new FilesFileStorageImpl(getFileStorageService(provider));
+    }
+
+    @Bean
+    TriggerFileStorage triggerFileStorage(ApplicationProperties applicationProperties) {
+        Provider provider = applicationProperties.getWorkflow()
+            .getOutputStorage()
+            .getProvider();
+
+        if (logger.isInfoEnabled()) {
+            logger.info("Files storage provider type enabled: %s".formatted(provider));
         }
 
         return new TriggerFileStorageImpl(getFileStorageService(provider));

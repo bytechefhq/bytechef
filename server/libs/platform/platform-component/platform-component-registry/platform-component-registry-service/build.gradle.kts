@@ -17,6 +17,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-component:platform-component-registry:platform-component-registry-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-instance-api"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
+    implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-coordinator:platform-workflow-coordinator-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-api"))
 
@@ -32,6 +33,7 @@ dependencies {
     testImplementation(project(":server:libs:platform:platform-configuration:platform-configuration-instance-api"))
     testImplementation(project(":server:libs:platform:platform-component:platform-component-registry:platform-component-registry-service"))
     testImplementation(project(":server:libs:platform:platform-connection:platform-connection-service"))
+    testImplementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-service"))
     testImplementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-api"))
     testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
     testImplementation(project(":server:libs:modules:components:petstore"))

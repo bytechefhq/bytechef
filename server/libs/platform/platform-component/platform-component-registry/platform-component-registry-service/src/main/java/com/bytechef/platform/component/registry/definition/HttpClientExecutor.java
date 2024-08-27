@@ -30,14 +30,13 @@ import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.registry.facade.OperationDefinitionFacade;
 import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.registry.util.RefreshCredentialsUtils;
-import com.bytechef.platform.workflow.execution.constants.FileEntryConstants;
+import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.mizosoft.methanol.FormBodyPublisher;
@@ -92,16 +91,16 @@ public class HttpClientExecutor implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;
     private final ConnectionDefinitionService connectionDefinitionService;
-    private final FileStorageService fileStorageService;
+    private final FilesFileStorage filesFileStorage;
     private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI")
     public HttpClientExecutor(
-        ConnectionDefinitionService connectionDefinitionService, FileStorageService fileStorageService,
+        ConnectionDefinitionService connectionDefinitionService, FilesFileStorage filesFileStorage,
         ObjectMapper objectMapper) {
 
         this.connectionDefinitionService = connectionDefinitionService;
-        this.fileStorageService = fileStorageService;
+        this.filesFileStorage = filesFileStorage;
         this.objectMapper = objectMapper;
     }
 
@@ -296,8 +295,8 @@ public class HttpClientExecutor implements ApplicationContextAware {
         builder.formPart(
             name, fileEntry.getName(),
             MoreBodyPublishers.ofMediaType(
-                BodyPublishers.ofInputStream(() -> fileStorageService.getFileStream(
-                    FileEntryConstants.FILES_DIR, ((FileEntryImpl) fileEntry).getFileEntry())),
+                BodyPublishers.ofInputStream(() -> filesFileStorage.getFileStream(
+                    ((FileEntryImpl) fileEntry).getFileEntry())),
                 MediaType.parse(fileEntry.getMimeType())));
     }
 
@@ -342,8 +341,8 @@ public class HttpClientExecutor implements ApplicationContextAware {
 
     private BodyPublisher getBinaryBodyPublisher(Body body, FileEntry fileEntry) {
         return MoreBodyPublishers.ofMediaType(
-            BodyPublishers.ofInputStream(() -> fileStorageService.getFileStream(
-                FileEntryConstants.FILES_DIR, ((FileEntryImpl) fileEntry).getFileEntry())),
+            BodyPublishers
+                .ofInputStream(() -> filesFileStorage.getFileStream(((FileEntryImpl) fileEntry).getFileEntry())),
             MediaType.parse(body.getMimeType() == null ? fileEntry.getMimeType() : body.getMimeType()));
     }
 
@@ -499,8 +498,7 @@ public class HttpClientExecutor implements ApplicationContextAware {
             }
         }
 
-        return new FileEntryImpl(
-            fileStorageService.storeFileContent(FileEntryConstants.FILES_DIR, filename, httpResponseBody));
+        return new FileEntryImpl(filesFileStorage.storeFileContent(filename, httpResponseBody));
     }
 
     private class ResponseImpl implements Response {

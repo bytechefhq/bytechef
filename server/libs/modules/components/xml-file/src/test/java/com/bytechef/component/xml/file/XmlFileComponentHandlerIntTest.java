@@ -24,10 +24,9 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.file.storage.domain.FileEntry;
-import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.test.ComponentJobTestExecutor;
 import com.bytechef.platform.component.test.annotation.ComponentIntTest;
-import com.bytechef.platform.workflow.execution.constants.FileEntryConstants;
+import com.bytechef.platform.file.storage.FilesFileStorage;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -47,7 +46,7 @@ public class XmlFileComponentHandlerIntTest {
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
     @Autowired
-    private FileStorageService fileStorageService;
+    private FilesFileStorage filesFileStorage;
 
     @Autowired
     private ComponentJobTestExecutor componentJobTestExecutor;
@@ -63,9 +62,8 @@ public class XmlFileComponentHandlerIntTest {
             ENCODER.encodeToString("xml-file_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 FILE_ENTRY,
-                fileStorageService.storeFileContent(
-                    FileEntryConstants.FILES_DIR, sampleFile.getAbsolutePath(),
-                    Files.contentOf(sampleFile, StandardCharsets.UTF_8))));
+                filesFileStorage.storeFileContent(
+                    sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, StandardCharsets.UTF_8))));
 
         Assertions.assertThat(job.getStatus())
             .isEqualTo(Job.Status.COMPLETED);
@@ -109,7 +107,7 @@ public class XmlFileComponentHandlerIntTest {
             .isEqualTo("file.xml");
 
         Assertions
-            .assertThat(XmlUtils.read(fileStorageService.readFileToString(FileEntryConstants.FILES_DIR, fileEntry)))
+            .assertThat(XmlUtils.read(filesFileStorage.readFileToString(fileEntry)))
             .isEqualTo(
                 XmlUtils.read(
                     "<root><Flower><id>45</id><petals>9</petals><color>RED</color><Florists><Florist><name>Joe</name></Florist><Florist><name>Mark</name></Florist></Florists><name>Poppy</name></Flower></root>"));
