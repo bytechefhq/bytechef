@@ -6,14 +6,13 @@ import 'reactflow/dist/base.css';
 
 import './WorkflowEditorLayout.css';
 
-import defaultNodes from '@/shared/defaultNodes';
 import {
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionBasicModel,
 } from '@/shared/middleware/platform/configuration';
 import {useGetPreviousWorkflowNodeOutputsQuery} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {useGetWorkflowNodeParameterDisplayConditionsQuery} from '@/shared/queries/platform/workflowNodeParameters.queries';
-import {ComponentType, UpdateWorkflowMutationType} from '@/shared/types';
+import {UpdateWorkflowMutationType} from '@/shared/types';
 import {useEffect, useState} from 'react';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -90,37 +89,6 @@ const WorkflowEditorLayout = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentNodeName, workflow?.nodeNames.length]);
 
-    // set currentComponent when currentNodeName changes
-    useEffect(() => {
-        const combinedComponents = [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])];
-
-        if (!workflow.triggers?.length) {
-            combinedComponents.unshift(defaultNodes[0].data);
-        }
-
-        const workflowComponents = combinedComponents.map((workflowNode) => {
-            const {description, label, metadata, name, parameters, type} = workflowNode;
-
-            const [componentName, operationName] = type.split('/v\\d+/');
-
-            return {
-                componentName,
-                metadata,
-                notes: description,
-                operationName,
-                parameters,
-                title: label,
-                type,
-                workflowNodeName: name,
-            } as ComponentType;
-        });
-
-        if (workflowComponents && currentNodeName && currentComponent?.workflowNodeName !== currentNodeName) {
-            setCurrentComponent(workflowComponents.find((component) => component.workflowNodeName === currentNodeName));
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [workflow.tasks, workflow.triggers, currentNodeName]);
-
     // update display conditions when currentNode changes
     useEffect(() => {
         if (currentComponent && workflowNodeParameterDisplayConditions?.displayConditions) {
@@ -139,7 +107,7 @@ const WorkflowEditorLayout = ({
                 taskDispatcherDefinitions={taskDispatcherDefinitions}
             />
 
-            {currentNodeName && (
+            {currentComponent && (
                 <WorkflowNodeDetailsPanel
                     previousComponentDefinitions={previousComponentDefinitions}
                     updateWorkflowMutation={updateWorkflowMutation}
