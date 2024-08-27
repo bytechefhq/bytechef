@@ -8,8 +8,8 @@
 package com.bytechef.ee.platform.data.storage.db.remote.web.rest.service;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -44,7 +44,7 @@ public class RemoteJdbcDataStorageServiceController {
             "application/json"
         })
     public ResponseEntity<Object> fetchValue(
-        @PathVariable String componentName, @PathVariable Scope scope,
+        @PathVariable String componentName, @PathVariable DataStorageScope scope,
         @PathVariable String scopeId, @PathVariable String key, @PathVariable AppType type) {
 
         return ResponseEntity.ok(
@@ -58,7 +58,7 @@ public class RemoteJdbcDataStorageServiceController {
             "application/json"
         })
     public ResponseEntity<Void> save(
-        @PathVariable String componentName, @PathVariable Scope scope,
+        @PathVariable String componentName, @PathVariable DataStorageScope scope,
         @PathVariable String scopeId, @PathVariable String key, @PathVariable AppType type, @RequestBody Object data) {
 
         dataStorageService.put(componentName, scope, scopeId, key, type, data);

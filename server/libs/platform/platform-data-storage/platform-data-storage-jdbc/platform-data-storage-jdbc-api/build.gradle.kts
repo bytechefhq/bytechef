@@ -1,4 +1,4 @@
 dependencies {
     api(project(":server:libs:platform:platform-api"))
-    api(project(":sdks:backend:java:component-api"))
+    api(project(":server:libs:platform:platform-data-storage:platform-data-storage-api"))
 }

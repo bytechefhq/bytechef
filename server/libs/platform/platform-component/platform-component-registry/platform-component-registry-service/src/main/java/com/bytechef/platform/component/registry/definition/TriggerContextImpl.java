@@ -22,6 +22,7 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.service.DataStorageService;
 import com.bytechef.platform.workflow.execution.constants.FileEntryConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -86,19 +87,19 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
         @Override
         public <T> Optional<T> fetchValue(Data.Scope scope, String key) {
             return dataStorageService.fetch(
-                componentName, scope.toActionScope(), getScopeId(scope), key, type);
+                componentName, getDataStorageScope(scope), getScopeId(scope), key, type);
         }
 
         @Override
         public <T> T getValue(Data.Scope scope, String key) {
             return dataStorageService.get(
-                componentName, scope.toActionScope(), getScopeId(scope), key, type);
+                componentName, getDataStorageScope(scope), getScopeId(scope), key, type);
         }
 
         @Override
         public Void setValue(Data.Scope scope, String key, Object value) {
             dataStorageService.put(
-                componentName, scope.toActionScope(), getScopeId(scope), key, type, value);
+                componentName, getDataStorageScope(scope), getScopeId(scope), key, type, value);
 
             return null;
         }
@@ -106,9 +107,16 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
         @Override
         public Void deleteValue(Data.Scope scope, String key) {
             dataStorageService.delete(
-                componentName, scope.toActionScope(), getScopeId(scope), key, type);
+                componentName, getDataStorageScope(scope), getScopeId(scope), key, type);
 
             return null;
+        }
+
+        private DataStorageScope getDataStorageScope(Scope scope) {
+            return switch (scope) {
+                case WORKFLOW -> DataStorageScope.WORKFLOW;
+                case ACCOUNT -> DataStorageScope.ACCOUNT;
+            };
         }
 
         private String getScopeId(Data.Scope scope) {
