@@ -173,7 +173,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
             <HoverCard
                 onOpenChange={(open) => {
                     if (open) {
-                        setHoveredNodeName(id);
+                        setHoveredNodeName(data.name);
                     } else {
                         setHoveredNodeName(undefined);
                     }
