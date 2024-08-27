@@ -19,12 +19,11 @@ package com.bytechef.platform.component.registry.definition;
 import com.bytechef.atlas.coordinator.event.TaskProgressedApplicationEvent;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.FileEntry;
-import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.service.DataStorageService;
-import com.bytechef.platform.workflow.execution.constants.FileEntryConstants;
+import com.bytechef.platform.file.storage.FilesFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,7 +55,7 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
         String componentName, int componentVersion, String actionName, AppType type,
         Long instanceId, Long instanceWorkflowId, Long jobId, ComponentConnection connection,
         DataStorageService dataStorageService, ApplicationEventPublisher eventPublisher,
-        FileStorageService fileStorageService, HttpClientExecutor httpClientExecutor) {
+        FilesFileStorage filesFileStorage, HttpClientExecutor httpClientExecutor) {
 
         super(componentName, componentVersion, actionName, connection, httpClientExecutor);
 
@@ -75,7 +74,7 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
         }
 
         this.event = jobId == null ? progress -> {} : new EventImpl(eventPublisher, jobId);
-        this.file = new FileImpl(fileStorageService);
+        this.file = new FileImpl(filesFileStorage);
     }
 
     @Override
@@ -182,24 +181,21 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
         }
     }
 
-    private record FileImpl(FileStorageService fileStorageService) implements File {
+    private record FileImpl(FilesFileStorage filesFileStorage) implements File {
 
         @Override
         public InputStream getStream(FileEntry fileEntry) {
-            return fileStorageService.getFileStream(
-                FileEntryConstants.FILES_DIR, ((FileEntryImpl) fileEntry).getFileEntry());
+            return filesFileStorage.getFileStream(((FileEntryImpl) fileEntry).getFileEntry());
         }
 
         @Override
         public String readToString(FileEntry fileEntry) {
-            return fileStorageService.readFileToString(
-                FileEntryConstants.FILES_DIR, ((FileEntryImpl) fileEntry).getFileEntry());
+            return filesFileStorage.readFileToString(((FileEntryImpl) fileEntry).getFileEntry());
         }
 
         @Override
         public FileEntry storeContent(String fileName, String data) {
-            return new FileEntryImpl(
-                fileStorageService.storeFileContent(FileEntryConstants.FILES_DIR, fileName, data));
+            return new FileEntryImpl(filesFileStorage.storeFileContent(fileName, data));
         }
 
         @Override
@@ -217,8 +213,7 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
                 tempFilePath = Files.createTempFile("action_context_", fileEntry.getName());
 
                 Files.copy(
-                    fileStorageService.getFileStream(FileEntryConstants.FILES_DIR, toFileEntry(fileEntry)),
-                    tempFilePath,
+                    filesFileStorage.getFileStream(toFileEntry(fileEntry)), tempFilePath,
                     StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -237,8 +232,7 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
         @Override
         public FileEntry storeContent(String fileName, InputStream inputStream) {
             try {
-                return new FileEntryImpl(
-                    fileStorageService.storeFileContent(FileEntryConstants.FILES_DIR, fileName, inputStream));
+                return new FileEntryImpl(filesFileStorage.storeFileContent(fileName, inputStream));
             } catch (Exception exception) {
                 throw new RuntimeException("Unable to store file " + fileName);
             }

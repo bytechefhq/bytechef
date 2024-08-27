@@ -20,9 +20,9 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
-import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
+import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.mizosoft.methanol.FormBodyPublisher;
@@ -64,7 +64,7 @@ public class HttpClientExecutorTest {
     private final Base64.Encoder encoder = Base64.getEncoder();
     private final HttpClientExecutor httpClientExecutor =
         new HttpClientExecutor(
-            Mockito.mock(ConnectionDefinitionService.class), Mockito.mock(FileStorageService.class), objectMapper);
+            Mockito.mock(ConnectionDefinitionService.class), Mockito.mock(FilesFileStorage.class), objectMapper);
 
     @Test
     public void testCreateBodyHandler() {

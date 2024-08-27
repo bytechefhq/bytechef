@@ -516,8 +516,8 @@ public class OpenApiComponentTaskHandlerIntTest {
 
         openApiComponentTaskHandler = createOpenApiComponentHandler("uploadFile");
 
-        FileEntry fileEntry = ComponentRegistryConfiguration.FILE_STORAGE_SERVICE.storeFileContent(
-            "data", "text.txt", "This is text");
+        FileEntry fileEntry = ComponentRegistryConfiguration.FILES_FILE_STORAGE.storeFileContent(
+            "text.txt", "This is text");
 
         taskExecution = getTaskExecution(Map.of("petId", 10, "fileEntry", new FileEntryImpl(fileEntry)));
 

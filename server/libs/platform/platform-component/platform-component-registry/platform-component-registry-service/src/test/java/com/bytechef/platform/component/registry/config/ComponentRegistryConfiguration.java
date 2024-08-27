@@ -29,7 +29,6 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
-import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.platform.component.registry.oas.handler.loader.OpenApiComponentHandlerLoader;
@@ -37,6 +36,8 @@ import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.data.storage.service.DataStorageService;
+import com.bytechef.platform.file.storage.FilesFileStorage;
+import com.bytechef.platform.file.storage.FilesFileStorageImpl;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
@@ -64,7 +65,7 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 @Configuration
 public class ComponentRegistryConfiguration {
 
-    public static final FileStorageService FILE_STORAGE_SERVICE = new Base64FileStorageService();
+    public static final FilesFileStorage FILES_FILE_STORAGE = new FilesFileStorageImpl(new Base64FileStorageService());
     public static final PetstoreComponentHandler PETSTORE_COMPONENT_HANDLER = new PetstoreComponentHandler() {
 
         @Override
@@ -101,6 +102,9 @@ public class ComponentRegistryConfiguration {
     @MockBean
     WorkflowConnectionFacade workflowConnectionFacade;
 
+    @MockBean
+    WorkflowTestConfigurationService workflowTestConfigurationService;
+
     @Bean
     List<ComponentHandler> componentHandlers() {
         return List.of(PETSTORE_COMPONENT_HANDLER);
@@ -112,12 +116,9 @@ public class ComponentRegistryConfiguration {
     }
 
     @Bean
-    FileStorageService fileStorageService() {
-        return FILE_STORAGE_SERVICE;
+    FilesFileStorage filesFileStorage() {
+        return FILES_FILE_STORAGE;
     }
-
-    @MockBean
-    WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @Bean
     InstanceAccessorRegistry instanceAccessorRegistry() {

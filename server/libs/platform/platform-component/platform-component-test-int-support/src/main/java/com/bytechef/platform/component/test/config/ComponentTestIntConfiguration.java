@@ -40,12 +40,13 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
-import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.platform.component.test.ComponentJobTestExecutor;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.data.storage.service.DataStorageService;
+import com.bytechef.platform.file.storage.FilesFileStorage;
+import com.bytechef.platform.file.storage.FilesFileStorageImpl;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -107,9 +108,8 @@ public class ComponentTestIntConfiguration {
     @Bean
     ComponentJobTestExecutor componentWorkflowTestSupport(
         ContextService contextService, JobService jobService, ObjectMapper objectMapper,
-        TaskExecutionService taskExecutionService,
-        Map<String, TaskHandler<?>> taskHandlerMap, TaskHandlerFactory taskHandlerFactory,
-        WorkflowService workflowService) {
+        TaskExecutionService taskExecutionService, Map<String, TaskHandler<?>> taskHandlerMap,
+        TaskHandlerFactory taskHandlerFactory, WorkflowService workflowService) {
 
         return new ComponentJobTestExecutor(
             contextService, jobService, objectMapper, taskExecutionService,
@@ -132,8 +132,8 @@ public class ComponentTestIntConfiguration {
     }
 
     @Bean
-    FileStorageService fileStorageService() {
-        return new Base64FileStorageService();
+    FilesFileStorage filesFileStorage() {
+        return new FilesFileStorageImpl(new Base64FileStorageService());
     }
 
     @Bean

@@ -22,10 +22,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.file.storage.domain.FileEntry;
-import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.test.ComponentJobTestExecutor;
 import com.bytechef.platform.component.test.annotation.ComponentIntTest;
-import com.bytechef.platform.workflow.execution.constants.FileEntryConstants;
+import com.bytechef.platform.file.storage.FilesFileStorage;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -43,7 +42,7 @@ public class FilesystemComponentHandlerIntTest {
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
     @Autowired
-    private FileStorageService fileStorageService;
+    private FilesFileStorage filesFileStorage;
 
     @Autowired
     private ComponentJobTestExecutor componentJobTestExecutor;
@@ -63,8 +62,8 @@ public class FilesystemComponentHandlerIntTest {
 
         Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 
-        FileEntry fileEntry = fileStorageService.storeFileContent(
-            FileEntryConstants.FILES_DIR, "sample.txt", Files.contentOf(getFile(), StandardCharsets.UTF_8));
+        FileEntry fileEntry = filesFileStorage.storeFileContent(
+            "sample.txt", Files.contentOf(getFile(), StandardCharsets.UTF_8));
 
         assertThat((Map<?, ?>) outputs.get("readLocalFile"))
             .hasFieldOrPropertyWithValue("extension", "txt")
@@ -82,9 +81,8 @@ public class FilesystemComponentHandlerIntTest {
             ENCODER.encodeToString("filesystem_v1_writeFile".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 FILE_ENTRY,
-                fileStorageService.storeFileContent(
-                    FileEntryConstants.FILES_DIR, sampleFile.getAbsolutePath(),
-                    Files.contentOf(getFile(), StandardCharsets.UTF_8)),
+                filesFileStorage.storeFileContent(
+                    sampleFile.getAbsolutePath(), Files.contentOf(getFile(), StandardCharsets.UTF_8)),
                 "filename", tempFile.getAbsolutePath()));
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);

@@ -22,10 +22,9 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.domain.FileEntry;
-import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.test.ComponentJobTestExecutor;
 import com.bytechef.platform.component.test.annotation.ComponentIntTest;
-import com.bytechef.platform.workflow.execution.constants.FileEntryConstants;
+import com.bytechef.platform.file.storage.FilesFileStorage;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -51,7 +50,7 @@ public class JsonFileComponentHandlerIntTest {
     private ComponentJobTestExecutor componentJobTestExecutor;
 
     @Autowired
-    private FileStorageService fileStorageService;
+    private FilesFileStorage filesFileStorage;
 
     @Autowired
     private TaskFileStorage taskFileStorage;
@@ -64,10 +63,9 @@ public class JsonFileComponentHandlerIntTest {
             ENCODER.encodeToString("json-file_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "fileEntry",
-                fileStorageService
+                filesFileStorage
                     .storeFileContent(
-                        FileEntryConstants.FILES_DIR, sampleFile.getAbsolutePath(),
-                        Files.contentOf(sampleFile, StandardCharsets.UTF_8))));
+                        sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, StandardCharsets.UTF_8))));
 
         Assertions.assertThat(job.getStatus())
             .isEqualTo(Job.Status.COMPLETED);
@@ -99,7 +97,7 @@ public class JsonFileComponentHandlerIntTest {
 
         JSONAssert.assertEquals(
             new JSONArray(Files.contentOf(getFile("sample_array.json"), StandardCharsets.UTF_8)),
-            new JSONArray(fileStorageService.readFileToString(FileEntryConstants.FILES_DIR, fileEntry)),
+            new JSONArray(filesFileStorage.readFileToString(fileEntry)),
             true);
     }
 

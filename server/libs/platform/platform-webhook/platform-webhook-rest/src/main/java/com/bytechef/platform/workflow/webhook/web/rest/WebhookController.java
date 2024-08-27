@@ -26,7 +26,6 @@ import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody.ContentType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
-import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.registry.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.WebhookRequest;
@@ -35,8 +34,8 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
-import com.bytechef.platform.workflow.execution.constants.FileEntryConstants;
 import com.bytechef.platform.workflow.webhook.executor.WebhookExecutor;
 import com.bytechef.tenant.util.TenantUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -82,7 +81,7 @@ public class WebhookController {
 
     private static final Logger logger = LoggerFactory.getLogger(WebhookController.class);
 
-    private final FileStorageService fileStorageService;
+    private final FilesFileStorage filesFileStorage;
     private final InstanceAccessorRegistry instanceAccessorRegistry;
     private final TriggerDefinitionService triggerDefinitionService;
     private final WebhookExecutor webhookExecutor;
@@ -90,11 +89,11 @@ public class WebhookController {
 
     @SuppressFBWarnings("EI")
     public WebhookController(
-        FileStorageService fileStorageService, InstanceAccessorRegistry instanceAccessorRegistry,
+        FilesFileStorage filesFileStorage, InstanceAccessorRegistry instanceAccessorRegistry,
         TriggerDefinitionService triggerDefinitionService, WebhookExecutor webhookExecutor,
         WorkflowService workflowService) {
 
-        this.fileStorageService = fileStorageService;
+        this.filesFileStorage = filesFileStorage;
         this.instanceAccessorRegistry = instanceAccessorRegistry;
         this.triggerDefinitionService = triggerDefinitionService;
         this.webhookExecutor = webhookExecutor;
@@ -315,8 +314,7 @@ public class WebhookController {
                     value.add(StreamUtils.copyToString(part.getInputStream(), StandardCharsets.UTF_8));
                 } else {
                     value.add(
-                        fileStorageService.storeFileContent(
-                            FileEntryConstants.FILES_DIR, part.getSubmittedFileName(), part.getInputStream()));
+                        filesFileStorage.storeFileContent(part.getSubmittedFileName(), part.getInputStream()));
                 }
 
                 multipartFormDataMap.put(part.getName(), value);
@@ -367,9 +365,8 @@ public class WebhookController {
             body = new WebhookBodyImpl(content, ContentType.XML, httpServletRequest.getContentType(), rawContent);
         } else if (contentType.startsWith("application/")) {
             body = new WebhookBodyImpl(
-                fileStorageService.storeFileContent(
-                    FileEntryConstants.FILES_DIR, getFilename(httpServletRequest.getContentType()),
-                    httpServletRequest.getInputStream()),
+                filesFileStorage.storeFileContent(
+                    getFilename(httpServletRequest.getContentType()), httpServletRequest.getInputStream()),
                 ContentType.BINARY, httpServletRequest.getContentType(), null);
         } else {
             String rawContent = StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8);

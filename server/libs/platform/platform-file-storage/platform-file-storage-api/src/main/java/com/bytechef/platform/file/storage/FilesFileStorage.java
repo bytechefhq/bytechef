@@ -14,12 +14,21 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.execution.constants;
+package com.bytechef.platform.file.storage;
+
+import com.bytechef.file.storage.domain.FileEntry;
+import java.io.InputStream;
 
 /**
  * @author Ivica Cardic
  */
-public class FileEntryConstants {
+public interface FilesFileStorage {
 
-    public static final String FILES_DIR = "files";
+    InputStream getFileStream(FileEntry fileEntry);
+
+    String readFileToString(FileEntry fileEntry);
+
+    FileEntry storeFileContent(String fileName, String data);
+
+    FileEntry storeFileContent(String submittedFileName, InputStream inputStream);
 }
