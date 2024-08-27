@@ -21,8 +21,8 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
-import com.bytechef.platform.data.storage.service.DataStorageService;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
@@ -54,7 +54,7 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
     public ActionContextImpl(
         String componentName, int componentVersion, String actionName, AppType type,
         Long instanceId, Long instanceWorkflowId, Long jobId, ComponentConnection connection,
-        DataStorageService dataStorageService, ApplicationEventPublisher eventPublisher,
+        DataStorage dataStorage, ApplicationEventPublisher eventPublisher,
         FilesFileStorage filesFileStorage, HttpClientExecutor httpClientExecutor) {
 
         super(componentName, componentVersion, actionName, connection, httpClientExecutor);
@@ -70,7 +70,7 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
         } else {
             this.data = new DataImpl(
                 componentName, componentVersion, actionName, type, instanceId, instanceWorkflowId, jobId,
-                dataStorageService);
+                dataStorage);
         }
 
         this.event = jobId == null ? progress -> {} : new EventImpl(eventPublisher, jobId);
@@ -122,33 +122,33 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
 
     private record DataImpl(
         String componentName, Integer componentVersion, String actionName, AppType type, long instanceId,
-        long instanceWorkflowId, long jobId, DataStorageService dataStorageService) implements Data {
+        long instanceWorkflowId, long jobId, DataStorage dataStorage) implements Data {
 
         @Override
         public <T> Optional<T> fetchValue(Scope scope, String key) {
-            return dataStorageService.fetch(componentName, getDataStorageScope(scope), getScopeId(scope), key, type);
+            return dataStorage.fetch(componentName, getDataStorageScope(scope), getScopeId(scope), key, type);
         }
 
         @Override
         public <T> T getValue(Scope scope, String key) {
-            return dataStorageService.get(componentName, getDataStorageScope(scope), getScopeId(scope), key, type);
+            return dataStorage.get(componentName, getDataStorageScope(scope), getScopeId(scope), key, type);
         }
 
         @Override
         public <T> Map<String, T> getAll(Scope scope) {
-            return dataStorageService.getAll(componentName, getDataStorageScope(scope), getScopeId(scope), type);
+            return dataStorage.getAll(componentName, getDataStorageScope(scope), getScopeId(scope), type);
         }
 
         @Override
         public Void setValue(Scope scope, String key, Object value) {
-            dataStorageService.put(componentName, getDataStorageScope(scope), getScopeId(scope), key, type, value);
+            dataStorage.put(componentName, getDataStorageScope(scope), getScopeId(scope), key, type, value);
 
             return null;
         }
 
         @Override
         public Void deleteValue(Scope scope, String key) {
-            dataStorageService.delete(componentName, getDataStorageScope(scope), getScopeId(scope), key, type);
+            dataStorage.delete(componentName, getDataStorageScope(scope), getScopeId(scope), key, type);
 
             return null;
         }

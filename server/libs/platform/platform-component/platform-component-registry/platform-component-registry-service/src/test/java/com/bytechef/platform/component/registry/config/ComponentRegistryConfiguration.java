@@ -35,7 +35,7 @@ import com.bytechef.platform.component.registry.oas.handler.loader.OpenApiCompon
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
-import com.bytechef.platform.data.storage.service.DataStorageService;
+import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.bytechef.platform.file.storage.FilesFileStorageImpl;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
@@ -85,7 +85,7 @@ public class ComponentRegistryConfiguration {
     };
 
     @MockBean
-    DataStorageService dataStorageService;
+    DataStorage dataStorage;
 
     @MockBean
     MessageBroker messageBroker;

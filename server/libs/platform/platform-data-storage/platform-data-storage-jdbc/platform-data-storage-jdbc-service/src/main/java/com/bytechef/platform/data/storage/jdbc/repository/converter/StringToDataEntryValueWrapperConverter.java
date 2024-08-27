@@ -16,10 +16,7 @@
 
 package com.bytechef.platform.data.storage.jdbc.repository.converter;
 
-import com.bytechef.platform.data.storage.jdbc.domain.DataEntry.ValueWrapper;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.bytechef.platform.data.storage.domain.ValueWrapper;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 
@@ -29,27 +26,8 @@ import org.springframework.data.convert.ReadingConverter;
 @ReadingConverter
 public class StringToDataEntryValueWrapperConverter implements Converter<String, ValueWrapper> {
 
-    private final ObjectMapper objectMapper;
-
-    @SuppressFBWarnings("EI2")
-    public StringToDataEntryValueWrapperConverter(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
-
     @Override
     public ValueWrapper convert(String source) {
-        return source == null ? null : read(objectMapper, source);
-    }
-
-    private ValueWrapper read(ObjectMapper objectMapper, String json) {
-        try {
-            ValueWrapper valueWrapper = objectMapper.readValue(json, ValueWrapper.class);
-
-            return new ValueWrapper(
-                objectMapper.convertValue(valueWrapper.value(), Class.forName(valueWrapper.classname())),
-                valueWrapper.classname());
-        } catch (JsonProcessingException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        return source == null ? null : ValueWrapper.read(source);
     }
 }

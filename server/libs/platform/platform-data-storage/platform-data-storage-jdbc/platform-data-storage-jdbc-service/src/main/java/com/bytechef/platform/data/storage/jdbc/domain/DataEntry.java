@@ -18,6 +18,7 @@ package com.bytechef.platform.data.storage.jdbc.domain;
 
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
+import com.bytechef.platform.data.storage.domain.ValueWrapper;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
@@ -87,7 +88,7 @@ public class DataEntry {
         this.scope = scope.ordinal();
         this.scopeId = scopeId;
         this.type = type.ordinal();
-        this.value = new ValueWrapper(value, value.getClass());
+        this.value = new ValueWrapper(value);
     }
 
     public String getComponentName() {
@@ -135,7 +136,7 @@ public class DataEntry {
             return null;
         }
 
-        return value.value;
+        return value.value();
     }
 
     public int getVersion() {
@@ -165,7 +166,7 @@ public class DataEntry {
     public void setValue(Object value) {
         Validate.notNull(value, "'value' must not be null");
 
-        this.value = new ValueWrapper(value, value.getClass());
+        this.value = new ValueWrapper(value);
     }
 
     @Override
@@ -186,9 +187,4 @@ public class DataEntry {
             '}';
     }
 
-    public record ValueWrapper(Object value, String classname) {
-        public ValueWrapper(Object value, Class<?> valueClass) {
-            this(value, valueClass.getName());
-        }
-    }
 }

@@ -21,8 +21,8 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
-import com.bytechef.platform.data.storage.service.DataStorageService;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
@@ -45,13 +45,13 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
     @SuppressFBWarnings("EI")
     public TriggerContextImpl(
         String componentName, int componentVersion, String triggerName, AppType type,
-        String workflowReferenceCode, ComponentConnection connection, DataStorageService dataStorageService,
+        String workflowReferenceCode, ComponentConnection connection, DataStorage dataStorage,
         FilesFileStorage filesFileStorage, HttpClientExecutor httpClientExecutor) {
 
         super(componentName, componentVersion, triggerName, connection, httpClientExecutor);
 
         this.data = type == null ? new NoOpDataImpl() : new DataImpl(
-            componentName, componentVersion, triggerName, type, workflowReferenceCode, dataStorageService);
+            componentName, componentVersion, triggerName, type, workflowReferenceCode, dataStorage);
         this.file = new FileImpl(filesFileStorage);
     }
 
@@ -80,23 +80,23 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
 
     private record DataImpl(
         String componentName, Integer componentVersion, String triggerName, AppType type,
-        String workflowReferenceCode, DataStorageService dataStorageService) implements Data {
+        String workflowReferenceCode, DataStorage dataStorage) implements Data {
 
         @Override
         public <T> Optional<T> fetchValue(Data.Scope scope, String key) {
-            return dataStorageService.fetch(
+            return dataStorage.fetch(
                 componentName, getDataStorageScope(scope), getScopeId(scope), key, type);
         }
 
         @Override
         public <T> T getValue(Data.Scope scope, String key) {
-            return dataStorageService.get(
+            return dataStorage.get(
                 componentName, getDataStorageScope(scope), getScopeId(scope), key, type);
         }
 
         @Override
         public Void setValue(Data.Scope scope, String key, Object value) {
-            dataStorageService.put(
+            dataStorage.put(
                 componentName, getDataStorageScope(scope), getScopeId(scope), key, type, value);
 
             return null;
@@ -104,7 +104,7 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
 
         @Override
         public Void deleteValue(Data.Scope scope, String key) {
-            dataStorageService.delete(
+            dataStorage.delete(
                 componentName, getDataStorageScope(scope), getScopeId(scope), key, type);
 
             return null;

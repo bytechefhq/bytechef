@@ -44,7 +44,7 @@ import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.platform.component.test.ComponentJobTestExecutor;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.data.storage.service.DataStorageService;
+import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.bytechef.platform.file.storage.FilesFileStorageImpl;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -86,7 +86,7 @@ public class ComponentTestIntConfiguration {
     private ConnectionService connectionService;
 
     @MockBean(name = "dataStorageService")
-    private DataStorageService dataStorageService;
+    private DataStorage dataStorage;
 
     private final JsonComponentModule jsonComponentModule;
 
