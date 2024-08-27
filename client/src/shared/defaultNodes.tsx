@@ -12,6 +12,7 @@ const defaultNodes: Node[] = [
             operationName: 'manual',
             trigger: true,
             type: 'manual/v1/manual',
+            workflowNodeName: 'manual_1',
         },
         id: 'trigger_1',
         position: {x: 0, y: 0},
