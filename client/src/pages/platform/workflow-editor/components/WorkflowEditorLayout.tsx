@@ -6,6 +6,7 @@ import 'reactflow/dist/base.css';
 
 import './WorkflowEditorLayout.css';
 
+import defaultNodes from '@/shared/defaultNodes';
 import {
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionBasicModel,
@@ -91,10 +92,16 @@ const WorkflowEditorLayout = ({
 
     // set currentComponent when currentNodeName changes
     useEffect(() => {
-        const workflowComponents = [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])]?.map((workflowNode) => {
+        const combinedComponents = [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])];
+
+        if (!workflow.triggers?.length) {
+            combinedComponents.unshift(defaultNodes[0].data);
+        }
+
+        const workflowComponents = combinedComponents.map((workflowNode) => {
             const {description, label, metadata, name, parameters, type} = workflowNode;
 
-            const [componentName, operationName] = type.split('/v1/');
+            const [componentName, operationName] = type.split('/v\\d+/');
 
             return {
                 componentName,
