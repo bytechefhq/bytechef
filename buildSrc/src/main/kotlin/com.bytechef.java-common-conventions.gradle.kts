@@ -228,6 +228,7 @@ val check by tasks.existing {//mozda ovdje dodati task delete
                 !project.name.contains("google-commons") && // REFINE: this includes all, probably it can be reduced
                 !project.name.contains("http-client") && // REFINE: this includes all, probably it can be reduced
                 !project.name.contains("message-") && // REFINE: this includes all, probably it can be reduced
+                !project.name.contains("llm") && // REFINE: this includes all, probably it can be reduced
                 !project.name.contains("microsoft-commons") &&
                 !project.name.contains("platform-") && // HARD: many uses this
                 !project.name.contains("platform-user-api") &&

@@ -5,3 +5,11 @@ dependencies {
     implementation("org.junit.jupiter:junit-jupiter-api:5.10.3")
     implementation("org.mockito:mockito-core:5.11.0")
 }
+
+subprojects {
+    dependencies {
+        implementation(project(":server:libs:modules:components:llm"))
+
+        testImplementation(project(":server:libs:modules:components:llm"))
+    }
+}
