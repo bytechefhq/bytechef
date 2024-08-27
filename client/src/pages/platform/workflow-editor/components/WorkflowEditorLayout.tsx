@@ -42,7 +42,7 @@ const WorkflowEditorLayout = ({
             id: workflow.id!,
             workflowNodeName: currentComponent?.workflowNodeName!,
         },
-        !!currentComponent && !!currentComponent?.workflowNodeName
+        !!currentComponent && !!currentComponent?.workflowNodeName && currentComponent?.componentName !== 'manual'
     );
 
     const {data: workflowNodeOutputs, refetch: refetchWorkflowNodeOutputs} = useGetPreviousWorkflowNodeOutputsQuery(
