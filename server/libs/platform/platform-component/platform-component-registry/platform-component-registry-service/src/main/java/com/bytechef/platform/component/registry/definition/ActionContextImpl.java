@@ -47,28 +47,31 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
     private final File file;
     private final String actionName;
     private final AppType type;
+    private final Long instanceId;
     private final Long instanceWorkflowId;
     private final Long jobId;
 
     @SuppressFBWarnings("EI")
     public ActionContextImpl(
         String componentName, int componentVersion, String actionName, AppType type,
-        Long instanceWorkflowId, Long jobId, ComponentConnection connection, DataStorageService dataStorageService,
-        ApplicationEventPublisher eventPublisher, FileStorageService fileStorageService,
-        HttpClientExecutor httpClientExecutor) {
+        Long instanceId, Long instanceWorkflowId, Long jobId, ComponentConnection connection,
+        DataStorageService dataStorageService, ApplicationEventPublisher eventPublisher,
+        FileStorageService fileStorageService, HttpClientExecutor httpClientExecutor) {
 
         super(componentName, componentVersion, actionName, connection, httpClientExecutor);
 
         this.actionName = actionName;
         this.type = type;
+        this.instanceId = instanceId;
         this.instanceWorkflowId = instanceWorkflowId;
         this.jobId = jobId;
 
-        if (type == null || instanceWorkflowId == null || jobId == null) {
+        if (type == null || instanceId == null || instanceWorkflowId == null || jobId == null) {
             this.data = new NoOpDataImpl();
         } else {
             this.data = new DataImpl(
-                componentName, componentVersion, actionName, type, instanceWorkflowId, jobId, dataStorageService);
+                componentName, componentVersion, actionName, type, instanceId, instanceWorkflowId, jobId,
+                dataStorageService);
         }
 
         this.event = jobId == null ? progress -> {} : new EventImpl(eventPublisher, jobId);
@@ -106,6 +109,10 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
         return type;
     }
 
+    public Long getInstanceId() {
+        return instanceId;
+    }
+
     public Long getInstanceWorkflowId() {
         return instanceWorkflowId;
     }
@@ -115,8 +122,8 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
     }
 
     private record DataImpl(
-        String componentName, Integer componentVersion, String actionName, AppType type, long instanceWorkflowId,
-        long jobId, DataStorageService dataStorageService) implements Data {
+        String componentName, Integer componentVersion, String actionName, AppType type, long instanceId,
+        long instanceWorkflowId, long jobId, DataStorageService dataStorageService) implements Data {
 
         @Override
         public <T> Optional<T> fetchValue(Scope scope, String key) {
@@ -151,6 +158,7 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
             return switch (scope) {
                 case CURRENT_EXECUTION -> DataStorageScope.CURRENT_EXECUTION;
                 case WORKFLOW -> DataStorageScope.WORKFLOW;
+                case INSTANCE -> DataStorageScope.INSTANCE;
                 case ACCOUNT -> DataStorageScope.ACCOUNT;
             };
         }
@@ -160,6 +168,7 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
                 switch (scope) {
                     case CURRENT_EXECUTION -> String.valueOf(jobId);
                     case WORKFLOW -> String.valueOf(instanceWorkflowId);
+                    case INSTANCE -> String.valueOf(instanceId);
                     case ACCOUNT -> "";
                 }, "scope");
         }

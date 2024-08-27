@@ -57,10 +57,11 @@ public class ContextFactory {
 
     public ActionContext createActionContext(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @Nullable AppType type,
-        @Nullable Long instanceWorkflowId, @Nullable Long jobId, @Nullable ComponentConnection connection) {
+        @Nullable Long instanceId, @Nullable Long instanceWorkflowId, @Nullable Long jobId,
+        @Nullable ComponentConnection connection) {
 
         return new ActionContextImpl(
-            componentName, componentVersion, actionName, type, instanceWorkflowId, jobId,
+            componentName, componentVersion, actionName, type, instanceId, instanceWorkflowId, jobId,
             connection, dataStorageService, eventPublisher, fileStorageService, httpClientExecutor);
     }
 
