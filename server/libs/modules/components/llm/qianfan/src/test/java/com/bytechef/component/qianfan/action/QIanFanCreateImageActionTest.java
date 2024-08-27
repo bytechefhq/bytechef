@@ -19,7 +19,7 @@ package com.bytechef.component.qianfan.action;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.llm.action.ImageActionTest;
+import com.bytechef.component.llm.test.ImageActionTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.qianfan.QianFanImageModel;
 

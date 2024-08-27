@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.llm.action;
+package com.bytechef.component.llm.test;
 
 import static com.bytechef.component.llm.constants.LLMConstants.FILE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
