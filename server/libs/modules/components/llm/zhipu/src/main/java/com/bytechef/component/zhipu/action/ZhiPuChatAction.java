@@ -107,14 +107,14 @@ public class ZhiPuChatAction {
                 .withTemperature(inputParameters.getFloat(TEMPERATURE))
                 .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
                 .withTopP(inputParameters.getFloat(TOP_P))
-                .withStop(inputParameters.getList(STOP, new TypeReference<>() {
-                }))
+                .withStop(inputParameters.getList(STOP, new TypeReference<>() {}))
                 .withUser(inputParameters.getString(USER))
                 .withRequestId(inputParameters.getString(REQUEST_ID))
                 .withDoSample(inputParameters.getBoolean(DO_SAMPLE));
 
             List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});
-            if(functions!=null) builder.withFunctions(new HashSet<>(functions));
+            if (functions != null)
+                builder.withFunctions(new HashSet<>(functions));
             return builder.build();
         }
 

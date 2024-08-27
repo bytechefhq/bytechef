@@ -55,14 +55,13 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.llm.util.interfaces.Chat;
+import java.util.HashSet;
+import java.util.List;
 import org.springframework.ai.azure.openai.AzureOpenAiChatModel;
 import org.springframework.ai.azure.openai.AzureOpenAiChatOptions;
 import org.springframework.ai.azure.openai.AzureOpenAiResponseFormat;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
-
-import java.util.HashSet;
-import java.util.List;
 
 public class AzureOpenAIChatAction {
 
@@ -101,25 +100,25 @@ public class AzureOpenAIChatAction {
     private static final Chat CHAT = new Chat() {
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
-            AzureOpenAiResponseFormat format = inputParameters.getInteger(RESPONSE_FORMAT) < 1 ? AzureOpenAiResponseFormat.TEXT : AzureOpenAiResponseFormat.JSON;
+            AzureOpenAiResponseFormat format = inputParameters.getInteger(RESPONSE_FORMAT) < 1
+                ? AzureOpenAiResponseFormat.TEXT : AzureOpenAiResponseFormat.JSON;
 
             AzureOpenAiChatOptions.Builder builder = AzureOpenAiChatOptions.builder()
                 .withDeploymentName(inputParameters.getRequiredString(MODEL))
                 .withFrequencyPenalty(inputParameters.getFloat(FREQUENCY_PENALTY))
-                .withLogitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {
-                }))
+                .withLogitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
                 .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
                 .withN(inputParameters.getInteger(N))
                 .withPresencePenalty(inputParameters.getFloat(PRESENCE_PENALTY))
-                .withStop(inputParameters.getList(STOP, new TypeReference<>() {
-                }))
+                .withStop(inputParameters.getList(STOP, new TypeReference<>() {}))
                 .withTemperature(inputParameters.getFloat(TEMPERATURE))
                 .withTopP(inputParameters.getFloat(TOP_P))
                 .withUser(inputParameters.getString(USER))
                 .withResponseFormat(format);
 
             List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});
-            if(functions!=null) builder.withFunctions(new HashSet<>(functions));
+            if (functions != null)
+                builder.withFunctions(new HashSet<>(functions));
             return builder.build();
         }
 

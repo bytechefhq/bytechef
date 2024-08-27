@@ -35,7 +35,6 @@ import static com.bytechef.component.llm.constants.LLMConstants.N;
 import static com.bytechef.component.llm.constants.LLMConstants.N_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.llm.constants.LLMConstants.PRESENCE_PENALTY_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.STOP;
 import static com.bytechef.component.llm.constants.LLMConstants.STOP_PROPERTY;
@@ -51,14 +50,13 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.llm.util.interfaces.Chat;
+import java.util.HashSet;
+import java.util.List;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
-
-import java.util.HashSet;
-import java.util.List;
 
 /**
  * @author Monika Domiter
@@ -102,19 +100,18 @@ public class NVIDIAChatAction {
             OpenAiChatOptions.Builder builder = OpenAiChatOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withFrequencyPenalty(inputParameters.getFloat(FREQUENCY_PENALTY))
-                .withLogitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {
-                }))
+                .withLogitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
                 .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
                 .withN(inputParameters.getInteger(N))
                 .withPresencePenalty(inputParameters.getFloat(PRESENCE_PENALTY))
-                .withStop(inputParameters.getList(STOP, new TypeReference<>() {
-                }))
+                .withStop(inputParameters.getList(STOP, new TypeReference<>() {}))
                 .withTemperature(inputParameters.getFloat(TEMPERATURE))
                 .withTopP(inputParameters.getFloat(TOP_P))
                 .withUser(inputParameters.getString(USER));
 
             List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});
-            if(functions!=null) builder.withFunctions(new HashSet<>(functions));
+            if (functions != null)
+                builder.withFunctions(new HashSet<>(functions));
             return builder.build();
         }
 
