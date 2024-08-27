@@ -54,7 +54,7 @@ public class FilesystemFileStorageService implements FileStorageService {
     }
 
     @Override
-    public void deleteFile(String directoryPath, FileEntry fileEntry) {
+    public void deleteFile(@NonNull String directoryPath, @NonNull FileEntry fileEntry) {
         Path path = resolveDirectoryPath(directoryPath);
         String url = fileEntry.getUrl();
 
@@ -68,7 +68,7 @@ public class FilesystemFileStorageService implements FileStorageService {
     }
 
     @Override
-    public boolean fileExists(String directoryPath, FileEntry fileEntry) throws FileStorageException {
+    public boolean fileExists(@NonNull String directoryPath, @NonNull FileEntry fileEntry) throws FileStorageException {
         Path path = resolveDirectoryPath(directoryPath);
         String url = fileEntry.getUrl();
 
@@ -78,7 +78,8 @@ public class FilesystemFileStorageService implements FileStorageService {
     }
 
     @Override
-    public boolean fileExists(String directoryPath, String nonRandomFilename) throws FileStorageException {
+    public boolean fileExists(@NonNull String directoryPath, @NonNull String nonRandomFilename)
+        throws FileStorageException {
         Path path = resolveDirectoryPath(directoryPath);
 
         return path.resolve(nonRandomFilename)
@@ -87,7 +88,8 @@ public class FilesystemFileStorageService implements FileStorageService {
     }
 
     @Override
-    public FileEntry getFileEntry(String directoryPath, String nonRandomFilename) throws FileStorageException {
+    public FileEntry getFileEntry(@NonNull String directoryPath, @NonNull String nonRandomFilename)
+        throws FileStorageException {
         Path path = resolveDirectoryPath(directoryPath);
 
         FileEntry fileEntry = new FileEntry(nonRandomFilename, URL_PREFIX + path.resolve(nonRandomFilename));
@@ -118,7 +120,7 @@ public class FilesystemFileStorageService implements FileStorageService {
     }
 
     @Override
-    public InputStream getFileStream(String directoryPath, FileEntry fileEntry) {
+    public InputStream getFileStream(@NonNull String directoryPath, @NonNull FileEntry fileEntry) {
         Path path = resolveDirectoryPath(directoryPath);
         String url = fileEntry.getUrl();
 
@@ -130,7 +132,7 @@ public class FilesystemFileStorageService implements FileStorageService {
     }
 
     @Override
-    public URL getFileEntryURL(String directoryPath, FileEntry fileEntry) {
+    public URL getFileEntryURL(@NonNull String directoryPath, @NonNull FileEntry fileEntry) {
         Path path = resolveDirectoryPath(directoryPath);
         String url = fileEntry.getUrl();
 
@@ -144,7 +146,8 @@ public class FilesystemFileStorageService implements FileStorageService {
     }
 
     @Override
-    public byte[] readFileToBytes(String directoryPath, FileEntry fileEntry) throws FileStorageException {
+    public byte[] readFileToBytes(@NonNull String directoryPath, @NonNull FileEntry fileEntry)
+        throws FileStorageException {
         Path path = resolveDirectoryPath(directoryPath);
         String url = fileEntry.getUrl();
 
@@ -156,7 +159,9 @@ public class FilesystemFileStorageService implements FileStorageService {
     }
 
     @Override
-    public String readFileToString(String directoryPath, FileEntry fileEntry) throws FileStorageException {
+    public String readFileToString(@NonNull String directoryPath, @NonNull FileEntry fileEntry)
+        throws FileStorageException {
+
         Path path = resolveDirectoryPath(directoryPath);
         String url = fileEntry.getUrl();
 
@@ -168,7 +173,9 @@ public class FilesystemFileStorageService implements FileStorageService {
     }
 
     @Override
-    public FileEntry storeFileContent(String directoryPath, String filename, byte[] data) throws FileStorageException {
+    public FileEntry storeFileContent(@NonNull String directoryPath, @NonNull String filename, byte[] data)
+        throws FileStorageException {
+
         Validate.notNull(directoryPath, "directory is required");
         Validate.notNull(filename, "fileName is required");
         Validate.notNull(data, "data is required");
@@ -178,7 +185,8 @@ public class FilesystemFileStorageService implements FileStorageService {
 
     @Override
     public FileEntry storeFileContent(
-        String directoryPath, String filename, byte[] data, boolean randomFilename) throws FileStorageException {
+        @NonNull String directoryPath, @NonNull String filename, byte[] data, boolean randomFilename)
+        throws FileStorageException {
 
         Validate.notNull(directoryPath, "directory is required");
         Validate.notNull(filename, "fileName is required");
@@ -188,13 +196,15 @@ public class FilesystemFileStorageService implements FileStorageService {
     }
 
     @Override
-    public FileEntry storeFileContent(String directoryPath, String filename, String data) throws FileStorageException {
+    public FileEntry storeFileContent(@NonNull String directoryPath, @NonNull String filename, @NonNull String data)
+        throws FileStorageException {
         return storeFileContent(directoryPath, filename, data, true);
     }
 
     @Override
     public FileEntry storeFileContent(
-        String directoryPath, String filename, String data, boolean randomFilename) throws FileStorageException {
+        @NonNull String directoryPath, @NonNull String filename, @NonNull String data, boolean randomFilename)
+        throws FileStorageException {
 
         Validate.notNull(directoryPath, "directory is required");
         Validate.notNull(filename, "fileName is required");
@@ -205,16 +215,17 @@ public class FilesystemFileStorageService implements FileStorageService {
     }
 
     @Override
-    public FileEntry storeFileContent(String directoryPath, String filename, InputStream inputStream)
-        throws FileStorageException {
+    public FileEntry
+        storeFileContent(@NonNull String directoryPath, @NonNull String filename, @NonNull InputStream inputStream)
+            throws FileStorageException {
 
         return storeFileContent(directoryPath, filename, inputStream, true);
     }
 
     @Override
     public FileEntry storeFileContent(
-        String directoryPath, String filename, InputStream inputStream, boolean randomFilename)
-        throws FileStorageException {
+        @NonNull String directoryPath, @NonNull String filename, @NonNull InputStream inputStream,
+        boolean randomFilename) throws FileStorageException {
 
         Validate.notNull(directoryPath, "directory is required");
         Validate.notNull(filename, "fileName is required");

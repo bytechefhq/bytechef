@@ -22,27 +22,30 @@ import org.springframework.lang.NonNull;
  */
 public class AwsFileStorageService implements FileStorageService {
 
+    @SuppressWarnings("PMD.UnusedPrivateField")
     private static final String URL_PREFIX = "aws://";
 
     @Override
-    public void deleteFile(String directoryPath, FileEntry fileEntry) {
+    public void deleteFile(@NonNull String directoryPath, @NonNull FileEntry fileEntry) {
         // TODO
     }
 
     @Override
-    public boolean fileExists(String directoryPath, FileEntry fileEntry) throws FileStorageException {
-        // TODO
-        return false;
-    }
-
-    @Override
-    public boolean fileExists(String directoryPath, String nonRandomFilename) throws FileStorageException {
+    public boolean fileExists(@NonNull String directoryPath, @NonNull FileEntry fileEntry) throws FileStorageException {
         // TODO
         return false;
     }
 
     @Override
-    public FileEntry getFileEntry(String directoryPath, String nonRandomFilename) throws FileStorageException {
+    public boolean fileExists(@NonNull String directoryPath, @NonNull String nonRandomFilename)
+        throws FileStorageException {
+        // TODO
+        return false;
+    }
+
+    @Override
+    public FileEntry getFileEntry(@NonNull String directoryPath, @NonNull String nonRandomFilename)
+        throws FileStorageException {
         // TODO
         return null;
     }
@@ -60,51 +63,58 @@ public class AwsFileStorageService implements FileStorageService {
     }
 
     @Override
-    public InputStream getFileStream(String directoryPath, FileEntry fileEntry) throws FileStorageException {
+    public InputStream getFileStream(@NonNull String directoryPath, @NonNull FileEntry fileEntry)
+        throws FileStorageException {
         // TODO
         return null;
     }
 
     @Override
-    public URL getFileEntryURL(String directoryPath, FileEntry fileEntry) {
+    public URL getFileEntryURL(@NonNull String directoryPath, @NonNull FileEntry fileEntry) {
         // TODO
         return null;
     }
 
     @Override
-    public byte[] readFileToBytes(String directoryPath, FileEntry fileEntry) throws FileStorageException {
+    public byte[] readFileToBytes(@NonNull String directoryPath, @NonNull FileEntry fileEntry)
+        throws FileStorageException {
         // TODO
         return new byte[0];
     }
 
     @Override
-    public String readFileToString(String directoryPath, FileEntry fileEntry) throws FileStorageException {
+    public String readFileToString(@NonNull String directoryPath, @NonNull FileEntry fileEntry)
+        throws FileStorageException {
         // TODO
         return "";
     }
 
     @Override
-    public FileEntry storeFileContent(String directoryPath, String filename, byte[] data) throws FileStorageException {
+    public FileEntry storeFileContent(@NonNull String directoryPath, @NonNull String filename, byte[] data)
+        throws FileStorageException {
         // TODO
         return null;
     }
 
     @Override
     public FileEntry storeFileContent(
-        String directoryPath, String filename, byte[] data, boolean randomFilename) throws FileStorageException {
+        @NonNull String directoryPath, @NonNull String filename, byte[] data, boolean randomFilename)
+        throws FileStorageException {
 
         // TODO
         return null;
     }
 
     @Override
-    public FileEntry storeFileContent(String directoryPath, String filename, String data) throws FileStorageException {
+    public FileEntry storeFileContent(@NonNull String directoryPath, @NonNull String filename, @NonNull String data)
+        throws FileStorageException {
         // TODO
         return null;
     }
 
     @Override
-    public FileEntry storeFileContent(String directoryPath, String filename, String data, boolean randomFilename)
+    public FileEntry storeFileContent(
+        @NonNull String directoryPath, @NonNull String filename, @NonNull String data, boolean randomFilename)
         throws FileStorageException {
 
         // TODO
@@ -113,8 +123,9 @@ public class AwsFileStorageService implements FileStorageService {
     }
 
     @Override
-    public FileEntry storeFileContent(String directoryPath, String filename, InputStream inputStream)
-        throws FileStorageException {
+    public FileEntry
+        storeFileContent(@NonNull String directoryPath, @NonNull String filename, @NonNull InputStream inputStream)
+            throws FileStorageException {
 
         // TODO
         return null;
@@ -122,8 +133,8 @@ public class AwsFileStorageService implements FileStorageService {
 
     @Override
     public FileEntry storeFileContent(
-        String directoryPath, String filename, InputStream inputStream, boolean randomFilename)
-        throws FileStorageException {
+        @NonNull String directoryPath, @NonNull String filename, @NonNull InputStream inputStream,
+        boolean randomFilename) throws FileStorageException {
 
         // TODO
 

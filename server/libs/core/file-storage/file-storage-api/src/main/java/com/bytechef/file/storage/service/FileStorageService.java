@@ -28,39 +28,46 @@ import org.springframework.lang.NonNull;
  */
 public interface FileStorageService {
 
-    void deleteFile(String directoryPath, FileEntry fileEntry);
+    void deleteFile(@NonNull String directoryPath, @NonNull FileEntry fileEntry);
 
-    boolean fileExists(String directoryPath, FileEntry fileEntry) throws FileStorageException;
+    boolean fileExists(@NonNull String directoryPath, @NonNull FileEntry fileEntry) throws FileStorageException;
 
-    boolean fileExists(String directoryPath, String nonRandomFilename) throws FileStorageException;
+    boolean fileExists(@NonNull String directoryPath, @NonNull String nonRandomFilename) throws FileStorageException;
 
-    FileEntry getFileEntry(String directoryPath, String nonRandomFilename) throws FileStorageException;
+    FileEntry getFileEntry(
+        @NonNull String directoryPath, @NonNull String nonRandomFilename) throws FileStorageException;
 
     Set<FileEntry> getFileEntries(@NonNull String directoryPath) throws FileStorageException;
 
     Set<FileEntry> getFileEntries(@NonNull String directoryPath, String contains) throws FileStorageException;
 
-    InputStream getFileStream(String directoryPath, FileEntry fileEntry) throws FileStorageException;
+    InputStream getFileStream(@NonNull String directoryPath, @NonNull FileEntry fileEntry) throws FileStorageException;
 
-    URL getFileEntryURL(String directoryPath, FileEntry fileEntry);
+    URL getFileEntryURL(@NonNull String directoryPath, @NonNull FileEntry fileEntry);
 
-    byte[] readFileToBytes(String directoryPath, FileEntry fileEntry) throws FileStorageException;
+    byte[] readFileToBytes(@NonNull String directoryPath, @NonNull FileEntry fileEntry) throws FileStorageException;
 
-    String readFileToString(String directoryPath, FileEntry fileEntry) throws FileStorageException;
+    String readFileToString(@NonNull String directoryPath, @NonNull FileEntry fileEntry) throws FileStorageException;
 
-    FileEntry storeFileContent(String directoryPath, String filename, byte[] data) throws FileStorageException;
+    FileEntry storeFileContent(
+        @NonNull String directoryPath, @NonNull String filename, byte[] data) throws FileStorageException;
 
-    FileEntry storeFileContent(String directoryPath, String filename, byte[] data, boolean randomFilename)
+    FileEntry storeFileContent(
+        @NonNull String directoryPath, @NonNull String filename, byte[] data, boolean randomFilename)
         throws FileStorageException;
 
-    FileEntry storeFileContent(String directoryPath, String filename, String data) throws FileStorageException;
+    FileEntry storeFileContent(
+        @NonNull String directoryPath, @NonNull String filename, @NonNull String data) throws FileStorageException;
 
-    FileEntry storeFileContent(String directoryPath, String filename, String data, boolean randomFilename)
+    FileEntry storeFileContent(
+        @NonNull String directoryPath, @NonNull String filename, @NonNull String data, boolean randomFilename)
         throws FileStorageException;
 
-    FileEntry storeFileContent(String directoryPath, String filename, InputStream inputStream)
+    FileEntry storeFileContent(
+        @NonNull String directoryPath, @NonNull String filename, @NonNull InputStream inputStream)
         throws FileStorageException;
 
-    FileEntry storeFileContent(String directoryPath, String filename, InputStream inputStream, boolean randomFilename)
-        throws FileStorageException;
+    FileEntry storeFileContent(
+        @NonNull String directoryPath, @NonNull String filename, @NonNull InputStream inputStream,
+        boolean randomFilename) throws FileStorageException;
 }
