@@ -352,4 +352,5 @@ include("server:ee:libs:platform:platform-workflow:platform-workflow-task-dispat
 include("server:ee:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-registry:platform-workflow-task-dispatcher-registry-remote-rest")
 include("server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-client")
 include("server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-rest")
-include("server:ee:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-remote-config")
+include("server:ee:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-remote-client")
+include("server:ee:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-remote-rest")
