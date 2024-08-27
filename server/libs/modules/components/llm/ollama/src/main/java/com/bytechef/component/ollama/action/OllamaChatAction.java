@@ -20,16 +20,20 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
+import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.llm.constants.LLMConstants.ASK;
 import static com.bytechef.component.llm.constants.LLMConstants.FREQUENCY_PENALTY;
 import static com.bytechef.component.llm.constants.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.FUNCTIONS;
+import static com.bytechef.component.llm.constants.LLMConstants.FUNCTIONS_PROERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.llm.constants.LLMConstants.MESSAGE_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
 import static com.bytechef.component.llm.constants.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.llm.constants.LLMConstants.PRESENCE_PENALTY_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.SEED;
 import static com.bytechef.component.llm.constants.LLMConstants.SEED_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.STOP;
@@ -73,6 +77,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.llm.util.LLMUtils;
 import com.bytechef.component.llm.util.interfaces.Chat;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
@@ -96,6 +101,7 @@ public class OllamaChatAction {
                         .collect(Collectors.toMap(
                             OllamaModel::getName, OllamaModel::getName, (f, s) -> f)))),
             MESSAGE_PROPERTY,
+            RESPONSE_FORMAT_PROPERTY,
             string(FORMAT)
                 .label("Format")
                 .description("The format to return a response in.")
@@ -116,6 +122,7 @@ public class OllamaChatAction {
             FREQUENCY_PENALTY_PROPERTY,
             PRESENCE_PENALTY_PROPERTY,
             STOP_PROPERTY,
+            FUNCTIONS_PROERTY,
             SEED_PROPERTY,
             bool(USE_NUMA)
                 .label("Use NUMA")
@@ -211,13 +218,13 @@ public class OllamaChatAction {
             bool(TRUNCATE)
                 .label("Truncate")
                 .advancedOption(true))
-        .outputSchema(string())
+        .outputSchema(object())
         .perform(OllamaChatAction::perform);
 
     private OllamaChatAction() {
     }
 
-    public static String perform(
+    public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }
@@ -259,6 +266,7 @@ public class OllamaChatAction {
                 .withUseMLock(inputParameters.getBoolean(USE_MLOCK))
                 .withUseNUMA(inputParameters.getBoolean(USE_NUMA))
                 .withVocabOnly(inputParameters.getBoolean(VOCAB_ONLY))
+                .withFunctions(new HashSet<>(inputParameters.getList(FUNCTIONS, new TypeReference<>() {})))
                 .build();
         }
 

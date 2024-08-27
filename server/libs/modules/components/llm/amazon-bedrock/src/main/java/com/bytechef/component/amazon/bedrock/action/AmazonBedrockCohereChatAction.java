@@ -29,6 +29,7 @@ import static com.bytechef.component.llm.constants.LLMConstants.MESSAGE_PROPERTY
 import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
 import static com.bytechef.component.llm.constants.LLMConstants.N;
 import static com.bytechef.component.llm.constants.LLMConstants.N_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.STOP;
 import static com.bytechef.component.llm.constants.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE;
@@ -71,6 +72,7 @@ public class AmazonBedrockCohereChatAction {
                             CohereChatBedrockApi.CohereChatModel::getName,
                             CohereChatBedrockApi.CohereChatModel::getName, (f, s) -> f)))),
             MESSAGE_PROPERTY,
+            RESPONSE_FORMAT_PROPERTY,
             MAX_TOKENS_PROPERTY,
             N_PROPERTY,
             TEMPERATURE_PROPERTY,
@@ -103,13 +105,13 @@ public class AmazonBedrockCohereChatAction {
                     Arrays.stream(CohereChatBedrockApi.CohereChatRequest.Truncate.values())
                         .collect(Collectors.toMap(
                             CohereChatBedrockApi.CohereChatRequest.Truncate::name, clas -> clas, (f, s) -> f)))))
-        .outputSchema(string())
+        .outputSchema(object())
         .perform(AmazonBedrockCohereChatAction::perform);
 
     private AmazonBedrockCohereChatAction() {
     }
 
-    public static String perform(
+    public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }

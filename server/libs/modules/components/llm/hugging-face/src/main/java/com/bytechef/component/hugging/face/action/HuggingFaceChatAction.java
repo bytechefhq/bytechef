@@ -18,6 +18,7 @@ package com.bytechef.component.hugging.face.action;
 
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.hugging.face.constant.HuggingFaceConstants.URL;
 import static com.bytechef.component.llm.constants.LLMConstants.ASK;
@@ -41,13 +42,13 @@ public class HuggingFaceChatAction {
                 .label("URL")
                 .description("Url of the inference endpoint"),
             MESSAGE_PROPERTY)
-        .outputSchema(string())
+        .outputSchema(object())
         .perform(HuggingFaceChatAction::perform);
 
     private HuggingFaceChatAction() {
     }
 
-    public static String perform(
+    public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }

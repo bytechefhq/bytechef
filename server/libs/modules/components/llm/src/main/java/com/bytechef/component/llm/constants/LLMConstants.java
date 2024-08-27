@@ -59,6 +59,7 @@ public class LLMConstants {
     public static final String VOICE = "voice";
     public static final String SPEED = "speed";
     public static final String WEIGHT = "weight";
+    public static final String FUNCTIONS = "functions";
 
     public static final ComponentDSL.ModifiableNumberProperty FREQUENCY_PENALTY_PROPERTY = number(FREQUENCY_PENALTY)
         .label("Frequency penalty")
@@ -69,6 +70,20 @@ public class LLMConstants {
         .minValue(-2)
         .maxValue(2)
         .advancedOption(true);
+
+    public static final ComponentDSL.ModifiableArrayProperty FUNCTIONS_PROERTY = array(FUNCTIONS)
+        .label("Functions")
+        .description("Enter the names of functions you want to use.")
+        .items(string())
+        .advancedOption(true);
+
+    public static final ComponentDSL.ModifiableIntegerProperty RESPONSE_FORMAT_PROPERTY = integer(RESPONSE_FORMAT)
+        .label("Response format")
+        .description("In which format do you want the response to be in?")
+        .options(option("Text", 0),
+            option("Map", 1),
+            option("List", 2))
+        .required(false);
 
     public static final ComponentDSL.ModifiableObjectProperty LOGIT_BIAS_PROPERTY = object(LOGIT_BIAS)
         .label("Logit bias")
