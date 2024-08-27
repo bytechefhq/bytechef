@@ -21,6 +21,7 @@ import com.bytechef.ee.file.storage.aws.service.AwsFileStorageService;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.data.storage.DataStorage;
+import com.bytechef.platform.data.storage.annotation.ConditionalOnDataStorageProviderAws;
 import com.bytechef.platform.data.storage.annotation.ConditionalOnDataStorageProviderFilesystem;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.file.storage.service.FileDataStorageService;
@@ -47,6 +48,16 @@ public class FileDataStorageConfiguration {
     @SuppressFBWarnings("EI")
     public FileDataStorageConfiguration(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
+    }
+
+    @Bean
+    @ConditionalOnDataStorageProviderAws
+    DataStorage awsFileStorageDataStorageService() {
+        if (logger.isInfoEnabled()) {
+            logger.info("Data storage provider type enabled: aws");
+        }
+
+        return new DataStorageImpl(new FileDataStorageServiceImpl(new AwsFileStorageService()));
     }
 
     @Bean
