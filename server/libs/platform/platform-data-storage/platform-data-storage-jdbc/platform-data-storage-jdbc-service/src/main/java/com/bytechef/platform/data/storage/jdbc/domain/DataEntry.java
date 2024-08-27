@@ -62,7 +62,7 @@ public class DataEntry {
     private LocalDateTime lastModifiedDate;
 
     @Column
-    private DataStorageScope scope;
+    private int scope;
 
     @Column("scope_id")
     private String scopeId;
@@ -84,7 +84,7 @@ public class DataEntry {
 
         this.componentName = componentName;
         this.key = key;
-        this.scope = scope;
+        this.scope = scope.ordinal();
         this.scopeId = scopeId;
         this.type = type.ordinal();
         this.value = new ValueWrapper(value, value.getClass());
@@ -119,7 +119,7 @@ public class DataEntry {
     }
 
     public DataStorageScope getScope() {
-        return scope;
+        return DataStorageScope.values()[scope];
     }
 
     public String getScopeId() {
