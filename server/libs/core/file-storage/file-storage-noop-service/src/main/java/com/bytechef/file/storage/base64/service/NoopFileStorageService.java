@@ -31,7 +31,6 @@ import java.nio.charset.StandardCharsets;
  */
 public class NoopFileStorageService implements FileStorageService {
 
-    private static final String NOOP = "noop://";
 
     public NoopFileStorageService() {
     }
@@ -49,7 +48,7 @@ public class NoopFileStorageService implements FileStorageService {
     public InputStream getFileStream(String directoryPath, FileEntry fileEntry) {
         String url = fileEntry.getUrl();
 
-        String data = url.replace(NOOP, "");
+        String data = url.replace(URL_PREFIX, "");
 
         return new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8));
     }
@@ -63,7 +62,7 @@ public class NoopFileStorageService implements FileStorageService {
     public byte[] readFileToBytes(String directoryPath, FileEntry fileEntry) throws FileStorageException {
         String url = fileEntry.getUrl();
 
-        String data = url.replace(NOOP, "");
+        String data = url.replace(URL_PREFIX, "");
 
         return data.getBytes(StandardCharsets.UTF_8);
     }
@@ -72,30 +71,32 @@ public class NoopFileStorageService implements FileStorageService {
     public String readFileToString(String directoryPath, FileEntry fileEntry) throws FileStorageException {
         String url = fileEntry.getUrl();
 
-        return url.replace(NOOP, "");
+        return url.replace(URL_PREFIX, "");
     }
 
     @Override
-    public FileEntry storeFileContent(String directoryPath, String fileName, byte[] data) throws FileStorageException {
-        return new FileEntry(fileName, NOOP + new String(data, StandardCharsets.UTF_8));
+    public FileEntry storeFileContent(String directoryPath, String filename, byte[] data) throws FileStorageException {
+        return new FileEntry(filename, URL_PREFIX + new String(data, StandardCharsets.UTF_8));
     }
 
     @Override
-    public FileEntry storeFileContent(String directoryPath, String fileName, byte[] data, boolean randomFilename)
         throws FileStorageException {
 
-        return storeFileContent(directoryPath, fileName, data);
+        return storeFileContent(directoryPath, filename, data);
     }
 
     @Override
-    public FileEntry storeFileContent(String directoryPath, String fileName, String data) throws FileStorageException {
-        return new FileEntry(fileName, NOOP + data);
+    public FileEntry storeFileContent(String directoryPath, String filename, String data) throws FileStorageException {
+        return new FileEntry(filename, URL_PREFIX + data);
     }
 
     @Override
-    public FileEntry storeFileContent(String directoryPath, String fileName, InputStream inputStream) {
+    }
+
+    @Override
+    public FileEntry storeFileContent(String directoryPath, String filename, InputStream inputStream) {
         try {
-            return new FileEntry(fileName, NOOP + new String(toByteArray(inputStream), StandardCharsets.UTF_8));
+            return new FileEntry(filename, URL_PREFIX + new String(toByteArray(inputStream), StandardCharsets.UTF_8));
         } catch (IOException ioe) {
             throw new FileStorageException("Failed to store file", ioe);
         }

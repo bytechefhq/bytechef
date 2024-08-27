@@ -22,7 +22,7 @@ public class AwsFileStorageService implements FileStorageService {
 
     @Override
     public void deleteFile(String directoryPath, FileEntry fileEntry) {
-// TODO
+        // TODO
     }
 
     @Override
@@ -56,27 +56,26 @@ public class AwsFileStorageService implements FileStorageService {
     }
 
     @Override
-    public FileEntry storeFileContent(String directoryPath, String fileName, byte[] data) throws FileStorageException {
+    public FileEntry storeFileContent(String directoryPath, String filename, byte[] data) throws FileStorageException {
         // TODO
         return null;
     }
 
     @Override
     public FileEntry storeFileContent(
-        String directoryPath, String fileName, byte[] data, boolean randomFilename) throws FileStorageException {
+        String directoryPath, String filename, byte[] data, boolean randomFilename) throws FileStorageException {
 
         // TODO
         return null;
     }
 
     @Override
-    public FileEntry storeFileContent(String directoryPath, String fileName, String data) throws FileStorageException {
         // TODO
         return null;
     }
 
     @Override
-    public FileEntry storeFileContent(String directoryPath, String fileName, InputStream inputStream)
+    public FileEntry storeFileContent(String directoryPath, String filename, InputStream inputStream)
         throws FileStorageException {
 
         // TODO

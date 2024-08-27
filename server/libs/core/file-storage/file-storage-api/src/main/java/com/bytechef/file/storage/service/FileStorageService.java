@@ -38,13 +38,15 @@ public interface FileStorageService {
 
     String readFileToString(String directoryPath, FileEntry fileEntry) throws FileStorageException;
 
-    FileEntry storeFileContent(String directoryPath, String fileName, byte[] data) throws FileStorageException;
+    FileEntry storeFileContent(String directoryPath, String filename, byte[] data) throws FileStorageException;
 
-    FileEntry storeFileContent(String directoryPath, String fileName, byte[] data, boolean randomFilename)
+    FileEntry storeFileContent(String directoryPath, String filename, byte[] data, boolean randomFilename)
         throws FileStorageException;
 
-    FileEntry storeFileContent(String directoryPath, String fileName, String data) throws FileStorageException;
+    FileEntry storeFileContent(String directoryPath, String filename, String data) throws FileStorageException;
 
-    FileEntry storeFileContent(String directoryPath, String fileName, InputStream inputStream)
+    FileEntry storeFileContent(String directoryPath, String filename, InputStream inputStream)
+        throws FileStorageException;
+
         throws FileStorageException;
 }

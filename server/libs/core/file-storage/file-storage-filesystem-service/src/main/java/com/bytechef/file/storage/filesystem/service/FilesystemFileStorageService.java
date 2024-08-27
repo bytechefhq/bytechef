@@ -41,7 +41,7 @@ import org.apache.commons.lang3.Validate;
  */
 public class FilesystemFileStorageService implements FileStorageService {
 
-    private static final String FILE = "file:";
+    private static final String URL_PREFIX = "file:";
 
     private final Path baseDirPath;
 
@@ -54,7 +54,7 @@ public class FilesystemFileStorageService implements FileStorageService {
         Path path = resolveDirectoryPath(directoryPath);
         String url = fileEntry.getUrl();
 
-        boolean deleted = path.resolve(url.replace(FILE, ""))
+        boolean deleted = path.resolve(url.replace(URL_PREFIX, ""))
             .toFile()
             .delete();
 
@@ -68,7 +68,7 @@ public class FilesystemFileStorageService implements FileStorageService {
         Path path = resolveDirectoryPath(directoryPath);
         String url = fileEntry.getUrl();
 
-        return path.resolve(url.replace(FILE, ""))
+        return path.resolve(url.replace(URL_PREFIX, ""))
             .toFile()
             .exists();
     }
@@ -79,7 +79,7 @@ public class FilesystemFileStorageService implements FileStorageService {
         String url = fileEntry.getUrl();
 
         try {
-            return Files.newInputStream(path.resolve(url.replace(FILE, "")), StandardOpenOption.READ);
+            return Files.newInputStream(path.resolve(url.replace(URL_PREFIX, "")), StandardOpenOption.READ);
         } catch (IOException ioe) {
             throw new FileStorageException("Failed to open file " + url, ioe);
         }
@@ -91,7 +91,7 @@ public class FilesystemFileStorageService implements FileStorageService {
         String url = fileEntry.getUrl();
 
         try {
-            return path.resolve(url.replace(FILE, ""))
+            return path.resolve(url.replace(URL_PREFIX, ""))
                 .toUri()
                 .toURL();
         } catch (MalformedURLException e) {
@@ -105,7 +105,7 @@ public class FilesystemFileStorageService implements FileStorageService {
         String url = fileEntry.getUrl();
 
         try {
-            return Files.readAllBytes(path.resolve(url.replace(FILE, "")));
+            return Files.readAllBytes(path.resolve(url.replace(URL_PREFIX, "")));
         } catch (IOException ioe) {
             throw new FileStorageException("Failed to open file " + url, ioe);
         }
@@ -117,75 +117,76 @@ public class FilesystemFileStorageService implements FileStorageService {
         String url = fileEntry.getUrl();
 
         try {
-            return Files.readString(path.resolve(url.replace(FILE, "")));
+            return Files.readString(path.resolve(url.replace(URL_PREFIX, "")));
         } catch (IOException ioe) {
             throw new FileStorageException("Failed to open file " + url, ioe);
         }
     }
 
     @Override
-    public FileEntry storeFileContent(String directoryPath, String fileName, byte[] data) throws FileStorageException {
+    public FileEntry storeFileContent(String directoryPath, String filename, byte[] data) throws FileStorageException {
         Validate.notNull(directoryPath, "directory is required");
-        Validate.notNull(fileName, "fileName is required");
+        Validate.notNull(filename, "fileName is required");
         Validate.notNull(data, "data is required");
 
-        return doStoreFileContent(directoryPath, fileName, new ByteArrayInputStream(data), true);
+        return doStoreFileContent(directoryPath, filename, new ByteArrayInputStream(data), true);
     }
 
     @Override
     public FileEntry storeFileContent(
-        String directoryPath, String fileName, byte[] data, boolean randomFilename) throws FileStorageException {
+        String directoryPath, String filename, byte[] data, boolean randomFilename) throws FileStorageException {
 
         Validate.notNull(directoryPath, "directory is required");
-        Validate.notNull(fileName, "fileName is required");
+        Validate.notNull(filename, "fileName is required");
         Validate.notNull(data, "data is required");
 
-        return doStoreFileContent(directoryPath, fileName, new ByteArrayInputStream(data), randomFilename);
+        return doStoreFileContent(directoryPath, filename, new ByteArrayInputStream(data), randomFilename);
     }
 
     @Override
-    public FileEntry storeFileContent(String directoryPath, String fileName, String data) throws FileStorageException {
+    public FileEntry storeFileContent(String directoryPath, String filename, String data) throws FileStorageException {
+        return storeFileContent(directoryPath, filename, data, true);
+    }
         Validate.notNull(directoryPath, "directory is required");
-        Validate.notNull(fileName, "fileName is required");
+        Validate.notNull(filename, "fileName is required");
         Validate.notNull(data, "data is required");
 
         return doStoreFileContent(
-            directoryPath, fileName, new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)), true);
+            directoryPath, filename, new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)), randomFilename);
     }
 
     @Override
-    public FileEntry storeFileContent(String directoryPath, String fileName, InputStream inputStream)
         throws FileStorageException {
 
         Validate.notNull(directoryPath, "directory is required");
-        Validate.notNull(fileName, "fileName is required");
+        Validate.notNull(filename, "fileName is required");
         Validate.notNull(inputStream, "inputStream is required");
 
-        return doStoreFileContent(directoryPath, fileName, inputStream, true);
+        return doStoreFileContent(directoryPath, filename, inputStream, randomFilename);
     }
 
     private FileEntry doStoreFileContent(
-        String directory, String fileName, InputStream inputStream, boolean randomFilename) {
+        String directory, String filename, InputStream inputStream, boolean randomFilename) {
 
         directory = StringUtils.replace(directory.replaceAll("[^0-9a-zA-Z/_]", ""), " ", "");
 
         Path path = resolveDirectoryPath(directory.toLowerCase());
 
-        path = path.resolve(randomFilename ? generateUuid() : fileName);
+        path = path.resolve(randomFilename ? generateUuid() : filename);
 
         try {
             Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException ioe) {
-            throw new FileStorageException("Failed to store file " + fileName, ioe);
+            throw new FileStorageException("Failed to store file " + filename, ioe);
         }
 
         File file = path.toFile();
 
         if (file.length() == 0) {
-            throw new FileStorageException("Failed to store empty file " + fileName);
+            throw new FileStorageException("Failed to store empty file " + filename);
         }
 
-        return new FileEntry(fileName, FILE + path);
+        return new FileEntry(filename, URL_PREFIX + path);
     }
 
     private Path resolveDirectoryPath(String directoryPath) {
