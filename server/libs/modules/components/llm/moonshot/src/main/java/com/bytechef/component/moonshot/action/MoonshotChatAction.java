@@ -103,15 +103,15 @@ public class MoonshotChatAction {
                 .withTemperature(inputParameters.getFloat(TEMPERATURE))
                 .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
                 .withTopP(inputParameters.getFloat(TOP_P))
-                .withStop(inputParameters.getList(STOP, new TypeReference<>() {
-                }))
+                .withStop(inputParameters.getList(STOP, new TypeReference<>() {}))
                 .withN(inputParameters.getInteger(N))
                 .withFrequencyPenalty(inputParameters.getFloat(FREQUENCY_PENALTY))
                 .withPresencePenalty(inputParameters.getFloat(PRESENCE_PENALTY))
                 .withUser(inputParameters.getString(USER));
 
             List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});
-            if(functions!=null) builder.withFunctions(new HashSet<>(functions));
+            if (functions != null)
+                builder.withFunctions(new HashSet<>(functions));
             return builder.build();
         }
 

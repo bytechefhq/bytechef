@@ -25,7 +25,6 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.llm.util.records.MessageRecord;
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.model.ChatModel;
@@ -43,10 +42,13 @@ public interface Chat {
     }
 
     private static Object returnChatEntity(Parameters inputParameters, ChatClient.CallResponseSpec call) {
-        return switch (inputParameters.getInteger(RESPONSE_FORMAT)){
+        return switch (inputParameters.getInteger(RESPONSE_FORMAT)) {
             case 1 -> call.entity(new ParameterizedTypeReference<Map<String, Object>>() {});
             case 2 -> call.entity(new ListOutputConverter(new DefaultConversionService()));
-            default -> call.chatResponse().getResult().getOutput().getContent();
+            default -> call.chatResponse()
+                .getResult()
+                .getOutput()
+                .getContent();
         };
     }
 

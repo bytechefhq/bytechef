@@ -107,14 +107,14 @@ public class VertexGeminiChatAction {
                 .withTemperature(inputParameters.getFloat(TEMPERATURE))
                 .withMaxOutputTokens(inputParameters.getInteger(MAX_TOKENS))
                 .withTopP(inputParameters.getFloat(TOP_P))
-                .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {
-                }))
+                .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
                 .withTopK(inputParameters.getFloat(TOP_K))
                 .withCandidateCount(inputParameters.getInteger(N))
                 .withResponseMimeType(type);
 
             List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});
-            if(functions!=null) builder.withFunctions(new HashSet<>(functions));
+            if (functions != null)
+                builder.withFunctions(new HashSet<>(functions));
             return builder.build();
         }
 
