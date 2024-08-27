@@ -46,14 +46,13 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
     @SuppressFBWarnings("EI")
     public TriggerContextImpl(
         String componentName, int componentVersion, String triggerName, AppType type,
-        String workflowReferenceCode, Long jobId, ComponentConnection connection, DataStorageService dataStorageService,
+        String workflowReferenceCode, ComponentConnection connection, DataStorageService dataStorageService,
         FileStorageService fileStorageService, HttpClientExecutor httpClientExecutor) {
 
         super(componentName, componentVersion, triggerName, connection, httpClientExecutor);
 
         this.data = type == null ? new NoOpDataImpl() : new DataImpl(
-            componentName, componentVersion, triggerName, type, workflowReferenceCode, jobId,
-            dataStorageService);
+            componentName, componentVersion, triggerName, type, workflowReferenceCode, dataStorageService);
         this.file = new FileImpl(fileStorageService);
     }
 
@@ -82,7 +81,7 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
 
     private record DataImpl(
         String componentName, Integer componentVersion, String triggerName, AppType type,
-        String workflowReferenceCode, Long jobId, DataStorageService dataStorageService) implements Data {
+        String workflowReferenceCode, DataStorageService dataStorageService) implements Data {
 
         @Override
         public <T> Optional<T> fetchValue(Data.Scope scope, String key) {

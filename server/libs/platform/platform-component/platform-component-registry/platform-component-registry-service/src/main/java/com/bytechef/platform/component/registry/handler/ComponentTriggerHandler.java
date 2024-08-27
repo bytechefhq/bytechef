@@ -62,7 +62,7 @@ public class ComponentTriggerHandler implements TriggerHandler {
             return triggerDefinitionFacade.executeTrigger(
                 componentName, componentVersion, triggerName,
                 workflowExecutionId.getType(), workflowExecutionId.getInstanceId(),
-                workflowExecutionId.getWorkflowReferenceCode(), null, triggerExecution.getParameters(),
+                workflowExecutionId.getWorkflowReferenceCode(), triggerExecution.getParameters(),
                 triggerExecution.getState(),
                 MapUtils.get(triggerExecution.getMetadata(), WebhookRequest.WEBHOOK_REQUEST, WebhookRequest.class),
                 OptionalUtils.orElse(CollectionUtils.findFirst(connectIdMap.values()), null));
