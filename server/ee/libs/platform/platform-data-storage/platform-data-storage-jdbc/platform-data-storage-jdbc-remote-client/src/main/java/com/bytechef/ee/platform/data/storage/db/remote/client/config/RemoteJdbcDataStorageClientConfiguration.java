@@ -10,16 +10,17 @@ package com.bytechef.ee.platform.data.storage.db.remote.client.config;
 import com.bytechef.ee.platform.data.storage.db.remote.client.service.RemoteJdbcDataStorageServiceClient;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.annotation.ConditionalOnDataStorageProviderJdbc;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageService;
-import com.bytechef.platform.data.storage.service.DataStorageService;
 import java.util.Map;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.NonNull;
 
 /**
  * @version ee
@@ -39,49 +40,58 @@ public class RemoteJdbcDataStorageClientConfiguration {
     }
 
     @Bean
-    DataStorageService dataStorageService(JdbcDataStorageService dbDataStorageService) {
-        return new DataStorageServiceImpl(dbDataStorageService);
+    DataStorage dataStorageService(JdbcDataStorageService jdbcDataStorageService) {
+        return new DataStorageImpl(jdbcDataStorageService);
     }
 
     @Bean
-    JdbcDataStorageService dbDataStorageService(LoadBalancedRestClient loadBalancedRestClient) {
+    JdbcDataStorageService jdbcDataStorageService(LoadBalancedRestClient loadBalancedRestClient) {
         return new RemoteJdbcDataStorageServiceClient(loadBalancedRestClient);
     }
 
-    private record DataStorageServiceImpl(JdbcDataStorageService jdbcDataStorageService)
-        implements DataStorageService {
+    private record DataStorageImpl(JdbcDataStorageService jdbcDataStorageService)
+        implements DataStorage {
 
+        @NonNull
         @Override
         public <T> Optional<T> fetch(
-            String componentName, DataStorageScope scope, String scopeId, String key,
-            AppType type) {
+            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
+            @NonNull String key, @NonNull AppType type) {
 
             return jdbcDataStorageService.fetch(componentName, scope, scopeId, key, type);
         }
 
+        @NonNull
         @Override
         public <T> T get(
-            String componentName, DataStorageScope scope, String scopeId, String key,
-            AppType type) {
+            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
+            @NonNull String key, @NonNull AppType type) {
 
             return jdbcDataStorageService.get(componentName, scope, scopeId, key, type);
         }
 
+        @NonNull
         @Override
-        public <T> Map<String, T> getAll(String componentName, DataStorageScope scope, String scopeId, AppType type) {
+        public <T> Map<String, T> getAll(
+            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
+            @NonNull AppType type) {
+
             return jdbcDataStorageService.getAll(componentName, scope, scopeId, type);
         }
 
         @Override
         public void put(
-            String componentName, DataStorageScope scope, String scopeId, String key,
-            AppType type, Object value) {
+            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
+            @NonNull String key, @NonNull AppType type, @NonNull Object value) {
 
             jdbcDataStorageService.put(componentName, scope, scopeId, key, type, value);
         }
 
         @Override
-        public void delete(String componentName, DataStorageScope scope, String scopeId, String key, AppType type) {
+        public void delete(
+            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
+            @NonNull String key, @NonNull AppType type) {
+
             jdbcDataStorageService.delete(componentName, scope, scopeId, key, type);
         }
     }

@@ -4,4 +4,5 @@ dependencies {
 
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.data:spring-data-relational")
+    implementation(project(":server:libs:core:commons:commons-util"))
 }

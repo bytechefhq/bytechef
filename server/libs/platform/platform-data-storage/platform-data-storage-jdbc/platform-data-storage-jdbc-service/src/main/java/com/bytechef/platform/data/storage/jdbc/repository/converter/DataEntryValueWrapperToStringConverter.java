@@ -16,9 +16,7 @@
 
 package com.bytechef.platform.data.storage.jdbc.repository.converter;
 
-import com.bytechef.platform.data.storage.jdbc.domain.DataEntry.ValueWrapper;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.bytechef.platform.data.storage.domain.ValueWrapper;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
 
@@ -28,23 +26,8 @@ import org.springframework.data.convert.WritingConverter;
 @WritingConverter
 public class DataEntryValueWrapperToStringConverter implements Converter<ValueWrapper, String> {
 
-    private final ObjectMapper objectMapper;
-
-    @SuppressFBWarnings("EI2")
-    public DataEntryValueWrapperToStringConverter(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
-
     @Override
-    public String convert(ValueWrapper workflowTask) {
-        return write(objectMapper, workflowTask);
-    }
-
-    private String write(ObjectMapper objectMapper, Object object) {
-        try {
-            return objectMapper.writeValueAsString(object);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public String convert(ValueWrapper valueWrapper) {
+        return valueWrapper.write();
     }
 }
