@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.data.storage.jdbc.service;
 
-import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import java.util.Map;
 import java.util.Optional;
 
@@ -26,13 +26,13 @@ import java.util.Optional;
  */
 public interface JdbcDataStorageService {
 
-    void delete(String componentName, Scope scope, String scopeId, String key, AppType type);
+    void delete(String componentName, DataStorageScope scope, String scopeId, String key, AppType type);
 
-    <T> Optional<T> fetch(String componentName, Scope scope, String scopeId, String key, AppType type);
+    <T> Optional<T> fetch(String componentName, DataStorageScope scope, String scopeId, String key, AppType type);
 
-    <T> T get(String componentName, Scope scope, String scopeId, String key, AppType type);
+    <T> T get(String componentName, DataStorageScope scope, String scopeId, String key, AppType type);
 
-    <T> Map<String, T> getAll(String componentName, Scope scope, String scopeId, AppType type);
+    <T> Map<String, T> getAll(String componentName, DataStorageScope scope, String scopeId, AppType type);
 
-    void put(String componentName, Scope scope, String scopeId, String key, AppType type, Object value);
+    void put(String componentName, DataStorageScope scope, String scopeId, String key, AppType type, Object value);
 }

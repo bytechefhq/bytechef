@@ -58,10 +58,6 @@ public interface TriggerContext extends Context {
             public String getLabel() {
                 return label;
             }
-
-            public ActionContext.Data.Scope toActionScope() {
-                return ActionContext.Data.Scope.valueOf(label.toUpperCase());
-            }
         }
 
         /**

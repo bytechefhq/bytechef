@@ -22,6 +22,7 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.service.DataStorageService;
 import com.bytechef.platform.workflow.execution.constants.FileEntryConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -119,31 +120,39 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
 
         @Override
         public <T> Optional<T> fetchValue(Scope scope, String key) {
-            return dataStorageService.fetch(componentName, scope, getScopeId(scope), key, type);
+            return dataStorageService.fetch(componentName, getDataStorageScope(scope), getScopeId(scope), key, type);
         }
 
         @Override
         public <T> T getValue(Scope scope, String key) {
-            return dataStorageService.get(componentName, scope, getScopeId(scope), key, type);
+            return dataStorageService.get(componentName, getDataStorageScope(scope), getScopeId(scope), key, type);
         }
 
         @Override
         public <T> Map<String, T> getAll(Scope scope) {
-            return dataStorageService.getAll(componentName, scope, getScopeId(scope), type);
+            return dataStorageService.getAll(componentName, getDataStorageScope(scope), getScopeId(scope), type);
         }
 
         @Override
         public Void setValue(Scope scope, String key, Object value) {
-            dataStorageService.put(componentName, scope, getScopeId(scope), key, type, value);
+            dataStorageService.put(componentName, getDataStorageScope(scope), getScopeId(scope), key, type, value);
 
             return null;
         }
 
         @Override
         public Void deleteValue(Scope scope, String key) {
-            dataStorageService.delete(componentName, scope, getScopeId(scope), key, type);
+            dataStorageService.delete(componentName, getDataStorageScope(scope), getScopeId(scope), key, type);
 
             return null;
+        }
+
+        private DataStorageScope getDataStorageScope(Scope scope) {
+            return switch (scope) {
+                case CURRENT_EXECUTION -> DataStorageScope.CURRENT_EXECUTION;
+                case WORKFLOW -> DataStorageScope.WORKFLOW;
+                case ACCOUNT -> DataStorageScope.ACCOUNT;
+            };
         }
 
         private String getScopeId(Scope scope) {

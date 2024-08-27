@@ -16,9 +16,9 @@
 
 package com.bytechef.platform.data.storage.jdbc.config;
 
-import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.data.storage.annotation.ConditionalOnDataStorageProviderJdbc;
+import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.jdbc.repository.DataStorageRepository;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageService;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageServiceImpl;
@@ -58,27 +58,30 @@ public class JdbcDataStorageConfiguration {
     private record DataStorageServiceImpl(JdbcDataStorageService jdbcDataStorageService) implements DataStorageService {
 
         @Override
-        public <T> Optional<T> fetch(String componentName, Scope scope, String scopeId, String key, AppType type) {
+        public <T> Optional<T> fetch(
+            String componentName, DataStorageScope scope, String scopeId, String key, AppType type) {
+
             return jdbcDataStorageService.fetch(componentName, scope, scopeId, key, type);
         }
 
         @Override
-        public <T> T get(String componentName, Scope scope, String scopeId, String key, AppType type) {
+        public <T> T get(String componentName, DataStorageScope scope, String scopeId, String key, AppType type) {
             return jdbcDataStorageService.get(componentName, scope, scopeId, key, type);
         }
 
         @Override
-        public <T> Map<String, T> getAll(String componentName, Scope scope, String scopeId, AppType type) {
+        public <T> Map<String, T> getAll(String componentName, DataStorageScope scope, String scopeId, AppType type) {
             return jdbcDataStorageService.getAll(componentName, scope, scopeId, type);
         }
 
         @Override
-        public void put(String componentName, Scope scope, String scopeId, String key, AppType type, Object value) {
+        public void
+            put(String componentName, DataStorageScope scope, String scopeId, String key, AppType type, Object value) {
             jdbcDataStorageService.put(componentName, scope, scopeId, key, type, value);
         }
 
         @Override
-        public void delete(String componentName, Scope scope, String scopeId, String key, AppType type) {
+        public void delete(String componentName, DataStorageScope scope, String scopeId, String key, AppType type) {
             jdbcDataStorageService.delete(componentName, scope, scopeId, key, type);
         }
     }

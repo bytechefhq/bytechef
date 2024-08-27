@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.data.storage.jdbc.domain;
 
-import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
@@ -62,7 +62,7 @@ public class DataEntry {
     private LocalDateTime lastModifiedDate;
 
     @Column
-    private Scope scope;
+    private DataStorageScope scope;
 
     @Column("scope_id")
     private String scopeId;
@@ -80,7 +80,7 @@ public class DataEntry {
     }
 
     public DataEntry(
-        String componentName, Scope scope, String scopeId, String key, Object value, AppType type) {
+        String componentName, DataStorageScope scope, String scopeId, String key, Object value, AppType type) {
 
         this.componentName = componentName;
         this.key = key;
@@ -118,7 +118,7 @@ public class DataEntry {
         return lastModifiedDate;
     }
 
-    public Scope getScope() {
+    public DataStorageScope getScope() {
         return scope;
     }
 
