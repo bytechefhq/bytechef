@@ -19,10 +19,11 @@ package com.bytechef.component.vertex.palm2.action;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.llm.constants.LLMConstants.ASK;
 import static com.bytechef.component.llm.constants.LLMConstants.MESSAGE_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.N;
+import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE;
 import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.TOP_K;
@@ -47,6 +48,7 @@ public class VertexPaLM2ChatAction {
         .description("Ask anything you want.")
         .properties(
             MESSAGE_PROPERTY,
+            RESPONSE_FORMAT_PROPERTY,
             integer(N)
                 .label("Candidate Count")
                 .description(
@@ -57,13 +59,13 @@ public class VertexPaLM2ChatAction {
             TEMPERATURE_PROPERTY,
             TOP_P_PROPERTY,
             TOP_K_PROPERTY)
-        .outputSchema(string())
+        .outputSchema(object())
         .perform(VertexPaLM2ChatAction::perform);
 
     private VertexPaLM2ChatAction() {
     }
 
-    public static String perform(
+    public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }

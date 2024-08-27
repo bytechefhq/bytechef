@@ -20,6 +20,7 @@ import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConsta
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
+import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.llm.constants.LLMConstants.FREQUENCY_PENALTY;
 import static com.bytechef.component.llm.constants.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
@@ -32,6 +33,7 @@ import static com.bytechef.component.llm.constants.LLMConstants.N_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.llm.constants.LLMConstants.PRESENCE_PENALTY_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.PROMPT;
+import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.STOP;
 import static com.bytechef.component.llm.constants.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE;
@@ -74,6 +76,7 @@ public class AmazonBedrockJurassic2ChatAction {
                             Ai21Jurassic2ChatBedrockApi.Ai21Jurassic2ChatModel::getName,
                             Ai21Jurassic2ChatBedrockApi.Ai21Jurassic2ChatModel::getName, (f, s) -> f)))),
             MESSAGE_PROPERTY,
+            RESPONSE_FORMAT_PROPERTY,
             integer(AmazonBedrockConstants.MIN_TOKENS)
                 .label("Min tokens")
                 .description("The minimum number of tokens to generate in the chat completion.")
@@ -94,13 +97,13 @@ public class AmazonBedrockJurassic2ChatAction {
                 .label("Count penalty")
                 .description("Penalty object for count.")
                 .advancedOption(true))
-        .outputSchema(string())
+        .outputSchema(object())
         .perform(AmazonBedrockJurassic2ChatAction::perform);
 
     private AmazonBedrockJurassic2ChatAction() {
     }
 
-    public static String perform(
+    public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }

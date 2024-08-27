@@ -18,10 +18,13 @@ package com.bytechef.component.moonshot.action;
 
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.llm.constants.LLMConstants.ASK;
 import static com.bytechef.component.llm.constants.LLMConstants.FREQUENCY_PENALTY;
 import static com.bytechef.component.llm.constants.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.FUNCTIONS;
+import static com.bytechef.component.llm.constants.LLMConstants.FUNCTIONS_PROERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MESSAGE_PROPERTY;
@@ -30,6 +33,7 @@ import static com.bytechef.component.llm.constants.LLMConstants.N;
 import static com.bytechef.component.llm.constants.LLMConstants.N_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.llm.constants.LLMConstants.PRESENCE_PENALTY_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.STOP;
 import static com.bytechef.component.llm.constants.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE;
@@ -46,6 +50,8 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.llm.util.LLMUtils;
 import com.bytechef.component.llm.util.interfaces.Chat;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
@@ -68,6 +74,7 @@ public class MoonshotChatAction {
                         .collect(Collectors.toMap(
                             MoonshotApi.ChatModel::getValue, MoonshotApi.ChatModel::getValue, (f, s) -> f)))),
             MESSAGE_PROPERTY,
+            RESPONSE_FORMAT_PROPERTY,
             MAX_TOKENS_PROPERTY,
             N_PROPERTY,
             TEMPERATURE_PROPERTY,
@@ -75,14 +82,15 @@ public class MoonshotChatAction {
             FREQUENCY_PENALTY_PROPERTY,
             PRESENCE_PENALTY_PROPERTY,
             STOP_PROPERTY,
+            FUNCTIONS_PROERTY,
             USER_PROPERTY)
-        .outputSchema(string())
+        .outputSchema(object())
         .perform(MoonshotChatAction::perform);
 
     private MoonshotChatAction() {
     }
 
-    public static String perform(
+    public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }
@@ -90,17 +98,21 @@ public class MoonshotChatAction {
     private static final Chat CHAT = new Chat() {
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
-            return MoonshotChatOptions.builder()
+            MoonshotChatOptions.Builder builder = MoonshotChatOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withTemperature(inputParameters.getFloat(TEMPERATURE))
                 .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
                 .withTopP(inputParameters.getFloat(TOP_P))
-                .withStop(inputParameters.getList(STOP, new TypeReference<>() {}))
+                .withStop(inputParameters.getList(STOP, new TypeReference<>() {
+                }))
                 .withN(inputParameters.getInteger(N))
                 .withFrequencyPenalty(inputParameters.getFloat(FREQUENCY_PENALTY))
                 .withPresencePenalty(inputParameters.getFloat(PRESENCE_PENALTY))
-                .withUser(inputParameters.getString(USER))
-                .build();
+                .withUser(inputParameters.getString(USER));
+
+            List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});
+            if(functions!=null) builder.withFunctions(new HashSet<>(functions));
+            return builder.build();
         }
 
         @Override

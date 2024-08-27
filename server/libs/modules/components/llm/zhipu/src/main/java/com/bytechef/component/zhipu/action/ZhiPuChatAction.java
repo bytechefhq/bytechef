@@ -19,12 +19,16 @@ package com.bytechef.component.zhipu.action;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.bool;
+import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.llm.constants.LLMConstants.ASK;
+import static com.bytechef.component.llm.constants.LLMConstants.FUNCTIONS;
+import static com.bytechef.component.llm.constants.LLMConstants.FUNCTIONS_PROERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MESSAGE_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
+import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.STOP;
 import static com.bytechef.component.llm.constants.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE;
@@ -43,6 +47,8 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.llm.util.LLMUtils;
 import com.bytechef.component.llm.util.interfaces.Chat;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
@@ -65,10 +71,12 @@ public class ZhiPuChatAction {
                         .collect(Collectors.toMap(
                             ZhiPuAiApi.ChatModel::getValue, ZhiPuAiApi.ChatModel::getValue, (f, s) -> f)))),
             MESSAGE_PROPERTY,
+            RESPONSE_FORMAT_PROPERTY,
             MAX_TOKENS_PROPERTY,
             TEMPERATURE_PROPERTY,
             TOP_P_PROPERTY,
             STOP_PROPERTY,
+            FUNCTIONS_PROERTY,
             USER_PROPERTY,
             string(REQUEST_ID)
                 .label("Request Id")
@@ -80,13 +88,13 @@ public class ZhiPuChatAction {
                 .description(
                     "When do_sample is set to true, the sampling strategy is enabled. If do_sample is false, the sampling strategy parameters temperature and top_p will not take effect.")
                 .advancedOption(true))
-        .outputSchema(string())
+        .outputSchema(object())
         .perform(ZhiPuChatAction::perform);
 
     private ZhiPuChatAction() {
     }
 
-    public static String perform(
+    public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }
@@ -94,16 +102,20 @@ public class ZhiPuChatAction {
     private static final Chat CHAT = new Chat() {
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
-            return ZhiPuAiChatOptions.builder()
+            ZhiPuAiChatOptions.Builder builder = ZhiPuAiChatOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withTemperature(inputParameters.getFloat(TEMPERATURE))
                 .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
                 .withTopP(inputParameters.getFloat(TOP_P))
-                .withStop(inputParameters.getList(STOP, new TypeReference<>() {}))
+                .withStop(inputParameters.getList(STOP, new TypeReference<>() {
+                }))
                 .withUser(inputParameters.getString(USER))
                 .withRequestId(inputParameters.getString(REQUEST_ID))
-                .withDoSample(inputParameters.getBoolean(DO_SAMPLE))
-                .build();
+                .withDoSample(inputParameters.getBoolean(DO_SAMPLE));
+
+            List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});
+            if(functions!=null) builder.withFunctions(new HashSet<>(functions));
+            return builder.build();
         }
 
         @Override

@@ -17,15 +17,22 @@
 package com.bytechef.component.llm.util;
 
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableOption;
 import java.util.ArrayList;
 import java.util.Map;
+
+import com.bytechef.component.definition.Parameters;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.ToolResponseMessage;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.converter.ListOutputConverter;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.convert.support.DefaultConversionService;
 
 /**
  * @author Monika Domiter

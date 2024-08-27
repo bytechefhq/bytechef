@@ -64,7 +64,7 @@ public abstract class ChatActionTest extends AbstractLLMActionTest {
         when(mockedChat.createChatModel(mockedParameters, mockedParameters)).thenReturn(mockedChatModel);
         when(mockedChatModel.call(any(Prompt.class))).thenReturn(mockedChatResponse);
 
-        String response = Chat.getResponse(mockedChat, mockedParameters, mockedParameters);
+        Object response = Chat.getResponse(mockedChat, mockedParameters, mockedParameters);
 
         assertEquals(answer, response);
     }

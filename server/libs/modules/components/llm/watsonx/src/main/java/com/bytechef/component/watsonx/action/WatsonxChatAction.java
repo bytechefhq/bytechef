@@ -20,12 +20,14 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
+import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.llm.constants.LLMConstants.ASK;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MESSAGE_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
+import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.SEED;
 import static com.bytechef.component.llm.constants.LLMConstants.SEED_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.STOP;
@@ -68,6 +70,7 @@ public class WatsonxChatAction {
                 .exampleValue("google/flan-ul2")
                 .required(false),
             MESSAGE_PROPERTY,
+            RESPONSE_FORMAT_PROPERTY,
             string(DECODING_METHOD)
                 .label("Decoding method")
                 .description("Decoding is the process that a model uses to choose the tokens in the generated output.")
@@ -88,13 +91,13 @@ public class WatsonxChatAction {
             TOP_K_PROPERTY,
             STOP_PROPERTY,
             SEED_PROPERTY)
-        .outputSchema(string())
+        .outputSchema(object())
         .perform(WatsonxChatAction::perform);
 
     private WatsonxChatAction() {
     }
 
-    public static String perform(
+    public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }

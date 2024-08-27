@@ -18,12 +18,16 @@ package com.bytechef.component.anthropic.action;
 
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.llm.constants.LLMConstants.ASK;
+import static com.bytechef.component.llm.constants.LLMConstants.FUNCTIONS;
+import static com.bytechef.component.llm.constants.LLMConstants.FUNCTIONS_PROERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MESSAGE_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
+import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.STOP;
 import static com.bytechef.component.llm.constants.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE;
@@ -40,6 +44,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.llm.util.LLMUtils;
 import com.bytechef.component.llm.util.interfaces.Chat;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 import org.springframework.ai.anthropic.AnthropicChatModel;
 import org.springframework.ai.anthropic.AnthropicChatOptions;
@@ -62,18 +67,20 @@ public class AnthropicChatAction {
                         .collect(Collectors.toMap(
                             AnthropicApi.ChatModel::getValue, AnthropicApi.ChatModel::getValue, (f, s) -> f)))),
             MESSAGE_PROPERTY,
+            RESPONSE_FORMAT_PROPERTY,
             MAX_TOKENS_PROPERTY,
             TEMPERATURE_PROPERTY,
             TOP_P_PROPERTY,
             TOP_K_PROPERTY,
-            STOP_PROPERTY)
-        .outputSchema(string())
+            STOP_PROPERTY,
+            FUNCTIONS_PROERTY)
+        .outputSchema(object())
         .perform(AnthropicChatAction::perform);
 
     private AnthropicChatAction() {
     }
 
-    public static String perform(
+    public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }
@@ -88,6 +95,7 @@ public class AnthropicChatAction {
                 .withTopP(inputParameters.getFloat(TOP_P))
                 .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
                 .withTopK(inputParameters.getInteger(TOP_K))
+                .withFunctions(new HashSet<>(inputParameters.getList(FUNCTIONS, new TypeReference<>() {})))
                 .build();
         }
 

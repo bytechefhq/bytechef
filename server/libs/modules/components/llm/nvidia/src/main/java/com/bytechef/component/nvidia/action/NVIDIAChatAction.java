@@ -18,10 +18,13 @@ package com.bytechef.component.nvidia.action;
 
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.llm.constants.LLMConstants.ASK;
 import static com.bytechef.component.llm.constants.LLMConstants.FREQUENCY_PENALTY;
 import static com.bytechef.component.llm.constants.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.FUNCTIONS;
+import static com.bytechef.component.llm.constants.LLMConstants.FUNCTIONS_PROERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.LOGIT_BIAS;
 import static com.bytechef.component.llm.constants.LLMConstants.LOGIT_BIAS_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
@@ -32,6 +35,8 @@ import static com.bytechef.component.llm.constants.LLMConstants.N;
 import static com.bytechef.component.llm.constants.LLMConstants.N_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.llm.constants.LLMConstants.PRESENCE_PENALTY_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.STOP;
 import static com.bytechef.component.llm.constants.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE;
@@ -52,6 +57,9 @@ import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 
+import java.util.HashSet;
+import java.util.List;
+
 /**
  * @author Monika Domiter
  */
@@ -66,6 +74,7 @@ public class NVIDIAChatAction {
                 .description("ID of the model to use.")
                 .required(true),
             MESSAGE_PROPERTY,
+            RESPONSE_FORMAT_PROPERTY,
             MAX_TOKENS_PROPERTY,
             N_PROPERTY,
             TEMPERATURE_PROPERTY,
@@ -74,14 +83,15 @@ public class NVIDIAChatAction {
             PRESENCE_PENALTY_PROPERTY,
             LOGIT_BIAS_PROPERTY,
             STOP_PROPERTY,
+            FUNCTIONS_PROERTY,
             USER_PROPERTY)
-        .outputSchema(string())
+        .outputSchema(object())
         .perform(NVIDIAChatAction::perform);
 
     private NVIDIAChatAction() {
     }
 
-    public static String perform(
+    public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }
@@ -89,18 +99,23 @@ public class NVIDIAChatAction {
     private static final Chat CHAT = new Chat() {
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
-            return OpenAiChatOptions.builder()
+            OpenAiChatOptions.Builder builder = OpenAiChatOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withFrequencyPenalty(inputParameters.getFloat(FREQUENCY_PENALTY))
-                .withLogitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
+                .withLogitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {
+                }))
                 .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
                 .withN(inputParameters.getInteger(N))
                 .withPresencePenalty(inputParameters.getFloat(PRESENCE_PENALTY))
-                .withStop(inputParameters.getList(STOP, new TypeReference<>() {}))
+                .withStop(inputParameters.getList(STOP, new TypeReference<>() {
+                }))
                 .withTemperature(inputParameters.getFloat(TEMPERATURE))
                 .withTopP(inputParameters.getFloat(TOP_P))
-                .withUser(inputParameters.getString(USER))
-                .build();
+                .withUser(inputParameters.getString(USER));
+
+            List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});
+            if(functions!=null) builder.withFunctions(new HashSet<>(functions));
+            return builder.build();
         }
 
         @Override

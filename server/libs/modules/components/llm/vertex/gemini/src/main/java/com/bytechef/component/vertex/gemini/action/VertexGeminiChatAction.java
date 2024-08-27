@@ -18,13 +18,18 @@ package com.bytechef.component.vertex.gemini.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.llm.constants.LLMConstants.ASK;
+import static com.bytechef.component.llm.constants.LLMConstants.FUNCTIONS;
+import static com.bytechef.component.llm.constants.LLMConstants.FUNCTIONS_PROERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MESSAGE_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
 import static com.bytechef.component.llm.constants.LLMConstants.N;
+import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.STOP;
 import static com.bytechef.component.llm.constants.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE;
@@ -44,6 +49,8 @@ import com.bytechef.component.llm.util.LLMUtils;
 import com.bytechef.component.llm.util.interfaces.Chat;
 import com.google.cloud.vertexai.VertexAI;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
@@ -66,6 +73,7 @@ public class VertexGeminiChatAction {
                             VertexAiGeminiChatModel.ChatModel::getValue, VertexAiGeminiChatModel.ChatModel::getValue,
                             (f, s) -> f)))),
             MESSAGE_PROPERTY,
+            RESPONSE_FORMAT_PROPERTY,
             MAX_TOKENS_PROPERTY,
             integer(N)
                 .label("Candidate Count")
@@ -77,14 +85,15 @@ public class VertexGeminiChatAction {
             TEMPERATURE_PROPERTY,
             TOP_P_PROPERTY,
             TOP_K_PROPERTY,
-            STOP_PROPERTY)
-        .outputSchema(string())
+            STOP_PROPERTY,
+            FUNCTIONS_PROERTY)
+        .outputSchema(object())
         .perform(VertexGeminiChatAction::perform);
 
     private VertexGeminiChatAction() {
     }
 
-    public static String perform(
+    public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }
@@ -92,15 +101,21 @@ public class VertexGeminiChatAction {
     private static final Chat CHAT = new Chat() {
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
-            return VertexAiGeminiChatOptions.builder()
+            String type = inputParameters.getInteger(RESPONSE_FORMAT) < 1 ? "text/plain" : "application/json";
+            VertexAiGeminiChatOptions.Builder builder = VertexAiGeminiChatOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withTemperature(inputParameters.getFloat(TEMPERATURE))
                 .withMaxOutputTokens(inputParameters.getInteger(MAX_TOKENS))
                 .withTopP(inputParameters.getFloat(TOP_P))
-                .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
+                .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {
+                }))
                 .withTopK(inputParameters.getFloat(TOP_K))
                 .withCandidateCount(inputParameters.getInteger(N))
-                .build();
+                .withResponseMimeType(type);
+
+            List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});
+            if(functions!=null) builder.withFunctions(new HashSet<>(functions));
+            return builder.build();
         }
 
         @Override

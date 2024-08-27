@@ -18,10 +18,13 @@ package com.bytechef.component.minimax.action;
 
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.llm.constants.LLMConstants.ASK;
 import static com.bytechef.component.llm.constants.LLMConstants.FREQUENCY_PENALTY;
 import static com.bytechef.component.llm.constants.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.FUNCTIONS;
+import static com.bytechef.component.llm.constants.LLMConstants.FUNCTIONS_PROERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MESSAGE_PROPERTY;
@@ -30,6 +33,8 @@ import static com.bytechef.component.llm.constants.LLMConstants.N;
 import static com.bytechef.component.llm.constants.LLMConstants.N_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.llm.constants.LLMConstants.PRESENCE_PENALTY_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.SEED;
 import static com.bytechef.component.llm.constants.LLMConstants.SEED_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.STOP;
@@ -46,6 +51,8 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.llm.util.LLMUtils;
 import com.bytechef.component.llm.util.interfaces.Chat;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
@@ -68,6 +75,7 @@ public class MinimaxChatAction {
                         .collect(Collectors.toMap(
                             MiniMaxApi.ChatModel::getValue, MiniMaxApi.ChatModel::getValue, (f, s) -> f)))),
             MESSAGE_PROPERTY,
+            RESPONSE_FORMAT_PROPERTY,
             MAX_TOKENS_PROPERTY,
             N_PROPERTY,
             TEMPERATURE_PROPERTY,
@@ -75,14 +83,15 @@ public class MinimaxChatAction {
             FREQUENCY_PENALTY_PROPERTY,
             PRESENCE_PENALTY_PROPERTY,
             STOP_PROPERTY,
+            FUNCTIONS_PROERTY,
             SEED_PROPERTY)
-        .outputSchema(string())
+        .outputSchema(object())
         .perform(MinimaxChatAction::perform);
 
     private MinimaxChatAction() {
     }
 
-    public static String perform(
+    public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }
@@ -90,17 +99,24 @@ public class MinimaxChatAction {
     private static final Chat CHAT = new Chat() {
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
-            return MiniMaxChatOptions.builder()
+            String type = inputParameters.getInteger(RESPONSE_FORMAT) < 1 ? null : "json_object";
+
+            MiniMaxChatOptions.Builder builder = MiniMaxChatOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withTemperature(inputParameters.getFloat(TEMPERATURE))
                 .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
                 .withTopP(inputParameters.getFloat(TOP_P))
-                .withStop(inputParameters.getList(STOP, new TypeReference<>() {}))
+                .withStop(inputParameters.getList(STOP, new TypeReference<>() {
+                }))
                 .withN(inputParameters.getInteger(N))
                 .withFrequencyPenalty(inputParameters.getFloat(FREQUENCY_PENALTY))
                 .withPresencePenalty(inputParameters.getFloat(PRESENCE_PENALTY))
                 .withSeed(inputParameters.getInteger(SEED))
-                .build();
+                .withResponseFormat(new MiniMaxApi.ChatCompletionRequest.ResponseFormat(type));
+
+            List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});
+            if(functions!=null) builder.withFunctions(new HashSet<>(functions));
+            return builder.build();
         }
 
         @Override

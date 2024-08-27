@@ -17,11 +17,13 @@
 package com.bytechef.component.amazon.bedrock.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MESSAGE_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
+import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE;
 import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.TOP_P;
@@ -59,16 +61,17 @@ public class AmazonBedrockLlamaChatAction {
                             LlamaChatBedrockApi.LlamaChatModel::getName, LlamaChatBedrockApi.LlamaChatModel::getName,
                             (f, s) -> f)))),
             MESSAGE_PROPERTY,
+            RESPONSE_FORMAT_PROPERTY,
             MAX_TOKENS_PROPERTY,
             TEMPERATURE_PROPERTY,
             TOP_P_PROPERTY)
-        .outputSchema(string())
+        .outputSchema(object())
         .perform(AmazonBedrockLlamaChatAction::perform);
 
     private AmazonBedrockLlamaChatAction() {
     }
 
-    public static String perform(
+    public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }

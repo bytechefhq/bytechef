@@ -18,6 +18,7 @@ package com.bytechef.component.qianfan.action;
 
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.llm.constants.LLMConstants.ASK;
 import static com.bytechef.component.llm.constants.LLMConstants.FREQUENCY_PENALTY;
@@ -28,6 +29,8 @@ import static com.bytechef.component.llm.constants.LLMConstants.MESSAGE_PROPERTY
 import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
 import static com.bytechef.component.llm.constants.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.llm.constants.LLMConstants.PRESENCE_PENALTY_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.STOP;
 import static com.bytechef.component.llm.constants.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE;
@@ -65,19 +68,20 @@ public class QIanFanChatAction {
                         .collect(Collectors.toMap(
                             QianFanApi.ChatModel::getValue, QianFanApi.ChatModel::getValue, (f, s) -> f)))),
             MESSAGE_PROPERTY,
+            RESPONSE_FORMAT_PROPERTY,
             MAX_TOKENS_PROPERTY,
             TEMPERATURE_PROPERTY,
             TOP_P_PROPERTY,
             PRESENCE_PENALTY_PROPERTY,
             FREQUENCY_PENALTY_PROPERTY,
             STOP_PROPERTY)
-        .outputSchema(string())
+        .outputSchema(object())
         .perform(QIanFanChatAction::perform);
 
     private QIanFanChatAction() {
     }
 
-    public static String perform(
+    public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }
@@ -85,6 +89,7 @@ public class QIanFanChatAction {
     private static final Chat CHAT = new Chat() {
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
+            String type = inputParameters.getInteger(RESPONSE_FORMAT) < 1 ? null : "json:object";
             return QianFanChatOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withTemperature(inputParameters.getFloat(TEMPERATURE))
@@ -93,6 +98,7 @@ public class QIanFanChatAction {
                 .withStop(inputParameters.getList(STOP, new TypeReference<>() {}))
                 .withPresencePenalty(inputParameters.getFloat(PRESENCE_PENALTY))
                 .withFrequencyPenalty(inputParameters.getFloat(FREQUENCY_PENALTY))
+                .withResponseFormat(new QianFanApi.ChatCompletionRequest.ResponseFormat(type))
                 .build();
         }
 
