@@ -530,7 +530,7 @@ public class ApplicationProperties {
     public static class DataStorage {
 
         public enum Provider {
-            JDBC
+            AWS, FILESYSTEM, JDBC
         }
 
         private Provider provider;
