@@ -28,9 +28,11 @@ export default function useNodeClick(data: NodeProps['data'], id: NodeProps['id'
                 componentName: data.componentName,
                 displayConditions: data.displayConditions,
                 metadata: data.metadata,
+                notes: data.description,
                 operationName: data.operationName,
                 parameters: data.parameters,
                 title: data.label,
+                type: data.type,
                 workflowNodeName: data.name,
             });
         }
