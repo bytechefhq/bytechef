@@ -32,9 +32,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -71,6 +75,46 @@ public class FilesystemFileStorageService implements FileStorageService {
         return path.resolve(url.replace(URL_PREFIX, ""))
             .toFile()
             .exists();
+    }
+
+    @Override
+    public boolean fileExists(String directoryPath, String nonRandomFilename) throws FileStorageException {
+        Path path = resolveDirectoryPath(directoryPath);
+
+        return path.resolve(nonRandomFilename)
+            .toFile()
+            .exists();
+    }
+
+    @Override
+    public FileEntry getFileEntry(String directoryPath, String nonRandomFilename) throws FileStorageException {
+        Path path = resolveDirectoryPath(directoryPath);
+
+        FileEntry fileEntry = new FileEntry(nonRandomFilename, URL_PREFIX + path.resolve(nonRandomFilename));
+
+        fileExists(directoryPath, fileEntry);
+
+        return fileEntry;
+    }
+
+    @Override
+    public Set<FileEntry> getFileEntries(@NonNull String directoryPath) throws FileStorageException {
+        return getFileEntries(directoryPath, null);
+    }
+
+    @Override
+    public Set<FileEntry> getFileEntries(@NonNull String directoryPath, String contains) throws FileStorageException {
+        Path curDirectoryPath = resolveDirectoryPath(directoryPath);
+
+        try (Stream<Path> stream = Files.walk(curDirectoryPath)) {
+            return stream
+                .filter(path -> !Files.isDirectory(path))
+                .filter(path -> contains == null || StringUtils.contains(path.toString(), contains))
+                .map(path -> new FileEntry(toString(path.getFileName()), URL_PREFIX + path))
+                .collect(Collectors.toSet());
+        } catch (IOException e) {
+            throw new FileStorageException(e.getMessage(), e);
+        }
     }
 
     @Override
@@ -147,6 +191,11 @@ public class FilesystemFileStorageService implements FileStorageService {
     public FileEntry storeFileContent(String directoryPath, String filename, String data) throws FileStorageException {
         return storeFileContent(directoryPath, filename, data, true);
     }
+
+    @Override
+    public FileEntry storeFileContent(
+        String directoryPath, String filename, String data, boolean randomFilename) throws FileStorageException {
+
         Validate.notNull(directoryPath, "directory is required");
         Validate.notNull(filename, "fileName is required");
         Validate.notNull(data, "data is required");
@@ -156,6 +205,15 @@ public class FilesystemFileStorageService implements FileStorageService {
     }
 
     @Override
+    public FileEntry storeFileContent(String directoryPath, String filename, InputStream inputStream)
+        throws FileStorageException {
+
+        return storeFileContent(directoryPath, filename, inputStream, true);
+    }
+
+    @Override
+    public FileEntry storeFileContent(
+        String directoryPath, String filename, InputStream inputStream, boolean randomFilename)
         throws FileStorageException {
 
         Validate.notNull(directoryPath, "directory is required");
@@ -203,5 +261,9 @@ public class FilesystemFileStorageService implements FileStorageService {
         UUID uuid = UUID.randomUUID();
 
         return uuid.toString();
+    }
+
+    private String toString(Path path) {
+        return path.toString();
     }
 }

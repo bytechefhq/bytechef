@@ -12,6 +12,8 @@ import com.bytechef.file.storage.exception.FileStorageException;
 import com.bytechef.file.storage.service.FileStorageService;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Set;
+import org.springframework.lang.NonNull;
 
 /**
  * @version ee
@@ -19,6 +21,8 @@ import java.net.URL;
  * @author Ivica Cardic
  */
 public class AwsFileStorageService implements FileStorageService {
+
+    private static final String URL_PREFIX = "aws://";
 
     @Override
     public void deleteFile(String directoryPath, FileEntry fileEntry) {
@@ -29,6 +33,30 @@ public class AwsFileStorageService implements FileStorageService {
     public boolean fileExists(String directoryPath, FileEntry fileEntry) throws FileStorageException {
         // TODO
         return false;
+    }
+
+    @Override
+    public boolean fileExists(String directoryPath, String nonRandomFilename) throws FileStorageException {
+        // TODO
+        return false;
+    }
+
+    @Override
+    public FileEntry getFileEntry(String directoryPath, String nonRandomFilename) throws FileStorageException {
+        // TODO
+        return null;
+    }
+
+    @Override
+    public Set<FileEntry> getFileEntries(@NonNull String directoryPath) throws FileStorageException {
+        // TODO
+        return Set.of();
+    }
+
+    @Override
+    public Set<FileEntry> getFileEntries(@NonNull String directoryPath, String startWith) throws FileStorageException {
+        // TODO
+        return null;
     }
 
     @Override
@@ -70,7 +98,17 @@ public class AwsFileStorageService implements FileStorageService {
     }
 
     @Override
+    public FileEntry storeFileContent(String directoryPath, String filename, String data) throws FileStorageException {
         // TODO
+        return null;
+    }
+
+    @Override
+    public FileEntry storeFileContent(String directoryPath, String filename, String data, boolean randomFilename)
+        throws FileStorageException {
+
+        // TODO
+
         return null;
     }
 
@@ -79,6 +117,16 @@ public class AwsFileStorageService implements FileStorageService {
         throws FileStorageException {
 
         // TODO
+        return null;
+    }
+
+    @Override
+    public FileEntry storeFileContent(
+        String directoryPath, String filename, InputStream inputStream, boolean randomFilename)
+        throws FileStorageException {
+
+        // TODO
+
         return null;
     }
 }
