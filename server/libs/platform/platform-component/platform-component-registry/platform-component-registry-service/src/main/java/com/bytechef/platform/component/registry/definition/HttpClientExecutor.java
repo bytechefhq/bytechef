@@ -404,7 +404,7 @@ public class HttpClientExecutor implements ApplicationContextAware {
 
                 OperationDefinitionFacade operationDefinitionFacade = getOperationDefinitionFacade(isAction);
 
-                if ((httpResponse.statusCode() > 199) && (httpResponse.statusCode() < 300)) {
+                if ((httpResponse.statusCode() > 199) && (httpResponse.statusCode() < 400)) {
                     List<String> detectOn = connectionDefinitionService.getAuthorizationDetectOn(
                         componentName, connectionVersion, authorizationName);
 
