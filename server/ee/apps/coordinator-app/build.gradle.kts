@@ -12,7 +12,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-loadbalancer")
     implementation("org.springframework.retry:spring-retry")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-config"))
-    implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-service"))
+    implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-impl"))
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:config:async-config"))
     implementation(project(":server:libs:config:environment-config"))
@@ -32,7 +32,7 @@ dependencies {
     implementation(project(":server:libs:automation:automation-workflow:automation-workflow-coordinator"))
     implementation(project(":server:libs:embedded:embedded-configuration:embedded-configuration-instance-impl"))
     implementation(project(":server:libs:embedded:embedded-workflow:embedded-workflow-coordinator"))
-    implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-service"))
+    implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-coordinator:platform-workflow-coordinator-impl"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-registry:platform-workflow-task-dispatcher-registry-service"))
 

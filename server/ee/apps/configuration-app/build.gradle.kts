@@ -20,7 +20,7 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-converter"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
-    implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-service"))
+    implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-impl"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-rest:automation-configuration-rest-impl"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
     implementation(project(":server:libs:automation:automation-swagger"))

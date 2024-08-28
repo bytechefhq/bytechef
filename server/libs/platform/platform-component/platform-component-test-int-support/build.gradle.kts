@@ -8,7 +8,7 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-resource"))
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-repository:atlas-execution-repository-memory"))
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-service"))
-    implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-service"))
+    implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-impl"))
     implementation(project(":server:libs:atlas:atlas-sync-executor"))
     implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-impl"))
     implementation(project(":server:libs:config:app-config"))
@@ -19,7 +19,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-component:platform-component-registry:platform-component-registry-service"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-instance-api"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
-    implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-service"))
+    implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
     implementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-api"))
     implementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
 }
