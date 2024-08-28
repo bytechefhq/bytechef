@@ -24,7 +24,7 @@ dependencies {
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
     testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-repository:atlas-execution-repository-jdbc"))
     testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-service"))
-    testImplementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-service"))
+    testImplementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-impl"))
     testImplementation(project(":server:libs:atlas:atlas-sync-executor"))
     testImplementation(project(":server:libs:atlas:atlas-worker:atlas-worker-impl"))
     testImplementation(project(":server:libs:core:message:message-broker:message-broker-sync"))

@@ -14,7 +14,7 @@ dependencies {
     testImplementation("org.springframework:spring-jdbc")
     testImplementation("org.springframework.security:spring-security-core")
     testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-service"))
-    testImplementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-service"))
+    testImplementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-impl"))
     testImplementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
     testImplementation(project(":server:libs:core:message:message-broker:message-broker-sync"))
 }
