@@ -17,32 +17,43 @@
 package com.bytechef.component.microsoft.one.drive.action;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.FileEntry;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.test.component.properties.ParametersFactory;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
-class MicrosoftOneDriveDownloadFileActionTest extends AbstractMicrosoftOneDriveActionTest {
+class MicrosoftOneDriveDownloadFileActionTest {
 
+    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
+    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final Parameters parameters = ParametersFactory.createParameters(Map.of());
 
     @Test
     void testPerform() {
-
+        when(mockedContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody())
             .thenReturn(mockedFileEntry);
 
-        Object result =
-            MicrosoftOneDriveDownloadFileAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = MicrosoftOneDriveDownloadFileAction.perform(parameters, parameters, mockedContext);
 
         assertEquals(mockedFileEntry, result);
-
     }
 
 }

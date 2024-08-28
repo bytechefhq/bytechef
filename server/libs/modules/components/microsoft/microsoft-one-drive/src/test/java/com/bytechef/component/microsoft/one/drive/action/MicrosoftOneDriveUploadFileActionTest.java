@@ -22,21 +22,26 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.FileEntry;
+import com.bytechef.component.definition.Parameters;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
-class MicrosoftOneDriveUploadFileActionTest extends AbstractMicrosoftOneDriveActionTest {
+class MicrosoftOneDriveUploadFileActionTest {
 
-    protected ArgumentCaptor<Http.Body> bodyArgumentCaptor =
-        ArgumentCaptor.forClass(Http.Body.class);
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
+    private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @Test
     void testPerform() {
@@ -44,7 +49,10 @@ class MicrosoftOneDriveUploadFileActionTest extends AbstractMicrosoftOneDriveAct
 
         when(mockedParameters.getRequiredFileEntry(FILE))
             .thenReturn(mockedFileEntry);
-
+        when(mockedContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
