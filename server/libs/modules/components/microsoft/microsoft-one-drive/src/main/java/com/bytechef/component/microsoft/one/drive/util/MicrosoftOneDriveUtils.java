@@ -23,12 +23,11 @@ import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDr
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.VALUE;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -45,8 +44,8 @@ public class MicrosoftOneDriveUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 
-        Map<String, ?> body = context
-            .http(http -> http.get("/items/" + getFolderId(inputParameters) + "/children"))
+        Map<String, Object> body = context
+            .http(http -> http.get("/items/" + getFolderId(inputParameters.getString(PARENT_ID)) + "/children"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -64,19 +63,16 @@ public class MicrosoftOneDriveUtils {
         return options;
     }
 
-    public static String getFolderId(Parameters inputParameters) {
-        String parentId = inputParameters.getString(PARENT_ID);
-
-        return (parentId == null) ? "root" : parentId;
+    public static String getFolderId(String parentId) {
+        return (parentId == null || parentId.isEmpty()) ? "root" : parentId;
     }
 
     public static List<Option<String>> getFolderIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 
-        String encode = URLEncoder.encode("folder ne null", StandardCharsets.UTF_8);
-
-        Map<String, ?> body = context.http(http -> http.get("/items/root/children?$filter=" + encode))
+        Map<String, Object> body = context.http(http -> http.get("/items/root/children"))
+            .queryParameters("$filter", "folder ne null")
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

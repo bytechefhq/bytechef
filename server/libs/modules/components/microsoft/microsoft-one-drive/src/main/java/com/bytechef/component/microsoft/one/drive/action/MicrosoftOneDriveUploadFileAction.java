@@ -72,7 +72,9 @@ public class MicrosoftOneDriveUploadFileAction {
         FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE);
 
         return context
-            .http(http -> http.put("/items/" + getFolderId(inputParameters) + ":/" + fileEntry.getName() + ":/content"))
+            .http(http -> http.put(
+                "/items/" + getFolderId(inputParameters.getString(PARENT_ID)) + ":/" + fileEntry.getName() +
+                    ":/content"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(fileEntry))
             .execute()
