@@ -69,7 +69,7 @@ public class MicrosoftOneDriveUtils {
 
     public static List<Option<String>> getFolderIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, Object> body = context.http(http -> http.get("/items/root/children"))
             .queryParameters("$filter", "folder ne null")
