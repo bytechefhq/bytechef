@@ -56,6 +56,9 @@ public class MicrosoftConnection {
                     .tokenUrl(
                         (parameters, context) -> "https://login.microsoftonline.com/" + parameters.getString(TENANT_ID)
                             + "/oauth2/v2.0/token")
+                    .refreshUrl(
+                        (parameters, context) -> "https://login.microsoftonline.com/" + parameters.getString(TENANT_ID)
+                            + "/oauth2/v2.0/token")
                     .scopes(scopes));
     }
 
