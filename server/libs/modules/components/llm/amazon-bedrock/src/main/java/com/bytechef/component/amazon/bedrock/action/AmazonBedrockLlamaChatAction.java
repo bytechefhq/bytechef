@@ -16,6 +16,8 @@
 
 package com.bytechef.component.amazon.bedrock.action;
 
+import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.ACCESS_KEY_ID;
+import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.SECRET_ACCESS_KEY;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
@@ -43,6 +45,9 @@ import org.springframework.ai.bedrock.llama.BedrockLlamaChatOptions;
 import org.springframework.ai.bedrock.llama.api.LlamaChatBedrockApi;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
 
 /**
@@ -92,7 +97,12 @@ public class AmazonBedrockLlamaChatAction {
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
             return new BedrockLlamaChatModel(new LlamaChatBedrockApi(inputParameters.getRequiredString(MODEL),
-                EnvironmentVariableCredentialsProvider.create(),
+                new AwsCredentialsProvider() {
+                    @Override
+                    public AwsCredentials resolveCredentials() {
+                        return AwsBasicCredentials.create(connectionParameters.getRequiredString(ACCESS_KEY_ID), connectionParameters.getRequiredString(SECRET_ACCESS_KEY));
+                    }
+                },
                 connectionParameters.getRequiredString(AmazonBedrockConstants.REGION), new ObjectMapper()),
                 (BedrockLlamaChatOptions) createChatOptions(inputParameters));
         }

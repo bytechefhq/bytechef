@@ -119,7 +119,7 @@ public class GroqChatAction {
 
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new OpenAiChatModel(new OpenAiApi(connectionParameters.getString(TOKEN)),
+            return new OpenAiChatModel(new OpenAiApi("https://api.groq.com/openai", connectionParameters.getString(TOKEN)),
                 (OpenAiChatOptions) createChatOptions(inputParameters));
         }
     };

@@ -44,14 +44,14 @@ public interface Chat {
             .toList();
     }
 
-    private static Object returnChatEntity(Parameters inputParameters, ChatClient.CallResponseSpec call) {
-        return switch (inputParameters.getInteger(RESPONSE_FORMAT)) {
+    private static Object returnChatEntity(Integer integer, ChatClient.CallResponseSpec call) {
+        return switch (integer) {
             case 1 -> call.entity(new ParameterizedTypeReference<Map<String, Object>>() {});
             case 2 -> call.entity(new ListOutputConverter(new DefaultConversionService()));
-            default -> call.chatResponse()
-                .getResult()
-                .getOutput()
-                .getContent();
+            case null, default -> call.chatResponse()
+                    .getResult()
+                    .getOutput()
+                    .getContent();
         };
     }
 
@@ -65,7 +65,7 @@ public interface Chat {
             .messages(messages)
             .call();
 
-        return returnChatEntity(inputParameters, call);
+        return returnChatEntity(inputParameters.getInteger(RESPONSE_FORMAT), call);
     }
 
     ChatOptions createChatOptions(Parameters inputParameters);

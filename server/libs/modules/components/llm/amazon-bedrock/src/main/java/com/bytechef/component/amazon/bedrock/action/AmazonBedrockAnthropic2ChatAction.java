@@ -16,6 +16,8 @@
 
 package com.bytechef.component.amazon.bedrock.action;
 
+import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.ACCESS_KEY_ID;
+import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.SECRET_ACCESS_KEY;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
@@ -48,7 +50,9 @@ import org.springframework.ai.bedrock.anthropic.BedrockAnthropicChatModel;
 import org.springframework.ai.bedrock.anthropic.api.AnthropicChatBedrockApi;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
-import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 
 /**
  * @author Marko Kriskovic
@@ -101,7 +105,12 @@ public class AmazonBedrockAnthropic2ChatAction {
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
             return new BedrockAnthropicChatModel(new AnthropicChatBedrockApi(inputParameters.getRequiredString(MODEL),
-                EnvironmentVariableCredentialsProvider.create(),
+                new AwsCredentialsProvider() {
+                    @Override
+                    public AwsCredentials resolveCredentials() {
+                        return AwsBasicCredentials.create(connectionParameters.getRequiredString(ACCESS_KEY_ID), connectionParameters.getRequiredString(SECRET_ACCESS_KEY));
+                    }
+                },
                 connectionParameters.getRequiredString(AmazonBedrockConstants.REGION), new ObjectMapper()),
                 (AnthropicChatOptions) createChatOptions(inputParameters));
         }
