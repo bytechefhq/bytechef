@@ -26,6 +26,7 @@ dependencies {
     implementation(project(":server:libs:core:message:message-event:message-event-impl"))
     implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-file-storage:platform-data-storage-file-storage-service"))
     implementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
     implementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
     implementation(project(":server:libs:core:file-storage:file-storage-noop-service"))
