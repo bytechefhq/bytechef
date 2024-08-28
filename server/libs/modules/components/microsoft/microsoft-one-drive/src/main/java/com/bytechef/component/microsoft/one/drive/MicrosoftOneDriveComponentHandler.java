@@ -27,6 +27,7 @@ import com.bytechef.component.microsoft.one.drive.action.MicrosoftOneDriveListFi
 import com.bytechef.component.microsoft.one.drive.action.MicrosoftOneDriveListFoldersAction;
 import com.bytechef.component.microsoft.one.drive.action.MicrosoftOneDriveUploadFileAction;
 import com.bytechef.component.microsoft.one.drive.connection.MicrosoftOneDriveConnection;
+import com.bytechef.component.microsoft.one.drive.trigger.MicrosoftOneDriveNewFileTrigger;
 import com.google.auto.service.AutoService;
 
 /**
@@ -47,7 +48,8 @@ public class MicrosoftOneDriveComponentHandler implements ComponentHandler {
             MicrosoftOneDriveDownloadFileAction.ACTION_DEFINITION,
             MicrosoftOneDriveListFilesAction.ACTION_DEFINITION,
             MicrosoftOneDriveListFoldersAction.ACTION_DEFINITION,
-            MicrosoftOneDriveUploadFileAction.ACTION_DEFINITION);
+            MicrosoftOneDriveUploadFileAction.ACTION_DEFINITION)
+        .triggers(MicrosoftOneDriveNewFileTrigger.TRIGGER_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
