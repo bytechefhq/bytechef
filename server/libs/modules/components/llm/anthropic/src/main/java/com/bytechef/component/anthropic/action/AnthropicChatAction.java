@@ -45,6 +45,7 @@ import com.bytechef.component.llm.util.LLMUtils;
 import com.bytechef.component.llm.util.interfaces.Chat;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.ai.anthropic.AnthropicChatModel;
 import org.springframework.ai.anthropic.AnthropicChatOptions;
@@ -92,15 +93,19 @@ public class AnthropicChatAction {
 
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
-            return AnthropicChatOptions.builder()
+            AnthropicChatOptions.Builder builder = AnthropicChatOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withTemperature(inputParameters.getFloat(TEMPERATURE))
                 .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
                 .withTopP(inputParameters.getFloat(TOP_P))
-                .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .withTopK(inputParameters.getInteger(TOP_K))
-                .withFunctions(new HashSet<>(inputParameters.getList(FUNCTIONS, new TypeReference<>() {})))
-                .build();
+                .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {
+                }))
+                .withTopK(inputParameters.getInteger(TOP_K));
+
+            List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});
+            if (functions != null)
+                builder.withFunctions(new HashSet<>(functions));
+            return builder.build();
         }
 
         @Override

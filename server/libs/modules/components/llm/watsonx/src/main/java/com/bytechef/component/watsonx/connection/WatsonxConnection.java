@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.Authorization.AuthorizationType.
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.connection;
+import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.llm.constants.LLMConstants.URL;
 import static com.bytechef.component.watsonx.constant.WatsonxConstants.PROJECT_ID;
@@ -35,14 +36,18 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefini
 public final class WatsonxConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri((connectionParameters, context) -> "https://us-south.ml.cloud.ibm.com")
+        .baseUri((connectionParameters, context) -> "https://eu-de.ml.cloud.ibm.com")
         .authorizations(
             authorization(BEARER_TOKEN)
                 .title("Bearer Token")
                 .properties(
                     string(URL)
-                        .label("Url")
+                        .label("Region")
                         .description("URL to connect to.")
+                        .options(option("Dallas [us-south]", "https://us-south.ml.cloud.ibm.com"),
+                            option("London [eu-gb]", "https://eu-gb.ml.cloud.ibm.com"),
+                            option("Tokyo [jp-tok]", "https://jp-tok.ml.cloud.ibm.com"),
+                            option("Frankfurt [eu-de]", "https://eu-de.ml.cloud.ibm.com"))
                         .required(true),
                     string(STREAM_ENDPOINT)
                         .label("Stream Endpoint")
