@@ -34,8 +34,6 @@ import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -69,10 +67,9 @@ public class MicrosoftOneDriveListFoldersAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        String encode = URLEncoder.encode("folder ne null", StandardCharsets.UTF_8);
-
         Map<String, ?> body = context
-            .http(http -> http.get("/items/" + getFolderId(inputParameters) + "/children?$filter=" + encode))
+            .http(http -> http.get("/items/" + getFolderId(inputParameters.getString(PARENT_ID)) + "/children"))
+            .queryParameters("$filter", "folder ne null")
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
