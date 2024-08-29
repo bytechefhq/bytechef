@@ -16,17 +16,12 @@
 
 package com.bytechef.component.microsoft.outlook.util;
 
-import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ID;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ODATA_NEXT_LINK;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.VALUE;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
-import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.Parameters;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,75 +30,6 @@ import java.util.Map;
  * @author Monika Kušter
  */
 public class MicrosoftOutlook365Utils {
-
-    private MicrosoftOutlook365Utils() {
-    }
-
-    public static List<Option<String>> getCategoryOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
-
-        Map<String, Object> body = context
-            .http(http -> http.get("/outlook/masterCategories"))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        List<Option<String>> options = new ArrayList<>();
-
-        if (body.get(VALUE) instanceof List<?> list) {
-            for (Object object : list) {
-                if (object instanceof Map<?, ?> map) {
-                    String displayName = (String) map.get("displayName");
-
-                    options.add(option(displayName, displayName));
-                }
-            }
-        }
-
-        List<Map<?, ?>> otherItems = getItemsFromNextPage(context, (String) body.get(ODATA_NEXT_LINK));
-
-        for (Map<?, ?> map : otherItems) {
-            String displayName = (String) map.get("displayName");
-
-            options.add(option(displayName, displayName));
-        }
-
-        return options;
-    }
-
-    public static List<Option<String>> getMessageIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
-
-        List<Option<String>> options = new ArrayList<>();
-
-        Map<String, Object> body = context.http(http -> http.get("/messages"))
-            .queryParameters("$top", 100)
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        if (body.get(VALUE) instanceof List<?> list) {
-            for (Object o : list) {
-                if (o instanceof Map<?, ?> map) {
-                    String id = (String) map.get(ID);
-
-                    options.add(option(id, id));
-                }
-            }
-        }
-
-        List<Map<?, ?>> otherItems = getItemsFromNextPage(context, (String) body.get(ODATA_NEXT_LINK));
-
-        for (Map<?, ?> map : otherItems) {
-            String id = (String) map.get(ID);
-
-            options.add(option(id, id));
-        }
-
-        return options;
-    }
 
     public static List<Map<?, ?>> getItemsFromNextPage(Context context, String link) {
         List<Map<?, ?>> otherItems = new ArrayList<>();
@@ -129,5 +55,4 @@ public class MicrosoftOutlook365Utils {
 
         return otherItems;
     }
-
 }
