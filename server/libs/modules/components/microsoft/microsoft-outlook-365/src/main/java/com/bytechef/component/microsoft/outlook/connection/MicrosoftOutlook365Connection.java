@@ -22,14 +22,14 @@ import com.bytechef.microsoft.commons.MicrosoftConnection;
 import java.util.List;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  * @author Ivica Cardic
  */
 public class MicrosoftOutlook365Connection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = MicrosoftConnection.createConnection(
         "https://graph.microsoft.com/v1.0/me",
-        (connection, context) -> List.of("Mail.Read", "MailboxSettings.Read", "Mail.Send"));
+        (connection, context) -> List.of("Mail.Read", "MailboxSettings.Read", "Mail.Send", "offline_access"));
 
     private MicrosoftOutlook365Connection() {
     }
