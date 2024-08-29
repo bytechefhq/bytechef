@@ -36,7 +36,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils;
+import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365OptionUtils;
 
 /**
  * @author Monika Domiter
@@ -50,7 +50,7 @@ public class MicrosoftOutlook365GetMailAction {
             string(ID)
                 .label("Message id")
                 .description("Id of the message")
-                .options((ActionOptionsFunction<String>) MicrosoftOutlook365Utils::getMessageIdOptions)
+                .options((ActionOptionsFunction<String>) MicrosoftOutlook365OptionUtils::getMessageIdOptions)
                 .required(true))
         .outputSchema(
             object()

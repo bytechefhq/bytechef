@@ -42,7 +42,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils;
+import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365OptionUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +71,7 @@ public class MicrosoftOutlook365SearchEmailAction {
             string(CATEGORY)
                 .label("Category")
                 .description("Messages in a certain category")
-                .options((ActionOptionsFunction<String>) MicrosoftOutlook365Utils::getCategoryOptions)
+                .options((ActionOptionsFunction<String>) MicrosoftOutlook365OptionUtils::getCategoryOptions)
                 .required(false))
         .outputSchema(
             object()
@@ -92,7 +92,7 @@ public class MicrosoftOutlook365SearchEmailAction {
         addParameter(stringBuilder, SUBJECT, inputParameters.getString(SUBJECT));
         addParameter(stringBuilder, CATEGORY, inputParameters.getString(CATEGORY));
 
-        List<Map<?, ?>> maps = new ArrayList<>();
+        List<Map<?, ?>> emails = new ArrayList<>();
 
         Map<String, Object> body = context.http(http -> http.get("/messages"))
             .queryParameters("$search", stringBuilder.toString(), "$top", 100)
@@ -103,14 +103,14 @@ public class MicrosoftOutlook365SearchEmailAction {
         if (body.get(VALUE) instanceof List<?> list) {
             for (Object o : list) {
                 if (o instanceof Map<?, ?> map) {
-                    maps.add(map);
+                    emails.add(map);
                 }
             }
         }
 
-        maps.addAll(getItemsFromNextPage(context, (String) body.get(ODATA_NEXT_LINK)));
+        emails.addAll(getItemsFromNextPage(context, (String) body.get(ODATA_NEXT_LINK)));
 
-        return maps;
+        return emails;
     }
 
     private static void addParameter(StringBuilder stringBuilder, String parameterName, String parameterValue) {
