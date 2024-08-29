@@ -1098,7 +1098,6 @@ public final class ComponentDSL {
         private int version = VERSION_1;
         private String title;
         private List<? extends TriggerDefinition> triggerDefinitions;
-        private List<String> workflowConnectionKeys;
 
         private ModifiableComponentDefinition() {
         }
@@ -1258,12 +1257,6 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableComponentDefinition workflowConnectionKeys(String... workflowConnectionKeys) {
-            this.workflowConnectionKeys = List.of(workflowConnectionKeys);
-
-            return this;
-        }
-
         @Override
         public Optional<List<? extends ActionDefinition>> getActions() {
             return Optional.ofNullable(actionDefinitions == null ? null : new ArrayList<>(actionDefinitions));
@@ -1366,15 +1359,13 @@ public final class ComponentDSL {
                 && Objects.equals(tags, that.tags)
                 && Objects.equals(metadata, that.metadata) && Objects.equals(name, that.name)
                 && Objects.equals(resources, that.resources) && Objects.equals(title, that.title)
-                && Objects.equals(triggerDefinitions, that.triggerDefinitions)
-                && version == that.version && workflowConnectionKeys == that.workflowConnectionKeys;
+                && Objects.equals(triggerDefinitions, that.triggerDefinitions);
         }
 
         @Override
         public int hashCode() {
             return Objects.hash(actionDefinitions, categories, connectionDefinition, customAction, customActionHelp,
-                description, icon, tags, metadata, name, resources, version, title, triggerDefinitions,
-                workflowConnectionKeys);
+                description, icon, tags, metadata, name, resources, version, title, triggerDefinitions);
         }
 
         void setActions(List<ModifiableActionDefinition> actionDefinitions) {
@@ -1409,7 +1400,6 @@ public final class ComponentDSL {
                 ", tags=" + tags +
                 ", actionDefinitions=" + actionDefinitions +
                 ", triggerDefinitions=" + triggerDefinitions +
-                ", workflowConnectionKeys=" + workflowConnectionKeys +
                 ", icon='" + icon + '\'' +
                 '}';
         }

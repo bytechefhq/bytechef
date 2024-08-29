@@ -43,8 +43,7 @@ public class DataStreamComponentHandler implements ComponentHandler {
                 .description("With the Data Stream, you can transfer large amounts of data efficiently.")
                 .icon("path:assets/data-stream.svg")
                 .categories(ComponentCategory.HELPERS)
-                .actions(new DataStreamSyncAction(jobLauncher).actionDefinition)
-                .workflowConnectionKeys("source", "destination"));
+                .actions(new DataStreamSyncAction(jobLauncher).actionDefinition));
     }
 
     @Override
