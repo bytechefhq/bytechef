@@ -63,6 +63,22 @@ public class MicrosoftOutlook365Constants {
             option("Html", "html"))
         .required(false);
 
+    public static final ModifiableObjectProperty MESSAGE_OUTPUT_PROPERTY = object()
+        .properties(
+            string(ID),
+            string(SUBJECT),
+            string("bodyPreview"),
+            object(BODY)
+                .properties(
+                    string(CONTENT_TYPE),
+                    string(CONTENT)),
+            object(FROM)
+                .properties(
+                    object(EMAIL_ADDRESS)
+                        .properties(
+                            string(NAME),
+                            string(ADDRESS))));
+
     public static final ModifiableObjectProperty RECIPIENT_PROPERTY = object(RECIPIENT)
         .label("Recipient")
         .properties(
