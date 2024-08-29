@@ -41,6 +41,7 @@ public class MicrosoftOutlook365Constants {
     public static final String ID = "id";
     public static final String MICROSOFT_OUTLOOK_365 = "microsoftOutlook365";
     public static final String NAME = "name";
+    public static final String ODATA_NEXT_LINK = "@odata.nextLink";
     public static final String RECIPIENT = "recipient";
     public static final String REPLY_TO = "replyTo";
     public static final String SEARCH_EMAIL = "searchEmail";
@@ -48,6 +49,7 @@ public class MicrosoftOutlook365Constants {
     public static final String SUBJECT = "subject";
     public static final String TO = "to";
     public static final String TO_RECIPIENTS = "toRecipients";
+    public static final String VALUE = "value";
     public static final ModifiableStringProperty CONTENT_PROPERTY = string(CONTENT)
         .label("Content")
         .description("The content of the item.")

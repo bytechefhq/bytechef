@@ -29,9 +29,12 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.time;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CATEGORY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ODATA_NEXT_LINK;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SEARCH_EMAIL;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.VALUE;
+import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils.getItemsFromNextPage;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -40,11 +43,12 @@ import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class MicrosoftOutlook365SearchEmailAction {
 
@@ -78,7 +82,7 @@ public class MicrosoftOutlook365SearchEmailAction {
     private MicrosoftOutlook365SearchEmailAction() {
     }
 
-    public static Object perform(
+    public static List<Map<?, ?>> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -88,17 +92,30 @@ public class MicrosoftOutlook365SearchEmailAction {
         addParameter(stringBuilder, SUBJECT, inputParameters.getString(SUBJECT));
         addParameter(stringBuilder, CATEGORY, inputParameters.getString(CATEGORY));
 
-        String encode = URLEncoder.encode(stringBuilder.toString(), StandardCharsets.UTF_8);
+        List<Map<?, ?>> maps = new ArrayList<>();
 
-        return context.http(http -> http.get("/messages?$search=" + encode))
+        Map<String, Object> body = context.http(http -> http.get("/messages"))
+            .queryParameters("$search", stringBuilder.toString(), "$top", 100)
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
+
+        if (body.get(VALUE) instanceof List<?> list) {
+            for (Object o : list) {
+                if (o instanceof Map<?, ?> map) {
+                    maps.add(map);
+                }
+            }
+        }
+
+        maps.addAll(getItemsFromNextPage(context, (String) body.get(ODATA_NEXT_LINK)));
+
+        return maps;
     }
 
     private static void addParameter(StringBuilder stringBuilder, String parameterName, String parameterValue) {
         if (parameterValue != null) {
-            if (!parameterName.equals("from") && !stringBuilder.isEmpty()) {
+            if (!parameterName.equals(FROM) && !stringBuilder.isEmpty()) {
                 stringBuilder.append(" AND ");
             }
 
