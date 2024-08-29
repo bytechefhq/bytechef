@@ -28,10 +28,10 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component(SCRIPT + "/v1/ruby")
-public class RubyScriptTaskHandler extends AbstractTaskHandler {
+public class ScriptRubyTaskHandler extends AbstractTaskHandler {
 
     @SuppressFBWarnings("EI")
-    public RubyScriptTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
+    public ScriptRubyTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
         super("script", 1, "ruby", actionDefinitionFacade);
     }
 }

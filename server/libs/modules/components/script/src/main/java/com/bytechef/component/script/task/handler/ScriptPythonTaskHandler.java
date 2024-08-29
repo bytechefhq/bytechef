@@ -28,10 +28,10 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component(SCRIPT + "/v1/python")
-public class PythonScriptTaskHandler extends AbstractTaskHandler {
+public class ScriptPythonTaskHandler extends AbstractTaskHandler {
 
     @SuppressFBWarnings("EI")
-    public PythonScriptTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
+    public ScriptPythonTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
         super("script", 1, "python", actionDefinitionFacade);
     }
 }
