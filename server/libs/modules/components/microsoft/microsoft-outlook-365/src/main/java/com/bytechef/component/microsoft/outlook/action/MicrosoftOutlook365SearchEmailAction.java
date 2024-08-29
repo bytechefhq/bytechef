@@ -85,7 +85,7 @@ public class MicrosoftOutlook365SearchEmailAction {
         List<Map<?, ?>> emails = new ArrayList<>();
 
         Map<String, Object> body = context.http(http -> http.get("/messages"))
-            .queryParameters("$search", stringBuilder.toString(), "$top", 100)
+            .queryParameters("$search", stringBuilder.isEmpty() ? null : stringBuilder.toString(), "$top", 100)
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
