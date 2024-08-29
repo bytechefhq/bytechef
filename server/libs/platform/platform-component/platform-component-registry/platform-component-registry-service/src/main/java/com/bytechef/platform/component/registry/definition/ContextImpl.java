@@ -241,7 +241,7 @@ public class ContextImpl implements Context {
                     .collect(
                         HashMap::new,
                         (map, i) -> map.put(String.valueOf(keyValueArray[i * 2]),
-                            List.of(URLEncoder.encode((String) keyValueArray[i * 2 + 1], StandardCharsets.UTF_8))),
+                            List.of(URLEncoder.encode(keyValueArray[i * 2 + 1].toString(), StandardCharsets.UTF_8))),
                         HashMap::putAll);
 
                 return this;
