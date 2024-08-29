@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.microsoft.outlook.action;
+package com.bytechef.component.microsoft.outlook.util;
 
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CATEGORY;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
+import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ID;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ODATA_NEXT_LINK;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.VALUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -32,8 +30,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
-import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils;
+import com.bytechef.component.definition.Option;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -44,28 +41,48 @@ import org.mockito.MockedStatic;
 /**
  * @author Monika Kušter
  */
-class MicrosoftOutlook365SearchEmailActionTest {
+class MicrosoftOutlook365OptionUtilsTest {
 
-    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final List<Option<String>> expectedOptions = List.of(option("abc", "abc"), option("cde", "cde"));
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final ActionContext mockedContext = mock(ActionContext.class);
     private final ArgumentCaptor<Object[]> queryArgumentCaptor = ArgumentCaptor.forClass(Object[].class);
 
     @Test
-    void testPerform() {
-        List<Map<String, String>> mails = List.of(Map.of(ID, "abc", SUBJECT, "subject"));
+    void testGetCategoryOptions() {
+        List<Map<String, String>> mails = List.of(Map.of("displayName", "abc"));
 
         Map<String, Object> body = Map.of(VALUE, mails, ODATA_NEXT_LINK, "link");
 
-        when(mockedParameters.getString(FROM))
-            .thenReturn("from");
-        when(mockedParameters.getString(TO))
-            .thenReturn("to");
-        when(mockedParameters.getString(SUBJECT))
-            .thenReturn("subject");
-        when(mockedParameters.getString(CATEGORY))
-            .thenReturn("category");
+        when(mockedContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(body);
+
+        try (MockedStatic<MicrosoftOutlook365Utils> microsoftOutlook365UtilsMockedStatic =
+            mockStatic(MicrosoftOutlook365Utils.class)) {
+
+            microsoftOutlook365UtilsMockedStatic
+                .when(() -> MicrosoftOutlook365Utils.getItemsFromNextPage(mockedContext, "link"))
+                .thenReturn(List.of(Map.of("displayName", "cde")));
+
+            List<Option<String>> categoryOptions = MicrosoftOutlook365OptionUtils.getCategoryOptions(
+                null, null, Map.of(), anyString(), mockedContext);
+
+            assertEquals(expectedOptions, categoryOptions);
+        }
+    }
+
+    @Test
+    void testGetMessageIdOptions() {
+        List<Map<String, String>> mails = List.of(Map.of(ID, "abc"));
+
+        Map<String, Object> body = Map.of(VALUE, mails, ODATA_NEXT_LINK, "link");
 
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
@@ -80,22 +97,19 @@ class MicrosoftOutlook365SearchEmailActionTest {
 
         try (MockedStatic<MicrosoftOutlook365Utils> microsoftOutlook365UtilsMockedStatic =
             mockStatic(MicrosoftOutlook365Utils.class)) {
+
             microsoftOutlook365UtilsMockedStatic
                 .when(() -> MicrosoftOutlook365Utils.getItemsFromNextPage(mockedContext, "link"))
-                .thenReturn(List.of());
+                .thenReturn(List.of(Map.of(ID, "cde")));
 
-            Object result =
-                MicrosoftOutlook365SearchEmailAction.perform(mockedParameters, mockedParameters, mockedContext);
+            List<Option<String>> messageIdOptions = MicrosoftOutlook365OptionUtils.getMessageIdOptions(
+                null, null, Map.of(), anyString(), mockedContext);
 
-            assertEquals(mails, result);
+            assertEquals(expectedOptions, messageIdOptions);
 
             Object[] query = queryArgumentCaptor.getValue();
 
-            assertEquals(
-                List.of(
-                    "$search", "\"from:from\" AND \"to:to\" AND \"subject:subject\" AND \"category:category\"",
-                    "$top", 100),
-                Arrays.asList(query));
+            assertEquals(List.of("$top", 100), Arrays.asList(query));
         }
     }
 }
