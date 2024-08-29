@@ -26,9 +26,12 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Parameters;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,18 +39,22 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
-class MicrosoftOutlook365SendEmailActionTest extends AbstractMicrosoftOutlook365ActionTest {
+class MicrosoftOutlook365SendEmailActionTest {
 
-    private final ArgumentCaptor<Context.Http.Body> bodyArgumentCaptor =
-        ArgumentCaptor.forClass(Context.Http.Body.class);
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
+    private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @Test
     void testPerform() {
-        Map<String, String> responeseMap = Map.of("key", "value");
         Map<String, Object> propertyStubsMap = createPropertyStubsMap();
 
+        when(mockedContext.http(any()))
+            .thenReturn(mockedExecutor);
         when(mockedParameters.get(FROM))
             .thenReturn(propertyStubsMap.get(FROM));
         when(mockedParameters.getRequiredString(SUBJECT))
@@ -69,14 +76,12 @@ class MicrosoftOutlook365SendEmailActionTest extends AbstractMicrosoftOutlook365
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(Context.TypeReference.class)))
-            .thenReturn(responeseMap);
 
         Object result = MicrosoftOutlook365SendEmailAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertNull(result);
 
-        Context.Http.Body body = bodyArgumentCaptor.getValue();
+        Http.Body body = bodyArgumentCaptor.getValue();
 
         assertEquals(Map.of("message", propertyStubsMap), body.getContent());
     }
