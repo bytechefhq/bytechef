@@ -18,8 +18,10 @@ package com.bytechef.component.qianfan.constant;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public final class QIanFanConstants {
+
     public static final String QIANFAN = "qianfan";
     public static final String SECRET_KEY = "secretKey";
 

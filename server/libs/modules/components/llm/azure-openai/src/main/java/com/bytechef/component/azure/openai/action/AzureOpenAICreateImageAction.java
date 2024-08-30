@@ -52,6 +52,7 @@ import org.springframework.ai.image.ImageOptions;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public class AzureOpenAICreateImageAction {
 
@@ -137,6 +138,7 @@ public class AzureOpenAICreateImageAction {
     }
 
     private static final Image IMAGE = new Image() {
+
         @Override
         public ImageOptions createImageOptions(Parameters inputParameters) {
             Integer[] size = inputParameters.getArray(SIZE, Integer.class);

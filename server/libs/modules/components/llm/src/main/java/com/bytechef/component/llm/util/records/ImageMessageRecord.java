@@ -16,7 +16,11 @@
 
 package com.bytechef.component.llm.util.records;
 
+/**
+ * @author Marko Kriskovic
+ */
 public class ImageMessageRecord {
+
     private String content;
     private Float weight;
 

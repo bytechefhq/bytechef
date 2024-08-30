@@ -52,6 +52,9 @@ import org.springframework.ai.anthropic.api.AnthropicApi;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 
+/**
+ * @author Marko Kriskovic
+ */
 public class AnthropicChatAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
@@ -86,6 +89,7 @@ public class AnthropicChatAction {
     }
 
     private static final Chat CHAT = new Chat() {
+
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
             return AnthropicChatOptions.builder()

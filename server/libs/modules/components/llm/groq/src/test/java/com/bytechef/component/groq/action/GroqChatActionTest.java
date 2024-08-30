@@ -23,7 +23,11 @@ import com.bytechef.component.llm.test.ChatActionTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.openai.OpenAiChatModel;
 
+/**
+ * @author Marko Kriskovic
+ */
 class GroqChatActionTest extends ChatActionTest {
+
     @Test
     void testPerform() {
         performTest((ActionDefinition.SingleConnectionPerformFunction) GroqChatAction.ACTION_DEFINITION.getPerform()

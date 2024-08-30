@@ -31,6 +31,7 @@ import com.google.auto.service.AutoService;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 @AutoService(ComponentHandler.class)
 public class OpenAIComponentHandler implements ComponentHandler {

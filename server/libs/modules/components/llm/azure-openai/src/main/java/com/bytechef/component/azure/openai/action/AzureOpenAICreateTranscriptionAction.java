@@ -52,6 +52,7 @@ import org.springframework.ai.model.Model;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public class AzureOpenAICreateTranscriptionAction {
 
@@ -127,12 +128,14 @@ public class AzureOpenAICreateTranscriptionAction {
         }
 
         @Override
-        public Model<AudioTranscriptionPrompt, AudioTranscriptionResponse>
-            createTranscriptionModel(Parameters inputParameters, Parameters connectionParameters) {
+        public Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> createTranscriptionModel(
+            Parameters inputParameters, Parameters connectionParameters) {
+
             OpenAIClient openAIClient = new OpenAIClientBuilder()
                 .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
                 .endpoint(connectionParameters.getString(ENDPOINT))
                 .buildClient();
+
             return new AzureOpenAiAudioTranscriptionModel(openAIClient,
                 (AzureOpenAiAudioTranscriptionOptions) createTranscriptOptions(inputParameters));
         }

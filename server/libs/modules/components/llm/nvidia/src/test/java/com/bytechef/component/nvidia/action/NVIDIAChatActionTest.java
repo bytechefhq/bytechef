@@ -23,7 +23,11 @@ import com.bytechef.component.llm.test.ChatActionTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.openai.OpenAiChatModel;
 
+/**
+ * @author Marko Kriskovic
+ */
 class NVIDIAChatActionTest extends ChatActionTest {
+
     @Test
     void testPerform() {
         performTest((ActionDefinition.SingleConnectionPerformFunction) NVIDIAChatAction.ACTION_DEFINITION.getPerform()

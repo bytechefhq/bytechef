@@ -16,7 +16,11 @@
 
 package com.bytechef.component.llm.util.records;
 
+/**
+ * @author Marko Kriskovic
+ */
 public class MessageRecord {
+
     private String content;
     private String role;
 

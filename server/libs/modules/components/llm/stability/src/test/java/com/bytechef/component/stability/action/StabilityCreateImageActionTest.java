@@ -23,7 +23,11 @@ import com.bytechef.component.llm.test.ImageActionTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.stabilityai.StabilityAiImageModel;
 
+/**
+ * @author Marko Kriskovic
+ */
 class StabilityCreateImageActionTest extends ImageActionTest {
+
     @Test
     void testPerform() {
         performTest(

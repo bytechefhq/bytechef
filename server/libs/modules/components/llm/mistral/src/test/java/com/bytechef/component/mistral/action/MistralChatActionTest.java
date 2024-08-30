@@ -23,7 +23,11 @@ import com.bytechef.component.llm.test.ChatActionTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.mistralai.MistralAiChatModel;
 
+/**
+ * @author Marko Kriskovic
+ */
 class MistralChatActionTest extends ChatActionTest {
+
     @Test
     void testPerform() {
         performTest((ActionDefinition.SingleConnectionPerformFunction) MistralChatAction.ACTION_DEFINITION.getPerform()

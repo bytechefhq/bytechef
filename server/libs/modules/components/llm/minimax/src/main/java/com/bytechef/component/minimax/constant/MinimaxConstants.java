@@ -18,8 +18,10 @@ package com.bytechef.component.minimax.constant;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public final class MinimaxConstants {
+
     public static final String MINIMAX = "minimax";
 
     private MinimaxConstants() {

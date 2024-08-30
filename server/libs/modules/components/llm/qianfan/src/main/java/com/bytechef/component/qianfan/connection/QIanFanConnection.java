@@ -27,6 +27,7 @@ import com.bytechef.component.qianfan.constant.QIanFanConstants;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public final class QIanFanConnection {
 

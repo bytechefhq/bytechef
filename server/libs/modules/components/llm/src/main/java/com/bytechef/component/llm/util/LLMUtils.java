@@ -29,6 +29,7 @@ import org.springframework.ai.chat.messages.UserMessage;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public class LLMUtils {
     private LLMUtils() {

@@ -23,7 +23,11 @@ import com.bytechef.component.llm.test.ChatActionTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.qianfan.QianFanChatModel;
 
+/**
+ * @author Marko Kriskovic
+ */
 class QIanFanChatActionTest extends ChatActionTest {
+
     @Test
     void testPerform() {
         performTest((ActionDefinition.SingleConnectionPerformFunction) QIanFanChatAction.ACTION_DEFINITION.getPerform()

@@ -27,18 +27,17 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefini
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public final class AzureOpenAIConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-//        .baseUri((connectionParameters, context) -> "https://api.openai.com/v1")
         .authorizations(
             authorization(BEARER_TOKEN)
                 .title("Bearer Token")
                 .properties(
                     string(ENDPOINT)
                         .label("Endpoint")
-//                        .description("e.g https://{yourDomain}}.atlassian.net")
                         .required(true),
                     string(TOKEN)
                         .label("Token")

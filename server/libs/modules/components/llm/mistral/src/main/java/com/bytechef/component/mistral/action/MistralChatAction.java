@@ -56,6 +56,9 @@ import org.springframework.ai.mistralai.MistralAiChatModel;
 import org.springframework.ai.mistralai.MistralAiChatOptions;
 import org.springframework.ai.mistralai.api.MistralAiApi;
 
+/**
+ * @author Marko Kriskovic
+ */
 public class MistralChatAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
@@ -95,6 +98,7 @@ public class MistralChatAction {
     }
 
     private static final Chat CHAT = new Chat() {
+
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
             String type = inputParameters.getInteger(RESPONSE_FORMAT) < 1 ? "text" : "json_object";

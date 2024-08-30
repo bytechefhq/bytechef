@@ -63,6 +63,9 @@ import org.springframework.ai.azure.openai.AzureOpenAiResponseFormat;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 
+/**
+ * @author Marko Kriskovic
+ */
 public class AzureOpenAIChatAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
@@ -117,8 +120,11 @@ public class AzureOpenAIChatAction {
                 .withResponseFormat(format);
 
             List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});
-            if (functions != null)
+
+            if (functions != null) {
                 builder.withFunctions(new HashSet<>(functions));
+            }
+
             return builder.build();
         }
 

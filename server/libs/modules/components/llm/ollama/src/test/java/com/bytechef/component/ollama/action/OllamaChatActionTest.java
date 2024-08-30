@@ -23,6 +23,9 @@ import com.bytechef.component.llm.test.ChatActionTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.ollama.OllamaChatModel;
 
+/**
+ * @author Marko Kriskovic
+ */
 class OllamaChatActionTest extends ChatActionTest {
     @Test
     void testPerform() {

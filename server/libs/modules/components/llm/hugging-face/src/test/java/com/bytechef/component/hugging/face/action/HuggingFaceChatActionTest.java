@@ -23,6 +23,9 @@ import com.bytechef.component.llm.test.ChatActionTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.huggingface.HuggingfaceChatModel;
 
+/**
+ * @author Marko Kriskovic
+ */
 class HuggingFaceChatActionTest extends ChatActionTest {
     @Test
     void testPerform() {

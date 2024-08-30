@@ -18,8 +18,10 @@ package com.bytechef.component.stability.constant;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public final class StabilityConstants {
+
     public static final String HEIGHT = "height";
     public static final String WIDTH = "width";
     public static final String STABILITY = "stability";

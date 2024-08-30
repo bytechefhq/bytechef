@@ -23,7 +23,11 @@ import com.bytechef.component.llm.test.ChatActionTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
 
+/**
+ * @author Marko Kriskovic
+ */
 class ZhiPuChatActionTest extends ChatActionTest {
+
     @Test
     void testPerform() {
         performTest((ActionDefinition.SingleConnectionPerformFunction) ZhiPuChatAction.ACTION_DEFINITION.getPerform()

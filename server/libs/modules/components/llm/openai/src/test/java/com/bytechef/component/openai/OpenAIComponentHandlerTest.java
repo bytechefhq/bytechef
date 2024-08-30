@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 class OpenAIComponentHandlerTest {
 

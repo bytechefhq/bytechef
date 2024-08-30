@@ -23,7 +23,11 @@ import com.bytechef.component.llm.test.ChatActionTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.minimax.MiniMaxChatModel;
 
+/**
+ * @author Marko Kriskovic
+ */
 class MinimaxChatActionTest extends ChatActionTest {
+
     @Test
     void testPerform() {
         performTest((ActionDefinition.SingleConnectionPerformFunction) MinimaxChatAction.ACTION_DEFINITION.getPerform()

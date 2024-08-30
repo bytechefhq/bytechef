@@ -23,7 +23,11 @@ import com.bytechef.component.llm.test.ChatActionTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.moonshot.MoonshotChatModel;
 
+/**
+ * @author Marko Kriskovic
+ */
 class MoonshotChatActionTest extends ChatActionTest {
+
     @Test
     void testPerform() {
         performTest((ActionDefinition.SingleConnectionPerformFunction) MoonshotChatAction.ACTION_DEFINITION.getPerform()

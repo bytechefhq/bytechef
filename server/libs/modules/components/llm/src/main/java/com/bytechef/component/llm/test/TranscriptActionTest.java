@@ -35,7 +35,11 @@ import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
 import org.springframework.ai.model.Model;
 
+/**
+ * @author Marko Kriskovic
+ */
 public abstract class TranscriptActionTest extends AbstractLLMActionTest {
+
     private static final String answer = "ANSWER";
 
     protected void performTest(ActionDefinition.SingleConnectionPerformFunction perform) {
@@ -52,7 +56,10 @@ public abstract class TranscriptActionTest extends AbstractLLMActionTest {
         }
     }
 
-    protected void getResponseTest(Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> mockedTranscriptModel) throws MalformedURLException {
+    protected void getResponseTest(
+        Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> mockedTranscriptModel)
+        throws MalformedURLException {
+
         when(mockedParameters.getFileEntry(FILE))
             .thenReturn(new FileEntry() {
                 @Override
@@ -77,10 +84,12 @@ public abstract class TranscriptActionTest extends AbstractLLMActionTest {
             });
 
         Transcript mockedTranscription = mock(Transcript.class);
-        AudioTranscriptionResponse transcriptionResponse = new AudioTranscriptionResponse(new AudioTranscription(answer));
+        AudioTranscriptionResponse transcriptionResponse = new AudioTranscriptionResponse(
+            new AudioTranscription(answer));
         AudioTranscriptionResponse mockedTranscriptionResponse = spy(transcriptionResponse);
 
-        when(mockedTranscription.createTranscriptionModel(mockedParameters, mockedParameters)).thenReturn(mockedTranscriptModel);
+        when(mockedTranscription.createTranscriptionModel(mockedParameters, mockedParameters))
+            .thenReturn(mockedTranscriptModel);
         when(mockedTranscriptModel.call(any(AudioTranscriptionPrompt.class))).thenReturn(mockedTranscriptionResponse);
 
         String response = Transcript.getResponse(mockedTranscription, mockedParameters, mockedParameters);

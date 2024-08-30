@@ -56,6 +56,7 @@ import org.springframework.ai.stabilityai.api.StabilityAiImageOptions;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public class StabilityCreateImageAction {
 
@@ -154,10 +155,12 @@ public class StabilityCreateImageAction {
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
         return Image.getResponse(IMAGE, inputParameters, connectionParameters);
     }
 
     private static final Image IMAGE = new Image() {
+
         @Override
         public ImageOptions createImageOptions(Parameters inputParameters) {
             return StabilityAiImageOptions.builder()
@@ -170,14 +173,14 @@ public class StabilityCreateImageAction {
                 .withCfgScale(inputParameters.getFloat(CFG_SCALE))
                 .withClipGuidancePreset(inputParameters.getString(CLIP_GUIDANCE_PRESET))
                 .withSampler(inputParameters.getString(SAMPLER))
-//                .withSamples(inputParameters.getInteger(N))
                 .withSeed(inputParameters.getLong(SEED))
                 .build();
         }
 
         @Override
         public ImageModel createImageModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new StabilityAiImageModel(new StabilityAiApi(connectionParameters.getString(TOKEN)),
+            return new StabilityAiImageModel(
+                new StabilityAiApi(connectionParameters.getString(TOKEN)),
                 (StabilityAiImageOptions) createImageOptions(inputParameters));
         }
     };

@@ -37,7 +37,11 @@ import org.springframework.ai.openai.audio.speech.Speech;
 import org.springframework.ai.openai.audio.speech.SpeechPrompt;
 import org.springframework.ai.openai.audio.speech.SpeechResponse;
 
+/**
+ * @author Marko Kriskovic
+ */
 class OpenAICreateSpeechActionTest extends AbstractLLMActionTest {
+
     private final FileEntry answer = new FileEntry() {
         @Override
         public String getExtension() {

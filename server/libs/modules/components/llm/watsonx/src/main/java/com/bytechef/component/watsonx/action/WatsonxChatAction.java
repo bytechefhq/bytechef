@@ -58,6 +58,9 @@ import org.springframework.ai.watsonx.WatsonxAiChatOptions;
 import org.springframework.ai.watsonx.api.WatsonxAiApi;
 import org.springframework.web.client.RestClient;
 
+/**
+ * @author Marko Kriskovic
+ */
 public class WatsonxChatAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
@@ -99,10 +102,12 @@ public class WatsonxChatAction {
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }
 
     private static final Chat CHAT = new Chat() {
+
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
             return WatsonxAiChatOptions.builder()

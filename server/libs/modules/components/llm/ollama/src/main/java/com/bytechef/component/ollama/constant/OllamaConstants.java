@@ -18,8 +18,10 @@ package com.bytechef.component.ollama.constant;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public final class OllamaConstants {
+
     public static final String OLLAMA = "ollama";
     public static final String URL = "url";
     public static final String FORMAT = "format";

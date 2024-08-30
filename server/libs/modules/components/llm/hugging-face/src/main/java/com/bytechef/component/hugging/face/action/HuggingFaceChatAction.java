@@ -32,6 +32,9 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.huggingface.HuggingfaceChatModel;
 
+/**
+ * @author Marko Kriskovic
+ */
 public class HuggingFaceChatAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
@@ -54,6 +57,7 @@ public class HuggingFaceChatAction {
     }
 
     public static final Chat CHAT = new Chat() {
+
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
             return null;

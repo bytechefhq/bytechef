@@ -45,6 +45,7 @@ import org.springframework.retry.support.RetryTemplate;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public class ZhiPuCreateImageAction {
 
@@ -81,10 +82,12 @@ public class ZhiPuCreateImageAction {
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
         return Image.getResponse(IMAGE, inputParameters, connectionParameters);
     }
 
     private static final Image IMAGE = new Image() {
+
         @Override
         public ImageOptions createImageOptions(Parameters inputParameters) {
             return ZhiPuAiImageOptions.builder()
@@ -95,7 +98,8 @@ public class ZhiPuCreateImageAction {
 
         @Override
         public ImageModel createImageModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new ZhiPuAiImageModel(new ZhiPuAiImageApi(connectionParameters.getString(TOKEN)),
+            return new ZhiPuAiImageModel(
+                new ZhiPuAiImageApi(connectionParameters.getString(TOKEN)),
                 (ZhiPuAiImageOptions) createImageOptions(inputParameters), new RetryTemplate());
         }
     };

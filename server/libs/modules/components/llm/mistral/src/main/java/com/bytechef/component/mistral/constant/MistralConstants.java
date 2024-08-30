@@ -20,6 +20,7 @@ package com.bytechef.component.mistral.constant;
  * @author Monika Domiter
  */
 public final class MistralConstants {
+
     public static final String MISTRAL = "mistral";
     public static final String SAFE_PROMPT = "safePrompt";
 

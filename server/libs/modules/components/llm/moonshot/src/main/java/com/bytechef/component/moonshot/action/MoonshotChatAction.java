@@ -59,6 +59,9 @@ import org.springframework.ai.moonshot.MoonshotChatModel;
 import org.springframework.ai.moonshot.MoonshotChatOptions;
 import org.springframework.ai.moonshot.api.MoonshotApi;
 
+/**
+ * @author Marko Kriskovic
+ */
 public class MoonshotChatAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
@@ -96,6 +99,7 @@ public class MoonshotChatAction {
     }
 
     private static final Chat CHAT = new Chat() {
+
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
             MoonshotChatOptions.Builder builder = MoonshotChatOptions.builder()

@@ -49,6 +49,7 @@ import org.springframework.ai.openai.api.OpenAiAudioApi;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public class OpenAICreateTranscriptionAction {
 
@@ -120,8 +121,9 @@ public class OpenAICreateTranscriptionAction {
         }
 
         @Override
-        public Model<AudioTranscriptionPrompt, AudioTranscriptionResponse>
-            createTranscriptionModel(Parameters inputParameters, Parameters connectionParameters) {
+        public Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> createTranscriptionModel(
+            Parameters inputParameters, Parameters connectionParameters) {
+
             return new OpenAiAudioTranscriptionModel(new OpenAiAudioApi(connectionParameters.getString(TOKEN)),
                 (OpenAiAudioTranscriptionOptions) createTranscriptOptions(inputParameters));
         }

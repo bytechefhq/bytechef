@@ -27,6 +27,7 @@ import org.springframework.ai.stabilityai.api.StabilityAiApi;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public final class StabilityConnection {
 

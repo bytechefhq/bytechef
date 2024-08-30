@@ -48,6 +48,9 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
 
+/**
+ * @author Marko Kriskovic
+ */
 public class AmazonBedrockTitanChatAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(AmazonBedrockConstants.ASK_TITAN)

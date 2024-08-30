@@ -29,6 +29,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefini
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public final class AmazonBedrockConnection {
 
