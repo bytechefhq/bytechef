@@ -67,5 +67,4 @@ class MicrosoftOneDriveListFoldersActionTest {
 
         assertEquals(List.of("$filter", "folder ne null"), Arrays.asList(query));
     }
-
 }
