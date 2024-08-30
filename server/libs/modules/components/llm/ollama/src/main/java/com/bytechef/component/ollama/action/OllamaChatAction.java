@@ -78,6 +78,7 @@ import com.bytechef.component.llm.util.LLMUtils;
 import com.bytechef.component.llm.util.interfaces.Chat;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
@@ -104,7 +105,6 @@ public class OllamaChatAction {
                         .collect(Collectors.toMap(
                             OllamaModel::getName, OllamaModel::getName, (f, s) -> f)))),
             MESSAGE_PROPERTY,
-            RESPONSE_FORMAT_PROPERTY,
             string(FORMAT)
                 .label("Format")
                 .description("The format to return a response in.")
@@ -236,11 +236,12 @@ public class OllamaChatAction {
 
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
-            return OllamaOptions.builder()
+            OllamaOptions builder = OllamaOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withTemperature(inputParameters.getFloat(TEMPERATURE))
                 .withTopP(inputParameters.getFloat(TOP_P))
-                .withStop(inputParameters.getList(STOP, new TypeReference<>() {}))
+                .withStop(inputParameters.getList(STOP, new TypeReference<>() {
+                }))
                 .withTopK(inputParameters.getInteger(TOP_K))
                 .withFrequencyPenalty(inputParameters.getFloat(FREQUENCY_PENALTY))
                 .withPresencePenalty(inputParameters.getFloat(PRESENCE_PENALTY))
@@ -269,15 +270,18 @@ public class OllamaChatAction {
                 .withTypicalP(inputParameters.getFloat(TYPICAL_P))
                 .withUseMLock(inputParameters.getBoolean(USE_MLOCK))
                 .withUseNUMA(inputParameters.getBoolean(USE_NUMA))
-                .withVocabOnly(inputParameters.getBoolean(VOCAB_ONLY))
-                .withFunctions(new HashSet<>(inputParameters.getList(FUNCTIONS, new TypeReference<>() {})))
-                .build();
+                .withVocabOnly(inputParameters.getBoolean(VOCAB_ONLY));
+
+            List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});
+            if (functions != null)
+                builder.withFunctions(new HashSet<>(functions));
+            return builder.build();
         }
 
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
             String url = connectionParameters.getString(URL);
-            OllamaApi ollamaApi = url == null ? new OllamaApi() : new OllamaApi(url);
+            OllamaApi ollamaApi = url.isEmpty() ? new OllamaApi() : new OllamaApi(url);
             return new OllamaChatModel(ollamaApi, (OllamaOptions) createChatOptions(inputParameters));
         }
     };

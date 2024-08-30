@@ -106,7 +106,8 @@ public class VertexGeminiChatAction {
 
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
-            String type = inputParameters.getInteger(RESPONSE_FORMAT) < 1 ? "text/plain" : "application/json";
+            Integer responseInteger = inputParameters.getInteger(RESPONSE_FORMAT);
+            String type = responseInteger == null || responseInteger < 1 ? "text/plain" : "application/json";
             VertexAiGeminiChatOptions.Builder builder = VertexAiGeminiChatOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withTemperature(inputParameters.getFloat(TEMPERATURE))

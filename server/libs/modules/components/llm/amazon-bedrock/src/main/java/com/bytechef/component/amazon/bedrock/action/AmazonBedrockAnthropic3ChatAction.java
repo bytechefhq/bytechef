@@ -19,6 +19,7 @@ package com.bytechef.component.amazon.bedrock.action;
 import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.ACCESS_KEY_ID;
 import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.SECRET_ACCESS_KEY;
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
@@ -73,8 +74,11 @@ public class AmazonBedrockAnthropic3ChatAction {
                             Anthropic3ChatBedrockApi.AnthropicChatModel::getName,
                             Anthropic3ChatBedrockApi.AnthropicChatModel::getName, (f, s) -> f)))),
             MESSAGE_PROPERTY,
+            integer(MAX_TOKENS)
+                .label("Max tokens")
+                .description("The maximum number of tokens to generate in the chat completion.")
+                .required(true),
             RESPONSE_FORMAT_PROPERTY,
-            MAX_TOKENS_PROPERTY,
             TEMPERATURE_PROPERTY,
             TOP_P_PROPERTY,
             TOP_K_PROPERTY,
@@ -99,6 +103,7 @@ public class AmazonBedrockAnthropic3ChatAction {
                 .withTopP(inputParameters.getFloat(TOP_P))
                 .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
                 .withTopK(inputParameters.getInteger(TOP_K))
+                .withAnthropicVersion("bedrock-2023-05-31")
                 .build();
         }
 
