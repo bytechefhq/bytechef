@@ -119,7 +119,8 @@ public class NVIDIAChatAction {
 
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new OpenAiChatModel(new OpenAiApi("https://integrate.api.nvidia.com/", connectionParameters.getString(TOKEN)),
+            return new OpenAiChatModel(
+                new OpenAiApi("https://integrate.api.nvidia.com/", connectionParameters.getString(TOKEN)),
                 (OpenAiChatOptions) createChatOptions(inputParameters));
         }
     };

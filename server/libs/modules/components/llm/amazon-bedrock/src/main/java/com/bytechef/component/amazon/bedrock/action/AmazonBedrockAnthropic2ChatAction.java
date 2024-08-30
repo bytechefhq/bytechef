@@ -108,7 +108,8 @@ public class AmazonBedrockAnthropic2ChatAction {
                 new AwsCredentialsProvider() {
                     @Override
                     public AwsCredentials resolveCredentials() {
-                        return AwsBasicCredentials.create(connectionParameters.getRequiredString(ACCESS_KEY_ID), connectionParameters.getRequiredString(SECRET_ACCESS_KEY));
+                        return AwsBasicCredentials.create(connectionParameters.getRequiredString(ACCESS_KEY_ID),
+                            connectionParameters.getRequiredString(SECRET_ACCESS_KEY));
                     }
                 },
                 connectionParameters.getRequiredString(AmazonBedrockConstants.REGION), new ObjectMapper()),

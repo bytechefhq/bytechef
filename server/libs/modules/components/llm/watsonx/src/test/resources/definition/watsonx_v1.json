@@ -422,13 +422,29 @@
         "type" : "STRING",
         "defaultValue" : null,
         "exampleValue" : null,
-        "label" : "Url",
+        "label" : "Region",
         "placeholder" : null,
-        "controlType" : "TEXT",
+        "controlType" : "SELECT",
         "languageId" : null,
         "maxLength" : null,
         "minLength" : null,
-        "options" : null,
+        "options" : [ {
+          "description" : null,
+          "label" : "Dallas [us-south]",
+          "value" : "https://us-south.ml.cloud.ibm.com"
+        }, {
+          "description" : null,
+          "label" : "London [eu-gb]",
+          "value" : "https://eu-gb.ml.cloud.ibm.com"
+        }, {
+          "description" : null,
+          "label" : "Tokyo [jp-tok]",
+          "value" : "https://jp-tok.ml.cloud.ibm.com"
+        }, {
+          "description" : null,
+          "label" : "Frankfurt [eu-de]",
+          "value" : "https://eu-de.ml.cloud.ibm.com"
+        } ],
         "optionsDataSource" : null
       }, {
         "advancedOption" : null,

@@ -401,6 +401,7 @@
     },
     "workflowNodeDescription" : null
   } ],
+  "triggers" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -451,12 +452,12 @@
       "title" : "Bearer Token",
       "type" : "BEARER_TOKEN",
       "acquire" : null,
-      "clientSecret" : null,
-      "pkce" : null,
       "apply" : null,
       "authorizationCallback" : null,
       "authorizationUrl" : null,
       "clientId" : null,
+      "clientSecret" : null,
+      "pkce" : null,
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
@@ -466,8 +467,7 @@
     "properties" : null,
     "version" : 1,
     "authorizationRequired" : null,
-    "test" : null,
-    "baseUri" : null
-  },
-  "triggers" : null
+    "baseUri" : null,
+    "test" : null
+  }
 }

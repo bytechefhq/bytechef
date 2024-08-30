@@ -408,7 +408,7 @@
     "title" : "Ask",
     "output" : null,
     "perform" : { },
-    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -433,7 +433,7 @@
       },
       "sampleOutput" : null
     },
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -573,7 +573,7 @@
     "title" : "Create image",
     "output" : null,
     "perform" : { },
-    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -718,7 +718,7 @@
       },
       "sampleOutput" : null
     },
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   } ],
   "triggers" : null,
   "connection" : {
