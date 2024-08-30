@@ -18,7 +18,6 @@ package com.bytechef.component.google.sheets;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.google.sheets.connection.GoogleSheetsConnection.CONNECTION_DEFINITION;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.GOOGLE_SHEETS;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -38,7 +37,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class GoogleSheetsComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(GOOGLE_SHEETS)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("googleSheets")
         .title("Google Sheets")
         .description(
             "Google Sheets is a cloud-based spreadsheet software that allows users to create, edit, and collaborate " +

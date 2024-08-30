@@ -30,7 +30,6 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID_PROPERTY;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.UPDATE_ROW;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.createRange;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.getMapOfValuesForRow;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.getRowValues;
@@ -49,7 +48,7 @@ import java.util.Map;
  */
 public class GoogleSheetsUpdateRowAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(UPDATE_ROW)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateRow")
         .title("Update row")
         .description("Overwrite values in an existing row")
         .properties(

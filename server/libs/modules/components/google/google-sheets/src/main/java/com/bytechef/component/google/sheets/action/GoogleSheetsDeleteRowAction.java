@@ -18,7 +18,6 @@ package com.bytechef.component.google.sheets.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.DELETE_ROW;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.INCLUDE_ITEMS_FROM_ALL_DRIVES_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW_NUMBER;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID;
@@ -42,19 +41,18 @@ import java.util.List;
  */
 public class GoogleSheetsDeleteRowAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION =
-        action(DELETE_ROW)
-            .title("Delete row")
-            .description("Delete row on an existing sheet")
-            .properties(
-                SPREADSHEET_ID_PROPERTY,
-                INCLUDE_ITEMS_FROM_ALL_DRIVES_PROPERTY,
-                SHEET_ID_PROPERTY,
-                integer(ROW_NUMBER)
-                    .label("Row number")
-                    .description("The row number to delete")
-                    .required(true))
-            .perform(GoogleSheetsDeleteRowAction::perform);
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteRow")
+        .title("Delete row")
+        .description("Delete row on an existing sheet")
+        .properties(
+            SPREADSHEET_ID_PROPERTY,
+            INCLUDE_ITEMS_FROM_ALL_DRIVES_PROPERTY,
+            SHEET_ID_PROPERTY,
+            integer(ROW_NUMBER)
+                .label("Row number")
+                .description("The row number to delete")
+                .required(true))
+        .perform(GoogleSheetsDeleteRowAction::perform);
 
     private GoogleSheetsDeleteRowAction() {
     }

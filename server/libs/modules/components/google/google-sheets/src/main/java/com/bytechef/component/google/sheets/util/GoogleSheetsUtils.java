@@ -41,6 +41,7 @@ import com.google.api.services.drive.model.File;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.SheetProperties;
+import com.google.api.services.sheets.v4.model.ValueRange;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -55,6 +56,17 @@ import java.util.stream.IntStream;
 public class GoogleSheetsUtils {
 
     private GoogleSheetsUtils() {
+    }
+
+    public static void appendRow(
+        Sheets sheets, String spreadsheetId, String range, ValueRange valueRange, String valueInputOption)
+        throws IOException {
+
+        sheets.spreadsheets()
+            .values()
+            .append(spreadsheetId, range, valueRange)
+            .setValueInputOption(valueInputOption)
+            .execute();
     }
 
     public static String createRange(String sheetName, Integer rowNumber) {
