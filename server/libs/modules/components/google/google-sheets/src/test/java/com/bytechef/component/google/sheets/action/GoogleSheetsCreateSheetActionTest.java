@@ -16,13 +16,15 @@
 
 package com.bytechef.component.google.sheets.action;
 
+import static com.bytechef.component.google.sheets.action.GoogleSheetsCreateSheetAction.HEADERS;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.VALUE_INPUT_OPTION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
@@ -30,7 +32,13 @@ import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
 import com.bytechef.google.commons.GoogleServices;
 import com.bytechef.test.component.properties.ParametersFactory;
 import com.google.api.services.sheets.v4.Sheets;
+import com.google.api.services.sheets.v4.model.AddSheetResponse;
+import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
+import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetResponse;
+import com.google.api.services.sheets.v4.model.Response;
+import com.google.api.services.sheets.v4.model.SheetProperties;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -41,32 +49,41 @@ import org.mockito.stubbing.Answer;
 /**
  * @author Monika Kušter
  */
-class GoogleSheetsInsertRowActionTest {
+class GoogleSheetsCreateSheetActionTest {
 
+    private final ArgumentCaptor<BatchUpdateSpreadsheetRequest> batchUpdateSpreadsheetRequestArgumentCaptor =
+        ArgumentCaptor.forClass(BatchUpdateSpreadsheetRequest.class);
+    private final Sheets.Spreadsheets.BatchUpdate mockedBatchUpdate = mock(Sheets.Spreadsheets.BatchUpdate.class);
     private final ActionContext mockedContext = mock(ActionContext.class);
     private final Sheets mockedSheets = mock(Sheets.class);
-    private final ArgumentCaptor<String> spreadsheetIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<String> sheetNameArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<String> valueInputOptionArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final Parameters parameters = ParametersFactory.createParameters(
-        Map.of(SPREADSHEET_ID, "spreadsheetId", SHEET_NAME, "sheetName", VALUE_INPUT_OPTION, "USER_ENTERED"));
+    private final Sheets.Spreadsheets mockedSpreadsheets = mock(Sheets.Spreadsheets.class);
     private final ArgumentCaptor<String> rangeArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> sheetNameArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> spreadsheetIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> valueInputOptionArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<ValueRange> valueRangeArgumentCaptor = ArgumentCaptor.forClass(ValueRange.class);
 
     @Test
     void perform() throws Exception {
-        Map<Object, Object> responseMap = Map.of();
-        List<Object> row = List.of("abc", "sheetName", false);
+        List<Object> headers = List.of("header1", "header2");
+        Parameters parameters = ParametersFactory.createParameters(
+            Map.of(SPREADSHEET_ID, "spreadsheetId", SHEET_ID, 123, SHEET_NAME, "sheetName", HEADERS, headers));
+
+        BatchUpdateSpreadsheetResponse batchUpdateSpreadsheetResponse = new BatchUpdateSpreadsheetResponse()
+            .setReplies(
+                List.of(
+                    new Response().setAddSheet(
+                        new AddSheetResponse()
+                            .setProperties(
+                                new SheetProperties()
+                                    .setTitle("sheetName")
+                                    .setSheetId(123)))));
 
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
             MockedStatic<GoogleSheetsUtils> googleSheetsUtilsMockedStatic = mockStatic(GoogleSheetsUtils.class)) {
-
             googleServicesMockedStatic
                 .when(() -> GoogleServices.getSheets(parameters))
                 .thenReturn(mockedSheets);
-            googleSheetsUtilsMockedStatic
-                .when(() -> GoogleSheetsUtils.getRowValues(parameters))
-                .thenReturn(row);
             googleSheetsUtilsMockedStatic
                 .when(() -> GoogleSheetsUtils.createRange(sheetNameArgumentCaptor.capture(), any()))
                 .thenReturn("range");
@@ -75,27 +92,33 @@ class GoogleSheetsInsertRowActionTest {
                     rangeArgumentCaptor.capture(), valueRangeArgumentCaptor.capture(),
                     valueInputOptionArgumentCaptor.capture()))
                 .thenAnswer((Answer<Void>) invocation -> null);
-            googleSheetsUtilsMockedStatic
-                .when(() -> GoogleSheetsUtils.getMapOfValuesForRow(parameters, mockedSheets, row))
-                .thenReturn(responseMap);
 
-            Map<String, Object> result = GoogleSheetsInsertRowAction.perform(
-                parameters, parameters, mockedContext);
+            when(mockedSheets.spreadsheets())
+                .thenReturn(mockedSpreadsheets);
+            when(mockedSpreadsheets.batchUpdate(
+                spreadsheetIdArgumentCaptor.capture(), batchUpdateSpreadsheetRequestArgumentCaptor.capture()))
+                    .thenReturn(mockedBatchUpdate);
+            when(mockedBatchUpdate.execute())
+                .thenReturn(batchUpdateSpreadsheetResponse);
 
-            assertEquals(responseMap, result);
+            Map<String, Object> expectedResponse = new HashMap<>();
 
+            expectedResponse.put(SPREADSHEET_ID, "spreadsheetId");
+            expectedResponse.put(SHEET_ID, 123);
+            expectedResponse.put(SHEET_NAME, "sheetName");
+            expectedResponse.put(HEADERS, headers);
+
+            Map<String, Object> result = GoogleSheetsCreateSheetAction.perform(parameters, parameters, mockedContext);
+
+            assertEquals(expectedResponse, result);
             assertEquals("sheetName", sheetNameArgumentCaptor.getValue());
             assertEquals("spreadsheetId", spreadsheetIdArgumentCaptor.getValue());
-            assertEquals("range", rangeArgumentCaptor.getValue());
             assertEquals("USER_ENTERED", valueInputOptionArgumentCaptor.getValue());
 
             ValueRange valueRange = valueRangeArgumentCaptor.getValue();
 
             assertEquals("ROWS", valueRange.getMajorDimension());
-
-            List<List<Object>> valueRangeValues = valueRange.getValues();
-
-            assertEquals(row, valueRangeValues.getFirst());
+            assertEquals(List.of(headers), valueRange.getValues());
         }
     }
 }
