@@ -35,7 +35,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableValueProperty;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.sheets.v4.Sheets;
@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class GoogleSheetsUtils {
 
@@ -65,39 +65,58 @@ public class GoogleSheetsUtils {
         return sheetName + "!" + rowNumber + ":" + rowNumber;
     }
 
-    public static List<Property.ValueProperty<?>> createArrayPropertyForRow(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        ActionContext context) throws Exception {
+    public static ActionPropertiesFunction createPropertiesForNewRows(boolean insertOneRow) {
+        return (inputParameters, connectionParameters, dependencyPaths, context) -> {
 
-        boolean isFirstRowHeader = inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER);
+            boolean isFirstRowHeader = inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER);
 
-        if (isFirstRowHeader) {
-            List<Object> firstRow = GoogleSheetsRowUtils.getRowValues(
-                GoogleServices.getSheets(connectionParameters), inputParameters.getRequiredString(SPREADSHEET_ID),
-                inputParameters.getRequiredString(SHEET_NAME), 1);
+            if (isFirstRowHeader) {
+                List<Object> firstRow = GoogleSheetsRowUtils.getRowValues(
+                    GoogleServices.getSheets(connectionParameters), inputParameters.getRequiredString(SPREADSHEET_ID),
+                    inputParameters.getRequiredString(SHEET_NAME), 1);
 
-            List<ModifiableValueProperty<?, ?>> list = new ArrayList<>();
+                List<ModifiableValueProperty<?, ?>> list = new ArrayList<>();
 
-            for (Object value : firstRow) {
-                list.add(
-                    string(value.toString())
-                        .defaultValue(""));
+                for (Object value : firstRow) {
+                    String label = value.toString();
+                    list.add(
+                        string(label.replaceAll(" ", "_"))
+                            .label(label)
+                            .defaultValue(""));
+                }
+
+                ModifiableObjectProperty updatedRow = object(VALUES)
+                    .label("Values")
+                    .properties(list)
+                    .required(true);
+
+                if (insertOneRow) {
+                    return List.of(updatedRow);
+                } else {
+                    ModifiableArrayProperty rows = array(VALUES)
+                        .label("Rows")
+                        .items(updatedRow)
+                        .required(true);
+                    return List.of(rows);
+                }
+            } else {
+                ModifiableArrayProperty updatedRow = array(VALUES)
+                    .label("Values")
+                    .items(bool(), number(), string())
+                    .required(true);
+
+                if (insertOneRow) {
+                    return List.of(updatedRow);
+                } else {
+                    ModifiableArrayProperty rows = array(VALUES)
+                        .label("Rows")
+                        .items(updatedRow)
+                        .required(true);
+
+                    return List.of(rows);
+                }
             }
-
-            ModifiableObjectProperty updatedRow = object(VALUES)
-                .label("Values")
-                .properties(list)
-                .required(true);
-
-            return List.of(updatedRow);
-        } else {
-            ModifiableArrayProperty updatedRow = array(VALUES)
-                .label("Values")
-                .items(bool(), number(), string())
-                .required(true);
-
-            return List.of(updatedRow);
-        }
+        };
     }
 
     public static Map<String, Object> getMapOfValuesForRow(Parameters inputParameters, Sheets sheets, List<Object> row)
