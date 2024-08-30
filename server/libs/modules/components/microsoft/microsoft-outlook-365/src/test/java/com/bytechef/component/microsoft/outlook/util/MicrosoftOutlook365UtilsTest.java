@@ -56,6 +56,5 @@ class MicrosoftOutlook365UtilsTest {
         List<Map<?, ?>> result = MicrosoftOutlook365Utils.getItemsFromNextPage(mockedContext, "link");
 
         assertEquals(items, result);
-
     }
 }
