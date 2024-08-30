@@ -47,7 +47,7 @@ import org.springframework.ai.vertexai.palm2.api.VertexAiPaLm2Api;
 public class VertexPaLM2ChatAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
-        .title("Ask Gemini")
+        .title("Ask Bison")
         .description("Ask anything you want.")
         .properties(
             MESSAGE_PROPERTY,
