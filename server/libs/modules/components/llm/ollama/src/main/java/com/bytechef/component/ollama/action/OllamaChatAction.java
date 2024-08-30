@@ -33,7 +33,6 @@ import static com.bytechef.component.llm.constants.LLMConstants.MESSAGE_PROPERTY
 import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
 import static com.bytechef.component.llm.constants.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.llm.constants.LLMConstants.PRESENCE_PENALTY_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.SEED;
 import static com.bytechef.component.llm.constants.LLMConstants.SEED_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.STOP;
@@ -240,8 +239,7 @@ public class OllamaChatAction {
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withTemperature(inputParameters.getFloat(TEMPERATURE))
                 .withTopP(inputParameters.getFloat(TOP_P))
-                .withStop(inputParameters.getList(STOP, new TypeReference<>() {
-                }))
+                .withStop(inputParameters.getList(STOP, new TypeReference<>() {}))
                 .withTopK(inputParameters.getInteger(TOP_K))
                 .withFrequencyPenalty(inputParameters.getFloat(FREQUENCY_PENALTY))
                 .withPresencePenalty(inputParameters.getFloat(PRESENCE_PENALTY))
