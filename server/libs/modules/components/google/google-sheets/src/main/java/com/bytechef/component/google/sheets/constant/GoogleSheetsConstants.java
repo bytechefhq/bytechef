@@ -19,6 +19,7 @@ package com.bytechef.component.google.sheets.constant;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableBooleanProperty;
@@ -30,7 +31,7 @@ import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunctio
 import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class GoogleSheetsConstants {
 
@@ -111,7 +112,17 @@ public class GoogleSheetsConstants {
 
     public static final ModifiableDynamicPropertiesProperty ROW_PROPERTY = dynamicProperties(ROW)
         .propertiesLookupDependsOn(SPREADSHEET_ID, SHEET_NAME, IS_THE_FIRST_ROW_HEADER)
-        .properties(GoogleSheetsUtils::createArrayPropertyForRow)
+        .properties(GoogleSheetsUtils.createPropertiesForNewRows(true))
+        .required(true);
+
+    public static final ModifiableStringProperty VALUE_INPUT_PROPERTY = string(VALUE_INPUT_OPTION)
+        .label("Value input option")
+        .description("How the input data should be interpreted.")
+        .options(
+            option("Raw", "RAW",
+                "The values the user has entered will not be parsed and will be stored as-is."),
+            option("User entered", "USER_ENTERED",
+                "The values will be parsed as if the user typed them into the UI. Numbers will stay as numbers, but strings may be converted to numbers, dates, etc. following the same rules that are applied when entering text into a cell via the Google Sheets UI."))
         .required(true);
 
     private GoogleSheetsConstants() {
