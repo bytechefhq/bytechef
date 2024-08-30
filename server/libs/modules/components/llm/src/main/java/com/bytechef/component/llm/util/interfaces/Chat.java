@@ -49,9 +49,9 @@ public interface Chat {
             case 1 -> call.entity(new ParameterizedTypeReference<Map<String, Object>>() {});
             case 2 -> call.entity(new ListOutputConverter(new DefaultConversionService()));
             case null, default -> call.chatResponse()
-                    .getResult()
-                    .getOutput()
-                    .getContent();
+                .getResult()
+                .getOutput()
+                .getContent();
         };
     }
 

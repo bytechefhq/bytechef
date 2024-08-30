@@ -53,7 +53,6 @@ import org.springframework.ai.chat.prompt.ChatOptions;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
-import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
 
 /**
  * @author Marko Kriskovic
@@ -109,7 +108,8 @@ public class AmazonBedrockAnthropic3ChatAction {
                 new AwsCredentialsProvider() {
                     @Override
                     public AwsCredentials resolveCredentials() {
-                        return AwsBasicCredentials.create(connectionParameters.getRequiredString(ACCESS_KEY_ID), connectionParameters.getRequiredString(SECRET_ACCESS_KEY));
+                        return AwsBasicCredentials.create(connectionParameters.getRequiredString(ACCESS_KEY_ID),
+                            connectionParameters.getRequiredString(SECRET_ACCESS_KEY));
                     }
                 },
                 connectionParameters.getRequiredString(AmazonBedrockConstants.REGION), new ObjectMapper()),

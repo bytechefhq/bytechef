@@ -98,8 +98,7 @@ public class AnthropicChatAction {
                 .withTemperature(inputParameters.getFloat(TEMPERATURE))
                 .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
                 .withTopP(inputParameters.getFloat(TOP_P))
-                .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {
-                }))
+                .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
                 .withTopK(inputParameters.getInteger(TOP_K));
 
             List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});
