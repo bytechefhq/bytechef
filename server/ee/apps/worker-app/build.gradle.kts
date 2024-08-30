@@ -112,7 +112,6 @@ dependencies {
     implementation(project(":server:libs:modules:components:llm:openai"))
     implementation(project(":server:libs:modules:components:llm:stability"))
     implementation(project(":server:libs:modules:components:llm:vertex:gemini"))
-    implementation(project(":server:libs:modules:components:llm:vertex:palm2"))
     implementation(project(":server:libs:modules:components:llm:watsonx"))
     implementation(project(":server:libs:modules:components:petstore"))
     implementation(project(":server:libs:modules:components:pipedrive"))
