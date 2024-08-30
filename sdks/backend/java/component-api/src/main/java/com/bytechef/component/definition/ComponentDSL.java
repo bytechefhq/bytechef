@@ -1259,7 +1259,7 @@ public final class ComponentDSL {
 
         @Override
         public Optional<List<? extends ActionDefinition>> getActions() {
-            return Optional.ofNullable(actionDefinitions == null ? null : new ArrayList<>(actionDefinitions));
+            return Optional.ofNullable(actionDefinitions == null ? null : actionDefinitions);
         }
 
         @Override
@@ -1330,7 +1330,7 @@ public final class ComponentDSL {
 
         @Override
         public Optional<List<? extends TriggerDefinition>> getTriggers() {
-            return Optional.ofNullable(triggerDefinitions == null ? null : new ArrayList<>(triggerDefinitions));
+            return Optional.ofNullable(triggerDefinitions == null ? null : triggerDefinitions);
         }
 
         @Override
@@ -1510,7 +1510,7 @@ public final class ComponentDSL {
 
         @Override
         public Optional<List<? extends Property>> getProperties() {
-            return Optional.ofNullable(properties == null ? null : new ArrayList<>(properties));
+            return Optional.ofNullable(properties);
         }
 
         @Override
@@ -2472,7 +2472,7 @@ public final class ComponentDSL {
 
         @Override
         public Optional<List<? extends ValueProperty<?>>> getAdditionalProperties() {
-            return Optional.ofNullable(additionalProperties == null ? null : new ArrayList<>(additionalProperties));
+            return Optional.ofNullable(additionalProperties);
         }
 
         @Override
@@ -2507,7 +2507,7 @@ public final class ComponentDSL {
 
         @Override
         public Optional<List<? extends ValueProperty<?>>> getProperties() {
-            return Optional.ofNullable(properties == null ? null : new ArrayList<>(properties));
+            return Optional.ofNullable(properties);
         }
     }
 
@@ -2862,7 +2862,7 @@ public final class ComponentDSL {
 
         @Override
         public Optional<List<? extends Option<String>>> getOptions() {
-            return Optional.ofNullable(options == null ? null : new ArrayList<>(options));
+            return Optional.ofNullable(options);
         }
 
         void setOptions(List<ModifiableOption<String>> options) {
