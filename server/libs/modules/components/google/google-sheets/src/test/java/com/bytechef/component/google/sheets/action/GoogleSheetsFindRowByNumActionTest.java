@@ -17,14 +17,19 @@
 package com.bytechef.component.google.sheets.action;
 
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW_NUMBER;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.sheets.util.GoogleSheetsRowUtils;
 import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
+import com.bytechef.google.commons.GoogleServices;
+import com.bytechef.test.component.properties.ParametersFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import java.util.List;
 import java.util.Map;
@@ -33,23 +38,31 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
-class GoogleSheetsFindRowByNumActionTest extends AbstractGoogleSheetsActionTest {
+class GoogleSheetsFindRowByNumActionTest {
 
+    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final Sheets mockedSheets = mock(Sheets.class);
     private final ArgumentCaptor<Integer> rowNumberArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
-    private final Map<String, Object> mockedMap = mock(Map.class);
     private final ArgumentCaptor<String> sheetNameArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> spreadsheetIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final Parameters parameters = ParametersFactory.createParameters(
+        Map.of(SPREADSHEET_ID, "spreadsheetId", SHEET_NAME, "sheetName", ROW_NUMBER, 2));
 
     @Test
     void perform() throws Exception {
+        Map<Object, Object> responseMap = Map.of();
         List<Object> row = List.of("1", 2, false);
 
-        when(mockedParameters.getRequiredInteger(ROW_NUMBER))
-            .thenReturn(2);
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
+            MockedStatic<GoogleSheetsRowUtils> googleSheetsRowUtilsMockedStatic =
+                mockStatic(GoogleSheetsRowUtils.class);
+            MockedStatic<GoogleSheetsUtils> googleSheetsUtilsMockedStatic = mockStatic(GoogleSheetsUtils.class)) {
 
-        try (MockedStatic<GoogleSheetsRowUtils> googleSheetsRowUtilsMockedStatic =
-            mockStatic(GoogleSheetsRowUtils.class)) {
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getSheets(parameters))
+                .thenReturn(mockedSheets);
             googleSheetsRowUtilsMockedStatic
                 .when(() -> GoogleSheetsRowUtils.getRowValues(
                     any(Sheets.class),
@@ -57,20 +70,17 @@ class GoogleSheetsFindRowByNumActionTest extends AbstractGoogleSheetsActionTest 
                     sheetNameArgumentCaptor.capture(),
                     rowNumberArgumentCaptor.capture()))
                 .thenReturn(row);
+            googleSheetsUtilsMockedStatic
+                .when(() -> GoogleSheetsUtils.getMapOfValuesForRow(parameters, mockedSheets, row))
+                .thenReturn(responseMap);
 
-            try (MockedStatic<GoogleSheetsUtils> googleSheetsUtilsMockedStatic = mockStatic(GoogleSheetsUtils.class)) {
-                googleSheetsUtilsMockedStatic
-                    .when(() -> GoogleSheetsUtils.getMapOfValuesForRow(mockedParameters, mockedSheets, row))
-                    .thenReturn(mockedMap);
+            Map<String, Object> result = GoogleSheetsFindRowByNumAction.perform(
+                parameters, parameters, mockedContext);
 
-                Map<String, Object> result = GoogleSheetsFindRowByNumAction.perform(
-                    mockedParameters, mockedParameters, mockedContext);
-
-                assertEquals(mockedMap, result);
-                assertEquals(2, rowNumberArgumentCaptor.getValue());
-                assertEquals("spreadsheetId", spreadsheetIdArgumentCaptor.getValue());
-                assertEquals("sheetName", sheetNameArgumentCaptor.getValue());
-            }
+            assertEquals(responseMap, result);
+            assertEquals(2, rowNumberArgumentCaptor.getValue());
+            assertEquals("spreadsheetId", spreadsheetIdArgumentCaptor.getValue());
+            assertEquals("sheetName", sheetNameArgumentCaptor.getValue());
         }
     }
 }
