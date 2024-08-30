@@ -55,5 +55,4 @@ class MicrosoftOneDriveDownloadFileActionTest {
 
         assertEquals(mockedFileEntry, result);
     }
-
 }
