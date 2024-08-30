@@ -1579,7 +1579,7 @@
       "clientSecret" : null,
       "pkce" : null,
       "refresh" : null,
-      "refreshUrl" : null,
+      "refreshUrl" : { },
       "scopes" : { },
       "refreshToken" : null,
       "tokenUrl" : { }
