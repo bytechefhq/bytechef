@@ -74,7 +74,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         return WorkflowTrigger.fetch(workflow, workflowNodeName)
-            .map(workflowTrigger -> executeTriggerWorkflowNodeTestOutput(
+            .map(workflowTrigger -> saveTriggerWorkflowNodeTestOutput(
                 workflowId, workflowNodeName, workflowTrigger,
                 workflowTestConfigurationService
                     .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowNodeName)
@@ -86,51 +86,6 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
                         workflowId, workflowNodeName),
                     WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
                     WorkflowTestConfigurationConnection::getConnectionId)));
-    }
-
-    @Override
-    public WorkflowNodeTestOutput saveWorkflowNodeTestOutput(
-        String workflowId, String workflowNodeName, Object sampleOutput) {
-
-        Workflow workflow = workflowService.getWorkflow(workflowId);
-
-        String type = WorkflowTrigger.fetch(workflow, workflowNodeName)
-            .map(WorkflowTrigger::getType)
-            .orElseGet(() -> {
-                WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
-
-                return workflowTask.getType();
-            });
-
-        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
-
-        return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, sampleOutput);
-    }
-
-    @SuppressFBWarnings("NP")
-    private WorkflowNodeTestOutput executeTriggerWorkflowNodeTestOutput(
-        String workflowId, String workflowNodeName, WorkflowTrigger workflowTrigger, Long connectionId) {
-
-        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
-
-        TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-            workflowNodeType.componentOperationName());
-
-        if (triggerDefinition.isDynamicOutput()) {
-            Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
-
-            Output output = triggerDefinitionFacade.executeOutput(
-                workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                workflowNodeType.componentOperationName(), workflowTrigger.evaluateParameters(inputs), connectionId);
-
-            return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, output);
-        } else {
-            // TODO
-            Map<String, ?> result = null;
-
-            return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, result);
-        }
     }
 
     @SuppressWarnings("unchecked")
@@ -170,8 +125,53 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
                 return null;
             }
 
-            return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType,
-                sampleOutput);
+            return workflowNodeTestOutputService.save(
+                workflowId, workflowNodeName, workflowNodeType, sampleOutput);
         }
+    }
+
+    @SuppressFBWarnings("NP")
+    private WorkflowNodeTestOutput saveTriggerWorkflowNodeTestOutput(
+        String workflowId, String workflowNodeName, WorkflowTrigger workflowTrigger, Long connectionId) {
+
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
+
+        TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
+            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
+            workflowNodeType.componentOperationName());
+
+        if (triggerDefinition.isDynamicOutput()) {
+            Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
+
+            Output output = triggerDefinitionFacade.executeOutput(
+                workflowNodeType.componentName(), workflowNodeType.componentVersion(),
+                workflowNodeType.componentOperationName(), workflowTrigger.evaluateParameters(inputs), connectionId);
+
+            return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, output);
+        } else {
+            // TODO
+            Map<String, ?> result = null;
+
+            return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, result);
+        }
+    }
+
+    @Override
+    public WorkflowNodeTestOutput saveWorkflowNodeTestOutput(
+        String workflowId, String workflowNodeName, Object sampleOutput) {
+
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        String type = WorkflowTrigger.fetch(workflow, workflowNodeName)
+            .map(WorkflowTrigger::getType)
+            .orElseGet(() -> {
+                WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
+
+                return workflowTask.getType();
+            });
+
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
+
+        return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, sampleOutput);
     }
 }
