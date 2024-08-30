@@ -101,7 +101,8 @@ public class MistralChatAction {
 
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
-            String type = inputParameters.getInteger(RESPONSE_FORMAT) < 1 ? "text" : "json_object";
+            Integer responseInteger = inputParameters.getInteger(RESPONSE_FORMAT);
+            String type = responseInteger!=null ? responseInteger < 1 ? "text" : "json_object" : null;
 
             MistralAiChatOptions.Builder builder = MistralAiChatOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))

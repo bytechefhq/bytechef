@@ -103,7 +103,8 @@ public class AzureOpenAIChatAction {
     private static final Chat CHAT = new Chat() {
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
-            AzureOpenAiResponseFormat format = inputParameters.getInteger(RESPONSE_FORMAT) < 1
+            Integer responseInteger = inputParameters.getInteger(RESPONSE_FORMAT);
+            AzureOpenAiResponseFormat format = responseInteger==null || responseInteger < 1
                 ? AzureOpenAiResponseFormat.TEXT : AzureOpenAiResponseFormat.JSON;
 
             AzureOpenAiChatOptions.Builder builder = AzureOpenAiChatOptions.builder()
@@ -120,7 +121,6 @@ public class AzureOpenAIChatAction {
                 .withResponseFormat(format);
 
             List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});
-
             if (functions != null) {
                 builder.withFunctions(new HashSet<>(functions));
             }

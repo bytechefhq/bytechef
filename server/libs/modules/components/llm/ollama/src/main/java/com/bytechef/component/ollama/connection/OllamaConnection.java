@@ -38,8 +38,7 @@ public final class OllamaConnection {
                 .properties(
                     string(URL)
                         .label("Url")
-                        .description("URL to your Ollama server")
-                        .required(true)));
+                        .description("URL to your Ollama server")));
 
     private OllamaConnection() {
     }

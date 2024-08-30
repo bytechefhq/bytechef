@@ -18,6 +18,7 @@ package com.bytechef.component.anthropic.action;
 
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.llm.constants.LLMConstants.ASK;
@@ -71,8 +72,11 @@ public class AnthropicChatAction {
                         .collect(Collectors.toMap(
                             AnthropicApi.ChatModel::getValue, AnthropicApi.ChatModel::getValue, (f, s) -> f)))),
             MESSAGE_PROPERTY,
+            integer(MAX_TOKENS)
+                .label("Max tokens")
+                .description("The maximum number of tokens to generate in the chat completion.")
+                .required(true),
             RESPONSE_FORMAT_PROPERTY,
-            MAX_TOKENS_PROPERTY,
             TEMPERATURE_PROPERTY,
             TOP_P_PROPERTY,
             TOP_K_PROPERTY,
