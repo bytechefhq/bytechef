@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.FIND_ROW_BY_NUM;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.INCLUDE_ITEMS_FROM_ALL_DRIVES_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW_NUMBER;
@@ -46,7 +45,7 @@ import java.util.Map;
  */
 public class GoogleSheetsFindRowByNumAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(FIND_ROW_BY_NUM)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("findRowByNum")
         .title("Find row by number")
         .description("Get a row in a Google Sheet by row number")
         .properties(

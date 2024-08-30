@@ -20,10 +20,8 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.INCLUDE_ITEMS_FROM_ALL_DRIVES_PROPERTY;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.INSERT_ROW;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
@@ -31,6 +29,8 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.VALUE_INPUT_OPTION;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.VALUE_INPUT_PROPERTY;
+import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.appendRow;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.createRange;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.getMapOfValuesForRow;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.getRowValues;
@@ -49,22 +49,14 @@ import java.util.Map;
  */
 public class GoogleSheetsInsertRowAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(INSERT_ROW)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("insertRow")
         .title("Insert row")
         .description("Append a row of values to an existing sheet")
         .properties(
             SPREADSHEET_ID_PROPERTY,
             INCLUDE_ITEMS_FROM_ALL_DRIVES_PROPERTY,
             SHEET_NAME_PROPERTY,
-            string(VALUE_INPUT_OPTION)
-                .label("Value input option")
-                .description("How the input data should be interpreted.")
-                .options(
-                    option("Raw", "RAW",
-                        "The values the user has entered will not be parsed and will be stored as-is."),
-                    option("User entered", "USER_ENTERED",
-                        "The values will be parsed as if the user typed them into the UI. Numbers will stay as numbers, but strings may be converted to numbers, dates, etc. following the same rules that are applied when entering text into a cell via the Google Sheets UI."))
-                .required(true),
+            VALUE_INPUT_PROPERTY,
             IS_THE_FIRST_ROW_HEADER_PROPERTY,
             ROW_PROPERTY)
         .outputSchema(
@@ -86,11 +78,7 @@ public class GoogleSheetsInsertRowAction {
         String spreadsheetId = inputParameters.getRequiredString(SPREADSHEET_ID);
         String range = createRange(inputParameters.getRequiredString(SHEET_NAME), null);
 
-        sheets.spreadsheets()
-            .values()
-            .append(spreadsheetId, range, valueRange)
-            .setValueInputOption(inputParameters.getRequiredString(VALUE_INPUT_OPTION))
-            .execute();
+        appendRow(sheets, spreadsheetId, range, valueRange, inputParameters.getRequiredString(VALUE_INPUT_OPTION));
 
         return getMapOfValuesForRow(inputParameters, sheets, row);
     }
