@@ -210,37 +210,6 @@
       "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
-      "description" : "In which format do you want the response to be in?",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : false,
-      "name" : "responseFormat",
-      "type" : "INTEGER",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Response format",
-      "placeholder" : null,
-      "maxValue" : null,
-      "minValue" : null,
-      "options" : [ {
-        "description" : null,
-        "label" : "Text",
-        "value" : 0
-      }, {
-        "description" : null,
-        "label" : "Map",
-        "value" : 1
-      }, {
-        "description" : null,
-        "label" : "List",
-        "value" : 2
-      } ],
-      "optionsDataSource" : null,
-      "controlType" : "SELECT"
-    }, {
-      "advancedOption" : null,
       "description" : "The format to return a response in.",
       "displayCondition" : null,
       "expressionEnabled" : null,
@@ -1019,7 +988,6 @@
     },
     "workflowNodeDescription" : null
   } ],
-  "triggers" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -1032,7 +1000,7 @@
         "expressionEnabled" : null,
         "hidden" : null,
         "metadata" : { },
-        "required" : true,
+        "required" : null,
         "name" : "url",
         "type" : "STRING",
         "defaultValue" : null,
@@ -1067,5 +1035,6 @@
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  }
+  },
+  "triggers" : null
 }

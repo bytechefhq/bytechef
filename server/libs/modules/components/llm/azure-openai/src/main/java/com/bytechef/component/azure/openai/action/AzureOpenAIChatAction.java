@@ -104,7 +104,7 @@ public class AzureOpenAIChatAction {
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
             Integer responseInteger = inputParameters.getInteger(RESPONSE_FORMAT);
-            AzureOpenAiResponseFormat format = responseInteger==null || responseInteger < 1
+            AzureOpenAiResponseFormat format = responseInteger == null || responseInteger < 1
                 ? AzureOpenAiResponseFormat.TEXT : AzureOpenAiResponseFormat.JSON;
 
             AzureOpenAiChatOptions.Builder builder = AzureOpenAiChatOptions.builder()

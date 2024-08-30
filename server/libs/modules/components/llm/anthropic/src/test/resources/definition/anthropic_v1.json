@@ -170,6 +170,25 @@
       "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
+      "description" : "The maximum number of tokens to generate in the chat completion.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "maxTokens",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Max tokens",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
+    }, {
+      "advancedOption" : null,
       "description" : "In which format do you want the response to be in?",
       "displayCondition" : null,
       "expressionEnabled" : null,
@@ -199,25 +218,6 @@
       } ],
       "optionsDataSource" : null,
       "controlType" : "SELECT"
-    }, {
-      "advancedOption" : true,
-      "description" : "The maximum number of tokens to generate in the chat completion.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : null,
-      "name" : "maxTokens",
-      "type" : "INTEGER",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Max tokens",
-      "placeholder" : null,
-      "maxValue" : null,
-      "minValue" : null,
-      "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
     }, {
       "advancedOption" : true,
       "description" : "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",

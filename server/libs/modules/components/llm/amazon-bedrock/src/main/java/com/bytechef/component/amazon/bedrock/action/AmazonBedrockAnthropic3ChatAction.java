@@ -23,7 +23,6 @@ import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
-import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MESSAGE_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
 import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT_PROPERTY;

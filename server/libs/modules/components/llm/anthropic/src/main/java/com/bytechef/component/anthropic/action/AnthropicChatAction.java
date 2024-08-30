@@ -25,7 +25,6 @@ import static com.bytechef.component.llm.constants.LLMConstants.ASK;
 import static com.bytechef.component.llm.constants.LLMConstants.FUNCTIONS;
 import static com.bytechef.component.llm.constants.LLMConstants.FUNCTIONS_PROERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
-import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MESSAGE_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
 import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT_PROPERTY;

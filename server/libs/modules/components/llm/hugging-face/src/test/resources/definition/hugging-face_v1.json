@@ -171,7 +171,6 @@
     },
     "workflowNodeDescription" : null
   } ],
-  "triggers" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -219,5 +218,6 @@
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  }
+  },
+  "triggers" : null
 }
