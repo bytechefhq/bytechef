@@ -18,8 +18,10 @@ package com.bytechef.component.azure.openai.constant;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public final class AzureOpenAIConstants {
+
     public static final String AZURE_OPENAI = "azureOpenai";
 
     private AzureOpenAIConstants() {

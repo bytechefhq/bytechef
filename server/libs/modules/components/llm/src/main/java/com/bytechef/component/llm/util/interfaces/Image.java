@@ -22,12 +22,16 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.llm.util.records.ImageMessageRecord;
 import java.util.List;
+import org.springframework.ai.image.ImageGeneration;
 import org.springframework.ai.image.ImageMessage;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImageOptions;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
 
+/**
+ * @author Marko Kriskovic
+ */
 public interface Image {
 
     private static List<ImageMessage> getMessages(Parameters inputParameters) {
@@ -45,8 +49,9 @@ public interface Image {
         List<ImageMessage> messages = getMessages(inputParameters);
 
         ImageResponse response = imageModel.call(new ImagePrompt(messages));
-        return response.getResult()
-            .getOutput();
+        ImageGeneration result = response.getResult();
+
+        return result.getOutput();
     }
 
     ImageOptions createImageOptions(Parameters inputParameters);

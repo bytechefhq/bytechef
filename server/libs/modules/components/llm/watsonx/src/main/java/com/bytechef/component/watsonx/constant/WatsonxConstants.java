@@ -18,8 +18,10 @@ package com.bytechef.component.watsonx.constant;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public final class WatsonxConstants {
+
     public static final String WATSONX = "watsonx";
     public static final String STREAM_ENDPOINT = "streamEndpoint";
     public static final String TEXT_ENDPOINT = "textEndpoint";

@@ -18,8 +18,10 @@ package com.bytechef.component.hugging.face.constant;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public final class HuggingFaceConstants {
+
     public static final String URL = "url";
     public static final String HUGGING_FACE = "hugging-face";
 

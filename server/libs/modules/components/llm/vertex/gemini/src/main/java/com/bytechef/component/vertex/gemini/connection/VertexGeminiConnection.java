@@ -27,11 +27,11 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefini
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public final class VertexGeminiConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-//        .baseUri((connectionParameters, context) -> "https://api-inference.huggingface.co")
         .authorizations(
             authorization(BEARER_TOKEN)
                 .title("Bearer Token")

@@ -18,6 +18,7 @@ package com.bytechef.component.vertex.palm2.constant;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public final class VertexPaLM2Constants {
     public static final String VERTEX_PALM2 = "vertexPalm2";

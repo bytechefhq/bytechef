@@ -51,6 +51,7 @@ import org.springframework.retry.support.RetryTemplate;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public class OpenAICreateImageAction {
 
@@ -142,6 +143,7 @@ public class OpenAICreateImageAction {
     }
 
     private static final Image IMAGE = new Image() {
+
         @Override
         public ImageOptions createImageOptions(Parameters inputParameters) {
             Integer[] size = inputParameters.getArray(SIZE, Integer.class);

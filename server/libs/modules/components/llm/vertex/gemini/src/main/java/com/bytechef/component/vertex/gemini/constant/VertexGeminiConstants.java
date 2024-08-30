@@ -18,8 +18,10 @@ package com.bytechef.component.vertex.gemini.constant;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public final class VertexGeminiConstants {
+
     public static final String VERTEX_GEMINI = "vertexGemini";
     public static final String PROJECT_ID = "projectId";
     public static final String LOCATION = "location";

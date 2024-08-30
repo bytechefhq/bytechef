@@ -41,6 +41,9 @@ import org.springframework.ai.vertexai.palm2.VertexAiPaLm2ChatModel;
 import org.springframework.ai.vertexai.palm2.VertexAiPaLm2ChatOptions;
 import org.springframework.ai.vertexai.palm2.api.VertexAiPaLm2Api;
 
+/**
+ * @author Marko Kriskovic
+ */
 public class VertexPaLM2ChatAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
@@ -67,10 +70,12 @@ public class VertexPaLM2ChatAction {
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }
 
     private static final Chat CHAT = new Chat() {
+
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
             return VertexAiPaLm2ChatOptions.builder()

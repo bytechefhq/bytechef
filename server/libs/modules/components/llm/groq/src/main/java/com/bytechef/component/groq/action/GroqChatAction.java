@@ -60,6 +60,7 @@ import org.springframework.ai.openai.api.OpenAiApi;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public class GroqChatAction {
 
@@ -95,6 +96,7 @@ public class GroqChatAction {
     }
 
     private static final Chat CHAT = new Chat() {
+
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
             OpenAiChatOptions.Builder builder = OpenAiChatOptions.builder()

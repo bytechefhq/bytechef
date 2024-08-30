@@ -23,7 +23,11 @@ import com.bytechef.component.llm.test.ChatActionTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.watsonx.WatsonxAiChatModel;
 
+/**
+ * @author Marko Kriskovic
+ */
 class WatsonxChatActionTest extends ChatActionTest {
+
     @Test
     void testPerform() {
         performTest((ActionDefinition.SingleConnectionPerformFunction) WatsonxChatAction.ACTION_DEFINITION.getPerform()

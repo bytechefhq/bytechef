@@ -21,12 +21,13 @@ import org.junit.jupiter.api.Test;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 class AzureOpenAIComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/azure-openai_v1.json",
-            new AzureOpenAIComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals(
+            "definition/azure-openai_v1.json", new AzureOpenAIComponentHandler().getDefinition());
     }
 }

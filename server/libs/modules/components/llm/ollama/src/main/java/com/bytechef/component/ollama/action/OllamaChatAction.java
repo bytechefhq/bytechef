@@ -86,6 +86,9 @@ import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.ollama.api.OllamaModel;
 import org.springframework.ai.ollama.api.OllamaOptions;
 
+/**
+ * @author Marko Kriskovic
+ */
 public class OllamaChatAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
@@ -230,6 +233,7 @@ public class OllamaChatAction {
     }
 
     private static final Chat CHAT = new Chat() {
+
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
             return OllamaOptions.builder()

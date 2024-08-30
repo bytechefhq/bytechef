@@ -56,6 +56,9 @@ import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
 import org.springframework.ai.zhipuai.ZhiPuAiChatOptions;
 import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
 
+/**
+ * @author Marko Kriskovic
+ */
 public class ZhiPuChatAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
@@ -96,6 +99,7 @@ public class ZhiPuChatAction {
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }
 
@@ -113,14 +117,18 @@ public class ZhiPuChatAction {
                 .withDoSample(inputParameters.getBoolean(DO_SAMPLE));
 
             List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});
-            if (functions != null)
+
+            if (functions != null) {
                 builder.withFunctions(new HashSet<>(functions));
+            }
+
             return builder.build();
         }
 
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new ZhiPuAiChatModel(new ZhiPuAiApi(connectionParameters.getString(TOKEN)),
+            return new ZhiPuAiChatModel(
+                new ZhiPuAiApi(connectionParameters.getString(TOKEN)),
                 (ZhiPuAiChatOptions) createChatOptions(inputParameters));
         }
     };

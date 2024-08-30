@@ -60,6 +60,7 @@ import org.springframework.ai.openai.api.OpenAiApi;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public class NVIDIAChatAction {
 
@@ -95,6 +96,7 @@ public class NVIDIAChatAction {
     }
 
     private static final Chat CHAT = new Chat() {
+
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
             OpenAiChatOptions.Builder builder = OpenAiChatOptions.builder()

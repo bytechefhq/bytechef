@@ -18,8 +18,10 @@ package com.bytechef.component.zhipu.constant;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public final class ZhiPuConstants {
+
     public static final String ZHIPU = "zhipu";
     public static final String REQUEST_ID = "requestId";
     public static final String DO_SAMPLE = "doSample";

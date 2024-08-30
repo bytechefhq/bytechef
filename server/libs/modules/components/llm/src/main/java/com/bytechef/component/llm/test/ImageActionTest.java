@@ -36,7 +36,11 @@ import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
 
+/**
+ * @author Marko Kriskovic
+ */
 public abstract class ImageActionTest extends AbstractLLMActionTest {
+
     private static final org.springframework.ai.image.Image answer =
         new org.springframework.ai.image.Image("url", "b64JSON");
 
@@ -65,7 +69,8 @@ public abstract class ImageActionTest extends AbstractLLMActionTest {
         when(mockedImage.createImageModel(mockedParameters, mockedParameters)).thenReturn(mockedImageModel);
         when(mockedImageModel.call(any(ImagePrompt.class))).thenReturn(mockedImageResponse);
 
-        org.springframework.ai.image.Image response = (org.springframework.ai.image.Image) Image.getResponse(mockedImage, mockedParameters, mockedParameters);
+        org.springframework.ai.image.Image response = (org.springframework.ai.image.Image) Image.getResponse(
+            mockedImage, mockedParameters, mockedParameters);
 
         assertEquals(answer, response);
     }

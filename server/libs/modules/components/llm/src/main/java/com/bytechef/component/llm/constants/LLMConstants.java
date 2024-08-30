@@ -26,7 +26,11 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import com.bytechef.component.definition.ComponentDSL;
 import java.util.List;
 
+/**
+ * @author Marko Kriskovic
+ */
 public class LLMConstants {
+
     public static final String ASK = "ask";
     public static final String CONTENT = "content";
     public static final String CREATE_IMAGE = "createImage";

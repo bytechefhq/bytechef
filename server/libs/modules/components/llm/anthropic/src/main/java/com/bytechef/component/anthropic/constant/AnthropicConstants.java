@@ -18,8 +18,10 @@ package com.bytechef.component.anthropic.constant;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public final class AnthropicConstants {
+
     public static final String ANTHROPIC = "anthropic";
 
     private AnthropicConstants() {

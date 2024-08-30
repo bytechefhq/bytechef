@@ -18,8 +18,10 @@ package com.bytechef.component.amazon.bedrock.constant;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public final class AmazonBedrockConstants {
+
     public static final String AMAZON_BEDROCK = "amazonBedrock";
     public static final String ASK_ANTHROPIC3 = "askAnthropic3";
     public static final String ASK_ANTHROPIC2 = "askAnthropic2";

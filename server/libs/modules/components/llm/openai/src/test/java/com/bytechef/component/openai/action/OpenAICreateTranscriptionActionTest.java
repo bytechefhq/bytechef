@@ -24,7 +24,11 @@ import java.net.MalformedURLException;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionModel;
 
+/**
+ * @author Marko Kriskovic
+ */
 class OpenAICreateTranscriptionActionTest extends TranscriptActionTest {
+
     @Test
     void testPerform() {
         performTest((ActionDefinition.SingleConnectionPerformFunction) OpenAICreateTranscriptionAction.ACTION_DEFINITION

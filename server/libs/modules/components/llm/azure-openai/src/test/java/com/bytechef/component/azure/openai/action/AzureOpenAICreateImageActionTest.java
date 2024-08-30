@@ -23,7 +23,11 @@ import com.bytechef.component.llm.test.ImageActionTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.azure.openai.AzureOpenAiImageModel;
 
+/**
+ * @author Marko Kriskovic
+ */
 class AzureOpenAICreateImageActionTest extends ImageActionTest {
+
     @Test
     void testPerform() {
         performTest((ActionDefinition.SingleConnectionPerformFunction) AzureOpenAICreateImageAction.ACTION_DEFINITION

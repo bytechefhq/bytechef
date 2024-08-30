@@ -57,6 +57,9 @@ import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.vertexai.gemini.VertexAiGeminiChatModel;
 import org.springframework.ai.vertexai.gemini.VertexAiGeminiChatOptions;
 
+/**
+ * @author Marko Kriskovic
+ */
 public class VertexGeminiChatAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
@@ -95,10 +98,12 @@ public class VertexGeminiChatAction {
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }
 
     private static final Chat CHAT = new Chat() {
+
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
             String type = inputParameters.getInteger(RESPONSE_FORMAT) < 1 ? "text/plain" : "application/json";

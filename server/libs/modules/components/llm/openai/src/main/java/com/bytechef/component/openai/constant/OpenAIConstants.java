@@ -18,8 +18,10 @@ package com.bytechef.component.openai.constant;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public final class OpenAIConstants {
+
     public static final String OPENAI = "openai";
     public static final String QUALITY = "quality";
 

@@ -26,6 +26,7 @@ import org.junit.jupiter.api.BeforeEach;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public abstract class AbstractLLMActionTest {
 

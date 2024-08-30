@@ -53,6 +53,9 @@ import org.springframework.ai.qianfan.QianFanChatModel;
 import org.springframework.ai.qianfan.QianFanChatOptions;
 import org.springframework.ai.qianfan.api.QianFanApi;
 
+/**
+ * @author Marko Kriskovic
+ */
 public class QIanFanChatAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
@@ -83,10 +86,12 @@ public class QIanFanChatAction {
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }
 
     private static final Chat CHAT = new Chat() {
+
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
             String type = inputParameters.getInteger(RESPONSE_FORMAT) < 1 ? null : "json:object";
@@ -105,8 +110,8 @@ public class QIanFanChatAction {
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
             return new QianFanChatModel(
-                new QianFanApi(connectionParameters.getString(TOKEN),
-                    connectionParameters.getString(QIanFanConstants.SECRET_KEY)),
+                new QianFanApi(
+                    connectionParameters.getString(TOKEN), connectionParameters.getString(QIanFanConstants.SECRET_KEY)),
                 (QianFanChatOptions) createChatOptions(inputParameters));
         }
     };

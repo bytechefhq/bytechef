@@ -23,7 +23,11 @@ import com.bytechef.component.llm.test.ChatActionTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.vertexai.gemini.VertexAiGeminiChatModel;
 
+/**
+ * @author Marko Kriskovic
+ */
 class VertexGeminiChatActionTest extends ChatActionTest {
+
     @Test
     void testPerform() {
         performTest(

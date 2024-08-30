@@ -23,7 +23,11 @@ import com.bytechef.component.llm.test.ImageActionTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.qianfan.QianFanImageModel;
 
+/**
+ * @author Marko Kriskovic
+ */
 class QIanFanCreateImageActionTest extends ImageActionTest {
+
     @Test
     void testPerform() {
         performTest(

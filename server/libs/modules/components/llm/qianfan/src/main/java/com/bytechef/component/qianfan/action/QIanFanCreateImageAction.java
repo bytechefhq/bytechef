@@ -50,6 +50,7 @@ import org.springframework.retry.support.RetryTemplate;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public class QIanFanCreateImageAction {
 
@@ -158,6 +159,7 @@ public class QIanFanCreateImageAction {
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
         return Image.getResponse(IMAGE, inputParameters, connectionParameters);
     }
 
@@ -179,8 +181,8 @@ public class QIanFanCreateImageAction {
         @Override
         public ImageModel createImageModel(Parameters inputParameters, Parameters connectionParameters) {
             return new QianFanImageModel(
-                new QianFanImageApi(connectionParameters.getString(TOKEN),
-                    connectionParameters.getString(QIanFanConstants.SECRET_KEY)),
+                new QianFanImageApi(
+                    connectionParameters.getString(TOKEN), connectionParameters.getString(QIanFanConstants.SECRET_KEY)),
                 (QianFanImageOptions) createImageOptions(inputParameters), new RetryTemplate());
         }
     };

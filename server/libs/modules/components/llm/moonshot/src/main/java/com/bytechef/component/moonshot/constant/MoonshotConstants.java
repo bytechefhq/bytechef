@@ -18,8 +18,10 @@ package com.bytechef.component.moonshot.constant;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public final class MoonshotConstants {
+
     public static final String MOONSHOT = "moonshot";
 
     private MoonshotConstants() {

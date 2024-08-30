@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 import org.springframework.ai.openai.OpenAiAudioSpeechModel;
 import org.springframework.ai.openai.OpenAiAudioSpeechOptions;
 import org.springframework.ai.openai.api.OpenAiAudioApi;
+import org.springframework.ai.openai.audio.speech.Speech;
 import org.springframework.ai.openai.audio.speech.SpeechModel;
 import org.springframework.ai.openai.audio.speech.SpeechPrompt;
 import org.springframework.ai.openai.audio.speech.SpeechResponse;
@@ -114,9 +115,12 @@ public class OpenAICreateSpeechAction {
             new OpenAiAudioSpeechModel(new OpenAiAudioApi(connectionParameters.getString(TOKEN)), speechOptions);
 
         SpeechResponse response = speechModel.call(new SpeechPrompt(input));
-        byte[] output = response.getResult()
-            .getOutput();
-        return context
-            .file(file -> file.storeContent("file." + audioResponseFormat.value, new ByteArrayInputStream(output)));
+
+        Speech result = response.getResult();
+
+        byte[] output = result.getOutput();
+
+        return context.file(
+            file -> file.storeContent("file." + audioResponseFormat.value, new ByteArrayInputStream(output)));
     }
 }

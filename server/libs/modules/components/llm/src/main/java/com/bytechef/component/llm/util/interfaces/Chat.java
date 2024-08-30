@@ -33,6 +33,9 @@ import org.springframework.ai.converter.ListOutputConverter;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.convert.support.DefaultConversionService;
 
+/**
+ * @author Marko Kriskovic
+ */
 public interface Chat {
     private static List<Message> getMessages(Parameters inputParameters) {
         List<MessageRecord> messageRecordList = inputParameters.getList(MESSAGES, new Context.TypeReference<>() {});

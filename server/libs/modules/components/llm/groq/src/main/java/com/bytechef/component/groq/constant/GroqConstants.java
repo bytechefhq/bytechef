@@ -18,8 +18,10 @@ package com.bytechef.component.groq.constant;
 
 /**
  * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 public final class GroqConstants {
+
     public static final String GROQ = "groq";
 
     private GroqConstants() {
