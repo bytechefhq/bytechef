@@ -84,6 +84,7 @@ const convertTaskToNode = (
             operationName: task.type.split('/')[2],
             taskDispatcher: TASK_DISPATCHER_NAMES.includes(componentName),
             trigger: index === 0,
+            workflowNodeName: task.name,
         },
         id: task.name,
         position: {x: 0, y: index * 150},

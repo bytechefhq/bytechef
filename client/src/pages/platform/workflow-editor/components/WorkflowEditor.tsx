@@ -202,8 +202,8 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
 
         if (workflowNodes?.length) {
             const workflowNodeNames = workflowNodes.map((node) => {
-                if (node.data.type !== 'placeholder' && node?.data.name) {
-                    return node?.data.name;
+                if (node.data.type !== 'placeholder' && node?.data.workflowNodeName) {
+                    return node?.data.workflowNodeName;
                 }
             });
 

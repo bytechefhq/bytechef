@@ -121,11 +121,12 @@ const WorkflowNodesPopoverMenuList = memo(
                                     id: getFormattedName(clickedItem.name!, nodes),
                                     label: clickedItem?.title,
                                     metadata: undefined,
-                                    name: getFormattedName(clickedItem.name!, nodes),
+                                    name: 'trigger_1',
                                     operationName: clickedComponentDefinition.triggers?.[0].name,
                                     parameters: undefined,
                                     trigger: true,
                                     type: `${clickedItem.name}/v${clickedComponentDefinition.version}/${clickedComponentDefinition.triggers?.[0].name}`,
+                                    workflowNodeName: 'trigger_1',
                                 },
                                 id: getFormattedName(clickedItem.name!, nodes),
                                 type: 'workflow',
@@ -197,7 +198,8 @@ const WorkflowNodesPopoverMenuList = memo(
                         ),
                         label: clickedItem?.title,
                         name: getFormattedName(clickedItem.name!, nodes),
-                        type: 'workflow',
+                        type: `${clickedComponentDefinition.name}/v${clickedComponentDefinition.version}/${clickedComponentDefinition.actions?.[0].name}`,
+                        workflowNodeName: getFormattedName(clickedItem.name!, nodes),
                     },
                     id: getRandomId(),
                     position: {
@@ -348,6 +350,7 @@ const WorkflowNodesPopoverMenuList = memo(
                                     label: clickedItem?.title,
                                     name: workflowNodeName,
                                     type: `${clickedComponentDefinition.name}/v${clickedComponentDefinition.version}/${clickedComponentDefinition.actions?.[0].name}`,
+                                    workflowNodeName,
                                 };
 
                                 setWorkflow({
