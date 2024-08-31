@@ -134,9 +134,7 @@ const Project = () => {
         workflowTestConfiguration && workflowTestConfiguration.connections ? workflowTestConfiguration.connections : []
     ).reduce(function (map: {[key: string]: number}, workflowTestConfigurationConnection) {
         map[
-            workflowTestConfigurationConnection.workflowNodeName +
-                '_' +
-                workflowTestConfigurationConnection.workflowConnectionKey
+            `${workflowTestConfigurationConnection.workflowNodeName}_${workflowTestConfigurationConnection.workflowConnectionKey}`
         ] = workflowTestConfigurationConnection.connectionId;
 
         return map;
@@ -152,7 +150,7 @@ const Project = () => {
                 (workflowConnection) =>
                     workflowConnection.required &&
                     !workflowTestConfigurationConnections[
-                        workflowConnection.workflowNodeName + '_' + workflowConnection.key
+                        `${workflowConnection.workflowNodeName}_${workflowConnection.key}`
                     ]
             ).length > 0;
 

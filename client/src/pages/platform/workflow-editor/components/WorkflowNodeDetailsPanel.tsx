@@ -103,9 +103,6 @@ const WorkflowNodeDetailsPanel = ({
 
     const {componentActions, setComponentActions, setDataPills, workflow} = useWorkflowDataStore();
 
-    const currentWorkflowTrigger = workflow.triggers?.find((trigger) => trigger.name === currentNode?.name);
-    const currentWorkflowTask = workflow.tasks?.find((task) => task.name === currentNode?.name);
-
     const {data: workflowTestConfigurationConnections} = useGetWorkflowTestConfigurationConnectionsQuery(
         {
             workflowId: workflow.id as string,
@@ -200,6 +197,9 @@ const WorkflowNodeDetailsPanel = ({
         },
         !!currentNode?.name && !!workflow.id && hasOutputData && activeTab === 'output'
     );
+
+    const currentWorkflowTrigger = workflow.triggers?.find((trigger) => trigger.name === currentNode?.name);
+    const currentWorkflowTask = workflow.tasks?.find((task) => task.name === currentNode?.name);
 
     const workflowConnections: WorkflowConnectionModel[] =
         currentWorkflowTask?.connections || currentWorkflowTrigger?.connections || [];
