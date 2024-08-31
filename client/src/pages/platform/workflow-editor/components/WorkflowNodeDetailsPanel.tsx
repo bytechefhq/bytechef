@@ -289,13 +289,7 @@ const WorkflowNodeDetailsPanel = ({
     };
 
     const handlePanelClose = () => {
-        setCurrentNode(undefined);
-
-        setCurrentComponent(undefined);
-
-        setCurrentComponentDefinition(undefined);
-
-        setWorkflowNodeDetailsPanelOpen(false);
+        useWorkflowNodeDetailsPanelStore.getState().reset();
     };
 
     // Set currentOperationProperties depending if the current node is a trigger or an action
@@ -379,7 +373,7 @@ const WorkflowNodeDetailsPanel = ({
     // Close the panel if the current node is deleted
     useEffect(() => {
         if (!currentNode?.name || !nodeNames.includes(currentNode?.name)) {
-            setWorkflowNodeDetailsPanelOpen(false);
+            useWorkflowNodeDetailsPanelStore.getState().reset();
         }
     }, [currentNode?.name, nodeNames, setWorkflowNodeDetailsPanelOpen]);
 
@@ -425,14 +419,14 @@ const WorkflowNodeDetailsPanel = ({
         const taskNames = workflowDefinition.tasks?.map((task) => task.name);
 
         if (currentNode && taskNames && !taskNames?.includes(currentNode?.name)) {
-            setWorkflowNodeDetailsPanelOpen(false);
+            useWorkflowNodeDetailsPanelStore.getState().reset();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentNode, workflowDefinition.tasks?.length]);
 
     // Store new operationName into currentNode
     useEffect(() => {
-        if (currentNode && currentOperationName) {
+        if (currentNode?.operationName && currentOperationName) {
             setCurrentNode({
                 ...currentNode,
                 operationName: currentOperationName,
@@ -440,6 +434,13 @@ const WorkflowNodeDetailsPanel = ({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentOperationName]);
+
+    // Set the currentOperationName to the currentNode.operationName
+    useEffect(() => {
+        if (currentNode?.operationName) {
+            setCurrentOperationName(currentNode?.operationName);
+        }
+    }, [currentNode?.operationName, currentOperationName]);
 
     const data = currentComponentDefinition || currentTaskDispatcherDefinition;
 
