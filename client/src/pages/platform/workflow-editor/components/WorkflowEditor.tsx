@@ -283,6 +283,18 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
         });
     }, [workflowNodeDetailsPanelOpen, setViewport, width]);
 
+    // Update nodeNames when workflow definition changes
+    useEffect(() => {
+        setWorkflow({
+            ...workflow,
+            nodeNames: [
+                ...(workflow.tasks?.map((task) => task.name) || []),
+                ...(workflow.triggers?.map((trigger) => trigger.name) || []),
+            ],
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [workflow.tasks, workflow.triggers]);
+
     useLayout({componentDefinitions, taskDispatcherDefinitions});
 
     return (
