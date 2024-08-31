@@ -54,6 +54,7 @@ export default function useHandleDrop(): [
                 ),
                 label: droppedNode?.title,
                 name: getFormattedName(droppedNode.name!, nodes),
+                workflowNodeName: getFormattedName(droppedNode.name!, nodes),
             },
             name: droppedNode.name,
             type: 'workflow',
@@ -168,6 +169,7 @@ export default function useHandleDrop(): [
                 ),
                 label: droppedNode?.title,
                 name: getFormattedName(droppedNode.name!, nodes),
+                workflowNodeName: getFormattedName(droppedNode.name!, nodes),
             },
             id: getRandomId(),
             name: droppedNode.name,
@@ -273,9 +275,10 @@ export default function useHandleDrop(): [
                 <PlayIcon className="size-9 text-gray-700" />
             ),
             label: title,
-            name: getFormattedName(name!, nodes),
+            name: 'trigger_1',
             trigger: true,
             type: `${name}/v${version}/${triggers?.[0].name}`,
+            workflowNodeName: 'trigger_1',
         };
 
         const draggedComponentTriggerDefinition = await queryClient.fetchQuery({

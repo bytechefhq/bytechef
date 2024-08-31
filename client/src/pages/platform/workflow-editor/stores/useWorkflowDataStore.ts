@@ -59,7 +59,7 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
                     workflow: {
                         actionNames: [],
                         componentNames: [],
-                        nodeNames: [],
+                        nodeNames: ['trigger_1'],
                     },
                 })),
 
@@ -69,7 +69,7 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
 
             workflow: {
                 componentNames: [],
-                nodeNames: [],
+                nodeNames: ['trigger_1'],
             },
             setWorkflow: (workflow) => set(() => ({workflow})),
         }),
