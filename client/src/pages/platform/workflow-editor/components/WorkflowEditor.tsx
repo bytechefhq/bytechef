@@ -4,6 +4,8 @@ import {
     ActionDefinitionBasicModel,
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionBasicModel,
+    WorkflowTaskModel,
+    WorkflowTriggerModel,
 } from '@/shared/middleware/platform/configuration';
 import {ComponentOperationType} from '@/shared/types';
 import {usePrevious} from '@uidotdev/usehooks';
@@ -283,7 +285,7 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
         });
     }, [workflowNodeDetailsPanelOpen, setViewport, width]);
 
-    // Update nodeNames when workflow definition changes
+    // Update nodeNames and componentActions when workflow definition changes
     useEffect(() => {
         setWorkflow({
             ...workflow,
@@ -292,6 +294,25 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
                 ...(workflow.triggers?.map((trigger) => trigger.name) || []),
             ],
         });
+
+        const workflowComponents: Array<WorkflowTriggerModel & WorkflowTaskModel> = [
+            workflow.triggers?.[0] || defaultNodes[0].data,
+            ...(workflow?.tasks || []),
+        ];
+
+        setComponentActions(
+            workflowComponents.map((component) => {
+                const componentName = component.type!.split('/')[0];
+                const operationName = component.type!.split('/')[2];
+
+                return {
+                    componentName,
+                    operationName,
+                    workflowNodeName: component.name,
+                };
+            })
+        );
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflow.tasks, workflow.triggers]);
 
