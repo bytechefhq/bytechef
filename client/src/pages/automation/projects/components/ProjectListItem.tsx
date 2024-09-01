@@ -109,12 +109,12 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
         },
     });
 
-    const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
+    const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files) {
             importProjectWorkflowMutation.mutate({
                 id: project.id!,
                 workflowModel: {
-                    definition: await e.target.files[0].text(),
+                    definition: await event.target.files[0].text(),
                 },
             });
         }
@@ -126,31 +126,29 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                 <div className="flex flex-1 items-center border-b border-muted py-5 group-data-[state='open']:border-none">
                     <div className="flex-1">
                         <div className="flex items-center justify-between">
-                            <div className="relative flex items-center gap-2">
-                                <Link
-                                    className="flex gap-2"
-                                    to={`/automation/projects/${project?.id}/project-workflows/${project?.projectWorkflowIds![0]}`}
-                                >
-                                    {project.description ? (
-                                        <Tooltip>
-                                            <TooltipTrigger>
-                                                <span className="text-base font-semibold">{project.name}</span>
-                                            </TooltipTrigger>
+                            <Link
+                                className="flex gap-2"
+                                to={`/automation/projects/${project?.id}/project-workflows/${project?.projectWorkflowIds![0]}`}
+                            >
+                                {project.description ? (
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <span className="text-base font-semibold">{project.name}</span>
+                                        </TooltipTrigger>
 
-                                            <TooltipContent>{project.description}</TooltipContent>
-                                        </Tooltip>
-                                    ) : (
-                                        <span className="text-base font-semibold">{project.name}</span>
-                                    )}
-                                </Link>
-
-                                {project.category && (
-                                    <span className="text-xs uppercase text-gray-700">{project.category.name}</span>
+                                        <TooltipContent>{project.description}</TooltipContent>
+                                    </Tooltip>
+                                ) : (
+                                    <span className="text-base font-semibold">{project.name}</span>
                                 )}
-                            </div>
+                            </Link>
+
+                            {project.category && (
+                                <span className="text-xs uppercase text-gray-700">{project.category.name}</span>
+                            )}
                         </div>
 
-                        <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">
+                        <div className="relative mt-2 min-h-8 sm:flex sm:items-center sm:justify-between">
                             <div className="flex items-center">
                                 <CollapsibleTrigger className="group mr-4 flex items-center text-xs font-semibold text-gray-700">
                                     <div className="mr-1">
