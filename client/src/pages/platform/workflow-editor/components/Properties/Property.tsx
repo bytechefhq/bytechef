@@ -92,7 +92,7 @@ const Property = ({
     );
     const [numericValue, setNumericValue] = useState(property.defaultValue || '');
     const [propertyParameterValue, setPropertyParameterValue] = useState(parameterValue || property.defaultValue || '');
-    const [selectValue, setSelectValue] = useState(property.defaultValue || '');
+    const [selectValue, setSelectValue] = useState(property.defaultValue || '' || 'null');
     const [showInputTypeSwitchButton, setShowInputTypeSwitchButton] = useState(
         (property.type !== 'STRING' && property.expressionEnabled) || false
     );
@@ -612,7 +612,9 @@ const Property = ({
             controlType === 'SELECT' &&
             (selectValue === '' || (selectValue === defaultValue && propertyParameterValue !== undefined))
         ) {
-            if (propertyParameterValue !== undefined) {
+            if (propertyParameterValue === null) {
+                setSelectValue('null');
+            } else if (propertyParameterValue !== undefined) {
                 if (type === 'BOOLEAN') {
                     setSelectValue(propertyParameterValue.toString());
                 } else {
@@ -706,14 +708,17 @@ const Property = ({
 
     // reset all values when currentNode.operationName changes
     useEffect(() => {
+        const parameterDefaultValue = property.defaultValue ?? '';
+
         if (previousOperationName) {
-            setPropertyParameterValue('');
-            setInputValue('');
-            setMentionInputValue('');
-            setSelectValue('');
-            setNumericValue('');
+            setPropertyParameterValue(parameterDefaultValue);
+            setInputValue(parameterDefaultValue);
+            setMentionInputValue(parameterDefaultValue);
+            setSelectValue(parameterDefaultValue.toString());
+            setNumericValue(parameterDefaultValue);
         }
-    }, [currentNode?.operationName, previousOperationName]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentNode?.operationName, previousOperationName, property.defaultValue]);
 
     // handle pasting mentions
     useEffect(() => {
