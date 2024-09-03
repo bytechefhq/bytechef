@@ -90,7 +90,6 @@
     "title" : "Create channel",
     "output" : null,
     "perform" : { },
-    "processErrorResponse" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -170,11 +169,12 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -282,7 +282,6 @@
     "title" : "Send channel message",
     "output" : null,
     "perform" : { },
-    "processErrorResponse" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -379,8 +378,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -439,14 +438,15 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -531,7 +531,6 @@
     "title" : "Send chat message",
     "output" : null,
     "perform" : { },
-    "processErrorResponse" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -648,17 +647,17 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "triggers" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -746,5 +745,6 @@
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  }
+  },
+  "triggers" : null
 }
