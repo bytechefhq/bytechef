@@ -43,17 +43,6 @@ public class IntegrationServiceImpl implements IntegrationService {
     }
 
     @Override
-    public int addVersion(long id) {
-        Integration integration = getIntegration(id);
-
-        int newVersion = integration.addVersion();
-
-        integrationRepository.save(integration);
-
-        return newVersion;
-    }
-
-    @Override
     public long countIntegrations() {
         return integrationRepository.count();
     }
@@ -130,12 +119,14 @@ public class IntegrationServiceImpl implements IntegrationService {
     }
 
     @Override
-    public Integration publishIntegration(long id, String description) {
+    public int publishIntegration(long id, String description) {
         Integration integration = getIntegration(id);
 
-        integration.publish(description);
+        int newVersion = integration.publish(description);
 
-        return integrationRepository.save(integration);
+        integrationRepository.save(integration);
+
+        return newVersion;
     }
 
     @Override

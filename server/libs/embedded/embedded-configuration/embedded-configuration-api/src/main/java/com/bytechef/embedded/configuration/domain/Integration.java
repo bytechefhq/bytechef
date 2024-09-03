@@ -111,16 +111,6 @@ public final class Integration {
         this.version = version;
     }
 
-    public int addVersion() {
-        IntegrationVersion integrationVersion = getMaxIntegrationVersion();
-
-        int newVersion = integrationVersion.getVersion() + 1;
-
-        integrationVersions.add(new IntegrationVersion(newVersion));
-
-        return newVersion;
-    }
-
     public static Builder builder() {
         return new Builder();
     }
@@ -226,12 +216,18 @@ public final class Integration {
             .anyMatch(projectVersion -> projectVersion.getStatus() == Status.PUBLISHED);
     }
 
-    public void publish(String description) {
+    public int publish(String description) {
         IntegrationVersion integrationVersion = getMaxIntegrationVersion();
 
         integrationVersion.setDescription(description);
         integrationVersion.setPublishedDate(LocalDateTime.now());
         integrationVersion.setStatus(Status.PUBLISHED);
+
+        int newVersion = integrationVersion.getVersion() + 1;
+
+        integrationVersions.add(new IntegrationVersion(newVersion));
+
+        return newVersion;
     }
 
     public void setAllowMultipleInstances(boolean allowMultipleInstances) {

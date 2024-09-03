@@ -37,11 +37,6 @@ public class RemoteIntegrationServiceClient implements IntegrationService {
     }
 
     @Override
-    public int addVersion(long id) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public long countIntegrations() {
         throw new UnsupportedOperationException();
     }
@@ -122,7 +117,7 @@ public class RemoteIntegrationServiceClient implements IntegrationService {
     }
 
     @Override
-    public Integration publishIntegration(long id, String description) {
+    public int publishIntegration(long id, String description) {
         throw new UnsupportedOperationException();
     }
 

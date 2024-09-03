@@ -276,8 +276,6 @@ public class IntegrationFacadeIntTest {
 
         integration.setComponentName("componentName");
 
-        integration.addVersion();
-
         integration = integrationRepository.save(integration);
 
         integrationWorkflowRepository.save(
