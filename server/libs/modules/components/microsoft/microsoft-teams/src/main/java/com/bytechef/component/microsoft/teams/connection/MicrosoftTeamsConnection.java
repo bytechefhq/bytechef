@@ -28,7 +28,8 @@ public class MicrosoftTeamsConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = MicrosoftConnection.createConnection(
         "https://graph.microsoft.com/v1.0", (connection, context) -> List.of(
-            "Channel.Create", "Channel.ReadBasic.All", "ChannelMessage.Send", "Chat.ReadWrite", "Team.ReadBasic.All"));
+            "Channel.Create", "Channel.ReadBasic.All", "ChannelMessage.Send", "Chat.ReadWrite", "Team.ReadBasic.All",
+            "offline_access"));
 
     private MicrosoftTeamsConnection() {
     }
