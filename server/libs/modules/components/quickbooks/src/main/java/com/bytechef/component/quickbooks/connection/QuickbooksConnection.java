@@ -52,7 +52,8 @@ public class QuickbooksConnection {
                         .required(true))
                 .authorizationUrl((connection, context) -> "https://appcenter.intuit.com/connect/oauth2")
                 .scopes((connection, context) -> List.of("com.intuit.quickbooks.accounting"))
-                .tokenUrl((connection, context) -> "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer"));
+                .tokenUrl((connection, context) -> "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer")
+                .refreshUrl((connection, context) -> "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer"));
 
     private QuickbooksConnection() {
     }
