@@ -88,6 +88,11 @@ public class RemoteProjectInstanceWorkflowServiceClient implements ProjectInstan
     }
 
     @Override
+    public ProjectInstanceWorkflow getProjectInstanceWorkflow(long projectInstanceWorkflowId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<ProjectInstanceWorkflowConnection> getProjectInstanceWorkflowConnections(
         long projectInstanceOd, String workflowId, String workflowNodeName) {
 

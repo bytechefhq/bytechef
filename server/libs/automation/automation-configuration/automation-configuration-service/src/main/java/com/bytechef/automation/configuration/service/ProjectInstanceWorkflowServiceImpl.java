@@ -81,6 +81,11 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
     }
 
     @Override
+    public ProjectInstanceWorkflow getProjectInstanceWorkflow(long projectInstanceWorkflowId) {
+        return OptionalUtils.get(projectInstanceWorkflowRepository.findById(projectInstanceWorkflowId));
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public List<ProjectInstanceWorkflowConnection> getProjectInstanceWorkflowConnections(
         long projectInstanceId, String workflowId, String workflowNodeName) {
