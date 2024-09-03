@@ -16,7 +16,7 @@
 
 package com.bytechef.component.reckon.action;
 
-import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
+import static com.bytechef.component.OpenAPIComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.date;
 import static com.bytechef.component.definition.ComponentDSL.number;

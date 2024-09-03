@@ -18,7 +18,7 @@ package com.bytechef.component.pipedrive;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
 
-import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.OpenAPIComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.pipedrive.action.PipedriveAddDealAction;
 import com.bytechef.component.pipedrive.action.PipedriveAddLeadAction;
@@ -47,7 +47,7 @@ import com.bytechef.component.pipedrive.connection.PipedriveConnection;
  *
  * @generated
  */
-public abstract class AbstractPipedriveComponentHandler implements OpenApiComponentHandler {
+public abstract class AbstractPipedriveComponentHandler implements OpenAPIComponentHandler {
     private final ComponentDefinition componentDefinition = modifyComponent(
         component("pipedrive")
             .title("Pipedrive")

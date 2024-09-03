@@ -18,7 +18,7 @@ package com.bytechef.component.gitlab;
 
 import static com.bytechef.component.gitlab.constant.GitlabConstants.PROJECT_ID;
 
-import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.OpenAPIComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
@@ -36,7 +36,7 @@ import java.util.Objects;
 /**
  * @author Monika Kušter
  */
-@AutoService(OpenApiComponentHandler.class)
+@AutoService(OpenAPIComponentHandler.class)
 public class GitlabComponentHandler extends AbstractGitlabComponentHandler {
 
     @Override

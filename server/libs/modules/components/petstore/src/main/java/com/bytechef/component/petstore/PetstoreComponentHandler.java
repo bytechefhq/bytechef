@@ -16,14 +16,14 @@
 
 package com.bytechef.component.petstore;
 
-import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.OpenAPIComponentHandler;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**
  * @generated
  */
-@AutoService(OpenApiComponentHandler.class)
+@AutoService(OpenAPIComponentHandler.class)
 public class PetstoreComponentHandler extends AbstractPetstoreComponentHandler {
 
     @Override

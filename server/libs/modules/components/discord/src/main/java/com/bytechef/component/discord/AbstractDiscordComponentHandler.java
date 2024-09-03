@@ -18,7 +18,7 @@ package com.bytechef.component.discord;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
 
-import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.OpenAPIComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.discord.action.DiscordCreateChannelAction;
 import com.bytechef.component.discord.action.DiscordSendChannelMessageAction;
@@ -29,7 +29,7 @@ import com.bytechef.component.discord.connection.DiscordConnection;
  *
  * @generated
  */
-public abstract class AbstractDiscordComponentHandler implements OpenApiComponentHandler {
+public abstract class AbstractDiscordComponentHandler implements OpenAPIComponentHandler {
     private final ComponentDefinition componentDefinition = modifyComponent(
         component("discord")
             .title("Discord")

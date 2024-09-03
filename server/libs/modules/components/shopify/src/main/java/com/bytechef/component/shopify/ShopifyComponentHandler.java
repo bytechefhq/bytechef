@@ -23,7 +23,7 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.PRODUCT_ID;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.SHOP_NAME;
 
-import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.OpenAPIComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentCategory;
@@ -49,7 +49,7 @@ import java.util.Optional;
 /**
  * @author Monika Domiter
  */
-@AutoService(OpenApiComponentHandler.class)
+@AutoService(OpenAPIComponentHandler.class)
 public class ShopifyComponentHandler extends AbstractShopifyComponentHandler {
 
     @Override

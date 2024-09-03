@@ -18,7 +18,7 @@ package com.bytechef.component.freshdesk;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
 
-import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.OpenAPIComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.freshdesk.action.FreshdeskCreateCompanyAction;
 import com.bytechef.component.freshdesk.action.FreshdeskCreateContactAction;
@@ -30,7 +30,7 @@ import com.bytechef.component.freshdesk.connection.FreshdeskConnection;
  *
  * @generated
  */
-public abstract class AbstractFreshdeskComponentHandler implements OpenApiComponentHandler {
+public abstract class AbstractFreshdeskComponentHandler implements OpenAPIComponentHandler {
     private final ComponentDefinition componentDefinition = modifyComponent(
         component("freshdesk")
             .title("Freshdesk")

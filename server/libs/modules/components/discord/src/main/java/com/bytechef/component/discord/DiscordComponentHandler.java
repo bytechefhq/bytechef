@@ -27,7 +27,7 @@ import static com.bytechef.component.discord.constant.DiscordConstants.GUILD_ID;
 import static com.bytechef.component.discord.constant.DiscordConstants.GUILD_ID_PROPERTY;
 import static com.bytechef.component.discord.constant.DiscordConstants.RECIPIENT_ID;
 
-import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.OpenAPIComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentCategory;
@@ -54,7 +54,7 @@ import java.util.Optional;
  * @author Monika Domiter
  */
 
-@AutoService(OpenApiComponentHandler.class)
+@AutoService(OpenAPIComponentHandler.class)
 public class DiscordComponentHandler extends AbstractDiscordComponentHandler {
 
     @Override

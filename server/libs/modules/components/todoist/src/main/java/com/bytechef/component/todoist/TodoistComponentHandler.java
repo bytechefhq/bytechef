@@ -18,7 +18,7 @@ package com.bytechef.component.todoist;
 
 import static com.bytechef.component.definition.ComponentDSL.option;
 
-import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.OpenAPIComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
@@ -36,7 +36,7 @@ import java.util.Optional;
 /**
  * @author Monika Kušter
  */
-@AutoService(OpenApiComponentHandler.class)
+@AutoService(OpenAPIComponentHandler.class)
 public class TodoistComponentHandler extends AbstractTodoistComponentHandler {
 
     @Override

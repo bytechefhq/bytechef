@@ -18,7 +18,7 @@ package com.bytechef.component.clickup;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
 
-import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.OpenAPIComponentHandler;
 import com.bytechef.component.clickup.action.ClickupCreateFolderAction;
 import com.bytechef.component.clickup.action.ClickupCreateListAction;
 import com.bytechef.component.clickup.action.ClickupCreateTaskAction;
@@ -30,7 +30,7 @@ import com.bytechef.component.definition.ComponentDefinition;
  *
  * @generated
  */
-public abstract class AbstractClickupComponentHandler implements OpenApiComponentHandler {
+public abstract class AbstractClickupComponentHandler implements OpenAPIComponentHandler {
     private final ComponentDefinition componentDefinition = modifyComponent(
         component("clickup")
             .title("Clickup")

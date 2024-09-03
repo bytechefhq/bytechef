@@ -22,7 +22,7 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.freshdesk.constant.FreshdeskConstants.DOMAIN;
 
-import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.OpenAPIComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentCategory;
@@ -41,7 +41,7 @@ import java.util.Optional;
 /**
  * @author Monika Domiter
  */
-@AutoService(OpenApiComponentHandler.class)
+@AutoService(OpenAPIComponentHandler.class)
 public class FreshdeskComponentHandler extends AbstractFreshdeskComponentHandler {
 
     @Override

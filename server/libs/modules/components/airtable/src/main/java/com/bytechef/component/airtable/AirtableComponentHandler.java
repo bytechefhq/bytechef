@@ -19,7 +19,7 @@ package com.bytechef.component.airtable;
 import static com.bytechef.component.airtable.constant.AirtableConstants.BASE_ID;
 import static com.bytechef.component.airtable.constant.AirtableConstants.TABLE_ID;
 
-import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.OpenAPIComponentHandler;
 import com.bytechef.component.airtable.trigger.AirtableNewRecordTrigger;
 import com.bytechef.component.airtable.util.AirtableUtils;
 import com.bytechef.component.definition.ActionDefinition;
@@ -41,7 +41,7 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
-@AutoService(OpenApiComponentHandler.class)
+@AutoService(OpenAPIComponentHandler.class)
 public class AirtableComponentHandler extends AbstractAirtableComponentHandler {
 
     @Override
