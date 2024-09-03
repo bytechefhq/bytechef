@@ -23,11 +23,12 @@ import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.HEADERS;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID_PROPERTY;
-import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.appendRow;
+import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.appendValues;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.createRange;
 
 import com.bytechef.component.definition.ActionContext;
@@ -51,8 +52,6 @@ import java.util.Map;
  * @author Monika Kušter
  */
 public class GoogleSheetsCreateSheetAction {
-
-    protected static final String HEADERS = "headers";
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createSheet")
         .title("Create sheet")
@@ -107,7 +106,7 @@ public class GoogleSheetsCreateSheetAction {
                 .setValues(List.of(headers))
                 .setMajorDimension("ROWS");
 
-            appendRow(sheets, spreadsheetId, createRange(sheetName, 1), valueRange, "USER_ENTERED");
+            appendValues(sheets, spreadsheetId, createRange(sheetName, 1), valueRange, "USER_ENTERED");
         }
 
         return getNewSheetResponse(spreadsheetId, batchUpdateSpreadsheetResponse, headers);

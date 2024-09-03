@@ -33,6 +33,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableValueProperty;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
@@ -58,7 +59,7 @@ public class GoogleSheetsUtils {
     private GoogleSheetsUtils() {
     }
 
-    public static void appendRow(
+    public static void appendValues(
         Sheets sheets, String spreadsheetId, String range, ValueRange valueRange, String valueInputOption)
         throws IOException {
 
@@ -151,7 +152,8 @@ public class GoogleSheetsUtils {
                 .boxed()
                 .collect(
                     Collectors.toMap(
-                        i -> columnToLabel(i + 1), i -> String.valueOf(row.get(i)), (a, b) -> b, LinkedHashMap::new));
+                        i -> "column_" + columnToLabel(i + 1), i -> String.valueOf(row.get(i)), (a, b) -> b,
+                        LinkedHashMap::new));
         }
 
         return valuesMap;
@@ -208,7 +210,8 @@ public class GoogleSheetsUtils {
     }
 
     public static List<Option<String>> getSheetNameOptions(
-        Parameters inputParameters, Parameters connectionParameters) throws Exception {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) throws Exception {
 
         List<Option<String>> options = new ArrayList<>();
 
@@ -230,7 +233,8 @@ public class GoogleSheetsUtils {
     }
 
     public static List<Option<String>> getSpreadsheetIdOptions(
-        Parameters inputParameters, Parameters connectionParameters) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) throws IOException {
 
         List<File> files = GoogleServices.getDrive(connectionParameters)
             .files()
@@ -269,7 +273,7 @@ public class GoogleSheetsUtils {
      * @param columnNumber column order number in column sequence
      * @return column name in <code>column_A</code> format
      */
-    private static String columnToLabel(int columnNumber) {
+    public static String columnToLabel(int columnNumber) {
         StringBuilder columnName = new StringBuilder();
 
         while (columnNumber > 0) {
@@ -278,6 +282,6 @@ public class GoogleSheetsUtils {
             columnNumber = (columnNumber - modulo) / 26;
         }
 
-        return "column_" + columnName;
+        return columnName.toString();
     }
 }

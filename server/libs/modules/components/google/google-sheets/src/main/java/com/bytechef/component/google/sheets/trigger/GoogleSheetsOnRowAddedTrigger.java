@@ -19,15 +19,15 @@ package com.bytechef.component.google.sheets.trigger;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDSL.trigger;
 import static com.bytechef.component.definition.TriggerContext.Data.Scope.WORKFLOW;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME_PROPERTY_TRIGGER;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID_PROPERTY_TRIGGER;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.getMapOfValuesForRowAndColumn;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
+import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
@@ -53,16 +53,23 @@ import java.util.UUID;
  */
 public class GoogleSheetsOnRowAddedTrigger {
 
-    private static final String ON_ROW_ADDED = "onRowAdded";
-
-    public static final ComponentDSL.ModifiableTriggerDefinition TRIGGER_DEFINITION = ComponentDSL.trigger(ON_ROW_ADDED)
-        .title("OnRowAdded")
-        .description("Triggers when you add a row in google sheets. Refresh the page when you're done putting input.")
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newRow")
+        .title("New Row")
+        .description("Triggers when a new row is added.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .properties(
-            SPREADSHEET_ID_PROPERTY_TRIGGER,
+            string(SPREADSHEET_ID)
+                .label("Spreadsheet")
+                .description("The spreadsheet to apply the updates to.")
+                .options((TriggerOptionsFunction<String>) GoogleSheetsUtils::getSpreadsheetIdOptions)
+                .required(true),
             IS_THE_FIRST_ROW_HEADER_PROPERTY,
-            SHEET_NAME_PROPERTY_TRIGGER)
+            string(SHEET_NAME)
+                .label("Sheet")
+                .description("The name of the sheet")
+                .options((TriggerOptionsFunction<String>) GoogleSheetsUtils::getSheetNameOptions)
+                .optionsLookupDependsOn(SPREADSHEET_ID)
+                .required(true))
         .outputSchema(
             array()
                 .items(

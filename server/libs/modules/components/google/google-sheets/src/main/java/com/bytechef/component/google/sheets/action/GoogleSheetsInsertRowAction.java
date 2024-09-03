@@ -30,7 +30,7 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.VALUE_INPUT_OPTION;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.VALUE_INPUT_PROPERTY;
-import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.appendRow;
+import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.appendValues;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.createRange;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.getMapOfValuesForRow;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.getRowValues;
@@ -78,7 +78,7 @@ public class GoogleSheetsInsertRowAction {
         String spreadsheetId = inputParameters.getRequiredString(SPREADSHEET_ID);
         String range = createRange(inputParameters.getRequiredString(SHEET_NAME), null);
 
-        appendRow(sheets, spreadsheetId, range, valueRange, inputParameters.getRequiredString(VALUE_INPUT_OPTION));
+        appendValues(sheets, spreadsheetId, range, valueRange, inputParameters.getRequiredString(VALUE_INPUT_OPTION));
 
         return getMapOfValuesForRow(inputParameters, sheets, row);
     }
