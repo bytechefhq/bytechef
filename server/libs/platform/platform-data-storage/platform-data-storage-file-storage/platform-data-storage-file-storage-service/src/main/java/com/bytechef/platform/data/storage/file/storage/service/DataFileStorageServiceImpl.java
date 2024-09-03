@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.data.storage.file.storage.service;
 
+import com.bytechef.commons.util.CompressionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.constant.AppType;
@@ -67,9 +68,10 @@ public class DataFileStorageServiceImpl implements DataFileStorageService {
         }
 
         ValueWrapper valueWrapper = ValueWrapper.read(
-            fileStorageService.readFileToString(
-                directoryPath,
-                fileStorageService.getFileEntry(directoryPath, getFilename(componentName, scope, scopeId, key))));
+            CompressionUtils.decompressToString(
+                fileStorageService.readFileToBytes(
+                    directoryPath,
+                    fileStorageService.getFileEntry(directoryPath, getFilename(componentName, scope, scopeId, key)))));
 
         return Optional.ofNullable((T) valueWrapper.value());
     }
@@ -104,7 +106,8 @@ public class DataFileStorageServiceImpl implements DataFileStorageService {
         ValueWrapper valueWrapper = new ValueWrapper(value);
 
         fileStorageService.storeFileContent(
-            getDirectoryPath(type), getFilename(componentName, scope, scopeId, key), valueWrapper.write(), false);
+            getDirectoryPath(type), getFilename(componentName, scope, scopeId, key),
+            CompressionUtils.compress(valueWrapper.write()), false);
     }
 
     private static String getDirectoryPath(AppType type) {
