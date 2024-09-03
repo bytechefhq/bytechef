@@ -23,6 +23,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.google.sheets.action.GoogleSheetsClearSheetAction;
+import com.bytechef.component.google.sheets.action.GoogleSheetsCreateColumnAction;
 import com.bytechef.component.google.sheets.action.GoogleSheetsCreateSheetAction;
 import com.bytechef.component.google.sheets.action.GoogleSheetsDeleteRowAction;
 import com.bytechef.component.google.sheets.action.GoogleSheetsFindRowByNumAction;
@@ -48,6 +49,7 @@ public class GoogleSheetsComponentHandler implements ComponentHandler {
         .connection(CONNECTION_DEFINITION)
         .actions(
             GoogleSheetsClearSheetAction.ACTION_DEFINITION,
+            GoogleSheetsCreateColumnAction.ACTION_DEFINITION,
             GoogleSheetsCreateSheetAction.ACTION_DEFINITION,
             GoogleSheetsDeleteRowAction.ACTION_DEFINITION,
             GoogleSheetsFindRowByNumAction.ACTION_DEFINITION,
