@@ -116,7 +116,7 @@ public class FileStorageDownloadAction {
 
             return uri.toURL();
         } catch (URISyntaxException | MalformedURLException e) {
-            throw new IllegalArgumentException("Unable to create URL=%s".formatted(fileUrl), e);
+            throw new IllegalArgumentException("Unable to create url: =%s".formatted(fileUrl), e);
         }
     }
 

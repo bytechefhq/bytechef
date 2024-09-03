@@ -86,7 +86,7 @@ public class PolyglotEngine {
                 case "python" -> "def perform(input):\n\treturn null";
                 case "R" -> "perform <- function(input) {\n\treturn null\n}";
                 case "ruby" -> "def perform(input)\n\treturn null;\nend";
-                default -> throw new IllegalArgumentException("languageId=%s does not exist".formatted(languageId));
+                default -> throw new IllegalArgumentException("languageId: %s does not exist".formatted(languageId));
             }));
 
             Value value = polyglotContext.getBindings(languageId)

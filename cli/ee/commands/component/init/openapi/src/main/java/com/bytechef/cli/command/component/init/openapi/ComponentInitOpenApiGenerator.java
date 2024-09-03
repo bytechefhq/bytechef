@@ -895,7 +895,7 @@ public class ComponentInitOpenApiGenerator {
                     } else if (Objects.equals(scheme, "bearer")) {
                         codeBlocks.add(getAuthorizationBearerCodeBlock());
                     } else {
-                        throw new IllegalArgumentException("Security scheme=%s not supported".formatted(scheme));
+                        throw new IllegalArgumentException("Security scheme: %s not supported".formatted(scheme));
                     }
                 } else if (securityScheme.getType() == SecurityScheme.Type.OAUTH2) {
                     OAuthFlows flows = securityScheme.getFlows();
