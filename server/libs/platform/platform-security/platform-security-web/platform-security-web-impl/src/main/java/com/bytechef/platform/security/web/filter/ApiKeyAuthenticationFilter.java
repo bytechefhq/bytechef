@@ -16,72 +16,19 @@
 
 package com.bytechef.platform.security.web.filter;
 
-import com.bytechef.platform.security.web.authentication.ApiKeyAuthenticationToken;
-import com.bytechef.platform.security.web.util.AuthTokenUtils;
-import com.bytechef.platform.security.web.util.AuthTokenUtils.AuthToken;
-import com.bytechef.tenant.TenantKey;
-import com.bytechef.tenant.util.TenantUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import java.util.regex.Pattern;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
  * @author Ivica Cardic
  */
-public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
-
-    private static final Pattern PATH_PATTERN = Pattern.compile("^/api/.+/v[0-9]+/([^/]+)");
-    private static final RequestMatcher REQUEST_MATCHER = new NegatedRequestMatcher(
-        RegexRequestMatcher.regexMatcher("^/api/(automation|embedded|platform)/v[0-9]+/.+"));
-
-    private final AuthenticationManager authenticationManager;
+public class ApiKeyAuthenticationFilter extends AbstractApiKeyAuthenticationFilter {
 
     @SuppressFBWarnings("EI")
     public ApiKeyAuthenticationFilter(AuthenticationManager authenticationManager) {
-        this.authenticationManager = authenticationManager;
-    }
-
-    @Override
-    protected void doFilterInternal(
-        HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) {
-
-        Authentication authentication = getAuthentication(httpServletRequest);
-
-        String tenantId = ((ApiKeyAuthenticationToken) authentication).getTenantId();
-
-        TenantUtils.runWithTenantId(
-            tenantId,
-            () -> {
-                Authentication authenticatedAuthentication = authenticationManager.authenticate(authentication);
-
-                SecurityContext context = SecurityContextHolder.getContext();
-
-                context.setAuthentication(authenticatedAuthentication);
-
-                filterChain.doFilter(httpServletRequest, httpServletResponse);
-            });
-    }
-
-    private Authentication getAuthentication(HttpServletRequest request) {
-        AuthToken authToken = AuthTokenUtils.getAuthToken(PATH_PATTERN, request);
-
-        TenantKey tenantKey = TenantKey.parse(authToken.token());
-
-        return new ApiKeyAuthenticationToken(authToken.environment(), authToken.token(), tenantKey.getTenantId());
-    }
-
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        return REQUEST_MATCHER.matches(request);
+        super(
+            "^/api/.+/v[0-9]+/([^/]+)",
+            RegexRequestMatcher.regexMatcher("^/api/(automation|embedded|platform)/v[0-9]+/.+"), authenticationManager);
     }
 }
