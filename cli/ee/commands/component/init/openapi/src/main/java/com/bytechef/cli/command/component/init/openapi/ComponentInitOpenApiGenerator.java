@@ -7,7 +7,7 @@
 
 package com.bytechef.cli.command.component.init.openapi;
 
-import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.OpenAPIComponentHandler;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -87,9 +87,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author Ivica Cardic
  */
-public class ComponentInitOpenApiGenerator {
+public class ComponentInitOpenAPIGenerator {
 
-    private static final Logger logger = LoggerFactory.getLogger(ComponentInitOpenApiGenerator.class);
+    private static final Logger logger = LoggerFactory.getLogger(ComponentInitOpenAPIGenerator.class);
 
     private static final ClassName AUTHORIZATION_CLASS_NAME = ClassName.get(
         "com.bytechef.component.definition", "Authorization");
@@ -103,7 +103,7 @@ public class ComponentInitOpenApiGenerator {
     private static final ClassName CONTEXT_HTTP_CLASS = ClassName
         .get("com.bytechef.component.definition", "Context", "Http");
     private static final ClassName OPEN_API_COMPONENT_HANDLER_CLASS = ClassName
-        .get("com.bytechef.component", "OpenApiComponentHandler");
+        .get("com.bytechef.component", "OpenAPIComponentHandler");
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper() {
         {
             enable(SerializationFeature.INDENT_OUTPUT);
@@ -127,7 +127,7 @@ public class ComponentInitOpenApiGenerator {
     private final Set<String> oAuth2Scopes = new HashSet<>();
 
     @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
-    public ComponentInitOpenApiGenerator(
+    public ComponentInitOpenAPIGenerator(
         String basePackageName, String componentName, int version, boolean internalComponent,
         String openApiPath, String outputPathname, String libsPathname) throws IOException {
 
@@ -1792,7 +1792,7 @@ public class ComponentInitOpenApiGenerator {
         return openAPI;
     }
 
-    private OpenApiComponentHandler createComponentHandler(Path classPath, String className) throws Exception {
+    private OpenAPIComponentHandler createComponentHandler(Path classPath, String className) throws Exception {
         File classFile = classPath.toFile();
 
         URI classURI = classFile.toURI();
@@ -1802,13 +1802,13 @@ public class ComponentInitOpenApiGenerator {
         };
 
         URLClassLoader classLoader = URLClassLoader.newInstance(
-            classUrls, OpenApiComponentHandler.class.getClassLoader());
+            classUrls, OpenAPIComponentHandler.class.getClassLoader());
 
         @SuppressWarnings("unchecked")
-        Class<OpenApiComponentHandler> clazz = (Class<OpenApiComponentHandler>) Class.forName(
+        Class<OpenAPIComponentHandler> clazz = (Class<OpenAPIComponentHandler>) Class.forName(
             className, true, classLoader);
 
-        Constructor<OpenApiComponentHandler> declaredConstructor = clazz.getDeclaredConstructor();
+        Constructor<OpenAPIComponentHandler> declaredConstructor = clazz.getDeclaredConstructor();
 
         return declaredConstructor.newInstance();
     }
@@ -1825,7 +1825,7 @@ public class ComponentInitOpenApiGenerator {
                         """)
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                     .addSuperinterface(
-                        ClassName.get(COM_BYTECHEF_COMPONENT_PACKAGE, "OpenApiComponentHandler"))
+                        ClassName.get(COM_BYTECHEF_COMPONENT_PACKAGE, "OpenAPIComponentHandler"))
                     .addField(FieldSpec.builder(COMPONENT_DEFINITION_CLASS_NAME, "componentDefinition")
                         .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
                         .initializer(getComponentCodeBlock(sourceDirPath))
@@ -1948,7 +1948,7 @@ public class ComponentInitOpenApiGenerator {
                     .addAnnotation(
                         AnnotationSpec.builder(ClassName.get("com.google.auto.service", "AutoService"))
                             .addMember("value", "$T.class",
-                                ClassName.get("com.bytechef.component", "OpenApiComponentHandler"))
+                                ClassName.get("com.bytechef.component", "OpenAPIComponentHandler"))
                             .build())
                     .addModifiers(Modifier.PUBLIC)
                     .superclass(
@@ -1999,10 +1999,10 @@ public class ComponentInitOpenApiGenerator {
         if (!definitionFile.exists()) {
             Path classPath = compileComponentHandlerSource(componentHandlerSourcePath);
 
-            OpenApiComponentHandler openApiComponentHandler = createComponentHandler(
+            OpenAPIComponentHandler openAPIComponentHandler = createComponentHandler(
                 classPath, packageName + "." + getComponentHandlerClassName(componentName));
 
-            OBJECT_MAPPER.writeValue(definitionFile, openApiComponentHandler.getDefinition());
+            OBJECT_MAPPER.writeValue(definitionFile, openAPIComponentHandler.getDefinition());
         }
     }
 
@@ -2087,9 +2087,9 @@ public class ComponentInitOpenApiGenerator {
 
     private static class GeneratorConfig {
         @JsonProperty
-        private OpenApi openApi = new OpenApi();
+        private OpenAPI openApi = new OpenAPI();
 
-        private static class OpenApi {
+        private static class OpenAPI {
             @JsonProperty
             private List<String> operations = Collections.emptyList();
 

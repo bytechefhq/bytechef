@@ -33,7 +33,7 @@ import java.util.stream.Stream;
  *
  * @author Ivica Cardic
  */
-public interface OpenApiComponentHandler extends ComponentHandler {
+public interface OpenAPIComponentHandler extends ComponentHandler {
 
     /**
      *

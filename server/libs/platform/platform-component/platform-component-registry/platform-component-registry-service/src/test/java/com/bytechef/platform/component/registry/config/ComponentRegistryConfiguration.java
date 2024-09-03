@@ -31,7 +31,7 @@ import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.platform.component.registry.oas.handler.loader.OpenApiComponentHandlerLoader;
+import com.bytechef.platform.component.registry.oas.handler.loader.OpenAPIComponentHandlerLoader;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
@@ -80,7 +80,7 @@ public class ComponentRegistryConfiguration {
         @Override
         public ModifiableActionDefinition modifyAction(ModifiableActionDefinition modifiableActionDefinition) {
             return modifiableActionDefinition.perform(
-                OpenApiComponentHandlerLoader.PERFORM_FUNCTION_FUNCTION.apply(modifiableActionDefinition));
+                OpenAPIComponentHandlerLoader.PERFORM_FUNCTION_FUNCTION.apply(modifiableActionDefinition));
         }
     };
 

@@ -16,7 +16,7 @@
 
 package com.bytechef.cli.command.component;
 
-import com.bytechef.cli.command.component.init.openapi.ComponentInitOpenApiGenerator;
+import com.bytechef.cli.command.component.init.openapi.ComponentInitOpenAPIGenerator;
 import java.io.File;
 import org.springframework.shell.command.annotation.Command;
 import org.springframework.shell.command.annotation.Option;
@@ -65,7 +65,7 @@ public class ComponentCommand {
             throw new RuntimeException("The OpenAPI file is not found: " + openApiPath);
         }
 
-        ComponentInitOpenApiGenerator generator = new ComponentInitOpenApiGenerator(
+        ComponentInitOpenAPIGenerator generator = new ComponentInitOpenAPIGenerator(
             basePackageName, name.toLowerCase(), version, internalComponent, openApiPath, outputPath, null);
 
         generator.generate();
