@@ -14,7 +14,7 @@
   "name" : "gitlab",
   "resources" : null,
   "version" : 1,
-  "title" : "Gitlab",
+  "title" : "GitLab",
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,

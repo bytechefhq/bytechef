@@ -14,7 +14,7 @@
   "name" : "clickup",
   "resources" : null,
   "version" : 1,
-  "title" : "Clickup",
+  "title" : "ClickUp",
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
