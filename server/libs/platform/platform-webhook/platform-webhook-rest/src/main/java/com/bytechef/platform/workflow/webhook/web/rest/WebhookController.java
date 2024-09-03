@@ -45,6 +45,7 @@ import jakarta.servlet.http.Part;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -285,6 +286,14 @@ public class WebhookController {
 
         if (str.equalsIgnoreCase("true") || str.equalsIgnoreCase("false")) {
             return Boolean.parseBoolean(str);
+        }
+
+        try {
+            return LocalDateTime.parse(str);
+        } catch (DateTimeParseException e) {
+            if (logger.isTraceEnabled()) {
+                logger.trace(e.getMessage(), e);
+            }
         }
 
         try {
