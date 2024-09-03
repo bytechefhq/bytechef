@@ -56,8 +56,6 @@ public class IntegrationWorkflowServiceIntTest {
     public void testAddWorkflow() {
         Integration integration = getIntegration();
 
-        integration.addVersion();
-
         integration = integrationRepository.save(integration);
 
         integrationWorkflowService.addWorkflow(

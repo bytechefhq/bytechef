@@ -369,9 +369,32 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     @Override
     public void publishIntegration(long id, String description) {
-        Integration integration = integrationService.publishIntegration(id, description);
+        Integration integration = integrationService.getIntegration(id);
 
-        checkIntegrationStatus(integration);
+        int oldIntegrationVersion = integration.getLastIntegrationVersion();
+
+        List<IntegrationWorkflow> oldIntegrationWorkflows = integrationWorkflowService
+            .getIntegrationWorkflows(integration.getId(), oldIntegrationVersion);
+
+        int newIntegrationVersion = integrationService.publishIntegration(id, description);
+
+        for (IntegrationWorkflow integrationWorkflow : oldIntegrationWorkflows) {
+            String oldWorkflowId = integrationWorkflow.getWorkflowId();
+
+            Workflow duplicatedWorkflow = workflowService.duplicateWorkflow(oldWorkflowId);
+
+            integrationWorkflow.setIntegrationVersion(newIntegrationVersion);
+            integrationWorkflow.setWorkflowId(duplicatedWorkflow.getId());
+
+            integrationWorkflowService.update(integrationWorkflow);
+
+            integrationWorkflowService.addWorkflow(
+                integration.getId(), oldIntegrationVersion, oldWorkflowId,
+                integrationWorkflow.getWorkflowReferenceCode());
+
+            workflowTestConfigurationService.updateWorkflowId(oldWorkflowId, duplicatedWorkflow.getId());
+            workflowNodeTestOutputService.updateWorkflowId(oldWorkflowId, duplicatedWorkflow.getId());
+        }
     }
 
     @Override
@@ -401,35 +424,6 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         IntegrationWorkflow integrationWorkflow = integrationWorkflowService.getWorkflowIntegrationWorkflow(workflowId);
 
         return new IntegrationWorkflowDTO(workflowFacade.update(workflowId, definition, version), integrationWorkflow);
-    }
-
-    private void checkIntegrationStatus(Integration integration) {
-        final List<IntegrationWorkflow> latestIntegrationWorkflows = integrationWorkflowService
-            .getIntegrationWorkflows(Validate.notNull(integration.getId(), "id"),
-                integration.getLastIntegrationVersion());
-
-        if (integration.getLastStatus() == Status.PUBLISHED) {
-            int lastVersion = integration.getLastIntegrationVersion();
-            int newVersion = integrationService.addVersion(integration.getId());
-
-            for (IntegrationWorkflow integrationWorkflow : latestIntegrationWorkflows) {
-                String oldWorkflowId = integrationWorkflow.getWorkflowId();
-
-                Workflow duplicatedWorkflow = workflowService.duplicateWorkflow(oldWorkflowId);
-
-                integrationWorkflow.setIntegrationVersion(newVersion);
-                integrationWorkflow.setWorkflowId(duplicatedWorkflow.getId());
-
-                integrationWorkflowService.update(integrationWorkflow);
-
-                integrationWorkflowService.addWorkflow(
-                    integration.getId(), lastVersion, oldWorkflowId,
-                    integrationWorkflow.getWorkflowReferenceCode());
-
-                workflowTestConfigurationService.updateWorkflowId(oldWorkflowId, duplicatedWorkflow.getId());
-                workflowNodeTestOutputService.updateWorkflowId(oldWorkflowId, duplicatedWorkflow.getId());
-            }
-        }
     }
 
     private Category getCategory(Integration integration) {

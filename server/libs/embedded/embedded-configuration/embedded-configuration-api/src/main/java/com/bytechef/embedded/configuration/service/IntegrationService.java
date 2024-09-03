@@ -27,8 +27,6 @@ import java.util.Optional;
  */
 public interface IntegrationService {
 
-    int addVersion(long id);
-
     long countIntegrations();
 
     Integration create(Integration integration);
@@ -53,7 +51,7 @@ public interface IntegrationService {
 
     Integration getWorkflowIntegration(String workflowId);
 
-    Integration publishIntegration(long id, String description);
+    int publishIntegration(long id, String description);
 
     Integration update(long id, List<Long> tagIds);
 
