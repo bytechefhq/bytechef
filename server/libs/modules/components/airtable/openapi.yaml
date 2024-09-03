@@ -1,7 +1,7 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "Airtable API"
+  title: "Airtable"
   description: "Airtable is a user-friendly and flexible cloud-based database management tool."
   version: "v0"
 servers:

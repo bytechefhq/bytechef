@@ -1,7 +1,7 @@
 ---
 openapi: "3.0.2"
 info:
-  title: "Shopify API"
+  title: "Shopify"
   description: "Shopify is an e-commerce platform that allows businesses to create online stores and sell products."
   version: "v1"
 servers:
