@@ -22,11 +22,11 @@ interface TagProps {
 }
 
 const Tag = ({onDeleteTag, tag}: TagProps) => (
-    <div className="group flex max-h-8 items-center rounded-full border border-gray-300 pl-2 pr-1 text-xs text-gray-700">
+    <div className="group flex max-h-8 items-center rounded-full border border-muted pl-2 pr-1 text-xs text-gray-700">
         <span className="py-1">{tag.name}</span>
 
         <Tooltip>
-            <TooltipTrigger>
+            <TooltipTrigger asChild>
                 <button
                     className="ml-1.5 rounded-full p-1 text-red-500 hover:bg-red-100 hover:text-red-700"
                     onClick={() => onDeleteTag(tag)}
