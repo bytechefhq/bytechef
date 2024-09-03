@@ -198,6 +198,7 @@ public class FilesystemFileStorageService implements FileStorageService {
     @Override
     public FileEntry storeFileContent(@NonNull String directoryPath, @NonNull String filename, @NonNull String data)
         throws FileStorageException {
+
         return storeFileContent(directoryPath, filename, data, true);
     }
 
@@ -241,7 +242,8 @@ public class FilesystemFileStorageService implements FileStorageService {
 
         Path path = resolveDirectoryPath(directory.toLowerCase());
 
-        path = path.resolve(randomFilename ? generateUuid() : filename);
+        path = path.resolve(
+            randomFilename ? generateRandomFilename(filename.substring(filename.lastIndexOf("."))) : filename);
 
         try {
             Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
@@ -268,10 +270,8 @@ public class FilesystemFileStorageService implements FileStorageService {
         }
     }
 
-    private String generateUuid() {
-        UUID uuid = UUID.randomUUID();
-
-        return uuid.toString();
+    private String generateRandomFilename(String extension) {
+        return UUID.randomUUID() + extension;
     }
 
     private String toString(Path path) {
