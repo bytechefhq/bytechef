@@ -18,7 +18,7 @@ package com.bytechef.component.hubspot;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
 
-import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.OpenAPIComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.hubspot.action.HubspotCreateContactAction;
 import com.bytechef.component.hubspot.action.HubspotCreateDealAction;
@@ -32,7 +32,7 @@ import com.bytechef.component.hubspot.connection.HubspotConnection;
  *
  * @generated
  */
-public abstract class AbstractHubspotComponentHandler implements OpenApiComponentHandler {
+public abstract class AbstractHubspotComponentHandler implements OpenAPIComponentHandler {
     private final ComponentDefinition componentDefinition = modifyComponent(
         component("hubspot")
             .title("Hubspot")

@@ -18,7 +18,7 @@ package com.bytechef.component.reckon;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
 
-import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.OpenAPIComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.reckon.action.ReckonCreateContactAction;
 import com.bytechef.component.reckon.action.ReckonCreateInvoiceAction;
@@ -30,7 +30,7 @@ import com.bytechef.component.reckon.connection.ReckonConnection;
  *
  * @generated
  */
-public abstract class AbstractReckonComponentHandler implements OpenApiComponentHandler {
+public abstract class AbstractReckonComponentHandler implements OpenAPIComponentHandler {
     private final ComponentDefinition componentDefinition = modifyComponent(
         component("reckon")
             .title("Reckon")

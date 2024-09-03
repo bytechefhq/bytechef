@@ -16,7 +16,7 @@
 
 package com.bytechef.component.clickup.action;
 
-import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
+import static com.bytechef.component.OpenAPIComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;

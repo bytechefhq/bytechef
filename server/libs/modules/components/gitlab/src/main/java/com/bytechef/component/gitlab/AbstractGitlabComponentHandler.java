@@ -18,7 +18,7 @@ package com.bytechef.component.gitlab;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
 
-import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.OpenAPIComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.gitlab.action.GitlabCreateCommentOnIssueAction;
 import com.bytechef.component.gitlab.action.GitlabCreateIssueAction;
@@ -29,7 +29,7 @@ import com.bytechef.component.gitlab.connection.GitlabConnection;
  *
  * @generated
  */
-public abstract class AbstractGitlabComponentHandler implements OpenApiComponentHandler {
+public abstract class AbstractGitlabComponentHandler implements OpenAPIComponentHandler {
     private final ComponentDefinition componentDefinition = modifyComponent(
         component("gitlab")
             .title("Gitlab")

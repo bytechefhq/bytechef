@@ -18,7 +18,7 @@ package com.bytechef.component.petstore;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
 
-import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.OpenAPIComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.petstore.action.PetstoreAddPetAction;
 import com.bytechef.component.petstore.action.PetstoreCreateUserAction;
@@ -44,7 +44,7 @@ import com.bytechef.component.petstore.connection.PetstoreConnection;
  *
  * @generated
  */
-public abstract class AbstractPetstoreComponentHandler implements OpenApiComponentHandler {
+public abstract class AbstractPetstoreComponentHandler implements OpenAPIComponentHandler {
     private final ComponentDefinition componentDefinition = modifyComponent(
         component("petstore")
             .title("Petstore")

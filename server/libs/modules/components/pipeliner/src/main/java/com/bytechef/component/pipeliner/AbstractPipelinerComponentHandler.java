@@ -18,7 +18,7 @@ package com.bytechef.component.pipeliner;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
 
-import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.OpenAPIComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.pipeliner.action.PipelinerCreateAccountAction;
 import com.bytechef.component.pipeliner.action.PipelinerCreateContactAction;
@@ -30,7 +30,7 @@ import com.bytechef.component.pipeliner.connection.PipelinerConnection;
  *
  * @generated
  */
-public abstract class AbstractPipelinerComponentHandler implements OpenApiComponentHandler {
+public abstract class AbstractPipelinerComponentHandler implements OpenAPIComponentHandler {
     private final ComponentDefinition componentDefinition = modifyComponent(
         component("pipeliner")
             .title("Pipeliner")

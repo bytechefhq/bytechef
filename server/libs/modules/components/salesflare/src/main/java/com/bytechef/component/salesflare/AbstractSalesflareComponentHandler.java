@@ -18,7 +18,7 @@ package com.bytechef.component.salesflare;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
 
-import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.OpenAPIComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.salesflare.action.SalesflareCreateAccountAction;
 import com.bytechef.component.salesflare.action.SalesflareCreateContactsAction;
@@ -30,7 +30,7 @@ import com.bytechef.component.salesflare.connection.SalesflareConnection;
  *
  * @generated
  */
-public abstract class AbstractSalesflareComponentHandler implements OpenApiComponentHandler {
+public abstract class AbstractSalesflareComponentHandler implements OpenAPIComponentHandler {
     private final ComponentDefinition componentDefinition = modifyComponent(
         component("salesflare")
             .title("Salesflare")

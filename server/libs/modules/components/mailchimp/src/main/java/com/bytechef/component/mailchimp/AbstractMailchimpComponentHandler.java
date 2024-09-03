@@ -18,7 +18,7 @@ package com.bytechef.component.mailchimp;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
 
-import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.OpenAPIComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.mailchimp.action.MailchimpAddMemberToListAction;
 import com.bytechef.component.mailchimp.connection.MailchimpConnection;
@@ -28,7 +28,7 @@ import com.bytechef.component.mailchimp.connection.MailchimpConnection;
  *
  * @generated
  */
-public abstract class AbstractMailchimpComponentHandler implements OpenApiComponentHandler {
+public abstract class AbstractMailchimpComponentHandler implements OpenAPIComponentHandler {
     private final ComponentDefinition componentDefinition = modifyComponent(
         component("mailchimp")
             .title("Mailchimp")
