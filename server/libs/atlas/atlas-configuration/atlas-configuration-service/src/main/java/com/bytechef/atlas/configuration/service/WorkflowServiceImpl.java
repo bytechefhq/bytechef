@@ -152,7 +152,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             }
         }
 
-        throw new IllegalArgumentException("Workflow %s does not exist".formatted(id));
+        throw new IllegalArgumentException("Workflow with id: %s does not exist".formatted(id));
     }
 
     @Override

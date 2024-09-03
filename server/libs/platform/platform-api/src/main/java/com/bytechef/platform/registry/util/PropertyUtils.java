@@ -54,7 +54,7 @@ public class PropertyUtils {
         String name = property.getName();
 
         if (name != null) {
-            throw new IllegalArgumentException("Defined property=%s must have empty name".formatted(name));
+            throw new IllegalArgumentException("Defined property: %s must have empty name".formatted(name));
         }
 
         if (property instanceof BaseArrayProperty<? extends BaseProperty> arrayProperty) {
