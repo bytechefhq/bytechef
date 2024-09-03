@@ -22,7 +22,6 @@ import static com.bytechef.component.jira.constant.JiraConstants.NAME;
 import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
@@ -39,28 +38,11 @@ public class JiraUtils {
     private JiraUtils() {
     }
 
-    public static String getBaseUrl(Context context) {
-        List<?> body = context
-            .http(http -> http.get("https://api.atlassian.com/oauth/token/accessible-resources"))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        Object object = body.getFirst();
-
-        if (object instanceof Map<?, ?> map) {
-            return "https://api.atlassian.com/ex/jira/" + map.get(ID) + "/rest/api/3";
-        }
-
-        return null;
-    }
-
     public static String getProjectName(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         Map<String, Object> body = context
-            .http(http -> http.get(
-                getBaseUrl(context) + "/project/" + inputParameters.getRequiredString(PROJECT)))
+            .http(http -> http.get("/project/" + inputParameters.getRequiredString(PROJECT)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -82,7 +64,7 @@ public class JiraUtils {
         }
 
         Map<String, ?> body = context
-            .http(http -> http.post(getBaseUrl(context) + "/webhook"))
+            .http(http -> http.post("/webhook"))
             .body(Http.Body.of(
                 "url", webhookUrl,
                 "webhooks", List.of(
@@ -107,7 +89,7 @@ public class JiraUtils {
     public static void unsubscribeWebhook(Parameters outputParameters, TriggerContext context) {
 
         context
-            .http(http -> http.delete(getBaseUrl(context) + "/webhook"))
+            .http(http -> http.delete("/webhook"))
             .body(Http.Body.of("webhookIds", List.of(outputParameters.getInteger(ID))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();

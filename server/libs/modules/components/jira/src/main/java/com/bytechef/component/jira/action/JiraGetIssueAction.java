@@ -22,7 +22,6 @@ import static com.bytechef.component.jira.constant.JiraConstants.GET_ISSUE;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_ID;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_OUTPUT_PROPERTY;
 import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
-import static com.bytechef.component.jira.util.JiraUtils.getBaseUrl;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -61,8 +60,7 @@ public class JiraGetIssueAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         return context
-            .http(http -> http
-                .get(getBaseUrl(context) + "/issue/" + inputParameters.getRequiredString(ISSUE_ID)))
+            .http(http -> http.get("/issue/" + inputParameters.getRequiredString(ISSUE_ID)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

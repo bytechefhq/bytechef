@@ -22,11 +22,15 @@ import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
 import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.connection;
 import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.jira.constant.JiraConstants.ID;
 import static com.bytechef.component.jira.constant.JiraConstants.YOUR_DOMAIN;
-import static com.bytechef.component.jira.util.JiraUtils.getBaseUrl;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Kušter
@@ -54,5 +58,21 @@ public class JiraConnection {
         .baseUri((connectionParameters, context) -> getBaseUrl(context));
 
     private JiraConnection() {
+    }
+
+    private static String getBaseUrl(Context context) {
+        List<?> body = context
+            .http(http -> http.get("https://api.atlassian.com/oauth/token/accessible-resources"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        Object object = body.getFirst();
+
+        if (object instanceof Map<?, ?> map) {
+            return "https://api.atlassian.com/ex/jira/" + map.get(ID) + "/rest/api/3";
+        }
+
+        return null;
     }
 }

@@ -32,7 +32,6 @@ import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
 import static com.bytechef.component.jira.constant.JiraConstants.SUMMARY;
 import static com.bytechef.component.jira.constant.JiraConstants.TEXT;
 import static com.bytechef.component.jira.constant.JiraConstants.TYPE;
-import static com.bytechef.component.jira.util.JiraUtils.getBaseUrl;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -103,7 +102,7 @@ public class JiraCreateIssueAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         Http.Response execute = context
-            .http(http -> http.post(getBaseUrl(context) + "/issue"))
+            .http(http -> http.post("/issue"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(FIELDS, getIssueFieldsMap(inputParameters)))
             .execute();
