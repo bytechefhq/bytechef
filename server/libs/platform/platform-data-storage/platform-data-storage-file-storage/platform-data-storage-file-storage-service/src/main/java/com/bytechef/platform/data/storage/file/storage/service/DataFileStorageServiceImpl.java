@@ -32,7 +32,7 @@ import org.springframework.lang.NonNull;
  */
 public class DataFileStorageServiceImpl implements DataFileStorageService {
 
-    public static final String DATA_ENTRIES_DIR = "data_entries";
+    public static final String DATA_ENTRIES_ROOT_DIR = "data_entries/";
 
     private final FileStorageService fileStorageService;
 
@@ -108,7 +108,7 @@ public class DataFileStorageServiceImpl implements DataFileStorageService {
     }
 
     private static String getDirectoryPath(AppType type) {
-        return DATA_ENTRIES_DIR + '_' + type.ordinal();
+        return DATA_ENTRIES_ROOT_DIR + type.ordinal();
     }
 
     private static String getFilename(String componentName, DataStorageScope scope, String scopeId, String key) {
