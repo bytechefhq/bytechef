@@ -15,94 +15,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Jira",
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "oauth2_authorization_code",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : "e.g https://{yourDomain}}.atlassian.net",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "yourDomain",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Your domain",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientId",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Id",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientSecret",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Secret",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "OAuth2 Authorization Code",
-      "type" : "OAUTH2_AUTHORIZATION_CODE",
-      "acquire" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : { },
-      "clientSecret" : null,
-      "refreshToken" : null,
-      "apply" : null,
-      "clientId" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : { },
-      "tokenUrl" : { }
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "actions" : [ {
     "batch" : null,
     "dynamicOutput" : true,
@@ -268,8 +180,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create issue",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
+    "output" : null,
+    "perform" : { },
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -776,8 +688,8 @@
       },
       "sampleOutput" : null
     },
-    "output" : null,
-    "perform" : { }
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -834,8 +746,8 @@
       }
     } ],
     "title" : "Get issue",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
+    "output" : null,
+    "perform" : { },
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -1342,8 +1254,8 @@
       },
       "sampleOutput" : null
     },
-    "output" : null,
-    "perform" : { }
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -1393,8 +1305,8 @@
       "controlType" : "INTEGER"
     } ],
     "title" : "Search issues",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
+    "output" : null,
+    "perform" : { },
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -1922,8 +1834,8 @@
       },
       "sampleOutput" : null
     },
-    "output" : null,
-    "perform" : { }
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
   "triggers" : [ {
     "batch" : null,
@@ -1985,10 +1897,14 @@
     "workflowSyncExecution" : null,
     "workflowSyncValidation" : null,
     "workflowSyncOnEnableValidation" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
+    "output" : null,
+    "poll" : null,
+    "deduplicate" : null,
+    "webhookDisable" : { },
+    "webhookEnable" : { },
     "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
+    "dwebhookRequest" : { },
+    "listenerDisable" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -2495,15 +2411,11 @@
       },
       "sampleOutput" : null
     },
-    "webhookDisable" : { },
-    "webhookEnable" : { },
-    "dwebhookRequest" : { },
-    "listenerDisable" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
-    "output" : null,
-    "deduplicate" : null,
-    "poll" : null
+    "webhookValidateOnEnable" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -2564,10 +2476,14 @@
     "workflowSyncExecution" : null,
     "workflowSyncValidation" : null,
     "workflowSyncOnEnableValidation" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
+    "output" : null,
+    "poll" : null,
+    "deduplicate" : null,
+    "webhookDisable" : { },
+    "webhookEnable" : { },
     "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
+    "dwebhookRequest" : { },
+    "listenerDisable" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -3074,14 +2990,98 @@
       },
       "sampleOutput" : null
     },
-    "webhookDisable" : { },
-    "webhookEnable" : { },
-    "dwebhookRequest" : { },
-    "listenerDisable" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
-    "output" : null,
-    "deduplicate" : null,
-    "poll" : null
-  } ]
+    "webhookValidateOnEnable" : null
+  } ],
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "oauth2_authorization_code",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : "e.g https://{yourDomain}}.atlassian.net",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "yourDomain",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Your domain",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientId",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Id",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientSecret",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Secret",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "OAuth2 Authorization Code",
+      "type" : "OAUTH2_AUTHORIZATION_CODE",
+      "acquire" : null,
+      "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : { },
+      "clientId" : null,
+      "clientSecret" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : { },
+      "scopes" : { },
+      "refreshToken" : null,
+      "tokenUrl" : { }
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  }
 }

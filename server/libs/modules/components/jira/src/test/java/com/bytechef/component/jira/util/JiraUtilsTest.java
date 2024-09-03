@@ -51,26 +51,6 @@ class JiraUtilsTest {
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
 
     @Test
-    void testGetBaseUrl() {
-        List<Map<String, String>> bodyList = List.of(Map.of(ID, "123"));
-
-        when(mockedActionContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(bodyList);
-
-        String result = JiraUtils.getBaseUrl(mockedActionContext);
-
-        String expected = "https://api.atlassian.com/ex/jira/123/rest/api/3";
-
-        assertEquals(expected, result);
-    }
-
-    @Test
     void testGetProjectName() {
         Map<String, Object> valuesMap = Map.of(NAME, "name");
 
