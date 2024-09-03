@@ -65,7 +65,7 @@ public class NoopFileStorageService implements FileStorageService {
     }
 
     @Override
-    public Set<FileEntry> getFileEntries(@NonNull String directoryPath, String startWith) throws FileStorageException {
+    public Set<FileEntry> getFileEntries(@NonNull String directoryPath, String contains) throws FileStorageException {
         throw new UnsupportedOperationException();
     }
 
