@@ -19,7 +19,7 @@ package com.bytechef.platform.component.util;
 import static com.bytechef.component.definition.Context.Http.RequestMethod;
 
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.component.OpenApiComponentHandler.PropertyType;
+import com.bytechef.component.OpenAPIComponentHandler.PropertyType;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ActionDefinition.ProcessErrorResponseFunction;
@@ -48,7 +48,7 @@ import org.springframework.lang.Nullable;
 /**
  * @author Ivica Cardic
  */
-public class OpenApiClientUtils {
+public class OpenAPIClientUtils {
 
     public enum ActionDefinitionErrorType implements ErrorType {
 

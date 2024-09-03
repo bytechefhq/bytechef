@@ -18,7 +18,7 @@ package com.bytechef.platform.component.registry.oas.handler;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.exception.TaskExecutionException;
-import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.OpenAPIComponentHandler;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.registry.handler.ComponentTaskHandler;
@@ -27,15 +27,15 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * @author Ivica Cardic
  */
-public class OpenApiComponentTaskHandler extends ComponentTaskHandler {
+public class OpenAPIComponentTaskHandler extends ComponentTaskHandler {
 
     private final String actionName;
-    private final OpenApiComponentHandler openApiComponentHandler;
+    private final OpenAPIComponentHandler openApiComponentHandler;
 
     @SuppressFBWarnings("EI2")
-    public OpenApiComponentTaskHandler(
+    public OpenAPIComponentTaskHandler(
         String actionName, ActionDefinitionFacade actionDefinitionFacade,
-        OpenApiComponentHandler openApiComponentHandler) {
+        OpenAPIComponentHandler openApiComponentHandler) {
 
         super(
             openApiComponentHandler.getName(), openApiComponentHandler.getVersion(), actionName,
