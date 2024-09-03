@@ -45,6 +45,7 @@ public class NiftyConnection {
                         .required(true))
                 .authorizationUrl((connection, context) -> "https://nifty.pm/authorize")
                 .tokenUrl((connection, context) -> "https://openapi.niftypm.com/oauth/token")
+                .refreshUrl((connection, context) -> "https://openapi.niftypm.com/oauth/token")
                 .scopes((connection, context) -> List.of(
                     "task",
                     "project",
