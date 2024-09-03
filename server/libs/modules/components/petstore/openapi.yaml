@@ -1,7 +1,7 @@
 ---
 openapi: "3.0.3"
 info:
-  title: "Swagger Petstore - OpenAPI 3.0"
+  title: "Petstore"
   description: "This is a sample Pet Store Server based on the OpenAPI 3.0 specification."
   termsOfService: "http://swagger.io/terms/"
   contact:

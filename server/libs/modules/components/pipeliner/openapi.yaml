@@ -1,7 +1,7 @@
 ---
 openapi: "3.0.2"
 info:
-  title: "Pipeliner API"
+  title: "Pipeliner"
   description: "Pipeliner CRM is a comprehensive sales management tool that helps streamline sales processes through visual pipline management,
   contact organization, sales forecasting, and reporting."
   version: "v0"

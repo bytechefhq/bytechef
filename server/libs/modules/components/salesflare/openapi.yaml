@@ -1,7 +1,7 @@
 ---
 openapi: "3.0.2"
 info:
-  title: "Salesflare API"
+  title: "Salesflare"
   description: "Salesflare is a CRM software designed to help small businesses and startups manage their customer relationships efficiently."
   version: "v1"
 servers:
