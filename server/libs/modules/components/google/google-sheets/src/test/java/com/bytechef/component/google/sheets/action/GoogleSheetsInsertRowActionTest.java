@@ -71,7 +71,7 @@ class GoogleSheetsInsertRowActionTest {
                 .when(() -> GoogleSheetsUtils.createRange(sheetNameArgumentCaptor.capture(), any()))
                 .thenReturn("range");
             googleSheetsUtilsMockedStatic
-                .when(() -> GoogleSheetsUtils.appendRow(any(Sheets.class), spreadsheetIdArgumentCaptor.capture(),
+                .when(() -> GoogleSheetsUtils.appendValues(any(Sheets.class), spreadsheetIdArgumentCaptor.capture(),
                     rangeArgumentCaptor.capture(), valueRangeArgumentCaptor.capture(),
                     valueInputOptionArgumentCaptor.capture()))
                 .thenAnswer((Answer<Void>) invocation -> null);
