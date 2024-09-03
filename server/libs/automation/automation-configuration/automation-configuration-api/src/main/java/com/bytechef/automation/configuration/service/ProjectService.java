@@ -27,8 +27,6 @@ import java.util.Optional;
  */
 public interface ProjectService {
 
-    int addVersion(long id);
-
     long countProjects();
 
     Project create(Project project);
@@ -53,7 +51,7 @@ public interface ProjectService {
 
     Project getWorkflowProject(String workflowId);
 
-    Project publishProject(long id, String description);
+    int publishProject(long id, String description);
 
     Project update(long id, List<Long> tagIds);
 

@@ -110,16 +110,6 @@ public final class Project {
         return new Builder();
     }
 
-    public int addVersion() {
-        ProjectVersion projectVersion = getMaxProjectVersion();
-
-        int newVersion = projectVersion.getVersion() + 1;
-
-        projectVersions.add(new ProjectVersion(newVersion));
-
-        return newVersion;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -214,12 +204,18 @@ public final class Project {
             .anyMatch(projectVersion -> projectVersion.getStatus() == Status.PUBLISHED);
     }
 
-    public void publish(String description) {
+    public int publish(String description) {
         ProjectVersion projectVersion = getMaxProjectVersion();
 
         projectVersion.setDescription(description);
         projectVersion.setPublishedDate(LocalDateTime.now());
         projectVersion.setStatus(Status.PUBLISHED);
+
+        int newVersion = projectVersion.getVersion() + 1;
+
+        projectVersions.add(new ProjectVersion(newVersion));
+
+        return newVersion;
     }
 
     public void setCategory(Category category) {
