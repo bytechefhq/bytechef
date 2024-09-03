@@ -52,7 +52,8 @@ public class WebhookExecutorImpl implements WebhookExecutor {
     @SuppressFBWarnings("EI")
     public WebhookExecutorImpl(
         ApplicationEventPublisher eventPublisher, InstanceAccessorRegistry instanceAccessorRegistry,
-        InstanceJobFacade instanceJobFacade, JobSyncExecutor jobSyncExecutor, WebhookTriggerSyncExecutor webhookTriggerSyncExecutor,
+        InstanceJobFacade instanceJobFacade, JobSyncExecutor jobSyncExecutor,
+        WebhookTriggerSyncExecutor webhookTriggerSyncExecutor,
         TaskFileStorage taskFileStorage) {
 
         this.instanceAccessorRegistry = instanceAccessorRegistry;
