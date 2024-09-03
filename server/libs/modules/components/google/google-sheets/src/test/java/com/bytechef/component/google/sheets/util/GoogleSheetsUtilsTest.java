@@ -87,7 +87,7 @@ class GoogleSheetsUtilsTest {
     private final Sheets.Spreadsheets.Values.Append mockedAppend = mock(Sheets.Spreadsheets.Values.Append.class);
 
     @Test
-    void appendRow() throws IOException {
+    void appendValues() throws IOException {
         when(mockedSheets.spreadsheets())
             .thenReturn(mockedSpreadsheets);
         when(mockedSpreadsheets.values())
@@ -98,7 +98,7 @@ class GoogleSheetsUtilsTest {
             .thenReturn(mockedAppend);
 
         ValueRange valueRange = new ValueRange();
-        GoogleSheetsUtils.appendRow(mockedSheets, "abc", "range", valueRange, "RAW");
+        GoogleSheetsUtils.appendValues(mockedSheets, "abc", "range", valueRange, "RAW");
 
         verify(mockedSheets, times(1)).spreadsheets();
         verify(mockedSpreadsheets, times(1)).values();
@@ -424,7 +424,7 @@ class GoogleSheetsUtilsTest {
                 .thenReturn(sheetsList);
 
             List<Option<String>> sheetNameOptions = GoogleSheetsUtils.getSheetNameOptions(
-                mockedParameters, mockedParameters);
+                mockedParameters, mockedParameters, Map.of(), anyString(), mockedContext);
 
             assertNotNull(sheetNameOptions);
             assertEquals(2, sheetNameOptions.size());
@@ -476,7 +476,7 @@ class GoogleSheetsUtilsTest {
                 .thenReturn(new FileList().setFiles(files));
 
             List<Option<String>> spreadsheetIdOptions = GoogleSheetsUtils.getSpreadsheetIdOptions(
-                mockedParameters, mockedParameters);
+                mockedParameters, mockedParameters, Map.of(), anyString(), mockedContext);
 
             assertNotNull(spreadsheetIdOptions);
             assertEquals(2, spreadsheetIdOptions.size());
@@ -494,6 +494,14 @@ class GoogleSheetsUtilsTest {
             assertEquals(true, includeItemsFromAllDrivesArgumentCaptor.getValue());
             assertEquals(true, supportsAllDrivesArgumentCaptor.getValue());
         }
+    }
+
+    @Test
+    void testColumnToLabel() {
+        assertEquals("A", GoogleSheetsUtils.columnToLabel(1));
+        assertEquals("Z", GoogleSheetsUtils.columnToLabel(26));
+        assertEquals("AA", GoogleSheetsUtils.columnToLabel(27));
+        assertEquals("AB", GoogleSheetsUtils.columnToLabel(28));
     }
 
     private static List<Sheet> getSheetList() {
