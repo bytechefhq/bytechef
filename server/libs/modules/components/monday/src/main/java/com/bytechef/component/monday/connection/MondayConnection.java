@@ -44,7 +44,8 @@ public class MondayConnection {
             .authorizationUrl((connectionParameters, context) -> "https://auth.monday.com/oauth2/authorize")
             .scopes(
                 (connection, context) -> List.of("boards:read", "boards:write", "workspaces:read", "webhooks:write"))
-            .tokenUrl((connectionParameters, context) -> "https://auth.monday.com/oauth2/token"))
+            .tokenUrl((connectionParameters, context) -> "https://auth.monday.com/oauth2/token")
+            .refreshUrl((connectionParameters, context) -> "https://auth.monday.com/oauth2/token"))
         .baseUri((connectionParameters, context) -> "https://api.monday.com/v2");
 
     private MondayConnection() {
