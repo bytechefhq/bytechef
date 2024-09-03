@@ -23,7 +23,6 @@ import static com.bytechef.component.jira.constant.JiraConstants.ISSUES;
 import static com.bytechef.component.jira.constant.JiraConstants.NAME;
 import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
 import static com.bytechef.component.jira.constant.JiraConstants.SUMMARY;
-import static com.bytechef.component.jira.util.JiraUtils.getBaseUrl;
 import static com.bytechef.component.jira.util.JiraUtils.getProjectName;
 
 import com.bytechef.component.definition.ActionContext;
@@ -54,7 +53,7 @@ public class JiraOptionsUtils {
             "=\"" + getProjectName(inputParameters, connectionParameters, context) + "\"", StandardCharsets.UTF_8);
 
         Map<String, Object> body = context
-            .http(http -> http.get(getBaseUrl(context) + "/search?jql=project" + encode))
+            .http(http -> http.get("/search?jql=project" + encode))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -77,7 +76,7 @@ public class JiraOptionsUtils {
         String searchText, Context context) {
 
         List<Object> body = context
-            .http(http -> http.get(getBaseUrl(context) + "/issuetype/project?projectId=" +
+            .http(http -> http.get("/issuetype/project?projectId=" +
                 inputParameters.getRequiredString(PROJECT)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
@@ -91,7 +90,7 @@ public class JiraOptionsUtils {
         String searchText, ActionContext context) {
 
         List<Object> body = context
-            .http(http -> http.get(getBaseUrl(context) + "/priority"))
+            .http(http -> http.get("/priority"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -104,7 +103,7 @@ public class JiraOptionsUtils {
         String searchText, Context context) {
 
         Map<String, Object> body = context
-            .http(http -> http.get(getBaseUrl(context) + "/project/search"))
+            .http(http -> http.get("/project/search"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -127,7 +126,7 @@ public class JiraOptionsUtils {
         String searchText, ActionContext context) {
 
         List<Object> body = context
-            .http(http -> http.get(getBaseUrl(context) + "/users/search"))
+            .http(http -> http.get("/users/search"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

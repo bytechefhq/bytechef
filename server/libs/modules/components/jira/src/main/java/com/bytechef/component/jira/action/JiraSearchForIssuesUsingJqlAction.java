@@ -25,7 +25,6 @@ import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_OUTPUT_PR
 import static com.bytechef.component.jira.constant.JiraConstants.JQL;
 import static com.bytechef.component.jira.constant.JiraConstants.MAX_RESULTS;
 import static com.bytechef.component.jira.constant.JiraConstants.SEARCH_FOR_ISSUES_USING_JQL;
-import static com.bytechef.component.jira.util.JiraUtils.getBaseUrl;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -75,7 +74,7 @@ public class JiraSearchForIssuesUsingJqlAction {
                 .append(URLEncoder.encode(jql, StandardCharsets.UTF_8));
         }
 
-        Map<String, Object> body = context.http(http -> http.get(getBaseUrl(context) + "/search" + url))
+        Map<String, Object> body = context.http(http -> http.get("/search" + url))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
