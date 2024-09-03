@@ -57,6 +57,7 @@ public class ZohoCrmConnection {
                         .required(true))
                 .authorizationUrl((connection, context) -> "https://" + connection.getString(REGION) + "/oauth/v2/auth")
                 .tokenUrl((connection, context) -> "https://" + connection.getString(REGION) + "/oauth/v2/token")
+                .refreshUrl((connection, context) -> "https://" + connection.getString(REGION) + "/oauth/v2/token")
                 .scopes((connection, context) -> List.of(
                     "ZohoCRM.users.ALL",
                     "ZohoCRM.org.ALL",
