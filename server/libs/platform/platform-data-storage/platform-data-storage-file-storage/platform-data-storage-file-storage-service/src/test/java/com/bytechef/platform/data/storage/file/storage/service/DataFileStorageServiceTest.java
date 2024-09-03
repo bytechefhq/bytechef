@@ -30,9 +30,9 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class FileDataStorageServiceTest {
+public class DataFileStorageServiceTest {
 
-    private static final FileDataStorageService FILE_DATA_STORAGE_SERVICE;
+    private static final DataFileStorageService FILE_DATA_STORAGE_SERVICE;
 
     static {
         try {
@@ -43,7 +43,7 @@ public class FileDataStorageServiceTest {
                 throw new RuntimeException("Failed to create base directory");
             }
 
-            FILE_DATA_STORAGE_SERVICE = new FileDataStorageServiceImpl(
+            FILE_DATA_STORAGE_SERVICE = new DataFileStorageServiceImpl(
                 new FilesystemFileStorageService(baseDir.getAbsolutePath()));
         } catch (IOException e) {
             throw new RuntimeException(e);
