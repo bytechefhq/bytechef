@@ -37,14 +37,14 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-public class TriggerFileStorageConfiguration {
+public class PlatformFileStorageConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(TriggerFileStorageConfiguration.class);
+    private static final Logger logger = LoggerFactory.getLogger(PlatformFileStorageConfiguration.class);
 
     private final ApplicationProperties applicationProperties;
 
     @SuppressFBWarnings("EI")
-    public TriggerFileStorageConfiguration(ApplicationProperties applicationProperties) {
+    public PlatformFileStorageConfiguration(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
     }
 
