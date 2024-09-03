@@ -37,11 +37,6 @@ public class RemoteProjectServiceClient implements ProjectService {
     }
 
     @Override
-    public int addVersion(long id) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public long countProjects() {
         throw new UnsupportedOperationException();
     }
@@ -122,7 +117,7 @@ public class RemoteProjectServiceClient implements ProjectService {
     }
 
     @Override
-    public Project publishProject(long id, String description) {
+    public int publishProject(long id, String description) {
         throw new UnsupportedOperationException();
     }
 

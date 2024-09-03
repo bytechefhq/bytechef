@@ -329,9 +329,31 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     public void publishProject(long id, String description) {
-        Project project = projectService.publishProject(id, description);
+        Project project = projectService.getProject(id);
 
-        checkProjectWorkflowsStatus(project);
+        int oldProjectVersion = project.getLastProjectVersion();
+
+        List<ProjectWorkflow> oldProjectWorkflows = projectWorkflowService.getProjectWorkflows(
+            project.getId(), oldProjectVersion);
+
+        int newProjectVersion = projectService.publishProject(id, description);
+
+        for (ProjectWorkflow oldProjectWorkflow : oldProjectWorkflows) {
+            String oldWorkflowId = oldProjectWorkflow.getWorkflowId();
+
+            Workflow duplicatedWorkflow = workflowService.duplicateWorkflow(oldWorkflowId);
+
+            oldProjectWorkflow.setProjectVersion(newProjectVersion);
+            oldProjectWorkflow.setWorkflowId(duplicatedWorkflow.getId());
+
+            projectWorkflowService.update(oldProjectWorkflow);
+
+            projectWorkflowService.addWorkflow(
+                project.getId(), oldProjectVersion, oldWorkflowId, oldProjectWorkflow.getWorkflowReferenceCode());
+
+            workflowTestConfigurationService.updateWorkflowId(oldWorkflowId, duplicatedWorkflow.getId());
+            workflowNodeTestOutputService.updateWorkflowId(oldWorkflowId, duplicatedWorkflow.getId());
+        }
     }
 
     @Override
@@ -360,35 +382,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
 
         return new ProjectWorkflowDTO(workflowFacade.update(workflowId, definition, version), projectWorkflow);
-    }
-
-    private void checkProjectWorkflowsStatus(Project project) {
-        List<ProjectWorkflow> latestProjectWorkflows = projectWorkflowService.getProjectWorkflows(
-            project.getId(), project.getLastProjectVersion());
-
-        if (project.getLastStatus() == Status.PUBLISHED) {
-            int lastVersion = project.getLastProjectVersion();
-            int newVersion = projectService.addVersion(project.getId());
-
-            for (ProjectWorkflow projectWorkflow : latestProjectWorkflows) {
-                String oldWorkflowId = projectWorkflow.getWorkflowId();
-
-                Workflow duplicatedWorkflow = workflowService.duplicateWorkflow(oldWorkflowId);
-
-                projectWorkflow.setProjectVersion(newVersion);
-                projectWorkflow.setWorkflowId(duplicatedWorkflow.getId());
-
-                projectWorkflowService.update(projectWorkflow);
-
-                projectWorkflowService.addWorkflow(
-                    project.getId(), lastVersion, oldWorkflowId, projectWorkflow.getWorkflowReferenceCode());
-
-                workflowTestConfigurationService.updateWorkflowId(oldWorkflowId, duplicatedWorkflow.getId());
-                workflowNodeTestOutputService.updateWorkflowId(oldWorkflowId, duplicatedWorkflow.getId());
-            }
-        } else {
-            throw new IllegalStateException("Project id=%s must be published".formatted(project.getId()));
-        }
     }
 
     private List<Tag> checkTags(List<Tag> tags) {

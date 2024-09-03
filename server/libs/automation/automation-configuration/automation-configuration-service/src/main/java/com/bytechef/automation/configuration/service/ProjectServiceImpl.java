@@ -43,17 +43,6 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public int addVersion(long id) {
-        Project project = getProject(id);
-
-        int newVersion = project.addVersion();
-
-        projectRepository.save(project);
-
-        return newVersion;
-    }
-
-    @Override
     public long countProjects() {
         return projectRepository.count();
     }
@@ -132,12 +121,14 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project publishProject(long id, String description) {
+    public int publishProject(long id, String description) {
         Project project = getProject(id);
 
-        project.publish(description);
+        int newVersion = project.publish(description);
 
-        return projectRepository.save(project);
+        projectRepository.save(project);
+
+        return newVersion;
     }
 
     @Override
