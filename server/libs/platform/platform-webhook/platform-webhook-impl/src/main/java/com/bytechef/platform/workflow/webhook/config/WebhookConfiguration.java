@@ -36,7 +36,7 @@ import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.platform.workflow.execution.facade.InstanceJobFacade;
-import com.bytechef.platform.workflow.webhook.executor.TriggerSyncExecutor;
+import com.bytechef.platform.workflow.webhook.executor.WebhookTriggerSyncExecutor;
 import com.bytechef.platform.workflow.webhook.executor.WebhookExecutor;
 import com.bytechef.platform.workflow.webhook.executor.WebhookExecutorImpl;
 import com.bytechef.task.dispatcher.branch.BranchTaskDispatcher;
@@ -74,7 +74,7 @@ public class WebhookConfiguration {
         InstanceAccessorRegistry instanceAccessorRegistry, InstanceJobFacade instanceJobFacade, JobService jobService,
         ObjectMapper objectMapper, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         Executor taskExecutor, TaskExecutionService taskExecutionService, TaskHandlerRegistry taskHandlerRegistry,
-        TriggerSyncExecutor triggerSyncExecutor, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
+        WebhookTriggerSyncExecutor webhookTriggerSyncExecutor, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
 
@@ -90,7 +90,7 @@ public class WebhookConfiguration {
                     contextService, counterService, syncMessageBroker, taskExecutionService, taskFileStorage),
                 taskExecutionService, (AsyncTaskExecutor) taskExecutor, taskHandlerRegistry, taskFileStorage,
                 workflowService),
-            triggerSyncExecutor, taskFileStorage);
+            webhookTriggerSyncExecutor, taskFileStorage);
     }
 
     private static ApplicationEventPublisher getEventPublisher(SyncMessageBroker syncMessageBroker) {
