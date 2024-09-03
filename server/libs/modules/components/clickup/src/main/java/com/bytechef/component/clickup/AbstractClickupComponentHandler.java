@@ -33,7 +33,7 @@ import com.bytechef.component.definition.ComponentDefinition;
 public abstract class AbstractClickupComponentHandler implements OpenAPIComponentHandler {
     private final ComponentDefinition componentDefinition = modifyComponent(
         component("clickup")
-            .title("Clickup")
+            .title("ClickUp")
             .description(
                 "ClickUp is a cloud-based collaboration tool that offers task management, document sharing, goal tracking, and other productivity features for teams."))
                     .actions(modifyActions(ClickupCreateListAction.ACTION_DEFINITION,
