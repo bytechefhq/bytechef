@@ -96,7 +96,6 @@
     "title" : "Create folder",
     "output" : null,
     "perform" : { },
-    "processErrorResponse" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -161,7 +160,8 @@
       },
       "sampleOutput" : null
     },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -237,7 +237,6 @@
     "title" : "Create list",
     "output" : null,
     "perform" : { },
-    "processErrorResponse" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -322,7 +321,8 @@
       },
       "sampleOutput" : null
     },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -396,7 +396,6 @@
     "title" : "Create list item",
     "output" : null,
     "perform" : { },
-    "processErrorResponse" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -441,7 +440,8 @@
       },
       "sampleOutput" : null
     },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "dynamicOutput" : true,
@@ -596,7 +596,6 @@
     "title" : "Upload file",
     "output" : null,
     "perform" : { },
-    "processErrorResponse" : null,
     "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
@@ -641,7 +640,8 @@
       },
       "sampleOutput" : null
     },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   } ],
   "connection" : {
     "authorizations" : [ {
