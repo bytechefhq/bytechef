@@ -25,7 +25,7 @@ import org.springframework.lang.NonNull;
 /**
  * @author Ivica Cardic
  */
-public interface FileDataStorageService {
+public interface DataFileStorageService {
 
     void delete(
         @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,

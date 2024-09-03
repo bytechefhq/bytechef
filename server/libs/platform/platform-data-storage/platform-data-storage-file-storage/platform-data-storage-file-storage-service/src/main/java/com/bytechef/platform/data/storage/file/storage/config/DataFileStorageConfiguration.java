@@ -24,8 +24,8 @@ import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.annotation.ConditionalOnDataStorageProviderAws;
 import com.bytechef.platform.data.storage.annotation.ConditionalOnDataStorageProviderFilesystem;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
-import com.bytechef.platform.data.storage.file.storage.service.FileDataStorageService;
-import com.bytechef.platform.data.storage.file.storage.service.FileDataStorageServiceImpl;
+import com.bytechef.platform.data.storage.file.storage.service.DataFileStorageService;
+import com.bytechef.platform.data.storage.file.storage.service.DataFileStorageServiceImpl;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.Optional;
@@ -39,14 +39,14 @@ import org.springframework.lang.NonNull;
  * @author Ivica Cardic
  */
 @Configuration
-public class FileDataStorageConfiguration {
+public class DataFileStorageConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(FileDataStorageConfiguration.class);
+    private static final Logger logger = LoggerFactory.getLogger(DataFileStorageConfiguration.class);
 
     private final ApplicationProperties applicationProperties;
 
     @SuppressFBWarnings("EI")
-    public FileDataStorageConfiguration(ApplicationProperties applicationProperties) {
+    public DataFileStorageConfiguration(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
     }
 
@@ -57,7 +57,7 @@ public class FileDataStorageConfiguration {
             logger.info("Data storage provider type enabled: aws");
         }
 
-        return new DataStorageImpl(new FileDataStorageServiceImpl(new AwsFileStorageService()));
+        return new DataStorageImpl(new DataFileStorageServiceImpl(new AwsFileStorageService()));
     }
 
     @Bean
@@ -67,7 +67,7 @@ public class FileDataStorageConfiguration {
             logger.info("Data storage provider type enabled: filesystem");
         }
 
-        return new DataStorageImpl(new FileDataStorageServiceImpl(new FilesystemFileStorageService(getBasedir())));
+        return new DataStorageImpl(new DataFileStorageServiceImpl(new FilesystemFileStorageService(getBasedir())));
     }
 
     private String getBasedir() {
@@ -76,7 +76,7 @@ public class FileDataStorageConfiguration {
             .getBasedir();
     }
 
-    private record DataStorageImpl(FileDataStorageService fileDataStorageService) implements DataStorage {
+    private record DataStorageImpl(DataFileStorageService dataFileStorageService) implements DataStorage {
 
         @NonNull
         @Override
@@ -84,7 +84,7 @@ public class FileDataStorageConfiguration {
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
             @NonNull String key, @NonNull AppType type) {
 
-            return fileDataStorageService.fetch(componentName, scope, scopeId, key, type);
+            return dataFileStorageService.fetch(componentName, scope, scopeId, key, type);
         }
 
         @NonNull
@@ -93,7 +93,7 @@ public class FileDataStorageConfiguration {
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
             @NonNull String key, @NonNull AppType type) {
 
-            return fileDataStorageService.get(componentName, scope, scopeId, key, type);
+            return dataFileStorageService.get(componentName, scope, scopeId, key, type);
         }
 
         @NonNull
@@ -102,7 +102,7 @@ public class FileDataStorageConfiguration {
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
             @NonNull AppType type) {
 
-            return fileDataStorageService.getAll(componentName, scope, scopeId, type);
+            return dataFileStorageService.getAll(componentName, scope, scopeId, type);
         }
 
         @Override
@@ -110,7 +110,7 @@ public class FileDataStorageConfiguration {
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
             @NonNull String key, @NonNull AppType type, @NonNull Object value) {
 
-            fileDataStorageService.put(componentName, scope, scopeId, key, type, value);
+            dataFileStorageService.put(componentName, scope, scopeId, key, type, value);
         }
 
         @Override
@@ -118,7 +118,7 @@ public class FileDataStorageConfiguration {
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
             @NonNull String key, @NonNull AppType type) {
 
-            fileDataStorageService.delete(componentName, scope, scopeId, key, type);
+            dataFileStorageService.delete(componentName, scope, scopeId, key, type);
         }
     }
 }
