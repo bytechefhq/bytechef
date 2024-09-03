@@ -45,7 +45,8 @@ public class BoxConnection {
                         .required(true))
                 .authorizationUrl((connectionParameters, context) -> "https://account.box.com/api/oauth2/authorize")
                 .scopes((connection, context) -> List.of("root_readonly", "root_readwrite", "manage_webhook"))
-                .tokenUrl((connectionParameters, context) -> "https://api.box.com/oauth2/token"));
+                .tokenUrl((connectionParameters, context) -> "https://api.box.com/oauth2/token")
+                .refreshUrl((connectionParameters, context) -> "https://api.box.com/oauth2/token"));
 
     private BoxConnection() {
     }
