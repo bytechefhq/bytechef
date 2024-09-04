@@ -83,7 +83,5 @@ public class GoogleMailNewEmailPollingTrigger {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
-
 }
