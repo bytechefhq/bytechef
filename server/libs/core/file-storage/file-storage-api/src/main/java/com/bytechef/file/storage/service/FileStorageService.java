@@ -39,8 +39,6 @@ public interface FileStorageService {
 
     Set<FileEntry> getFileEntries(@NonNull String directoryPath) throws FileStorageException;
 
-    Set<FileEntry> getFileEntries(@NonNull String directoryPath, String contains) throws FileStorageException;
-
     InputStream getFileStream(@NonNull String directoryPath, @NonNull FileEntry fileEntry) throws FileStorageException;
 
     URL getFileEntryURL(@NonNull String directoryPath, @NonNull FileEntry fileEntry);

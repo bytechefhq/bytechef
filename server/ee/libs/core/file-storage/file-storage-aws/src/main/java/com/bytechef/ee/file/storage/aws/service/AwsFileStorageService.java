@@ -57,12 +57,6 @@ public class AwsFileStorageService implements FileStorageService {
     }
 
     @Override
-    public Set<FileEntry> getFileEntries(@NonNull String directoryPath, String contains) throws FileStorageException {
-        // TODO
-        return null;
-    }
-
-    @Override
     public InputStream getFileStream(@NonNull String directoryPath, @NonNull FileEntry fileEntry)
         throws FileStorageException {
         // TODO

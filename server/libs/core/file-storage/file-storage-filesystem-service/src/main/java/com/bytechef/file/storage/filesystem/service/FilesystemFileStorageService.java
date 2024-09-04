@@ -101,17 +101,11 @@ public class FilesystemFileStorageService implements FileStorageService {
 
     @Override
     public Set<FileEntry> getFileEntries(@NonNull String directoryPath) throws FileStorageException {
-        return getFileEntries(directoryPath, null);
-    }
-
-    @Override
-    public Set<FileEntry> getFileEntries(@NonNull String directoryPath, String contains) throws FileStorageException {
         Path curDirectoryPath = resolveDirectoryPath(directoryPath);
 
         try (Stream<Path> stream = Files.walk(curDirectoryPath)) {
             return stream
                 .filter(path -> !Files.isDirectory(path))
-                .filter(path -> contains == null || StringUtils.contains(path.toString(), contains))
                 .map(path -> new FileEntry(toString(path.getFileName()), URL_PREFIX + path))
                 .collect(Collectors.toSet());
         } catch (IOException e) {
