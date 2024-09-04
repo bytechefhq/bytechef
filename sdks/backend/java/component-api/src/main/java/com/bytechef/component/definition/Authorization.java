@@ -273,6 +273,8 @@ public interface Authorization {
 
     String getName();
 
+    Optional<OAuth2AuthorizationExtraQueryParametersFunction> getOAuth2AuthorizationExtraQueryParameters();
+
     /**
      * TODO
      *
@@ -431,6 +433,20 @@ public interface Authorization {
          * @return
          */
         String apply(Parameters connectionParameters, Context context) throws Exception;
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface OAuth2AuthorizationExtraQueryParametersFunction {
+
+        /**
+         * @param connectionParameters
+         * @param context
+         * @return
+         */
+        Map<String, String> apply(Parameters connectionParameters, Context context) throws Exception;
     }
 
     /**

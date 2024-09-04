@@ -34,6 +34,7 @@ import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.Authorization.AuthorizationUrlFunction;
 import com.bytechef.component.definition.Authorization.ClientIdFunction;
 import com.bytechef.component.definition.Authorization.ClientSecretFunction;
+import com.bytechef.component.definition.Authorization.OAuth2AuthorizationExtraQueryParametersFunction;
 import com.bytechef.component.definition.Authorization.PkceFunction;
 import com.bytechef.component.definition.Authorization.RefreshFunction;
 import com.bytechef.component.definition.Authorization.RefreshTokenFunction;
@@ -305,13 +306,18 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         ScopesFunction scopesFunction = OptionalUtils.orElse(
             authorization.getScopes(),
             (connectionParameters, context1) -> getDefaultScopes(connectionParameters));
+        OAuth2AuthorizationExtraQueryParametersFunction oAuth2AuthorizationExtraQueryParametersFunction =
+            OptionalUtils.orElse(
+                authorization.getOAuth2AuthorizationExtraQueryParameters(),
+                (connectionParameters, context1) -> Map.of());
 
         ParametersImpl connectionParameters = new ParametersImpl(authorizationParams);
 
         try {
             return new OAuth2AuthorizationParameters(
                 authorizationUrlFunction.apply(connectionParameters, context),
-                clientIdFunction.apply(connectionParameters, context), Map.of("access_type", "offline"),
+                clientIdFunction.apply(connectionParameters, context),
+                oAuth2AuthorizationExtraQueryParametersFunction.apply(connectionParameters, context),
                 scopesFunction.apply(connectionParameters, context));
         } catch (Exception e) {
             throw new ComponentConfigurationException(
