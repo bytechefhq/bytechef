@@ -749,6 +749,7 @@ public final class ComponentDSL {
         private List<String> detectOn;
         private String description;
         private String name;
+        private OAuth2AuthorizationExtraQueryParametersFunction oAuth2AuthorizationExtraQueryParametersFunction;
         private PkceFunction pkceFunction;
         private List<? extends Property> properties;
         private RefreshFunction refreshFunction;
@@ -818,8 +819,20 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableAuthorization pkce(PkceFunction pkce) {
-            this.pkceFunction = Objects.requireNonNull(pkce);
+        public ModifiableAuthorization oAuth2AuthorizationExtraQueryParameters(
+            Map<String, String> oAuth2AuthorizationExtraQueryParameters) {
+
+            this.oAuth2AuthorizationExtraQueryParametersFunction =
+                (connectionParameters, context) -> Objects.requireNonNull(oAuth2AuthorizationExtraQueryParameters);
+
+            return this;
+        }
+
+        public ModifiableAuthorization oAuth2AuthorizationExtraQueryParameters(
+            OAuth2AuthorizationExtraQueryParametersFunction oAuth2AuthorizationExtraQueryParameters) {
+
+            this.oAuth2AuthorizationExtraQueryParametersFunction = Objects.requireNonNull(
+                oAuth2AuthorizationExtraQueryParameters);
 
             return this;
         }
@@ -934,6 +947,11 @@ public final class ComponentDSL {
         @Override
         public String getName() {
             return name;
+        }
+
+        @Override
+        public Optional<OAuth2AuthorizationExtraQueryParametersFunction> getOAuth2AuthorizationExtraQueryParameters() {
+            return Optional.ofNullable(oAuth2AuthorizationExtraQueryParametersFunction);
         }
 
         @Override
