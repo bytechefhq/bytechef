@@ -434,20 +434,6 @@ public interface Authorization {
     }
 
     /**
-     * Adds oauth refresh token value to provided connectionParameters
-     */
-    @FunctionalInterface
-    interface RefreshTokenFunction {
-
-        /**
-         * @param connectionParameters
-         * @param context
-         * @return
-         */
-        String apply(Parameters connectionParameters, Context context) throws Exception;
-    }
-
-    /**
      *
      */
     @FunctionalInterface
@@ -463,6 +449,21 @@ public interface Authorization {
          */
         Pkce apply(String verifier, String challenge, String challengeMethod, Context context)
             throws Exception;
+    }
+
+    /**
+     * Adds oauth refresh token value to provided connectionParameters
+     */
+    @FunctionalInterface
+    interface RefreshTokenFunction {
+
+        /**
+         * @param connectionParameters
+         * @param context
+         * @return
+         */
+        String apply(Parameters connectionParameters, Context context) throws Exception;
+
     }
 
     /**
