@@ -109,31 +109,14 @@ public interface ActionDefinition {
 
     /**
      *
-     * @return
      */
-    boolean isDynamicOutput();
-
-    /**
-     *
-     */
-    interface PerformFunction {
+    interface OutputFunction {
     }
 
     /**
      *
      */
-    @FunctionalInterface
-    interface SingleConnectionPerformFunction extends PerformFunction {
-
-        /**
-         *
-         * @param inputParameters
-         * @param connectionParameters
-         * @param context
-         * @return
-         */
-        Object apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
-            throws Exception;
+    interface PerformFunction {
     }
 
     /**
@@ -155,12 +138,6 @@ public interface ActionDefinition {
     /**
      *
      */
-    interface OutputFunction {
-    }
-
-    /**
-     *
-     */
     interface SingleConnectionOutputFunction extends OutputFunction {
 
         /**
@@ -171,5 +148,22 @@ public interface ActionDefinition {
          */
         OutputResponse apply(
             Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws Exception;
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface SingleConnectionPerformFunction extends PerformFunction {
+
+        /**
+         *
+         * @param inputParameters
+         * @param connectionParameters
+         * @param context
+         * @return
+         */
+        Object apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
+            throws Exception;
     }
 }
