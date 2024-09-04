@@ -27,12 +27,13 @@ import static com.bytechef.component.llm.constants.LLMConstants.ASK;
 import static com.bytechef.component.llm.constants.LLMConstants.FREQUENCY_PENALTY;
 import static com.bytechef.component.llm.constants.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.FUNCTIONS;
-import static com.bytechef.component.llm.constants.LLMConstants.FUNCTIONS_PROERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.FUNCTIONS_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.llm.constants.LLMConstants.MESSAGE_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
 import static com.bytechef.component.llm.constants.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.llm.constants.LLMConstants.PRESENCE_PENALTY_PROPERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.llm.constants.LLMConstants.SEED;
 import static com.bytechef.component.llm.constants.LLMConstants.SEED_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.STOP;
@@ -104,11 +105,13 @@ public class OllamaChatAction {
                         .collect(Collectors.toMap(
                             OllamaModel::getName, OllamaModel::getName, (f, s) -> f)))),
             MESSAGE_PROPERTY,
-            string(FORMAT)
-                .label("Format")
-                .description("The format to return a response in.")
-                .options(option("JSON", "json"))
-                .defaultValue("json"),
+            integer(RESPONSE_FORMAT)
+                .label("Response format")
+                .description("In which format do you want the response to be in?")
+                .options(option("Object", 1, "JSON response with key-value pairs."),
+                    option("List", 2, "JSON response that is a list."))
+                .defaultValue(1)
+                .required(false),
             string(KEEP_ALIVE)
                 .label("Keep alive for")
                 .description("Controls how long the model will stay loaded into memory following the request")
@@ -124,7 +127,7 @@ public class OllamaChatAction {
             FREQUENCY_PENALTY_PROPERTY,
             PRESENCE_PENALTY_PROPERTY,
             STOP_PROPERTY,
-            FUNCTIONS_PROERTY,
+            FUNCTIONS_PROPERTY,
             SEED_PROPERTY,
             bool(USE_NUMA)
                 .label("Use NUMA")

@@ -75,7 +75,7 @@ public class LLMConstants {
         .maxValue(2)
         .advancedOption(true);
 
-    public static final ComponentDSL.ModifiableArrayProperty FUNCTIONS_PROERTY = array(FUNCTIONS)
+    public static final ComponentDSL.ModifiableArrayProperty FUNCTIONS_PROPERTY = array(FUNCTIONS)
         .label("Functions")
         .description("Enter the names of functions you want to use.")
         .items(string())
@@ -85,8 +85,9 @@ public class LLMConstants {
         .label("Response format")
         .description("In which format do you want the response to be in?")
         .options(option("Text", 0),
-            option("Map", 1),
-            option("List", 2))
+            option("Object", 1, "JSON response with key-value pairs."),
+            option("List", 2, "JSON response that is a list."))
+        .defaultValue(0)
         .required(false);
 
     public static final ComponentDSL.ModifiableObjectProperty LOGIT_BIAS_PROPERTY = object(LOGIT_BIAS)

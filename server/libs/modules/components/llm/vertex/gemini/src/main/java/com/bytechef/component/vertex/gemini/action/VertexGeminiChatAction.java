@@ -22,7 +22,7 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.llm.constants.LLMConstants.ASK;
 import static com.bytechef.component.llm.constants.LLMConstants.FUNCTIONS;
-import static com.bytechef.component.llm.constants.LLMConstants.FUNCTIONS_PROERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.FUNCTIONS_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MESSAGE_PROPERTY;
@@ -89,7 +89,7 @@ public class VertexGeminiChatAction {
             TOP_P_PROPERTY,
             TOP_K_PROPERTY,
             STOP_PROPERTY,
-            FUNCTIONS_PROERTY)
+                FUNCTIONS_PROPERTY)
         .outputSchema(object())
         .perform(VertexGeminiChatAction::perform);
 
