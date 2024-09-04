@@ -91,7 +91,7 @@ public class DataFileStorageServiceImpl implements DataFileStorageService {
         @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
         @NonNull AppType type) {
 
-        return fileStorageService.getFileEntries(getDirectoryPath(type), getDirectoryPath(type))
+        return fileStorageService.getFileEntries(getDirectoryPath(type))
             .stream()
             .collect(Collectors.toMap(
                 fileEntry -> getKey(fileEntry.getName()),
