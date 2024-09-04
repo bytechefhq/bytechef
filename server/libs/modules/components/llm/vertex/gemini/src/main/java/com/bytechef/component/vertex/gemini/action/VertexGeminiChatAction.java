@@ -89,7 +89,7 @@ public class VertexGeminiChatAction {
             TOP_P_PROPERTY,
             TOP_K_PROPERTY,
             STOP_PROPERTY,
-                FUNCTIONS_PROPERTY)
+            FUNCTIONS_PROPERTY)
         .outputSchema(object())
         .perform(VertexGeminiChatAction::perform);
 
