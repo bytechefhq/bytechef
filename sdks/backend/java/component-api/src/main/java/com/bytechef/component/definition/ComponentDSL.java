@@ -749,12 +749,12 @@ public final class ComponentDSL {
         private List<String> detectOn;
         private String description;
         private String name;
+        private PkceFunction pkceFunction;
         private List<? extends Property> properties;
         private RefreshFunction refreshFunction;
         private List<Object> refreshOn;
         private RefreshUrlFunction refreshUrlFunction;
         private ScopesFunction scopesFunction;
-        private PkceFunction pkceFunction;
         private String title;
         private TokenUrlFunction tokenUrlFunction;
         private AuthorizationType type;
@@ -818,6 +818,18 @@ public final class ComponentDSL {
             return this;
         }
 
+        public ModifiableAuthorization pkce(PkceFunction pkce) {
+            this.pkceFunction = Objects.requireNonNull(pkce);
+
+            return this;
+        }
+
+        public ModifiableAuthorization pkce(PkceFunction pkce) {
+            this.pkceFunction = Objects.requireNonNull(pkce);
+
+            return this;
+        }
+
         public ModifiableAuthorization refreshOn(Object... refreshOn) {
             if (refreshOn != null) {
                 this.refreshOn = List.of(refreshOn);
@@ -830,12 +842,6 @@ public final class ComponentDSL {
             if (refreshTokenFunction != null) {
                 this.refreshTokenFunction = refreshTokenFunction;
             }
-
-            return this;
-        }
-
-        public ModifiableAuthorization pkce(PkceFunction pkce) {
-            this.pkceFunction = Objects.requireNonNull(pkce);
 
             return this;
         }
@@ -931,11 +937,6 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<List<Object>> getRefreshOn() {
-            return Optional.ofNullable(refreshOn);
-        }
-
-        @Override
         public Optional<PkceFunction> getPkce() {
             return Optional.ofNullable(pkceFunction);
         }
@@ -948,6 +949,11 @@ public final class ComponentDSL {
         @Override
         public Optional<RefreshFunction> getRefresh() {
             return Optional.ofNullable(refreshFunction);
+        }
+
+        @Override
+        public Optional<List<Object>> getRefreshOn() {
+            return Optional.ofNullable(refreshOn);
         }
 
         @Override
