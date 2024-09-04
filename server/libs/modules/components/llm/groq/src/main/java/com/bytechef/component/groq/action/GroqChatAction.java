@@ -24,7 +24,7 @@ import static com.bytechef.component.llm.constants.LLMConstants.ASK;
 import static com.bytechef.component.llm.constants.LLMConstants.FREQUENCY_PENALTY;
 import static com.bytechef.component.llm.constants.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.FUNCTIONS;
-import static com.bytechef.component.llm.constants.LLMConstants.FUNCTIONS_PROERTY;
+import static com.bytechef.component.llm.constants.LLMConstants.FUNCTIONS_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.LOGIT_BIAS;
 import static com.bytechef.component.llm.constants.LLMConstants.LOGIT_BIAS_PROPERTY;
 import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
@@ -82,7 +82,7 @@ public class GroqChatAction {
             PRESENCE_PENALTY_PROPERTY,
             LOGIT_BIAS_PROPERTY,
             STOP_PROPERTY,
-            FUNCTIONS_PROERTY,
+                FUNCTIONS_PROPERTY,
             USER_PROPERTY)
         .outputSchema(object())
         .perform(GroqChatAction::perform);
