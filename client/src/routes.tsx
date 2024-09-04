@@ -23,6 +23,7 @@ import Integrations from '@/pages/embedded/integrations/Integrations';
 import {WorkflowExecutions as EmbeddedIntegrationWorkflowExecutions} from '@/pages/embedded/workflow-executions/WorkflowExecutions';
 import Home from '@/pages/home/Home';
 import OAuthPopup from '@/pages/platform/connection/components/oauth2/OAuthPopup';
+import AdminApiKeys from '@/pages/platform/settings/admin-api-keys/AdminApiKeys';
 import Workspaces from '@/pages/settings/automation/workspaces/Workspaces';
 import ApiKeys from '@/pages/settings/embedded/api-keys/ApiKeys';
 import SigningKeys from '@/pages/settings/embedded/signing-keys/SigningKeys';
@@ -75,6 +76,28 @@ const getAccountRoutes = (path: string) => ({
     ),
     path: 'account',
 });
+
+const platformSettingsRoutes = {
+    children: [
+        {
+            element: <AdminApiKeys />,
+            path: 'admin-api-keys',
+        },
+    ],
+    navItems: [
+        {
+            title: 'Organization',
+        },
+        {
+            href: `api-connectors`,
+            title: 'API Connectors',
+        },
+        {
+            href: `admin-api-keys`,
+            title: 'Admin API Keys',
+        },
+    ],
+};
 
 export const getRouter = (queryClient: QueryClient) =>
     createBrowserRouter([
@@ -189,6 +212,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                     ),
                                     path: 'workspaces',
                                 },
+                                ...platformSettingsRoutes.children,
                             ],
                             element: (
                                 <Settings
@@ -197,6 +221,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                             href: '/automation/settings/workspaces',
                                             title: 'Workspaces',
                                         },
+                                        ...platformSettingsRoutes.navItems,
                                     ]}
                                 />
                             ),
@@ -309,6 +334,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                     ),
                                     path: 'signing-keys',
                                 },
+                                ...platformSettingsRoutes.children,
                             ],
                             element: (
                                 <Settings
@@ -321,6 +347,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                             href: '/embedded/settings/signing-keys',
                                             title: 'Signing Keys',
                                         },
+                                        ...platformSettingsRoutes.navItems,
                                     ]}
                                 />
                             ),
