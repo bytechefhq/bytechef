@@ -26,6 +26,7 @@ import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.google.api.client.googleapis.auth.oauth2.GoogleOAuthConstants;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -45,6 +46,7 @@ public class GoogleConnection {
                             .label("Client Secret")
                             .required(true))
                     .authorizationUrl((connection, context) -> " https://accounts.google.com/o/oauth2/v2/auth")
+                    .oAuth2AuthorizationExtraQueryParameters(Map.of("access_type", "offline"))
                     .refreshUrl((connectionParameters, context) -> GoogleOAuthConstants.TOKEN_SERVER_URL)
                     .refreshOn("^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$")
                     .scopes(scopes)
