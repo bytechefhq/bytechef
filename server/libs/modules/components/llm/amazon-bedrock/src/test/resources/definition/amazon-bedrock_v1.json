@@ -197,7 +197,7 @@
       "required" : false,
       "name" : "responseFormat",
       "type" : "INTEGER",
-      "defaultValue" : null,
+      "defaultValue" : 0,
       "exampleValue" : null,
       "label" : "Response format",
       "placeholder" : null,
@@ -208,11 +208,11 @@
         "label" : "Text",
         "value" : 0
       }, {
-        "description" : null,
-        "label" : "Map",
+        "description" : "JSON response with key-value pairs.",
+        "label" : "Object",
         "value" : 1
       }, {
-        "description" : null,
+        "description" : "JSON response that is a list.",
         "label" : "List",
         "value" : 2
       } ],
@@ -518,7 +518,7 @@
       "required" : false,
       "name" : "responseFormat",
       "type" : "INTEGER",
-      "defaultValue" : null,
+      "defaultValue" : 0,
       "exampleValue" : null,
       "label" : "Response format",
       "placeholder" : null,
@@ -529,11 +529,11 @@
         "label" : "Text",
         "value" : 0
       }, {
-        "description" : null,
-        "label" : "Map",
+        "description" : "JSON response with key-value pairs.",
+        "label" : "Object",
         "value" : 1
       }, {
-        "description" : null,
+        "description" : "JSON response that is a list.",
         "label" : "List",
         "value" : 2
       } ],
@@ -816,7 +816,7 @@
       "required" : false,
       "name" : "responseFormat",
       "type" : "INTEGER",
-      "defaultValue" : null,
+      "defaultValue" : 0,
       "exampleValue" : null,
       "label" : "Response format",
       "placeholder" : null,
@@ -827,11 +827,11 @@
         "label" : "Text",
         "value" : 0
       }, {
-        "description" : null,
-        "label" : "Map",
+        "description" : "JSON response with key-value pairs.",
+        "label" : "Object",
         "value" : 1
       }, {
-        "description" : null,
+        "description" : "JSON response that is a list.",
         "label" : "List",
         "value" : 2
       } ],
@@ -1278,7 +1278,7 @@
       "required" : false,
       "name" : "responseFormat",
       "type" : "INTEGER",
-      "defaultValue" : null,
+      "defaultValue" : 0,
       "exampleValue" : null,
       "label" : "Response format",
       "placeholder" : null,
@@ -1289,11 +1289,11 @@
         "label" : "Text",
         "value" : 0
       }, {
-        "description" : null,
-        "label" : "Map",
+        "description" : "JSON response with key-value pairs.",
+        "label" : "Object",
         "value" : 1
       }, {
-        "description" : null,
+        "description" : "JSON response that is a list.",
         "label" : "List",
         "value" : 2
       } ],
@@ -1727,7 +1727,7 @@
       "required" : false,
       "name" : "responseFormat",
       "type" : "INTEGER",
-      "defaultValue" : null,
+      "defaultValue" : 0,
       "exampleValue" : null,
       "label" : "Response format",
       "placeholder" : null,
@@ -1738,11 +1738,11 @@
         "label" : "Text",
         "value" : 0
       }, {
-        "description" : null,
-        "label" : "Map",
+        "description" : "JSON response with key-value pairs.",
+        "label" : "Object",
         "value" : 1
       }, {
-        "description" : null,
+        "description" : "JSON response that is a list.",
         "label" : "List",
         "value" : 2
       } ],
@@ -1988,7 +1988,7 @@
       "required" : false,
       "name" : "responseFormat",
       "type" : "INTEGER",
-      "defaultValue" : null,
+      "defaultValue" : 0,
       "exampleValue" : null,
       "label" : "Response format",
       "placeholder" : null,
@@ -1999,11 +1999,11 @@
         "label" : "Text",
         "value" : 0
       }, {
-        "description" : null,
-        "label" : "Map",
+        "description" : "JSON response with key-value pairs.",
+        "label" : "Object",
         "value" : 1
       }, {
-        "description" : null,
+        "description" : "JSON response that is a list.",
         "label" : "List",
         "value" : 2
       } ],
@@ -2144,6 +2144,7 @@
     "workflowNodeDescription" : null,
     "processErrorResponse" : null
   } ],
+  "triggers" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -2279,6 +2280,5 @@
     "authorizationRequired" : null,
     "baseUri" : null,
     "test" : null
-  },
-  "triggers" : null
+  }
 }

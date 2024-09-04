@@ -82,7 +82,7 @@ public class NVIDIAChatAction {
             PRESENCE_PENALTY_PROPERTY,
             LOGIT_BIAS_PROPERTY,
             STOP_PROPERTY,
-                FUNCTIONS_PROPERTY,
+            FUNCTIONS_PROPERTY,
             USER_PROPERTY)
         .outputSchema(object())
         .perform(NVIDIAChatAction::perform);

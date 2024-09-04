@@ -87,7 +87,7 @@ public class AzureOpenAIChatAction {
             LOGIT_BIAS_PROPERTY,
             TOP_P_PROPERTY,
             STOP_PROPERTY,
-                FUNCTIONS_PROPERTY,
+            FUNCTIONS_PROPERTY,
             USER_PROPERTY)
         .outputSchema(object())
         .perform(AzureOpenAIChatAction::perform);
