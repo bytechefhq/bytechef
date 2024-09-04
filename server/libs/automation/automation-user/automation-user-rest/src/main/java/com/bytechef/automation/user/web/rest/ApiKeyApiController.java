@@ -25,6 +25,7 @@ import com.bytechef.platform.user.service.ApiKeyService;
 import com.bytechef.platform.user.web.rest.AbstractApiKeyApiController;
 import com.bytechef.platform.user.web.rest.model.ApiKeyModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,5 +58,27 @@ public class ApiKeyApiController extends AbstractApiKeyApiController implements 
         return ResponseEntity.ok(
             new CreateApiKey200ResponseModel().secretKey(
                 apiKeyFacade.create(conversionService.convert(appEventModel, ApiKey.class), AppType.AUTOMATION)));
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteApiKey(Long id) {
+        return super.doDeleteApiKey(id);
+    }
+
+    @Override
+    public ResponseEntity<ApiKeyModel> getApiKey(Long id) {
+        return super.doGetApiKey(id);
+    }
+
+    @Override
+    public ResponseEntity<List<ApiKeyModel>> getApiKeys() {
+        return super.doGetApiKeys();
+    }
+
+    @Override
+    public ResponseEntity<ApiKeyModel> updateApiKey(
+        Long id, ApiKeyModel comBytechefPlatformUserWebRestModelApiKeyModel) {
+
+        return super.doUpdateApiKey(id, comBytechefPlatformUserWebRestModelApiKeyModel);
     }
 }

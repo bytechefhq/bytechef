@@ -41,7 +41,7 @@ public abstract class AbstractApiKeyApiController {
         this.conversionService = conversionService;
     }
 
-    public ResponseEntity<Void> deleteApiKey(Long id) {
+    protected ResponseEntity<Void> doDeleteApiKey(Long id) {
         apiKeyService.delete(id);
 
         return ResponseEntity.ok()
@@ -49,13 +49,13 @@ public abstract class AbstractApiKeyApiController {
     }
 
     @SuppressFBWarnings("NP")
-    public ResponseEntity<ApiKeyModel> getApiKey(Long id) {
+    protected ResponseEntity<ApiKeyModel> doGetApiKey(Long id) {
         ApiKeyModel apiKeyModel = conversionService.convert(apiKeyService.getApiKey(id), ApiKeyModel.class);
 
         return ResponseEntity.ok(apiKeyModel.secretKey(obfuscate(apiKeyModel.getSecretKey())));
     }
 
-    public ResponseEntity<List<ApiKeyModel>> getApiKeys() {
+    protected ResponseEntity<List<ApiKeyModel>> doGetApiKeys() {
         return ResponseEntity.ok(
             CollectionUtils.map(
                 apiKeyService.getApiKeys(AppType.EMBEDDED),
@@ -64,7 +64,7 @@ public abstract class AbstractApiKeyApiController {
     }
 
     @SuppressFBWarnings("NP")
-    public ResponseEntity<ApiKeyModel> updateApiKey(Long id, ApiKeyModel appEventModel) {
+    protected ResponseEntity<ApiKeyModel> doUpdateApiKey(Long id, ApiKeyModel appEventModel) {
         return ResponseEntity.ok(
             conversionService.convert(
                 apiKeyService.update(conversionService.convert(appEventModel.id(id), ApiKey.class)),
