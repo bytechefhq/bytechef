@@ -17,6 +17,7 @@
 package com.bytechef.component.github.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.Body;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
@@ -59,7 +60,7 @@ public class GithubCreateCommentOnIssueAction {
                 .label("Comment")
                 .description("The comment to add to the issue.")
                 .required(true))
-        .outputSchema(ISSUE_OUTPUT_PROPERTY)
+        .output(outputSchema(ISSUE_OUTPUT_PROPERTY))
         .perform(GithubCreateCommentOnIssueAction::perform);
 
     private GithubCreateCommentOnIssueAction() {

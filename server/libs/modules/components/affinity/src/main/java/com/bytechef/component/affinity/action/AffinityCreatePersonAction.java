@@ -24,6 +24,7 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ActionContext;
@@ -55,14 +56,15 @@ public class AffinityCreatePersonAction {
                 .description("The email addresses of the person.")
                 .items(string())
                 .required(false))
-        .outputSchema(
-            object()
-                .properties(
-                    integer("id"),
-                    string(FIRST_NAME),
-                    string(LAST_NAME),
-                    array(EMAILS)
-                        .items(string())))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        integer("id"),
+                        string(FIRST_NAME),
+                        string(LAST_NAME),
+                        array(EMAILS)
+                            .items(string()))))
         .perform(AffinityCreatePersonAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_PERSONS_CONTEXT_FUNCTION =

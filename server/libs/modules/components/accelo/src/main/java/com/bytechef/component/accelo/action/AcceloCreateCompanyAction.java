@@ -23,6 +23,7 @@ import static com.bytechef.component.accelo.constant.AcceloConstants.PHONE;
 import static com.bytechef.component.accelo.constant.AcceloConstants.WEBSITE;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ActionContext;
@@ -56,18 +57,19 @@ public class AcceloCreateCompanyAction {
                 .label("Comments")
                 .description("Any comments or notes made against the company.")
                 .required(false))
-        .outputSchema(
-            object()
-                .properties(
-                    object("response")
-                        .properties(
-                            string("id"),
-                            string(NAME)),
-                    object("meta")
-                        .properties(
-                            string("more_info"),
-                            string("status"),
-                            string("message"))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object("response")
+                            .properties(
+                                string("id"),
+                                string(NAME)),
+                        object("meta")
+                            .properties(
+                                string("more_info"),
+                                string("status"),
+                                string("message")))))
         .perform(AcceloCreateCompanyAction::perform);
 
     private AcceloCreateCompanyAction() {

@@ -25,6 +25,7 @@ import static com.bytechef.component.accelo.constant.AcceloConstants.PHONE;
 import static com.bytechef.component.accelo.constant.AcceloConstants.POSITION;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.accelo.util.AcceloUtils;
@@ -71,20 +72,21 @@ public class AcceloCreateContactAction {
                 .label("Position")
                 .description("The contact's position in the associated company.")
                 .required(false))
-        .outputSchema(
-            object()
-                .properties(
-                    object("response")
-                        .properties(
-                            string("id"),
-                            string(FIRST_NAME),
-                            string(LAST_NAME),
-                            string(EMAIL)),
-                    object("meta")
-                        .properties(
-                            string("more_info"),
-                            string("status"),
-                            string("message"))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object("response")
+                            .properties(
+                                string("id"),
+                                string(FIRST_NAME),
+                                string(LAST_NAME),
+                                string(EMAIL)),
+                        object("meta")
+                            .properties(
+                                string("more_info"),
+                                string("status"),
+                                string("message")))))
         .perform(AcceloCreateContactAction::perform);
 
     private AcceloCreateContactAction() {

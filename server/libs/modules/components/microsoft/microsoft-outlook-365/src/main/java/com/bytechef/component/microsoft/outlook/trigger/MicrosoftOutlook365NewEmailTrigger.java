@@ -17,6 +17,7 @@
 package com.bytechef.component.microsoft.outlook.trigger;
 
 import static com.bytechef.component.definition.ComponentDSL.array;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ODATA_NEXT_LINK;
@@ -46,7 +47,7 @@ public class MicrosoftOutlook365NewEmailTrigger {
         .title("New Email")
         .description("Triggers when new mail is received.")
         .type(TriggerType.POLLING)
-        .outputSchema(array().items(MESSAGE_OUTPUT_PROPERTY))
+        .output(outputSchema(array().items(MESSAGE_OUTPUT_PROPERTY)))
         .poll(MicrosoftOutlook365NewEmailTrigger::poll);
 
     protected static final String LAST_TIME_CHECKED = "lastTimeChecked";

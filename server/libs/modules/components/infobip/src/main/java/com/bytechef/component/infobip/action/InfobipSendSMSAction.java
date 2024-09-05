@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.infobip.constant.InfobipConstants.BULK_ID;
 import static com.bytechef.component.infobip.constant.InfobipConstants.CONTENT;
@@ -68,22 +69,23 @@ public class InfobipSendSMSAction {
                 .label("Text")
                 .description("Content of the message being sent.")
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    string(BULK_ID),
-                    array(MESSAGES)
-                        .items(
-                            string(MESSAGE_ID),
-                            object(STATUS)
-                                .properties(
-                                    integer(GROUP_ID),
-                                    string(GROUP_NAME),
-                                    integer(ID),
-                                    string(NAME),
-                                    string(DESCRIPTION)),
-                            string(TO),
-                            integer(SMS_COUNT))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(BULK_ID),
+                        array(MESSAGES)
+                            .items(
+                                string(MESSAGE_ID),
+                                object(STATUS)
+                                    .properties(
+                                        integer(GROUP_ID),
+                                        string(GROUP_NAME),
+                                        integer(ID),
+                                        string(NAME),
+                                        string(DESCRIPTION)),
+                                string(TO),
+                                integer(SMS_COUNT)))))
         .perform(InfobipSendSMSAction::perform);
 
     private InfobipSendSMSAction() {

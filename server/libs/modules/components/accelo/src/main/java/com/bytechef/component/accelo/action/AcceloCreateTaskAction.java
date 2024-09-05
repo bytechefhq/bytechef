@@ -25,6 +25,7 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.date;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.accelo.util.AcceloUtils;
@@ -64,18 +65,19 @@ public class AcceloCreateTaskAction {
                 .label("Start date")
                 .description("The date the task is is scheduled to start.")
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    object("response")
-                        .properties(
-                            string("id"),
-                            string(TITLE)),
-                    object("meta")
-                        .properties(
-                            string("more_info"),
-                            string("status"),
-                            string("message"))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object("response")
+                            .properties(
+                                string("id"),
+                                string(TITLE)),
+                        object("meta")
+                            .properties(
+                                string("more_info"),
+                                string("status"),
+                                string("message")))))
         .perform(AcceloCreateTaskAction::perform);
 
     private AcceloCreateTaskAction() {

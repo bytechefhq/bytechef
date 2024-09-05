@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
@@ -65,7 +66,7 @@ public class FreshdeskCreateTicketAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .outputSchema(object()
+        .output(outputSchema(object()
             .properties(object("body")
                 .properties(string("subject").required(false), string("email").required(false),
                     string("description").required(false), integer("priority").description("Priority of the ticket.")
@@ -74,7 +75,7 @@ public class FreshdeskCreateTicketAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON)));
+                    "responseType", ResponseType.JSON))));
 
     private FreshdeskCreateTicketAction() {
     }

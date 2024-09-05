@@ -19,6 +19,7 @@ package com.bytechef.component.dropbox.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.QUERY;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.SEARCH;
@@ -50,23 +51,24 @@ public class DropboxSearchAction {
                 .minLength(3)
                 .maxLength(1000)
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    array("matches")
-                        .items(
-                            object()
-                                .properties(
-                                    object("match_type")
-                                        .properties(
-                                            string(".tag")),
-                                    object("metadata")
-                                        .properties(
-                                            string(".tag"),
-                                            string("id"),
-                                            string("name"),
-                                            string("path_display"),
-                                            string("path_lower"))))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        array("matches")
+                            .items(
+                                object()
+                                    .properties(
+                                        object("match_type")
+                                            .properties(
+                                                string(".tag")),
+                                        object("metadata")
+                                            .properties(
+                                                string(".tag"),
+                                                string("id"),
+                                                string("name"),
+                                                string("path_display"),
+                                                string("path_lower")))))))
         .perform(DropboxSearchAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_SEARCH_CONTEXT_FUNCTION =

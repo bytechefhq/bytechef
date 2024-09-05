@@ -22,6 +22,7 @@ import static com.bytechef.component.box.constant.BoxConstants.FOLDER_ID;
 import static com.bytechef.component.box.constant.BoxConstants.ID;
 import static com.bytechef.component.box.constant.BoxConstants.NEW_FILE;
 import static com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 
@@ -53,7 +54,7 @@ public class BoxNewFileTrigger {
                 .description("Folder in which file uploads will trigger this webhook.")
                 .options((TriggerOptionsFunction<String>) BoxUtils::getRootFolderOptions)
                 .required(true))
-        .outputSchema(FILE_OUTPUT_PROPERTY)
+        .output(outputSchema(FILE_OUTPUT_PROPERTY))
         .webhookEnable(BoxNewFileTrigger::webhookEnable)
         .webhookDisable(BoxNewFileTrigger::webhookDisable)
         .webhookRequest(BoxNewFileTrigger::webhookRequest);

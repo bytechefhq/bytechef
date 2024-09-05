@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDe
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 import static com.bytechef.component.github.constant.GithubConstants.BODY;
@@ -56,37 +57,38 @@ public class GithubNewIssueTrigger {
                 .label("Repository")
                 .options((TriggerOptionsFunction<String>) GithubUtils::getRepositoryOptions)
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    object("issue")
-                        .properties(
-                            string("url"),
-                            string("repository_url"),
-                            number(ID),
-                            integer("number"),
-                            string(TITLE),
-                            string("state"),
-                            string(BODY)),
-                    object("sender")
-                        .properties(
-                            string("login"),
-                            integer(ID)),
-                    string("action"),
-                    string("starred_at"),
-                    object("repository")
-                        .properties(
-                            integer(ID),
-                            string("name"),
-                            string("full_name"),
-                            object("owner")
-                                .properties(
-                                    string("login"),
-                                    integer(ID)),
-                            string("visibility"),
-                            integer("forks"),
-                            integer("open_issues"),
-                            string("default_branch"))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object("issue")
+                            .properties(
+                                string("url"),
+                                string("repository_url"),
+                                number(ID),
+                                integer("number"),
+                                string(TITLE),
+                                string("state"),
+                                string(BODY)),
+                        object("sender")
+                            .properties(
+                                string("login"),
+                                integer(ID)),
+                        string("action"),
+                        string("starred_at"),
+                        object("repository")
+                            .properties(
+                                integer(ID),
+                                string("name"),
+                                string("full_name"),
+                                object("owner")
+                                    .properties(
+                                        string("login"),
+                                        integer(ID)),
+                                string("visibility"),
+                                integer("forks"),
+                                integer("open_issues"),
+                                string("default_branch")))))
         .webhookEnable(GithubNewIssueTrigger::webhookEnable)
         .webhookDisable(GithubNewIssueTrigger::webhookDisable)
         .webhookRequest(GithubNewIssueTrigger::webhookRequest);

@@ -18,6 +18,7 @@ package com.bytechef.component.dropbox.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.GET_FILE_LINK;
@@ -55,16 +56,17 @@ public class DropboxGetFileLinkAction {
                 .description(
                     "Name of the file with the extension. Needs to have a streamable extension (.mp4, .mov, .webm, ect)")
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    object("metadata")
-                        .properties(
-                            string("name"),
-                            string("path_lower"),
-                            string("path_display"),
-                            string("id")),
-                    string("link")))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object("metadata")
+                            .properties(
+                                string("name"),
+                                string("path_lower"),
+                                string("path_display"),
+                                string("id")),
+                        string("link"))))
         .perform(DropboxGetFileLinkAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_TEMPORARY_LINK_CONTEXT_FUNCTION =

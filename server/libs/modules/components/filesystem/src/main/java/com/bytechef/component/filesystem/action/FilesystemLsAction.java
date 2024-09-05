@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.LS;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.PATH;
@@ -57,14 +58,15 @@ public class FilesystemLsAction {
                 .label("Recursive")
                 .description("Should the subdirectories be included?")
                 .defaultValue(false))
-        .outputSchema(
-            array()
-                .items(
-                    object()
-                        .properties(
-                            string("fileName"),
-                            string("relativePath"),
-                            integer("size"))))
+        .output(
+            outputSchema(
+                array()
+                    .items(
+                        object()
+                            .properties(
+                                string("fileName"),
+                                string("relativePath"),
+                                integer("size")))))
         .perform(FilesystemLsAction::perform);
 
     private FilesystemLsAction() {

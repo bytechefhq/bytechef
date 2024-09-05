@@ -18,6 +18,7 @@ package com.bytechef.component.google.contacts.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.CREATE_GROUP;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.NAME;
@@ -44,10 +45,11 @@ public class GoogleContactsCreateGroupAction {
                 .label("Group name")
                 .description("The name of the group")
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    string(NAME)))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(NAME))))
         .perform(GoogleContactsCreateGroupAction::perform);
 
     private GoogleContactsCreateGroupAction() {

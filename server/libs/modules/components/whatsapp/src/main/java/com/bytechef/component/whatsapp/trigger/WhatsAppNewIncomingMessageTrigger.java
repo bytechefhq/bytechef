@@ -18,6 +18,7 @@ package com.bytechef.component.whatsapp.trigger;
 
 import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import static com.bytechef.component.definition.TriggerDefinition.HttpParameters;
@@ -54,36 +55,37 @@ public class WhatsAppNewIncomingMessageTrigger {
                     .label("Sender number")
                     .description("Type in the number from whom you want to trigger")
                     .required(true))
-            .outputSchema(
-                object()
-                    .properties(
-                        string("object"),
-                        object("entry")
-                            .properties(
-                                string("id"),
-                                object("changes")
-                                    .properties(
-                                        object("value")
-                                            .properties(
-                                                string("messaging_product"),
-                                                object("metadata")
-                                                    .properties(
-                                                        string("display_phone_number"),
-                                                        string("phone_number_id"))),
-                                        object("contacts")
-                                            .properties(
-                                                object("profile")
-                                                    .properties(
-                                                        string("name")),
-                                                string("wa_id")),
-                                        object("messages")
-                                            .properties(
-                                                string("from"),
-                                                string("id"),
-                                                string("timestamp"),
-                                                object("text")
-                                                    .properties(
-                                                        string("body")))))))
+            .output(
+                outputSchema(
+                    object()
+                        .properties(
+                            string("object"),
+                            object("entry")
+                                .properties(
+                                    string("id"),
+                                    object("changes")
+                                        .properties(
+                                            object("value")
+                                                .properties(
+                                                    string("messaging_product"),
+                                                    object("metadata")
+                                                        .properties(
+                                                            string("display_phone_number"),
+                                                            string("phone_number_id"))),
+                                            object("contacts")
+                                                .properties(
+                                                    object("profile")
+                                                        .properties(
+                                                            string("name")),
+                                                    string("wa_id")),
+                                            object("messages")
+                                                .properties(
+                                                    string("from"),
+                                                    string("id"),
+                                                    string("timestamp"),
+                                                    object("text")
+                                                        .properties(
+                                                            string("body"))))))))
             .webhookDisable(WhatsAppNewIncomingMessageTrigger::webhookDisable)
             .webhookEnable(WhatsAppNewIncomingMessageTrigger::webhookEnable)
             .webhookRequest(WhatsAppNewIncomingMessageTrigger::webhookRequest);

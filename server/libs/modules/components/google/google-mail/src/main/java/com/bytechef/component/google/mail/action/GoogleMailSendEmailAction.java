@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ATTACHMENTS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BCC;
@@ -98,13 +99,14 @@ public class GoogleMailSendEmailAction {
                 .label("Attachments")
                 .description("A list of attachments to send with the email.")
                 .items(fileEntry()))
-        .outputSchema(
-            object()
-                .properties(
-                    string(ID),
-                    array(LABEL_IDS)
-                        .items(string()),
-                    string(THREAD_ID)))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(ID),
+                        array(LABEL_IDS)
+                            .items(string()),
+                        string(THREAD_ID))))
         .perform(GoogleMailSendEmailAction::perform);
 
     private GoogleMailSendEmailAction() {

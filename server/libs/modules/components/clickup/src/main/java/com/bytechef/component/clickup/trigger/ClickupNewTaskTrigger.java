@@ -24,6 +24,7 @@ import static com.bytechef.component.clickup.util.ClickupUtils.subscribeWebhook;
 import static com.bytechef.component.clickup.util.ClickupUtils.unsubscribeWebhook;
 import static com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 
@@ -52,7 +53,7 @@ public class ClickupNewTaskTrigger {
             .label("Workspace")
             .options((TriggerOptionsFunction<String>) ClickupUtils::getWorkspaceIdOptions)
             .required(true))
-        .outputSchema(
+        .output(outputSchema(
             object()
                 .properties(
                     string(ID),
@@ -70,7 +71,7 @@ public class ClickupNewTaskTrigger {
                     object("space")
                         .properties(
                             string(ID),
-                            string(NAME))))
+                            string(NAME)))))
         .webhookEnable(ClickupNewTaskTrigger::webhookEnable)
         .webhookDisable(ClickupNewTaskTrigger::webhookDisable)
         .webhookRequest(ClickupNewTaskTrigger::webhookRequest);

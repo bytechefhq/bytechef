@@ -20,6 +20,7 @@ import static com.bytechef.component.OpenAPIComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
@@ -52,7 +53,7 @@ public class PipedriveAddOrganizationAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .outputSchema(object()
+        .output(outputSchema(object()
             .properties(object("body")
                 .properties(object("data")
                     .properties(integer("id").required(false), integer("company_id").required(false),
@@ -65,7 +66,7 @@ public class PipedriveAddOrganizationAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON)));
+                    "responseType", ResponseType.JSON))));
 
     private PipedriveAddOrganizationAction() {
     }

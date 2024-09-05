@@ -18,6 +18,7 @@ package com.bytechef.component.monday.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.monday.constant.MondayConstants.BOARD_ID;
 import static com.bytechef.component.monday.constant.MondayConstants.COLUMN_TYPE;
@@ -64,13 +65,14 @@ public class MondayCreateColumnAction {
                 .description("The type of column to create.")
                 .options(getColumnTypeOptions())
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    object("create_column")
-                        .properties(
-                            string(ID),
-                            string(TITLE))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object("create_column")
+                            .properties(
+                                string(ID),
+                                string(TITLE)))))
         .perform(MondayCreateColumnAction::perform);
 
     private MondayCreateColumnAction() {

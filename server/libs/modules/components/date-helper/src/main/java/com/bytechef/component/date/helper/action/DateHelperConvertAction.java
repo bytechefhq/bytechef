@@ -26,6 +26,7 @@ import static com.bytechef.component.date.helper.constants.DateHelperConstants.D
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ActionContext;
@@ -65,7 +66,7 @@ public class DateHelperConvertAction {
                             DATE_FORMAT_OPTION_ISO8601_DATE_VALUE, "Get date in yyyy-MM-dd"))
                     .required(true)
                     .defaultValue(DATE_FORMAT_OPTION_ISO8601_DATE_TIME_VALUE))
-            .outputSchema(string())
+            .output(outputSchema(string()))
             .perform(DateHelperConvertAction::perform);
 
     private DateHelperConvertAction() {

@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.date;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.CONTENT;
 import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.CREATE_TASK;
@@ -47,17 +48,18 @@ public class ZendeskSellCreateTaskAction {
             date(DUE_DATE)
                 .label("Due Date")
                 .required(false))
-        .outputSchema(
-            object()
-                .properties(
-                    object(DATA)
-                        .properties(
-                            integer("id"),
-                            string(CONTENT),
-                            date(DUE_DATE)),
-                    object("meta")
-                        .properties(
-                            string("type"))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object(DATA)
+                            .properties(
+                                integer("id"),
+                                string(CONTENT),
+                                date(DUE_DATE)),
+                        object("meta")
+                            .properties(
+                                string("type")))))
         .perform(ZendeskSellCreateTaskAction::perform);
 
     private ZendeskSellCreateTaskAction() {

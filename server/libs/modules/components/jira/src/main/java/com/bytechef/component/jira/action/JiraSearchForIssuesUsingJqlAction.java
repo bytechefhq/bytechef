@@ -19,6 +19,7 @@ package com.bytechef.component.jira.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUES;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_OUTPUT_PROPERTY;
@@ -57,9 +58,9 @@ public class JiraSearchForIssuesUsingJqlAction {
                 .minValue(1)
                 .maxValue(100)
                 .required(true))
-        .outputSchema(
+        .output(outputSchema(
             array()
-                .items(ISSUE_OUTPUT_PROPERTY))
+                .items(ISSUE_OUTPUT_PROPERTY)))
         .perform(JiraSearchForIssuesUsingJqlAction::perform);
 
     private JiraSearchForIssuesUsingJqlAction() {

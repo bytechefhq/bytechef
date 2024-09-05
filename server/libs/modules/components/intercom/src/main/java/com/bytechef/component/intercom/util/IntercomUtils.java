@@ -33,6 +33,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Luka Ljubić
+ * @author Monika Kušter
+ */
 public class IntercomUtils {
 
     protected static final ContextFunction<Http, Http.Executor> GET_ADMINS_CONTEXT_FUNCTION =

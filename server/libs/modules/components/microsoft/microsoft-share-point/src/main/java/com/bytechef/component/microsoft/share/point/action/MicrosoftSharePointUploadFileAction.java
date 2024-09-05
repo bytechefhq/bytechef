@@ -19,6 +19,7 @@ package com.bytechef.component.microsoft.share.point.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.FILE;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.ID;
@@ -57,10 +58,11 @@ public class MicrosoftSharePointUploadFileAction {
                 .label("File")
                 .description("File to upload.")
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    string(ID)))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(ID))))
         .perform(MicrosoftSharePointUploadFileAction::perform);
 
     private MicrosoftSharePointUploadFileAction() {

@@ -18,6 +18,7 @@ package com.bytechef.component.random.helper.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -41,7 +42,7 @@ public class RandomHelperRandomIntAction {
                 .description("The maximum possible generated value.")
                 .required(true)
                 .defaultValue(100))
-        .outputSchema(integer())
+        .output(outputSchema(integer()))
         .perform(RandomHelperRandomIntAction::perform);
 
     /**

@@ -19,6 +19,7 @@ package com.bytechef.component.google.contacts.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.COMPANY;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.CREATE_CONTACT;
@@ -82,32 +83,33 @@ public class GoogleContactsCreateContactAction {
                 .description("The phone numbers of the contact")
                 .controlType(Property.ControlType.PHONE)
                 .required(false))
-        .outputSchema(
-            object()
-                .properties(
-                    array("names")
-                        .items(
-                            object()
-                                .properties(
-                                    string(FIRST_NAME),
-                                    string(MIDDLE_NAME),
-                                    string(LAST_NAME))),
-                    array("organizations")
-                        .items(
-                            object()
-                                .properties(
-                                    string(COMPANY),
-                                    string(JOB_TITLE))),
-                    array("emailAddresses")
-                        .items(
-                            object()
-                                .properties(
-                                    string("value"))),
-                    array("phoneNumbers")
-                        .items(
-                            object()
-                                .properties(
-                                    string("value")))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        array("names")
+                            .items(
+                                object()
+                                    .properties(
+                                        string(FIRST_NAME),
+                                        string(MIDDLE_NAME),
+                                        string(LAST_NAME))),
+                        array("organizations")
+                            .items(
+                                object()
+                                    .properties(
+                                        string(COMPANY),
+                                        string(JOB_TITLE))),
+                        array("emailAddresses")
+                            .items(
+                                object()
+                                    .properties(
+                                        string("value"))),
+                        array("phoneNumbers")
+                            .items(
+                                object()
+                                    .properties(
+                                        string("value"))))))
         .perform(GoogleContactsCreateContactAction::perform);
 
     private GoogleContactsCreateContactAction() {

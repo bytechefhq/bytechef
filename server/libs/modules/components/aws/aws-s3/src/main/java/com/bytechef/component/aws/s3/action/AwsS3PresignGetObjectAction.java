@@ -21,6 +21,7 @@ import static com.bytechef.component.aws.s3.constant.AwsS3Constants.KEY;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.PRESIGN_GET_OBJECT;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.SIGNATURE_DURATION;
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.aws.s3.util.AwsS3Utils;
@@ -51,7 +52,7 @@ public class AwsS3PresignGetObjectAction {
                 .description("Time interval until the pre-signed URL expires")
                 .placeholder("15M, 10H, PT-6H3M, etc.")
                 .required(true))
-        .outputSchema(string())
+        .output(outputSchema(string()))
         .perform(AwsS3PresignGetObjectAction::perform);
 
     protected static String perform(

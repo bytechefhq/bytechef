@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.date;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 import static com.bytechef.component.reckon.constant.ReckonConstants.BOOK_ID;
@@ -48,19 +49,20 @@ public class ReckonNewPaymentTrigger {
                 .label("Book")
                 .options((TriggerOptionsFunction<String>) ReckonUtils::getBookIdOptions)
                 .required(true))
-        .outputSchema(
-            array()
-                .items(
-                    object()
-                        .properties(
-                            string(ID),
-                            string("paymentNumber"),
-                            object("supplier")
-                                .properties(
-                                    string(ID),
-                                    string(NAME)),
-                            date("paymentDate"),
-                            number("totalAmount"))))
+        .output(
+            outputSchema(
+                array()
+                    .items(
+                        object()
+                            .properties(
+                                string(ID),
+                                string("paymentNumber"),
+                                object("supplier")
+                                    .properties(
+                                        string(ID),
+                                        string(NAME)),
+                                date("paymentDate"),
+                                number("totalAmount")))))
         .poll(ReckonNewPaymentTrigger::poll);
 
     private ReckonNewPaymentTrigger() {

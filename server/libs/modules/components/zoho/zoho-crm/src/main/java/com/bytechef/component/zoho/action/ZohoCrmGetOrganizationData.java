@@ -18,6 +18,7 @@ package com.bytechef.component.zoho.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.zoho.constant.ZohoCrmConstants.GET_ORG_DATA;
@@ -36,19 +37,20 @@ public class ZohoCrmGetOrganizationData {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(GET_ORG_DATA)
         .title("Get Organization data")
         .description("Get info about your organization")
-        .outputSchema(
-            object()
-                .properties(
-                    object("org")
-                        .properties(
-                            string("company_name"),
-                            string("id"),
-                            string("country"),
-                            string("city"),
-                            string("type"),
-                            string("phone"),
-                            string("website"),
-                            string("country_code"))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object("org")
+                            .properties(
+                                string("company_name"),
+                                string("id"),
+                                string("country"),
+                                string("city"),
+                                string("type"),
+                                string("phone"),
+                                string("website"),
+                                string("country_code")))))
         .perform(ZohoCrmGetOrganizationData::perform);
 
     private ZohoCrmGetOrganizationData() {

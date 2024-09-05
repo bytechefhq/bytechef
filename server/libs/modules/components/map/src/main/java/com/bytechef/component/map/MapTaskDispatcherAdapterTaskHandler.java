@@ -72,7 +72,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
     public List<?> handle(TaskExecution taskExecution) {
         List<Object> result = new ArrayList<>();
 
-        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
         TaskFileStorage taskFileStorage = new TaskFileStorageImpl(new Base64FileStorageService());
 
         syncMessageBroker.receive(TaskCoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS, message -> {

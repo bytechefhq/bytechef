@@ -19,6 +19,7 @@ package com.bytechef.component.vtiger.action;
 import static com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.vtiger.constant.VTigerConstants.CREATE_CONTACT;
@@ -54,15 +55,16 @@ public class VTigerCreateContactAction {
                 .label("Contact email")
                 .description("email for your new contact")
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    object("result")
-                        .properties(
-                            string(FIRSTNAME),
-                            string(LASTNAME),
-                            string(EMAIL),
-                            string("phone"))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object("result")
+                            .properties(
+                                string(FIRSTNAME),
+                                string(LASTNAME),
+                                string(EMAIL),
+                                string("phone")))))
         .perform(VTigerCreateContactAction::perform);
 
     private VTigerCreateContactAction() {

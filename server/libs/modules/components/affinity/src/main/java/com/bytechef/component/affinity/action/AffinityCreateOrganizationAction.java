@@ -22,6 +22,7 @@ import static com.bytechef.component.affinity.constant.AffinityConstants.NAME;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ActionContext;
@@ -48,12 +49,13 @@ public class AffinityCreateOrganizationAction {
                 .label("Domain")
                 .description("The domain name of the organization.")
                 .required(false))
-        .outputSchema(
-            object()
-                .properties(
-                    integer("id"),
-                    string(NAME),
-                    string(DOMAIN)))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        integer("id"),
+                        string(NAME),
+                        string(DOMAIN))))
         .perform(AffinityCreateOrganizationAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_ORGANIZATIONS_CONTEXT_FUNCTION =

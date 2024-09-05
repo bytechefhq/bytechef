@@ -18,6 +18,8 @@ package com.bytechef.component.google.drive.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
+import static com.bytechef.component.definition.ComponentDSL.sampleOutput;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.CREATE_NEW_TEXT_FILE;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_NAME;
@@ -79,8 +81,7 @@ public final class GoogleDriveCreateNewTextFileAction {
                         "in the root folder.")
                 .options((ActionOptionsFunction<String>) GoogleDriveOptionUtils::getFolderOptions)
                 .required(false))
-        .outputSchema(GOOGLE_FILE_OUTPUT_PROPERTY)
-        .sampleOutput(GOOGLE_FILE_SAMPLE_OUTPUT)
+        .output(outputSchema(GOOGLE_FILE_OUTPUT_PROPERTY), sampleOutput(GOOGLE_FILE_SAMPLE_OUTPUT))
         .perform(GoogleDriveCreateNewTextFileAction::perform);
 
     private GoogleDriveCreateNewTextFileAction() {

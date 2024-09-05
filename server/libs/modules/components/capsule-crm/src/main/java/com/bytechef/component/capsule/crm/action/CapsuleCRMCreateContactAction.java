@@ -44,6 +44,7 @@ import static com.bytechef.component.definition.ComponentDSL.nullable;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.time;
 
@@ -168,10 +169,12 @@ public class CapsuleCRMCreateContactAction {
                                 .description("The actual phone number.")
                                 .required(true)))
                 .required(false))
-        .outputSchema(
-            object()
-                .additionalProperties(
-                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time()))
+        .output(
+            outputSchema(
+                object()
+                    .additionalProperties(
+                        array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(),
+                        time())))
         .perform(CapsuleCRMCreateContactAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_PARTIES_CONTEXT_FUNCTION =

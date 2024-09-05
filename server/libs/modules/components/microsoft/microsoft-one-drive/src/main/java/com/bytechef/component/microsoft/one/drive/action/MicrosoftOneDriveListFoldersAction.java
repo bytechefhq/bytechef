@@ -19,6 +19,7 @@ package com.bytechef.component.microsoft.one.drive.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.LIST_FOLDERS;
@@ -52,13 +53,14 @@ public class MicrosoftOneDriveListFoldersAction {
                         "be used.")
                 .options((ActionOptionsFunction<String>) MicrosoftOneDriveUtils::getFolderIdOptions)
                 .required(false))
-        .outputSchema(
-            array()
-                .items(
-                    object()
-                        .properties(
-                            string(ID),
-                            string(NAME))))
+        .output(
+            outputSchema(
+                array()
+                    .items(
+                        object()
+                            .properties(
+                                string(ID),
+                                string(NAME)))))
         .perform(MicrosoftOneDriveListFoldersAction::perform);
 
     private MicrosoftOneDriveListFoldersAction() {

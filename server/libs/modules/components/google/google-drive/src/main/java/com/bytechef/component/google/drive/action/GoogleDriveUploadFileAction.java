@@ -18,6 +18,8 @@ package com.bytechef.component.google.drive.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
+import static com.bytechef.component.definition.ComponentDSL.sampleOutput;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ENTRY;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_FILE_OUTPUT_PROPERTY;
@@ -60,8 +62,7 @@ public final class GoogleDriveUploadFileAction {
                         "the root folder.")
                 .options((ActionOptionsFunction<String>) GoogleDriveOptionUtils::getFolderOptions)
                 .required(false))
-        .outputSchema(GOOGLE_FILE_OUTPUT_PROPERTY)
-        .sampleOutput(GOOGLE_FILE_SAMPLE_OUTPUT)
+        .output(outputSchema(GOOGLE_FILE_OUTPUT_PROPERTY), sampleOutput(GOOGLE_FILE_SAMPLE_OUTPUT))
         .perform(GoogleDriveUploadFileAction::perform);
 
     private GoogleDriveUploadFileAction() {

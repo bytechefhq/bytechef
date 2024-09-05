@@ -39,8 +39,8 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.SingleConnectionOutputFunction;
 import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.OutputResponse;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.google.commons.GoogleServices;
 import com.bytechef.test.component.properties.ParametersFactory;
 import com.google.api.services.gmail.Gmail;
@@ -199,9 +199,9 @@ class GoogleMailUtilsTest {
 
         SingleConnectionOutputFunction output = GoogleMailUtils.getOutput();
 
-        OutputResponse outputResponse = output.apply(parameters, parameters, mockedContext);
+        OutputResponse outputDefinitionResponse = output.apply(parameters, parameters, mockedContext);
 
-        assertEquals(PARSED_MESSAGE_OUTPUT_PROPERTY, outputResponse.getOutputSchema());
+        assertEquals(PARSED_MESSAGE_OUTPUT_PROPERTY, outputDefinitionResponse.outputSchema());
     }
 
     @Test
@@ -210,9 +210,9 @@ class GoogleMailUtilsTest {
 
         SingleConnectionOutputFunction output = GoogleMailUtils.getOutput();
 
-        OutputResponse outputResponse = output.apply(parameters, parameters, mockedContext);
+        OutputResponse outputDefinitionResponse = output.apply(parameters, parameters, mockedContext);
 
-        assertEquals(RAW_MESSAGE_OUTPUT_PROPERTY, outputResponse.getOutputSchema());
+        assertEquals(RAW_MESSAGE_OUTPUT_PROPERTY, outputDefinitionResponse.outputSchema());
     }
 
     @Test
@@ -221,9 +221,9 @@ class GoogleMailUtilsTest {
 
         SingleConnectionOutputFunction output = GoogleMailUtils.getOutput();
 
-        OutputResponse outputResponse = output.apply(parameters, parameters, mockedContext);
+        OutputResponse outputDefinitionResponse = output.apply(parameters, parameters, mockedContext);
 
-        assertEquals(MINIMAL_MESSAGE_OUTPUT_PROPERTY, outputResponse.getOutputSchema());
+        assertEquals(MINIMAL_MESSAGE_OUTPUT_PROPERTY, outputDefinitionResponse.outputSchema());
     }
 
     @Test
@@ -232,9 +232,9 @@ class GoogleMailUtilsTest {
 
         SingleConnectionOutputFunction output = GoogleMailUtils.getOutput();
 
-        OutputResponse outputResponse = output.apply(parameters, parameters, mockedContext);
+        OutputResponse outputDefinitionResponse = output.apply(parameters, parameters, mockedContext);
 
-        assertEquals(METADATA_MESSAGE_OUTPUT_PROPERTY, outputResponse.getOutputSchema());
+        assertEquals(METADATA_MESSAGE_OUTPUT_PROPERTY, outputDefinitionResponse.outputSchema());
     }
 
     @Test
@@ -243,8 +243,8 @@ class GoogleMailUtilsTest {
 
         SingleConnectionOutputFunction output = GoogleMailUtils.getOutput();
 
-        OutputResponse outputResponse = output.apply(parameters, parameters, mockedContext);
+        OutputResponse outputDefinitionResponse = output.apply(parameters, parameters, mockedContext);
 
-        assertEquals(FULL_MESSAGE_OUTPUT_PROPERTY, outputResponse.getOutputSchema());
+        assertEquals(FULL_MESSAGE_OUTPUT_PROPERTY, outputDefinitionResponse.outputSchema());
     }
 }

@@ -18,6 +18,7 @@ package com.bytechef.component.github.action;
 
 import static com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
@@ -53,7 +54,7 @@ public class GithubGetIssueAction {
                 .options((ActionOptionsFunction<String>) GithubUtils::getIssueOptions)
                 .optionsLookupDependsOn(REPOSITORY)
                 .required(true))
-        .outputSchema(ISSUE_OUTPUT_PROPERTY)
+        .output(outputSchema(ISSUE_OUTPUT_PROPERTY))
         .perform(GithubGetIssueAction::perform);
 
     private GithubGetIssueAction() {

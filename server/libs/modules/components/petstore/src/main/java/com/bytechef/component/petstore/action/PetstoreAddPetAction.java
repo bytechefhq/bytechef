@@ -19,6 +19,7 @@ package com.bytechef.component.petstore.action;
 import static com.bytechef.component.OpenAPIComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
@@ -47,10 +48,10 @@ public class PetstoreAddPetAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .outputSchema(object().properties(PetstorePetProperties.PROPERTIES)
+        .output(outputSchema(object().properties(PetstorePetProperties.PROPERTIES)
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON)));
+                    "responseType", ResponseType.JSON))));
 
     private PetstoreAddPetAction() {
     }

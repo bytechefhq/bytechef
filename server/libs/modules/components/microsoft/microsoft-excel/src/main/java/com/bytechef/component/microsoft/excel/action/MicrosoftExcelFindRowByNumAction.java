@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.FIND_ROW_BY_NUM;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
@@ -51,9 +52,9 @@ public class MicrosoftExcelFindRowByNumAction {
                 .label("Row number")
                 .description("The row number to get the values from")
                 .required(true))
-        .outputSchema(
+        .output(outputSchema(
             object()
-                .additionalProperties(bool(), number(), string()))
+                .additionalProperties(bool(), number(), string())))
         .perform(MicrosoftExcelFindRowByNumAction::perform);
 
     private MicrosoftExcelFindRowByNumAction() {

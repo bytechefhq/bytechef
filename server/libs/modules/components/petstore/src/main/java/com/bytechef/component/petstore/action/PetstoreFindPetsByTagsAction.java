@@ -20,6 +20,7 @@ import static com.bytechef.component.OpenAPIComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
@@ -50,10 +51,10 @@ public class PetstoreFindPetsByTagsAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.QUERY)))
-        .outputSchema(array().items(object().properties(PetstorePetProperties.PROPERTIES))
+        .output(outputSchema(array().items(object().properties(PetstorePetProperties.PROPERTIES))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON)));
+                    "responseType", ResponseType.JSON))));
 
     private PetstoreFindPetsByTagsAction() {
     }

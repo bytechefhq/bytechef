@@ -17,6 +17,7 @@
 package com.bytechef.component.google.calendar.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID_PROPERTY;
@@ -49,7 +50,7 @@ public class GoogleCalendarCreateQuickEventAction {
                 .description("The text describing the event to be created.")
                 .required(true),
             SEND_UPDATES_PROPERTY)
-        .outputSchema(EVENT_PROPERTY)
+        .output(outputSchema(EVENT_PROPERTY))
         .perform(GoogleCalendarCreateQuickEventAction::perform);
 
     private GoogleCalendarCreateQuickEventAction() {

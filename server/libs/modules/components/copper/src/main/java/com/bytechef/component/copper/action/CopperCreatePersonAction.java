@@ -45,6 +45,7 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.copper.util.CopperOptionUtils;
@@ -203,7 +204,7 @@ public class CopperCreatePersonAction {
                     string()
                         .options((ActionOptionsFunction<String>) CopperOptionUtils::getTagsOptions))
                 .required(false))
-        .outputSchema(
+        .output(outputSchema(
             object()
                 .properties(
                     string(ID),
@@ -245,7 +246,7 @@ public class CopperCreatePersonAction {
                             object()
                                 .properties(
                                     string(URL),
-                                    string(CATEGORY)))))
+                                    string(CATEGORY))))))
         .perform(CopperCreatePersonAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_PEOPLE_CONTEXT_FUNCTION =

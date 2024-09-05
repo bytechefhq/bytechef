@@ -26,6 +26,7 @@ import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.nullable;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.time;
 import static com.bytechef.component.ods.file.constant.OdsFileConstants.FILENAME;
@@ -76,7 +77,7 @@ public class OdsFileWriteAction {
                 .required(true)
                 .defaultValue("file.ods")
                 .advancedOption(true))
-        .outputSchema(fileEntry())
+        .output(outputSchema(fileEntry()))
         .perform(OdsFileWriteAction::perform);
 
     private static Object[] getHeaderValues(Set<String> names) {

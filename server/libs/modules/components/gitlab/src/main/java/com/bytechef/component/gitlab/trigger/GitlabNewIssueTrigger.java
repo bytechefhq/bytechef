@@ -19,6 +19,7 @@ package com.bytechef.component.gitlab.trigger;
 import static com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 import static com.bytechef.component.definition.Context.Http.responseType;
@@ -55,14 +56,15 @@ public class GitlabNewIssueTrigger {
                 .label("Project")
                 .options((TriggerOptionsFunction<String>) GitlabUtils::getProjectOptions)
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    string("description"),
-                    integer(ID),
-                    integer("iid"),
-                    integer(PROJECT_ID),
-                    string("title")))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string("description"),
+                        integer(ID),
+                        integer("iid"),
+                        integer(PROJECT_ID),
+                        string("title"))))
         .webhookEnable(GitlabNewIssueTrigger::dynamicWebhookEnable)
         .webhookDisable(GitlabNewIssueTrigger::dynamicWebhookDisable)
         .webhookRequest(GitlabNewIssueTrigger::dynamicWebhookRequest);

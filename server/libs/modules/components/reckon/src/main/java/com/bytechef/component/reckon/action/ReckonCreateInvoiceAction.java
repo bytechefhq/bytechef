@@ -23,6 +23,7 @@ import static com.bytechef.component.definition.ComponentDSL.date;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
@@ -73,11 +74,11 @@ public class ReckonCreateInvoiceAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.BODY)))
-        .outputSchema(object().properties(object("body").properties(string("id").required(false))
+        .output(outputSchema(object().properties(object("body").properties(string("id").required(false))
             .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON)));
+                    "responseType", ResponseType.JSON))));
 
     private ReckonCreateInvoiceAction() {
     }

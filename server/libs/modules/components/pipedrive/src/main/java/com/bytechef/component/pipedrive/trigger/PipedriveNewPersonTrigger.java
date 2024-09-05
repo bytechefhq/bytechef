@@ -16,6 +16,7 @@
 
 package com.bytechef.component.pipedrive.trigger;
 
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 import static com.bytechef.component.pipedrive.constant.PipedriveConstants.ADDED;
 import static com.bytechef.component.pipedrive.constant.PipedriveConstants.CURRENT;
@@ -45,7 +46,7 @@ public class PipedriveNewPersonTrigger {
         .title("New Person")
         .description("Trigger off whenever a new person is added.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
-        .outputSchema(PERSON_OUTPUT_PROPERTY)
+        .output(outputSchema(PERSON_OUTPUT_PROPERTY))
         .webhookDisable(PipedriveNewPersonTrigger::webhookDisable)
         .webhookEnable(PipedriveNewPersonTrigger::webhookEnable)
         .webhookRequest(PipedriveNewPersonTrigger::webhookRequest);

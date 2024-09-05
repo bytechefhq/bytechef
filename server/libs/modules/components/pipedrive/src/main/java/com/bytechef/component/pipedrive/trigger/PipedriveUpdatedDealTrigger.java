@@ -16,6 +16,7 @@
 
 package com.bytechef.component.pipedrive.trigger;
 
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 import static com.bytechef.component.pipedrive.constant.PipedriveConstants.CURRENT;
 import static com.bytechef.component.pipedrive.constant.PipedriveConstants.DEAL_OUTPUT_PROPERTY;
@@ -45,7 +46,7 @@ public class PipedriveUpdatedDealTrigger {
         .title("Updated Deal")
         .description("Trigger off whenever an existing deal is updated.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
-        .outputSchema(DEAL_OUTPUT_PROPERTY)
+        .output(outputSchema(DEAL_OUTPUT_PROPERTY))
         .webhookEnable(PipedriveUpdatedDealTrigger::webhookEnable)
         .webhookDisable(PipedriveUpdatedDealTrigger::webhookDisable)
         .webhookRequest(PipedriveUpdatedDealTrigger::webhookRequest);

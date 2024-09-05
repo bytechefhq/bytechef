@@ -23,6 +23,7 @@ import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
@@ -100,40 +101,43 @@ public class KeapCreateCompanyAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .outputSchema(object()
-            .properties(
-                object("address")
-                    .properties(string("country_code").required(false), string("line1").required(false),
-                        string("line2").required(false), string("locality").required(false),
-                        string("region").required(false), string("zip_code").required(false),
-                        string("zip_four").required(false))
-                    .required(false),
-                string("company_name").required(false),
-                array("custom_fields")
-                    .items(object().properties(object("content").required(false), integer("id").required(false)))
-                    .required(false),
-                string("email_address").required(false), bool("email_opted_in").required(false),
-                string("email_status")
-                    .options(option("UnengagedMarketable", "UnengagedMarketable"), option("SingleOptIn", "SingleOptIn"),
-                        option("DoubleOptin", "DoubleOptin"), option("Confirmed", "Confirmed"),
-                        option("UnengagedNonMarketable", "UnengagedNonMarketable"),
-                        option("NonMarketable", "NonMarketable"), option("Lockdown", "Lockdown"),
-                        option("Bounce", "Bounce"), option("HardBounce", "HardBounce"), option("Manual", "Manual"),
-                        option("Admin", "Admin"), option("System", "System"),
-                        option("ListUnsubscribe", "ListUnsubscribe"), option("Feedback", "Feedback"),
-                        option("Spam", "Spam"), option("Invalid", "Invalid"), option("Deactivated", "Deactivated"))
-                    .required(false),
-                object("fax_number").properties(string("number").required(false), string("type").required(false))
-                    .required(false),
-                integer("id").required(false), string("notes").required(false),
-                object("phone_number")
-                    .properties(string("extension").required(false), string("number").required(false),
-                        string("type").required(false))
-                    .required(false),
-                string("website").required(false))
-            .metadata(
-                Map.of(
-                    "responseType", ResponseType.JSON)));
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object("address")
+                            .properties(string("country_code").required(false), string("line1").required(false),
+                                string("line2").required(false), string("locality").required(false),
+                                string("region").required(false), string("zip_code").required(false),
+                                string("zip_four").required(false))
+                            .required(false),
+                        string("company_name").required(false),
+                        array("custom_fields").items(
+                            object().properties(object("content").required(false), integer("id").required(false)))
+                            .required(false),
+                        string("email_address").required(false), bool("email_opted_in").required(false),
+                        string("email_status").options(option("UnengagedMarketable", "UnengagedMarketable"),
+                            option("SingleOptIn", "SingleOptIn"), option("DoubleOptin", "DoubleOptin"),
+                            option("Confirmed", "Confirmed"),
+                            option("UnengagedNonMarketable", "UnengagedNonMarketable"),
+                            option("NonMarketable", "NonMarketable"), option("Lockdown", "Lockdown"),
+                            option("Bounce", "Bounce"), option("HardBounce", "HardBounce"), option("Manual", "Manual"),
+                            option("Admin", "Admin"), option("System", "System"),
+                            option("ListUnsubscribe", "ListUnsubscribe"), option("Feedback", "Feedback"),
+                            option("Spam", "Spam"), option("Invalid", "Invalid"), option("Deactivated", "Deactivated"))
+                            .required(false),
+                        object("fax_number")
+                            .properties(string("number").required(false), string("type").required(false))
+                            .required(false),
+                        integer("id").required(false), string("notes").required(false),
+                        object("phone_number")
+                            .properties(string("extension").required(false), string("number").required(false),
+                                string("type").required(false))
+                            .required(false),
+                        string("website").required(false))
+                    .metadata(
+                        Map.of(
+                            "responseType", ResponseType.JSON))));
 
     private KeapCreateCompanyAction() {
     }

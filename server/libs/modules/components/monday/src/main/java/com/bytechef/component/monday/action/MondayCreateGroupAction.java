@@ -18,6 +18,7 @@ package com.bytechef.component.monday.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.monday.constant.MondayConstants.BOARD_ID;
 import static com.bytechef.component.monday.constant.MondayConstants.CREATE_GROUP;
@@ -57,13 +58,14 @@ public class MondayCreateGroupAction {
             string(GROUP_NAME)
                 .label("Group Name")
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    object("create_group")
-                        .properties(
-                            string(ID),
-                            string(NAME))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object("create_group")
+                            .properties(
+                                string(ID),
+                                string(NAME)))))
         .perform(MondayCreateGroupAction::perform);
 
     private MondayCreateGroupAction() {

@@ -22,6 +22,7 @@ import static com.bytechef.component.data.storage.constant.DataStorageConstants.
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.VALUE_TO_ADD;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ActionContext;
@@ -59,7 +60,7 @@ public class DataStorageAtomicIncrementAction {
                 .description(
                     "The value that can be added to the existing numeric value, which may have a negative value.")
                 .defaultValue(1))
-        .outputSchema(integer())
+        .output(outputSchema(integer()))
         .perform(DataStorageAtomicIncrementAction::perform);
 
     protected static Integer perform(

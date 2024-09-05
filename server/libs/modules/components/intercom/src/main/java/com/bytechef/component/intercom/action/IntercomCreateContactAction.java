@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.ModifiableActionDef
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.Body;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
@@ -40,6 +41,10 @@ import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 
+/**
+ * @author Luka Ljubić
+ * @author Monika Kušter
+ */
 public class IntercomCreateContactAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_CONTACT)
@@ -72,15 +77,16 @@ public class IntercomCreateContactAction {
                 .description("Image of the contact")
                 .maxLength(500)
                 .required(false))
-        .outputSchema(
-            object()
-                .properties(
-                    string("type"),
-                    string(ID),
-                    string(ROLE),
-                    string(EMAIL),
-                    string(PHONE),
-                    string(NAME)))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string("type"),
+                        string(ID),
+                        string(ROLE),
+                        string(EMAIL),
+                        string(PHONE),
+                        string(NAME))))
         .perform(IntercomCreateContactAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_CONTACTS_CONTEXT_FUNCTION =

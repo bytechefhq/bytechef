@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDSL.dateTime;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ACCESS_ROLE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
@@ -117,26 +118,27 @@ public class GoogleCalendarFindEventsAction {
                         "example, 2011-06-03T10:00:00-07:00, 2011-06-03T10:00:00Z. Milliseconds may be provided but " +
                         "are ignored.")
                 .required(false))
-        .outputSchema(
-            object()
-                .properties(
-                    string(KIND),
-                    string(ETAG),
-                    string(SUMMARY),
-                    string(DESCRIPTION),
-                    dateTime(UPDATED),
-                    string(TIME_ZONE),
-                    string(ACCESS_ROLE),
-                    array(DEFAULT_REMINDERS)
-                        .items(
-                            object()
-                                .properties(
-                                    string(METHOD),
-                                    integer(MINUTES))),
-                    string(NEXT_PAGE_TOKEN),
-                    string(NEXT_SYNC_TOKEN),
-                    array(EVENT)
-                        .items(EVENT_PROPERTY)))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(KIND),
+                        string(ETAG),
+                        string(SUMMARY),
+                        string(DESCRIPTION),
+                        dateTime(UPDATED),
+                        string(TIME_ZONE),
+                        string(ACCESS_ROLE),
+                        array(DEFAULT_REMINDERS)
+                            .items(
+                                object()
+                                    .properties(
+                                        string(METHOD),
+                                        integer(MINUTES))),
+                        string(NEXT_PAGE_TOKEN),
+                        string(NEXT_SYNC_TOKEN),
+                        array(EVENT)
+                            .items(EVENT_PROPERTY))))
         .perform(GoogleCalendarFindEventsAction::perform);
 
     private GoogleCalendarFindEventsAction() {

@@ -27,6 +27,7 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.date;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ActionContext;
@@ -72,7 +73,7 @@ public class CapsuleCRMCreateTaskAction {
                                 "(e.g. #ffffff).")
                         .required(false))
                 .required(false))
-        .outputSchema(
+        .output(outputSchema(
             object()
                 .properties(
                     integer("id"),
@@ -82,7 +83,7 @@ public class CapsuleCRMCreateTaskAction {
                     object(CATEGORY)
                         .properties(
                             string(NAME),
-                            string(COLOUR))))
+                            string(COLOUR)))))
         .perform(CapsuleCRMCreateTaskAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_TASKS_CONTEXT_FUNCTION =

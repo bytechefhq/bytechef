@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.openai.constant.OpenAIConstants.CREATE_ASSISTANT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DESCRIPTION;
@@ -123,30 +124,31 @@ public class OpenAICreateAssistantAction {
                         "characters long and values can be a maxium of 512 characters long.")
                 .additionalProperties(string())
                 .required(false))
-        .outputSchema(
-            object()
-                .properties(
-                    string("id"),
-                    string("object"),
-                    integer("createdAt"),
-                    string("name"),
-                    string("description"),
-                    string("model"),
-                    string("instructions"),
-                    array("tools")
-                        .items(
-                            object()
-                                .properties(
-                                    string("type"),
-                                    object("function")
-                                        .properties(
-                                            string("description"),
-                                            string("name"),
-                                            object("parameters")))),
-                    array("fileIds")
-                        .items(
-                            string("fileId")),
-                    object("metadata")))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string("id"),
+                        string("object"),
+                        integer("createdAt"),
+                        string("name"),
+                        string("description"),
+                        string("model"),
+                        string("instructions"),
+                        array("tools")
+                            .items(
+                                object()
+                                    .properties(
+                                        string("type"),
+                                        object("function")
+                                            .properties(
+                                                string("description"),
+                                                string("name"),
+                                                object("parameters")))),
+                        array("fileIds")
+                            .items(
+                                string("fileId")),
+                        object("metadata"))))
         .perform(OpenAICreateAssistantAction::perform);
 
     private OpenAICreateAssistantAction() {

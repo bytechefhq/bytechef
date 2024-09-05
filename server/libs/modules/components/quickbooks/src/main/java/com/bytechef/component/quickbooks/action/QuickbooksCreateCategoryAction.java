@@ -18,6 +18,7 @@ package com.bytechef.component.quickbooks.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.CREATE_CATEGORY;
@@ -42,17 +43,18 @@ public class QuickbooksCreateCategoryAction {
                 .maxLength(100)
                 .required(true))
         .description("Has conditionally required parameters.")
-        .outputSchema(
-            object()
-                .properties(
-                    object("item")
-                        .properties(
-                            string("id"),
-                            string("domain"),
-                            string("Name"),
-                            string("Level"),
-                            string("Subitem"),
-                            string("FullyQualifiedName"))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object("item")
+                            .properties(
+                                string("id"),
+                                string("domain"),
+                                string("Name"),
+                                string("Level"),
+                                string("Subitem"),
+                                string("FullyQualifiedName")))))
         .perform(QuickbooksCreateCategoryAction::perform);
 
     private QuickbooksCreateCategoryAction() {

@@ -17,6 +17,8 @@
 package com.bytechef.component.filesystem.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
+import static com.bytechef.component.definition.ComponentDSL.sampleOutput;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILENAME;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.GET_PARENT_FOLDER;
@@ -41,8 +43,7 @@ public class FilesystemGetParentFolderAction {
             .description("The path to full filename.")
             .placeholder("/data/your_file.pdf")
             .required(true))
-        .outputSchema(string())
-        .sampleOutput("/sample_data")
+        .output(outputSchema(string()), sampleOutput("/sample_data"))
         .perform(FilesystemGetParentFolderAction::perform);
 
     private FilesystemGetParentFolderAction() {

@@ -18,6 +18,7 @@ package com.bytechef.component.pipedrive.trigger;
 
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 import static com.bytechef.component.pipedrive.constant.PipedriveConstants.ADDED;
@@ -47,17 +48,18 @@ public class PipedriveNewActivityTrigger {
         .title("New Activity")
         .description("Trigger off whenever a new activity is added.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
-        .outputSchema(
-            object()
-                .properties(
-                    string("type_name"),
-                    string("public_description"),
-                    string("subject"),
-                    string("type"),
-                    integer(ID),
-                    string("owner_name"),
-                    integer("user_id"),
-                    integer("company_id")))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string("type_name"),
+                        string("public_description"),
+                        string("subject"),
+                        string("type"),
+                        integer(ID),
+                        string("owner_name"),
+                        integer("user_id"),
+                        integer("company_id"))))
         .webhookDisable(PipedriveNewActivityTrigger::webhookDisable)
         .webhookEnable(PipedriveNewActivityTrigger::webhookEnable)
         .webhookRequest(PipedriveNewActivityTrigger::webhookRequest);

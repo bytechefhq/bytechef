@@ -17,6 +17,7 @@
 package com.bytechef.component.xero.trigger;
 
 import static com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 import static com.bytechef.component.xero.constant.XeroConstants.ACCREC;
 import static com.bytechef.component.xero.constant.XeroConstants.INVOICE;
@@ -45,7 +46,7 @@ public class XeroNewInvoiceTrigger {
         .description("Trigger off whenever a new invoice is added.")
         .type(TriggerType.STATIC_WEBHOOK)
         .properties(WEBHOOK_KEY_PROPERTY)
-        .outputSchema(INVOICE_OUTPUT_PROPERTY)
+        .output(outputSchema(INVOICE_OUTPUT_PROPERTY))
         .workflowSyncValidation(true)
         .webhookValidate(XeroUtils::webhookValidate)
         .webhookRequest(XeroNewInvoiceTrigger::webhookRequest);

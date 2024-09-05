@@ -19,6 +19,7 @@ package com.bytechef.component.typeform.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.typeform.constant.TypeformConstants.HREF;
 import static com.bytechef.component.typeform.constant.TypeformConstants.TITLE;
@@ -64,9 +65,10 @@ public class TypeformCreateFormAction {
                 .description("Workspace where the form will be created.")
                 .options((ActionOptionsFunction<String>) TypeformUtils::getWorkspaceOptions)
                 .required(false))
-        .outputSchema(
-            // TODO
-            object())
+        .output(
+            outputSchema(
+                // TODO
+                object()))
         .perform(TypeformCreateFormAction::perform);
 
     private TypeformCreateFormAction() {

@@ -18,6 +18,7 @@ package com.bytechef.component.dropbox.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.COPY;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
@@ -56,16 +57,17 @@ public class DropboxCopyAction {
                 .label("Destination path")
                 .description("The path which the file or folder should be copyed to.  Root is /.")
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    object("metadata")
-                        .properties(
-                            string(".tag"),
-                            string("name"),
-                            string("path_lower"),
-                            string("path_display"),
-                            string("id"))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object("metadata")
+                            .properties(
+                                string(".tag"),
+                                string("name"),
+                                string("path_lower"),
+                                string("path_display"),
+                                string("id")))))
         .perform(DropboxCopyAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_COPY_CONTEXT_FUNCTION =

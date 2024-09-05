@@ -20,6 +20,7 @@ import static com.bytechef.component.OpenAPIComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
@@ -59,12 +60,12 @@ public class InsightlyCreateOrganizationAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .outputSchema(object()
+        .output(outputSchema(object()
             .properties(integer("ORGANISATION_ID").required(false), string("ORGANISATION_NAME").required(false),
                 string("PHONE").required(false), string("WEBSITE").required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON)));
+                    "responseType", ResponseType.JSON))));
 
     private InsightlyCreateOrganizationAction() {
     }

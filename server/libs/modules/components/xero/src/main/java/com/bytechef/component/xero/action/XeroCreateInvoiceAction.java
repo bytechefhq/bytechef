@@ -19,6 +19,7 @@ package com.bytechef.component.xero.action;
 import static com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.date;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.xero.constant.XeroConstants.ACCREC;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACT_ID;
@@ -76,7 +77,7 @@ public class XeroCreateInvoiceAction {
                 .label("Invoice Reference")
                 .description("Reference number of the invoice.")
                 .required(false))
-        .outputSchema(INVOICE_OUTPUT_PROPERTY)
+        .output(outputSchema(INVOICE_OUTPUT_PROPERTY))
         .perform(XeroCreateInvoiceAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_INVOICES_CONTEXT_FUNCTION =

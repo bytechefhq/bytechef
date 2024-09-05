@@ -19,6 +19,7 @@ package com.bytechef.component.freshsales.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.CREATE_LEAD;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.EMAIL;
@@ -54,13 +55,14 @@ public class FreshsalesCreateLeadAction {
                 .description("Primary email address of the lead")
                 .controlType(ControlType.EMAIL)
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    number("id"),
-                    string(EMAIL),
-                    string(FIRST_NAME),
-                    string(LAST_NAME)))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        number("id"),
+                        string(EMAIL),
+                        string(FIRST_NAME),
+                        string(LAST_NAME))))
         .perform(FreshsalesCreateLeadAction::perform);
 
     private FreshsalesCreateLeadAction() {

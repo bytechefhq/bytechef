@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDSL.date;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.time;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
@@ -79,20 +80,21 @@ public class MondayNewItemInBoardTrigger {
                 .options((TriggerOptionsFunction<String>) MondayOptionUtils::getBoardIdOptions)
                 .optionsLookupDependsOn(WORKSPACE_ID)
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    string(TYPE),
-                    string("triggerTime"),
-                    integer("subscriptionId"),
-                    integer("userId"),
-                    integer("boardId"),
-                    integer("pulseId"),
-                    string("pulseName"),
-                    string("groupId"),
-                    string("groupName"),
-                    object("columnValues")
-                        .additionalProperties(string(), number(), date(), time(), integer(), object(), bool())))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(TYPE),
+                        string("triggerTime"),
+                        integer("subscriptionId"),
+                        integer("userId"),
+                        integer("boardId"),
+                        integer("pulseId"),
+                        string("pulseName"),
+                        string("groupId"),
+                        string("groupName"),
+                        object("columnValues")
+                            .additionalProperties(string(), number(), date(), time(), integer(), object(), bool()))))
         .webhookEnable(MondayNewItemInBoardTrigger::webhookEnable)
         .webhookDisable(MondayNewItemInBoardTrigger::webhookDisable)
         .webhookRequest(MondayNewItemInBoardTrigger::webhookRequest);

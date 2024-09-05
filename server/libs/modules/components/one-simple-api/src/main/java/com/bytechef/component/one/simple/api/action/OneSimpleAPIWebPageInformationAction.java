@@ -19,6 +19,7 @@ package com.bytechef.component.one.simple.api.action;
 import static com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.ACCESS_TOKEN;
@@ -46,26 +47,27 @@ public class OneSimpleAPIWebPageInformationAction {
                 .label("URL")
                 .description("Place the web page url you want to get info from")
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    object("general")
-                        .properties(
-                            string(TITLE),
-                            string(DESC),
-                            string("canonical")),
-                    object("twitter")
-                        .properties(
-                            string("site"),
-                            string(TITLE),
-                            string(DESC)),
-                    object("og")
-                        .properties(
-                            string(TITLE),
-                            string("url"),
-                            string("image"),
-                            string(DESC),
-                            string("type"))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object("general")
+                            .properties(
+                                string(TITLE),
+                                string(DESC),
+                                string("canonical")),
+                        object("twitter")
+                            .properties(
+                                string("site"),
+                                string(TITLE),
+                                string(DESC)),
+                        object("og")
+                            .properties(
+                                string(TITLE),
+                                string("url"),
+                                string("image"),
+                                string(DESC),
+                                string("type")))))
         .perform(OneSimpleAPIWebPageInformationAction::perform);
 
     private OneSimpleAPIWebPageInformationAction() {

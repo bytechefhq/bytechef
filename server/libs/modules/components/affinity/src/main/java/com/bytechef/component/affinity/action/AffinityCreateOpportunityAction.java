@@ -21,6 +21,7 @@ import static com.bytechef.component.affinity.constant.AffinityConstants.NAME;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ActionContext;
@@ -44,11 +45,12 @@ public class AffinityCreateOpportunityAction {
                 .label("Name")
                 .description("The name of the opportunity.")
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    integer("id"),
-                    string(NAME)))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        integer("id"),
+                        string(NAME))))
         .perform(AffinityCreateOpportunityAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_OPPORTUNITIES_CONTEXT_FUNCTION =

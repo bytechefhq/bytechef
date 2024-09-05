@@ -18,6 +18,7 @@ package com.bytechef.component.filesystem.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILENAME;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.READ_FILE;
@@ -43,7 +44,7 @@ public class FilesystemReadFileAction {
             .description("The path of the file to read.")
             .placeholder("/data/your_file.pdf")
             .required(true))
-        .outputSchema(fileEntry())
+        .output(outputSchema(fileEntry()))
         .perform(FilesystemReadFileAction::perform);
 
     private FilesystemReadFileAction() {

@@ -17,6 +17,7 @@
 package com.bytechef.component.google.calendar.trigger;
 
 import static com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
@@ -62,7 +63,7 @@ public class GoogleCalendarEventTrigger {
                         inputParameters, connectionParameters, arrayIndex, searchText, context) -> GoogleCalendarUtils
                             .getCalendarIdOptions(inputParameters, connectionParameters, null, null, context))
                 .required(true))
-        .outputSchema(EVENT_PROPERTY)
+        .output(outputSchema(EVENT_PROPERTY))
         .webhookEnable(GoogleCalendarEventTrigger::webhookEnable)
         .webhookDisable(GoogleCalendarEventTrigger::webhookDisable)
         .webhookRequest(GoogleCalendarEventTrigger::webhookRequest);

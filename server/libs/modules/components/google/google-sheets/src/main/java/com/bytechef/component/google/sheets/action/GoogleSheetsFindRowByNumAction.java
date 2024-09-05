@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.INCLUDE_ITEMS_FROM_ALL_DRIVES_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
@@ -57,9 +58,10 @@ public class GoogleSheetsFindRowByNumAction {
                 .label("Row number")
                 .required(true)
                 .description("The row number to get from the sheet."))
-        .outputSchema(
-            object()
-                .additionalProperties(bool(), number(), string()))
+        .output(
+            outputSchema(
+                object()
+                    .additionalProperties(bool(), number(), string())))
         .perform(GoogleSheetsFindRowByNumAction::perform);
 
     private GoogleSheetsFindRowByNumAction() {

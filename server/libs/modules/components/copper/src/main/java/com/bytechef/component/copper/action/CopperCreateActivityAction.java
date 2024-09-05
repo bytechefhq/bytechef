@@ -30,6 +30,7 @@ import static com.bytechef.component.copper.constant.CopperConstants.TYPE;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.copper.util.CopperOptionUtils;
@@ -76,7 +77,7 @@ public class CopperCreateActivityAction {
                 .options((ActionOptionsFunction<String>) CopperOptionUtils::getParentOptions)
                 .optionsLookupDependsOn(TYPE)
                 .required(true))
-        .outputSchema(
+        .output(outputSchema(
             object()
                 .properties(
                     string(ID),
@@ -88,7 +89,7 @@ public class CopperCreateActivityAction {
                     object(PARENT)
                         .properties(
                             string(TYPE),
-                            string(ID))))
+                            string(ID)))))
         .perform(CopperCreateActivityAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_ACTIVITIES_CONTEXT_FUNCTION =

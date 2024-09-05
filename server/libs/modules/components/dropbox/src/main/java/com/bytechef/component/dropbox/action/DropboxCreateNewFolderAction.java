@@ -18,6 +18,7 @@ package com.bytechef.component.dropbox.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.CREATE_FOLDER;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.PATH;
@@ -43,15 +44,16 @@ public class DropboxCreateNewFolderAction {
                 .label("Folder path/name")
                 .description("The path of the new folder. Root is /.")
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    object("metadata")
-                        .properties(
-                            string("name"),
-                            string("path_lower"),
-                            string("path_display"),
-                            string("id"))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object("metadata")
+                            .properties(
+                                string("name"),
+                                string("path_lower"),
+                                string("path_display"),
+                                string("id")))))
         .perform(DropboxCreateNewFolderAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_CREATE_FOLDER_CONTEXT_FUNCTION =

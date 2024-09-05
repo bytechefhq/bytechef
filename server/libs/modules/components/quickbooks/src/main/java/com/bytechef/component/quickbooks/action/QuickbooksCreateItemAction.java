@@ -19,6 +19,7 @@ package com.bytechef.component.quickbooks.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.CREATE_ITEM;
@@ -52,18 +53,19 @@ public final class QuickbooksCreateItemAction {
                 .description(
                     "Current quantity of the Inventory items available for sale. Not used for Service or " +
                         "NonInventory type items.Required for Inventory type items."))
-        .outputSchema(
-            object()
-                .properties(
-                    string("id")
-                        .label("ID")
-                        .required(true),
-                    string("name")
-                        .label("Name"),
-                    string("description")
-                        .label("Description"),
-                    number("unitPrice")
-                        .label("Unit price")))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string("id")
+                            .label("ID")
+                            .required(true),
+                        string("name")
+                            .label("Name"),
+                        string("description")
+                            .label("Description"),
+                        number("unitPrice")
+                            .label("Unit price"))))
         .perform(QuickbooksCreateItemAction::perform);
 
     private QuickbooksCreateItemAction() {

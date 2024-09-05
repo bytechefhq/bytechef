@@ -18,6 +18,7 @@ package com.bytechef.component.microsoft.teams.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CREATE_CHANNEL;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.DESCRIPTION;
@@ -55,12 +56,13 @@ public class MicrosoftTeamsCreateChannelAction {
                 .label("Description")
                 .description("Description for the channel.")
                 .required(false))
-        .outputSchema(
-            object()
-                .properties(
-                    string(ID),
-                    string(DISPLAY_NAME),
-                    string(DESCRIPTION)))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(ID),
+                        string(DISPLAY_NAME),
+                        string(DESCRIPTION))))
         .perform(MicrosoftTeamsCreateChannelAction::perform);
 
     private MicrosoftTeamsCreateChannelAction() {

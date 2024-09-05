@@ -26,6 +26,7 @@ import static com.bytechef.component.aitable.constant.AITableConstants.RECORD_ID
 import static com.bytechef.component.aitable.constant.AITableConstants.SPACE_ID_PROPERTY;
 import static com.bytechef.component.aitable.constant.AITableConstants.UPDATE_RECORD;
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.aitable.util.AITableUtils;
@@ -56,7 +57,7 @@ public class AITableUpdateRecordAction {
                 .options((OptionsDataSource.ActionOptionsFunction<String>) AITableUtils::getDatasheetRecordIdOptions)
                 .required(true),
             FIELDS_DYNAMIC_PROPERTY)
-        .outputSchema(OUTPUT_PROPERTY)
+        .output(outputSchema(OUTPUT_PROPERTY))
         .perform(AITableUpdateRecordAction::perform);
 
     private AITableUpdateRecordAction() {

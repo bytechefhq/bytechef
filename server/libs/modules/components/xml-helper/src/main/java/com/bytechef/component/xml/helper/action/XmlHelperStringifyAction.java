@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ActionContext;
@@ -53,7 +54,7 @@ public class XmlHelperStringifyAction {
                 .description("The array to convert to XML string.")
                 .displayCondition("type == 2")
                 .required(true))
-        .outputSchema(string())
+        .output(outputSchema(string()))
         .perform(XmlHelperStringifyAction::perform);
 
     protected static String perform(

@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.openai.constant.OpenAIConstants.ASK_CHAT_GPT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.CONTENT;
@@ -109,7 +110,7 @@ public class OpenAIAskChatGPTAction {
             TEMPERATURE_PROPERTY,
             TOP_P_PROPERTY,
             USER_PROPERTY)
-        .outputSchema(OpenAIUtils.OUTPUT_SCHEMA_RESPONSE)
+        .output(outputSchema(OpenAIUtils.OUTPUT_SCHEMA_RESPONSE))
         .perform(OpenAIAskChatGPTAction::perform);
 
     private OpenAIAskChatGPTAction() {

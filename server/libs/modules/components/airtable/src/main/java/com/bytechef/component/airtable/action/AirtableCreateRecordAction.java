@@ -27,6 +27,7 @@ import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.nullable;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.time;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
@@ -65,13 +66,13 @@ public class AirtableCreateRecordAction {
             dynamicProperties("__item").metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .outputSchema(object()
+        .output(outputSchema(object()
             .properties(dateTime("createdTime").required(false), object("fields").additionalProperties(
                 array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON)));
+                    "responseType", ResponseType.JSON))));
 
     private AirtableCreateRecordAction() {
     }

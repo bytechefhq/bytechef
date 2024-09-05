@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ActionContext;
@@ -67,7 +68,7 @@ public class XmlFileWriteAction {
                 .required(true)
                 .defaultValue("file.xml")
                 .advancedOption(true))
-        .outputSchema(fileEntry())
+        .output(outputSchema(fileEntry()))
         .perform(XmlFileWriteAction::perform);
 
     protected static FileEntry perform(

@@ -18,6 +18,7 @@ package com.bytechef.component.microsoft.share.point.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.CREATE_FOLDER;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.FOLDER;
@@ -56,11 +57,12 @@ public class MicrosoftSharePointCreateFolderAction {
             string(NAME)
                 .label("Folder name")
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    string(ID),
-                    string(NAME)))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(ID),
+                        string(NAME))))
         .perform(MicrosoftSharePointCreateFolderAction::perform);
 
     private MicrosoftSharePointCreateFolderAction() {

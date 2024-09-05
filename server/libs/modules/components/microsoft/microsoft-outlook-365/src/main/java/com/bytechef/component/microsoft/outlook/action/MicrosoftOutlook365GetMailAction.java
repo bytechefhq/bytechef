@@ -17,6 +17,7 @@
 package com.bytechef.component.microsoft.outlook.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.GET_MAIL;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ID;
@@ -44,7 +45,7 @@ public class MicrosoftOutlook365GetMailAction {
                 .description("Id of the message")
                 .options((ActionOptionsFunction<String>) MicrosoftOutlook365OptionUtils::getMessageIdOptions)
                 .required(true))
-        .outputSchema(MESSAGE_OUTPUT_PROPERTY)
+        .output(outputSchema(MESSAGE_OUTPUT_PROPERTY))
         .perform(MicrosoftOutlook365GetMailAction::perform);
 
     private MicrosoftOutlook365GetMailAction() {
