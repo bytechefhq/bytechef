@@ -18,12 +18,12 @@
   "connection" : null,
   "actions" : [ {
     "batch" : null,
-    "dynamicOutput" : false,
     "deprecated" : null,
     "description" : "Delay action execution.",
     "help" : null,
     "metadata" : null,
     "name" : "sleep",
+    "outputDefinition" : null,
     "properties" : [ {
       "advancedOption" : null,
       "description" : "Time in milliseconds.",
@@ -41,15 +41,13 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     } ],
     "title" : "Sleep",
-    "outputResponse" : null,
-    "output" : null,
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
   "triggers" : null
 }

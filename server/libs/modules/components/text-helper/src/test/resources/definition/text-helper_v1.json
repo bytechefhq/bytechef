@@ -18,12 +18,17 @@
   "connection" : null,
   "actions" : [ {
     "batch" : null,
-    "dynamicOutput" : true,
     "deprecated" : null,
     "description" : "Extract content from the HTML content.",
     "help" : null,
     "metadata" : null,
     "name" : "extractContentFromHtml",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : null,
+      "outputSchema" : null,
+      "sampleOutput" : null
+    },
     "properties" : [ {
       "advancedOption" : null,
       "description" : "The HTML content.",
@@ -144,17 +149,20 @@
     "title" : "Extract Content from HTML",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "outputResponse" : null,
-    "output" : null,
     "perform" : { }
   }, {
     "batch" : null,
-    "dynamicOutput" : true,
     "deprecated" : null,
     "description" : "Decodes base64 encoded text into human readable plain text.",
     "help" : null,
     "metadata" : null,
     "name" : "base64Decode",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : null,
+      "outputSchema" : null,
+      "sampleOutput" : null
+    },
     "properties" : [ {
       "advancedOption" : null,
       "description" : null,
@@ -207,8 +215,6 @@
     "title" : "Base64 Decode",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "outputResponse" : null,
-    "output" : null,
     "perform" : { }
   } ],
   "triggers" : null

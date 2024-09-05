@@ -62,6 +62,8 @@
       "title" : null,
       "type" : "CUSTOM",
       "acquire" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -71,8 +73,7 @@
       "tokenUrl" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
-      "refreshToken" : null,
-      "authorizationCallback" : null
+      "refreshToken" : null
     } ],
     "properties" : [ {
       "advancedOption" : null,
@@ -141,12 +142,17 @@
   },
   "actions" : [ {
     "batch" : null,
-    "dynamicOutput" : false,
     "deprecated" : null,
     "description" : "Execute an SQL query.",
     "help" : null,
     "metadata" : null,
     "name" : "query",
+    "outputDefinition" : {
+      "output" : { },
+      "outputResponse" : null,
+      "sampleOutput" : null,
+      "outputSchema" : null
+    },
     "properties" : [ {
       "advancedOption" : null,
       "description" : "The raw SQL query to execute. You can use :property1 and :property2 in conjunction with parameters.",
@@ -272,19 +278,22 @@
       "optionsDataSource" : null
     } ],
     "title" : "Query",
-    "perform" : { },
-    "output" : { },
-    "outputResponse" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
-    "dynamicOutput" : false,
     "deprecated" : null,
     "description" : "Insert rows in database.",
     "help" : null,
     "metadata" : null,
     "name" : "insert",
+    "outputDefinition" : {
+      "output" : { },
+      "outputResponse" : null,
+      "sampleOutput" : null,
+      "outputSchema" : null
+    },
     "properties" : [ {
       "advancedOption" : null,
       "description" : "Name of the schema the table belongs to.",
@@ -601,19 +610,22 @@
       "optionsDataSource" : null
     } ],
     "title" : "Insert",
-    "perform" : { },
-    "output" : { },
-    "outputResponse" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
-    "dynamicOutput" : false,
     "deprecated" : null,
     "description" : "Update rows in database.",
     "help" : null,
     "metadata" : null,
     "name" : "update",
+    "outputDefinition" : {
+      "output" : { },
+      "outputResponse" : null,
+      "sampleOutput" : null,
+      "outputSchema" : null
+    },
     "properties" : [ {
       "advancedOption" : null,
       "description" : "Name of the schema the table belongs to.",
@@ -950,19 +962,22 @@
       "optionsDataSource" : null
     } ],
     "title" : "Update",
-    "perform" : { },
-    "output" : { },
-    "outputResponse" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
-    "dynamicOutput" : false,
     "deprecated" : null,
     "description" : "Delete rows from database.",
     "help" : null,
     "metadata" : null,
     "name" : "delete",
+    "outputDefinition" : {
+      "output" : { },
+      "outputResponse" : null,
+      "sampleOutput" : null,
+      "outputSchema" : null
+    },
     "properties" : [ {
       "advancedOption" : null,
       "description" : "Name of the schema the table belongs to.",
@@ -1258,19 +1273,22 @@
       "optionsDataSource" : null
     } ],
     "title" : "Delete",
-    "perform" : { },
-    "output" : { },
-    "outputResponse" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
-    "dynamicOutput" : false,
     "deprecated" : null,
     "description" : "Execute an SQL DML or DML statement.",
     "help" : null,
     "metadata" : null,
     "name" : "execute",
+    "outputDefinition" : {
+      "output" : { },
+      "outputResponse" : null,
+      "sampleOutput" : null,
+      "outputSchema" : null
+    },
     "properties" : [ {
       "advancedOption" : null,
       "description" : "The raw DML or DDL statement to execute. You can use :property1 and :property2 in conjunction with parameters.",
@@ -1629,11 +1647,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Execute",
-    "perform" : { },
-    "output" : { },
-    "outputResponse" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
   "triggers" : null
 }

@@ -101,12 +101,12 @@
   },
   "actions" : [ {
     "batch" : null,
-    "dynamicOutput" : false,
     "deprecated" : null,
     "description" : "Send a new RabbitMQ message.",
     "help" : null,
     "metadata" : null,
     "name" : "sendMessage",
+    "outputDefinition" : null,
     "properties" : [ {
       "advancedOption" : null,
       "description" : "The name of the queue to read from",
@@ -151,17 +151,20 @@
     "title" : "Send Message",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "output" : null,
-    "outputResponse" : null
+    "perform" : { }
   } ],
   "triggers" : [ {
     "batch" : null,
-    "dynamicOutput" : true,
     "deprecated" : null,
     "description" : "Triggers on new RabbitMQ messages.",
     "help" : null,
     "name" : "newMessage",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : null,
+      "outputSchema" : null,
+      "sampleOutput" : null
+    },
     "properties" : [ {
       "advancedOption" : null,
       "description" : "The name of the queue to read from",
@@ -195,8 +198,6 @@
     "webhookValidateOnEnable" : null,
     "deduplicate" : null,
     "poll" : null,
-    "output" : null,
-    "outputResponse" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "dwebhookRequest" : null,

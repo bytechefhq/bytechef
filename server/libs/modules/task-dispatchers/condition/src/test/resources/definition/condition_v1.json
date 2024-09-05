@@ -3,8 +3,7 @@
   "help" : null,
   "icon" : "path:assets/condition.svg",
   "name" : "condition",
-  "output" : null,
-  "outputFunction" : null,
+  "outputDefinition" : null,
   "properties" : [ {
     "advancedOption" : null,
     "displayCondition" : null,
@@ -567,7 +566,6 @@
     "controlType" : "MULTI_SELECT"
   } ],
   "title" : "Condition",
-  "variableProperties" : null,
-  "variablePropertiesFunction" : null,
-  "version" : 1
+  "version" : 1,
+  "variableProperties" : null
 }

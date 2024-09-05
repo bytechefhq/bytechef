@@ -3,8 +3,7 @@
   "help" : null,
   "icon" : "path:assets/fork-join.svg",
   "name" : "fork-join",
-  "output" : null,
-  "outputFunction" : null,
+  "outputDefinition" : null,
   "properties" : null,
   "resources" : null,
   "taskProperties" : [ {
@@ -64,7 +63,6 @@
     "controlType" : "MULTI_SELECT"
   } ],
   "title" : "Fork/Join",
-  "variableProperties" : null,
-  "variablePropertiesFunction" : null,
-  "version" : 1
+  "version" : 1,
+  "variableProperties" : null
 }

@@ -3,8 +3,7 @@
   "help" : null,
   "icon" : "path:assets/branch.svg",
   "name" : "branch",
-  "output" : null,
-  "outputFunction" : null,
+  "outputDefinition" : null,
   "properties" : [ {
     "advancedOption" : null,
     "displayCondition" : null,
@@ -154,7 +153,6 @@
     "controlType" : "MULTI_SELECT"
   } ],
   "title" : "Branch",
-  "variableProperties" : null,
-  "variablePropertiesFunction" : null,
-  "version" : 1
+  "version" : 1,
+  "variableProperties" : null
 }

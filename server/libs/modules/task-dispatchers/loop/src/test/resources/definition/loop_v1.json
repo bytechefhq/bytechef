@@ -3,8 +3,7 @@
   "help" : null,
   "icon" : "path:assets/loop.svg",
   "name" : "loop",
-  "output" : null,
-  "outputFunction" : null,
+  "outputDefinition" : null,
   "properties" : [ {
     "advancedOption" : null,
     "displayCondition" : null,
@@ -88,7 +87,6 @@
     "controlType" : "MULTI_SELECT"
   } ],
   "title" : "Loop",
-  "variableProperties" : null,
-  "variablePropertiesFunction" : { },
-  "version" : 1
+  "version" : 1,
+  "variableProperties" : { }
 }

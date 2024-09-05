@@ -3,8 +3,7 @@
   "help" : null,
   "icon" : "path:assets/parallel.svg",
   "name" : "parallel",
-  "output" : null,
-  "outputFunction" : null,
+  "outputDefinition" : null,
   "properties" : null,
   "resources" : null,
   "taskProperties" : [ {
@@ -44,7 +43,6 @@
     "controlType" : "MULTI_SELECT"
   } ],
   "title" : "Parallel",
-  "variableProperties" : null,
-  "variablePropertiesFunction" : null,
-  "version" : 1
+  "version" : 1,
+  "variableProperties" : null
 }

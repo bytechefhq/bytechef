@@ -18,12 +18,58 @@
   "connection" : null,
   "actions" : [ {
     "batch" : null,
-    "dynamicOutput" : true,
     "deprecated" : null,
     "description" : "Generates a random integer value.",
     "help" : null,
     "metadata" : null,
     "name" : "randomInt",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "INTEGER",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "maxValue" : null,
+          "minValue" : null,
+          "options" : null,
+          "optionsDataSource" : null,
+          "controlType" : "INTEGER"
+        },
+        "sampleOutput" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "INTEGER",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "maxValue" : null,
+        "minValue" : null,
+        "options" : null,
+        "optionsDataSource" : null,
+        "controlType" : "INTEGER"
+      },
+      "sampleOutput" : null
+    },
     "properties" : [ {
       "advancedOption" : null,
       "description" : "The minimum possible generated value.",
@@ -66,7 +112,42 @@
     "title" : "Int",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "outputResponse" : {
+    "perform" : { }
+  }, {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Generates a random float value.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "randomFloat",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "NUMBER",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "maxNumberPrecision" : null,
+          "maxValue" : null,
+          "minNumberPrecision" : null,
+          "minValue" : null,
+          "numberPrecision" : null,
+          "options" : null,
+          "optionsDataSource" : null,
+          "controlType" : "NUMBER"
+        },
+        "sampleOutput" : null
+      },
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -76,29 +157,22 @@
         "metadata" : { },
         "required" : null,
         "name" : null,
-        "type" : "INTEGER",
+        "type" : "NUMBER",
         "defaultValue" : null,
         "exampleValue" : null,
         "label" : null,
         "placeholder" : null,
+        "maxNumberPrecision" : null,
         "maxValue" : null,
+        "minNumberPrecision" : null,
         "minValue" : null,
+        "numberPrecision" : null,
         "options" : null,
         "optionsDataSource" : null,
-        "controlType" : "INTEGER"
+        "controlType" : "NUMBER"
       },
       "sampleOutput" : null
     },
-    "output" : null,
-    "perform" : { }
-  }, {
-    "batch" : null,
-    "dynamicOutput" : true,
-    "deprecated" : null,
-    "description" : "Generates a random float value.",
-    "help" : null,
-    "metadata" : null,
-    "name" : "randomFloat",
     "properties" : [ {
       "advancedOption" : null,
       "description" : "The minimum possible generated value.",
@@ -141,33 +215,6 @@
     "title" : "Float",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "outputResponse" : {
-      "outputSchema" : {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : null,
-        "name" : null,
-        "type" : "NUMBER",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : null,
-        "placeholder" : null,
-        "maxNumberPrecision" : null,
-        "maxValue" : null,
-        "minNumberPrecision" : null,
-        "minValue" : null,
-        "numberPrecision" : null,
-        "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "NUMBER"
-      },
-      "sampleOutput" : null
-    },
-    "output" : null,
     "perform" : { }
   } ],
   "triggers" : null

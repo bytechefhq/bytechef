@@ -18,12 +18,60 @@
   "connection" : null,
   "actions" : [ {
     "batch" : null,
-    "dynamicOutput" : true,
     "deprecated" : null,
     "description" : "Converts the XML string to object/array.",
     "help" : null,
     "metadata" : null,
     "name" : "parse",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "OBJECT",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "additionalProperties" : null,
+          "multipleValues" : null,
+          "options" : null,
+          "properties" : null,
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
+        },
+        "sampleOutput" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "OBJECT",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "additionalProperties" : null,
+        "multipleValues" : null,
+        "options" : null,
+        "properties" : null,
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
+      },
+      "sampleOutput" : null
+    },
     "properties" : [ {
       "advancedOption" : null,
       "description" : "The XML string to convert to the data.",
@@ -48,7 +96,40 @@
     "title" : "Convert from XML string",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "outputResponse" : {
+    "perform" : { }
+  }, {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Writes the object/array to a XML string.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "stringify",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        },
+        "sampleOutput" : null
+      },
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -58,30 +139,20 @@
         "metadata" : { },
         "required" : null,
         "name" : null,
-        "type" : "OBJECT",
+        "type" : "STRING",
         "defaultValue" : null,
         "exampleValue" : null,
         "label" : null,
         "placeholder" : null,
-        "additionalProperties" : null,
-        "multipleValues" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
         "options" : null,
-        "properties" : null,
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
-    "perform" : { },
-    "output" : null
-  }, {
-    "batch" : null,
-    "dynamicOutput" : true,
-    "deprecated" : null,
-    "description" : "Writes the object/array to a XML string.",
-    "help" : null,
-    "metadata" : null,
-    "name" : "stringify",
     "properties" : [ {
       "advancedOption" : null,
       "description" : "The value type.",
@@ -107,8 +178,8 @@
         "label" : "Array",
         "value" : 2
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "SELECT"
+      "controlType" : "SELECT",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The object to convert to XML string.",
@@ -127,8 +198,8 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The array to convert to XML string.",
@@ -148,38 +219,13 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     } ],
     "title" : "Convert to XML string",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "outputResponse" : {
-      "outputSchema" : {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : null,
-        "name" : null,
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : null,
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      },
-      "sampleOutput" : null
-    },
-    "perform" : { },
-    "output" : null
+    "perform" : { }
   } ],
   "triggers" : null
 }
