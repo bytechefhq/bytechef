@@ -188,7 +188,7 @@ const WorkflowNodeDetailsPanel = ({
         }
     );
 
-    const hasOutputData = currentNodeDefinition?.outputDefined || currentNodeDefinition?.dynamicOutput;
+    const hasOutputData = currentNodeDefinition?.outputDefined;
 
     const {data: workflowNodeOutput, refetch: refetchWorkflowNodeOutput} = useGetWorkflowNodeOutputQuery(
         {
@@ -364,7 +364,6 @@ const WorkflowNodeDetailsPanel = ({
     }, [
         activeTab,
         currentActionDefinition?.outputDefined,
-        currentActionDefinition?.dynamicOutput,
         currentActionFetched,
         currentOperationProperties?.length,
         currentComponentDefinition?.name,

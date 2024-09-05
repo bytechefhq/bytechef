@@ -27,10 +27,7 @@ const DataPillPanel = ({
 
         return (
             workflowNodeName !== currentNode?.name &&
-            (actionDefinition?.outputDefined ||
-                actionDefinition?.dynamicOutput ||
-                triggerDefinition?.outputDefined ||
-                triggerDefinition?.dynamicOutput)
+            (actionDefinition?.outputDefined || triggerDefinition?.outputDefined)
         );
     });
 
