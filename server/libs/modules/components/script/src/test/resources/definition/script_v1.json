@@ -3,11 +3,9 @@
     "batch" : null,
     "deprecated" : null,
     "description" : "Executes custom JavaScript code.",
-    "dynamicOutput" : true,
     "help" : null,
     "metadata" : null,
     "name" : "javascript",
-    "outputResponse" : null,
     "properties" : [ {
       "advancedOption" : null,
       "description" : "Initialize parameter values used in the custom code.",
@@ -41,8 +39,8 @@
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "ARRAY_BUILDER"
+        "controlType" : "ARRAY_BUILDER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -82,8 +80,8 @@
         "label" : null,
         "placeholder" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "DATE"
+        "controlType" : "DATE",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -99,8 +97,8 @@
         "label" : null,
         "placeholder" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "DATE_TIME"
+        "controlType" : "DATE_TIME",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -118,8 +116,8 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "INTEGER"
+        "controlType" : "INTEGER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -155,8 +153,8 @@
         "minValue" : null,
         "numberPrecision" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "NUMBER"
+        "controlType" : "NUMBER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -175,8 +173,8 @@
         "multipleValues" : null,
         "options" : null,
         "properties" : null,
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -212,14 +210,14 @@
         "label" : null,
         "placeholder" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "TIME"
+        "controlType" : "TIME",
+        "optionsDataSource" : null
       } ],
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Add your JavaScript custom logic here.",
@@ -243,18 +241,21 @@
     } ],
     "title" : "JavaScript",
     "perform" : { },
-    "output" : null,
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : null,
+      "sampleOutput" : null,
+      "outputSchema" : null
+    },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
     "description" : "Executes custom Python code.",
-    "dynamicOutput" : true,
     "help" : null,
     "metadata" : null,
     "name" : "python",
-    "outputResponse" : null,
     "properties" : [ {
       "advancedOption" : null,
       "description" : "Initialize parameter values used in the custom code.",
@@ -288,8 +289,8 @@
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "ARRAY_BUILDER"
+        "controlType" : "ARRAY_BUILDER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -329,8 +330,8 @@
         "label" : null,
         "placeholder" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "DATE"
+        "controlType" : "DATE",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -346,8 +347,8 @@
         "label" : null,
         "placeholder" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "DATE_TIME"
+        "controlType" : "DATE_TIME",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -365,8 +366,8 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "INTEGER"
+        "controlType" : "INTEGER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -402,8 +403,8 @@
         "minValue" : null,
         "numberPrecision" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "NUMBER"
+        "controlType" : "NUMBER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -422,8 +423,8 @@
         "multipleValues" : null,
         "options" : null,
         "properties" : null,
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -459,14 +460,14 @@
         "label" : null,
         "placeholder" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "TIME"
+        "controlType" : "TIME",
+        "optionsDataSource" : null
       } ],
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Add your Python custom logic here.",
@@ -490,18 +491,21 @@
     } ],
     "title" : "Python",
     "perform" : { },
-    "output" : null,
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : null,
+      "sampleOutput" : null,
+      "outputSchema" : null
+    },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
     "description" : "Executes custom Ruby code.",
-    "dynamicOutput" : true,
     "help" : null,
     "metadata" : null,
     "name" : "ruby",
-    "outputResponse" : null,
     "properties" : [ {
       "advancedOption" : null,
       "description" : "Initialize parameter values used in the custom code.",
@@ -535,8 +539,8 @@
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "ARRAY_BUILDER"
+        "controlType" : "ARRAY_BUILDER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -576,8 +580,8 @@
         "label" : null,
         "placeholder" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "DATE"
+        "controlType" : "DATE",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -593,8 +597,8 @@
         "label" : null,
         "placeholder" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "DATE_TIME"
+        "controlType" : "DATE_TIME",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -612,8 +616,8 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "INTEGER"
+        "controlType" : "INTEGER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -649,8 +653,8 @@
         "minValue" : null,
         "numberPrecision" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "NUMBER"
+        "controlType" : "NUMBER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -669,8 +673,8 @@
         "multipleValues" : null,
         "options" : null,
         "properties" : null,
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -706,14 +710,14 @@
         "label" : null,
         "placeholder" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "TIME"
+        "controlType" : "TIME",
+        "optionsDataSource" : null
       } ],
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Add your Ruby custom logic here.",
@@ -737,7 +741,12 @@
     } ],
     "title" : "Ruby",
     "perform" : { },
-    "output" : null,
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : null,
+      "sampleOutput" : null,
+      "outputSchema" : null
+    },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],

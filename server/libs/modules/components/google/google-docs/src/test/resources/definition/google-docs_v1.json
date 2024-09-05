@@ -65,17 +65,18 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : { },
-      "clientSecret" : null,
-      "refreshToken" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : { },
       "scopes" : { },
-      "tokenUrl" : { }
+      "tokenUrl" : { },
+      "authorizationUrl" : { },
+      "clientSecret" : null,
+      "refreshToken" : null,
+      "oauth2AuthorizationExtraQueryParameters" : { },
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -85,12 +86,12 @@
   },
   "actions" : [ {
     "batch" : null,
-    "dynamicOutput" : false,
     "deprecated" : null,
     "description" : "Create a document on Google Docs",
     "help" : null,
     "metadata" : null,
     "name" : "createDocument",
+    "outputDefinition" : null,
     "properties" : [ {
       "advancedOption" : null,
       "description" : "Document title",
@@ -133,19 +134,17 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create document",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "outputResponse" : null,
-    "output" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
-    "dynamicOutput" : false,
     "deprecated" : null,
     "description" : "Edit a template file and replace the values with the ones provided",
     "help" : null,
     "metadata" : null,
     "name" : "createDocumentBasedOnTemplate",
+    "outputDefinition" : null,
     "properties" : [ {
       "advancedOption" : null,
       "description" : "The ID of the file to replace the values",
@@ -204,8 +203,8 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Key: Image ID (get it manually from the Read File Action), Value: Image URL",
@@ -244,23 +243,21 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     } ],
     "title" : "Edit template file",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "outputResponse" : null,
-    "output" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
-    "dynamicOutput" : false,
     "deprecated" : null,
     "description" : "Read a document from Google Docs",
     "help" : null,
     "metadata" : null,
     "name" : "readDocument",
+    "outputDefinition" : null,
     "properties" : [ {
       "advancedOption" : null,
       "description" : "The ID of the document to read",
@@ -283,11 +280,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Read document",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "outputResponse" : null,
-    "output" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
   "triggers" : null
 }

@@ -3,8 +3,7 @@
   "help" : null,
   "icon" : "path:assets/subflow.svg",
   "name" : "subflow",
-  "output" : null,
-  "outputFunction" : null,
+  "outputDefinition" : null,
   "properties" : [ {
     "advancedOption" : null,
     "displayCondition" : null,
@@ -175,7 +174,6 @@
   "resources" : null,
   "taskProperties" : null,
   "title" : "Subflow",
-  "variableProperties" : null,
-  "variablePropertiesFunction" : null,
-  "version" : 1
+  "version" : 1,
+  "variableProperties" : null
 }

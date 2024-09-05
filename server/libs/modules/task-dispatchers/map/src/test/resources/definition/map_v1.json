@@ -3,8 +3,12 @@
   "help" : null,
   "icon" : "path:assets/map.svg",
   "name" : "map",
-  "output" : null,
-  "outputFunction" : { },
+  "outputDefinition" : {
+    "output" : { },
+    "outputResponse" : null,
+    "outputSchema" : null,
+    "sampleOutput" : null
+  },
   "properties" : [ {
     "advancedOption" : null,
     "displayCondition" : null,
@@ -44,7 +48,6 @@
     "controlType" : null
   } ],
   "title" : "Map",
-  "variableProperties" : null,
-  "variablePropertiesFunction" : { },
-  "version" : 1
+  "version" : 1,
+  "variableProperties" : { }
 }

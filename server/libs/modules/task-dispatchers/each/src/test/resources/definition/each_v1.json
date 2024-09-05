@@ -3,8 +3,7 @@
   "help" : null,
   "icon" : "path:assets/each.svg",
   "name" : "each",
-  "output" : null,
-  "outputFunction" : null,
+  "outputDefinition" : null,
   "properties" : [ {
     "advancedOption" : null,
     "displayCondition" : null,
@@ -44,7 +43,6 @@
     "controlType" : null
   } ],
   "title" : "Each",
-  "variableProperties" : null,
-  "variablePropertiesFunction" : { },
-  "version" : 1
+  "version" : 1,
+  "variableProperties" : { }
 }
