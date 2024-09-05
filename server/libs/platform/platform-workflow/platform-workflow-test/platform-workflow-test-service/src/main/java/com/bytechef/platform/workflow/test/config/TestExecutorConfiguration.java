@@ -98,7 +98,7 @@ public class TestExecutorConfiguration {
                 contextService, jobService,
                 getTaskCompletionHandlerFactories(
                     contextService, counterService, taskExecutionService, taskFileStorage),
-                getTaskDispatcherAdapterFactories(objectMapper),
+                getTaskDispatcherAdapterFactories(),
                 List.of(new TestTaskDispatcherPreSendProcessor(jobService)),
                 getTaskDispatcherResolverFactories(
                     syncMessageBroker, contextService, counterService, taskExecutionService, taskFileStorage),
@@ -133,13 +133,13 @@ public class TestExecutorConfiguration {
                 taskCompletionHandler, taskExecutionService));
     }
 
-    private List<TaskDispatcherAdapterFactory> getTaskDispatcherAdapterFactories(ObjectMapper objectMapper) {
+    private List<TaskDispatcherAdapterFactory> getTaskDispatcherAdapterFactories() {
         return List.of(
             new TaskDispatcherAdapterFactory() {
 
                 @Override
                 public TaskHandler<?> create(TaskHandlerResolver taskHandlerResolver) {
-                    return new MapTaskDispatcherAdapterTaskHandler(objectMapper, taskHandlerResolver);
+                    return new MapTaskDispatcherAdapterTaskHandler(taskHandlerResolver);
                 }
 
                 @Override
