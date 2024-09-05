@@ -173,7 +173,7 @@ const ProjectInstanceWorkflowListItem = ({
                             onClick={(event) => event.stopPropagation()}
                         />
 
-                        {(!workflow.triggers?.length || workflow.triggers?.[0]?.name === 'manual') && (
+                        {(!workflow.triggers?.length || workflow.triggers?.[0]?.type.includes('manual')) && (
                             <Button
                                 disabled={!projectInstanceEnabled || !projectInstanceWorkflow.enabled}
                                 onClick={handleRunWorkflowClick}
@@ -207,7 +207,7 @@ const ProjectInstanceWorkflowListItem = ({
                             </Button>
                         )}
 
-                        {!(workflow.triggers?.length == 0 || workflow.triggers?.[0]?.name === 'manual') &&
+                        {!(workflow.triggers?.length == 0 || workflow.triggers?.[0]?.type.includes('manual')) &&
                             !projectInstanceWorkflow.staticWebhookUrl && <div className="w-9"></div>}
 
                         <ProjectInstanceWorkflowListItemDropdownMenu
