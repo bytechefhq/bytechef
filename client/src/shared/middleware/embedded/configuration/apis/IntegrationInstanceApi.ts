@@ -15,11 +15,11 @@
 
 import * as runtime from '../runtime';
 import type {
-  IntegrationInstanceModel,
+  IntegrationInstance,
 } from '../models/index';
 import {
-    IntegrationInstanceModelFromJSON,
-    IntegrationInstanceModelToJSON,
+    IntegrationInstanceFromJSON,
+    IntegrationInstanceToJSON,
 } from '../models/index';
 
 export interface DeleteIntegrationInstanceRequest {
@@ -173,7 +173,7 @@ export class IntegrationInstanceApi extends runtime.BaseAPI {
      * Get an integration instance by id.
      * Get an integration instance by id
      */
-    async getIntegrationInstanceRaw(requestParameters: GetIntegrationInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IntegrationInstanceModel>> {
+    async getIntegrationInstanceRaw(requestParameters: GetIntegrationInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IntegrationInstance>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -192,14 +192,14 @@ export class IntegrationInstanceApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => IntegrationInstanceModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => IntegrationInstanceFromJSON(jsonValue));
     }
 
     /**
      * Get an integration instance by id.
      * Get an integration instance by id
      */
-    async getIntegrationInstance(requestParameters: GetIntegrationInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IntegrationInstanceModel> {
+    async getIntegrationInstance(requestParameters: GetIntegrationInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IntegrationInstance> {
         const response = await this.getIntegrationInstanceRaw(requestParameters, initOverrides);
         return await response.value();
     }

@@ -1,10 +1,10 @@
 apis/ConnectedUserApi.ts
 apis/index.ts
 index.ts
-models/ConnectedUserIntegrationInstanceModel.ts
-models/ConnectedUserModel.ts
-models/CredentialStatusModel.ts
-models/EnvironmentModel.ts
-models/PageModel.ts
+models/ConnectedUser.ts
+models/ConnectedUserIntegrationInstance.ts
+models/CredentialStatus.ts
+models/Environment.ts
+models/Page.ts
 models/index.ts
 runtime.ts

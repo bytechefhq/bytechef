@@ -15,14 +15,14 @@
 
 import * as runtime from '../runtime';
 import type {
-  TaskDispatcherDefinitionBasicModel,
-  TaskDispatcherDefinitionModel,
+  TaskDispatcherDefinition,
+  TaskDispatcherDefinitionBasic,
 } from '../models/index';
 import {
-    TaskDispatcherDefinitionBasicModelFromJSON,
-    TaskDispatcherDefinitionBasicModelToJSON,
-    TaskDispatcherDefinitionModelFromJSON,
-    TaskDispatcherDefinitionModelToJSON,
+    TaskDispatcherDefinitionFromJSON,
+    TaskDispatcherDefinitionToJSON,
+    TaskDispatcherDefinitionBasicFromJSON,
+    TaskDispatcherDefinitionBasicToJSON,
 } from '../models/index';
 
 export interface GetTaskDispatcherDefinitionRequest {
@@ -43,7 +43,7 @@ export class TaskDispatcherDefinitionApi extends runtime.BaseAPI {
      * Get a task dispatcher definition.
      * Get a task dispatcher definition
      */
-    async getTaskDispatcherDefinitionRaw(requestParameters: GetTaskDispatcherDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TaskDispatcherDefinitionModel>> {
+    async getTaskDispatcherDefinitionRaw(requestParameters: GetTaskDispatcherDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TaskDispatcherDefinition>> {
         if (requestParameters['taskDispatcherName'] == null) {
             throw new runtime.RequiredError(
                 'taskDispatcherName',
@@ -69,14 +69,14 @@ export class TaskDispatcherDefinitionApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => TaskDispatcherDefinitionModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => TaskDispatcherDefinitionFromJSON(jsonValue));
     }
 
     /**
      * Get a task dispatcher definition.
      * Get a task dispatcher definition
      */
-    async getTaskDispatcherDefinition(requestParameters: GetTaskDispatcherDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TaskDispatcherDefinitionModel> {
+    async getTaskDispatcherDefinition(requestParameters: GetTaskDispatcherDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TaskDispatcherDefinition> {
         const response = await this.getTaskDispatcherDefinitionRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -85,7 +85,7 @@ export class TaskDispatcherDefinitionApi extends runtime.BaseAPI {
      * Get all task dispatcher definition versions of a task dispatcher.
      * Get all task dispatcher definition versions of a task dispatcher
      */
-    async getTaskDispatcherDefinitionVersionsRaw(requestParameters: GetTaskDispatcherDefinitionVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TaskDispatcherDefinitionBasicModel>>> {
+    async getTaskDispatcherDefinitionVersionsRaw(requestParameters: GetTaskDispatcherDefinitionVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TaskDispatcherDefinitionBasic>>> {
         if (requestParameters['taskDispatcherName'] == null) {
             throw new runtime.RequiredError(
                 'taskDispatcherName',
@@ -104,14 +104,14 @@ export class TaskDispatcherDefinitionApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TaskDispatcherDefinitionBasicModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TaskDispatcherDefinitionBasicFromJSON));
     }
 
     /**
      * Get all task dispatcher definition versions of a task dispatcher.
      * Get all task dispatcher definition versions of a task dispatcher
      */
-    async getTaskDispatcherDefinitionVersions(requestParameters: GetTaskDispatcherDefinitionVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TaskDispatcherDefinitionBasicModel>> {
+    async getTaskDispatcherDefinitionVersions(requestParameters: GetTaskDispatcherDefinitionVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TaskDispatcherDefinitionBasic>> {
         const response = await this.getTaskDispatcherDefinitionVersionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -120,7 +120,7 @@ export class TaskDispatcherDefinitionApi extends runtime.BaseAPI {
      * Get all task dispatcher definitions.
      * Get all task dispatcher definitions
      */
-    async getTaskDispatcherDefinitionsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TaskDispatcherDefinitionModel>>> {
+    async getTaskDispatcherDefinitionsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TaskDispatcherDefinition>>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -132,14 +132,14 @@ export class TaskDispatcherDefinitionApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TaskDispatcherDefinitionModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TaskDispatcherDefinitionFromJSON));
     }
 
     /**
      * Get all task dispatcher definitions.
      * Get all task dispatcher definitions
      */
-    async getTaskDispatcherDefinitions(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TaskDispatcherDefinitionModel>> {
+    async getTaskDispatcherDefinitions(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TaskDispatcherDefinition>> {
         const response = await this.getTaskDispatcherDefinitionsRaw(initOverrides);
         return await response.value();
     }

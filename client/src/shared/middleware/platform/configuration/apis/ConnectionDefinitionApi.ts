@@ -15,14 +15,14 @@
 
 import * as runtime from '../runtime';
 import type {
-  ConnectionDefinitionBasicModel,
-  ConnectionDefinitionModel,
+  ConnectionDefinition,
+  ConnectionDefinitionBasic,
 } from '../models/index';
 import {
-    ConnectionDefinitionBasicModelFromJSON,
-    ConnectionDefinitionBasicModelToJSON,
-    ConnectionDefinitionModelFromJSON,
-    ConnectionDefinitionModelToJSON,
+    ConnectionDefinitionFromJSON,
+    ConnectionDefinitionToJSON,
+    ConnectionDefinitionBasicFromJSON,
+    ConnectionDefinitionBasicToJSON,
 } from '../models/index';
 
 export interface GetComponentConnectionDefinitionRequest {
@@ -44,7 +44,7 @@ export class ConnectionDefinitionApi extends runtime.BaseAPI {
      * Get connection definition for a component.
      * Get connection definition for a component
      */
-    async getComponentConnectionDefinitionRaw(requestParameters: GetComponentConnectionDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConnectionDefinitionModel>> {
+    async getComponentConnectionDefinitionRaw(requestParameters: GetComponentConnectionDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConnectionDefinition>> {
         if (requestParameters['componentName'] == null) {
             throw new runtime.RequiredError(
                 'componentName',
@@ -70,14 +70,14 @@ export class ConnectionDefinitionApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ConnectionDefinitionModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ConnectionDefinitionFromJSON(jsonValue));
     }
 
     /**
      * Get connection definition for a component.
      * Get connection definition for a component
      */
-    async getComponentConnectionDefinition(requestParameters: GetComponentConnectionDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConnectionDefinitionModel> {
+    async getComponentConnectionDefinition(requestParameters: GetComponentConnectionDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConnectionDefinition> {
         const response = await this.getComponentConnectionDefinitionRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -86,7 +86,7 @@ export class ConnectionDefinitionApi extends runtime.BaseAPI {
      * Get all compatible connection definitions for a component.
      * Get all compatible connection definitions for a component
      */
-    async getComponentConnectionDefinitionsRaw(requestParameters: GetComponentConnectionDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ConnectionDefinitionBasicModel>>> {
+    async getComponentConnectionDefinitionsRaw(requestParameters: GetComponentConnectionDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ConnectionDefinitionBasic>>> {
         if (requestParameters['componentName'] == null) {
             throw new runtime.RequiredError(
                 'componentName',
@@ -112,14 +112,14 @@ export class ConnectionDefinitionApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ConnectionDefinitionBasicModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ConnectionDefinitionBasicFromJSON));
     }
 
     /**
      * Get all compatible connection definitions for a component.
      * Get all compatible connection definitions for a component
      */
-    async getComponentConnectionDefinitions(requestParameters: GetComponentConnectionDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ConnectionDefinitionBasicModel>> {
+    async getComponentConnectionDefinitions(requestParameters: GetComponentConnectionDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ConnectionDefinitionBasic>> {
         const response = await this.getComponentConnectionDefinitionsRaw(requestParameters, initOverrides);
         return await response.value();
     }

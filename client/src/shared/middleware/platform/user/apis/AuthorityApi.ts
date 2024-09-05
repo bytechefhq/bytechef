@@ -15,11 +15,11 @@
 
 import * as runtime from '../runtime';
 import type {
-  AuthorityModel,
+  Authority,
 } from '../models/index';
 import {
-    AuthorityModelFromJSON,
-    AuthorityModelToJSON,
+    AuthorityFromJSON,
+    AuthorityToJSON,
 } from '../models/index';
 
 /**
@@ -31,7 +31,7 @@ export class AuthorityApi extends runtime.BaseAPI {
      * Get all authorities.
      * Get all authorities
      */
-    async getAuthoritiesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<AuthorityModel>>> {
+    async getAuthoritiesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Authority>>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -43,14 +43,14 @@ export class AuthorityApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(AuthorityModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(AuthorityFromJSON));
     }
 
     /**
      * Get all authorities.
      * Get all authorities
      */
-    async getAuthorities(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<AuthorityModel>> {
+    async getAuthorities(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Authority>> {
         const response = await this.getAuthoritiesRaw(initOverrides);
         return await response.value();
     }

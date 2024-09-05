@@ -15,18 +15,18 @@
 
 import * as runtime from '../runtime';
 import type {
-  AdminApiKeyModel,
-  CreateAdminApiKey200ResponseModel,
+  AdminApiKey,
+  CreateAdminApiKey200Response,
 } from '../models/index';
 import {
-    AdminApiKeyModelFromJSON,
-    AdminApiKeyModelToJSON,
-    CreateAdminApiKey200ResponseModelFromJSON,
-    CreateAdminApiKey200ResponseModelToJSON,
+    AdminApiKeyFromJSON,
+    AdminApiKeyToJSON,
+    CreateAdminApiKey200ResponseFromJSON,
+    CreateAdminApiKey200ResponseToJSON,
 } from '../models/index';
 
 export interface CreateAdminApiKeyRequest {
-    adminApiKeyModel: Omit<AdminApiKeyModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'|'secretKey'>;
+    adminApiKey: Omit<AdminApiKey, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'|'secretKey'>;
 }
 
 export interface DeleteAdminApiKeyRequest {
@@ -39,7 +39,7 @@ export interface GetAdminApiKeyRequest {
 
 export interface UpdateAdminApiKeyRequest {
     id: number;
-    adminApiKeyModel: Omit<AdminApiKeyModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'|'secretKey'>;
+    adminApiKey: Omit<AdminApiKey, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'|'secretKey'>;
 }
 
 /**
@@ -51,11 +51,11 @@ export class AdminApiKeyApi extends runtime.BaseAPI {
      * Create a new admin API key.
      * Create a new admin API key
      */
-    async createAdminApiKeyRaw(requestParameters: CreateAdminApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateAdminApiKey200ResponseModel>> {
-        if (requestParameters['adminApiKeyModel'] == null) {
+    async createAdminApiKeyRaw(requestParameters: CreateAdminApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateAdminApiKey200Response>> {
+        if (requestParameters['adminApiKey'] == null) {
             throw new runtime.RequiredError(
-                'adminApiKeyModel',
-                'Required parameter "adminApiKeyModel" was null or undefined when calling createAdminApiKey().'
+                'adminApiKey',
+                'Required parameter "adminApiKey" was null or undefined when calling createAdminApiKey().'
             );
         }
 
@@ -70,17 +70,17 @@ export class AdminApiKeyApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: AdminApiKeyModelToJSON(requestParameters['adminApiKeyModel']),
+            body: AdminApiKeyToJSON(requestParameters['adminApiKey']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => CreateAdminApiKey200ResponseModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => CreateAdminApiKey200ResponseFromJSON(jsonValue));
     }
 
     /**
      * Create a new admin API key.
      * Create a new admin API key
      */
-    async createAdminApiKey(requestParameters: CreateAdminApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateAdminApiKey200ResponseModel> {
+    async createAdminApiKey(requestParameters: CreateAdminApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateAdminApiKey200Response> {
         const response = await this.createAdminApiKeyRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -123,7 +123,7 @@ export class AdminApiKeyApi extends runtime.BaseAPI {
      * Get an admin API key by id.
      * Get an admin API key by id
      */
-    async getAdminApiKeyRaw(requestParameters: GetAdminApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AdminApiKeyModel>> {
+    async getAdminApiKeyRaw(requestParameters: GetAdminApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AdminApiKey>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -142,14 +142,14 @@ export class AdminApiKeyApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => AdminApiKeyModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => AdminApiKeyFromJSON(jsonValue));
     }
 
     /**
      * Get an admin API key by id.
      * Get an admin API key by id
      */
-    async getAdminApiKey(requestParameters: GetAdminApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AdminApiKeyModel> {
+    async getAdminApiKey(requestParameters: GetAdminApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AdminApiKey> {
         const response = await this.getAdminApiKeyRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -158,7 +158,7 @@ export class AdminApiKeyApi extends runtime.BaseAPI {
      * Get admin API keys.
      * Get admin api keys
      */
-    async getAdminApiKeysRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<AdminApiKeyModel>>> {
+    async getAdminApiKeysRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<AdminApiKey>>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -170,14 +170,14 @@ export class AdminApiKeyApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(AdminApiKeyModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(AdminApiKeyFromJSON));
     }
 
     /**
      * Get admin API keys.
      * Get admin api keys
      */
-    async getAdminApiKeys(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<AdminApiKeyModel>> {
+    async getAdminApiKeys(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<AdminApiKey>> {
         const response = await this.getAdminApiKeysRaw(initOverrides);
         return await response.value();
     }
@@ -186,7 +186,7 @@ export class AdminApiKeyApi extends runtime.BaseAPI {
      * Update an existing admin API key.
      * Update an existing admin API key
      */
-    async updateAdminApiKeyRaw(requestParameters: UpdateAdminApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AdminApiKeyModel>> {
+    async updateAdminApiKeyRaw(requestParameters: UpdateAdminApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AdminApiKey>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -194,10 +194,10 @@ export class AdminApiKeyApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['adminApiKeyModel'] == null) {
+        if (requestParameters['adminApiKey'] == null) {
             throw new runtime.RequiredError(
-                'adminApiKeyModel',
-                'Required parameter "adminApiKeyModel" was null or undefined when calling updateAdminApiKey().'
+                'adminApiKey',
+                'Required parameter "adminApiKey" was null or undefined when calling updateAdminApiKey().'
             );
         }
 
@@ -212,17 +212,17 @@ export class AdminApiKeyApi extends runtime.BaseAPI {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: AdminApiKeyModelToJSON(requestParameters['adminApiKeyModel']),
+            body: AdminApiKeyToJSON(requestParameters['adminApiKey']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => AdminApiKeyModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => AdminApiKeyFromJSON(jsonValue));
     }
 
     /**
      * Update an existing admin API key.
      * Update an existing admin API key
      */
-    async updateAdminApiKey(requestParameters: UpdateAdminApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AdminApiKeyModel> {
+    async updateAdminApiKey(requestParameters: UpdateAdminApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AdminApiKey> {
         const response = await this.updateAdminApiKeyRaw(requestParameters, initOverrides);
         return await response.value();
     }

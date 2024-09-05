@@ -15,14 +15,14 @@
 
 import * as runtime from '../runtime';
 import type {
-  ActionDefinitionBasicModel,
-  ActionDefinitionModel,
+  ActionDefinition,
+  ActionDefinitionBasic,
 } from '../models/index';
 import {
-    ActionDefinitionBasicModelFromJSON,
-    ActionDefinitionBasicModelToJSON,
-    ActionDefinitionModelFromJSON,
-    ActionDefinitionModelToJSON,
+    ActionDefinitionFromJSON,
+    ActionDefinitionToJSON,
+    ActionDefinitionBasicFromJSON,
+    ActionDefinitionBasicToJSON,
 } from '../models/index';
 
 export interface GetComponentActionDefinitionRequest {
@@ -45,7 +45,7 @@ export class ActionDefinitionApi extends runtime.BaseAPI {
      * Get an action definition of a component.
      * Get an action definition of a component
      */
-    async getComponentActionDefinitionRaw(requestParameters: GetComponentActionDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ActionDefinitionModel>> {
+    async getComponentActionDefinitionRaw(requestParameters: GetComponentActionDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ActionDefinition>> {
         if (requestParameters['componentName'] == null) {
             throw new runtime.RequiredError(
                 'componentName',
@@ -78,14 +78,14 @@ export class ActionDefinitionApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ActionDefinitionModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ActionDefinitionFromJSON(jsonValue));
     }
 
     /**
      * Get an action definition of a component.
      * Get an action definition of a component
      */
-    async getComponentActionDefinition(requestParameters: GetComponentActionDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ActionDefinitionModel> {
+    async getComponentActionDefinition(requestParameters: GetComponentActionDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ActionDefinition> {
         const response = await this.getComponentActionDefinitionRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -94,7 +94,7 @@ export class ActionDefinitionApi extends runtime.BaseAPI {
      * Get a list of action definitions for a component.
      * Get a list of action definitions for a component
      */
-    async getComponentActionDefinitionsRaw(requestParameters: GetComponentActionDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ActionDefinitionBasicModel>>> {
+    async getComponentActionDefinitionsRaw(requestParameters: GetComponentActionDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ActionDefinitionBasic>>> {
         if (requestParameters['componentName'] == null) {
             throw new runtime.RequiredError(
                 'componentName',
@@ -120,14 +120,14 @@ export class ActionDefinitionApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ActionDefinitionBasicModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ActionDefinitionBasicFromJSON));
     }
 
     /**
      * Get a list of action definitions for a component.
      * Get a list of action definitions for a component
      */
-    async getComponentActionDefinitions(requestParameters: GetComponentActionDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ActionDefinitionBasicModel>> {
+    async getComponentActionDefinitions(requestParameters: GetComponentActionDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ActionDefinitionBasic>> {
         const response = await this.getComponentActionDefinitionsRaw(requestParameters, initOverrides);
         return await response.value();
     }

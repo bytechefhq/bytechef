@@ -15,20 +15,20 @@
 
 import * as runtime from '../runtime';
 import type {
-  ConnectedUserModel,
-  CredentialStatusModel,
-  EnvironmentModel,
-  PageModel,
+  ConnectedUser,
+  CredentialStatus,
+  Environment,
+  Page,
 } from '../models/index';
 import {
-    ConnectedUserModelFromJSON,
-    ConnectedUserModelToJSON,
-    CredentialStatusModelFromJSON,
-    CredentialStatusModelToJSON,
-    EnvironmentModelFromJSON,
-    EnvironmentModelToJSON,
-    PageModelFromJSON,
-    PageModelToJSON,
+    ConnectedUserFromJSON,
+    ConnectedUserToJSON,
+    CredentialStatusFromJSON,
+    CredentialStatusToJSON,
+    EnvironmentFromJSON,
+    EnvironmentToJSON,
+    PageFromJSON,
+    PageToJSON,
 } from '../models/index';
 
 export interface DeleteConnectedUserRequest {
@@ -45,8 +45,8 @@ export interface GetConnectedUserRequest {
 }
 
 export interface GetConnectedUsersRequest {
-    environment?: EnvironmentModel;
-    credentialStatus?: CredentialStatusModel;
+    environment?: Environment;
+    credentialStatus?: CredentialStatus;
     createDateFrom?: Date;
     createDateTo?: Date;
     integrationId?: number;
@@ -138,7 +138,7 @@ export class ConnectedUserApi extends runtime.BaseAPI {
      * Get a connected user.
      * Get a connected user
      */
-    async getConnectedUserRaw(requestParameters: GetConnectedUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConnectedUserModel>> {
+    async getConnectedUserRaw(requestParameters: GetConnectedUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConnectedUser>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -157,14 +157,14 @@ export class ConnectedUserApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ConnectedUserModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ConnectedUserFromJSON(jsonValue));
     }
 
     /**
      * Get a connected user.
      * Get a connected user
      */
-    async getConnectedUser(requestParameters: GetConnectedUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConnectedUserModel> {
+    async getConnectedUser(requestParameters: GetConnectedUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConnectedUser> {
         const response = await this.getConnectedUserRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -173,7 +173,7 @@ export class ConnectedUserApi extends runtime.BaseAPI {
      * Get all connected users.
      * Get all connected users
      */
-    async getConnectedUsersRaw(requestParameters: GetConnectedUsersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PageModel>> {
+    async getConnectedUsersRaw(requestParameters: GetConnectedUsersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Page>> {
         const queryParameters: any = {};
 
         if (requestParameters['environment'] != null) {
@@ -213,14 +213,14 @@ export class ConnectedUserApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => PageModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => PageFromJSON(jsonValue));
     }
 
     /**
      * Get all connected users.
      * Get all connected users
      */
-    async getConnectedUsers(requestParameters: GetConnectedUsersRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PageModel> {
+    async getConnectedUsers(requestParameters: GetConnectedUsersRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Page> {
         const response = await this.getConnectedUsersRaw(requestParameters, initOverrides);
         return await response.value();
     }

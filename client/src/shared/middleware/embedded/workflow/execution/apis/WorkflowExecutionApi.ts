@@ -15,17 +15,17 @@
 
 import * as runtime from '../runtime';
 import type {
-  EnvironmentModel,
-  PageModel,
-  WorkflowExecutionModel,
+  Environment,
+  Page,
+  WorkflowExecution,
 } from '../models/index';
 import {
-    EnvironmentModelFromJSON,
-    EnvironmentModelToJSON,
-    PageModelFromJSON,
-    PageModelToJSON,
-    WorkflowExecutionModelFromJSON,
-    WorkflowExecutionModelToJSON,
+    EnvironmentFromJSON,
+    EnvironmentToJSON,
+    PageFromJSON,
+    PageToJSON,
+    WorkflowExecutionFromJSON,
+    WorkflowExecutionToJSON,
 } from '../models/index';
 
 export interface GetWorkflowExecutionRequest {
@@ -33,7 +33,7 @@ export interface GetWorkflowExecutionRequest {
 }
 
 export interface GetWorkflowExecutionsPageRequest {
-    environment?: EnvironmentModel;
+    environment?: Environment;
     jobStatus?: GetWorkflowExecutionsPageJobStatusEnum;
     jobStartDate?: Date;
     jobEndDate?: Date;
@@ -52,7 +52,7 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
      * Get workflow execution by id.
      * Get workflow executions by id
      */
-    async getWorkflowExecutionRaw(requestParameters: GetWorkflowExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowExecutionModel>> {
+    async getWorkflowExecutionRaw(requestParameters: GetWorkflowExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowExecution>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -71,14 +71,14 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowExecutionModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowExecutionFromJSON(jsonValue));
     }
 
     /**
      * Get workflow execution by id.
      * Get workflow executions by id
      */
-    async getWorkflowExecution(requestParameters: GetWorkflowExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowExecutionModel> {
+    async getWorkflowExecution(requestParameters: GetWorkflowExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowExecution> {
         const response = await this.getWorkflowExecutionRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -87,7 +87,7 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
      * Get Integration workflow executions.
      * Get Integration workflow executions
      */
-    async getWorkflowExecutionsPageRaw(requestParameters: GetWorkflowExecutionsPageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PageModel>> {
+    async getWorkflowExecutionsPageRaw(requestParameters: GetWorkflowExecutionsPageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Page>> {
         const queryParameters: any = {};
 
         if (requestParameters['environment'] != null) {
@@ -131,14 +131,14 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => PageModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => PageFromJSON(jsonValue));
     }
 
     /**
      * Get Integration workflow executions.
      * Get Integration workflow executions
      */
-    async getWorkflowExecutionsPage(requestParameters: GetWorkflowExecutionsPageRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PageModel> {
+    async getWorkflowExecutionsPage(requestParameters: GetWorkflowExecutionsPageRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Page> {
         const response = await this.getWorkflowExecutionsPageRaw(requestParameters, initOverrides);
         return await response.value();
     }

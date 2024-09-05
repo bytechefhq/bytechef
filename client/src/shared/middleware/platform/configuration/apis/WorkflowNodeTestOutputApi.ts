@@ -15,11 +15,11 @@
 
 import * as runtime from '../runtime';
 import type {
-  WorkflowNodeTestOutputModel,
+  WorkflowNodeTestOutput,
 } from '../models/index';
 import {
-    WorkflowNodeTestOutputModelFromJSON,
-    WorkflowNodeTestOutputModelToJSON,
+    WorkflowNodeTestOutputFromJSON,
+    WorkflowNodeTestOutputToJSON,
 } from '../models/index';
 
 export interface DeleteWorkflowNodeTestOutputRequest {
@@ -88,7 +88,7 @@ export class WorkflowNodeTestOutputApi extends runtime.BaseAPI {
      * Create a new or update existing workflow node test output.
      * Create a new or update existing workflow node test output
      */
-    async saveWorkflowNodeTestOutputRaw(requestParameters: SaveWorkflowNodeTestOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowNodeTestOutputModel>> {
+    async saveWorkflowNodeTestOutputRaw(requestParameters: SaveWorkflowNodeTestOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowNodeTestOutput>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -114,14 +114,14 @@ export class WorkflowNodeTestOutputApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowNodeTestOutputModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowNodeTestOutputFromJSON(jsonValue));
     }
 
     /**
      * Create a new or update existing workflow node test output.
      * Create a new or update existing workflow node test output
      */
-    async saveWorkflowNodeTestOutput(requestParameters: SaveWorkflowNodeTestOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowNodeTestOutputModel> {
+    async saveWorkflowNodeTestOutput(requestParameters: SaveWorkflowNodeTestOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowNodeTestOutput> {
         const response = await this.saveWorkflowNodeTestOutputRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -130,7 +130,7 @@ export class WorkflowNodeTestOutputApi extends runtime.BaseAPI {
      * Upload a sample output to create a new or update existing workflow node test output.
      * Upload a sample output to create a new or update existing workflow node test output
      */
-    async uploadWorkflowNodeSampleOutputRaw(requestParameters: UploadWorkflowNodeSampleOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowNodeTestOutputModel>> {
+    async uploadWorkflowNodeSampleOutputRaw(requestParameters: UploadWorkflowNodeSampleOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowNodeTestOutput>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -166,14 +166,14 @@ export class WorkflowNodeTestOutputApi extends runtime.BaseAPI {
             body: requestParameters['body'] as any,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowNodeTestOutputModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowNodeTestOutputFromJSON(jsonValue));
     }
 
     /**
      * Upload a sample output to create a new or update existing workflow node test output.
      * Upload a sample output to create a new or update existing workflow node test output
      */
-    async uploadWorkflowNodeSampleOutput(requestParameters: UploadWorkflowNodeSampleOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowNodeTestOutputModel> {
+    async uploadWorkflowNodeSampleOutput(requestParameters: UploadWorkflowNodeSampleOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowNodeTestOutput> {
         const response = await this.uploadWorkflowNodeSampleOutputRaw(requestParameters, initOverrides);
         return await response.value();
     }

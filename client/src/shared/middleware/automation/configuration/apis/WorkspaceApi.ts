@@ -15,11 +15,11 @@
 
 import * as runtime from '../runtime';
 import type {
-  WorkspaceModel,
+  Workspace,
 } from '../models/index';
 import {
-    WorkspaceModelFromJSON,
-    WorkspaceModelToJSON,
+    WorkspaceFromJSON,
+    WorkspaceToJSON,
 } from '../models/index';
 
 export interface GetUserWorkspacesRequest {
@@ -35,7 +35,7 @@ export class WorkspaceApi extends runtime.BaseAPI {
      * Get all user workspaces.
      * Get all user workspaces
      */
-    async getUserWorkspacesRaw(requestParameters: GetUserWorkspacesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WorkspaceModel>>> {
+    async getUserWorkspacesRaw(requestParameters: GetUserWorkspacesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Workspace>>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -54,14 +54,14 @@ export class WorkspaceApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(WorkspaceModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(WorkspaceFromJSON));
     }
 
     /**
      * Get all user workspaces.
      * Get all user workspaces
      */
-    async getUserWorkspaces(requestParameters: GetUserWorkspacesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WorkspaceModel>> {
+    async getUserWorkspaces(requestParameters: GetUserWorkspacesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Workspace>> {
         const response = await this.getUserWorkspacesRaw(requestParameters, initOverrides);
         return await response.value();
     }

@@ -1,8 +1,8 @@
 apis/ApiKeyApi.ts
 apis/index.ts
 index.ts
-models/ApiKeyModel.ts
-models/CreateApiKey200ResponseModel.ts
-models/EnvironmentModel.ts
+models/ApiKey.ts
+models/CreateApiKey200Response.ts
+models/Environment.ts
 models/index.ts
 runtime.ts

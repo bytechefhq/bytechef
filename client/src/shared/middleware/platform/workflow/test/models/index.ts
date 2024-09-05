@@ -1,14 +1,14 @@
 /* tslint:disable */
 /* eslint-disable */
-export * from './ComponentDefinitionBasicModel';
-export * from './DataStreamComponentModel';
-export * from './ExecutionErrorModel';
-export * from './JobModel';
-export * from './TaskExecutionModel';
-export * from './TriggerExecutionModel';
-export * from './WebhookModel';
-export * from './WebhookRetryModel';
-export * from './WorkflowConnectionModel';
-export * from './WorkflowTaskModel';
-export * from './WorkflowTestExecutionModel';
-export * from './WorkflowTriggerModel';
+export * from './ComponentDefinitionBasic';
+export * from './DataStreamComponent';
+export * from './ExecutionError';
+export * from './Job';
+export * from './TaskExecution';
+export * from './TriggerExecution';
+export * from './Webhook';
+export * from './WebhookRetry';
+export * from './WorkflowConnection';
+export * from './WorkflowTask';
+export * from './WorkflowTestExecution';
+export * from './WorkflowTrigger';

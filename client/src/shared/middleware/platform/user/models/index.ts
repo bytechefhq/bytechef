@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
-export * from './AdminApiKeyModel';
-export * from './ApiKeyModel';
-export * from './AuthorityModel';
-export * from './CreateAdminApiKey200ResponseModel';
-export * from './EnvironmentModel';
-export * from './SigningKeyModel';
+export * from './AdminApiKey';
+export * from './ApiKey';
+export * from './Authority';
+export * from './CreateAdminApiKey200Response';
+export * from './Environment';
+export * from './SigningKey';

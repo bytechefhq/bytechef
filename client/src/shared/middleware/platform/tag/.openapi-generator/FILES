@@ -1,4 +1,5 @@
 index.ts
-models/TagModel.ts
-models/UpdateTagsRequestModel.ts
+models/Tag.ts
+models/UpdateTagsRequest.ts
+models/index.ts
 runtime.ts

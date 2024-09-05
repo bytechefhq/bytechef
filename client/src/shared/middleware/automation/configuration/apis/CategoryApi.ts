@@ -15,11 +15,11 @@
 
 import * as runtime from '../runtime';
 import type {
-  CategoryModel,
+  Category,
 } from '../models/index';
 import {
-    CategoryModelFromJSON,
-    CategoryModelToJSON,
+    CategoryFromJSON,
+    CategoryToJSON,
 } from '../models/index';
 
 /**
@@ -31,7 +31,7 @@ export class CategoryApi extends runtime.BaseAPI {
      * Get categories.
      * Get categories
      */
-    async getProjectCategoriesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<CategoryModel>>> {
+    async getProjectCategoriesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Category>>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -43,14 +43,14 @@ export class CategoryApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(CategoryModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(CategoryFromJSON));
     }
 
     /**
      * Get categories.
      * Get categories
      */
-    async getProjectCategories(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<CategoryModel>> {
+    async getProjectCategories(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Category>> {
         const response = await this.getProjectCategoriesRaw(initOverrides);
         return await response.value();
     }

@@ -15,14 +15,14 @@
 
 import * as runtime from '../runtime';
 import type {
-  TriggerDefinitionBasicModel,
-  TriggerDefinitionModel,
+  TriggerDefinition,
+  TriggerDefinitionBasic,
 } from '../models/index';
 import {
-    TriggerDefinitionBasicModelFromJSON,
-    TriggerDefinitionBasicModelToJSON,
-    TriggerDefinitionModelFromJSON,
-    TriggerDefinitionModelToJSON,
+    TriggerDefinitionFromJSON,
+    TriggerDefinitionToJSON,
+    TriggerDefinitionBasicFromJSON,
+    TriggerDefinitionBasicToJSON,
 } from '../models/index';
 
 export interface GetComponentTriggerDefinitionRequest {
@@ -45,7 +45,7 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
      * Get a trigger definition of a component.
      * Get a trigger definition of a component
      */
-    async getComponentTriggerDefinitionRaw(requestParameters: GetComponentTriggerDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TriggerDefinitionModel>> {
+    async getComponentTriggerDefinitionRaw(requestParameters: GetComponentTriggerDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TriggerDefinition>> {
         if (requestParameters['componentName'] == null) {
             throw new runtime.RequiredError(
                 'componentName',
@@ -78,14 +78,14 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => TriggerDefinitionModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => TriggerDefinitionFromJSON(jsonValue));
     }
 
     /**
      * Get a trigger definition of a component.
      * Get a trigger definition of a component
      */
-    async getComponentTriggerDefinition(requestParameters: GetComponentTriggerDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TriggerDefinitionModel> {
+    async getComponentTriggerDefinition(requestParameters: GetComponentTriggerDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TriggerDefinition> {
         const response = await this.getComponentTriggerDefinitionRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -94,7 +94,7 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
      * Get a list of trigger definitionss for a component.
      * Get a list of trigger definitionss for a component
      */
-    async getComponentTriggerDefinitionsRaw(requestParameters: GetComponentTriggerDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TriggerDefinitionBasicModel>>> {
+    async getComponentTriggerDefinitionsRaw(requestParameters: GetComponentTriggerDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TriggerDefinitionBasic>>> {
         if (requestParameters['componentName'] == null) {
             throw new runtime.RequiredError(
                 'componentName',
@@ -120,14 +120,14 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TriggerDefinitionBasicModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TriggerDefinitionBasicFromJSON));
     }
 
     /**
      * Get a list of trigger definitionss for a component.
      * Get a list of trigger definitionss for a component
      */
-    async getComponentTriggerDefinitions(requestParameters: GetComponentTriggerDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TriggerDefinitionBasicModel>> {
+    async getComponentTriggerDefinitions(requestParameters: GetComponentTriggerDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TriggerDefinitionBasic>> {
         const response = await this.getComponentTriggerDefinitionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
