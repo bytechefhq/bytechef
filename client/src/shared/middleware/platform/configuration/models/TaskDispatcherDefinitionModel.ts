@@ -33,12 +33,6 @@ import {
  */
 export interface TaskDispatcherDefinitionModel {
     /**
-     * Does task dispatcher define dynamic output schema.
-     * @type {boolean}
-     * @memberof TaskDispatcherDefinitionModel
-     */
-    dynamicOutput: boolean;
-    /**
      * The description.
      * @type {string}
      * @memberof TaskDispatcherDefinitionModel
@@ -104,7 +98,6 @@ export interface TaskDispatcherDefinitionModel {
  * Check if a given object implements the TaskDispatcherDefinitionModel interface.
  */
 export function instanceOfTaskDispatcherDefinitionModel(value: object): boolean {
-    if (!('dynamicOutput' in value)) return false;
     if (!('name' in value)) return false;
     if (!('outputDefined' in value)) return false;
     if (!('version' in value)) return false;
@@ -121,7 +114,6 @@ export function TaskDispatcherDefinitionModelFromJSONTyped(json: any, ignoreDisc
     }
     return {
         
-        'dynamicOutput': json['dynamicOutput'],
         'description': json['description'] == null ? undefined : json['description'],
         'icon': json['icon'] == null ? undefined : json['icon'],
         'name': json['name'],
@@ -141,7 +133,6 @@ export function TaskDispatcherDefinitionModelToJSON(value?: TaskDispatcherDefini
     }
     return {
         
-        'dynamicOutput': value['dynamicOutput'],
         'description': value['description'],
         'icon': value['icon'],
         'name': value['name'],
