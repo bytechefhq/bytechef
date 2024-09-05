@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowExecutionBasic", description = "Contains information about execution of a Integration workflow.")
 @JsonTypeName("WorkflowExecutionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:40.611743+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T10:08:03.597414+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class WorkflowExecutionBasicModel {
 
   private Long id;
@@ -42,7 +42,7 @@ public class WorkflowExecutionBasicModel {
   /**
    * The id of a workflow execution.
    * @return id
-  */
+   */
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a workflow execution.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
@@ -62,7 +62,7 @@ public class WorkflowExecutionBasicModel {
   /**
    * Get project
    * @return project
-  */
+   */
   @Valid 
   @Schema(name = "project", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("project")
@@ -82,7 +82,7 @@ public class WorkflowExecutionBasicModel {
   /**
    * Get projectInstance
    * @return projectInstance
-  */
+   */
   @Valid 
   @Schema(name = "projectInstance", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("projectInstance")
@@ -102,7 +102,7 @@ public class WorkflowExecutionBasicModel {
   /**
    * Get job
    * @return job
-  */
+   */
   @Valid 
   @Schema(name = "job", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("job")
@@ -122,7 +122,7 @@ public class WorkflowExecutionBasicModel {
   /**
    * Get workflow
    * @return workflow
-  */
+   */
   @Valid 
   @Schema(name = "workflow", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflow")

@@ -33,7 +33,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "StringProperty", description = "A string property.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T08:55:29.450670+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T11:10:11.248638+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class StringPropertyModel extends ValuePropertyModel {
 
   private String languageId;
@@ -70,7 +70,7 @@ public class StringPropertyModel extends ValuePropertyModel {
   /**
    * The language id used together with CODE_EDITOR control type.
    * @return languageId
-  */
+   */
   
   @Schema(name = "languageId", description = "The language id used together with CODE_EDITOR control type.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("languageId")
@@ -90,7 +90,7 @@ public class StringPropertyModel extends ValuePropertyModel {
   /**
    * The property default value.
    * @return defaultValue
-  */
+   */
   
   @Schema(name = "defaultValue", description = "The property default value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("defaultValue")
@@ -110,7 +110,7 @@ public class StringPropertyModel extends ValuePropertyModel {
   /**
    * The property sample value.
    * @return exampleValue
-  */
+   */
   
   @Schema(name = "exampleValue", description = "The property sample value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("exampleValue")
@@ -130,7 +130,7 @@ public class StringPropertyModel extends ValuePropertyModel {
   /**
    * The maximum string length.
    * @return maxLength
-  */
+   */
   
   @Schema(name = "maxLength", description = "The maximum string length.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("maxLength")
@@ -150,7 +150,7 @@ public class StringPropertyModel extends ValuePropertyModel {
   /**
    * The minimum string length.
    * @return minLength
-  */
+   */
   
   @Schema(name = "minLength", description = "The minimum string length.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("minLength")
@@ -178,7 +178,7 @@ public class StringPropertyModel extends ValuePropertyModel {
   /**
    * The list of valid property options.
    * @return options
-  */
+   */
   @Valid 
   @Schema(name = "options", description = "The list of valid property options.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("options")
@@ -198,7 +198,7 @@ public class StringPropertyModel extends ValuePropertyModel {
   /**
    * Get optionsDataSource
    * @return optionsDataSource
-  */
+   */
   @Valid 
   @Schema(name = "optionsDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("optionsDataSource")

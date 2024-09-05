@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "JobBasic", description = "Represents an execution of a workflow.")
 @JsonTypeName("JobBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:42.260068+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T10:08:05.971353+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class JobBasicModel {
 
   private String createdBy;
@@ -115,7 +115,7 @@ public class JobBasicModel {
   /**
    * The created by.
    * @return createdBy
-  */
+   */
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
@@ -135,7 +135,7 @@ public class JobBasicModel {
   /**
    * The created date.
    * @return createdDate
-  */
+   */
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
@@ -155,7 +155,7 @@ public class JobBasicModel {
   /**
    * The time execution entered end status COMPLETED, STOPPED, FAILED
    * @return endDate
-  */
+   */
   @Valid 
   @Schema(name = "endDate", description = "The time execution entered end status COMPLETED, STOPPED, FAILED", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("endDate")
@@ -175,7 +175,7 @@ public class JobBasicModel {
   /**
    * The id of a job.
    * @return id
-  */
+   */
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a job.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
@@ -195,7 +195,7 @@ public class JobBasicModel {
   /**
    * The job's human-readable name.
    * @return label
-  */
+   */
   
   @Schema(name = "label", accessMode = Schema.AccessMode.READ_ONLY, description = "The job's human-readable name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("label")
@@ -215,7 +215,7 @@ public class JobBasicModel {
   /**
    * The last modified by.
    * @return lastModifiedBy
-  */
+   */
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
@@ -235,7 +235,7 @@ public class JobBasicModel {
   /**
    * The last modified date.
    * @return lastModifiedDate
-  */
+   */
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
@@ -255,7 +255,7 @@ public class JobBasicModel {
   /**
    * The priority value.
    * @return priority
-  */
+   */
   
   @Schema(name = "priority", accessMode = Schema.AccessMode.READ_ONLY, description = "The priority value.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("priority")
@@ -275,7 +275,7 @@ public class JobBasicModel {
   /**
    * The time of when the job began.
    * @return startDate
-  */
+   */
   @Valid 
   @Schema(name = "startDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The time of when the job began.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("startDate")
@@ -295,7 +295,7 @@ public class JobBasicModel {
   /**
    * The job's status.
    * @return status
-  */
+   */
   
   @Schema(name = "status", accessMode = Schema.AccessMode.READ_ONLY, description = "The job's status.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("status")
@@ -315,7 +315,7 @@ public class JobBasicModel {
   /**
    * Get workflowId
    * @return workflowId
-  */
+   */
   
   @Schema(name = "workflowId", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowId")

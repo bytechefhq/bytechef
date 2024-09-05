@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Project", description = "A group of workflows that make one logical project.")
 @JsonTypeName("Project")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:40.306014+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T10:08:03.100799+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class ProjectModel {
 
   private String createdBy;
@@ -87,7 +87,7 @@ public class ProjectModel {
   /**
    * The created by.
    * @return createdBy
-  */
+   */
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
@@ -107,7 +107,7 @@ public class ProjectModel {
   /**
    * The created date.
    * @return createdDate
-  */
+   */
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
@@ -127,7 +127,7 @@ public class ProjectModel {
   /**
    * The description of a project.
    * @return description
-  */
+   */
   
   @Schema(name = "description", description = "The description of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
@@ -147,7 +147,7 @@ public class ProjectModel {
   /**
    * The id of a project.
    * @return id
-  */
+   */
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
@@ -167,7 +167,7 @@ public class ProjectModel {
   /**
    * The last modified by.
    * @return lastModifiedBy
-  */
+   */
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
@@ -187,7 +187,7 @@ public class ProjectModel {
   /**
    * The last modified date.
    * @return lastModifiedDate
-  */
+   */
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
@@ -207,7 +207,7 @@ public class ProjectModel {
   /**
    * The name of a project.
    * @return name
-  */
+   */
   @NotNull 
   @Schema(name = "name", description = "The name of a project.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
@@ -227,7 +227,7 @@ public class ProjectModel {
   /**
    * The last published date.
    * @return lastPublishedDate
-  */
+   */
   @Valid 
   @Schema(name = "lastPublishedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last published date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastPublishedDate")
@@ -247,7 +247,7 @@ public class ProjectModel {
   /**
    * Get lastStatus
    * @return lastStatus
-  */
+   */
   @Valid 
   @Schema(name = "lastStatus", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastStatus")
@@ -267,7 +267,7 @@ public class ProjectModel {
   /**
    * The last version of a project.
    * @return lastProjectVersion
-  */
+   */
   
   @Schema(name = "lastProjectVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The last version of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastProjectVersion")
@@ -287,7 +287,7 @@ public class ProjectModel {
   /**
    * Get category
    * @return category
-  */
+   */
   @Valid 
   @Schema(name = "category", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("category")
@@ -315,7 +315,7 @@ public class ProjectModel {
   /**
    * The project workflow ids belonging to this project.
    * @return projectWorkflowIds
-  */
+   */
   
   @Schema(name = "projectWorkflowIds", description = "The project workflow ids belonging to this project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("projectWorkflowIds")
@@ -343,7 +343,7 @@ public class ProjectModel {
   /**
    * Get tags
    * @return tags
-  */
+   */
   @Valid 
   @Schema(name = "tags", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("tags")
@@ -363,7 +363,7 @@ public class ProjectModel {
   /**
    * The workspace id.
    * @return workspaceId
-  */
+   */
   @NotNull 
   @Schema(name = "workspaceId", description = "The workspace id.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("workspaceId")
@@ -383,7 +383,7 @@ public class ProjectModel {
   /**
    * Get version
    * @return version
-  */
+   */
   
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("__version")

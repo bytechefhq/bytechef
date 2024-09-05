@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "DynamicPropertiesProperty", description = "A dynamic properties property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T08:55:29.450670+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T11:10:11.248638+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class DynamicPropertiesPropertyModel extends PropertyModel {
 
   private String header;
@@ -54,7 +54,7 @@ public class DynamicPropertiesPropertyModel extends PropertyModel {
   /**
    * The dynamic property header.
    * @return header
-  */
+   */
   
   @Schema(name = "header", description = "The dynamic property header.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("header")
@@ -74,7 +74,7 @@ public class DynamicPropertiesPropertyModel extends PropertyModel {
   /**
    * Get propertiesDataSource
    * @return propertiesDataSource
-  */
+   */
   @Valid 
   @Schema(name = "propertiesDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("propertiesDataSource")

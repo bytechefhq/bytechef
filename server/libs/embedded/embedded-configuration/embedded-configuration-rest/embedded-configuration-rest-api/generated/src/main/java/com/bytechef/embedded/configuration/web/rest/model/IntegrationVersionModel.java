@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationVersion", description = "The integration version.")
 @JsonTypeName("IntegrationVersion")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:40.820234+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T10:08:03.892557+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class IntegrationVersionModel {
 
   private String description;
@@ -45,7 +45,7 @@ public class IntegrationVersionModel {
   /**
    * The description of an integration version.
    * @return description
-  */
+   */
   
   @Schema(name = "description", description = "The description of an integration version.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
@@ -65,7 +65,7 @@ public class IntegrationVersionModel {
   /**
    * The published date.
    * @return publishedDate
-  */
+   */
   @Valid 
   @Schema(name = "publishedDate", description = "The published date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("publishedDate")
@@ -85,7 +85,7 @@ public class IntegrationVersionModel {
   /**
    * The version of an integration.
    * @return version
-  */
+   */
   
   @Schema(name = "version", accessMode = Schema.AccessMode.READ_ONLY, description = "The version of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("version")
@@ -105,7 +105,7 @@ public class IntegrationVersionModel {
   /**
    * Get status
    * @return status
-  */
+   */
   @Valid 
   @Schema(name = "status", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("status")

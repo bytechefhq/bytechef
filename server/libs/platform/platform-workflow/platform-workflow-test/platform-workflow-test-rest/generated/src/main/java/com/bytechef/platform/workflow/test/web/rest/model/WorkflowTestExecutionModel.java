@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTestExecution", description = "Contains information about test execution of a workflow.")
 @JsonTypeName("WorkflowTestExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:42.146731+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T10:08:05.829450+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class WorkflowTestExecutionModel {
 
   private com.bytechef.platform.workflow.execution.web.rest.model.JobModel job;
@@ -36,7 +36,7 @@ public class WorkflowTestExecutionModel {
   /**
    * Get job
    * @return job
-  */
+   */
   @Valid 
   @Schema(name = "job", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("job")
@@ -56,7 +56,7 @@ public class WorkflowTestExecutionModel {
   /**
    * Get triggerExecution
    * @return triggerExecution
-  */
+   */
   @Valid 
   @Schema(name = "triggerExecution", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("triggerExecution")

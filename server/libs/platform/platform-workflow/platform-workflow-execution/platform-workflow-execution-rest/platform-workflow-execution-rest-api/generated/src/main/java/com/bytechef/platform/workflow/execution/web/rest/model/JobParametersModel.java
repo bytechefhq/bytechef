@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "JobParameters", description = "Defines parameters used to execute a job.")
 @JsonTypeName("JobParameters")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:42.260068+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T10:08:05.971353+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class JobParametersModel {
 
   @Valid
@@ -79,7 +79,7 @@ public class JobParametersModel {
   /**
    * Get connections
    * @return connections
-  */
+   */
   @Valid 
   @Schema(name = "connections", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connections")
@@ -107,7 +107,7 @@ public class JobParametersModel {
   /**
    * The inputs expected by the workflow
    * @return inputs
-  */
+   */
   
   @Schema(name = "inputs", description = "The inputs expected by the workflow", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("inputs")
@@ -127,7 +127,7 @@ public class JobParametersModel {
   /**
    * The job's human-readable name
    * @return label
-  */
+   */
   
   @Schema(name = "label", description = "The job's human-readable name", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("label")
@@ -147,7 +147,7 @@ public class JobParametersModel {
   /**
    * The id of the parent task that created this job. Used for sub-flows.
    * @return parentTaskExecutionId
-  */
+   */
   
   @Schema(name = "parentTaskExecutionId", description = "The id of the parent task that created this job. Used for sub-flows.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("parentTaskExecutionId")
@@ -167,7 +167,7 @@ public class JobParametersModel {
   /**
    * The priority value used during execution of individual tasks.
    * @return priority
-  */
+   */
   
   @Schema(name = "priority", description = "The priority value used during execution of individual tasks.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("priority")
@@ -195,7 +195,7 @@ public class JobParametersModel {
   /**
    * Get triggerOutputs
    * @return triggerOutputs
-  */
+   */
   @Valid 
   @Schema(name = "triggerOutputs", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("triggerOutputs")
@@ -215,7 +215,7 @@ public class JobParametersModel {
   /**
    * Id of the workflow to execute.
    * @return workflowId
-  */
+   */
   @NotNull 
   @Schema(name = "workflowId", description = "Id of the workflow to execute.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("workflowId")
@@ -243,7 +243,7 @@ public class JobParametersModel {
   /**
    * The list of webhooks to register to receive notifications for certain events.
    * @return webhooks
-  */
+   */
   @Valid 
   @Schema(name = "webhooks", description = "The list of webhooks to register to receive notifications for certain events.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("webhooks")

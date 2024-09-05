@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTask", description = "Represents a definition of a workflow task.")
 @JsonTypeName("WorkflowTask")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T08:55:29.450670+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T11:10:11.248638+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class WorkflowTaskModel {
 
   @Valid
@@ -93,7 +93,7 @@ public class WorkflowTaskModel {
   /**
    * Get connections
    * @return connections
-  */
+   */
   @Valid 
   @Schema(name = "connections", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connections")
@@ -113,7 +113,7 @@ public class WorkflowTaskModel {
   /**
    * The description of the task.
    * @return description
-  */
+   */
   
   @Schema(name = "description", description = "The description of the task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
@@ -133,7 +133,7 @@ public class WorkflowTaskModel {
   /**
    * Get destination
    * @return destination
-  */
+   */
   @Valid 
   @Schema(name = "destination", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("destination")
@@ -161,7 +161,7 @@ public class WorkflowTaskModel {
   /**
    * The (optional) list of tasks that are to be executed after execution of a task -- regardless of whether it had failed or not.
    * @return finalize
-  */
+   */
   @Valid 
   @Schema(name = "finalize", description = "The (optional) list of tasks that are to be executed after execution of a task -- regardless of whether it had failed or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("finalize")
@@ -181,7 +181,7 @@ public class WorkflowTaskModel {
   /**
    * The human-readable description of the task.
    * @return label
-  */
+   */
   
   @Schema(name = "label", description = "The human-readable description of the task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("label")
@@ -209,7 +209,7 @@ public class WorkflowTaskModel {
   /**
    * Key-value map of metadata.
    * @return metadata
-  */
+   */
   
   @Schema(name = "metadata", description = "Key-value map of metadata.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("metadata")
@@ -229,7 +229,7 @@ public class WorkflowTaskModel {
   /**
    * The identifier name of the task. Task names are used for assigning the output of one task so it can be later used by subsequent tasks.
    * @return name
-  */
+   */
   @NotNull 
   @Schema(name = "name", description = "The identifier name of the task. Task names are used for assigning the output of one task so it can be later used by subsequent tasks.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
@@ -249,7 +249,7 @@ public class WorkflowTaskModel {
   /**
    * Defines the name of the type of the node that the task execution will be routed to. For instance, if the node value is \"encoder\", then the task will be routed to the \"encoder\" queue which is presumably subscribed to by worker nodes of \"encoder\" type.
    * @return node
-  */
+   */
   
   @Schema(name = "node", description = "Defines the name of the type of the node that the task execution will be routed to. For instance, if the node value is \"encoder\", then the task will be routed to the \"encoder\" queue which is presumably subscribed to by worker nodes of \"encoder\" type.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("node")
@@ -277,7 +277,7 @@ public class WorkflowTaskModel {
   /**
    * Key-value map of task parameters.
    * @return parameters
-  */
+   */
   
   @Schema(name = "parameters", description = "Key-value map of task parameters.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("parameters")
@@ -305,7 +305,7 @@ public class WorkflowTaskModel {
   /**
    * The (optional) list of tasks that are to be executed after the successful execution of a task.
    * @return post
-  */
+   */
   @Valid 
   @Schema(name = "post", description = "The (optional) list of tasks that are to be executed after the successful execution of a task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("post")
@@ -333,7 +333,7 @@ public class WorkflowTaskModel {
   /**
    * The (optional) list of tasks that are to be executed prior to a task.
    * @return pre
-  */
+   */
   @Valid 
   @Schema(name = "pre", description = "The (optional) list of tasks that are to be executed prior to a task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("pre")
@@ -353,7 +353,7 @@ public class WorkflowTaskModel {
   /**
    * Get source
    * @return source
-  */
+   */
   @Valid 
   @Schema(name = "source", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("source")
@@ -373,7 +373,7 @@ public class WorkflowTaskModel {
   /**
    * The timeout expression which describes when a task should be deemed as timed-out.
    * @return timeout
-  */
+   */
   
   @Schema(name = "timeout", description = "The timeout expression which describes when a task should be deemed as timed-out.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("timeout")
@@ -393,7 +393,7 @@ public class WorkflowTaskModel {
   /**
    * The type of the task.
    * @return type
-  */
+   */
   @NotNull 
   @Schema(name = "type", description = "The type of the task.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("type")

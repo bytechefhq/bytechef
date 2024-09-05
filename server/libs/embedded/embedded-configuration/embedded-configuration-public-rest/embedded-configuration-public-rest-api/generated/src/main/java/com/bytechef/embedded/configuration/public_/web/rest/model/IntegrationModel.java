@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T17:59:20.075746+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T10:08:03.806897+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class IntegrationModel {
 
   private Boolean allowMultipleInstances = false;
@@ -62,7 +62,7 @@ public class IntegrationModel {
   /**
    * If multiple instances of an integration are allowed or not.
    * @return allowMultipleInstances
-  */
+   */
   @NotNull 
   @Schema(name = "allowMultipleInstances", description = "If multiple instances of an integration are allowed or not.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("allowMultipleInstances")
@@ -82,7 +82,7 @@ public class IntegrationModel {
   /**
    * The name of the integration's component.
    * @return componentName
-  */
+   */
   @NotNull 
   @Schema(name = "componentName", description = "The name of the integration's component.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("componentName")
@@ -102,7 +102,7 @@ public class IntegrationModel {
   /**
    * The version of the integration's component.
    * @return componentVersion
-  */
+   */
   @NotNull 
   @Schema(name = "componentVersion", description = "The version of the integration's component.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("componentVersion")
@@ -122,7 +122,7 @@ public class IntegrationModel {
   /**
    * The description of a project.
    * @return description
-  */
+   */
   
   @Schema(name = "description", description = "The description of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
@@ -142,7 +142,7 @@ public class IntegrationModel {
   /**
    * The icon.
    * @return icon
-  */
+   */
   @NotNull 
   @Schema(name = "icon", description = "The icon.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("icon")
@@ -162,7 +162,7 @@ public class IntegrationModel {
   /**
    * The id of an integration.
    * @return id
-  */
+   */
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
@@ -182,7 +182,7 @@ public class IntegrationModel {
   /**
    * The version of an integration.
    * @return integrationVersion
-  */
+   */
   
   @Schema(name = "integrationVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The version of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationVersion")
@@ -202,7 +202,7 @@ public class IntegrationModel {
   /**
    * The title of the integration's component.
    * @return title
-  */
+   */
   
   @Schema(name = "title", description = "The title of the integration's component.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("title")

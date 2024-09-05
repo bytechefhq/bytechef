@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "JobConnection", description = "The connection used in a particular task.")
 @JsonTypeName("JobConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:42.260068+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T10:08:05.971353+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class JobConnectionModel {
 
   private Long id;
@@ -38,7 +38,7 @@ public class JobConnectionModel {
   /**
    * The connection id
    * @return id
-  */
+   */
   
   @Schema(name = "id", description = "The connection id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
@@ -58,7 +58,7 @@ public class JobConnectionModel {
   /**
    * The connection key under which a connection is defined in a workflow definition.
    * @return key
-  */
+   */
   
   @Schema(name = "key", description = "The connection key under which a connection is defined in a workflow definition.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("key")
@@ -78,7 +78,7 @@ public class JobConnectionModel {
   /**
    * The task name to which a connection belongs.
    * @return taskName
-  */
+   */
   
   @Schema(name = "taskName", description = "The task name to which a connection belongs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("taskName")

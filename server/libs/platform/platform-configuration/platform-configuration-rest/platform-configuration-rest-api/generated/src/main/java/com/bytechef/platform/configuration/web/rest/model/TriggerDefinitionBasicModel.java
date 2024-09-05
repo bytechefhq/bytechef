@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerDefinitionBasic", description = "A trigger definition defines ways to trigger workflows from the outside services.")
 @JsonTypeName("TriggerDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T08:55:29.450670+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T11:10:11.248638+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class TriggerDefinitionBasicModel {
 
   private String description;
@@ -57,7 +57,7 @@ public class TriggerDefinitionBasicModel {
   /**
    * The description.
    * @return description
-  */
+   */
   
   @Schema(name = "description", description = "The description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
@@ -77,7 +77,7 @@ public class TriggerDefinitionBasicModel {
   /**
    * Get help
    * @return help
-  */
+   */
   @Valid 
   @Schema(name = "help", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("help")
@@ -97,7 +97,7 @@ public class TriggerDefinitionBasicModel {
   /**
    * The action name.
    * @return name
-  */
+   */
   @NotNull 
   @Schema(name = "name", description = "The action name.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
@@ -117,7 +117,7 @@ public class TriggerDefinitionBasicModel {
   /**
    * The title
    * @return title
-  */
+   */
   
   @Schema(name = "title", description = "The title", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("title")
@@ -137,7 +137,7 @@ public class TriggerDefinitionBasicModel {
   /**
    * Get type
    * @return type
-  */
+   */
   @NotNull @Valid 
   @Schema(name = "type", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("type")

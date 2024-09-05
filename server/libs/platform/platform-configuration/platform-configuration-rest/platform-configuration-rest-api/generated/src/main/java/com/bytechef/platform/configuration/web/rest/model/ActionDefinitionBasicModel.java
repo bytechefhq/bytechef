@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ActionDefinitionBasic", description = "An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
 @JsonTypeName("ActionDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T08:55:29.450670+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T11:10:11.248638+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class ActionDefinitionBasicModel {
 
   private String description;
@@ -52,7 +52,7 @@ public class ActionDefinitionBasicModel {
   /**
    * The description.
    * @return description
-  */
+   */
   
   @Schema(name = "description", description = "The description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
@@ -72,7 +72,7 @@ public class ActionDefinitionBasicModel {
   /**
    * Get help
    * @return help
-  */
+   */
   @Valid 
   @Schema(name = "help", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("help")
@@ -92,7 +92,7 @@ public class ActionDefinitionBasicModel {
   /**
    * The action name.
    * @return name
-  */
+   */
   @NotNull 
   @Schema(name = "name", description = "The action name.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
@@ -112,7 +112,7 @@ public class ActionDefinitionBasicModel {
   /**
    * The title
    * @return title
-  */
+   */
   
   @Schema(name = "title", description = "The title", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("title")

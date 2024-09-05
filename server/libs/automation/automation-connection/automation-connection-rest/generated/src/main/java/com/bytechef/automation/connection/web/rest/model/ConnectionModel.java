@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:39.811895+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T10:05:11.667699+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class ConnectionModel {
 
   private Boolean active;
@@ -98,7 +98,7 @@ public class ConnectionModel {
   /**
    * If a connection is used in any of active workflows.
    * @return active
-  */
+   */
   
   @Schema(name = "active", accessMode = Schema.AccessMode.READ_ONLY, description = "If a connection is used in any of active workflows.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("active")
@@ -118,7 +118,7 @@ public class ConnectionModel {
   /**
    * The name of an authorization used by this connection. Used for HTTP based services.
    * @return authorizationName
-  */
+   */
   
   @Schema(name = "authorizationName", description = "The name of an authorization used by this connection. Used for HTTP based services.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("authorizationName")
@@ -146,7 +146,7 @@ public class ConnectionModel {
   /**
    * The authorization parameters of a connection.
    * @return authorizationParameters
-  */
+   */
   
   @Schema(name = "authorizationParameters", accessMode = Schema.AccessMode.READ_ONLY, description = "The authorization parameters of a connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("authorizationParameters")
@@ -166,7 +166,7 @@ public class ConnectionModel {
   /**
    * The name of a component that uses this connection.
    * @return componentName
-  */
+   */
   @NotNull 
   @Schema(name = "componentName", description = "The name of a component that uses this connection.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("componentName")
@@ -194,7 +194,7 @@ public class ConnectionModel {
   /**
    * The connection parameters of a connection.
    * @return connectionParameters
-  */
+   */
   
   @Schema(name = "connectionParameters", accessMode = Schema.AccessMode.READ_ONLY, description = "The connection parameters of a connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connectionParameters")
@@ -214,7 +214,7 @@ public class ConnectionModel {
   /**
    * The version of a component that uses this connection.
    * @return connectionVersion
-  */
+   */
   
   @Schema(name = "connectionVersion", description = "The version of a component that uses this connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connectionVersion")
@@ -234,7 +234,7 @@ public class ConnectionModel {
   /**
    * The created by.
    * @return createdBy
-  */
+   */
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
@@ -254,7 +254,7 @@ public class ConnectionModel {
   /**
    * The created date.
    * @return createdDate
-  */
+   */
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
@@ -274,7 +274,7 @@ public class ConnectionModel {
   /**
    * Get credentialStatus
    * @return credentialStatus
-  */
+   */
   @Valid 
   @Schema(name = "credentialStatus", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("credentialStatus")
@@ -294,7 +294,7 @@ public class ConnectionModel {
   /**
    * Get environment
    * @return environment
-  */
+   */
   @Valid 
   @Schema(name = "environment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("environment")
@@ -314,7 +314,7 @@ public class ConnectionModel {
   /**
    * The id of a connection.
    * @return id
-  */
+   */
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
@@ -334,7 +334,7 @@ public class ConnectionModel {
   /**
    * The last modified by.
    * @return lastModifiedBy
-  */
+   */
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
@@ -354,7 +354,7 @@ public class ConnectionModel {
   /**
    * The last modified date.
    * @return lastModifiedDate
-  */
+   */
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
@@ -374,7 +374,7 @@ public class ConnectionModel {
   /**
    * The name of a connection.
    * @return name
-  */
+   */
   @NotNull 
   @Schema(name = "name", description = "The name of a connection.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
@@ -402,7 +402,7 @@ public class ConnectionModel {
   /**
    * The parameters of a connection.
    * @return parameters
-  */
+   */
   @NotNull 
   @Schema(name = "parameters", description = "The parameters of a connection.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("parameters")
@@ -430,7 +430,7 @@ public class ConnectionModel {
   /**
    * Get tags
    * @return tags
-  */
+   */
   @Valid 
   @Schema(name = "tags", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("tags")
@@ -450,7 +450,7 @@ public class ConnectionModel {
   /**
    * Get version
    * @return version
-  */
+   */
   
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("__version")
@@ -470,7 +470,7 @@ public class ConnectionModel {
   /**
    * Get workspaceId
    * @return workspaceId
-  */
+   */
   
   @Schema(name = "workspaceId", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workspaceId")

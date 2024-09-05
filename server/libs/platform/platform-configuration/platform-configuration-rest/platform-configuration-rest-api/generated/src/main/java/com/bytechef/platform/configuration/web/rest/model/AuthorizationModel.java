@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Authorization", description = "Contains information required for a connection's authorization.")
 @JsonTypeName("Authorization")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T08:55:29.450670+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T11:10:11.248638+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class AuthorizationModel {
 
   private String description;
@@ -49,7 +49,7 @@ public class AuthorizationModel {
   /**
    * The description.
    * @return description
-  */
+   */
   
   @Schema(name = "description", description = "The description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
@@ -69,7 +69,7 @@ public class AuthorizationModel {
   /**
    * The authorization name.
    * @return name
-  */
+   */
   
   @Schema(name = "name", description = "The authorization name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("name")
@@ -97,7 +97,7 @@ public class AuthorizationModel {
   /**
    * Properties of the connection.
    * @return properties
-  */
+   */
   @Valid 
   @Schema(name = "properties", description = "Properties of the connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("properties")
@@ -117,7 +117,7 @@ public class AuthorizationModel {
   /**
    * The title
    * @return title
-  */
+   */
   
   @Schema(name = "title", description = "The title", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("title")
@@ -137,7 +137,7 @@ public class AuthorizationModel {
   /**
    * Get type
    * @return type
-  */
+   */
   @Valid 
   @Schema(name = "type", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("type")

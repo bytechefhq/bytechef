@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowNodeOutput", description = "The workflow node output")
 @JsonTypeName("WorkflowNodeOutput")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T08:55:29.450670+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T11:10:11.248638+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class WorkflowNodeOutputModel {
 
   private ActionDefinitionModel actionDefinition;
@@ -60,7 +60,7 @@ public class WorkflowNodeOutputModel {
   /**
    * Get actionDefinition
    * @return actionDefinition
-  */
+   */
   @Valid 
   @Schema(name = "actionDefinition", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("actionDefinition")
@@ -80,7 +80,7 @@ public class WorkflowNodeOutputModel {
   /**
    * Get outputSchema
    * @return outputSchema
-  */
+   */
   @NotNull @Valid 
   @Schema(name = "outputSchema", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("outputSchema")
@@ -100,7 +100,7 @@ public class WorkflowNodeOutputModel {
   /**
    * The sample value of an output.
    * @return sampleOutput
-  */
+   */
   
   @Schema(name = "sampleOutput", description = "The sample value of an output.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("sampleOutput")
@@ -120,7 +120,7 @@ public class WorkflowNodeOutputModel {
   /**
    * Get taskDispatcherDefinition
    * @return taskDispatcherDefinition
-  */
+   */
   @Valid 
   @Schema(name = "taskDispatcherDefinition", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("taskDispatcherDefinition")
@@ -140,7 +140,7 @@ public class WorkflowNodeOutputModel {
   /**
    * Get triggerDefinition
    * @return triggerDefinition
-  */
+   */
   @Valid 
   @Schema(name = "triggerDefinition", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("triggerDefinition")
@@ -160,7 +160,7 @@ public class WorkflowNodeOutputModel {
   /**
    * The workflow node name
    * @return workflowNodeName
-  */
+   */
   @NotNull 
   @Schema(name = "workflowNodeName", description = "The workflow node name", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("workflowNodeName")

@@ -34,7 +34,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ArrayProperty", description = "An array property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T08:55:29.450670+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T11:10:11.248638+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class ArrayPropertyModel extends ValuePropertyModel {
 
   @Valid
@@ -84,7 +84,7 @@ public class ArrayPropertyModel extends ValuePropertyModel {
   /**
    * The property default value.
    * @return defaultValue
-  */
+   */
   
   @Schema(name = "defaultValue", description = "The property default value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("defaultValue")
@@ -112,7 +112,7 @@ public class ArrayPropertyModel extends ValuePropertyModel {
   /**
    * The property sample value.
    * @return exampleValue
-  */
+   */
   
   @Schema(name = "exampleValue", description = "The property sample value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("exampleValue")
@@ -140,7 +140,7 @@ public class ArrayPropertyModel extends ValuePropertyModel {
   /**
    * Types of the array items.
    * @return items
-  */
+   */
   @Valid 
   @Schema(name = "items", description = "Types of the array items.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("items")
@@ -160,7 +160,7 @@ public class ArrayPropertyModel extends ValuePropertyModel {
   /**
    * Get maxItems
    * @return maxItems
-  */
+   */
   
   @Schema(name = "maxItems", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("maxItems")
@@ -180,7 +180,7 @@ public class ArrayPropertyModel extends ValuePropertyModel {
   /**
    * Get minItems
    * @return minItems
-  */
+   */
   
   @Schema(name = "minItems", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("minItems")
@@ -200,7 +200,7 @@ public class ArrayPropertyModel extends ValuePropertyModel {
   /**
    * If the array can contain multiple items.
    * @return multipleValues
-  */
+   */
   
   @Schema(name = "multipleValues", description = "If the array can contain multiple items.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("multipleValues")
@@ -228,7 +228,7 @@ public class ArrayPropertyModel extends ValuePropertyModel {
   /**
    * The list of valid property options.
    * @return options
-  */
+   */
   @Valid 
   @Schema(name = "options", description = "The list of valid property options.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("options")
@@ -248,7 +248,7 @@ public class ArrayPropertyModel extends ValuePropertyModel {
   /**
    * Get optionsDataSource
    * @return optionsDataSource
-  */
+   */
   @Valid 
   @Schema(name = "optionsDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("optionsDataSource")

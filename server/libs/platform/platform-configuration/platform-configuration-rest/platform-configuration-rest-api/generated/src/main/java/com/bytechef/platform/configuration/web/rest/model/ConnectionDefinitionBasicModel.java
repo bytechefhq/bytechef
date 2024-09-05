@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectionDefinitionBasic", description = "Definition of a connection to an outside service.")
 @JsonTypeName("ConnectionDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T08:55:29.450670+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T11:10:11.248638+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class ConnectionDefinitionBasicModel {
 
   private String componentDescription;
@@ -52,7 +52,7 @@ public class ConnectionDefinitionBasicModel {
   /**
    * The description used from the connection's component.
    * @return componentDescription
-  */
+   */
   
   @Schema(name = "componentDescription", description = "The description used from the connection's component.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("componentDescription")
@@ -72,7 +72,7 @@ public class ConnectionDefinitionBasicModel {
   /**
    * The component name used from the connection's component.
    * @return componentName
-  */
+   */
   @NotNull 
   @Schema(name = "componentName", description = "The component name used from the connection's component.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("componentName")
@@ -92,7 +92,7 @@ public class ConnectionDefinitionBasicModel {
   /**
    * The title used from the connection's component
    * @return componentTitle
-  */
+   */
   
   @Schema(name = "componentTitle", description = "The title used from the connection's component", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("componentTitle")
@@ -112,7 +112,7 @@ public class ConnectionDefinitionBasicModel {
   /**
    * The version of a connection.
    * @return version
-  */
+   */
   @NotNull 
   @Schema(name = "version", description = "The version of a connection.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("version")

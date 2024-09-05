@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinitionBasic", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T08:55:29.450670+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T11:10:11.248638+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class ComponentDefinitionBasicModel {
 
   private Integer actionsCount;
@@ -58,7 +58,7 @@ public class ComponentDefinitionBasicModel {
   /**
    * Get actionsCount
    * @return actionsCount
-  */
+   */
   
   @Schema(name = "actionsCount", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("actionsCount")
@@ -78,7 +78,7 @@ public class ComponentDefinitionBasicModel {
   /**
    * The description.
    * @return description
-  */
+   */
   
   @Schema(name = "description", description = "The description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
@@ -98,7 +98,7 @@ public class ComponentDefinitionBasicModel {
   /**
    * The icon.
    * @return icon
-  */
+   */
   
   @Schema(name = "icon", description = "The icon.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("icon")
@@ -118,7 +118,7 @@ public class ComponentDefinitionBasicModel {
   /**
    * The name of a component.
    * @return name
-  */
+   */
   @NotNull 
   @Schema(name = "name", description = "The name of a component.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
@@ -138,7 +138,7 @@ public class ComponentDefinitionBasicModel {
   /**
    * The title
    * @return title
-  */
+   */
   
   @Schema(name = "title", description = "The title", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("title")
@@ -158,7 +158,7 @@ public class ComponentDefinitionBasicModel {
   /**
    * Get triggersCount
    * @return triggersCount
-  */
+   */
   
   @Schema(name = "triggersCount", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("triggersCount")
@@ -178,7 +178,7 @@ public class ComponentDefinitionBasicModel {
   /**
    * The version of a component.
    * @return version
-  */
+   */
   @NotNull 
   @Schema(name = "version", description = "The version of a component.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("version")

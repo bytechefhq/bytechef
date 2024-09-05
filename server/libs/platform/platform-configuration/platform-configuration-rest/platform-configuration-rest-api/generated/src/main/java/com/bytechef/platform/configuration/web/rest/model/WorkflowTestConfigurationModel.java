@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTestConfiguration", description = "Contains configuration and connections required for the test execution of a particular workflow.")
 @JsonTypeName("WorkflowTestConfiguration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T08:55:29.450670+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T11:10:11.248638+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class WorkflowTestConfigurationModel {
 
   private String createdBy;
@@ -60,7 +60,7 @@ public class WorkflowTestConfigurationModel {
   /**
    * The created by.
    * @return createdBy
-  */
+   */
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
@@ -80,7 +80,7 @@ public class WorkflowTestConfigurationModel {
   /**
    * The created date.
    * @return createdDate
-  */
+   */
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
@@ -108,7 +108,7 @@ public class WorkflowTestConfigurationModel {
   /**
    * The input parameters used as workflow input values.
    * @return inputs
-  */
+   */
   
   @Schema(name = "inputs", description = "The input parameters used as workflow input values.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("inputs")
@@ -136,7 +136,7 @@ public class WorkflowTestConfigurationModel {
   /**
    * The connections used by workflow test.
    * @return connections
-  */
+   */
   @Valid 
   @Schema(name = "connections", description = "The connections used by workflow test.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connections")
@@ -156,7 +156,7 @@ public class WorkflowTestConfigurationModel {
   /**
    * The last modified by.
    * @return lastModifiedBy
-  */
+   */
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
@@ -176,7 +176,7 @@ public class WorkflowTestConfigurationModel {
   /**
    * The last modified date.
    * @return lastModifiedDate
-  */
+   */
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
@@ -196,7 +196,7 @@ public class WorkflowTestConfigurationModel {
   /**
    * The id of a workflow.
    * @return workflowId
-  */
+   */
   
   @Schema(name = "workflowId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowId")
@@ -216,7 +216,7 @@ public class WorkflowTestConfigurationModel {
   /**
    * Get version
    * @return version
-  */
+   */
   
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("__version")

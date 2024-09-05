@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("executeAction_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:40.093184+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T10:08:02.832388+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class ExecuteActionRequestModel {
 
   @Valid
@@ -55,7 +55,7 @@ public class ExecuteActionRequestModel {
   /**
    * The input parameters for the action.
    * @return input
-  */
+   */
   @NotNull 
   @Schema(name = "input", description = "The input parameters for the action.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("input")

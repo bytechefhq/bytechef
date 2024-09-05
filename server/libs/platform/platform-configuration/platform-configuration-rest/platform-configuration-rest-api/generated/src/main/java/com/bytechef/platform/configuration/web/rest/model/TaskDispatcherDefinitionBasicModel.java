@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskDispatcherDefinitionBasic", description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
 @JsonTypeName("TaskDispatcherDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T08:55:29.450670+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T11:10:11.248638+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class TaskDispatcherDefinitionBasicModel {
 
   private String description;
@@ -54,7 +54,7 @@ public class TaskDispatcherDefinitionBasicModel {
   /**
    * The description.
    * @return description
-  */
+   */
   
   @Schema(name = "description", description = "The description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
@@ -74,7 +74,7 @@ public class TaskDispatcherDefinitionBasicModel {
   /**
    * The icon.
    * @return icon
-  */
+   */
   
   @Schema(name = "icon", description = "The icon.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("icon")
@@ -94,7 +94,7 @@ public class TaskDispatcherDefinitionBasicModel {
   /**
    * The task dispatcher name..
    * @return name
-  */
+   */
   @NotNull 
   @Schema(name = "name", description = "The task dispatcher name..", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
@@ -114,7 +114,7 @@ public class TaskDispatcherDefinitionBasicModel {
   /**
    * Get resources
    * @return resources
-  */
+   */
   @Valid 
   @Schema(name = "resources", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("resources")
@@ -134,7 +134,7 @@ public class TaskDispatcherDefinitionBasicModel {
   /**
    * The title
    * @return title
-  */
+   */
   
   @Schema(name = "title", description = "The title", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("title")

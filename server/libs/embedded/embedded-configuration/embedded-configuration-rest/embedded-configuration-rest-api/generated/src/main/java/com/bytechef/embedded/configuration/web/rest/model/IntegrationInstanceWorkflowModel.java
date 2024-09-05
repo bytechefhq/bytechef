@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceWorkflow", description = "Contains user configurations for the execution of a particular integration workflow.")
 @JsonTypeName("IntegrationInstanceWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:40.820234+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T10:08:03.892557+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class IntegrationInstanceWorkflowModel {
 
   @Valid
@@ -64,7 +64,7 @@ public class IntegrationInstanceWorkflowModel {
   /**
    * The input parameters of an integration instance used as workflow input values.
    * @return inputs
-  */
+   */
   
   @Schema(name = "inputs", description = "The input parameters of an integration instance used as workflow input values.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("inputs")
@@ -84,7 +84,7 @@ public class IntegrationInstanceWorkflowModel {
   /**
    * If a workflow is enabled or not in the integration instance workflow.
    * @return enabled
-  */
+   */
   @NotNull 
   @Schema(name = "enabled", description = "If a workflow is enabled or not in the integration instance workflow.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("enabled")
@@ -104,7 +104,7 @@ public class IntegrationInstanceWorkflowModel {
   /**
    * The id of a integration instance configuration workflow.
    * @return integrationInstanceConfigurationWorkflowId
-  */
+   */
   @NotNull 
   @Schema(name = "integrationInstanceConfigurationWorkflowId", description = "The id of a integration instance configuration workflow.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("integrationInstanceConfigurationWorkflowId")
@@ -124,7 +124,7 @@ public class IntegrationInstanceWorkflowModel {
   /**
    * The id of a workflow.
    * @return workflowId
-  */
+   */
   @NotNull 
   @Schema(name = "workflowId", description = "The id of a workflow.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("workflowId")

@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceConfigurationWorkflowConnection", description = "The connection used in a particular task or trigger.")
 @JsonTypeName("IntegrationInstanceConfigurationWorkflowConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:40.820234+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T10:08:03.892557+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class IntegrationInstanceConfigurationWorkflowConnectionModel {
 
   private Long connectionId;
@@ -38,7 +38,7 @@ public class IntegrationInstanceConfigurationWorkflowConnectionModel {
   /**
    * The connection id
    * @return connectionId
-  */
+   */
   
   @Schema(name = "connectionId", description = "The connection id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connectionId")
@@ -58,7 +58,7 @@ public class IntegrationInstanceConfigurationWorkflowConnectionModel {
   /**
    * The connection key under which a connection is defined in a workflow definition.
    * @return key
-  */
+   */
   
   @Schema(name = "key", description = "The connection key under which a connection is defined in a workflow definition.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("key")
@@ -78,7 +78,7 @@ public class IntegrationInstanceConfigurationWorkflowConnectionModel {
   /**
    * The action/trigger name to which a connection belongs.
    * @return workflowNodeName
-  */
+   */
   
   @Schema(name = "workflowNodeName", description = "The action/trigger name to which a connection belongs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowNodeName")
