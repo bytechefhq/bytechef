@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys */
-import {WorkflowTestExecutionModel} from '@/shared/middleware/platform/workflow/test';
+import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
@@ -16,8 +16,8 @@ interface WorkflowEditorI {
     showWorkflowCodeEditorSheet: boolean;
     setShowWorkflowCodeEditorSheet: (showWorkflowCodeEditorSheet: boolean) => void;
 
-    workflowTestExecution?: WorkflowTestExecutionModel;
-    setWorkflowTestExecution: (workflowTestExecution?: WorkflowTestExecutionModel) => void;
+    workflowTestExecution?: WorkflowTestExecution;
+    setWorkflowTestExecution: (workflowTestExecution?: WorkflowTestExecution) => void;
 
     workflowIsRunning: boolean;
     setWorkflowIsRunning: (workflowIsRunning: boolean) => void;
@@ -51,7 +51,7 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
                 })),
 
             workflowTestExecution: undefined,
-            setWorkflowTestExecution: (workflowTestExecution?: WorkflowTestExecutionModel) =>
+            setWorkflowTestExecution: (workflowTestExecution?: WorkflowTestExecution) =>
                 set(() => ({
                     workflowTestExecution: workflowTestExecution,
                 })),

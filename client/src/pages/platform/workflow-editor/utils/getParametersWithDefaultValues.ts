@@ -1,11 +1,11 @@
-import {PropertyType} from '@/shared/types';
+import {PropertyAllType} from '@/shared/types';
 
 export default function getParametersWithDefaultValues({
     data = {},
     properties,
 }: {
     data?: {[key: string]: string | object};
-    properties: Array<PropertyType>;
+    properties: Array<PropertyAllType>;
 }) {
     if (!properties?.length) {
         return data;

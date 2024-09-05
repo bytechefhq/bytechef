@@ -1,8 +1,8 @@
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
 import {Badge} from '@/components/ui/badge';
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
-import {ProjectStatusModel} from '@/shared/middleware/automation/configuration';
-import {IntegrationStatusModel} from '@/shared/middleware/embedded/configuration';
+import {ProjectStatus} from '@/shared/middleware/automation/configuration';
+import {IntegrationStatus} from '@/shared/middleware/embedded/configuration';
 import {useGetIntegrationVersionsQuery} from '@/shared/queries/embedded/integrationVersions.queries';
 
 interface IntegrationVersionHistorySheetProps {
@@ -32,7 +32,7 @@ const IntegrationVersionHistorySheet = ({integrationId, onClose}: IntegrationVer
                                     key={integrationVersion.version}
                                     value={integrationVersion.version?.toString() || ''}
                                 >
-                                    <AccordionTrigger disabled={integrationVersion.status === ProjectStatusModel.Draft}>
+                                    <AccordionTrigger disabled={integrationVersion.status === ProjectStatus.Draft}>
                                         <div className="flex w-full items-center justify-between pr-2">
                                             <span className="text-sm font-semibold">{`V${integrationVersion.version}`}</span>
 
@@ -45,7 +45,7 @@ const IntegrationVersionHistorySheet = ({integrationId, onClose}: IntegrationVer
 
                                                 <Badge
                                                     variant={
-                                                        integrationVersion.status === IntegrationStatusModel.Published
+                                                        integrationVersion.status === IntegrationStatus.Published
                                                             ? 'success'
                                                             : 'secondary'
                                                     }

@@ -12,7 +12,7 @@ import {Button} from '@/components/ui/button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import WorkflowOutputsSheetDialog from '@/pages/platform/workflow-editor/components/WorkflowOutputsSheetDialog';
 import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
-import {WorkflowInputModel, WorkflowModel} from '@/shared/middleware/platform/configuration';
+import {Workflow, WorkflowInput} from '@/shared/middleware/platform/configuration';
 import {WorkflowDefinitionType} from '@/shared/types';
 import {CableIcon, EditIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
@@ -22,7 +22,7 @@ import WorkflowOutputValue from './WorkflowOutputValue';
 
 const SPACE = 4;
 
-const WorkflowOutputsSheetTable = ({workflow}: {workflow: WorkflowModel}) => {
+const WorkflowOutputsSheetTable = ({workflow}: {workflow: Workflow}) => {
     const [currentInputIndex, setCurrentInputIndex] = useState<number>(-1);
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -31,10 +31,10 @@ const WorkflowOutputsSheetTable = ({workflow}: {workflow: WorkflowModel}) => {
 
     const {componentDefinitions} = useWorkflowDataStore();
 
-    function handleDelete(input: WorkflowInputModel) {
+    function handleDelete(input: WorkflowInput) {
         const definitionObject: WorkflowDefinitionType = JSON.parse(workflow.definition!);
 
-        const outputs: WorkflowInputModel[] = definitionObject.outputs ?? [];
+        const outputs: WorkflowInput[] = definitionObject.outputs ?? [];
 
         const index = outputs.findIndex((curInput) => curInput.name === input.name);
 
@@ -42,7 +42,7 @@ const WorkflowOutputsSheetTable = ({workflow}: {workflow: WorkflowModel}) => {
 
         updateWorkflowMutation.mutate({
             id: workflow.id!,
-            workflowModel: {
+            workflow: {
                 definition: JSON.stringify(
                     {
                         ...definitionObject,

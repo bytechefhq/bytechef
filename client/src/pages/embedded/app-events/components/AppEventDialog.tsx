@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
-import {AppEventModel} from '@/shared/middleware/embedded/configuration';
+import {AppEvent} from '@/shared/middleware/embedded/configuration';
 import {useCreateAppEventMutation, useUpdateAppEventMutation} from '@/shared/mutations/embedded/appEvents.mutations';
 import {AppEventKeys} from '@/shared/queries/embedded/appEvents.queries';
 import Editor from '@monaco-editor/react';
@@ -20,7 +20,7 @@ import {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
 interface AppEventDialogProps {
-    appEvent?: AppEventModel;
+    appEvent?: AppEvent;
     onClose?: () => void;
     triggerNode?: ReactNode;
 }
@@ -32,7 +32,7 @@ const AppEventDialog = ({appEvent, onClose, triggerNode}: AppEventDialogProps) =
         defaultValues: {
             name: appEvent?.name || '',
             schema: appEvent?.schema || '',
-        } as AppEventModel,
+        } as AppEvent,
     });
 
     const {control, getValues, handleSubmit, reset} = form;

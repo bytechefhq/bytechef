@@ -12,19 +12,19 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
-import {ConnectionModelI, useConnectionQuery} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
+import {ConnectionI, useConnectionQuery} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
 import Properties from '@/pages/platform/workflow-editor/components/Properties/Properties';
 import {
-    WorkflowConnectionModel,
-    WorkflowInputModel,
-    WorkflowModel,
-    WorkflowTestConfigurationConnectionModel,
-    WorkflowTestConfigurationModel,
+    Workflow,
+    WorkflowConnection,
+    WorkflowInput,
+    WorkflowTestConfiguration,
+    WorkflowTestConfigurationConnection,
 } from '@/shared/middleware/platform/configuration';
 import {useSaveWorkflowTestConfigurationMutation} from '@/shared/mutations/platform/workflowTestConfigurations.mutations';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
-import {PropertyType} from '@/shared/types';
+import {PropertyAllType} from '@/shared/types';
 import * as Portal from '@radix-ui/react-portal';
 import {useQueryClient} from '@tanstack/react-query';
 import {PlusIcon} from 'lucide-react';
@@ -34,8 +34,8 @@ import InlineSVG from 'react-inlinesvg';
 
 interface WorkflowTestConfigurationDialogProps {
     onClose: () => void;
-    workflow: WorkflowModel;
-    workflowTestConfiguration?: WorkflowTestConfigurationModel;
+    workflow: Workflow;
+    workflowTestConfiguration?: WorkflowTestConfiguration;
 }
 
 const WorkflowTestConfigurationFormField = ({
@@ -46,12 +46,12 @@ const WorkflowTestConfigurationFormField = ({
     setWorkflowConnection,
     workflowConnection,
 }: {
-    connections: ConnectionModelI[];
-    form: UseFormReturn<WorkflowTestConfigurationModel>;
+    connections: ConnectionI[];
+    form: UseFormReturn<WorkflowTestConfiguration>;
     index: number;
-    workflowConnection: WorkflowConnectionModel;
+    workflowConnection: WorkflowConnection;
     setShowNewConnectionDialog: Dispatch<SetStateAction<boolean>>;
-    setWorkflowConnection: Dispatch<SetStateAction<WorkflowConnectionModel | undefined>>;
+    setWorkflowConnection: Dispatch<SetStateAction<WorkflowConnection | undefined>>;
 }) => {
     const {data: componentDefinition} = useGetComponentDefinitionQuery({
         componentName: workflowConnection.componentName,
@@ -142,12 +142,12 @@ const WorkflowTestConfigurationDialog = ({
     workflowTestConfiguration,
 }: WorkflowTestConfigurationDialogProps) => {
     const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
-    const [workflowConnection, setWorkflowConnection] = useState<WorkflowConnectionModel | undefined>();
+    const [workflowConnection, setWorkflowConnection] = useState<WorkflowConnection | undefined>();
 
     const {ConnectionKeys, useCreateConnectionMutation, useGetConnectionTagsQuery, useGetConnectionsQuery} =
         useConnectionQuery();
 
-    const workflowConnections: WorkflowConnectionModel[] = [
+    const workflowConnections: WorkflowConnection[] = [
         ...(workflow?.triggers ?? []),
         ...(workflow?.tasks ?? []),
     ].flatMap((operation) => (operation.connections ? operation.connections : []));
@@ -164,11 +164,11 @@ const WorkflowTestConfigurationDialog = ({
             ({
                 workflowConnectionKey: workflowConnection.key,
                 workflowNodeName: workflowConnection.workflowNodeName,
-            } as WorkflowTestConfigurationConnectionModel)
+            } as WorkflowTestConfigurationConnection)
         );
     });
 
-    const form = useForm<WorkflowTestConfigurationModel>({
+    const form = useForm<WorkflowTestConfiguration>({
         defaultValues: {
             ...workflowTestConfiguration,
             connections: workflowTestConfigurationConnections,
@@ -177,7 +177,7 @@ const WorkflowTestConfigurationDialog = ({
 
     const {control, formState, handleSubmit} = form;
 
-    const inputs: WorkflowInputModel[] = workflow.inputs ?? [];
+    const inputs: WorkflowInput[] = workflow.inputs ?? [];
 
     const {data: connections} = useGetConnectionsQuery!({});
 
@@ -200,15 +200,15 @@ const WorkflowTestConfigurationDialog = ({
         },
     });
 
-    function saveWorkflowTestConfiguration(workflowTestConfigurationModel: WorkflowTestConfigurationModel) {
-        workflowTestConfigurationModel = {
-            ...workflowTestConfigurationModel,
-            connections: workflowTestConfigurationModel.connections?.filter((connection) => connection.connectionId),
+    function saveWorkflowTestConfiguration(workflowTestConfiguration: WorkflowTestConfiguration) {
+        workflowTestConfiguration = {
+            ...workflowTestConfiguration,
+            connections: workflowTestConfiguration.connections?.filter((connection) => connection.connectionId),
         };
 
         saveWorkflowTestConfigurationMutation.mutate({
             workflowId: workflow.id!,
-            workflowTestConfigurationModel,
+            workflowTestConfiguration,
         });
     }
 
@@ -242,18 +242,18 @@ const WorkflowTestConfigurationDialog = ({
                                                         controlType: 'TEXT',
                                                         type: 'STRING',
                                                         ...input,
-                                                    } as PropertyType;
+                                                    } as PropertyAllType;
                                                 } else if (input.type === 'number') {
                                                     return {
                                                         type: 'NUMBER',
                                                         ...input,
-                                                    } as PropertyType;
+                                                    } as PropertyAllType;
                                                 } else {
                                                     return {
                                                         controlType: 'SELECT',
                                                         type: 'BOOLEAN',
                                                         ...input,
-                                                    } as PropertyType;
+                                                    } as PropertyAllType;
                                                 }
                                             })}
                                         />

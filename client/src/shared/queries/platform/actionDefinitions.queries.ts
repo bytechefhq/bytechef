@@ -1,6 +1,6 @@
 import {
+    ActionDefinition,
     ActionDefinitionApi,
-    ActionDefinitionModel,
     GetComponentActionDefinitionRequest,
 } from '@/shared/middleware/platform/configuration';
 
@@ -18,7 +18,7 @@ export const ActionDefinitionKeys = {
 };
 
 export const useGetComponentActionDefinitionQuery = (request: GetComponentActionDefinitionRequest, enabled?: boolean) =>
-    useQuery<ActionDefinitionModel, Error>({
+    useQuery<ActionDefinition, Error>({
         queryKey: ActionDefinitionKeys.actionDefinition(request),
         queryFn: () => new ActionDefinitionApi().getComponentActionDefinition(request),
         enabled: enabled === undefined ? true : enabled,

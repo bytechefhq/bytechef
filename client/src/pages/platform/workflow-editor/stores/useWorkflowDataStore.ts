@@ -1,9 +1,5 @@
 /* eslint-disable sort-keys */
-import {
-    ComponentDefinitionBasicModel,
-    TaskDispatcherDefinitionModel,
-    WorkflowModel,
-} from '@/shared/middleware/platform/configuration';
+import {ComponentDefinitionBasic, TaskDispatcherDefinition, Workflow} from '@/shared/middleware/platform/configuration';
 import {ComponentOperationType, DataPillType} from '@/shared/types';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
@@ -18,22 +14,22 @@ interface WorkflowDataStateI {
     componentActions: Array<ComponentOperationType>;
     setComponentActions: (componentActions: Array<ComponentOperationType>) => void;
 
-    componentDefinitions: Array<ComponentDefinitionBasicModel>;
-    setComponentDefinitions: (componentDefinitions: Array<ComponentDefinitionBasicModel>) => void;
+    componentDefinitions: Array<ComponentDefinitionBasic>;
+    setComponentDefinitions: (componentDefinitions: Array<ComponentDefinitionBasic>) => void;
 
     dataPills: Array<DataPillType>;
     setDataPills: (dataPills: Array<DataPillType>) => void;
 
-    latestComponentDefinition: ComponentDefinitionBasicModel | null;
-    setLatestComponentDefinition: (latestComponentDefinition: ComponentDefinitionBasicModel | null) => void;
+    latestComponentDefinition: ComponentDefinitionBasic | null;
+    setLatestComponentDefinition: (latestComponentDefinition: ComponentDefinitionBasic | null) => void;
 
     reset: () => void;
 
-    taskDispatcherDefinitions: Array<TaskDispatcherDefinitionModel>;
-    setTaskDispatcherDefinitions: (taskDispatcherDefinitions: Array<TaskDispatcherDefinitionModel>) => void;
+    taskDispatcherDefinitions: Array<TaskDispatcherDefinition>;
+    setTaskDispatcherDefinitions: (taskDispatcherDefinitions: Array<TaskDispatcherDefinition>) => void;
 
-    workflow: WorkflowModel & WorkflowTaskDataType;
-    setWorkflow: (workflowDefinition: WorkflowModel & WorkflowTaskDataType) => void;
+    workflow: Workflow & WorkflowTaskDataType;
+    setWorkflow: (workflowDefinition: Workflow & WorkflowTaskDataType) => void;
 }
 
 const useWorkflowDataStore = create<WorkflowDataStateI>()(

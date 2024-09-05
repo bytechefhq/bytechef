@@ -11,7 +11,7 @@ import {
 import {Button} from '@/components/ui/button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import ApiKeyDialog from '@/pages/settings/embedded/api-keys/components/ApiKeyDialog';
-import {ApiKeyModel} from '@/shared/middleware/embedded/user';
+import {ApiKey} from '@/shared/middleware/embedded/user';
 import {useDeleteApiKeyMutation} from '@/shared/mutations/embedded/apiKeys.mutations';
 import {ApiKeyKeys} from '@/shared/queries/embedded/apiKeys.queries';
 import {useQueryClient} from '@tanstack/react-query';
@@ -20,10 +20,10 @@ import {EditIcon, Trash2Icon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-const columnHelper = createColumnHelper<ApiKeyModel>();
+const columnHelper = createColumnHelper<ApiKey>();
 
 interface ApiKeyTableProps {
-    apiKeys: ApiKeyModel[];
+    apiKeys: ApiKey[];
 }
 
 const ApiKeyDeleteDialog = ({apiKeyId, onClose}: {apiKeyId: number; onClose: () => void}) => {
@@ -68,7 +68,7 @@ const ApiKeyDeleteDialog = ({apiKeyId, onClose}: {apiKeyId: number; onClose: () 
 };
 
 const ApiKeyTable = ({apiKeys}: ApiKeyTableProps) => {
-    const [currentApiKey, setCurrentApiKey] = useState<ApiKeyModel>();
+    const [currentApiKey, setCurrentApiKey] = useState<ApiKey>();
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showEditDialog, setShowEditDialog] = useState(false);
 
@@ -128,7 +128,7 @@ const ApiKeyTable = ({apiKeys}: ApiKeyTableProps) => {
         []
     );
 
-    const reactTable = useReactTable<ApiKeyModel>({
+    const reactTable = useReactTable<ApiKey>({
         columns,
         data: apiKeys,
         getCoreRowModel: getCoreRowModel(),

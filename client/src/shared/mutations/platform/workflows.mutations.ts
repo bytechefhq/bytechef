@@ -1,14 +1,14 @@
-import {WorkflowModel} from '@/shared/middleware/platform/configuration';
+import {Workflow} from '@/shared/middleware/platform/configuration';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {UseMutationResult, useQueryClient} from '@tanstack/react-query';
 
 export interface UpdateWorkflowRequestI {
     id: string;
-    workflowModel: WorkflowModel;
+    workflow: Workflow;
 }
 
 interface UpdateWorkflowMutationPropsI {
-    onSuccess?: (result: WorkflowModel, variables: UpdateWorkflowRequestI) => void;
+    onSuccess?: (result: Workflow, variables: UpdateWorkflowRequestI) => void;
     onError?: (error: Error, variables: UpdateWorkflowRequestI) => void;
 }
 
@@ -26,7 +26,7 @@ const useUpdatePlatformWorkflowMutation = ({
 }: {
     useUpdateWorkflowMutation: (
         mutationProps?: UpdateWorkflowMutationPropsI | undefined
-    ) => UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequestI, unknown>;
+    ) => UseMutationResult<Workflow, Error, UpdateWorkflowRequestI, unknown>;
     workflowId: string;
     workflowKeys: WorkflowKeysI;
     onError?: () => void;
@@ -44,7 +44,7 @@ const useUpdatePlatformWorkflowMutation = ({
                 onError();
             }
         },
-        onSuccess: (workflow: WorkflowModel) => {
+        onSuccess: (workflow: Workflow) => {
             queryClient.invalidateQueries({
                 queryKey: workflowKeys.workflow(workflow.id!),
             });

@@ -3,7 +3,7 @@ import {DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import {useToast} from '@/components/ui/use-toast';
-import {ProjectModel} from '@/shared/middleware/automation/configuration';
+import {Project} from '@/shared/middleware/automation/configuration';
 import {usePublishProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {Dialog} from '@radix-ui/react-dialog';
@@ -11,7 +11,7 @@ import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 
-const ProjectPublishDialog = ({onClose, project}: {onClose: () => void; project: ProjectModel}) => {
+const ProjectPublishDialog = ({onClose, project}: {onClose: () => void; project: Project}) => {
     const [description, setDescription] = useState<string | undefined>(undefined);
 
     const {toast} = useToast();
@@ -61,7 +61,7 @@ const ProjectPublishDialog = ({onClose, project}: {onClose: () => void; project:
                             onClick={() =>
                                 publishProjectMutation.mutate({
                                     id: project.id!,
-                                    publishProjectRequestModel: {
+                                    publishProjectRequest: {
                                         description,
                                     },
                                 })

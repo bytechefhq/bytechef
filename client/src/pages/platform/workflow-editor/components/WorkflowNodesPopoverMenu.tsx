@@ -1,6 +1,6 @@
 import {Input} from '@/components/ui/input';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
-import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/shared/middleware/platform/configuration';
+import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {PropsWithChildren, useEffect, useState} from 'react';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -26,13 +26,13 @@ const WorkflowNodesPopoverMenu = ({
 }: WorkflowNodesPopoverMenuProps) => {
     const [filter, setFilter] = useState('');
     const [filteredActionComponentDefinitions, setFilteredActionComponentDefinitions] = useState<
-        Array<ComponentDefinitionBasicModel>
+        Array<ComponentDefinitionBasic>
     >([]);
     const [filteredTaskDispatcherDefinitions, setFilteredTaskDispatcherDefinitions] = useState<
-        Array<TaskDispatcherDefinitionModel>
+        Array<TaskDispatcherDefinition>
     >([]);
     const [filteredTriggerComponentDefinitions, setFilteredTriggerComponentDefinitions] = useState<
-        Array<ComponentDefinitionBasicModel>
+        Array<ComponentDefinitionBasic>
     >([]);
 
     const {componentDefinitions, taskDispatcherDefinitions} = useWorkflowDataStore();

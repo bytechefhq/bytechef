@@ -1,5 +1,5 @@
 import CreatableSelect from '@/components/CreatableSelect/CreatableSelect';
-import {IntegrationInstanceConfigurationModel} from '@/shared/middleware/embedded/configuration';
+import {IntegrationInstanceConfiguration} from '@/shared/middleware/embedded/configuration';
 import {useGetIntegrationInstanceConfigurationTagsQuery} from '@/shared/queries/embedded/integrationInstanceConfigurationTags.queries';
 import {ControllerRenderProps} from 'react-hook-form/dist/types/controller';
 
@@ -8,8 +8,8 @@ const IntegrationInstanceConfigurationDialogBasicStepTagsSelect = ({
     integrationInstanceConfiguration,
     onCreateOption,
 }: {
-    field: ControllerRenderProps<IntegrationInstanceConfigurationModel, 'tags'>;
-    integrationInstanceConfiguration?: IntegrationInstanceConfigurationModel;
+    field: ControllerRenderProps<IntegrationInstanceConfiguration, 'tags'>;
+    integrationInstanceConfiguration?: IntegrationInstanceConfiguration;
     onCreateOption: (inputValue: string) => void;
 }) => {
     const {data: tags} = useGetIntegrationInstanceConfigurationTagsQuery();

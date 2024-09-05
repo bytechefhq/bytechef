@@ -1,7 +1,7 @@
 import {Skeleton} from '@/components/ui/skeleton';
 import IntegrationInstanceConfigurationWorkflowListItem from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationWorkflowListItem';
-import {IntegrationInstanceConfigurationWorkflowModel} from '@/shared/middleware/embedded/configuration';
-import {ComponentDefinitionBasicModel} from '@/shared/middleware/platform/configuration';
+import {IntegrationInstanceConfigurationWorkflow} from '@/shared/middleware/embedded/configuration';
+import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useGetIntegrationVersionWorkflowsQuery} from '@/shared/queries/embedded/integrationWorkflows.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
@@ -16,7 +16,7 @@ const IntegrationInstanceConfigurationWorkflowList = ({
     integrationId: number;
     integrationInstanceConfigurationId: number;
     integrationInstanceConfigurationEnabled: boolean;
-    integrationInstanceConfigurationWorkflows?: Array<IntegrationInstanceConfigurationWorkflowModel>;
+    integrationInstanceConfigurationWorkflows?: Array<IntegrationInstanceConfigurationWorkflow>;
     integrationVersion: number;
 }) => {
     const {data: componentDefinitions, isLoading: isComponentDefinitionsLoading} = useGetComponentDefinitionsQuery({
@@ -33,11 +33,11 @@ const IntegrationInstanceConfigurationWorkflowList = ({
     );
 
     const workflowComponentDefinitions: {
-        [key: string]: ComponentDefinitionBasicModel | undefined;
+        [key: string]: ComponentDefinitionBasic | undefined;
     } = {};
 
     const workflowTaskDispatcherDefinitions: {
-        [key: string]: ComponentDefinitionBasicModel | undefined;
+        [key: string]: ComponentDefinitionBasic | undefined;
     } = {};
 
     return isComponentDefinitionsLoading || isTaskDispatcherDefinitionsLoading || isIntegrationWorkflowsLoading ? (

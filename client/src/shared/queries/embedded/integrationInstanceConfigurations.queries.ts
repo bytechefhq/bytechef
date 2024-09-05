@@ -1,7 +1,7 @@
 import {
     GetIntegrationInstanceConfigurationsRequest,
+    IntegrationInstanceConfiguration,
     IntegrationInstanceConfigurationApi,
-    IntegrationInstanceConfigurationModel,
 } from '@/shared/middleware/embedded/configuration';
 
 /* eslint-disable sort-keys */
@@ -20,14 +20,14 @@ export const IntegrationInstanceConfigurationKeys = {
 };
 
 export const useGetIntegrationInstanceConfigurationQuery = (id: number, enabled?: boolean) =>
-    useQuery<IntegrationInstanceConfigurationModel, Error>({
+    useQuery<IntegrationInstanceConfiguration, Error>({
         queryKey: IntegrationInstanceConfigurationKeys.integrationInstanceConfiguration(id),
         queryFn: () => new IntegrationInstanceConfigurationApi().getIntegrationInstanceConfiguration({id}),
         enabled: enabled === undefined ? true : enabled,
     });
 
 export const useGetIntegrationInstanceConfigurationsQuery = (filters: GetIntegrationInstanceConfigurationsRequest) =>
-    useQuery<IntegrationInstanceConfigurationModel[], Error>({
+    useQuery<IntegrationInstanceConfiguration[], Error>({
         queryKey: IntegrationInstanceConfigurationKeys.filteredIntegrationInstanceConfigurations(filters),
         queryFn: () => new IntegrationInstanceConfigurationApi().getIntegrationInstanceConfigurations(filters),
     });

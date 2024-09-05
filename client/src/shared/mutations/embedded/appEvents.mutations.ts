@@ -1,16 +1,16 @@
-import {AppEventApi, AppEventModel} from '@/shared/middleware/embedded/configuration';
+import {AppEvent, AppEventApi} from '@/shared/middleware/embedded/configuration';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateAppEventMutationProps {
-    onError?: (error: Error, variables: AppEventModel) => void;
-    onSuccess?: (result: AppEventModel, variables: AppEventModel) => void;
+    onError?: (error: Error, variables: AppEvent) => void;
+    onSuccess?: (result: AppEvent, variables: AppEvent) => void;
 }
 
 export const useCreateAppEventMutation = (mutationProps?: CreateAppEventMutationProps) =>
-    useMutation<AppEventModel, Error, AppEventModel>({
-        mutationFn: (appEventModel: AppEventModel) => {
+    useMutation<AppEvent, Error, AppEvent>({
+        mutationFn: (appEvent: AppEvent) => {
             return new AppEventApi().createAppEvent({
-                appEventModel,
+                appEvent,
             });
         },
         onError: mutationProps?.onError,
@@ -34,16 +34,16 @@ export const useDeleteAppEventMutation = (mutationProps?: DeleteAppEventMutation
     });
 
 interface UpdateAppEventMutationProps {
-    onError?: (error: Error, variables: AppEventModel) => void;
-    onSuccess?: (result: AppEventModel, variables: AppEventModel) => void;
+    onError?: (error: Error, variables: AppEvent) => void;
+    onSuccess?: (result: AppEvent, variables: AppEvent) => void;
 }
 
 export const useUpdateAppEventMutation = (mutationProps?: UpdateAppEventMutationProps) =>
-    useMutation<AppEventModel, Error, AppEventModel>({
-        mutationFn: (appEventModel: AppEventModel) => {
+    useMutation<AppEvent, Error, AppEvent>({
+        mutationFn: (appEvent: AppEvent) => {
             return new AppEventApi().updateAppEvent({
-                appEventModel,
-                id: appEventModel.id!,
+                appEvent,
+                id: appEvent.id!,
             });
         },
         onError: mutationProps?.onError,

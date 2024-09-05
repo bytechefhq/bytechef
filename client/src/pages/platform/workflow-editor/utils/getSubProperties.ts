@@ -1,9 +1,9 @@
-import {PropertyType} from '@/shared/types';
+import {PropertyAllType} from '@/shared/types';
 
 export default function getSubProperties(
     componentIcon: string,
     nodeName: string,
-    properties: Array<PropertyType>,
+    properties: Array<PropertyAllType>,
     propertyName?: string
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): any {

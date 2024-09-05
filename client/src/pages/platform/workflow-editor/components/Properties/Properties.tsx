@@ -1,5 +1,5 @@
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
-import {PropertyType} from '@/shared/types';
+import {PropertyAllType} from '@/shared/types';
 import {ChevronDownIcon} from 'lucide-react';
 import {Fragment} from 'react';
 import {FieldValues} from 'react-hook-form/dist/types';
@@ -17,7 +17,7 @@ interface PropertiesProps {
     operationName?: string;
     formState?: FormState<FieldValues>;
     path?: string;
-    properties: Array<PropertyType>;
+    properties: Array<PropertyAllType>;
 }
 
 const Properties = ({

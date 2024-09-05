@@ -5,10 +5,10 @@ import Properties from '@/pages/platform/workflow-editor/components/Properties/P
 import DestinationTab from '@/pages/platform/workflow-editor/components/node-details-tabs/DestinationTab';
 import SourceTab from '@/pages/platform/workflow-editor/components/node-details-tabs/SourceTab';
 import {
-    ComponentDefinitionBasicModel,
-    ComponentDefinitionModel,
-    WorkflowConnectionModel,
-    WorkflowNodeOutputModel,
+    ComponentDefinition,
+    ComponentDefinitionBasic,
+    WorkflowConnection,
+    WorkflowNodeOutput,
 } from '@/shared/middleware/platform/configuration';
 import {useGetComponentActionDefinitionQuery} from '@/shared/queries/platform/actionDefinitions.queries';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
@@ -21,7 +21,7 @@ import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/
 import {
     ComponentPropertiesType,
     DataPillType,
-    PropertyType,
+    PropertyAllType,
     UpdateWorkflowMutationType,
     WorkflowDefinitionType,
 } from '@/shared/types';
@@ -74,14 +74,14 @@ const WorkflowNodeDetailsPanel = ({
     updateWorkflowMutation,
     workflowNodeOutputs,
 }: {
-    previousComponentDefinitions: Array<ComponentDefinitionBasicModel>;
+    previousComponentDefinitions: Array<ComponentDefinitionBasic>;
     updateWorkflowMutation: UpdateWorkflowMutationType;
-    workflowNodeOutputs: WorkflowNodeOutputModel[];
+    workflowNodeOutputs: WorkflowNodeOutput[];
 }) => {
     const [activeTab, setActiveTab] = useState('description');
     const [availableDataPills, setAvailableDataPills] = useState<Array<DataPillType>>();
     const [currentOperationName, setCurrentOperationName] = useState('');
-    const [currentOperationProperties, setCurrentOperationProperties] = useState<Array<PropertyType>>([]);
+    const [currentOperationProperties, setCurrentOperationProperties] = useState<Array<PropertyAllType>>([]);
     const [workflowDefinition, setWorkflowDefinition] = useState<WorkflowDefinitionType>({});
 
     const {
@@ -175,7 +175,7 @@ const WorkflowNodeDetailsPanel = ({
                 return;
             }
 
-            const outputSchemaDefinition: PropertyType | undefined = workflowNodeOutputs[index]?.outputSchema;
+            const outputSchemaDefinition: PropertyAllType | undefined = workflowNodeOutputs[index]?.outputSchema;
 
             const properties = outputSchemaDefinition?.properties?.length
                 ? outputSchemaDefinition.properties
@@ -201,7 +201,7 @@ const WorkflowNodeDetailsPanel = ({
     const currentWorkflowTrigger = workflow.triggers?.find((trigger) => trigger.name === currentNode?.name);
     const currentWorkflowTask = workflow.tasks?.find((task) => task.name === currentNode?.name);
 
-    const workflowConnections: WorkflowConnectionModel[] =
+    const workflowConnections: WorkflowConnection[] =
         currentWorkflowTask?.connections || currentWorkflowTrigger?.connections || [];
 
     const nodeTabs = TABS.filter(({name}) => {
@@ -251,7 +251,7 @@ const WorkflowNodeDetailsPanel = ({
                 name: workflowNodeName || currentNode?.name || '',
                 operationName: newOperationName,
                 parameters: getParametersWithDefaultValues({
-                    properties: currentOperationProperties as Array<PropertyType>,
+                    properties: currentOperationProperties as Array<PropertyAllType>,
                 }),
                 trigger: currentNode?.trigger,
                 type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
@@ -266,7 +266,7 @@ const WorkflowNodeDetailsPanel = ({
                     metadata: {},
                     operationName: newOperationName,
                     parameters: getParametersWithDefaultValues({
-                        properties: currentOperationProperties as Array<PropertyType>,
+                        properties: currentOperationProperties as Array<PropertyAllType>,
                     }),
                 });
 
@@ -486,8 +486,8 @@ const WorkflowNodeDetailsPanel = ({
                 </header>
 
                 <main className="flex h-full flex-col">
-                    {(!!(data as ComponentDefinitionModel).actions?.length ||
-                        !!(data as ComponentDefinitionModel).triggers?.length) && (
+                    {(!!(data as ComponentDefinition).actions?.length ||
+                        !!(data as ComponentDefinition).triggers?.length) && (
                         <CurrentOperationSelect
                             description={
                                 currentNode?.trigger

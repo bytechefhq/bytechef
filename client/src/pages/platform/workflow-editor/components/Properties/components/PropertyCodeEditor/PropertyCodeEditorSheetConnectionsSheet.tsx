@@ -13,10 +13,10 @@ import {useConnectionQuery} from '@/pages/platform/connection/providers/connecti
 import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
 import {useConnectionNoteStore} from '@/pages/platform/workflow-editor/stores/useConnectionNoteStore';
 import {
-    ComponentDefinitionBasicModel,
-    WorkflowConnectionModel,
-    WorkflowModel,
-    WorkflowTestConfigurationConnectionModel,
+    ComponentDefinitionBasic,
+    Workflow,
+    WorkflowConnection,
+    WorkflowTestConfigurationConnection,
 } from '@/shared/middleware/platform/configuration';
 import {useSaveWorkflowTestConfigurationConnectionMutation} from '@/shared/mutations/platform/workflowTestConfigurations.mutations';
 import {
@@ -52,7 +52,7 @@ const ConnectionLabel = ({
     workflowConnection,
 }: {
     onRemoveClick: () => void;
-    workflowConnection: WorkflowConnectionModel;
+    workflowConnection: WorkflowConnection;
 }) => {
     const {data: componentDefinition} = useGetComponentDefinitionQuery({
         componentName: workflowConnection.componentName,
@@ -172,7 +172,7 @@ const ComponentPopover = ({
                                                     onBlur={field.onBlur}
                                                     onChange={(item) => {
                                                         const componentDefinition =
-                                                            item?.componentDefinition as ComponentDefinitionBasicModel;
+                                                            item?.componentDefinition as ComponentDefinitionBasic;
 
                                                         form.setValue('componentName', componentDefinition.name, {
                                                             shouldDirty: true,
@@ -210,10 +210,10 @@ const ConnectionSelect = ({
     workflowNodeName,
     workflowTestConfigurationConnection,
 }: {
-    workflowConnection: WorkflowConnectionModel;
+    workflowConnection: WorkflowConnection;
     workflowId: string;
     workflowNodeName: string;
-    workflowTestConfigurationConnection?: WorkflowTestConfigurationConnectionModel;
+    workflowTestConfigurationConnection?: WorkflowTestConfigurationConnection;
 }) => {
     const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
 
@@ -252,7 +252,7 @@ const ConnectionSelect = ({
 
     const handleValueChange = (connectionId: number, workflowConnectionKey: string) => {
         saveWorkflowTestConfigurationConnectionMutation.mutate({
-            saveWorkflowTestConfigurationConnectionRequestModel: {
+            saveWorkflowTestConfigurationConnectionRequest: {
                 connectionId,
             },
             workflowConnectionKey,
@@ -320,8 +320,8 @@ const PropertyCodeEditorSheetConnectionsSheet = ({
     workflowNodeName,
 }: {
     onCLose: () => void;
-    workflowConnections: WorkflowConnectionModel[];
-    workflow: WorkflowModel;
+    workflowConnections: WorkflowConnection[];
+    workflow: Workflow;
     workflowNodeName: string;
 }) => {
     const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
@@ -366,7 +366,7 @@ const PropertyCodeEditorSheetConnectionsSheet = ({
 
         updateWorkflowMutation.mutate({
             id: workflow.id!,
-            workflowModel: {
+            workflow: {
                 definition: JSON.stringify(workflowDefinition, null, SPACE),
                 version: workflow.version,
             },
@@ -400,7 +400,7 @@ const PropertyCodeEditorSheetConnectionsSheet = ({
 
         updateWorkflowMutation.mutate({
             id: workflow.id!,
-            workflowModel: {
+            workflow: {
                 definition: JSON.stringify(workflowDefinition, null, SPACE),
                 version: workflow.version,
             },

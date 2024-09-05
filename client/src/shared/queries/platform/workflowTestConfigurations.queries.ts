@@ -1,9 +1,9 @@
 import {
     GetWorkflowTestConfigurationConnectionsRequest,
     GetWorkflowTestConfigurationRequest,
+    WorkflowTestConfiguration,
     WorkflowTestConfigurationApi,
-    WorkflowTestConfigurationConnectionModel,
-    WorkflowTestConfigurationModel,
+    WorkflowTestConfigurationConnection,
 } from '@/shared/middleware/platform/configuration';
 
 /* eslint-disable sort-keys */
@@ -26,14 +26,14 @@ export const useGetWorkflowTestConfigurationConnectionsQuery = (
     request: GetWorkflowTestConfigurationConnectionsRequest,
     enabled?: boolean
 ) =>
-    useQuery<WorkflowTestConfigurationConnectionModel[], Error>({
+    useQuery<WorkflowTestConfigurationConnection[], Error>({
         queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurationConnections(request),
         queryFn: () => new WorkflowTestConfigurationApi().getWorkflowTestConfigurationConnections(request),
         enabled: enabled === undefined ? true : enabled,
     });
 
 export const useGetWorkflowTestConfigurationQuery = (requestParameters: GetWorkflowTestConfigurationRequest) =>
-    useQuery<WorkflowTestConfigurationModel, Error>({
+    useQuery<WorkflowTestConfiguration, Error>({
         queryKey: WorkflowTestConfigurationKeys.workflowTestConfiguration(requestParameters.workflowId),
         queryFn: () => new WorkflowTestConfigurationApi().getWorkflowTestConfiguration(requestParameters),
     });

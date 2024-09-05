@@ -3,8 +3,8 @@ import {Button} from '@/components/ui/button';
 import {Skeleton} from '@/components/ui/skeleton';
 import IntegrationWorkflowListItem from '@/pages/embedded/integrations/components/IntegrationWorkflowListItem';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
-import {IntegrationModel} from '@/shared/middleware/embedded/configuration';
-import {ComponentDefinitionBasicModel} from '@/shared/middleware/platform/configuration';
+import {Integration} from '@/shared/middleware/embedded/configuration';
+import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useCreateIntegrationWorkflowMutation} from '@/shared/mutations/embedded/integrations.mutations';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {useGetIntegrationWorkflowsQuery} from '@/shared/queries/embedded/integrationWorkflows.queries';
@@ -13,7 +13,7 @@ import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/ta
 import {WorkflowIcon} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 
-const IntegrationWorkflowList = ({integration}: {integration: IntegrationModel}) => {
+const IntegrationWorkflowList = ({integration}: {integration: Integration}) => {
     const {data: componentDefinitions, isLoading: isComponentDefinitionsLoading} = useGetComponentDefinitionsQuery({
         actionDefinitions: true,
         triggerDefinitions: true,
@@ -25,7 +25,7 @@ const IntegrationWorkflowList = ({integration}: {integration: IntegrationModel})
         useGetTaskDispatcherDefinitionsQuery();
 
     const workflowComponentDefinitions: {
-        [key: string]: ComponentDefinitionBasicModel | undefined;
+        [key: string]: ComponentDefinitionBasic | undefined;
     } = {};
 
     const {data: workflows, isLoading: isIntegrationWorkflowsLoading} = useGetIntegrationWorkflowsQuery(
@@ -33,7 +33,7 @@ const IntegrationWorkflowList = ({integration}: {integration: IntegrationModel})
     );
 
     const workflowTaskDispatcherDefinitions: {
-        [key: string]: ComponentDefinitionBasicModel | undefined;
+        [key: string]: ComponentDefinitionBasic | undefined;
     } = {};
 
     const createIntegrationWorkflowMutation = useCreateIntegrationWorkflowMutation({

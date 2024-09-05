@@ -2,7 +2,7 @@ import {Button} from '@/components/ui/button';
 import DataPill from '@/pages/platform/workflow-editor/components/DataPill';
 import getFilteredProperties from '@/pages/platform/workflow-editor/utils/getFilteredProperties';
 import getNestedObject from '@/pages/platform/workflow-editor/utils/getNestedObject';
-import {PropertyType} from '@/shared/types';
+import {PropertyAllType} from '@/shared/types';
 import {AccordionContent, AccordionTrigger} from '@radix-ui/react-accordion';
 import {ChevronDownIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
@@ -27,9 +27,9 @@ const DataPillPanelBodyPropertiesItem = ({
 
     const {componentDefinition, workflowNodeName} = componentOperation;
 
-    const outputSchema: PropertyType | undefined = componentOperation?.outputSchema;
+    const outputSchema: PropertyAllType | undefined = componentOperation?.outputSchema;
 
-    const properties: Array<PropertyType> | undefined = outputSchema?.properties || outputSchema?.items;
+    const properties: Array<PropertyAllType> | undefined = outputSchema?.properties || outputSchema?.items;
 
     const filteredProperties = properties?.length
         ? getFilteredProperties({

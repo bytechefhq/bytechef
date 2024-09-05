@@ -13,8 +13,8 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
-import {CategoryModel, IntegrationModel, TagModel} from '@/shared/middleware/embedded/configuration';
-import {ComponentDefinitionBasicModel} from '@/shared/middleware/platform/configuration';
+import {Category, Integration, Tag} from '@/shared/middleware/embedded/configuration';
+import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {
     useCreateIntegrationMutation,
     useUpdateIntegrationMutation,
@@ -32,15 +32,15 @@ import {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
 interface IntegrationDialogProps {
-    integration: IntegrationModel | undefined;
-    onClose?: (integration?: IntegrationModel) => void;
+    integration: Integration | undefined;
+    onClose?: (integration?: Integration) => void;
     triggerNode?: ReactNode;
 }
 
 const IntegrationDialog = ({integration, onClose, triggerNode}: IntegrationDialogProps) => {
     const [isOpen, setIsOpen] = useState(!triggerNode);
 
-    const form = useForm<IntegrationModel>({
+    const form = useForm<Integration>({
         defaultValues: {
             allowMultipleInstances: false,
             category: integration?.category
@@ -54,11 +54,11 @@ const IntegrationDialog = ({integration, onClose, triggerNode}: IntegrationDialo
             description: integration?.description || '',
             name: integration?.name || '',
             tags:
-                integration?.tags?.map((tag: TagModel) => ({
+                integration?.tags?.map((tag: Tag) => ({
                     ...tag,
                     label: tag.name,
                 })) || [],
-        } as IntegrationModel,
+        } as Integration,
     });
 
     const {control, getValues, handleSubmit, reset, setValue} = form;
@@ -114,7 +114,7 @@ const IntegrationDialog = ({integration, onClose, triggerNode}: IntegrationDialo
             return;
         }
 
-        const tagValues = formData.tags?.map((tag: TagModel) => {
+        const tagValues = formData.tags?.map((tag: Tag) => {
             return {id: tag.id, name: tag.name, version: tag.version};
         });
 
@@ -125,13 +125,13 @@ const IntegrationDialog = ({integration, onClose, triggerNode}: IntegrationDialo
                 ...integration,
                 ...formData,
                 category,
-            } as IntegrationModel);
+            } as Integration);
         } else {
             createIntegrationMutation.mutate({
                 ...formData,
                 category,
                 tags: tagValues,
-            } as IntegrationModel);
+            } as Integration);
         }
     }
 
@@ -186,11 +186,10 @@ const IntegrationDialog = ({integration, onClose, triggerNode}: IntegrationDialo
                                             onBlur={field.onBlur}
                                             onChange={(item) => {
                                                 const componentName = (
-                                                    item?.componentDefinition as ComponentDefinitionBasicModel
+                                                    item?.componentDefinition as ComponentDefinitionBasic
                                                 ).name;
-                                                const title = (
-                                                    item?.componentDefinition as ComponentDefinitionBasicModel
-                                                ).title;
+                                                const title = (item?.componentDefinition as ComponentDefinitionBasic)
+                                                    .title;
 
                                                 setValue('componentName', componentName);
                                                 setValue('name', title);
@@ -243,7 +242,7 @@ const IntegrationDialog = ({integration, onClose, triggerNode}: IntegrationDialo
                                                     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
                                                 } as any);
                                             }}
-                                            options={categories!.map((category: CategoryModel) => ({
+                                            options={categories!.map((category: Category) => ({
                                                 label: category.name,
                                                 value: category.name.toLowerCase().replace(/\W/g, ''),
                                                 ...category,
@@ -296,7 +295,7 @@ const IntegrationDialog = ({integration, onClose, triggerNode}: IntegrationDialo
                                                     },
                                                 ] as never[]);
                                             }}
-                                            options={remainingTags!.map((tag: TagModel) => {
+                                            options={remainingTags!.map((tag: Tag) => {
                                                 return {
                                                     label: tag.name,
                                                     value: tag.name.toLowerCase().replace(/\W/g, ''),

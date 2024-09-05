@@ -3,14 +3,14 @@ import {Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, Dia
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import {useToast} from '@/components/ui/use-toast';
-import {IntegrationModel} from '@/shared/middleware/embedded/configuration';
+import {Integration} from '@/shared/middleware/embedded/configuration';
 import {usePublishIntegrationMutation} from '@/shared/mutations/embedded/integrations.mutations';
 import {IntegrationKeys} from '@/shared/queries/embedded/integrations.queries';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 
-const IntegrationPublishDialog = ({integration, onClose}: {integration: IntegrationModel; onClose: () => void}) => {
+const IntegrationPublishDialog = ({integration, onClose}: {integration: Integration; onClose: () => void}) => {
     const [description, setDescription] = useState<string | undefined>(undefined);
 
     const {toast} = useToast();
@@ -60,7 +60,7 @@ const IntegrationPublishDialog = ({integration, onClose}: {integration: Integrat
                             onClick={() =>
                                 publishIntegrationMutation.mutate({
                                     id: integration.id!,
-                                    publishIntegrationRequestModel: {
+                                    publishIntegrationRequest: {
                                         description,
                                     },
                                 })

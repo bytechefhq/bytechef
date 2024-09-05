@@ -6,7 +6,7 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import {EnvironmentModel, ProjectInstanceModel} from '@/shared/middleware/automation/configuration';
+import {Environment, ProjectInstance} from '@/shared/middleware/automation/configuration';
 import {useGetProjectInstanceTagsQuery} from '@/shared/queries/automation/projectInstanceTags.queries';
 import {useGetWorkspaceProjectInstancesQuery} from '@/shared/queries/automation/projectInstances.queries';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
@@ -45,17 +45,17 @@ const ProjectInstances = () => {
         error: projectInstancesError,
         isLoading: projectInstancesIsLoading,
     } = useGetWorkspaceProjectInstancesQuery({
-        environment: environment === 1 ? EnvironmentModel.Test : EnvironmentModel.Production,
+        environment: environment === 1 ? Environment.Test : Environment.Production,
         id: currentWorkspaceId!,
         projectId: searchParams.get('projectId') ? parseInt(searchParams.get('projectId')!) : undefined,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
 
-    const projectInstanceMap: Map<number, ProjectInstanceModel[]> = new Map<number, ProjectInstanceModel[]>();
+    const projectInstanceMap: Map<number, ProjectInstance[]> = new Map<number, ProjectInstance[]>();
 
     if (projectInstances) {
         for (const projectInstance of projectInstances) {
-            let currentProjectInstances: ProjectInstanceModel[];
+            let currentProjectInstances: ProjectInstance[];
 
             if (projectInstance.project) {
                 if (projectInstanceMap.has(projectInstance.projectId!)) {
@@ -117,9 +117,8 @@ const ProjectInstances = () => {
                             <ProjectInstanceDialog
                                 projectInstance={
                                     {
-                                        environment:
-                                            environment === 1 ? EnvironmentModel.Test : EnvironmentModel.Production,
-                                    } as ProjectInstanceModel
+                                        environment: environment === 1 ? Environment.Test : Environment.Production,
+                                    } as ProjectInstance
                                 }
                                 triggerNode={<Button>New Instance</Button>}
                             />
@@ -260,9 +259,8 @@ const ProjectInstances = () => {
                             <ProjectInstanceDialog
                                 projectInstance={
                                     {
-                                        environment:
-                                            environment === 1 ? EnvironmentModel.Test : EnvironmentModel.Production,
-                                    } as ProjectInstanceModel
+                                        environment: environment === 1 ? Environment.Test : Environment.Production,
+                                    } as ProjectInstance
                                 }
                                 triggerNode={<Button>Create Instance</Button>}
                             />

@@ -11,11 +11,11 @@ import {
 import {Form} from '@/components/ui/form';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-instances/stores/useWorkflowsEnabledStore';
 import {
-    EnvironmentModel,
-    ProjectInstanceModel,
-    ProjectInstanceWorkflowConnectionModel,
-    ProjectInstanceWorkflowModel,
-    WorkflowConnectionModel,
+    Environment,
+    ProjectInstance,
+    ProjectInstanceWorkflow,
+    ProjectInstanceWorkflowConnection,
+    WorkflowConnection,
 } from '@/shared/middleware/automation/configuration';
 import {
     useCreateProjectInstanceMutation,
@@ -36,7 +36,7 @@ import ProjectInstanceDialogWorkflowsStep from './ProjectInstanceDialogWorkflows
 
 interface ProjectInstanceDialogProps {
     onClose?: () => void;
-    projectInstance?: ProjectInstanceModel;
+    projectInstance?: ProjectInstance;
     triggerNode?: ReactNode;
     updateProjectVersion?: boolean;
 }
@@ -54,11 +54,11 @@ const ProjectInstanceDialog = ({
         useShallow(({reset, setWorkflowEnabled}) => [reset, setWorkflowEnabled])
     );
 
-    const form = useForm<ProjectInstanceModel>({
+    const form = useForm<ProjectInstance>({
         defaultValues: {
             description: projectInstance?.description || undefined,
             enabled: projectInstance?.enabled || false,
-            environment: projectInstance?.environment || EnvironmentModel.Test,
+            environment: projectInstance?.environment || Environment.Test,
             name: projectInstance?.name || undefined,
             projectId: projectInstance?.projectId || undefined,
             projectInstanceWorkflows: [],
@@ -135,7 +135,7 @@ const ProjectInstanceDialog = ({
 
         setTimeout(() => {
             reset({
-                environment: EnvironmentModel.Test,
+                environment: Environment.Test,
                 projectInstanceWorkflows: [],
             });
 
@@ -153,7 +153,7 @@ const ProjectInstanceDialog = ({
         setActiveStepIndex(activeStepIndex + 1);
     };
 
-    const handleSaveClick = (formData: ProjectInstanceModel) => {
+    const handleSaveClick = (formData: ProjectInstance) => {
         if (!formData) {
             return;
         }
@@ -169,7 +169,7 @@ const ProjectInstanceDialog = ({
                         inputs: projectInstanceWorkflow.enabled ? projectInstanceWorkflow.inputs : {},
                     };
                 }),
-            } as ProjectInstanceModel);
+            } as ProjectInstance);
         } else {
             createProjectInstanceMutation.mutate({
                 ...formData,
@@ -186,7 +186,7 @@ const ProjectInstanceDialog = ({
 
     useEffect(() => {
         if (workflows) {
-            let projectInstanceWorkflows: ProjectInstanceWorkflowModel[] = [];
+            let projectInstanceWorkflows: ProjectInstanceWorkflow[] = [];
 
             for (let i = 0; i < workflows.length; i++) {
                 const workflow = workflows[i];
@@ -202,9 +202,9 @@ const ProjectInstanceDialog = ({
                     setWorkflowEnabled(workflow.id!, false);
                 }
 
-                let newProjectInstanceWorkflowConnections: ProjectInstanceWorkflowConnectionModel[] = [];
+                let newProjectInstanceWorkflowConnections: ProjectInstanceWorkflowConnection[] = [];
 
-                const workflowConnections: WorkflowConnectionModel[] = (workflow?.tasks ?? [])
+                const workflowConnections: WorkflowConnection[] = (workflow?.tasks ?? [])
                     .flatMap((task) => task.connections ?? [])
                     .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []));
 
@@ -222,7 +222,7 @@ const ProjectInstanceDialog = ({
                             ({
                                 key: workflowConnection.key,
                                 workflowNodeName: workflowConnection.workflowNodeName,
-                            } as ProjectInstanceWorkflowConnectionModel),
+                            } as ProjectInstanceWorkflowConnection),
                     ];
                 }
 

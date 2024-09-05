@@ -1,20 +1,16 @@
-import {
-    AdminApiKeyApi,
-    AdminApiKeyModel,
-    type CreateAdminApiKey200ResponseModel,
-} from '@/shared/middleware/platform/user';
+import {AdminApiKey, AdminApiKeyApi, type CreateAdminApiKey200Response} from '@/shared/middleware/platform/user';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateAdminApiKeyMutationProps {
-    onError?: (error: Error, variables: AdminApiKeyModel) => void;
-    onSuccess?: (result: CreateAdminApiKey200ResponseModel, variables: AdminApiKeyModel) => void;
+    onError?: (error: Error, variables: AdminApiKey) => void;
+    onSuccess?: (result: CreateAdminApiKey200Response, variables: AdminApiKey) => void;
 }
 
 export const useCreateAdminApiKeyMutation = (mutationProps?: CreateAdminApiKeyMutationProps) =>
-    useMutation<CreateAdminApiKey200ResponseModel, Error, AdminApiKeyModel>({
-        mutationFn: (adminApiKeyModel: AdminApiKeyModel) => {
+    useMutation<CreateAdminApiKey200Response, Error, AdminApiKey>({
+        mutationFn: (adminApiKey: AdminApiKey) => {
             return new AdminApiKeyApi().createAdminApiKey({
-                adminApiKeyModel,
+                adminApiKey,
             });
         },
         onError: mutationProps?.onError,
@@ -38,16 +34,16 @@ export const useDeleteAdminApiKeyMutation = (mutationProps?: DeleteAdminApiKeyMu
     });
 
 interface UpdateAdminApiKeyMutationProps {
-    onError?: (error: Error, variables: AdminApiKeyModel) => void;
-    onSuccess?: (result: AdminApiKeyModel, variables: AdminApiKeyModel) => void;
+    onError?: (error: Error, variables: AdminApiKey) => void;
+    onSuccess?: (result: AdminApiKey, variables: AdminApiKey) => void;
 }
 
 export const useUpdateAdminApiKeyMutation = (mutationProps?: UpdateAdminApiKeyMutationProps) =>
-    useMutation<AdminApiKeyModel, Error, AdminApiKeyModel>({
-        mutationFn: (adminApiKeyModel: AdminApiKeyModel) => {
+    useMutation<AdminApiKey, Error, AdminApiKey>({
+        mutationFn: (adminApiKey: AdminApiKey) => {
             return new AdminApiKeyApi().updateAdminApiKey({
-                adminApiKeyModel,
-                id: adminApiKeyModel.id!,
+                adminApiKey,
+                id: adminApiKey.id!,
             });
         },
         onError: mutationProps?.onError,

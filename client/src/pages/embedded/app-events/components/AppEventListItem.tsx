@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AppEventDialog from '@/pages/embedded/app-events/components/AppEventDialog';
-import {AppEventModel} from '@/shared/middleware/embedded/configuration';
+import {AppEvent} from '@/shared/middleware/embedded/configuration';
 import {useDeleteAppEventMutation} from '@/shared/mutations/embedded/appEvents.mutations';
 import {AppEventKeys} from '@/shared/queries/embedded/appEvents.queries';
 import {useQueryClient} from '@tanstack/react-query';
@@ -26,7 +26,7 @@ import {EllipsisVerticalIcon} from 'lucide-react';
 import {useState} from 'react';
 
 interface AppEventListItemProps {
-    appEvent: AppEventModel;
+    appEvent: AppEvent;
 }
 
 const AppEventListItem = ({appEvent}: AppEventListItemProps) => {

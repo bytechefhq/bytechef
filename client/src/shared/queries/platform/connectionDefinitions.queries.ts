@@ -1,7 +1,7 @@
 /* eslint-disable sort-keys */
 import {
+    ConnectionDefinition,
     ConnectionDefinitionApi,
-    ConnectionDefinitionModel,
     GetComponentConnectionDefinitionsRequest,
 } from '@/shared/middleware/platform/configuration';
 import {useQuery} from '@tanstack/react-query';
@@ -25,7 +25,7 @@ export const ConnectDefinitionKeys = {
 };
 
 export const useGetConnectionDefinitionQuery = (request?: GetComponentConnectionDefinitionRequestI) =>
-    useQuery<ConnectionDefinitionModel, Error>({
+    useQuery<ConnectionDefinition, Error>({
         queryKey: ConnectDefinitionKeys.connectionDefinition(request),
         queryFn: () =>
             new ConnectionDefinitionApi().getComponentConnectionDefinition({
@@ -36,7 +36,7 @@ export const useGetConnectionDefinitionQuery = (request?: GetComponentConnection
     });
 
 export const useGetConnectionDefinitionsQuery = (request: GetComponentConnectionDefinitionsRequest) =>
-    useQuery<ConnectionDefinitionModel[], Error>({
+    useQuery<ConnectionDefinition[], Error>({
         queryKey: ConnectDefinitionKeys.filteredConnectionDefinitions(request),
         queryFn: () => new ConnectionDefinitionApi().getComponentConnectionDefinitions(request),
         enabled: !!request?.componentName,

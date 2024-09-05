@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys */
-import {CategoryApi, CategoryModel} from '@/shared/middleware/automation/configuration';
+import {Category, CategoryApi} from '@/shared/middleware/automation/configuration';
 import {useQuery} from '@tanstack/react-query';
 
 export const ProjectCategoryKeys = {
@@ -7,7 +7,7 @@ export const ProjectCategoryKeys = {
 };
 
 export const useGetProjectCategoriesQuery = () =>
-    useQuery<CategoryModel[], Error>({
+    useQuery<Category[], Error>({
         queryKey: ProjectCategoryKeys.projectCategories,
         queryFn: () => new CategoryApi().getProjectCategories(),
     });

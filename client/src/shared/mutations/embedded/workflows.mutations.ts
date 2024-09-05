@@ -1,8 +1,8 @@
 import {
     DeleteWorkflowRequest,
     UpdateWorkflowRequest,
+    Workflow,
     WorkflowApi,
-    WorkflowModel,
 } from '@/shared/middleware/embedded/configuration';
 import {useMutation} from '@tanstack/react-query';
 
@@ -21,7 +21,7 @@ export const useDeleteWorkflowMutation = (mutationProps?: DeleteWorkflowMutation
     });
 
 interface UpdateWorkflowMutationProps {
-    onSuccess?: (result: WorkflowModel, variables: UpdateWorkflowRequest) => void;
+    onSuccess?: (result: Workflow, variables: UpdateWorkflowRequest) => void;
     onError?: (error: Error, variables: UpdateWorkflowRequest) => void;
 }
 

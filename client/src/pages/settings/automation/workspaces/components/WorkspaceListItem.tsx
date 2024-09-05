@@ -19,7 +19,7 @@ import {
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useDeleteWorkspaceMutation} from '@/ee/shared/mutations/automation/workspaces.mutations';
 import WorkspaceDialog from '@/pages/settings/automation/workspaces/components/WorkspaceDialog';
-import {WorkspaceModel} from '@/shared/middleware/automation/configuration';
+import {Workspace} from '@/shared/middleware/automation/configuration';
 import {WorkspaceKeys} from '@/shared/queries/automation/workspaces.queries';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useQueryClient} from '@tanstack/react-query';
@@ -27,7 +27,7 @@ import {EllipsisVerticalIcon} from 'lucide-react';
 import {useState} from 'react';
 
 interface WorkspaceListItemProps {
-    workspace: WorkspaceModel;
+    workspace: Workspace;
 }
 
 const WorkspaceListItem = ({workspace}: WorkspaceListItemProps) => {

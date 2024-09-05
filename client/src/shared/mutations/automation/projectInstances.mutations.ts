@@ -1,20 +1,20 @@
 import {
     EnableProjectInstanceRequest,
+    ProjectInstance,
     ProjectInstanceApi,
-    ProjectInstanceModel,
 } from '@/shared/middleware/automation/configuration';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateProjectInstanceMutationProps {
-    onSuccess?: (result: ProjectInstanceModel, variables: ProjectInstanceModel) => void;
-    onError?: (error: Error, variables: ProjectInstanceModel) => void;
+    onSuccess?: (result: ProjectInstance, variables: ProjectInstance) => void;
+    onError?: (error: Error, variables: ProjectInstance) => void;
 }
 
 export const useCreateProjectInstanceMutation = (mutationProps?: CreateProjectInstanceMutationProps) =>
     useMutation({
-        mutationFn: (projectInstanceModel: ProjectInstanceModel) => {
+        mutationFn: (projectInstance: ProjectInstance) => {
             return new ProjectInstanceApi().createProjectInstance({
-                projectInstanceModel,
+                projectInstance,
             });
         },
         onError: mutationProps?.onError,
@@ -52,16 +52,16 @@ export const useEnableProjectInstanceMutation = (mutationProps: EnableProjectIns
     });
 
 interface UpdateProjectInstanceMutationProps {
-    onSuccess?: (result: ProjectInstanceModel, variables: ProjectInstanceModel) => void;
-    onError?: (error: Error, variables: ProjectInstanceModel) => void;
+    onSuccess?: (result: ProjectInstance, variables: ProjectInstance) => void;
+    onError?: (error: Error, variables: ProjectInstance) => void;
 }
 
 export const useUpdateProjectInstanceMutation = (mutationProps?: UpdateProjectInstanceMutationProps) =>
     useMutation({
-        mutationFn: (projectInstanceModel: ProjectInstanceModel) => {
+        mutationFn: (projectInstance: ProjectInstance) => {
             return new ProjectInstanceApi().updateProjectInstance({
-                id: projectInstanceModel.id!,
-                projectInstanceModel,
+                id: projectInstance.id!,
+                projectInstance,
             });
         },
         onError: mutationProps?.onError,

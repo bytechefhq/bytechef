@@ -18,8 +18,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
-import {IntegrationModel, WorkflowModel} from '@/shared/middleware/embedded/configuration';
-import {ComponentDefinitionBasicModel} from '@/shared/middleware/platform/configuration';
+import {Integration, Workflow} from '@/shared/middleware/embedded/configuration';
+import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useDeleteWorkflowMutation, useUpdateWorkflowMutation} from '@/shared/mutations/embedded/workflows.mutations';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {IntegrationWorkflowKeys} from '@/shared/queries/embedded/integrationWorkflows.queries';
@@ -40,13 +40,13 @@ const IntegrationWorkflowListItem = ({
     workflowTaskDispatcherDefinitions,
 }: {
     filteredComponentNames?: string[];
-    integration: IntegrationModel;
-    workflow: WorkflowModel;
+    integration: Integration;
+    workflow: Workflow;
     workflowComponentDefinitions: {
-        [key: string]: ComponentDefinitionBasicModel | undefined;
+        [key: string]: ComponentDefinitionBasic | undefined;
     };
     workflowTaskDispatcherDefinitions: {
-        [key: string]: ComponentDefinitionBasicModel | undefined;
+        [key: string]: ComponentDefinitionBasic | undefined;
     };
 }) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);

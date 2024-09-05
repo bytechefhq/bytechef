@@ -9,7 +9,7 @@ import {
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import ConnectedUserDeleteDialog from '@/pages/embedded/connected-users/components/ConnectedUserDeleteDialog';
 import useConnectedUserSheetStore from '@/pages/embedded/connected-users/stores/useConnectedUserSheetStore';
-import {ConnectedUserModel, CredentialStatusModel} from '@/shared/middleware/embedded/connected-user';
+import {ConnectedUser, CredentialStatus} from '@/shared/middleware/embedded/connected-user';
 import {useEnableConnectedUserMutation} from '@/shared/mutations/embedded/connectedUsers.mutations';
 import {ConnectedUserKeys} from '@/shared/queries/embedded/connectedUsers.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
@@ -20,10 +20,10 @@ import {useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
-const columnHelper = createColumnHelper<ConnectedUserModel>();
+const columnHelper = createColumnHelper<ConnectedUser>();
 
 interface ConnectedUserTableProps {
-    connectedUsers: ConnectedUserModel[];
+    connectedUsers: ConnectedUser[];
 }
 
 const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
@@ -43,7 +43,7 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
                     let enabled = true;
 
                     for (const integrationInstance of info.getValue()!) {
-                        if (integrationInstance.credentialStatus === CredentialStatusModel.Invalid) {
+                        if (integrationInstance.credentialStatus === CredentialStatus.Invalid) {
                             enabled = false;
 
                             break;
@@ -144,7 +144,7 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
         [componentDefinitions, connectedUsers]
     );
 
-    const reactTable = useReactTable<ConnectedUserModel>({
+    const reactTable = useReactTable<ConnectedUser>({
         columns,
         data: connectedUsers,
         getCoreRowModel: getCoreRowModel(),

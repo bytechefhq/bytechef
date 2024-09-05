@@ -1,9 +1,9 @@
-import {WorkflowModel} from '@/shared/middleware/platform/configuration';
-import {ComponentPropertiesType, DataPillType, PropertyType} from '@/shared/types';
+import {Workflow} from '@/shared/middleware/platform/configuration';
+import {ComponentPropertiesType, DataPillType, PropertyAllType} from '@/shared/types';
 
 import getSubProperties from './getSubProperties';
 
-const getExistingProperties = (properties: Array<PropertyType>): Array<PropertyType> =>
+const getExistingProperties = (properties: Array<PropertyAllType>): Array<PropertyAllType> =>
     properties.filter((property) => {
         if (property.properties) {
             return getExistingProperties(property.properties);
@@ -16,7 +16,7 @@ const getExistingProperties = (properties: Array<PropertyType>): Array<PropertyT
 
 export default function getDataPillsFromProperties(
     properties: Array<ComponentPropertiesType>,
-    workflow: WorkflowModel,
+    workflow: Workflow,
     previousNodeNames: Array<string>
 ) {
     const dataPills: Array<DataPillType> = [];

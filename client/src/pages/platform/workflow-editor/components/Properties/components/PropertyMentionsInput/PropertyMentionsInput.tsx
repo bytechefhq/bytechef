@@ -15,7 +15,7 @@ import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/P
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import {ControlTypeModel} from '@/shared/middleware/platform/configuration';
+import {ControlType} from '@/shared/middleware/platform/configuration';
 import {DataPillType} from '@/shared/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {twMerge} from 'tailwind-merge';
@@ -43,7 +43,7 @@ const MentionInputListItem = (item: DataPillType) => {
 
 interface PropertyMentionsInputProps {
     className?: string;
-    controlType?: ControlTypeModel;
+    controlType?: ControlType;
     defaultValue?: string;
     deletePropertyButton?: ReactNode;
     description?: string;

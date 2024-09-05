@@ -12,11 +12,7 @@ import {Button} from '@/components/ui/button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import WorkflowInputsSheetDialog from '@/pages/platform/workflow-editor/components/WorkflowInputsSheetDialog';
 import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
-import {
-    WorkflowInputModel,
-    WorkflowModel,
-    WorkflowTestConfigurationModel,
-} from '@/shared/middleware/platform/configuration';
+import {Workflow, WorkflowInput, WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
 import {WorkflowDefinitionType} from '@/shared/types';
 import {EditIcon, PlusIcon, SlidersIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
@@ -27,8 +23,8 @@ const WorkflowInputsSheetTable = ({
     workflow,
     workflowTestConfiguration,
 }: {
-    workflow: WorkflowModel;
-    workflowTestConfiguration?: WorkflowTestConfigurationModel;
+    workflow: Workflow;
+    workflowTestConfiguration?: WorkflowTestConfiguration;
 }) => {
     const [currentInputIndex, setCurrentInputIndex] = useState<number>(-1);
     const [showEditDialog, setShowEditDialog] = useState(false);
@@ -36,10 +32,10 @@ const WorkflowInputsSheetTable = ({
 
     const {updateWorkflowMutation} = useWorkflowMutation();
 
-    function handleDelete(input: WorkflowInputModel) {
+    function handleDelete(input: WorkflowInput) {
         const definitionObject: WorkflowDefinitionType = JSON.parse(workflow.definition!);
 
-        const inputs: WorkflowInputModel[] = definitionObject.inputs ?? [];
+        const inputs: WorkflowInput[] = definitionObject.inputs ?? [];
 
         const index = inputs.findIndex((curInput) => curInput.name === input.name);
 
@@ -47,7 +43,7 @@ const WorkflowInputsSheetTable = ({
 
         updateWorkflowMutation.mutate({
             id: workflow.id!,
-            workflowModel: {
+            workflow: {
                 definition: JSON.stringify(
                     {
                         ...definitionObject,

@@ -1,13 +1,13 @@
-import {PropertyType} from '@/shared/types';
+import {PropertyAllType} from '@/shared/types';
 
 export default function getFilteredProperties({
     filterQuery,
     properties,
 }: {
-    properties: Array<PropertyType>;
+    properties: Array<PropertyAllType>;
     filterQuery: string;
 }) {
-    return properties?.reduce((previousValue: Array<PropertyType>, currentValue) => {
+    return properties?.reduce((previousValue: Array<PropertyAllType>, currentValue) => {
         const subProperties = getFilteredProperties({
             filterQuery,
             properties: currentValue.properties || currentValue.items || [],

@@ -12,7 +12,7 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {useToast} from '@/components/ui/use-toast';
-import {ApiKeyModel} from '@/shared/middleware/embedded/user';
+import {ApiKey} from '@/shared/middleware/embedded/user';
 import {useCreateApiKeyMutation, useUpdateApiKeyMutation} from '@/shared/mutations/embedded/apiKeys.mutations';
 import {ApiKeyKeys} from '@/shared/queries/embedded/apiKeys.queries';
 import {zodResolver} from '@hookform/resolvers/zod';
@@ -31,7 +31,7 @@ const formSchema = z.object({
 });
 
 interface ApiKeyDialogProps {
-    apiKey?: ApiKeyModel;
+    apiKey?: ApiKey;
     onClose?: () => void;
     triggerNode?: ReactNode;
 }
@@ -94,12 +94,12 @@ const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
             updateApiKeyMutation.mutate({
                 ...apiKey,
                 ...getValues(),
-            } as ApiKeyModel);
+            } as ApiKey);
         } else {
             createApiKeyMutation.mutate({
                 ...apiKey,
                 ...getValues(),
-            } as ApiKeyModel);
+            } as ApiKey);
         }
     }
 

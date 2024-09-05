@@ -1,24 +1,24 @@
 import {
     CreateIntegrationWorkflowRequest,
+    Integration,
     IntegrationApi,
-    IntegrationModel,
     IntegrationTagApi,
-    PublishIntegrationRequest,
+    PublishIntegrationOperationRequest,
     UpdateIntegrationTagsRequest,
-    WorkflowModel,
+    Workflow,
 } from '@/shared/middleware/embedded/configuration';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateIntegrationMutationProps {
-    onSuccess?: (result: IntegrationModel, variables: IntegrationModel) => void;
-    onError?: (error: Error, variables: IntegrationModel) => void;
+    onSuccess?: (result: Integration, variables: Integration) => void;
+    onError?: (error: Error, variables: Integration) => void;
 }
 
 export const useCreateIntegrationMutation = (mutationProps?: CreateIntegrationMutationProps) =>
     useMutation({
-        mutationFn: (integration: IntegrationModel) => {
+        mutationFn: (integration: Integration) => {
             return new IntegrationApi().createIntegration({
-                integrationModel: integration,
+                integration: integration,
             });
         },
         onError: mutationProps?.onError,
@@ -26,16 +26,16 @@ export const useCreateIntegrationMutation = (mutationProps?: CreateIntegrationMu
     });
 
 interface UpdateIntegrationMutationProps {
-    onSuccess?: (result: IntegrationModel, variables: IntegrationModel) => void;
-    onError?: (error: Error, variables: IntegrationModel) => void;
+    onSuccess?: (result: Integration, variables: Integration) => void;
+    onError?: (error: Error, variables: Integration) => void;
 }
 
 export const useUpdateIntegrationMutation = (mutationProps?: UpdateIntegrationMutationProps) =>
     useMutation({
-        mutationFn: (integration: IntegrationModel) => {
+        mutationFn: (integration: Integration) => {
             return new IntegrationApi().updateIntegration({
                 id: integration.id!,
-                integrationModel: integration,
+                integration: integration,
             });
         },
         onError: mutationProps?.onError,
@@ -43,7 +43,7 @@ export const useUpdateIntegrationMutation = (mutationProps?: UpdateIntegrationMu
     });
 
 interface CreateIntegrationWorkflowMutationProps {
-    onSuccess?: (result: WorkflowModel, variables: CreateIntegrationWorkflowRequest) => void;
+    onSuccess?: (result: Workflow, variables: CreateIntegrationWorkflowRequest) => void;
     onError?: (error: Error, variables: CreateIntegrationWorkflowRequest) => void;
 }
 
@@ -71,13 +71,13 @@ export const useDeleteIntegrationMutation = (mutationProps?: DeleteIntegrationMu
     });
 
 interface PublishIntegrationMutationProps {
-    onSuccess?: (result: void, variables: PublishIntegrationRequest) => void;
-    onError?: (error: Error, variables: PublishIntegrationRequest) => void;
+    onSuccess?: (result: void, variables: PublishIntegrationOperationRequest) => void;
+    onError?: (error: Error, variables: PublishIntegrationOperationRequest) => void;
 }
 
 export const usePublishIntegrationMutation = (mutationProps?: PublishIntegrationMutationProps) =>
     useMutation({
-        mutationFn: (request: PublishIntegrationRequest) => {
+        mutationFn: (request: PublishIntegrationOperationRequest) => {
             return new IntegrationApi().publishIntegration(request);
         },
         onError: mutationProps?.onError,

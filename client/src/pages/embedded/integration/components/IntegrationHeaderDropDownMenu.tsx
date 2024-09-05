@@ -1,14 +1,14 @@
 import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
-import {IntegrationModel} from '@/shared/middleware/embedded/configuration';
+import {Integration} from '@/shared/middleware/embedded/configuration';
 import {useGetIntegrationsQuery} from '@/shared/queries/embedded/integrations.queries';
 import {CaretDownIcon} from '@radix-ui/react-icons';
 import * as React from 'react';
 import {useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
-const IntegrationHeaderDropDownMenu = ({integration}: {integration: IntegrationModel}) => {
+const IntegrationHeaderDropDownMenu = ({integration}: {integration: Integration}) => {
     const {data: integrations} = useGetIntegrationsQuery();
 
     const navigate = useNavigate();

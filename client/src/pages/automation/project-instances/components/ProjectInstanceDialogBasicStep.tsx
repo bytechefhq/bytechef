@@ -6,16 +6,16 @@ import ProjectInstanceDialogBasicStepProjectVersionsSelect from '@/pages/automat
 import ProjectInstanceDialogBasicStepProjectsComboBox from '@/pages/automation/project-instances/components/ProjectInstanceDialogBasicStepProjectsComboBox';
 import ProjectInstanceDialogBasicStepTagsSelect from '@/pages/automation/project-instances/components/ProjectInstanceDialogBasicStepTagsSelect';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-instances/stores/useWorkflowsEnabledStore';
-import {ProjectInstanceModel} from '@/shared/middleware/automation/configuration';
+import {ProjectInstance} from '@/shared/middleware/automation/configuration';
 import {useState} from 'react';
 import {Control, UseFormGetValues, UseFormSetValue} from 'react-hook-form';
 import {useShallow} from 'zustand/react/shallow';
 
 interface ProjectDialogBasicStepProps {
-    control: Control<ProjectInstanceModel>;
-    getValues: UseFormGetValues<ProjectInstanceModel>;
-    projectInstance: ProjectInstanceModel | undefined;
-    setValue: UseFormSetValue<ProjectInstanceModel>;
+    control: Control<ProjectInstance>;
+    getValues: UseFormGetValues<ProjectInstance>;
+    projectInstance: ProjectInstance | undefined;
+    setValue: UseFormSetValue<ProjectInstance>;
     updateProjectVersion: boolean;
 }
 

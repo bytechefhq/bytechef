@@ -18,8 +18,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
-import {ProjectModel, WorkflowModel} from '@/shared/middleware/automation/configuration';
-import {ComponentDefinitionBasicModel} from '@/shared/middleware/platform/configuration';
+import {Project, Workflow} from '@/shared/middleware/automation/configuration';
+import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {
     useDeleteWorkflowMutation,
     useDuplicateWorkflowMutation,
@@ -43,13 +43,13 @@ const ProjectWorkflowListItem = ({
     workflowTaskDispatcherDefinitions,
 }: {
     filteredComponentNames?: string[];
-    project: ProjectModel;
-    workflow: WorkflowModel;
+    project: Project;
+    workflow: Workflow;
     workflowComponentDefinitions: {
-        [key: string]: ComponentDefinitionBasicModel | undefined;
+        [key: string]: ComponentDefinitionBasic | undefined;
     };
     workflowTaskDispatcherDefinitions: {
-        [key: string]: ComponentDefinitionBasicModel | undefined;
+        [key: string]: ComponentDefinitionBasic | undefined;
     };
 }) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);

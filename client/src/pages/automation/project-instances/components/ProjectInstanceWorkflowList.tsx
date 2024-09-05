@@ -1,7 +1,7 @@
 import {Skeleton} from '@/components/ui/skeleton';
 import ProjectInstanceWorkflowListItem from '@/pages/automation/project-instances/components/ProjectInstanceWorkflowListItem';
-import {ProjectInstanceWorkflowModel} from '@/shared/middleware/automation/configuration';
-import {ComponentDefinitionBasicModel} from '@/shared/middleware/platform/configuration';
+import {ProjectInstanceWorkflow} from '@/shared/middleware/automation/configuration';
+import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useGetProjectVersionWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
@@ -16,7 +16,7 @@ const ProjectInstanceWorkflowList = ({
     projectId: number;
     projectInstanceId: number;
     projectInstanceEnabled: boolean;
-    projectInstanceWorkflows: Array<ProjectInstanceWorkflowModel>;
+    projectInstanceWorkflows: Array<ProjectInstanceWorkflow>;
     projectVersion: number;
 }) => {
     const {data: componentDefinitions, isLoading: isComponentDefinitionsLoading} = useGetComponentDefinitionsQuery({
@@ -33,11 +33,11 @@ const ProjectInstanceWorkflowList = ({
     );
 
     const workflowComponentDefinitions: {
-        [key: string]: ComponentDefinitionBasicModel | undefined;
+        [key: string]: ComponentDefinitionBasic | undefined;
     } = {};
 
     const workflowTaskDispatcherDefinitions: {
-        [key: string]: ComponentDefinitionBasicModel | undefined;
+        [key: string]: ComponentDefinitionBasic | undefined;
     } = {};
 
     if (isComponentDefinitionsLoading || isTaskDispatcherDefinitionsLoading || isProjectWorkflowsLoading) {

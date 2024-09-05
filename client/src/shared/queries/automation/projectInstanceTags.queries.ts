@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys */
-import {ProjectInstanceTagApi, TagModel} from '@/shared/middleware/automation/configuration';
+import {ProjectInstanceTagApi, Tag} from '@/shared/middleware/automation/configuration';
 import {useQuery} from '@tanstack/react-query';
 
 export const ProjectInstanceTagKeys = {
@@ -7,7 +7,7 @@ export const ProjectInstanceTagKeys = {
 };
 
 export const useGetProjectInstanceTagsQuery = () =>
-    useQuery<TagModel[], Error>({
+    useQuery<Tag[], Error>({
         queryKey: ProjectInstanceTagKeys.projectInstanceTags,
         queryFn: () => new ProjectInstanceTagApi().getProjectInstanceTags(),
     });

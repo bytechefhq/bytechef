@@ -1,10 +1,10 @@
 /* eslint-disable sort-keys */
 import {
+    Connection,
     ConnectionApi,
-    ConnectionModel,
     ConnectionTagApi,
     GetWorkspaceConnectionsRequest,
-    TagModel,
+    Tag,
 } from '@/shared/middleware/automation/connection';
 import {useQuery} from '@tanstack/react-query';
 
@@ -21,13 +21,13 @@ export const ConnectionKeys = {
 };
 
 export const useGetConnectionTagsQuery = () =>
-    useQuery<TagModel[], Error>({
+    useQuery<Tag[], Error>({
         queryKey: ConnectionKeys.connectionTags,
         queryFn: () => new ConnectionTagApi().getConnectionTags(),
     });
 
 export const useGetWorkspaceConnectionsQuery = (request: GetWorkspaceConnectionsRequest, enabled?: boolean) =>
-    useQuery<ConnectionModel[], Error>({
+    useQuery<Connection[], Error>({
         queryKey: ConnectionKeys.filteredConnections(request),
         queryFn: () => new ConnectionApi().getWorkspaceConnections(request),
         enabled: enabled === undefined ? true : enabled,

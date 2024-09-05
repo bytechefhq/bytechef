@@ -22,7 +22,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/components/ui/use-toast';
 import ProjectPublishDialog from '@/pages/automation/projects/components/ProjectPublishDialog';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
-import {ProjectModel, TagModel} from '@/shared/middleware/automation/configuration';
+import {Project, Tag} from '@/shared/middleware/automation/configuration';
 import {useUpdateProjectTagsMutation} from '@/shared/mutations/automation/projectTags.mutations';
 import {useDeleteProjectMutation, useDuplicateProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {useCreateProjectWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
@@ -40,8 +40,8 @@ import TagList from '../../../../components/TagList';
 import ProjectDialog from './ProjectDialog';
 
 interface ProjectItemProps {
-    project: ProjectModel;
-    remainingTags?: TagModel[];
+    project: Project;
+    remainingTags?: Tag[];
 }
 
 const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
@@ -113,7 +113,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
         if (event.target.files) {
             importProjectWorkflowMutation.mutate({
                 id: project.id!,
-                workflowModel: {
+                workflow: {
                     definition: await event.target.files[0].text(),
                 },
             });
@@ -165,7 +165,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                                         <TagList
                                             getRequest={(id, tags) => ({
                                                 id: id!,
-                                                updateTagsRequestModel: {
+                                                updateTagsRequest: {
                                                     tags: tags || [],
                                                 },
                                             })}

@@ -1,5 +1,5 @@
 import DataPill from '@/pages/platform/workflow-editor/components/DataPill';
-import {PropertyTypeModel} from '@/shared/middleware/platform/configuration';
+import {PropertyType} from '@/shared/middleware/platform/configuration';
 import {AccordionContent, AccordionTrigger} from '@radix-ui/react-accordion';
 import {ChevronDownIcon, FormInputIcon} from 'lucide-react';
 
@@ -30,7 +30,7 @@ const DataPillPanelBodyInputsItem = () => {
                                     componentIcon={''}
                                     property={{
                                         name: input.name,
-                                        type: input.type?.toUpperCase() as PropertyTypeModel,
+                                        type: input.type?.toUpperCase() as PropertyType,
                                     }}
                                     root={true}
                                     sampleOutput={undefined}

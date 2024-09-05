@@ -8,7 +8,7 @@ import useIntegrationInstanceConfigurationWorkflowSheetStore from '@/pages/embed
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import {EnvironmentModel, IntegrationInstanceConfigurationModel} from '@/shared/middleware/embedded/configuration';
+import {Environment, IntegrationInstanceConfiguration} from '@/shared/middleware/embedded/configuration';
 import {useGetIntegrationInstanceConfigurationTagsQuery} from '@/shared/queries/embedded/integrationInstanceConfigurationTags.queries';
 import {useGetIntegrationInstanceConfigurationsQuery} from '@/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useGetIntegrationsQuery} from '@/shared/queries/embedded/integrations.queries';
@@ -49,19 +49,19 @@ const IntegrationInstanceConfigurations = () => {
         error: integrationInstanceConfigurationsError,
         isLoading: integrationInstanceConfigurationsLoading,
     } = useGetIntegrationInstanceConfigurationsQuery({
-        environment: environment === 1 ? EnvironmentModel.Test : EnvironmentModel.Production,
+        environment: environment === 1 ? Environment.Test : Environment.Production,
         integrationId: searchParams.get('integrationId') ? parseInt(searchParams.get('integrationId')!) : undefined,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
 
-    const integrationInstanceConfigurationMap: Map<number, IntegrationInstanceConfigurationModel[]> = new Map<
+    const integrationInstanceConfigurationMap: Map<number, IntegrationInstanceConfiguration[]> = new Map<
         number,
-        IntegrationInstanceConfigurationModel[]
+        IntegrationInstanceConfiguration[]
     >();
 
     if (integrationInstanceConfigurations) {
         for (const integrationInstanceConfiguration of integrationInstanceConfigurations) {
-            let currentIntegrationInstanceConfigurations: IntegrationInstanceConfigurationModel[];
+            let currentIntegrationInstanceConfigurations: IntegrationInstanceConfiguration[];
 
             if (integrationInstanceConfiguration.integration) {
                 if (integrationInstanceConfigurationMap.has(integrationInstanceConfiguration.integrationId!)) {
@@ -130,9 +130,8 @@ const IntegrationInstanceConfigurations = () => {
                                 <IntegrationInstanceConfigurationDialog
                                     integrationInstanceConfiguration={
                                         {
-                                            environment:
-                                                environment === 1 ? EnvironmentModel.Test : EnvironmentModel.Production,
-                                        } as IntegrationInstanceConfigurationModel
+                                            environment: environment === 1 ? Environment.Test : Environment.Production,
+                                        } as IntegrationInstanceConfiguration
                                     }
                                     triggerNode={<Button>New Instance Configuration</Button>}
                                 />
@@ -300,9 +299,8 @@ const IntegrationInstanceConfigurations = () => {
                             <IntegrationInstanceConfigurationDialog
                                 integrationInstanceConfiguration={
                                     {
-                                        environment:
-                                            environment === 1 ? EnvironmentModel.Test : EnvironmentModel.Production,
-                                    } as IntegrationInstanceConfigurationModel
+                                        environment: environment === 1 ? Environment.Test : Environment.Production,
+                                    } as IntegrationInstanceConfiguration
                                 }
                                 triggerNode={<Button>Create Instance Configuration</Button>}
                             />

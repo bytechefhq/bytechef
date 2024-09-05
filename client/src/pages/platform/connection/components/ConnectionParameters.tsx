@@ -1,4 +1,4 @@
-import {ConnectionDefinitionModel} from '@/shared/middleware/platform/configuration';
+import {ConnectionDefinition} from '@/shared/middleware/platform/configuration';
 
 const ConnectionParameters = ({
     authorizationParameters,
@@ -7,7 +7,7 @@ const ConnectionParameters = ({
 }: {
     /* eslint-disable @typescript-eslint/no-explicit-any */
     authorizationParameters?: {[key: string]: any};
-    connectionDefinition: ConnectionDefinitionModel;
+    connectionDefinition: ConnectionDefinition;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     connectionParameters?: {[key: string]: any};
 }) => {

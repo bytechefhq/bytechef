@@ -21,8 +21,8 @@ import {
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useIntegrationInstanceConfigurationsEnabledStore} from '@/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationsEnabledStore';
-import {IntegrationInstanceConfigurationModel, TagModel} from '@/shared/middleware/embedded/configuration';
-import {ComponentDefinitionBasicModel} from '@/shared/middleware/platform/configuration';
+import {IntegrationInstanceConfiguration, Tag} from '@/shared/middleware/embedded/configuration';
+import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {
     useDeleteIntegrationInstanceConfigurationMutation,
     useEnableIntegrationInstanceConfigurationMutation,
@@ -40,9 +40,9 @@ import TagList from '../../../../components/TagList';
 import IntegrationInstanceConfigurationDialog from './IntegrationInstanceConfigurationDialog';
 
 interface IntegrationInstanceConfigurationListItemProps {
-    componentDefinition: ComponentDefinitionBasicModel;
-    integrationInstanceConfiguration: IntegrationInstanceConfigurationModel;
-    remainingTags?: TagModel[];
+    componentDefinition: ComponentDefinitionBasic;
+    integrationInstanceConfiguration: IntegrationInstanceConfiguration;
+    remainingTags?: Tag[];
 }
 
 const IntegrationInstanceConfigurationListItem = ({
@@ -166,7 +166,7 @@ const IntegrationInstanceConfigurationListItem = ({
                                         <TagList
                                             getRequest={(id, tags) => ({
                                                 id: id!,
-                                                updateTagsRequestModel: {
+                                                updateTagsRequest: {
                                                     tags: tags || [],
                                                 },
                                             })}

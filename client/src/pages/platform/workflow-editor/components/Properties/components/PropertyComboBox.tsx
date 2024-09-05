@@ -14,7 +14,7 @@ import {twMerge} from 'tailwind-merge';
 import useWorkflowNodeDetailsPanelStore from '../../../stores/useWorkflowNodeDetailsPanelStore';
 import InputTypeSwitchButton from './InputTypeSwitchButton';
 
-import type {OptionModel} from '@/shared/middleware/platform/configuration';
+import type {Option} from '@/shared/middleware/platform/configuration';
 
 type ComboBoxItemType = {
     description?: string;
@@ -37,7 +37,7 @@ interface PropertyComboBoxProps {
     name?: string;
     onBlur?: FocusEventHandler;
     onValueChange?: (value: string) => void;
-    options: Array<OptionModel>;
+    options: Array<Option>;
     path?: string;
     placeholder?: string;
     required?: boolean;

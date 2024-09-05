@@ -1,7 +1,7 @@
 import WorkspaceListItem from '@/pages/settings/automation/workspaces/components/WorkspaceListItem';
-import {WorkspaceModel} from '@/shared/middleware/automation/configuration';
+import {Workspace} from '@/shared/middleware/automation/configuration';
 
-const WorkspaceList = ({workspaces}: {workspaces: WorkspaceModel[]}) => {
+const WorkspaceList = ({workspaces}: {workspaces: Workspace[]}) => {
     return (
         <ul className="w-full divide-y divide-gray-100 px-2 2xl:mx-auto 2xl:w-4/5" role="list">
             {workspaces.map((workspace) => {

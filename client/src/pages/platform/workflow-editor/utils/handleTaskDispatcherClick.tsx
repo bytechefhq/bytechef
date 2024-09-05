@@ -1,7 +1,7 @@
-import {TaskDispatcherDefinitionApi, WorkflowModel} from '@/shared/middleware/platform/configuration';
+import {TaskDispatcherDefinitionApi, Workflow} from '@/shared/middleware/platform/configuration';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
-import {ClickedItemType, NodeType, PropertyType, UpdateWorkflowMutationType} from '@/shared/types';
+import {ClickedItemType, NodeType, PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
 import {getRandomId} from '@/shared/util/random-utils';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {QueryClient} from '@tanstack/react-query';
@@ -22,9 +22,9 @@ interface HandleTaskDispatcherClickProps {
     queryClient: QueryClient;
     setEdges: (edges: unknown) => Array<Edge>;
     setNodes: (nodes: unknown) => Array<Node>;
-    setWorkflow: (workflowDefinition: WorkflowModel & WorkflowTaskDataType) => void;
+    setWorkflow: (workflowDefinition: Workflow & WorkflowTaskDataType) => void;
     updateWorkflowMutation: UpdateWorkflowMutationType;
-    workflow: WorkflowModel & WorkflowTaskDataType;
+    workflow: Workflow & WorkflowTaskDataType;
 }
 
 export default async function handleTaskDispatcherClick({
@@ -117,7 +117,7 @@ export default async function handleTaskDispatcherClick({
                             {
                                 ...newWorkflowNodeData,
                                 parameters: getParametersWithDefaultValues({
-                                    properties: clickedTaskDispatcherDefinition?.properties as Array<PropertyType>,
+                                    properties: clickedTaskDispatcherDefinition?.properties as Array<PropertyAllType>,
                                 }),
                                 type: `${clickedTaskDispatcherDefinition.name}/v${clickedTaskDispatcherDefinition.version}`,
                             },

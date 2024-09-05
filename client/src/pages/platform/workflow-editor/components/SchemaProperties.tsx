@@ -1,4 +1,4 @@
-import {PropertyType} from '@/shared/types';
+import {PropertyAllType} from '@/shared/types';
 
 import PropertyField from './PropertyField';
 
@@ -6,7 +6,7 @@ interface SchemaPropertiesProps {
     copiedValue: string | null;
     copyToClipboard: (text: string) => Promise<void>;
     parentPath?: string;
-    properties: Array<PropertyType>;
+    properties: Array<PropertyAllType>;
     sampleOutput: object;
     workflowNodeName: string;
 }

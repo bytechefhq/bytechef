@@ -16,7 +16,7 @@ import {
     useCreateWorkspaceMutation,
     useUpdateWorkspaceMutation,
 } from '@/ee/shared/mutations/automation/workspaces.mutations';
-import {WorkspaceModel} from '@/shared/middleware/automation/configuration';
+import {Workspace} from '@/shared/middleware/automation/configuration';
 import {WorkspaceKeys} from '@/shared/queries/automation/workspaces.queries';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {zodResolver} from '@hookform/resolvers/zod';
@@ -31,7 +31,7 @@ const formSchema = z.object({
 });
 
 interface WorkspaceDialogProps {
-    workspace?: WorkspaceModel;
+    workspace?: Workspace;
     onClose?: () => void;
     triggerNode?: ReactNode;
 }

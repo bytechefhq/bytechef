@@ -2,13 +2,13 @@ import {Button} from '@/components/ui/button';
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import WorkflowInputsSheetDialog from '@/pages/platform/workflow-editor/components/WorkflowInputsSheetDialog';
 import WorkflowInputsSheetTable from '@/pages/platform/workflow-editor/components/WorkflowInputsSheetTable';
-import {WorkflowModel} from '@/shared/middleware/automation/configuration';
-import {WorkflowTestConfigurationModel} from '@/shared/middleware/platform/configuration';
+import {Workflow} from '@/shared/middleware/automation/configuration';
+import {WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
 
 interface WorkflowInputsSheetProps {
     onClose: () => void;
-    workflow: WorkflowModel;
-    workflowTestConfiguration?: WorkflowTestConfigurationModel;
+    workflow: Workflow;
+    workflowTestConfiguration?: WorkflowTestConfiguration;
 }
 
 const WorkflowInputsSheet = ({onClose, workflow, workflowTestConfiguration}: WorkflowInputsSheetProps) => (

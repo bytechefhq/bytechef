@@ -11,7 +11,7 @@ import {
 import {Button} from '@/components/ui/button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import SigningKeyDialog from '@/pages/settings/embedded/signing-keys/components/SigningKeyDialog';
-import {SigningKeyModel} from '@/shared/middleware/embedded/user';
+import {SigningKey} from '@/shared/middleware/embedded/user';
 import {useDeleteSigningKeyMutation} from '@/shared/mutations/embedded/signingKeys.mutations';
 import {SigningKeyKeys} from '@/shared/queries/embedded/signingKeys.queries';
 import {useQueryClient} from '@tanstack/react-query';
@@ -21,10 +21,10 @@ import {ClipboardIcon, EditIcon, Trash2Icon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-const columnHelper = createColumnHelper<SigningKeyModel>();
+const columnHelper = createColumnHelper<SigningKey>();
 
 interface SigningKeyTableProps {
-    signingKeys: SigningKeyModel[];
+    signingKeys: SigningKey[];
 }
 
 const SigningKeyDeleteDialog = ({apiKeyId, onClose}: {apiKeyId: number; onClose: () => void}) => {
@@ -69,7 +69,7 @@ const SigningKeyDeleteDialog = ({apiKeyId, onClose}: {apiKeyId: number; onClose:
 };
 
 const SigningKeyTable = ({signingKeys}: SigningKeyTableProps) => {
-    const [currentSigningKey, setCurrentSigningKey] = useState<SigningKeyModel>();
+    const [currentSigningKey, setCurrentSigningKey] = useState<SigningKey>();
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showEditDialog, setShowEditDialog] = useState(false);
 
@@ -145,7 +145,7 @@ const SigningKeyTable = ({signingKeys}: SigningKeyTableProps) => {
         [copyToClipboard]
     );
 
-    const reactTable = useReactTable<SigningKeyModel>({
+    const reactTable = useReactTable<SigningKey>({
         columns,
         data: signingKeys,
         getCoreRowModel: getCoreRowModel(),

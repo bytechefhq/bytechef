@@ -4,14 +4,14 @@ import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Textarea} from '@/components/ui/textarea';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/components/ui/use-toast';
-import {IntegrationModel} from '@/shared/middleware/embedded/configuration';
+import {Integration} from '@/shared/middleware/embedded/configuration';
 import {usePublishIntegrationMutation} from '@/shared/mutations/embedded/integrations.mutations';
 import {IntegrationKeys} from '@/shared/queries/embedded/integrations.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {CircleDotIcon} from 'lucide-react';
 import {useState} from 'react';
 
-const IntegrationPublishPopover = ({integration}: {integration: IntegrationModel}) => {
+const IntegrationPublishPopover = ({integration}: {integration: Integration}) => {
     const [open, setOpen] = useState(false);
     const [description, setDescription] = useState<string | undefined>(undefined);
 
@@ -61,7 +61,7 @@ const IntegrationPublishPopover = ({integration}: {integration: IntegrationModel
                         onClick={() =>
                             publishIntegrationMutation.mutate({
                                 id: integration.id!,
-                                publishIntegrationRequestModel: {
+                                publishIntegrationRequest: {
                                     description,
                                 },
                             })

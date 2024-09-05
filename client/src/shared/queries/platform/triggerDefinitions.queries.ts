@@ -4,7 +4,7 @@ import {
     GetComponentTriggerDefinitionRequest,
     TriggerDefinitionApi,
 } from '@/shared/middleware/platform/configuration/apis/TriggerDefinitionApi';
-import {TriggerDefinitionModel} from '@/shared/middleware/platform/configuration/models/TriggerDefinitionModel';
+import {TriggerDefinition} from '@/shared/middleware/platform/configuration/models/TriggerDefinition';
 import {useQuery} from '@tanstack/react-query';
 
 export const TriggerDefinitionKeys = {
@@ -17,7 +17,7 @@ export const TriggerDefinitionKeys = {
 };
 
 export const useGetTriggerDefinitionQuery = (request: GetComponentTriggerDefinitionRequest, enabled?: boolean) =>
-    useQuery<TriggerDefinitionModel, Error>({
+    useQuery<TriggerDefinition, Error>({
         queryKey: TriggerDefinitionKeys.triggerDefinition(request),
         queryFn: () => new TriggerDefinitionApi().getComponentTriggerDefinition(request),
         enabled: enabled === undefined ? true : enabled,

@@ -1,10 +1,10 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import ReadOnlyWorkflowEditor from '@/shared/components/ReadOnlyWorkflow';
-import {WorkflowExecutionModel} from '@/shared/middleware/embedded/workflow/execution';
+import {WorkflowExecution} from '@/shared/middleware/embedded/workflow/execution';
 import {useGetWorkflowQuery} from '@/shared/queries/embedded/workflows.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 
-const WorkflowExecutionWorkflowPanel = ({workflowExecution}: {workflowExecution: WorkflowExecutionModel}) => {
+const WorkflowExecutionWorkflowPanel = ({workflowExecution}: {workflowExecution: WorkflowExecution}) => {
     const {integration, integrationInstance, workflow} = workflowExecution;
 
     const {data: workflowDetails} = useGetWorkflowQuery(workflow!.id!, !!workflow?.id);

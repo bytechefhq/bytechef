@@ -1,6 +1,6 @@
 import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
-import {WorkflowModel} from '@/shared/middleware/automation/configuration';
+import {Workflow} from '@/shared/middleware/automation/configuration';
 import {EllipsisVerticalIcon} from 'lucide-react';
 
 interface IntegrationInstanceConfigurationWorkflowListItemDropDownMenuProps {
@@ -8,7 +8,7 @@ interface IntegrationInstanceConfigurationWorkflowListItemDropDownMenuProps {
     onEnableClick: () => void;
     integrationInstanceConfigurationEnabled: boolean;
     integrationInstanceConfigurationWorkflowEnabled: boolean;
-    workflow: WorkflowModel;
+    workflow: Workflow;
 }
 
 const IntegrationInstanceConfigurationWorkflowListItemDropDownMenuProps = ({

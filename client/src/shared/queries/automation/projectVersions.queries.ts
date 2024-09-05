@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys */
-import {ProjectApi, ProjectVersionModel} from '@/shared/middleware/automation/configuration';
+import {ProjectApi, ProjectVersion} from '@/shared/middleware/automation/configuration';
 import {useQuery} from '@tanstack/react-query';
 
 export const ProjectVersionKeys = {
@@ -9,7 +9,7 @@ export const ProjectVersionKeys = {
 };
 
 export const useGetProjectVersionsQuery = (projectId: number, enabled?: boolean) =>
-    useQuery<ProjectVersionModel[], Error>({
+    useQuery<ProjectVersion[], Error>({
         queryKey: ProjectVersionKeys.projectProjectVersions(projectId),
         queryFn: () => new ProjectApi().getProjectVersions({id: projectId}),
         enabled: enabled === undefined ? true : enabled,

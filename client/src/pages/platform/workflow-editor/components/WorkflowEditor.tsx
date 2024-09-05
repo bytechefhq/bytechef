@@ -1,11 +1,11 @@
 import defaultEdges from '@/shared/defaultEdges';
 import defaultNodes from '@/shared/defaultNodes';
 import {
-    ActionDefinitionBasicModel,
-    ComponentDefinitionBasicModel,
-    TaskDispatcherDefinitionBasicModel,
-    WorkflowTaskModel,
-    WorkflowTriggerModel,
+    ActionDefinitionBasic,
+    ComponentDefinitionBasic,
+    TaskDispatcherDefinitionBasic,
+    WorkflowTask,
+    WorkflowTrigger,
 } from '@/shared/middleware/platform/configuration';
 import {ComponentOperationType} from '@/shared/types';
 import {usePrevious} from '@uidotdev/usehooks';
@@ -26,8 +26,8 @@ import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 
 export interface WorkflowEditorProps {
-    componentDefinitions: ComponentDefinitionBasicModel[];
-    taskDispatcherDefinitions: TaskDispatcherDefinitionBasicModel[];
+    componentDefinitions: ComponentDefinitionBasic[];
+    taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
 }
 
 const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: WorkflowEditorProps) => {
@@ -35,8 +35,7 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
     const [nodeOperations] = useState<Array<ComponentOperationType>>([]);
     const [viewportWidth, setViewportWidth] = useState(0);
     const [workflowComponentWithAlias, setWorkflowComponentWithAlias] = useState<
-        | (ComponentDefinitionBasicModel & {actions?: Array<ActionDefinitionBasicModel>; workflowNodeName: string})
-        | undefined
+        (ComponentDefinitionBasic & {actions?: Array<ActionDefinitionBasic>; workflowNodeName: string}) | undefined
     >();
 
     const {workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
@@ -295,7 +294,7 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
             ],
         });
 
-        const workflowComponents: Array<WorkflowTriggerModel & WorkflowTaskModel> = [
+        const workflowComponents: Array<WorkflowTrigger & WorkflowTask> = [
             workflow.triggers?.[0] || defaultNodes[0].data,
             ...(workflow?.tasks || []),
         ];

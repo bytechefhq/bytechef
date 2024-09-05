@@ -1,7 +1,7 @@
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ActionDefinitionBasicModel, TriggerDefinitionBasicModel} from '@/shared/middleware/platform/configuration';
+import {ActionDefinitionBasic, TriggerDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {CheckIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {Item, ItemIndicator, ItemText} from '@radix-ui/react-select';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
@@ -10,7 +10,7 @@ import {twMerge} from 'tailwind-merge';
 interface CurrentOperationSelectProps {
     description?: string;
     handleValueChange: (value: string) => void;
-    operations: Array<ActionDefinitionBasicModel | TriggerDefinitionBasicModel>;
+    operations: Array<ActionDefinitionBasic | TriggerDefinitionBasic>;
     triggerSelect?: boolean;
     value: string;
 }

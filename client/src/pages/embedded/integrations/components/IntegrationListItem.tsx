@@ -23,7 +23,7 @@ import {useToast} from '@/components/ui/use-toast';
 import IntegrationDialog from '@/pages/embedded/integrations/components/IntegrationDialog';
 import IntegrationPublishDialog from '@/pages/embedded/integrations/components/IntegrationPublishDialog';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
-import {IntegrationModel, TagModel} from '@/shared/middleware/embedded/configuration';
+import {Integration, Tag} from '@/shared/middleware/embedded/configuration';
 import {
     useCreateIntegrationWorkflowMutation,
     useDeleteIntegrationMutation,
@@ -44,8 +44,8 @@ import {Link, useNavigate} from 'react-router-dom';
 import TagList from '../../../../components/TagList';
 
 interface IntegrationItemProps {
-    integration: IntegrationModel;
-    remainingTags?: TagModel[];
+    integration: Integration;
+    remainingTags?: Tag[];
 }
 
 const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps) => {
@@ -121,7 +121,7 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
         if (e.target.files) {
             importIntegrationWorkflowMutation.mutate({
                 id: integration.id!,
-                workflowModel: {
+                workflow: {
                     definition: await e.target.files[0].text(),
                 },
             });
@@ -184,7 +184,7 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                                         <TagList
                                             getRequest={(id, tags) => ({
                                                 id: id!,
-                                                updateTagsRequestModel: {
+                                                updateTagsRequest: {
                                                     tags: tags || [],
                                                 },
                                             })}

@@ -5,12 +5,8 @@ import {useToast} from '@/components/ui/use-toast';
 import ProjectInstanceEditWorkflowDialog from '@/pages/automation/project-instances/components/ProjectInstanceEditWorkflowDialog';
 import ProjectInstanceWorkflowListItemDropdownMenu from '@/pages/automation/project-instances/components/ProjectInstanceWorkflowListItemDropdownMenu';
 import useProjectInstanceWorkflowSheetStore from '@/pages/automation/project-instances/stores/useProjectInstanceWorkflowSheetStore';
-import {
-    ProjectInstanceApi,
-    ProjectInstanceWorkflowModel,
-    WorkflowModel,
-} from '@/shared/middleware/automation/configuration';
-import {ComponentDefinitionBasicModel} from '@/shared/middleware/platform/configuration';
+import {ProjectInstanceApi, ProjectInstanceWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
+import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useEnableProjectInstanceWorkflowMutation} from '@/shared/mutations/automation/projectInstanceWorkflows.mutations';
 import {ProjectInstanceKeys} from '@/shared/queries/automation/projectInstances.queries';
 import {Component1Icon} from '@radix-ui/react-icons';
@@ -35,13 +31,13 @@ const ProjectInstanceWorkflowListItem = ({
     filteredComponentNames?: string[];
     projectInstanceEnabled: boolean;
     projectInstanceId: number;
-    projectInstanceWorkflow: ProjectInstanceWorkflowModel;
-    workflow: WorkflowModel;
+    projectInstanceWorkflow: ProjectInstanceWorkflow;
+    workflow: Workflow;
     workflowComponentDefinitions: {
-        [key: string]: ComponentDefinitionBasicModel | undefined;
+        [key: string]: ComponentDefinitionBasic | undefined;
     };
     workflowTaskDispatcherDefinitions: {
-        [key: string]: ComponentDefinitionBasicModel | undefined;
+        [key: string]: ComponentDefinitionBasic | undefined;
     };
 }) => {
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);

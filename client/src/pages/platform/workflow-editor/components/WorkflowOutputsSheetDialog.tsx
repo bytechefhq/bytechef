@@ -4,10 +4,10 @@ import {Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger} from '@/
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
-import {WorkflowInputModel, WorkflowModel} from '@/shared/middleware/platform/configuration';
+import {Workflow, WorkflowInput} from '@/shared/middleware/platform/configuration';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useGetPreviousWorkflowNodeOutputsQuery} from '@/shared/queries/platform/workflowNodeOutputs.queries';
-import {PropertyType, WorkflowDefinitionType} from '@/shared/types';
+import {PropertyAllType, WorkflowDefinitionType} from '@/shared/types';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {ReactNode, useRef, useState} from 'react';
 import {useForm} from 'react-hook-form';
@@ -37,7 +37,7 @@ const WorkflowOutputsSheetDialog = ({
     onClose?: () => void;
     outputIndex?: number;
     triggerNode?: ReactNode;
-    workflow: WorkflowModel;
+    workflow: Workflow;
 }) => {
     const [isOpen, setIsOpen] = useState(!triggerNode);
     const [mentionInputValue, setMentionInputValue] = useState('');
@@ -88,7 +88,7 @@ const WorkflowOutputsSheetDialog = ({
     function saveWorkflowOutputs(output: z.infer<typeof formSchema>) {
         const workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow.definition!);
 
-        let outputs: WorkflowInputModel[] = workflowDefinition.outputs ?? [];
+        let outputs: WorkflowInput[] = workflowDefinition.outputs ?? [];
 
         if (outputIndex === -1) {
             outputs = [...(outputs || []), output];
@@ -99,7 +99,7 @@ const WorkflowOutputsSheetDialog = ({
         updateWorkflowMutation.mutate(
             {
                 id: workflow.id!,
-                workflowModel: {
+                workflow: {
                     definition: JSON.stringify(
                         {
                             ...workflowDefinition,
@@ -126,7 +126,7 @@ const WorkflowOutputsSheetDialog = ({
             return;
         }
 
-        const outputSchemaDefinition: PropertyType | undefined = workflowNodeOutputs?.[index]?.outputSchema;
+        const outputSchemaDefinition: PropertyAllType | undefined = workflowNodeOutputs?.[index]?.outputSchema;
 
         const properties = outputSchemaDefinition?.properties?.length
             ? outputSchemaDefinition.properties

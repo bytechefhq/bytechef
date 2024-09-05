@@ -3,8 +3,8 @@ import {useToast} from '@/components/ui/use-toast';
 import IntegrationInstanceConfigurationEditWorkflowDialog from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationEditWorkflowDialog';
 import IntegrationInstanceConfigurationWorkflowListItemDropDownMenuProps from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationWorkflowListItemDropDownMenu';
 import useIntegrationInstanceConfigurationWorkflowSheetStore from '@/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationWorkflowSheetStore';
-import {IntegrationInstanceConfigurationWorkflowModel, WorkflowModel} from '@/shared/middleware/embedded/configuration';
-import {ComponentDefinitionBasicModel} from '@/shared/middleware/platform/configuration';
+import {IntegrationInstanceConfigurationWorkflow, Workflow} from '@/shared/middleware/embedded/configuration';
+import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useEnableIntegrationInstanceConfigurationWorkflowMutation} from '@/shared/mutations/embedded/integrationInstanceConfigurations.mutations';
 import {IntegrationInstanceConfigurationKeys} from '@/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useQueryClient} from '@tanstack/react-query';
@@ -25,13 +25,13 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
     filteredComponentNames?: string[];
     integrationInstanceConfigurationEnabled: boolean;
     integrationInstanceConfigurationId: number;
-    integrationInstanceConfigurationWorkflow: IntegrationInstanceConfigurationWorkflowModel;
-    workflow: WorkflowModel;
+    integrationInstanceConfigurationWorkflow: IntegrationInstanceConfigurationWorkflow;
+    workflow: Workflow;
     workflowComponentDefinitions: {
-        [key: string]: ComponentDefinitionBasicModel | undefined;
+        [key: string]: ComponentDefinitionBasic | undefined;
     };
     workflowTaskDispatcherDefinitions: {
-        [key: string]: ComponentDefinitionBasicModel | undefined;
+        [key: string]: ComponentDefinitionBasic | undefined;
     };
 }) => {
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);

@@ -5,13 +5,13 @@ import getFormattedName from '@/pages/platform/workflow-editor/utils/getFormatte
 import {
     ActionDefinitionApi,
     ComponentDefinitionApi,
-    ComponentDefinitionBasicModel,
-    TaskDispatcherDefinitionModel,
+    ComponentDefinitionBasic,
+    TaskDispatcherDefinition,
 } from '@/shared/middleware/platform/configuration';
 import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
-import {ClickedItemType, NodeWithMetadataType, PropertyType} from '@/shared/types';
+import {ClickedItemType, NodeWithMetadataType, PropertyAllType} from '@/shared/types';
 import {getRandomId} from '@/shared/util/random-utils';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
@@ -25,15 +25,15 @@ import handleTaskDispatcherClick from '../utils/handleTaskDispatcherClick';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 
 interface WorkflowNodesListProps {
-    actionComponentDefinitions: Array<ComponentDefinitionBasicModel>;
+    actionComponentDefinitions: Array<ComponentDefinitionBasic>;
     condition?: boolean;
     edge?: boolean;
     hideActionComponents?: boolean;
     hideTriggerComponents?: boolean;
     hideTaskDispatchers?: boolean;
     id: string;
-    taskDispatcherDefinitions: Array<TaskDispatcherDefinitionModel>;
-    triggerComponentDefinitions: Array<ComponentDefinitionBasicModel>;
+    taskDispatcherDefinitions: Array<TaskDispatcherDefinition>;
+    triggerComponentDefinitions: Array<ComponentDefinitionBasic>;
 }
 
 const WorkflowNodesPopoverMenuList = memo(
@@ -279,7 +279,7 @@ const WorkflowNodesPopoverMenuList = memo(
                         {
                             ...newWorkflowNode.data,
                             parameters: getParametersWithDefaultValues({
-                                properties: clickedComponentActionDefinition?.properties as Array<PropertyType>,
+                                properties: clickedComponentActionDefinition?.properties as Array<PropertyAllType>,
                             }),
                             type: `${name}/v${version}/${actions?.[0].name}`,
                         },
@@ -364,7 +364,7 @@ const WorkflowNodesPopoverMenuList = memo(
                                         ...newWorkflowNodeData,
                                         parameters: getParametersWithDefaultValues({
                                             properties:
-                                                clickedComponentActionDefinition?.properties as Array<PropertyType>,
+                                                clickedComponentActionDefinition?.properties as Array<PropertyAllType>,
                                         }),
                                         type: `${clickedComponentDefinition.name}/v${clickedComponentDefinition.version}/${clickedComponentDefinition.actions?.[0].name}`,
                                     },

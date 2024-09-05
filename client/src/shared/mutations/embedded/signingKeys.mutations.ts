@@ -1,16 +1,16 @@
-import {type CreateSigningKey200ResponseModel, SigningKeyApi, SigningKeyModel} from '@/shared/middleware/embedded/user';
+import {type CreateSigningKey200Response, SigningKey, SigningKeyApi} from '@/shared/middleware/embedded/user';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateSigningKeyMutationProps {
-    onError?: (error: Error, variables: SigningKeyModel) => void;
-    onSuccess?: (result: CreateSigningKey200ResponseModel, variables: SigningKeyModel) => void;
+    onError?: (error: Error, variables: SigningKey) => void;
+    onSuccess?: (result: CreateSigningKey200Response, variables: SigningKey) => void;
 }
 
 export const useCreateSigningKeyMutation = (mutationProps?: CreateSigningKeyMutationProps) =>
-    useMutation<CreateSigningKey200ResponseModel, Error, SigningKeyModel>({
-        mutationFn: (signingKeyModel: SigningKeyModel) => {
+    useMutation<CreateSigningKey200Response, Error, SigningKey>({
+        mutationFn: (signingKey: SigningKey) => {
             return new SigningKeyApi().createSigningKey({
-                signingKeyModel,
+                signingKey,
             });
         },
         onError: mutationProps?.onError,
@@ -34,16 +34,16 @@ export const useDeleteSigningKeyMutation = (mutationProps?: DeleteSigningKeyMuta
     });
 
 interface UpdateSigningKeyMutationProps {
-    onError?: (error: Error, variables: SigningKeyModel) => void;
-    onSuccess?: (result: SigningKeyModel, variables: SigningKeyModel) => void;
+    onError?: (error: Error, variables: SigningKey) => void;
+    onSuccess?: (result: SigningKey, variables: SigningKey) => void;
 }
 
 export const useUpdateSigningKeyMutation = (mutationProps?: UpdateSigningKeyMutationProps) =>
-    useMutation<SigningKeyModel, Error, SigningKeyModel>({
-        mutationFn: (signingKeyModel: SigningKeyModel) => {
+    useMutation<SigningKey, Error, SigningKey>({
+        mutationFn: (signingKey: SigningKey) => {
             return new SigningKeyApi().updateSigningKey({
-                id: signingKeyModel.id!,
-                signingKeyModel,
+                id: signingKey.id!,
+                signingKey,
             });
         },
         onError: mutationProps?.onError,

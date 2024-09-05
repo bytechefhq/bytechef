@@ -3,8 +3,8 @@ import WorkflowExecutionBadge from '@/pages/platform/workflow-executions/compone
 import WorkflowExecutionContent from '@/pages/platform/workflow-executions/components/WorkflowExecutionContent';
 import WorkflowTaskExecutionItem from '@/pages/platform/workflow-executions/components/WorkflowTaskExecutionItem';
 import WorkflowTriggerExecutionItem from '@/pages/platform/workflow-executions/components/WorkflowTriggerExecutionItem';
-import {JobModel, TaskExecutionModel, TriggerExecutionModel} from '@/shared/middleware/platform/workflow/execution';
-import {WorkflowTestExecutionModel} from '@/shared/middleware/platform/workflow/test';
+import {Job, TaskExecution, TriggerExecution} from '@/shared/middleware/platform/workflow/execution';
+import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
 import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {RefreshCwIcon, RefreshCwOffIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
@@ -14,8 +14,8 @@ const WorkflowExecutionsTestOutputHeader = ({
     job,
     triggerExecution,
 }: {
-    job: JobModel;
-    triggerExecution?: TriggerExecutionModel;
+    job: Job;
+    triggerExecution?: TriggerExecution;
 }) => {
     const startTime = job?.startDate?.getTime();
     const endTime = job?.endDate?.getTime();
@@ -70,26 +70,26 @@ const WorkflowExecutionsTestOutput = ({
 }: {
     resizablePanelSize?: number;
     workflowIsRunning: boolean;
-    workflowTestExecution?: WorkflowTestExecutionModel;
+    workflowTestExecution?: WorkflowTestExecution;
     onCloseClick?: () => void;
 }) => {
-    const [content, setContent] = useState<TaskExecutionModel | TriggerExecutionModel | undefined>(
+    const [content, setContent] = useState<TaskExecution | TriggerExecution | undefined>(
         workflowTestExecution?.triggerExecution
-            ? (workflowTestExecution.triggerExecution as TriggerExecutionModel)
+            ? (workflowTestExecution.triggerExecution as TriggerExecution)
             : workflowTestExecution?.job?.taskExecutions
-              ? (workflowTestExecution.job?.taskExecutions[0] as TaskExecutionModel)
+              ? (workflowTestExecution.job?.taskExecutions[0] as TaskExecution)
               : undefined
     );
 
-    const job = workflowTestExecution?.job as JobModel;
-    const triggerExecution = workflowTestExecution?.triggerExecution as TriggerExecutionModel;
+    const job = workflowTestExecution?.job as Job;
+    const triggerExecution = workflowTestExecution?.triggerExecution as TriggerExecution;
 
     useEffect(() => {
         setContent(
             workflowTestExecution?.triggerExecution
-                ? (workflowTestExecution.triggerExecution as TriggerExecutionModel)
+                ? (workflowTestExecution.triggerExecution as TriggerExecution)
                 : workflowTestExecution?.job?.taskExecutions
-                  ? (workflowTestExecution.job?.taskExecutions[0] as TaskExecutionModel)
+                  ? (workflowTestExecution.job?.taskExecutions[0] as TaskExecution)
                   : undefined
         );
     }, [workflowTestExecution]);

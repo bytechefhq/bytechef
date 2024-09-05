@@ -2,11 +2,11 @@ import {Button} from '@/components/ui/button';
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import WorkflowOutputsSheetDialog from '@/pages/platform/workflow-editor/components/WorkflowOutputsSheetDialog';
 import WorkflowOutputsSheetTable from '@/pages/platform/workflow-editor/components/WorkflowOutputsSheetTable';
-import {WorkflowModel} from '@/shared/middleware/platform/configuration';
+import {Workflow} from '@/shared/middleware/platform/configuration';
 
 interface WorkflowOutputsSheetProps {
     onClose: () => void;
-    workflow: WorkflowModel;
+    workflow: Workflow;
 }
 
 const WorkflowOutputsSheet = ({onClose, workflow}: WorkflowOutputsSheetProps) => (

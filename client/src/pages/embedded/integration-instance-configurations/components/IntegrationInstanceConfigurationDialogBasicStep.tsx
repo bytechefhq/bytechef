@@ -6,20 +6,20 @@ import IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect 
 import IntegrationInstanceConfigurationDialogBasicStepIntegrationsComboBox from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationDialogBasicStepIntegrationsComboBox';
 import IntegrationInstanceConfigurationDialogBasicStepTagsSelect from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationDialogBasicStepTagsSelect';
 import {useWorkflowsEnabledStore} from '@/pages/embedded/integration-instance-configurations/stores/useWorkflowsEnabledStore';
-import {IntegrationInstanceConfigurationModel} from '@/shared/middleware/embedded/configuration';
+import {IntegrationInstanceConfiguration} from '@/shared/middleware/embedded/configuration';
 import {Dispatch, SetStateAction} from 'react';
 import {Control, UseFormGetValues, UseFormSetValue} from 'react-hook-form';
 import {useShallow} from 'zustand/react/shallow';
 
 interface IntegrationInstanceConfigurationDialogBasicStepProps {
-    control: Control<IntegrationInstanceConfigurationModel>;
+    control: Control<IntegrationInstanceConfiguration>;
     curIntegrationId?: number;
     curIntegrationVersion?: number;
-    getValues: UseFormGetValues<IntegrationInstanceConfigurationModel>;
-    integrationInstanceConfiguration: IntegrationInstanceConfigurationModel | undefined;
+    getValues: UseFormGetValues<IntegrationInstanceConfiguration>;
+    integrationInstanceConfiguration: IntegrationInstanceConfiguration | undefined;
     setCurIntegrationId: Dispatch<SetStateAction<number | undefined>>;
     setCurIntegrationVersion: Dispatch<SetStateAction<number | undefined>>;
-    setValue: UseFormSetValue<IntegrationInstanceConfigurationModel>;
+    setValue: UseFormSetValue<IntegrationInstanceConfiguration>;
 }
 
 const IntegrationInstanceConfigurationDialogBasicStep = ({

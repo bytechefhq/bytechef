@@ -1,9 +1,9 @@
 import {
     GetWorkflowExecutionRequest,
     GetWorkflowExecutionsPageRequest,
-    PageModel,
+    Page,
+    WorkflowExecution,
     WorkflowExecutionApi,
-    WorkflowExecutionModel,
 } from '@/shared/middleware/automation/workflow/execution';
 
 /* eslint-disable sort-keys */
@@ -19,13 +19,13 @@ export const WorkflowExecutionKeys = {
 };
 
 export const useGetWorkflowExecutionsQuery = (request: GetWorkflowExecutionsPageRequest) =>
-    useQuery<PageModel, Error>({
+    useQuery<Page, Error>({
         queryKey: WorkflowExecutionKeys.filteredWorkflowExecutions(request),
         queryFn: () => new WorkflowExecutionApi().getWorkflowExecutionsPage(request),
     });
 
 export const useGetWorkflowExecutionQuery = (request: GetWorkflowExecutionRequest, enabled?: boolean) =>
-    useQuery<WorkflowExecutionModel, Error>({
+    useQuery<WorkflowExecution, Error>({
         queryKey: WorkflowExecutionKeys.workflowExecution(request.id),
         queryFn: () => new WorkflowExecutionApi().getWorkflowExecution(request),
         enabled: enabled === undefined ? true : enabled,

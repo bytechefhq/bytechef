@@ -1,4 +1,4 @@
-import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/shared/middleware/platform/configuration';
+import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {HTMLAttributes, MouseEvent} from 'react';
 import InlineSVG from 'react-inlinesvg';
@@ -9,7 +9,7 @@ interface DragEventI<T = Element> extends MouseEvent<T, DragEventInit> {
 
 interface WorkflowNodesTabsItemProps extends HTMLAttributes<HTMLLIElement> {
     handleClick?: () => void;
-    node: (ComponentDefinitionBasicModel | TaskDispatcherDefinitionModel) & {taskDispatcher: boolean; trigger: boolean};
+    node: (ComponentDefinitionBasic | TaskDispatcherDefinition) & {taskDispatcher: boolean; trigger: boolean};
 }
 
 const WorkflowNodesTabsItem = ({draggable, handleClick, node}: WorkflowNodesTabsItemProps) => {

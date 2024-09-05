@@ -18,8 +18,8 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import deleteProperty from '@/pages/platform/workflow-editor/utils/deleteProperty';
 import getInputHTMLType from '@/pages/platform/workflow-editor/utils/getInputHTMLType';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
-import {OptionModel} from '@/shared/middleware/platform/configuration';
-import {PropertyType} from '@/shared/types';
+import {Option} from '@/shared/middleware/platform/configuration';
+import {PropertyAllType} from '@/shared/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {usePrevious} from '@uidotdev/usehooks';
@@ -65,7 +65,7 @@ interface PropertyProps {
     /* eslint-disable @typescript-eslint/no-explicit-any */
     parameterValue?: any;
     path?: string;
-    property: PropertyType;
+    property: PropertyAllType;
 }
 
 const Property = ({
@@ -1062,7 +1062,7 @@ const Property = ({
                             lookupDependsOnValues={lookupDependsOnValues}
                             name={name}
                             onValueChange={(value: string) => handleSelectChange(value, name!)}
-                            options={(formattedOptions as Array<OptionModel>) || undefined || []}
+                            options={(formattedOptions as Array<Option>) || undefined || []}
                             path={path}
                             required={required}
                             showInputTypeSwitchButton={showInputTypeSwitchButton}

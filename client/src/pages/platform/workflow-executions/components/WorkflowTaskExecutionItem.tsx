@@ -1,5 +1,5 @@
 import WorkflowExecutionBadge from '@/pages/platform/workflow-executions/components/WorkflowExecutionBadge';
-import {TaskExecutionModel} from '@/shared/middleware/platform/workflow/execution';
+import {TaskExecution} from '@/shared/middleware/platform/workflow/execution';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
@@ -9,7 +9,7 @@ const WorkflowTaskExecutionItem = ({
     taskExecution,
 }: {
     selected?: boolean;
-    taskExecution: TaskExecutionModel;
+    taskExecution: TaskExecution;
     onClick?: () => void;
 }) => {
     const {component, endDate, startDate, workflowTask} = taskExecution;

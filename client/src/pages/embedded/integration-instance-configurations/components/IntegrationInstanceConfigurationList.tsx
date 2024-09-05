@@ -1,11 +1,7 @@
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import {useIntegrationInstanceConfigurationsEnabledStore} from '@/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationsEnabledStore';
-import {
-    IntegrationInstanceConfigurationModel,
-    IntegrationModel,
-    TagModel,
-} from '@/shared/middleware/embedded/configuration';
-import {ComponentDefinitionBasicModel} from '@/shared/middleware/platform/configuration';
+import {Integration, IntegrationInstanceConfiguration, Tag} from '@/shared/middleware/embedded/configuration';
+import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 
 import IntegrationInstanceConfigurationListItem from './IntegrationInstanceConfigurationListItem';
 import IntegrationInstanceConfigurationWorkflowList from './IntegrationInstanceConfigurationWorkflowList';
@@ -16,10 +12,10 @@ const IntegrationInstanceConfigurationList = ({
     integrationInstanceConfigurations,
     tags,
 }: {
-    componentDefinitions: ComponentDefinitionBasicModel[];
-    integration: IntegrationModel;
-    integrationInstanceConfigurations: IntegrationInstanceConfigurationModel[];
-    tags: TagModel[];
+    componentDefinitions: ComponentDefinitionBasic[];
+    integration: Integration;
+    integrationInstanceConfigurations: IntegrationInstanceConfiguration[];
+    tags: Tag[];
 }) => {
     const integrationInstanceConfigurationMap = useIntegrationInstanceConfigurationsEnabledStore(
         ({integrationInstanceConfigurationMap}) => integrationInstanceConfigurationMap

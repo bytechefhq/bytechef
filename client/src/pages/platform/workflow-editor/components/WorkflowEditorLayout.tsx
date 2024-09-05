@@ -6,10 +6,7 @@ import 'reactflow/dist/base.css';
 
 import './WorkflowEditorLayout.css';
 
-import {
-    ComponentDefinitionBasicModel,
-    TaskDispatcherDefinitionBasicModel,
-} from '@/shared/middleware/platform/configuration';
+import {ComponentDefinitionBasic, TaskDispatcherDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useGetPreviousWorkflowNodeOutputsQuery} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {useGetWorkflowNodeParameterDisplayConditionsQuery} from '@/shared/queries/platform/workflowNodeParameters.queries';
 import {UpdateWorkflowMutationType} from '@/shared/types';
@@ -21,8 +18,8 @@ import DataPillPanel from './DataPillPanel';
 import WorkflowEditor from './WorkflowEditor';
 
 export interface WorkflowEditorLayoutProps {
-    componentDefinitions: ComponentDefinitionBasicModel[];
-    taskDispatcherDefinitions: TaskDispatcherDefinitionBasicModel[];
+    componentDefinitions: ComponentDefinitionBasic[];
+    taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
     updateWorkflowMutation: UpdateWorkflowMutationType;
 }
 

@@ -47,7 +47,7 @@ const IntegrationHeaderIntegrationDropDownMenu = ({
         if (e.target.files) {
             importIntegrationWorkflowMutation.mutate({
                 id: integrationId,
-                workflowModel: {
+                workflow: {
                     definition: await e.target.files[0].text(),
                 },
             });

@@ -1,13 +1,13 @@
 import ProjectInstanceDialogWorkflowsStepItem from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItem';
-import {ProjectInstanceModel, WorkflowModel} from '@/shared/middleware/automation/configuration';
+import {ProjectInstance, Workflow} from '@/shared/middleware/automation/configuration';
 import {Control, UseFormSetValue} from 'react-hook-form';
 import {FormState} from 'react-hook-form/dist/types/form';
 
 export interface ProjectInstanceDialogWorkflowsStepProps {
-    control: Control<ProjectInstanceModel>;
-    formState: FormState<ProjectInstanceModel>;
-    setValue: UseFormSetValue<ProjectInstanceModel>;
-    workflows: WorkflowModel[];
+    control: Control<ProjectInstance>;
+    formState: FormState<ProjectInstance>;
+    setValue: UseFormSetValue<ProjectInstance>;
+    workflows: Workflow[];
 }
 
 const ProjectInstanceDialogWorkflowsStep = ({

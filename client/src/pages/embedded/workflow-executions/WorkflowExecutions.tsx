@@ -8,11 +8,11 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {EnvironmentModel} from '@/shared/middleware/automation/configuration';
-import {IntegrationModel} from '@/shared/middleware/embedded/configuration';
+import {Environment} from '@/shared/middleware/automation/configuration';
+import {Integration} from '@/shared/middleware/embedded/configuration';
 import {
     GetWorkflowExecutionsPageJobStatusEnum,
-    WorkflowExecutionModelFromJSON,
+    WorkflowExecutionFromJSON,
 } from '@/shared/middleware/embedded/workflow/execution';
 import {
     useGetIntegrationInstanceConfigurationQuery,
@@ -51,7 +51,7 @@ const jobStatusOptions = [
     },
 ];
 
-const IntegrationLabel = ({integration}: {integration: IntegrationModel}) => (
+const IntegrationLabel = ({integration}: {integration: Integration}) => (
     <div className="flex items-center">
         <span className="mr-1 ">{integration.componentName}</span>
 
@@ -105,7 +105,7 @@ export const WorkflowExecutions = () => {
         error: workflowExecutionsError,
         isLoading: workflowExecutionsIsLoading,
     } = useGetWorkflowExecutionsQuery({
-        environment: filterEnvironment as EnvironmentModel,
+        environment: filterEnvironment as Environment,
         integrationId: filterIntegrationId,
         integrationInstanceConfigurationId: filterIntegrationInstanceConfigurationId,
         jobEndDate: filterEndDate,
@@ -133,8 +133,8 @@ export const WorkflowExecutions = () => {
             ? "You don't have any executed workflows yet."
             : 'There is no executed workflows for the current criteria.';
 
-    const workflowExecutions = workflowExecutionPage?.content?.map((workflowExecutionModel: object) =>
-        WorkflowExecutionModelFromJSON(workflowExecutionModel)
+    const workflowExecutions = workflowExecutionPage?.content?.map((workflowExecution: object) =>
+        WorkflowExecutionFromJSON(workflowExecution)
     );
 
     function filter(
@@ -382,9 +382,8 @@ export const WorkflowExecutions = () => {
                                               <span className="flex items-center">
                                                   <span className="mr-1 ">
                                                       {
-                                                          (
-                                                              integrationInstanceConfiguration.integration as IntegrationModel
-                                                          )?.componentName
+                                                          (integrationInstanceConfiguration.integration as Integration)
+                                                              ?.componentName
                                                       }
                                                   </span>
 

@@ -1,13 +1,13 @@
 import IntegrationInstanceConfigurationDialogWorkflowsStepItem from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationDialogWorkflowsStepItem';
-import {IntegrationInstanceConfigurationModel, WorkflowModel} from '@/shared/middleware/embedded/configuration';
+import {IntegrationInstanceConfiguration, Workflow} from '@/shared/middleware/embedded/configuration';
 import {Control, UseFormSetValue} from 'react-hook-form';
 import {FormState} from 'react-hook-form/dist/types/form';
 
 export interface IntegrationInstanceConfigurationDialogWorkflowsStepProps {
-    control: Control<IntegrationInstanceConfigurationModel>;
-    formState: FormState<IntegrationInstanceConfigurationModel>;
-    setValue: UseFormSetValue<IntegrationInstanceConfigurationModel>;
-    workflows: WorkflowModel[];
+    control: Control<IntegrationInstanceConfiguration>;
+    formState: FormState<IntegrationInstanceConfiguration>;
+    setValue: UseFormSetValue<IntegrationInstanceConfiguration>;
+    workflows: Workflow[];
 }
 
 const IntegrationInstanceConfigurationDialogWorkflowsStep = ({

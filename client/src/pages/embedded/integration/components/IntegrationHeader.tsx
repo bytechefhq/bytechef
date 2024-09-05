@@ -14,7 +14,7 @@ import IntegrationDialog from '@/pages/embedded/integrations/components/Integrat
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
-import {IntegrationModel, WorkflowModel} from '@/shared/middleware/embedded/configuration';
+import {Integration, Workflow} from '@/shared/middleware/embedded/configuration';
 import {WorkflowTestApi} from '@/shared/middleware/platform/workflow/test';
 import {
     useCreateIntegrationWorkflowMutation,
@@ -68,7 +68,7 @@ const IntegrationHeader = ({
 
     const {data: integration} = useGetIntegrationQuery(
         integrationId,
-        useLoaderData() as IntegrationModel,
+        useLoaderData() as Integration,
         !showDeleteIntegrationAlertDialog
     );
 
@@ -111,13 +111,13 @@ const IntegrationHeader = ({
 
             navigate('/embedded/integrations');
             navigate(
-                `/embedded/integrations/${integrationId}/integration-workflows/${integration?.integrationWorkflowIds?.filter((integrationWorkflowId) => integrationWorkflowId !== (workflow as WorkflowModel).integrationWorkflowId)[0]}`
+                `/embedded/integrations/${integrationId}/integration-workflows/${integration?.integrationWorkflowIds?.filter((integrationWorkflowId) => integrationWorkflowId !== (workflow as Workflow).integrationWorkflowId)[0]}`
             );
 
             queryClient.removeQueries({
                 queryKey: IntegrationWorkflowKeys.integrationWorkflow(
                     integrationId,
-                    (workflow as WorkflowModel).integrationWorkflowId!
+                    (workflow as Workflow).integrationWorkflowId!
                 ),
             });
             queryClient.removeQueries({queryKey: WorkflowKeys.workflow(workflow.id!)});

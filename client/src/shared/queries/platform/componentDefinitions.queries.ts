@@ -1,8 +1,8 @@
 /* eslint-disable sort-keys */
 import {
+    ComponentDefinition,
     ComponentDefinitionApi,
-    ComponentDefinitionBasicModel,
-    ComponentDefinitionModel,
+    ComponentDefinitionBasic,
     GetComponentDefinitionRequest,
     GetComponentDefinitionsRequest,
     GetDataStreamComponentDefinitionsRequest,
@@ -27,14 +27,14 @@ export const ComponentDefinitionKeys = {
 };
 
 export const useGetComponentDefinitionQuery = (request: GetComponentDefinitionRequest, enabled?: boolean) =>
-    useQuery<ComponentDefinitionModel, Error>({
+    useQuery<ComponentDefinition, Error>({
         queryKey: ComponentDefinitionKeys.componentDefinition(request),
         queryFn: () => new ComponentDefinitionApi().getComponentDefinition(request),
         enabled: enabled === undefined ? true : enabled,
     });
 
 export const useGetComponentDefinitionsQuery = (request?: GetComponentDefinitionsRequest, enabled?: boolean) =>
-    useQuery<ComponentDefinitionBasicModel[], Error>({
+    useQuery<ComponentDefinitionBasic[], Error>({
         queryKey: ComponentDefinitionKeys.filteredComponentDefinitions(request),
         queryFn: () => new ComponentDefinitionApi().getComponentDefinitions(request),
         enabled: enabled === undefined ? true : enabled,
@@ -44,7 +44,7 @@ export const useGetDataStreamComponentDefinitions = (
     request: GetDataStreamComponentDefinitionsRequest,
     enabled?: boolean
 ) =>
-    useQuery<ComponentDefinitionBasicModel[], Error>({
+    useQuery<ComponentDefinitionBasic[], Error>({
         queryKey: ComponentDefinitionKeys.filteredDataStreamComponentDefinitions(request),
         queryFn: () => new ComponentDefinitionApi().getDataStreamComponentDefinitions(request),
         enabled: enabled === undefined ? true : enabled,

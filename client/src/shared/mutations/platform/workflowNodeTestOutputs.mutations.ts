@@ -2,8 +2,8 @@ import {
     DeleteWorkflowNodeTestOutputRequest,
     SaveWorkflowNodeTestOutputRequest,
     UploadWorkflowNodeSampleOutputRequest,
+    WorkflowNodeTestOutput,
     WorkflowNodeTestOutputApi,
-    WorkflowNodeTestOutputModel,
 } from '@/shared/middleware/platform/configuration';
 import {useMutation} from '@tanstack/react-query';
 
@@ -22,7 +22,7 @@ export const useDeleteWorkflowNodeTestOutputMutation = (mutationProps?: DeleteWo
     });
 
 interface SaveWorkflowNodeTestOutputProps {
-    onSuccess?: (result: WorkflowNodeTestOutputModel, variables: SaveWorkflowNodeTestOutputRequest) => void;
+    onSuccess?: (result: WorkflowNodeTestOutput, variables: SaveWorkflowNodeTestOutputRequest) => void;
     onError?: (error: Error, variables: SaveWorkflowNodeTestOutputRequest) => void;
 }
 
@@ -36,7 +36,7 @@ export const useSaveWorkflowNodeTestOutputMutation = (mutationProps?: SaveWorkfl
     });
 
 interface UploadSampleOutputRequestProps {
-    onSuccess?: (result: WorkflowNodeTestOutputModel, variables: UploadWorkflowNodeSampleOutputRequest) => void;
+    onSuccess?: (result: WorkflowNodeTestOutput, variables: UploadWorkflowNodeSampleOutputRequest) => void;
     onError?: (error: Error, variables: UploadWorkflowNodeSampleOutputRequest) => void;
 }
 

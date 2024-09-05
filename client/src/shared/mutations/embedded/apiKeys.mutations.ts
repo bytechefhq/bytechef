@@ -1,16 +1,16 @@
-import {ApiKeyApi, ApiKeyModel, type CreateApiKey200ResponseModel} from '@/shared/middleware/embedded/user';
+import {ApiKey, ApiKeyApi, type CreateApiKey200Response} from '@/shared/middleware/embedded/user';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateApiKeyMutationProps {
-    onError?: (error: Error, variables: ApiKeyModel) => void;
-    onSuccess?: (result: CreateApiKey200ResponseModel, variables: ApiKeyModel) => void;
+    onError?: (error: Error, variables: ApiKey) => void;
+    onSuccess?: (result: CreateApiKey200Response, variables: ApiKey) => void;
 }
 
 export const useCreateApiKeyMutation = (mutationProps?: CreateApiKeyMutationProps) =>
-    useMutation<CreateApiKey200ResponseModel, Error, ApiKeyModel>({
-        mutationFn: (apiKeyModel: ApiKeyModel) => {
+    useMutation<CreateApiKey200Response, Error, ApiKey>({
+        mutationFn: (apiKey: ApiKey) => {
             return new ApiKeyApi().createApiKey({
-                apiKeyModel,
+                apiKey,
             });
         },
         onError: mutationProps?.onError,
@@ -34,16 +34,16 @@ export const useDeleteApiKeyMutation = (mutationProps?: DeleteApiKeyMutationProp
     });
 
 interface UpdateApiKeyMutationProps {
-    onError?: (error: Error, variables: ApiKeyModel) => void;
-    onSuccess?: (result: ApiKeyModel, variables: ApiKeyModel) => void;
+    onError?: (error: Error, variables: ApiKey) => void;
+    onSuccess?: (result: ApiKey, variables: ApiKey) => void;
 }
 
 export const useUpdateApiKeyMutation = (mutationProps?: UpdateApiKeyMutationProps) =>
-    useMutation<ApiKeyModel, Error, ApiKeyModel>({
-        mutationFn: (apiKeyModel: ApiKeyModel) => {
+    useMutation<ApiKey, Error, ApiKey>({
+        mutationFn: (apiKey: ApiKey) => {
             return new ApiKeyApi().updateApiKey({
-                apiKeyModel,
-                id: apiKeyModel.id!,
+                apiKey,
+                id: apiKey.id!,
             });
         },
         onError: mutationProps?.onError,

@@ -13,9 +13,9 @@ import ConnectedUserTable from '@/pages/embedded/connected-users/components/Conn
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {EnvironmentModel} from '@/shared/middleware/automation/configuration';
-import {IntegrationModel} from '@/shared/middleware/embedded/configuration';
-import {ConnectedUserModelFromJSON, type CredentialStatusModel} from '@/shared/middleware/embedded/connected-user';
+import {Environment} from '@/shared/middleware/automation/configuration';
+import {Integration} from '@/shared/middleware/embedded/configuration';
+import {ConnectedUserFromJSON, type CredentialStatus} from '@/shared/middleware/embedded/connected-user';
 import {useGetConnectedUsersQuery} from '@/shared/queries/embedded/connectedUsers.queries';
 import {useGetIntegrationsQuery} from '@/shared/queries/embedded/integrations.queries';
 import {cn} from '@/shared/util/cn-utils';
@@ -90,7 +90,7 @@ export function DatePickerWithRange({
     );
 }
 
-const IntegrationLabel = ({integration}: {integration: IntegrationModel}) => (
+const IntegrationLabel = ({integration}: {integration: Integration}) => (
     <div className="flex items-center">
         <span className="mr-1 ">{integration.componentName}</span>
 
@@ -116,7 +116,7 @@ const ConnectedUsers = () => {
                 to: searchParams.get('createDateTo') ? new Date(+searchParams.get('createDateTo')!) : new Date(),
             },
             credentialStatus: searchParams.get('credentialStatus')
-                ? (searchParams.get('credentialStatus')! as CredentialStatusModel)
+                ? (searchParams.get('credentialStatus')! as CredentialStatus)
                 : undefined,
             integrationId: searchParams.get('integrationId') ? +searchParams.get('integrationId')! : undefined,
             search: searchParams.get('search') ? searchParams.get('search')! : '',
@@ -132,18 +132,16 @@ const ConnectedUsers = () => {
         createDateFrom: searchParams.get('createDateFrom') ? new Date(+searchParams.get('createDateFrom')!) : undefined,
         createDateTo: searchParams.get('createDateTo') ? new Date(+searchParams.get('createDateTo')!) : undefined,
         credentialStatus: searchParams.get('credentialStatus')
-            ? (searchParams.get('credentialStatus')! as CredentialStatusModel)
+            ? (searchParams.get('credentialStatus')! as CredentialStatus)
             : undefined,
-        environment: searchParams.get('environment')
-            ? (searchParams.get('environment') as EnvironmentModel)
-            : undefined,
+        environment: searchParams.get('environment') ? (searchParams.get('environment') as Environment) : undefined,
         integrationId: searchParams.get('integrationId') ? +searchParams.get('integrationId')! : undefined,
         pageNumber: searchParams.get('pageNumber') ? +searchParams.get('pageNumber')! : undefined,
         search: searchParams.get('search') ? searchParams.get('search')! : undefined,
     });
 
-    const connectedUsers = connectedUsersPage?.content?.map((connectedUserModel: object) =>
-        ConnectedUserModelFromJSON(connectedUserModel)
+    const connectedUsers = connectedUsersPage?.content?.map((connectedUser: object) =>
+        ConnectedUserFromJSON(connectedUser)
     );
 
     const {data: integrations} = useGetIntegrationsQuery({});

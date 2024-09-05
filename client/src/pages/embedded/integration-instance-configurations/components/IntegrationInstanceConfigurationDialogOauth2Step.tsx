@@ -1,7 +1,7 @@
 import {Label} from '@/components/ui/label';
 import Properties from '@/pages/platform/workflow-editor/components/Properties/Properties';
-import {IntegrationInstanceConfigurationModel} from '@/shared/middleware/embedded/configuration';
-import {AuthorizationModel} from '@/shared/middleware/platform/configuration';
+import {IntegrationInstanceConfiguration} from '@/shared/middleware/embedded/configuration';
+import {Authorization} from '@/shared/middleware/platform/configuration';
 import {useGetOAuth2PropertiesQuery} from '@/shared/queries/platform/oauth2.queries';
 import {Dispatch, SetStateAction} from 'react';
 import {Control} from 'react-hook-form';
@@ -16,9 +16,9 @@ const IntegrationInstanceConfigurationDialogOauth2Step = ({
     usePredefinedOAuthApp,
 }: {
     componentName: string;
-    control: Control<IntegrationInstanceConfigurationModel>;
-    formState: FormState<IntegrationInstanceConfigurationModel>;
-    oAuth2Authorization: AuthorizationModel;
+    control: Control<IntegrationInstanceConfiguration>;
+    formState: FormState<IntegrationInstanceConfiguration>;
+    oAuth2Authorization: Authorization;
     usePredefinedOAuthApp: boolean;
     setUsePredefinedOAuthApp: Dispatch<SetStateAction<boolean>>;
 }) => {

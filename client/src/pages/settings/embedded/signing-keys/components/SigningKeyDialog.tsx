@@ -13,7 +13,7 @@ import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Textarea} from '@/components/ui/textarea';
 import {useToast} from '@/components/ui/use-toast';
-import {SigningKeyModel} from '@/shared/middleware/embedded/user';
+import {SigningKey} from '@/shared/middleware/embedded/user';
 import {
     useCreateSigningKeyMutation,
     useUpdateSigningKeyMutation,
@@ -36,7 +36,7 @@ const formSchema = z.object({
 
 interface SigningKeyDialogProps {
     onClose?: () => void;
-    signingKey?: SigningKeyModel;
+    signingKey?: SigningKey;
     triggerNode?: ReactNode;
 }
 
@@ -97,11 +97,11 @@ const SigningKeyDialog = ({onClose, signingKey, triggerNode}: SigningKeyDialogPr
             updateSigningKeyMutation.mutate({
                 ...signingKey,
                 ...getValues(),
-            } as SigningKeyModel);
+            } as SigningKey);
         } else {
             createSigningKeyMutation.mutate({
                 ...getValues(),
-            } as SigningKeyModel);
+            } as SigningKey);
         }
     }
 
