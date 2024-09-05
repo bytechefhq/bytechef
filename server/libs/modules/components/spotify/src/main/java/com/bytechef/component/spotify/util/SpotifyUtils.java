@@ -37,6 +37,16 @@ public class SpotifyUtils {
     private SpotifyUtils() {
     }
 
+    public static String getCurrentUserId(ActionContext actionContext) {
+        Map<String, Object> body = actionContext
+            .http(http -> http.get("/me"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        return (String) body.get(ID);
+    }
+
     public static List<Option<String>> getPlaylistOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {

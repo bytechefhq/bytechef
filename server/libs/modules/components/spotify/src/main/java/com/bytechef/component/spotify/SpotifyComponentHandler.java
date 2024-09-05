@@ -18,12 +18,15 @@ package com.bytechef.component.spotify;
 
 import com.bytechef.component.OpenAPIComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.spotify.action.SpotifyCreatePlaylistAction;
 import com.bytechef.component.spotify.util.SpotifyUtils;
 import com.google.auto.service.AutoService;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -31,6 +34,11 @@ import java.util.Objects;
  */
 @AutoService(OpenAPIComponentHandler.class)
 public class SpotifyComponentHandler extends AbstractSpotifyComponentHandler {
+
+    @Override
+    public List<? extends ModifiableActionDefinition> getCustomActions() {
+        return List.of(SpotifyCreatePlaylistAction.ACTION_DEFINITION);
+    }
 
     @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
