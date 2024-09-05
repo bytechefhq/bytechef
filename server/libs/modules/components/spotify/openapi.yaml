@@ -1,0 +1,100 @@
+---
+openapi: "3.0.1"
+info:
+  title: "Spotify"
+  description: "Spotify is a popular music streaming service that offers a vast library of songs, podcasts, and playlists for users to enjoy."
+  version: "v1"
+servers:
+  - url: "https://api.spotify.com/v1"
+paths:
+  /me/player/play:
+    put:
+      summary: "Play/Resume Playback"
+      description: "Start or resume current playback on an active device."
+      operationId: "startResumePlayback"
+      parameters:
+        - name: "deviceId"
+          in: "query"
+          required: false
+          schema:
+            title: "Device"
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                context_uri:
+                  type: "string"
+                  description: "Spotify URI of the context to play (album, artist, playlist)."
+                uris:
+                  type: "array"
+                  description: "Spotify track URIs to play."
+                  title: "Tracks"
+                  items:
+                    type: "string"
+                    format: "uri"
+                position_ms:
+                  type: "integer"
+                  description: "The position in milliseconds to start playback from."
+      responses:
+        204:
+          description: "Successful operation"
+  /playlists/{playlist_id}/tracks:
+    post:
+      summary: "Add Items to a Playlist"
+      description: "Adds one or more items to your playlist."
+      operationId: "addItemsToPlaylist"
+      parameters:
+        - name: "playlist_id"
+          in: "path"
+          required: true
+          schema:
+            title: "Playlist"
+            type: "string"
+        - name: "uris"
+          in: "query"
+          required: true
+          schema:
+            type: "array"
+            description: "URI's of the items to add to the playlist."
+            maxItems: 100
+            items:
+              type: "string"
+              format: "uri"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                position:
+                  type: "integer"
+                  description: "Position to insert the items, a zero-based index."
+      responses:
+        201:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      snapshot_id:
+                        type: "string"
+components:
+  securitySchemes:
+    oauth2:
+      type: "oauth2"
+      flows:
+        authorizationCode:
+          authorizationUrl: "https://accounts.spotify.com/authorize"
+          tokenUrl: "https://accounts.spotify.com/api/token"
+          refreshUrl: "https://accounts.spotify.com/api/token"
+          scopes:
+            "playlist-modify-private" : " "
+            "playlist-modify-public": " "
+            "user-modify-playback-state": " "
