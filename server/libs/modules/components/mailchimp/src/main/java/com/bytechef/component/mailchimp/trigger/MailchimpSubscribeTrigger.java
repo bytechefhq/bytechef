@@ -19,6 +19,7 @@ package com.bytechef.component.mailchimp.trigger;
 import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.dateTime;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ComponentDSL;
@@ -60,7 +61,7 @@ public class MailchimpSubscribeTrigger {
                 .label("List Id")
                 .description("The list id of intended audience to which you would like to add the contact.")
                 .required(true))
-        .outputSchema(
+        .output(outputSchema(
             object()
                 .properties(
                     object("data")
@@ -78,7 +79,7 @@ public class MailchimpSubscribeTrigger {
                                     string("INTERESTS"),
                                     string("LNAME"))),
                     dateTime("fired_at"),
-                    string("type")))
+                    string("type"))))
         .webhookDisable(MailchimpSubscribeTrigger::webhookDisable)
         .webhookEnable(MailchimpSubscribeTrigger::webhookEnable)
         .webhookRequest(MailchimpSubscribeTrigger::webhookRequest);

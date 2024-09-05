@@ -19,6 +19,7 @@ package com.bytechef.component.one.simple.api.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
@@ -60,13 +61,14 @@ public class OneSimpleAPICurrencyConverterAction {
                 .label("Value")
                 .description("Input the number for conversion")
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    string(FROM_CURRENCY),
-                    string(TO_CURRENCY),
-                    string(TO_CURRENCY),
-                    string("to_value")))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(FROM_CURRENCY),
+                        string(TO_CURRENCY),
+                        string(TO_CURRENCY),
+                        string("to_value"))))
         .perform(OneSimpleAPICurrencyConverterAction::perform);
 
     private OneSimpleAPICurrencyConverterAction() {

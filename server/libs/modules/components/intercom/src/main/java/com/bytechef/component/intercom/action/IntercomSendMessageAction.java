@@ -19,6 +19,7 @@ package com.bytechef.component.intercom.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.Body;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
@@ -41,6 +42,10 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.intercom.util.IntercomUtils;
 import java.util.Map;
 
+/**
+ * @author Luka Ljubić
+ * @author Monika Kušter
+ */
 public class IntercomSendMessageAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEND_MESSAGE)
@@ -73,8 +78,7 @@ public class IntercomSendMessageAction {
                 .required(true)
                 .options(
                     (OptionsDataSource.ActionOptionsFunction<String>) IntercomUtils::getContactIdOptions))
-        .outputSchema(
-            object())
+        .output(outputSchema(object()))
         .perform(IntercomSendMessageAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_MESSAGES_CONTEXT_FUNCTION =

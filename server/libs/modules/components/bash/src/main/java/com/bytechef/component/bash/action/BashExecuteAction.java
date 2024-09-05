@@ -19,6 +19,8 @@ package com.bytechef.component.bash.action;
 import static com.bytechef.component.bash.constant.BashConstants.EXECUTE;
 import static com.bytechef.component.bash.constant.BashConstants.SCRIPT;
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
+import static com.bytechef.component.definition.ComponentDSL.sampleOutput;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ActionContext;
@@ -50,8 +52,7 @@ public class BashExecuteAction {
             .description("Script written in bash. Multiple commands are possible with the ';' separator.")
             .placeholder("ls -la")
             .required(true))
-        .outputSchema(string())
-        .sampleOutput("Sample result")
+        .output(outputSchema(string()), sampleOutput("Sample result"))
         .perform(BashExecuteAction::perform);
 
     protected static String perform(

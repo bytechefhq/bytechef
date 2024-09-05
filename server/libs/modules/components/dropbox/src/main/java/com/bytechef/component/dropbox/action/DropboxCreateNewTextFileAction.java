@@ -19,6 +19,7 @@ package com.bytechef.component.dropbox.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.CREATE_TEXT_FILE;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
@@ -51,13 +52,14 @@ public class DropboxCreateNewTextFileAction {
                 .description("Name of the paper file")
                 .placeholder("New paper file")
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    string("url"),
-                    string("resultPath"),
-                    string("fileId"),
-                    integer("paperRevision")))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string("url"),
+                        string("resultPath"),
+                        string("fileId"),
+                        integer("paperRevision"))))
         .perform(DropboxCreateNewTextFileAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_FILES_UPLOAD_CONTEXT_FUNCTION =

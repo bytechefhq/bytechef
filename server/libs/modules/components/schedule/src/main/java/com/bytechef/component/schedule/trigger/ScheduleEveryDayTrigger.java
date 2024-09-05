@@ -19,6 +19,7 @@ package com.bytechef.component.schedule.trigger;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.DATETIME;
@@ -85,22 +86,23 @@ public class ScheduleEveryDayTrigger {
                 .label("Timezone")
                 .description("The timezone at which the cron expression will be scheduled.")
                 .options(ScheduleUtils.getTimeZoneOptions()))
-        .outputSchema(
-            object()
-                .properties(
-                    string(DATETIME),
-                    integer(HOUR),
-                    integer(MINUTE),
-                    object(DAY_OF_WEEK)
-                        .properties(
-                            bool("1"),
-                            bool("2"),
-                            bool("3"),
-                            bool("4"),
-                            bool("5"),
-                            bool("6"),
-                            bool("7")),
-                    string(TIMEZONE)))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(DATETIME),
+                        integer(HOUR),
+                        integer(MINUTE),
+                        object(DAY_OF_WEEK)
+                            .properties(
+                                bool("1"),
+                                bool("2"),
+                                bool("3"),
+                                bool("4"),
+                                bool("5"),
+                                bool("6"),
+                                bool("7")),
+                        string(TIMEZONE))))
         .listenerDisable(this::listenerDisable)
         .listenerEnable(this::listenerEnable);
 

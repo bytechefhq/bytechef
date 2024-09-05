@@ -17,6 +17,7 @@
 package com.bytechef.component.typeform.trigger;
 
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 import static com.bytechef.component.typeform.constant.TypeformConstants.ID;
@@ -51,9 +52,10 @@ public class TypeformNewSubmissionTrigger {
                 .label("Form name")
                 .options((TriggerOptionsFunction<String>) TypeformUtils::getFormOptions)
                 .required(true))
-        .outputSchema(
-            // TODO
-            object())
+        .output(
+            outputSchema(
+                // TODO
+                object()))
         .webhookEnable(TypeformNewSubmissionTrigger::webhookEnable)
         .webhookDisable(TypeformNewSubmissionTrigger::webhookDisable)
         .webhookRequest(TypeformNewSubmissionTrigger::webhookRequest);

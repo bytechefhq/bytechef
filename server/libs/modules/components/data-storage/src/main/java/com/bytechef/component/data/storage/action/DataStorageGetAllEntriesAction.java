@@ -21,6 +21,7 @@ import static com.bytechef.component.data.storage.constant.DataStorageConstants.
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ActionContext;
@@ -43,10 +44,10 @@ public class DataStorageGetAllEntriesAction {
                 .description("The namespace to get keys from.")
                 .options(SCOPE_OPTIONS)
                 .required(true))
-        .outputSchema(
+        .output(outputSchema(
             array()
                 .items(
-                    object()))
+                    object())))
         .perform(DataStorageGetAllEntriesAction::perform);
 
     protected static Object perform(

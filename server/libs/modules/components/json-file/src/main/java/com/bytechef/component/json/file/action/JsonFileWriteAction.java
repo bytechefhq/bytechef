@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.json.file.constant.JsonFileConstants.FILENAME;
 import static com.bytechef.component.json.file.constant.JsonFileConstants.FILE_TYPE;
@@ -83,7 +84,7 @@ public class JsonFileWriteAction {
                 .required(true)
                 .defaultValue("file.json")
                 .advancedOption(true))
-        .outputSchema(fileEntry())
+        .output(outputSchema(fileEntry()))
         .perform(JsonFileWriteAction::perform);
 
     private static String getDefaultFileName(JsonFileConstants.FileType fileType, String defaultFilename) {

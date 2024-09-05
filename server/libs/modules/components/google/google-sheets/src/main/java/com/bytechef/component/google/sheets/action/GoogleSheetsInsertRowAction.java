@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.INCLUDE_ITEMS_FROM_ALL_DRIVES_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
@@ -59,9 +60,10 @@ public class GoogleSheetsInsertRowAction {
             VALUE_INPUT_PROPERTY,
             IS_THE_FIRST_ROW_HEADER_PROPERTY,
             ROW_PROPERTY)
-        .outputSchema(
-            object()
-                .additionalProperties(bool(), number(), string()))
+        .output(
+            outputSchema(
+                object()
+                    .additionalProperties(bool(), number(), string())))
         .perform(GoogleSheetsInsertRowAction::perform);
 
     private GoogleSheetsInsertRowAction() {

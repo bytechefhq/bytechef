@@ -20,6 +20,8 @@ import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
+import static com.bytechef.component.definition.ComponentDSL.sampleOutput;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ComponentDSL;
@@ -109,41 +111,42 @@ public class HubspotSubscribeTrigger {
                 .description("The name of property to listen for change events.")
                 .displayCondition("eventType.contains('.propertyChange')")
                 .required(true))
-        .outputSchema(
-            array().items(
-                object()
-                    .properties(
-                        object("data").properties(
-                            integer("objectId"),
-                            string("propertyName"),
-                            string("propertyValue"),
-                            string("changeSource"),
-                            integer("eventId"),
-                            integer("subscriptionId"),
-                            integer("portalId"),
-                            integer("appId"),
-                            integer("occurredAt"),
-                            string("eventType"),
-                            integer("attemptNumber"),
-                            integer("messageId"),
-                            string("messageType")))))
-        .sampleOutput("""
-            [
-                {
-                    "objectId": 1246965,
-                    "propertyName": "lifecyclestage",
-                    "propertyValue": "subscriber",
-                    "changeSource": "ACADEMY",
-                    "eventId": 3816279340,
-                    "subscriptionId": 25,
-                    "portalId": 33,
-                    "appId": 1160452,
-                    "occurredAt": 1462216307945,
-                    "eventType":"contact.propertyChange",
-                    "attemptNumber": 0
-               }
-            ]
-            """)
+        .output(
+            outputSchema(
+                array().items(
+                    object()
+                        .properties(
+                            object("data").properties(
+                                integer("objectId"),
+                                string("propertyName"),
+                                string("propertyValue"),
+                                string("changeSource"),
+                                integer("eventId"),
+                                integer("subscriptionId"),
+                                integer("portalId"),
+                                integer("appId"),
+                                integer("occurredAt"),
+                                string("eventType"),
+                                integer("attemptNumber"),
+                                integer("messageId"),
+                                string("messageType"))))),
+            sampleOutput("""
+                [
+                    {
+                        "objectId": 1246965,
+                        "propertyName": "lifecyclestage",
+                        "propertyValue": "subscriber",
+                        "changeSource": "ACADEMY",
+                        "eventId": 3816279340,
+                        "subscriptionId": 25,
+                        "portalId": 33,
+                        "appId": 1160452,
+                        "occurredAt": 1462216307945,
+                        "eventType":"contact.propertyChange",
+                        "attemptNumber": 0
+                   }
+                ]
+                """))
         .webhookDisable(HubspotSubscribeTrigger::webhookDisable)
         .webhookEnable(HubspotSubscribeTrigger::wbhookEnable)
         .webhookRequest(HubspotSubscribeTrigger::webhookRequest);

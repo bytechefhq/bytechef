@@ -25,6 +25,7 @@ import static com.bytechef.component.definition.ComponentDSL.dateTime;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.csv.file.constant.CsvFileConstants;
@@ -65,7 +66,7 @@ public class CsvFileWriteAction {
                 .label("File")
                 .description("File you want to write to.")
                 .required(true))
-        .outputSchema(fileEntry())
+        .output(outputSchema(fileEntry()))
         .perform(CsvFileWriteAction::perform);
 
     private CsvFileWriteAction() {

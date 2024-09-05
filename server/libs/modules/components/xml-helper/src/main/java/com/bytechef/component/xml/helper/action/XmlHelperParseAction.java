@@ -18,6 +18,7 @@ package com.bytechef.component.xml.helper.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.xml.helper.constant.XmlHelperConstants.PARSE;
 import static com.bytechef.component.xml.helper.constant.XmlHelperConstants.SOURCE;
@@ -39,7 +40,7 @@ public class XmlHelperParseAction {
                 .label("Source")
                 .description("The XML string to convert to the data.")
                 .required(true))
-        .outputSchema(object())
+        .output(outputSchema(object()))
         .perform(XmlHelperParseAction::perform);
 
     protected static Object perform(

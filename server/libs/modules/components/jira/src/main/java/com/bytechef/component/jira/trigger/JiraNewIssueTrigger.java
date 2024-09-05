@@ -17,6 +17,7 @@
 package com.bytechef.component.jira.trigger;
 
 import static com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 import static com.bytechef.component.jira.constant.JiraConstants.ID;
@@ -61,7 +62,7 @@ public class JiraNewIssueTrigger {
                 .options((TriggerOptionsFunction<String>) JiraOptionsUtils::getIssueTypesIdOptions)
                 .optionsLookupDependsOn(PROJECT)
                 .required(false))
-        .outputSchema(ISSUE_OUTPUT_PROPERTY)
+        .output(outputSchema(ISSUE_OUTPUT_PROPERTY))
         .webhookEnable(JiraNewIssueTrigger::webhookEnable)
         .webhookDisable(JiraNewIssueTrigger::webhookDisable)
         .webhookRequest(JiraNewIssueTrigger::webhookRequest);

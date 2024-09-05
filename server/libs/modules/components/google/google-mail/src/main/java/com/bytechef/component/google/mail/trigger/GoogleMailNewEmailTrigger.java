@@ -18,6 +18,7 @@ package com.bytechef.component.google.mail.trigger;
 
 import static com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import static com.bytechef.component.definition.ComponentDSL.array;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 import static com.bytechef.component.definition.TriggerContext.Data.Scope.WORKFLOW;
@@ -71,9 +72,10 @@ public class GoogleMailNewEmailTrigger {
                 .maxLength(255)
                 .minLength(3)
                 .required(true))
-        .outputSchema(
-            array()
-                .items(FULL_MESSAGE_OUTPUT_PROPERTY))
+        .output(
+            outputSchema(
+                array()
+                    .items(FULL_MESSAGE_OUTPUT_PROPERTY)))
         .webhookEnable(GoogleMailNewEmailTrigger::webhookEnable)
         .webhookDisable(GoogleMailNewEmailTrigger::webhookDisable)
         .webhookRequest(GoogleMailNewEmailTrigger::webhookRequest);

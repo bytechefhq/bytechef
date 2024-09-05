@@ -17,6 +17,7 @@
 package com.bytechef.component.xero.trigger;
 
 import static com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACT_OUTPUT_PROPERTY;
 import static com.bytechef.component.xero.constant.XeroConstants.NEW_CONTACT;
@@ -43,7 +44,7 @@ public class XeroNewContactTrigger {
         .description("Triggers when a contact is created.")
         .type(TriggerType.STATIC_WEBHOOK)
         .properties(WEBHOOK_KEY_PROPERTY)
-        .outputSchema(CONTACT_OUTPUT_PROPERTY)
+        .output(outputSchema(CONTACT_OUTPUT_PROPERTY))
         .workflowSyncValidation(true)
         .webhookValidate(XeroUtils::webhookValidate)
         .webhookRequest(XeroNewContactTrigger::webhookRequest);

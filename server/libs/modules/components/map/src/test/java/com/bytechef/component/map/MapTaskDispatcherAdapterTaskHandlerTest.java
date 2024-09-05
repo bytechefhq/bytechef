@@ -121,7 +121,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
 
     @Test
     public void test3() {
-        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(OBJECT_MAPPER);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
         syncMessageBroker.receive(TaskCoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS, t -> {
             TaskExecution taskExecution = ((TaskExecutionCompleteEvent) t).getTaskExecution();

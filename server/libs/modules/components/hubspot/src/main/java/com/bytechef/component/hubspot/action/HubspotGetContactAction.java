@@ -19,6 +19,7 @@ package com.bytechef.component.hubspot.action;
 import static com.bytechef.component.OpenAPIComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
@@ -45,7 +46,7 @@ public class HubspotGetContactAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))
-        .outputSchema(object()
+        .output(outputSchema(object()
             .properties(object("body")
                 .properties(string("id").required(false),
                     object("properties")
@@ -56,7 +57,7 @@ public class HubspotGetContactAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON)));
+                    "responseType", ResponseType.JSON))));
 
     private HubspotGetContactAction() {
     }

@@ -19,6 +19,7 @@ package com.bytechef.component.freshsales.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.CREATE_ACCOUNT;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.NAME;
@@ -54,13 +55,14 @@ public class FreshsalesCreateAccountAction {
                 .label("Phone")
                 .description("Phone number of the account")
                 .required(false))
-        .outputSchema(
-            object()
-                .properties(
-                    number("id"),
-                    string(NAME),
-                    string(WEBSITE),
-                    string(PHONE)))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        number("id"),
+                        string(NAME),
+                        string(WEBSITE),
+                        string(PHONE))))
         .perform(FreshsalesCreateAccountAction::perform);
 
     private FreshsalesCreateAccountAction() {

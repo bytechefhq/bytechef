@@ -18,6 +18,8 @@ package com.bytechef.component.file.storage.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
+import static com.bytechef.component.definition.ComponentDSL.sampleOutput;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.file.storage.constant.FileStorageConstants.FILE_ENTRY;
 import static com.bytechef.component.file.storage.constant.FileStorageConstants.READ;
@@ -39,8 +41,7 @@ public class FileStorageReadAction {
             .description(
                 "The object property which contains a reference to the file to read from.")
             .required(true))
-        .outputSchema(string())
-        .sampleOutput("Sample content")
+        .output(outputSchema(string()), sampleOutput("Sample content"))
         .perform(FileStorageReadAction::perform);
 
     protected static String perform(

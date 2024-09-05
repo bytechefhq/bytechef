@@ -18,6 +18,7 @@ package com.bytechef.component.dropbox.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.DELETE;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
@@ -51,7 +52,7 @@ public class DropboxDeleteAction {
                 .label("Filename")
                 .description("Name of the file. Leave empty if you want to delete a folder.")
                 .required(false))
-        .outputSchema(
+        .output(outputSchema(
             object()
                 .properties(
                     object("metadata")
@@ -60,7 +61,7 @@ public class DropboxDeleteAction {
                             string("name"),
                             string("path_lower"),
                             string("path_display"),
-                            string("id"))))
+                            string("id")))))
         .perform(DropboxDeleteAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_DELETE_CONTEXT_FUNCTION =

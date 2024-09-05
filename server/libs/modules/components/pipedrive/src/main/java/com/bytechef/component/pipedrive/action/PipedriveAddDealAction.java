@@ -23,6 +23,7 @@ import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
@@ -95,11 +96,12 @@ public class PipedriveAddDealAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .outputSchema(object()
+        .output(outputSchema(object()
             .properties(object("body")
                 .properties(object("data")
                     .properties(
-                        integer("id").required(false), object("user_id")
+                        integer("id").required(false),
+                        object("user_id")
                             .properties(integer("id").required(false), string("name").required(false),
                                 string("email").required(false))
                             .required(false),
@@ -114,7 +116,7 @@ public class PipedriveAddDealAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON)));
+                    "responseType", ResponseType.JSON))));
 
     private PipedriveAddDealAction() {
     }

@@ -19,6 +19,7 @@ package com.bytechef.component.infobip.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.infobip.constant.InfobipConstants.CONTENT;
 import static com.bytechef.component.infobip.constant.InfobipConstants.DESCRIPTION;
@@ -67,19 +68,20 @@ public class InfobipSendWhatsappTextMesageAction {
                 .description("Content of the message being sent.")
                 .maxLength(4096)
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    string(TO),
-                    integer(MESSAGE_COUNT),
-                    string(MESSAGE_ID),
-                    object(STATUS)
-                        .properties(
-                            integer(GROUP_ID),
-                            string(GROUP_NAME),
-                            integer(ID),
-                            string(NAME),
-                            string(DESCRIPTION))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(TO),
+                        integer(MESSAGE_COUNT),
+                        string(MESSAGE_ID),
+                        object(STATUS)
+                            .properties(
+                                integer(GROUP_ID),
+                                string(GROUP_NAME),
+                                integer(ID),
+                                string(NAME),
+                                string(DESCRIPTION)))))
         .perform(InfobipSendWhatsappTextMesageAction::perform);
 
     private InfobipSendWhatsappTextMesageAction() {

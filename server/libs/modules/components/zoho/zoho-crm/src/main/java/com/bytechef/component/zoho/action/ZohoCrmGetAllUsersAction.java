@@ -19,6 +19,7 @@ package com.bytechef.component.zoho.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.zoho.constant.ZohoCrmConstants.GET_ALL_USERS;
@@ -54,32 +55,33 @@ public class ZohoCrmGetAllUsersAction {
                     option("Get all active confirmed admins", "ActiveConfirmedAdmins"),
                     option("Get current user", "CurrentUser"))
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    object("users")
-                        .properties(
-                            string("country"),
-                            string("name_format__s"),
-                            string("language"),
-                            string("microsoft"),
-                            string("Currency"),
-                            string("ID"),
-                            object("profile")
-                                .properties(
-                                    string("name"),
-                                    string("id")),
-                            object("created_by")
-                                .properties(
-                                    string("name"),
-                                    string("id")),
-                            string("full_name"),
-                            string("status"),
-                            object("role")
-                                .properties(
-                                    string("name"),
-                                    string("id")),
-                            string("city"))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object("users")
+                            .properties(
+                                string("country"),
+                                string("name_format__s"),
+                                string("language"),
+                                string("microsoft"),
+                                string("Currency"),
+                                string("ID"),
+                                object("profile")
+                                    .properties(
+                                        string("name"),
+                                        string("id")),
+                                object("created_by")
+                                    .properties(
+                                        string("name"),
+                                        string("id")),
+                                string("full_name"),
+                                string("status"),
+                                object("role")
+                                    .properties(
+                                        string("name"),
+                                        string("id")),
+                                string("city")))))
         .perform(ZohoCrmGetAllUsersAction::perform);
 
     private ZohoCrmGetAllUsersAction() {

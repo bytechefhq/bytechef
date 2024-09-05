@@ -17,6 +17,8 @@
 package com.bytechef.component.filesystem.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
+import static com.bytechef.component.definition.ComponentDSL.sampleOutput;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.MKDIR;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.PATH;
@@ -41,8 +43,7 @@ public class FilesystemMkdirAction {
                 .label("Path")
                 .description("The path of a directory.")
                 .required(true))
-        .outputSchema(string())
-        .sampleOutput("/sample_data")
+        .output(outputSchema(string()), sampleOutput("/sample_data"))
         .perform(FilesystemMkdirAction::perform);
 
     private FilesystemMkdirAction() {

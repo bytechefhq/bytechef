@@ -25,6 +25,7 @@ import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.openai.constant.OpenAIConstants.CREATE_TRANSCRIPTION;
 import static com.bytechef.component.openai.constant.OpenAIConstants.FILE;
@@ -154,28 +155,29 @@ public class OpenAICreateTranscriptionAction {
                 .minValue(0)
                 .maxValue(1)
                 .required(false))
-        .outputSchema(
-            object().properties(
-                string("text"),
-                string("task"),
-                string("language"),
-                number("duration"),
-                array("segments")
-                    .items(
-                        object()
-                            .properties(
-                                integer("id"),
-                                integer("seek"),
-                                number("start"),
-                                number("end"),
-                                string("text"),
-                                array("tokens")
-                                    .items(integer()),
-                                number("temperature"),
-                                number("averageLogProb"),
-                                number("compressionRatio"),
-                                number("noSpeechProb"),
-                                bool("transientFlag")))))
+        .output(
+            outputSchema(
+                object().properties(
+                    string("text"),
+                    string("task"),
+                    string("language"),
+                    number("duration"),
+                    array("segments")
+                        .items(
+                            object()
+                                .properties(
+                                    integer("id"),
+                                    integer("seek"),
+                                    number("start"),
+                                    number("end"),
+                                    string("text"),
+                                    array("tokens")
+                                        .items(integer()),
+                                    number("temperature"),
+                                    number("averageLogProb"),
+                                    number("compressionRatio"),
+                                    number("noSpeechProb"),
+                                    bool("transientFlag"))))))
         .perform(OpenAICreateTranscriptionAction::perform);
 
     private OpenAICreateTranscriptionAction() {

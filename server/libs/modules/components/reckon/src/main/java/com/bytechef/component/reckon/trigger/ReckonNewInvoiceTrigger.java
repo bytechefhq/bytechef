@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.date;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 import static com.bytechef.component.reckon.constant.ReckonConstants.BOOK_ID;
@@ -49,24 +50,25 @@ public class ReckonNewInvoiceTrigger {
                 .label("Book")
                 .options((TriggerOptionsFunction<String>) ReckonUtils::getBookIdOptions)
                 .required(true))
-        .outputSchema(
-            array()
-                .items(
-                    object()
-                        .properties(
-                            string(ID),
-                            string("invoiceNumber"),
-                            object("customer")
-                                .properties(
-                                    string(ID),
-                                    string(NAME)),
-                            date("invoiceDate"),
-                            string("amountTaxStatus"),
-                            array("lineItems")
-                                .items(
-                                    object()
-                                        .properties(
-                                            integer("lineNumber"))))))
+        .output(
+            outputSchema(
+                array()
+                    .items(
+                        object()
+                            .properties(
+                                string(ID),
+                                string("invoiceNumber"),
+                                object("customer")
+                                    .properties(
+                                        string(ID),
+                                        string(NAME)),
+                                date("invoiceDate"),
+                                string("amountTaxStatus"),
+                                array("lineItems")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                integer("lineNumber")))))))
         .poll(ReckonNewInvoiceTrigger::poll);
 
     private ReckonNewInvoiceTrigger() {

@@ -17,6 +17,7 @@
 package com.bytechef.component.jira.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.jira.constant.JiraConstants.GET_ISSUE;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_ID;
@@ -50,7 +51,7 @@ public class JiraGetIssueAction {
                 .options((ActionOptionsFunction<String>) JiraOptionsUtils::getIssueIdOptions)
                 .optionsLookupDependsOn(PROJECT)
                 .required(true))
-        .outputSchema(ISSUE_OUTPUT_PROPERTY)
+        .output(outputSchema(ISSUE_OUTPUT_PROPERTY))
         .perform(JiraGetIssueAction::perform);
 
     private JiraGetIssueAction() {

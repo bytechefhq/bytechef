@@ -19,6 +19,7 @@ package com.bytechef.component.github.trigger;
 import static com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 import static com.bytechef.component.github.constant.GithubConstants.BODY;
@@ -55,35 +56,36 @@ public class GithubNewPullRequestTrigger {
                 .label("Repository")
                 .options((TriggerOptionsFunction<String>) GithubUtils::getRepositoryOptions)
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    integer("number"),
-                    object("pull_request")
-                        .properties(
-                            integer(ID),
-                            string("state"),
-                            string(TITLE),
-                            string(BODY),
-                            integer("commits")),
-                    object("sender")
-                        .properties(
-                            string("login"),
-                            integer(ID)),
-                    string("action"),
-                    object("repository")
-                        .properties(
-                            integer(ID),
-                            string("name"),
-                            string("full_name"),
-                            object("owner")
-                                .properties(
-                                    string("login"),
-                                    integer(ID)),
-                            string("visibility"),
-                            integer("forks"),
-                            integer("open_issues"),
-                            string("default_branch"))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        integer("number"),
+                        object("pull_request")
+                            .properties(
+                                integer(ID),
+                                string("state"),
+                                string(TITLE),
+                                string(BODY),
+                                integer("commits")),
+                        object("sender")
+                            .properties(
+                                string("login"),
+                                integer(ID)),
+                        string("action"),
+                        object("repository")
+                            .properties(
+                                integer(ID),
+                                string("name"),
+                                string("full_name"),
+                                object("owner")
+                                    .properties(
+                                        string("login"),
+                                        integer(ID)),
+                                string("visibility"),
+                                integer("forks"),
+                                integer("open_issues"),
+                                string("default_branch")))))
         .webhookEnable(GithubNewPullRequestTrigger::webhookEnable)
         .webhookDisable(GithubNewPullRequestTrigger::webhookDisable)
         .webhookRequest(GithubNewPullRequestTrigger::webhookRequest);

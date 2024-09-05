@@ -18,6 +18,7 @@ package com.bytechef.component.intercom.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http;
 import static com.bytechef.component.intercom.constant.IntercomConstants.CONTACT_NAME;
@@ -35,6 +36,10 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.intercom.util.IntercomUtils;
 
+/**
+ * @author Luka Ljubić
+ * @author Monika Kušter
+ */
 public class IntercomGetContactAction {
 
     public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action(GET_CONTACT)
@@ -45,15 +50,16 @@ public class IntercomGetContactAction {
                 .label("Contact Name")
                 .required(true)
                 .options((ActionOptionsFunction<String>) IntercomUtils::getContactIdOptions))
-        .outputSchema(
-            object()
-                .properties(
-                    string(TYPE),
-                    string(CONTACT_NAME),
-                    string(ROLE),
-                    string(EMAIL),
-                    string(PHONE),
-                    string(NAME)))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(TYPE),
+                        string(CONTACT_NAME),
+                        string(ROLE),
+                        string(EMAIL),
+                        string(PHONE),
+                        string(NAME))))
         .perform(IntercomGetContactAction::perform);
 
     public static Object

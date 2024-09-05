@@ -22,6 +22,7 @@ import static com.bytechef.component.aws.s3.constant.AwsS3Constants.PREFIX;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.aws.s3.util.AwsS3Utils;
@@ -52,8 +53,9 @@ public class AwsS3ListObjectsAction {
                 .label("Prefix")
                 .description("The prefix of an AWS S3 objects.")
                 .required(true))
-        .outputSchema(
-            array().items(object().properties(string("key"), string("suffix"), string("uri"))))
+        .output(
+            outputSchema(
+                array().items(object().properties(string("key"), string("suffix"), string("uri")))))
         .perform(AwsS3ListObjectsAction::perform);
 
     protected static List<S3ObjectDescription> perform(

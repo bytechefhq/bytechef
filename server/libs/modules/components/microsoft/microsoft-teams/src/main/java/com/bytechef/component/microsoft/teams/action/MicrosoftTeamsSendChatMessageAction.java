@@ -18,6 +18,7 @@ package com.bytechef.component.microsoft.teams.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.BODY;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CHAT_ID;
@@ -51,15 +52,16 @@ public class MicrosoftTeamsSendChatMessageAction {
                 .required(true),
             CONTENT_TYPE_PROPERTY,
             CONTENT_PROPERTY)
-        .outputSchema(
-            object()
-                .properties(
-                    string(ID),
-                    string("chatId"),
-                    object(BODY)
-                        .properties(
-                            string(CONTENT_TYPE),
-                            string(CONTENT))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(ID),
+                        string("chatId"),
+                        object(BODY)
+                            .properties(
+                                string(CONTENT_TYPE),
+                                string(CONTENT)))))
         .perform(MicrosoftTeamsSendChatMessageAction::perform);
 
     private MicrosoftTeamsSendChatMessageAction() {

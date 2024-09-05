@@ -17,6 +17,7 @@
 package com.bytechef.component.jira.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.jira.constant.JiraConstants.ASSIGNEE;
 import static com.bytechef.component.jira.constant.JiraConstants.CONTENT;
@@ -92,7 +93,7 @@ public class JiraCreateIssueAction {
                 .description("Description of the issue.")
                 .controlType(ControlType.TEXT_AREA)
                 .required(false))
-        .outputSchema(ISSUE_OUTPUT_PROPERTY)
+        .output(outputSchema(ISSUE_OUTPUT_PROPERTY))
         .perform(JiraCreateIssueAction::perform);
 
     private JiraCreateIssueAction() {

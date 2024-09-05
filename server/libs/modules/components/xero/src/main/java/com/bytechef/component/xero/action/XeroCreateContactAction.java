@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.xero.constant.XeroConstants.ACCOUNT_NUMBER;
 import static com.bytechef.component.xero.constant.XeroConstants.ADDRESSES;
@@ -174,7 +175,7 @@ public class XeroCreateContactAction {
                                 .required(false)))
                 .maxItems(2)
                 .required(false))
-        .outputSchema(CONTACT_OUTPUT_PROPERTY)
+        .output(outputSchema(CONTACT_OUTPUT_PROPERTY))
         .perform(XeroCreateContactAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_CONTACTS_CONTEXT_FUNCTION =

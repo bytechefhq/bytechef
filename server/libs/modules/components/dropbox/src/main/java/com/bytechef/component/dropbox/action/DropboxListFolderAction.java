@@ -19,6 +19,7 @@ package com.bytechef.component.dropbox.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.LIST_FOLDER;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.PATH;
@@ -45,20 +46,21 @@ public class DropboxListFolderAction {
                 .label("Path")
                 .description("Path of the filename. Inputting nothing searches root.")
                 .required(false))
-        .outputSchema(
-            object()
-                .properties(
-                    array("entries")
-                        .items(
-                            object()
-                                .properties(
-                                    object("f")
-                                        .properties(
-                                            string(".tag"),
-                                            string("name"),
-                                            string("path_lower"),
-                                            string("path_Display"),
-                                            string("id"))))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        array("entries")
+                            .items(
+                                object()
+                                    .properties(
+                                        object("f")
+                                            .properties(
+                                                string(".tag"),
+                                                string("name"),
+                                                string("path_lower"),
+                                                string("path_Display"),
+                                                string("id")))))))
         .perform(DropboxListFolderAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_LIST_FOLDER_CONTEXT_FUNCTION =

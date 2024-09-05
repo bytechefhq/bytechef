@@ -23,6 +23,7 @@ import static com.bytechef.component.definition.ComponentDSL.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.openai.constant.OpenAIConstants.CREATE_IMAGE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DALL_E_2;
@@ -122,18 +123,19 @@ public class OpenAICreateImageAction {
                 .description("Maximum wait time in seconds to wait on AI response")
                 .defaultValue(10L)
                 .required(false))
-        .outputSchema(
-            object()
-                .properties(
-                    integer("created"),
-                    array("data")
-                        .items(
-                            object()
-                                .properties(
-                                    string("url")
-                                        .controlType(Property.ControlType.URL),
-                                    string("b64Json"),
-                                    string("revisedPrompt")))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        integer("created"),
+                        array("data")
+                            .items(
+                                object()
+                                    .properties(
+                                        string("url")
+                                            .controlType(Property.ControlType.URL),
+                                        string("b64Json"),
+                                        string("revisedPrompt"))))))
         .perform(OpenAICreateImageAction::perform);
 
     private OpenAICreateImageAction() {

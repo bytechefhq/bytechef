@@ -16,6 +16,7 @@
 
 package com.bytechef.component.trello.trigger;
 
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 import static com.bytechef.component.definition.Context.Http.responseType;
@@ -60,7 +61,7 @@ public class TrelloNewCardTrigger {
                 .options((TriggerOptionsFunction<String>) TrelloUtils::getListOptions)
                 .optionsLookupDependsOn(ID_BOARD)
                 .required(false))
-        .outputSchema(CARD_OUTPUT_PROPERTY)
+        .output(outputSchema(CARD_OUTPUT_PROPERTY))
         .webhookEnable(TrelloNewCardTrigger::dynamicWebhookEnable)
         .webhookDisable(TrelloNewCardTrigger::dynamicWebhookDisable)
         .webhookRequest(TrelloNewCardTrigger::dynamicWebhookRequest);

@@ -17,6 +17,7 @@
 package com.bytechef.component.example.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.example.constant.ExampleConstants.DUMMY;
 
@@ -33,7 +34,7 @@ public final class ExampleDummyAction {
         .title("Title")
         .description("Description")
         .properties()
-        .outputSchema(string())
+        .output(outputSchema(string()))
         .perform(ExampleDummyAction::perform);
 
     private ExampleDummyAction() {

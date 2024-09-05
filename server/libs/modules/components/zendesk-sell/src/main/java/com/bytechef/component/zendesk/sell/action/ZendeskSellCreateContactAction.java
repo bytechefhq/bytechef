@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.CREATE_CONTACT;
 import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.DATA;
@@ -76,20 +77,21 @@ public class ZendeskSellCreateContactAction {
                 .label("Email")
                 .controlType(ControlType.EMAIL)
                 .required(false))
-        .outputSchema(
-            object()
-                .properties(
-                    object(DATA)
-                        .properties(
-                            string("id"),
-                            bool(IS_ORGANIZATION),
-                            string(TITLE),
-                            string(WEBSITE),
-                            string(EMAIL)),
-                    object("meta")
-                        .properties(
-                            integer("version"),
-                            string("type"))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object(DATA)
+                            .properties(
+                                string("id"),
+                                bool(IS_ORGANIZATION),
+                                string(TITLE),
+                                string(WEBSITE),
+                                string(EMAIL)),
+                        object("meta")
+                            .properties(
+                                integer("version"),
+                                string("type")))))
         .perform(ZendeskSellCreateContactAction::perform);
 
     private ZendeskSellCreateContactAction() {

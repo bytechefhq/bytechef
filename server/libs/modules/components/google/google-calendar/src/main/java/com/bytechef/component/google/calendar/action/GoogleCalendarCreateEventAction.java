@@ -25,6 +25,7 @@ import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ALL_DAY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ATTACHMENTS;
@@ -169,7 +170,7 @@ public class GoogleCalendarCreateEventAction {
                                 .maxValue(40320)
                                 .required(true)))
                 .required(false))
-        .outputSchema(EVENT_PROPERTY)
+        .output(outputSchema(EVENT_PROPERTY))
         .perform(GoogleCalendarCreateEventAction::perform);
 
     private GoogleCalendarCreateEventAction() {

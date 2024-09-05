@@ -22,6 +22,7 @@ import static com.bytechef.component.box.constant.BoxConstants.ID;
 import static com.bytechef.component.box.constant.BoxConstants.NAME;
 import static com.bytechef.component.box.constant.BoxConstants.PARENT;
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.box.util.BoxUtils;
@@ -56,7 +57,7 @@ public class BoxCreateFolderAction {
                 .options((ActionOptionsFunction<String>) BoxUtils::getRootFolderOptions)
                 .defaultValue("0")
                 .required(true))
-        .outputSchema(FILE_OUTPUT_PROPERTY)
+        .output(outputSchema(FILE_OUTPUT_PROPERTY))
         .perform(BoxCreateFolderAction::perform);
 
     private BoxCreateFolderAction() {

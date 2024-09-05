@@ -20,6 +20,7 @@ import static com.bytechef.component.aws.s3.constant.AwsS3Constants.BUCKET_NAME;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.GET_URL;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.KEY;
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.aws.s3.util.AwsS3Utils;
@@ -43,7 +44,7 @@ public class AwsS3GetUrlAction {
                 .description("Key is most likely the name of the file.")
                 .placeholder("file.txt")
                 .required(true))
-        .outputSchema(string())
+        .output(outputSchema(string()))
         .perform(AwsS3GetUrlAction::perform);
 
     protected static String perform(

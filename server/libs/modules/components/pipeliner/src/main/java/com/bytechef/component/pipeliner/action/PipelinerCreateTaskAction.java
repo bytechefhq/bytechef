@@ -20,6 +20,7 @@ import static com.bytechef.component.OpenAPIComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
@@ -58,16 +59,17 @@ public class PipelinerCreateTaskAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .outputSchema(object().properties(bool("success").description("True when response succeeded, false on error.")
-            .required(false),
-            object("data")
-                .properties(string("id").required(false), string("subject").required(false),
-                    string("activity_type_id").required(false), string("unit_id").required(false),
-                    string("owner_id").required(false))
-                .required(false))
+        .output(outputSchema(object()
+            .properties(bool("success").description("True when response succeeded, false on error.")
+                .required(false),
+                object("data")
+                    .properties(string("id").required(false), string("subject").required(false),
+                        string("activity_type_id").required(false), string("unit_id").required(false),
+                        string("owner_id").required(false))
+                    .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON)));
+                    "responseType", ResponseType.JSON))));
 
     private PipelinerCreateTaskAction() {
     }

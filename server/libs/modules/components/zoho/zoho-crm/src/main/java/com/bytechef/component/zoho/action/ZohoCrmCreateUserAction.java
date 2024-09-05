@@ -18,6 +18,7 @@ package com.bytechef.component.zoho.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.zoho.constant.ZohoCrmConstants.CREATE_USER;
@@ -67,17 +68,18 @@ public class ZohoCrmCreateUserAction {
                 .description("Input user profile")
                 .options((ActionOptionsFunction<String>) ZohoCrmUtils::getProfileOptions)
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    object("users")
-                        .properties(
-                            string("code"),
-                            object("details")
-                                .properties(
-                                    string("id")),
-                            string("message"),
-                            string("status"))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object("users")
+                            .properties(
+                                string("code"),
+                                object("details")
+                                    .properties(
+                                        string("id")),
+                                string("message"),
+                                string("status")))))
         .perform(ZohoCrmCreateUserAction::perform);
 
     private ZohoCrmCreateUserAction() {

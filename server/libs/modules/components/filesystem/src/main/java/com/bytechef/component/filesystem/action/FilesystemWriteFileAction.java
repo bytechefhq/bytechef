@@ -20,6 +20,8 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
+import static com.bytechef.component.definition.ComponentDSL.sampleOutput;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILENAME;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILE_ENTRY;
@@ -53,8 +55,7 @@ public class FilesystemWriteFileAction {
                 .description("The path to which the file should be written.")
                 .placeholder("/data/your_file.pdf")
                 .required(true))
-        .outputSchema(object().properties(integer("bytes")))
-        .sampleOutput(Map.of("bytes", 1024))
+        .output(outputSchema(object().properties(integer("bytes"))), sampleOutput(Map.of("bytes", 1024)))
         .perform(FilesystemWriteFileAction::perform);
 
     private FilesystemWriteFileAction() {

@@ -19,6 +19,7 @@ package com.bytechef.component.nifty.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.dateTime;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.nifty.constant.NiftyConstants.CREATE_TASK;
 import static com.bytechef.component.nifty.constant.NiftyConstants.DESCRIPTION;
@@ -68,15 +69,16 @@ public class NiftyCreateTaskAction {
                 .label("Due date")
                 .description("Due date for the task.")
                 .required(false))
-        .outputSchema(
-            object()
-                .properties(
-                    string("id"),
-                    string(NAME),
-                    string(PROJECT),
-                    string(DESCRIPTION),
-                    string(DUE_DATE),
-                    string("task_group")))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string("id"),
+                        string(NAME),
+                        string(PROJECT),
+                        string(DESCRIPTION),
+                        string(DUE_DATE),
+                        string("task_group"))))
         .perform(NiftyCreateTaskAction::perform);
 
     private NiftyCreateTaskAction() {

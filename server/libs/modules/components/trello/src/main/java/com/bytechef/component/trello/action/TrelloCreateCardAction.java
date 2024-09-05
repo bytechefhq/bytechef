@@ -17,6 +17,7 @@
 package com.bytechef.component.trello.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.trello.constant.TrelloConstants.CARD_OUTPUT_PROPERTY;
 import static com.bytechef.component.trello.constant.TrelloConstants.DESC;
@@ -59,7 +60,7 @@ public class TrelloCreateCardAction {
                 .label("Description")
                 .description("The description for the card.")
                 .required(false))
-        .outputSchema(CARD_OUTPUT_PROPERTY)
+        .output(outputSchema(CARD_OUTPUT_PROPERTY))
         .perform(TrelloCreateCardAction::perform);
 
     private TrelloCreateCardAction() {

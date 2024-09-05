@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.resend.constant.ResendConstants.ATTACHMENTS;
 import static com.bytechef.component.resend.constant.ResendConstants.BCC;
@@ -130,10 +131,11 @@ public final class ResendSendEmailAction {
                                 .maxLength(256)
                                 .required(true)))
                 .required(false))
-        .outputSchema(
-            object()
-                .properties(
-                    string("id")))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string("id"))))
         .perform(ResendSendEmailAction::perform);
 
     private ResendSendEmailAction() {

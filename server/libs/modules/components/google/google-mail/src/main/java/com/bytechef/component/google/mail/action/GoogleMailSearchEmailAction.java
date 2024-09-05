@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.CATEGORY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FROM;
@@ -107,17 +108,18 @@ public class GoogleMailSearchEmailAction {
                 .label("Include spam trash")
                 .description("Include messages from SPAM and TRASH in the results.")
                 .required(false))
-        .outputSchema(
-            object()
-                .properties(
-                    array(MESSAGES)
-                        .items(
-                            object()
-                                .properties(
-                                    string(ID),
-                                    string(THREAD_ID))),
-                    string(NEXT_PAGE_TOKEN),
-                    number(RESULT_SIZE_ESTIMATE)))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        array(MESSAGES)
+                            .items(
+                                object()
+                                    .properties(
+                                        string(ID),
+                                        string(THREAD_ID))),
+                        string(NEXT_PAGE_TOKEN),
+                        number(RESULT_SIZE_ESTIMATE))))
         .perform(GoogleMailSearchEmailAction::perform);
 
     private GoogleMailSearchEmailAction() {

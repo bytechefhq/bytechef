@@ -18,6 +18,7 @@ package com.bytechef.component.dropbox.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FROM_PATH;
@@ -56,16 +57,17 @@ public class DropboxMoveAction {
                 .label("Destination path")
                 .description("Path in the user's Dropbox that is the destination. Root is /.")
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    object("metadata")
-                        .properties(
-                            string(".tag"),
-                            string("name"),
-                            string("path_lower"),
-                            string("path_display"),
-                            string("id"))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object("metadata")
+                            .properties(
+                                string(".tag"),
+                                string("name"),
+                                string("path_lower"),
+                                string("path_display"),
+                                string("id")))))
         .perform(DropboxMoveAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_MOVE_CONTEXT_FUNCTION =

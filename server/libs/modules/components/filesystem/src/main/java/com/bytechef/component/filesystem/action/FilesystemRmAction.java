@@ -18,6 +18,8 @@ package com.bytechef.component.filesystem.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.bool;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
+import static com.bytechef.component.definition.ComponentDSL.sampleOutput;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.PATH;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.RM;
@@ -46,8 +48,7 @@ public class FilesystemRmAction {
                 .label("Path")
                 .description("The path of a directory.")
                 .required(true))
-        .outputSchema(bool())
-        .sampleOutput(true)
+        .output(outputSchema(bool()), sampleOutput(true))
         .perform(FilesystemRmAction::perform);
 
     private FilesystemRmAction() {

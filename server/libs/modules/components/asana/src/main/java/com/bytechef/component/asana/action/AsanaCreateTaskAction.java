@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.date;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
@@ -72,25 +73,27 @@ public class AsanaCreateTaskAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .outputSchema(
-            object()
-                .properties(
-                    object("data")
-                        .properties(string("gid").required(false), date("due_on").required(false),
-                            string("notes").required(false), string("name").required(false),
-                            object("workspace")
-                                .properties(string("gid").required(false), string("name").required(false))
-                                .required(false),
-                            array("tags")
-                                .items(
-                                    object().properties(string("gid").required(false), string("name").required(false)))
-                                .required(false),
-                            object("assignee").properties(string("gid").required(false), string("name").required(false))
-                                .required(false))
-                        .required(false))
-                .metadata(
-                    Map.of(
-                        "responseType", ResponseType.JSON)));
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object("data")
+                            .properties(string("gid").required(false), date("due_on").required(false),
+                                string("notes").required(false), string("name").required(false),
+                                object("workspace")
+                                    .properties(string("gid").required(false), string("name").required(false))
+                                    .required(false),
+                                array("tags")
+                                    .items(object().properties(string("gid").required(false),
+                                        string("name").required(false)))
+                                    .required(false),
+                                object("assignee")
+                                    .properties(string("gid").required(false), string("name").required(false))
+                                    .required(false))
+                            .required(false))
+                    .metadata(
+                        Map.of(
+                            "responseType", ResponseType.JSON))));
 
     private AsanaCreateTaskAction() {
     }

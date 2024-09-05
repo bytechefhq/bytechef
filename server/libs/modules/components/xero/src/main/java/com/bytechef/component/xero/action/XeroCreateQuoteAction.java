@@ -23,6 +23,7 @@ import static com.bytechef.component.definition.ComponentDSL.date;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.xero.constant.XeroConstants.BRANDING_THEME_ID;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACT;
@@ -118,35 +119,36 @@ public class XeroCreateQuoteAction {
                 .controlType(ControlType.TEXT_AREA)
                 .maxLength(4000)
                 .required(false))
-        .outputSchema(
-            object()
-                .properties(
-                    string("QuoteID"),
-                    string(QUOTE_NUMBER),
-                    string(REFERENCE),
-                    string(TERMS),
-                    object(CONTACT)
-                        .properties(
-                            string(CONTACT_ID),
-                            string(NAME),
-                            string(EMAIL_ADDRESS)),
-                    array(LINE_ITEMS)
-                        .items(
-                            object()
-                                .properties(
-                                    string("LineItemID"),
-                                    string(DESCRIPTION),
-                                    number(UNIT_AMOUNT),
-                                    integer(DISCOUNT_RATE),
-                                    integer(QUANTITY))),
-                    string("DateString"),
-                    string("ExpiryDateString"),
-                    string(STATUS),
-                    string(CURRENCY_CODE),
-                    string(TITLE),
-                    string(BRANDING_THEME_ID),
-                    string(SUMMARY),
-                    string(LINE_AMOUNT_TYPES)))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string("QuoteID"),
+                        string(QUOTE_NUMBER),
+                        string(REFERENCE),
+                        string(TERMS),
+                        object(CONTACT)
+                            .properties(
+                                string(CONTACT_ID),
+                                string(NAME),
+                                string(EMAIL_ADDRESS)),
+                        array(LINE_ITEMS)
+                            .items(
+                                object()
+                                    .properties(
+                                        string("LineItemID"),
+                                        string(DESCRIPTION),
+                                        number(UNIT_AMOUNT),
+                                        integer(DISCOUNT_RATE),
+                                        integer(QUANTITY))),
+                        string("DateString"),
+                        string("ExpiryDateString"),
+                        string(STATUS),
+                        string(CURRENCY_CODE),
+                        string(TITLE),
+                        string(BRANDING_THEME_ID),
+                        string(SUMMARY),
+                        string(LINE_AMOUNT_TYPES))))
         .perform(XeroCreateQuoteAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_QUOTES_CONTEXT_FUNCTION =

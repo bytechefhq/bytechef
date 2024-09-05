@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.HEADERS;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID;
@@ -67,9 +68,10 @@ public class GoogleSheetsCreateSheetAction {
                 .description("The headers of the new sheet.")
                 .items(bool(), number(), string())
                 .required(false))
-        .outputSchema(
-            object()
-                .additionalProperties(string(), integer(), array().items(bool(), number(), string())))
+        .output(
+            outputSchema(
+                object()
+                    .additionalProperties(string(), integer(), array().items(bool(), number(), string()))))
         .perform(GoogleSheetsCreateSheetAction::perform);
 
     private GoogleSheetsCreateSheetAction() {

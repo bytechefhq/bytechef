@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.dateTime;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
@@ -88,8 +89,8 @@ public class KeapCreateTaskAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .outputSchema(
-            object()
+        .output(
+            outputSchema(object()
                 .properties(bool("completed").required(false), dateTime("completion_date").required(false),
                     object("contact").properties(
                         string("email").required(false), string("first_name").required(false),
@@ -106,7 +107,7 @@ public class KeapCreateTaskAction {
                     integer("user_id").required(false))
                 .metadata(
                     Map.of(
-                        "responseType", ResponseType.JSON)));
+                        "responseType", ResponseType.JSON))));
 
     private KeapCreateTaskAction() {
     }

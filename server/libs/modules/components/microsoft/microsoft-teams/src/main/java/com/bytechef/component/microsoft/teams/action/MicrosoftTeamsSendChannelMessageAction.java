@@ -18,6 +18,7 @@ package com.bytechef.component.microsoft.teams.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.BODY;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CHANNEL_ID;
@@ -58,18 +59,19 @@ public class MicrosoftTeamsSendChannelMessageAction {
                 .required(true),
             CONTENT_TYPE_PROPERTY,
             CONTENT_PROPERTY)
-        .outputSchema(
-            object()
-                .properties(
-                    string(ID),
-                    object(BODY)
-                        .properties(
-                            string(CONTENT_TYPE),
-                            string(CONTENT)),
-                    object("channelIdentity")
-                        .properties(
-                            string(TEAM_ID),
-                            string(CHANNEL_ID))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(ID),
+                        object(BODY)
+                            .properties(
+                                string(CONTENT_TYPE),
+                                string(CONTENT)),
+                        object("channelIdentity")
+                            .properties(
+                                string(TEAM_ID),
+                                string(CHANNEL_ID)))))
         .perform(MicrosoftTeamsSendChannelMessageAction::perform);
 
     private MicrosoftTeamsSendChannelMessageAction() {

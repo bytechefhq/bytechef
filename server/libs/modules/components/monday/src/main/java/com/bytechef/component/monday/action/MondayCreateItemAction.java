@@ -19,6 +19,7 @@ package com.bytechef.component.monday.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.monday.constant.MondayConstants.BOARD_ID;
 import static com.bytechef.component.monday.constant.MondayConstants.CREATE_ITEM;
@@ -72,13 +73,14 @@ public class MondayCreateItemAction {
                 .properties(MondayPropertiesUtils::createPropertiesForItem)
                 .propertiesLookupDependsOn(WORKSPACE_ID, BOARD_ID, GROUP_ID)
                 .required(false))
-        .outputSchema(
-            object()
-                .properties(
-                    object("create_item")
-                        .properties(
-                            string(ID),
-                            string(NAME))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object("create_item")
+                            .properties(
+                                string(ID),
+                                string(NAME)))))
         .perform(MondayCreateItemAction::perform);
 
     private MondayCreateItemAction() {

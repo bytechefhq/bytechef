@@ -24,6 +24,7 @@ import static com.bytechef.component.aws.s3.constant.AwsS3Constants.PUT_OBJECT;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.aws.s3.util.AwsS3Utils;
@@ -73,7 +74,7 @@ public class AwsS3PutObjectAction {
                     option("private", "private"),
                     option("public-read", "public-read"),
                     option("public-read-write", "public-read-write")))
-        .outputSchema(string())
+        .output(outputSchema(string()))
         .perform(AwsS3PutObjectAction::perform);
 
     @SuppressFBWarnings("RV")

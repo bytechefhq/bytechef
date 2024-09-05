@@ -24,6 +24,7 @@ import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.twilio.constant.TwilioConstants.ACCOUNT_SID;
@@ -304,45 +305,46 @@ public class TwilioSendSMSAction {
                 .displayCondition("%s == %s".formatted(CONTENT, 2))
                 .required(false)
                 .advancedOption(true))
-        .outputSchema(
-            object()
-                .properties(
-                    string("body"),
-                    string("numSegments"),
-                    string("direction"),
-                    object("from")
-                        .properties(
-                            string("rawNumber")),
-                    string("to"),
-                    object("dateUpdated")
-                        .properties(
-                            dateTime(DATE_TIME),
-                            string(ZONE_ID)),
-                    string("price"),
-                    string("errorMessage"),
-                    string("uri"),
-                    string("accountSid"),
-                    string("numMedia"),
-                    string("status"),
-                    string("messagingServiceSid"),
-                    string("sid"),
-                    object("dateSent")
-                        .properties(
-                            dateTime(DATE_TIME),
-                            string(ZONE_ID)),
-                    object("dateCreated")
-                        .properties(
-                            dateTime(DATE_TIME),
-                            string(ZONE_ID)),
-                    integer("errorCode"),
-                    object("currency")
-                        .properties(
-                            string("currencyCode"),
-                            integer("defaultFractionDigits"),
-                            integer("numericCode")),
-                    string("apiVersion"),
-                    object("subresourceUris")
-                        .additionalProperties(string())))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string("body"),
+                        string("numSegments"),
+                        string("direction"),
+                        object("from")
+                            .properties(
+                                string("rawNumber")),
+                        string("to"),
+                        object("dateUpdated")
+                            .properties(
+                                dateTime(DATE_TIME),
+                                string(ZONE_ID)),
+                        string("price"),
+                        string("errorMessage"),
+                        string("uri"),
+                        string("accountSid"),
+                        string("numMedia"),
+                        string("status"),
+                        string("messagingServiceSid"),
+                        string("sid"),
+                        object("dateSent")
+                            .properties(
+                                dateTime(DATE_TIME),
+                                string(ZONE_ID)),
+                        object("dateCreated")
+                            .properties(
+                                dateTime(DATE_TIME),
+                                string(ZONE_ID)),
+                        integer("errorCode"),
+                        object("currency")
+                            .properties(
+                                string("currencyCode"),
+                                integer("defaultFractionDigits"),
+                                integer("numericCode")),
+                        string("apiVersion"),
+                        object("subresourceUris")
+                            .additionalProperties(string()))))
         .perform(TwilioSendSMSAction::perform);
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {

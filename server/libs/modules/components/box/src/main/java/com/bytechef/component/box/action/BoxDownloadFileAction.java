@@ -21,6 +21,7 @@ import static com.bytechef.component.box.constant.BoxConstants.FILE_ID;
 import static com.bytechef.component.box.constant.BoxConstants.ID;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
@@ -52,7 +53,7 @@ public class BoxDownloadFileAction {
                 .optionsLookupDependsOn(ID)
                 .options((ActionOptionsFunction<String>) BoxUtils::getFileIdOptions)
                 .required(true))
-        .outputSchema(fileEntry())
+        .output(outputSchema(fileEntry()))
         .perform(BoxDownloadFileAction::perform);
 
     private BoxDownloadFileAction() {

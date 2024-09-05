@@ -26,6 +26,7 @@ import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.nullable;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.time;
 import static com.bytechef.component.xlsx.file.constant.XlsxFileConstants.FILENAME;
@@ -79,7 +80,7 @@ public class XlsxFileWriteAction {
                 .required(true)
                 .defaultValue("file.xlsx")
                 .advancedOption(true))
-        .outputSchema(fileEntry())
+        .output(outputSchema(fileEntry()))
         .perform(XlsxFileWriteAction::perform);
 
     @SuppressWarnings({

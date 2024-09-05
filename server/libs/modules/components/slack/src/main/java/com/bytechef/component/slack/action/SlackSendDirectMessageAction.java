@@ -18,6 +18,7 @@ package com.bytechef.component.slack.action;
 
 import static com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.slack.constant.SlackConstants.CHANNEL;
 import static com.bytechef.component.slack.constant.SlackConstants.CHAT_POST_MESSAGE_RESPONSE_PROPERTY;
@@ -47,7 +48,7 @@ public class SlackSendDirectMessageAction {
                 .options((ActionOptionsFunction<String>) SlackUtils::getUserOptions)
                 .required(true),
             TEXT_PROPERTY)
-        .outputSchema(CHAT_POST_MESSAGE_RESPONSE_PROPERTY)
+        .output(outputSchema(CHAT_POST_MESSAGE_RESPONSE_PROPERTY))
         .perform(SlackSendDirectMessageAction::perform);
 
     private SlackSendDirectMessageAction() {

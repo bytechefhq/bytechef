@@ -19,6 +19,7 @@ package com.bytechef.component.google.mail.trigger;
 import static com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
@@ -48,12 +49,13 @@ public class GoogleMailNewEmailPollingTrigger {
         .title("New Email Polling")
         .description("Periodically checks your Gmail inbox for any new incoming emails.")
         .type(TriggerType.POLLING)
-        .outputSchema(
-            array()
-                .items(object()
-                    .properties(
-                        string(ID),
-                        string(THREAD_ID))))
+        .output(
+            outputSchema(
+                array()
+                    .items(object()
+                        .properties(
+                            string(ID),
+                            string(THREAD_ID)))))
         .poll(GoogleMailNewEmailPollingTrigger::poll);
 
     private GoogleMailNewEmailPollingTrigger() {

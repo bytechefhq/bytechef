@@ -18,6 +18,7 @@ package com.bytechef.component.one.simple.api.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.ACCESS_TOKEN;
@@ -44,11 +45,12 @@ public class OneSimpleAPIUrlShortenerAction {
                 .label("URL")
                 .description("Place the URL you want to shorten")
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    string(URL),
-                    string("short_url")))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(URL),
+                        string("short_url"))))
         .perform(OneSimpleAPIUrlShortenerAction::perform);
 
     private OneSimpleAPIUrlShortenerAction() {

@@ -16,6 +16,7 @@
 
 package com.bytechef.component.pipedrive.trigger;
 
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 import static com.bytechef.component.pipedrive.constant.PipedriveConstants.CURRENT;
 import static com.bytechef.component.pipedrive.constant.PipedriveConstants.ID;
@@ -45,7 +46,7 @@ public class PipedriveUpdatedOrganizationTrigger {
         .title("Updated Organization")
         .description("Trigger off whenever an existing organization is updated.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
-        .outputSchema(ORGANIZATION_OUTPUT_PROPERTY)
+        .output(outputSchema(ORGANIZATION_OUTPUT_PROPERTY))
         .webhookDisable(PipedriveUpdatedOrganizationTrigger::webhookDisable)
         .webhookEnable(PipedriveUpdatedOrganizationTrigger::webhookEnable)
         .webhookRequest(PipedriveUpdatedOrganizationTrigger::webhookRequest);

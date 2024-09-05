@@ -18,6 +18,7 @@ package com.bytechef.component.microsoft.one.drive.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.DOWNLOAD_FILE;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
@@ -50,7 +51,7 @@ public class MicrosoftOneDriveDownloadFileAction {
                 .optionsLookupDependsOn(PARENT_ID)
                 .options((ActionOptionsFunction<String>) MicrosoftOneDriveUtils::getFileIdOptions)
                 .required(true))
-        .outputSchema(fileEntry())
+        .output(outputSchema(fileEntry()))
         .perform(MicrosoftOneDriveDownloadFileAction::perform);
 
     private MicrosoftOneDriveDownloadFileAction() {

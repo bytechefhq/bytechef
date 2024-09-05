@@ -18,6 +18,7 @@ package com.bytechef.component.whatsapp.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
@@ -59,17 +60,18 @@ public class WhatsAppSendMessageAction {
                 .label("Send message to")
                 .description("Phone number to send the message. It must start with \"+\" sign")
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    string(MESSAGING_PRODUCT),
-                    object(CONTACTS)
-                        .properties(
-                            string(INPUT),
-                            string("wa_id")),
-                    object(MESSAGES)
-                        .properties(
-                            string(ID))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(MESSAGING_PRODUCT),
+                        object(CONTACTS)
+                            .properties(
+                                string(INPUT),
+                                string("wa_id")),
+                        object(MESSAGES)
+                            .properties(
+                                string(ID)))))
         .perform(WhatsAppSendMessageAction::perform);
 
     private WhatsAppSendMessageAction() {

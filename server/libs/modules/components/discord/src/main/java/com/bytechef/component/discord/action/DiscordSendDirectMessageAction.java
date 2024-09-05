@@ -19,6 +19,7 @@ package com.bytechef.component.discord.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.discord.constant.DiscordConstants.CONTENT;
 import static com.bytechef.component.discord.constant.DiscordConstants.GUILD_ID;
@@ -61,12 +62,13 @@ public class DiscordSendDirectMessageAction {
                 .description("True if this is a TTS message")
                 .defaultValue(false)
                 .required(false))
-        .outputSchema(
-            object()
-                .properties(
-                    object("body")
-                        .properties(
-                            string("id"))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object("body")
+                            .properties(
+                                string("id")))))
         .perform(DiscordSendDirectMessageAction::perform);
 
     private DiscordSendDirectMessageAction() {

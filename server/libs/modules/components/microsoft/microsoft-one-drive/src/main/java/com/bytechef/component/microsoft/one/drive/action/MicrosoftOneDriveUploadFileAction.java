@@ -19,6 +19,7 @@ package com.bytechef.component.microsoft.one.drive.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.FILE;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
@@ -56,11 +57,12 @@ public class MicrosoftOneDriveUploadFileAction {
                 .label("File")
                 .description("File to upload")
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    string(ID),
-                    string(NAME)))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(ID),
+                        string(NAME))))
         .perform(MicrosoftOneDriveUploadFileAction::perform);
 
     private MicrosoftOneDriveUploadFileAction() {

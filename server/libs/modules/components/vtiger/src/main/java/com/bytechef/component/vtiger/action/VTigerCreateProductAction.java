@@ -19,6 +19,7 @@ package com.bytechef.component.vtiger.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.vtiger.constant.VTigerConstants.CREATE_PRODUCT;
@@ -54,17 +55,18 @@ public class VTigerCreateProductAction {
                 .label("Product Type")
                 .description("Type of the product")
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    object("results")
-                        .properties(
-                            string("id"),
-                            string(PRODUCT_NAME),
-                            string(PRODUCT_TYPE),
-                            string("createdtime"),
-                            string("source"),
-                            string("assigned_user_id"))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object("results")
+                            .properties(
+                                string("id"),
+                                string(PRODUCT_NAME),
+                                string(PRODUCT_TYPE),
+                                string("createdtime"),
+                                string("source"),
+                                string("assigned_user_id")))))
         .perform(VTigerCreateProductAction::perform);
 
     private VTigerCreateProductAction() {

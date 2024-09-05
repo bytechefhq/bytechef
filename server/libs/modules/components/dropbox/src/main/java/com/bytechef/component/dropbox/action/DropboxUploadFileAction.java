@@ -23,6 +23,7 @@ import static com.bytechef.component.definition.ComponentDSL.date;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.AUTORENAME;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
@@ -88,46 +89,47 @@ public class DropboxUploadFileAction {
                         "existing file's \"rev\", even if the existing file has been deleted.")
                 .defaultValue(false)
                 .required(false))
-        .outputSchema(
-            object()
-                .properties(
-                    string("id"),
-                    date("clientModified"),
-                    date("serverModified"),
-                    string("rev"),
-                    integer("size"),
-                    object("symlinkInfo")
-                        .properties(
-                            string("target")),
-                    object("sharingInfo")
-                        .properties(
-                            string("parentSharedFolderId"),
-                            string("modifiedBy")),
-                    bool("isDownloadable"),
-                    object("exportInfo")
-                        .properties(
-                            string("exportAs"),
-                            array("exportOptions")
-                                .items(string())),
-                    array("propertyGroups")
-                        .items(
-                            object()
-                                .properties(
-                                    string("templateId"),
-                                    array("fields")
-                                        .items(
-                                            object()
-                                                .properties(
-                                                    string("name"),
-                                                    string("value"))))),
-                    bool("hasExplicitSharedMembers"),
-                    string("contentHash"),
-                    object("fileLockInfo")
-                        .properties(
-                            bool("isLockholder"),
-                            string("lockholderName"),
-                            string("lockholderAccountId"),
-                            date("created"))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string("id"),
+                        date("clientModified"),
+                        date("serverModified"),
+                        string("rev"),
+                        integer("size"),
+                        object("symlinkInfo")
+                            .properties(
+                                string("target")),
+                        object("sharingInfo")
+                            .properties(
+                                string("parentSharedFolderId"),
+                                string("modifiedBy")),
+                        bool("isDownloadable"),
+                        object("exportInfo")
+                            .properties(
+                                string("exportAs"),
+                                array("exportOptions")
+                                    .items(string())),
+                        array("propertyGroups")
+                            .items(
+                                object()
+                                    .properties(
+                                        string("templateId"),
+                                        array("fields")
+                                            .items(
+                                                object()
+                                                    .properties(
+                                                        string("name"),
+                                                        string("value"))))),
+                        bool("hasExplicitSharedMembers"),
+                        string("contentHash"),
+                        object("fileLockInfo")
+                            .properties(
+                                bool("isLockholder"),
+                                string("lockholderName"),
+                                string("lockholderAccountId"),
+                                date("created")))))
         .perform(DropboxUploadFileAction::perform);
 
     private DropboxUploadFileAction() {

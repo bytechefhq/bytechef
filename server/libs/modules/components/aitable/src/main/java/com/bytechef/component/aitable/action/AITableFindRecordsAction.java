@@ -28,6 +28,7 @@ import static com.bytechef.component.aitable.util.AITableUtils.createQuery;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.aitable.util.AITableUtils;
@@ -69,7 +70,7 @@ public class AITableFindRecordsAction {
                 .label("Max records")
                 .description("How many records are returned in total")
                 .required(false))
-        .outputSchema(OUTPUT_PROPERTY)
+        .output(outputSchema(OUTPUT_PROPERTY))
         .perform(AITableFindRecordsAction::perform);
 
     private AITableFindRecordsAction() {

@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.INCLUDE_ITEMS_FROM_ALL_DRIVES_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER;
@@ -67,11 +68,12 @@ public class GoogleSheetsInsertMultipleRowsAction {
                 .propertiesLookupDependsOn(SPREADSHEET_ID, SHEET_NAME, IS_THE_FIRST_ROW_HEADER)
                 .properties(GoogleSheetsUtils.createPropertiesForNewRows(false))
                 .required(true))
-        .outputSchema(
-            array()
-                .items(
-                    object()
-                        .additionalProperties(bool(), number(), string())))
+        .output(
+            outputSchema(
+                array()
+                    .items(
+                        object()
+                            .additionalProperties(bool(), number(), string()))))
         .perform(GoogleSheetsInsertMultipleRowsAction::perform);
 
     private GoogleSheetsInsertMultipleRowsAction() {

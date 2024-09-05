@@ -17,6 +17,8 @@
 package com.bytechef.component.filesystem.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
+import static com.bytechef.component.definition.ComponentDSL.sampleOutput;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.CREATE_TEMP_DIR;
 
@@ -37,8 +39,7 @@ public class FilesystemCreateTempDirAction {
         .title("Create Temp Directory")
         .description(
             "Creates a file in the temporary directory on the filesystem. Returns the created directory's full path.")
-        .outputSchema(string())
-        .sampleOutput("/sample_tmp_dir")
+        .output(outputSchema(string()), sampleOutput("/sample_tmp_dir"))
         .perform(FilesystemCreateTempDirAction::perform);
 
     private FilesystemCreateTempDirAction() {

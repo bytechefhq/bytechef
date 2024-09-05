@@ -24,6 +24,8 @@ import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
+import static com.bytechef.component.definition.ComponentDSL.sampleOutput;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
@@ -133,8 +135,8 @@ public class MailchimpAddMemberToListAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.BODY)))
-        .outputSchema(object()
-            .properties(string("id")
+        .output(
+            outputSchema(object().properties(string("id")
                 .description("The MD5 hash of the lowercase version of the list member's email address.")
                 .required(false),
                 string("email_address").description("Email address for a subscriber.")
@@ -273,43 +275,47 @@ public class MailchimpAddMemberToListAction {
                     .description("The list of link types and descriptions for the API schema documents."))
                     .description("The list of link types and descriptions for the API schema documents.")
                     .required(false))
-            .metadata(
-                Map.of(
-                    "responseType", ResponseType.JSON)))
-        .sampleOutput(Map.<String, Object>ofEntries(Map.entry("id", "string"), Map.entry("email_address", "string"),
-            Map.entry("unique_email_id", "string"), Map.entry("contact_id", "string"), Map.entry("full_name", "string"),
-            Map.entry("web_id", 0), Map.entry("email_type", "string"), Map.entry("status", "subscribed"),
-            Map.entry("unsubscribe_reason", "string"), Map.entry("consents_to_one_to_one_messaging", true),
-            Map.entry("merge_fields",
-                Map.<String, Object>ofEntries(Map.entry("property1", ""), Map.entry("property2", ""))),
-            Map.entry("interests",
-                Map.<String, Object>ofEntries(Map.entry("property1", true), Map.entry("property2", true))),
-            Map.entry("stats",
-                Map.<String, Object>ofEntries(Map.entry("avg_open_rate", 0), Map.entry("avg_click_rate", 0),
-                    Map.entry("ecommerce_data",
-                        Map.<String, Object>ofEntries(Map.entry("total_revenue", 0), Map.entry("number_of_orders", 0),
-                            Map.entry("currency_code", "USD"))))),
-            Map.entry("ip_signup", "string"), Map.entry("timestamp_signup", LocalDateTime.of(2019, 8, 24, 14, 15, 22)),
-            Map.entry("ip_opt", "string"), Map.entry("timestamp_opt", LocalDateTime.of(2019, 8, 24, 14, 15, 22)),
-            Map.entry("member_rating", 0), Map.entry("last_changed", LocalDateTime.of(2019, 8, 24, 14, 15, 22)),
-            Map.entry("language", "string"), Map.entry("vip", true), Map.entry("email_client", "string"),
-            Map.entry("location",
-                Map.<String, Object>ofEntries(Map.entry("latitude", 0), Map.entry("longitude", 0),
-                    Map.entry("gmtoff", 0), Map.entry("dstoff", 0), Map.entry("country_code", "string"),
-                    Map.entry("timezone", "string"), Map.entry("region", "string"))),
-            Map.entry("marketing_permissions",
-                List.of(Map.<String, Object>ofEntries(Map.entry("marketing_permission_id", "string"),
-                    Map.entry("text", "string"), Map.entry("enabled", true)))),
-            Map.entry("last_note",
-                Map.<String, Object>ofEntries(Map.entry("note_id", 0),
-                    Map.entry("created_at", LocalDateTime.of(2019, 8, 24, 14, 15, 22)),
-                    Map.entry("created_by", "string"), Map.entry("note", "string"))),
-            Map.entry("source", "string"), Map.entry("tags_count", 0),
-            Map.entry("tags", List.of(Map.<String, Object>ofEntries(Map.entry("id", 0), Map.entry("name", "string")))),
-            Map.entry("list_id", "string"),
-            Map.entry("_links",
-                List.of(Map.<String, Object>ofEntries(Map.entry("rel", "string"), Map.entry("href", "string"),
-                    Map.entry("method", "GET"), Map.entry("targetSchema", "string"), Map.entry("schema", "string"))))));
+                .metadata(
+                    Map.of(
+                        "responseType", ResponseType.JSON))),
+            sampleOutput(Map.<String, Object>ofEntries(Map.entry("id", "string"), Map.entry("email_address", "string"),
+                Map.entry("unique_email_id", "string"), Map.entry("contact_id", "string"),
+                Map.entry("full_name", "string"), Map.entry("web_id", 0), Map.entry("email_type", "string"),
+                Map.entry("status", "subscribed"), Map.entry("unsubscribe_reason", "string"),
+                Map.entry("consents_to_one_to_one_messaging", true),
+                Map.entry("merge_fields",
+                    Map.<String, Object>ofEntries(Map.entry("property1", ""), Map.entry("property2", ""))),
+                Map.entry("interests",
+                    Map.<String, Object>ofEntries(Map.entry("property1", true), Map.entry("property2", true))),
+                Map.entry("stats",
+                    Map.<String, Object>ofEntries(Map.entry("avg_open_rate", 0), Map.entry("avg_click_rate", 0),
+                        Map.entry("ecommerce_data",
+                            Map.<String, Object>ofEntries(Map.entry("total_revenue", 0),
+                                Map.entry("number_of_orders", 0), Map.entry("currency_code", "USD"))))),
+                Map.entry("ip_signup", "string"),
+                Map.entry("timestamp_signup", LocalDateTime.of(2019, 8, 24, 14, 15, 22)), Map.entry("ip_opt", "string"),
+                Map.entry("timestamp_opt", LocalDateTime.of(2019, 8, 24, 14, 15, 22)), Map.entry("member_rating", 0),
+                Map.entry("last_changed", LocalDateTime.of(2019, 8, 24, 14, 15, 22)), Map.entry("language", "string"),
+                Map.entry("vip", true), Map.entry("email_client", "string"),
+                Map.entry("location",
+                    Map.<String, Object>ofEntries(Map.entry("latitude", 0), Map.entry("longitude", 0),
+                        Map.entry("gmtoff", 0), Map.entry("dstoff", 0), Map.entry("country_code", "string"),
+                        Map.entry("timezone", "string"), Map.entry("region", "string"))),
+                Map.entry("marketing_permissions",
+                    List.of(Map.<String, Object>ofEntries(Map.entry("marketing_permission_id", "string"),
+                        Map.entry("text", "string"), Map.entry("enabled", true)))),
+                Map.entry("last_note",
+                    Map.<String, Object>ofEntries(Map.entry("note_id", 0),
+                        Map.entry("created_at", LocalDateTime.of(2019, 8, 24, 14, 15, 22)),
+                        Map.entry("created_by", "string"), Map.entry("note", "string"))),
+                Map.entry("source", "string"), Map.entry("tags_count", 0),
+                Map.entry("tags",
+                    List.of(Map.<String, Object>ofEntries(Map.entry("id", 0), Map.entry("name", "string")))),
+                Map.entry("list_id", "string"),
+                Map.entry("_links",
+                    List.of(Map.<String, Object>ofEntries(Map.entry("rel", "string"), Map.entry("href", "string"),
+                        Map.entry("method", "GET"), Map.entry("targetSchema", "string"),
+                        Map.entry("schema", "string")))))));
 
     private MailchimpAddMemberToListAction() {
     }

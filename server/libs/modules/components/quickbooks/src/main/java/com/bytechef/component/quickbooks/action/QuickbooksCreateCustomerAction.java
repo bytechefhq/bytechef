@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.CREATE_CUSTOMER;
@@ -89,37 +90,38 @@ public final class QuickbooksCreateCustomerAction {
                         "GivenName, MiddleName, FamilyName, or Suffix attributes is required for object create.")
                 .maxLength(100))
         .description("Has conditionally required parameters.")
-        .outputSchema(
-            object()
-                .properties(
-                    string("id")
-                        .label("ID")
-                        .required(true),
-                    string("contactName")
-                        .label("Contact name"),
-                    object("creditChargeInfo")
-                        .properties(
-                            string("number")
-                                .label("Number"),
-                            string("nameOnAcct")
-                                .label("Name on account"),
-                            integer("ccExpiryMonth")
-                                .label("Expiry month"),
-                            integer("ccExpiryYear")
-                                .label("Expiry year"),
-                            string("billAddrStreet")
-                                .label("Billing address street"),
-                            string("postalCode")
-                                .label("Postal code"),
-                            number("amount")
-                                .label("Amount"))
-                        .label("Credit card"),
-                    number("balance")
-                        .label("Balance"),
-                    string("acctNum")
-                        .label("Account number"),
-                    string("businessNumber")
-                        .label("Business number")))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string("id")
+                            .label("ID")
+                            .required(true),
+                        string("contactName")
+                            .label("Contact name"),
+                        object("creditChargeInfo")
+                            .properties(
+                                string("number")
+                                    .label("Number"),
+                                string("nameOnAcct")
+                                    .label("Name on account"),
+                                integer("ccExpiryMonth")
+                                    .label("Expiry month"),
+                                integer("ccExpiryYear")
+                                    .label("Expiry year"),
+                                string("billAddrStreet")
+                                    .label("Billing address street"),
+                                string("postalCode")
+                                    .label("Postal code"),
+                                number("amount")
+                                    .label("Amount"))
+                            .label("Credit card"),
+                        number("balance")
+                            .label("Balance"),
+                        string("acctNum")
+                            .label("Account number"),
+                        string("businessNumber")
+                            .label("Business number"))))
         .perform(QuickbooksCreateCustomerAction::perform);
 
     private QuickbooksCreateCustomerAction() {

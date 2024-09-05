@@ -26,6 +26,7 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
@@ -60,11 +61,11 @@ public class BoxUploadFileAction {
             fileEntry(FILE)
                 .label("File")
                 .required(true))
-        .outputSchema(
+        .output(outputSchema(
             object()
                 .properties(
                     array("entries")
-                        .items(FILE_OUTPUT_PROPERTY)))
+                        .items(FILE_OUTPUT_PROPERTY))))
         .perform(BoxUploadFileAction::perform);
 
     private BoxUploadFileAction() {

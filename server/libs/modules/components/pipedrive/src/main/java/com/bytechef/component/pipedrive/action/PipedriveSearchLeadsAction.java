@@ -24,6 +24,7 @@ import static com.bytechef.component.definition.ComponentDSL.date;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
@@ -86,10 +87,10 @@ public class PipedriveSearchLeadsAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)))
-        .outputSchema(
-            object()
-                .properties(
-                    object("body")
+        .output(
+            outputSchema(
+                object()
+                    .properties(object("body")
                         .properties(object("data")
                             .properties(array("items")
                                 .items(object().properties(string("id").required(false),
@@ -102,9 +103,9 @@ public class PipedriveSearchLeadsAction {
                                 .required(false))
                             .required(false))
                         .required(false))
-                .metadata(
-                    Map.of(
-                        "responseType", ResponseType.JSON)));
+                    .metadata(
+                        Map.of(
+                            "responseType", ResponseType.JSON))));
 
     private PipedriveSearchLeadsAction() {
     }
