@@ -209,6 +209,8 @@ public class ComponentInitOpenAPIGenerator {
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "number")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "object")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "option")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "outputSchema")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "sampleOutput")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "string")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "time")
             .addStaticImport(CONNECTION_DEFINITION_CLASS_NAME, "BASE_URI")
@@ -488,16 +490,16 @@ public class ComponentInitOpenAPIGenerator {
             metadataBuilder.build(),
             propertiesEntry.propertiesCodeBlock());
 
-        CodeBlock codeBlock = outputEntry == null ? null : outputEntry.outputSchemaCodeBlock();
+        CodeBlock outputSchemaCodeBlock = outputEntry == null ? null : outputEntry.outputSchemaCodeBlock();
+        CodeBlock sampleOutputCodeBlock = outputEntry == null ? null : outputEntry.sampleOutputCodeBlock();
 
-        if (codeBlock != null && !codeBlock.isEmpty()) {
-            builder.add(".outputSchema($L)", codeBlock);
-        }
-
-        codeBlock = outputEntry == null ? null : outputEntry.sampleOutputCodeBlock();
-
-        if (codeBlock != null && !codeBlock.isEmpty()) {
-            builder.add(".sampleOutput($L)", outputEntry.sampleOutputCodeBlock());
+        if (outputSchemaCodeBlock != null && !outputSchemaCodeBlock.isEmpty()) {
+            if (sampleOutputCodeBlock == null || sampleOutputCodeBlock.isEmpty()) {
+                builder.add(".output(outputSchema($L))", outputSchemaCodeBlock);
+            } else {
+                builder.add(".output(outputSchema($L), sampleOutput($L))", outputSchemaCodeBlock,
+                    sampleOutputCodeBlock);
+            }
         }
 
         return builder.build();
