@@ -17,11 +17,19 @@
 package com.bytechef.component.spotify;
 
 import com.bytechef.component.OpenAPIComponentHandler;
+import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**
- * This class will not be overwritten on the subsequent calls of the generator.
+ * @author Monika Kušter
  */
 @AutoService(OpenAPIComponentHandler.class)
 public class SpotifyComponentHandler extends AbstractSpotifyComponentHandler {
+
+    @Override
+    public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
+        return modifiableComponentDefinition
+            .customAction(true)
+            .icon("path:assets/spotify.svg");
+    }
 }
