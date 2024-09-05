@@ -410,6 +410,12 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
+            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
+
+            if (Objects.equals(workflowNodeType.componentName(), "manual")) {
+                continue;
+            }
+
             ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflow.getId());
 
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
@@ -417,8 +423,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
                 projectWorkflow.getWorkflowReferenceCode(), workflowTrigger.getName());
 
             triggerLifecycleFacade.executeTriggerEnable(
-                workflow.getId(), workflowExecutionId, WorkflowNodeType.ofType(workflowTrigger.getType()),
-                workflowTrigger.getParameters(),
+                workflow.getId(), workflowExecutionId, workflowNodeType, workflowTrigger.getParameters(),
                 getConnectionId(projectInstanceWorkflow.getProjectInstanceId(), workflow.getId(), workflowTrigger),
                 getWebhookUrl(workflowExecutionId));
         }
