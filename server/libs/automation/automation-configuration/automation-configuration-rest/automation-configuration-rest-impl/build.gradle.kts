@@ -46,7 +46,6 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
 val generateOpenAPITypeScriptFetch by tasks.registering(org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
     generatorName.set("typescript-fetch")
     inputSpec.set("$projectDir/openapi.yaml")
-    modelNameSuffix.set("Model")
     outputDir.set("$rootDir/client/src/shared/middleware/automation/configuration")
     typeMappings.set(
         mapOf(
