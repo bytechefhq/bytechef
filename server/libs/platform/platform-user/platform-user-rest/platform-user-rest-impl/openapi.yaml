@@ -176,14 +176,6 @@ components:
           description: "The preview of secret admin api key."
           type: "string"
           readOnly: true
-    Authority:
-      description: "A user authority."
-      required:
-        - "name"
-      properties:
-        name:
-          description: "The name of an authority."
-          type: "string"
     ApiKey:
       description: "Contains generated key required for calling API."
       type: "object"
