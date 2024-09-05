@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.test;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.service.ContextService;
@@ -70,14 +71,18 @@ public class ComponentJobTestExecutor {
 
     public Job execute(String workflowId, Map<String, Object> inputs, Map<String, TaskHandler<?>> taskHandlerMap) {
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, jobService, objectMapper, List.of(taskExecution -> {
-                taskExecution.putMetadata(MetadataConstants.TYPE, AppType.AUTOMATION);
-
-                return taskExecution;
-            }), taskExecutionService, EXECUTOR_SERVICE::execute,
-            MapUtils.concat(this.taskHandlerMap, taskHandlerMap)::get,
+            contextService, jobService, getTaskDispatcherPreSendProcessors(), taskExecutionService,
+            EXECUTOR_SERVICE::execute, MapUtils.concat(this.taskHandlerMap, taskHandlerMap)::get,
             new TaskFileStorageImpl(new Base64FileStorageService()), workflowService);
 
         return jobSyncExecutor.execute(new JobParameters(workflowId, inputs));
+    }
+
+    private static List<TaskDispatcherPreSendProcessor> getTaskDispatcherPreSendProcessors() {
+        return List.of(taskExecution -> {
+            taskExecution.putMetadata(MetadataConstants.TYPE, AppType.AUTOMATION);
+
+            return taskExecution;
+        });
     }
 }

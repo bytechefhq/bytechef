@@ -19,14 +19,12 @@ package com.bytechef.platform.configuration.service;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.component.definition.PropertyFactory;
-import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.repository.WorkflowNodeTestOutputRepository;
 import com.bytechef.platform.definition.WorkflowNodeType;
-import com.bytechef.platform.registry.util.SchemaUtils;
+import com.bytechef.platform.registry.domain.OutputResponse;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
@@ -91,22 +89,11 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
     @Override
     public WorkflowNodeTestOutput save(
         @NonNull String workflowId, @NonNull String workflowNodeName, @NonNull WorkflowNodeType workflowNodeType,
-        @NonNull Object sampleOutput) {
-
-        Property outputSchema = Property.toProperty(
-            (com.bytechef.component.definition.Property) SchemaUtils.getOutputSchema(
-                sampleOutput, new PropertyFactory(sampleOutput)));
-
-        return save(workflowId, workflowNodeName, workflowNodeType, outputSchema, sampleOutput);
-    }
-
-    @Override
-    public WorkflowNodeTestOutput save(
-        @NonNull String workflowId, @NonNull String workflowNodeName, @NonNull WorkflowNodeType workflowNodeType,
-        @NonNull Output output) {
+        @NonNull OutputResponse outputResponse) {
 
         return save(
-            workflowId, workflowNodeName, workflowNodeType, output.getOutputSchema(), output.getSampleOutput());
+            workflowId, workflowNodeName, workflowNodeType, (Property) outputResponse.outputSchema(),
+            outputResponse.sampleOutput());
     }
 
     @Override

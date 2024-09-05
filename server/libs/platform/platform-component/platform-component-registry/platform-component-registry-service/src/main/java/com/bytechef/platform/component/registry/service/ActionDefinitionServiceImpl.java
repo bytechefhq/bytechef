@@ -19,7 +19,6 @@ package com.bytechef.platform.component.registry.service;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionDefinition.OutputFunction;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.ActionDefinition.ProcessErrorResponseFunction;
 import com.bytechef.component.definition.ActionDefinition.SingleConnectionOutputFunction;
@@ -30,11 +29,13 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.DynamicOptionsProperty;
 import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
-import com.bytechef.component.definition.OutputResponse;
+import com.bytechef.component.definition.OutputDefinition;
 import com.bytechef.component.definition.PropertiesDataSource;
 import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.component.exception.ProviderException;
+import com.bytechef.definition.BaseOutputDefinition;
+import com.bytechef.definition.BaseOutputFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.exception.ComponentConfigurationException;
@@ -44,9 +45,9 @@ import com.bytechef.platform.component.registry.definition.ParametersImpl;
 import com.bytechef.platform.component.registry.domain.ActionDefinition;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
-import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.exception.ActionDefinitionErrorType;
+import com.bytechef.platform.registry.domain.OutputResponse;
 import com.bytechef.platform.registry.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -98,7 +99,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public Output executeMultipleConnectionsOutput(
+    public OutputResponse executeMultipleConnectionsOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, @NonNull Map<String, ComponentConnection> connections,
         @NonNull ActionContext context) {
@@ -107,16 +108,16 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             (MultipleConnectionsOutputFunction) getOutputFunction(componentName, componentVersion, actionName);
 
         try {
-            OutputResponse outputResponse = multipleConnectionsOutputFunction.apply(
+            BaseOutputDefinition.OutputResponse outputDefinition = multipleConnectionsOutputFunction.apply(
                 new ParametersImpl(inputParameters), connections, context);
 
-            if (outputResponse == null) {
+            if (outputDefinition == null) {
                 return null;
             }
 
             return SchemaUtils.toOutput(
-                outputResponse,
-                (property, sampleOutput) -> new Output(
+                outputDefinition,
+                (property, sampleOutput) -> new OutputResponse(
                     Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput));
         } catch (Exception e) {
             throw new ComponentConfigurationException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
@@ -193,7 +194,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public Output executeSingleConnectionOutput(
+    public OutputResponse executeSingleConnectionOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
 
@@ -201,7 +202,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             (SingleConnectionOutputFunction) getOutputFunction(componentName, componentVersion, actionName);
 
         try {
-            OutputResponse outputResponse = singleConnectionOutputFunction.apply(
+            BaseOutputDefinition.OutputResponse outputResponse = singleConnectionOutputFunction.apply(
                 new ParametersImpl(inputParameters), ParametersImpl.getConnectionParameters(connection), context);
 
             if (outputResponse == null) {
@@ -210,7 +211,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
             return SchemaUtils.toOutput(
                 outputResponse,
-                (property, sampleOutput) -> new Output(
+                (property, sampleOutput) -> new OutputResponse(
                     Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput));
         } catch (Exception e) {
             if (e instanceof ProviderException) {
@@ -352,16 +353,15 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return MapUtils.toMap(lookupDependsOnPaths, item -> item.substring(item.lastIndexOf(".") + 1), item -> item);
     }
 
-    private OutputFunction getOutputFunction(String componentName, int componentVersion, String actionName) {
+    private BaseOutputFunction getOutputFunction(String componentName, int componentVersion, String actionName) {
         com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
 
-        return actionDefinition.getOutput()
-            .orElseGet(() -> {
-                if (!actionDefinition.isDynamicOutput()) {
-                    throw new IllegalStateException("Default output schema function not allowed");
-                }
+        Optional<OutputDefinition> outputDefinition = actionDefinition.getOutputDefinition();
 
+        return outputDefinition
+            .map(OutputDefinition::getOutput)
+            .map(outputFunction -> outputFunction.orElseGet(() -> {
                 PerformFunction performFunction = OptionalUtils.get(actionDefinition.getPerform());
 
                 return switch (performFunction) {
@@ -376,6 +376,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                                     inputParameters, connectionParameters, context)));
                     default -> throw new IllegalStateException();
                 };
-            });
+            }))
+            .orElseThrow(() -> new IllegalStateException("Output function not found"));
     }
 }

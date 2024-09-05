@@ -17,6 +17,8 @@
 package com.bytechef.component.definition;
 
 import com.bytechef.component.exception.ProviderException;
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
+import com.bytechef.definition.BaseOutputFunction;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -81,13 +83,7 @@ public interface ActionDefinition {
      *
      * @return
      */
-    Optional<OutputFunction> getOutput();
-
-    /**
-     *
-     * @return
-     */
-    Optional<OutputResponse> getOutputResponse();
+    Optional<OutputDefinition> getOutputDefinition();
 
     /**
      *
@@ -106,12 +102,6 @@ public interface ActionDefinition {
      * @return
      */
     Optional<ActionWorkflowNodeDescriptionFunction> getWorkflowNodeDescription();
-
-    /**
-     *
-     */
-    interface OutputFunction {
-    }
 
     /**
      *
@@ -138,7 +128,7 @@ public interface ActionDefinition {
     /**
      *
      */
-    interface SingleConnectionOutputFunction extends OutputFunction {
+    interface SingleConnectionOutputFunction extends BaseOutputFunction {
 
         /**
          * @param inputParameters
@@ -147,7 +137,9 @@ public interface ActionDefinition {
          * @return
          */
         OutputResponse apply(
-            Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws Exception;
+            Parameters inputParameters, Parameters connectionParameters, ActionContext context)
+
+            throws Exception;
     }
 
     /**

@@ -49,7 +49,6 @@ import com.bytechef.platform.component.registry.definition.HttpParametersImpl;
 import com.bytechef.platform.component.registry.definition.ParametersImpl;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
-import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.domain.TriggerDefinition;
 import com.bytechef.platform.component.registry.domain.ValueProperty;
@@ -58,6 +57,7 @@ import com.bytechef.platform.component.registry.exception.ActionDefinitionErrorT
 import com.bytechef.platform.component.registry.exception.TriggerDefinitionErrorType;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
+import com.bytechef.platform.registry.domain.OutputResponse;
 import com.bytechef.platform.workflow.coordinator.event.TriggerListenerEvent;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -201,7 +201,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public Output executeOutput(
+    public OutputResponse executeOutput(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull TriggerContext context) {
 

@@ -23,7 +23,6 @@ import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.registry.definition.factory.ContextFactory;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
-import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.helper.TokenRefreshHelper;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
@@ -32,6 +31,7 @@ import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.registry.domain.OutputResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -134,7 +134,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     }
 
     @Override
-    public Output executeOutput(
+    public OutputResponse executeOutput(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, Long connectionId) {
 

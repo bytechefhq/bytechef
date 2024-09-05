@@ -20,7 +20,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ActionWorkflowNodeDescriptionFunction;
 import com.bytechef.component.definition.Help;
-import com.bytechef.component.definition.OutputResponse;
+import com.bytechef.component.definition.OutputDefinition;
 import com.bytechef.component.definition.Property;
 import java.util.HashMap;
 import java.util.List;
@@ -35,13 +35,11 @@ public abstract class AbstractActionDefinitionWrapper implements ActionDefinitio
     protected final Boolean batch;
     protected final Boolean deprecated;
     protected final String description;
-    protected final boolean dynamicOutput;
     protected final ProcessErrorResponseFunction processErrorResponseFunction;
     protected final Help help;
     protected final Map<String, Object> metadata;
     protected final String name;
-    protected final OutputResponse outputResponse;
-    protected final OutputFunction outputSchemaFunction;
+    protected final OutputDefinition outputSchemaFunction;
     protected final PerformFunction performFunction;
     protected final List<? extends Property> properties;
     protected final String title;
@@ -49,15 +47,13 @@ public abstract class AbstractActionDefinitionWrapper implements ActionDefinitio
 
     public AbstractActionDefinitionWrapper(ActionDefinition actionDefinition) {
         this.batch = OptionalUtils.orElse(actionDefinition.getBatch(), null);
-        this.dynamicOutput = actionDefinition.isDynamicOutput();
         this.deprecated = OptionalUtils.orElse(actionDefinition.getDeprecated(), null);
         this.description = OptionalUtils.orElse(actionDefinition.getDescription(), null);
         this.processErrorResponseFunction = OptionalUtils.orElse(actionDefinition.getProcessErrorResponse(), null);
         this.help = OptionalUtils.orElse(actionDefinition.getHelp(), null);
         this.metadata = OptionalUtils.orElse(actionDefinition.getMetadata(), null);
         this.name = actionDefinition.getName();
-        this.outputResponse = OptionalUtils.orElse(actionDefinition.getOutputResponse(), null);
-        this.outputSchemaFunction = OptionalUtils.orElse(actionDefinition.getOutput(), null);
+        this.outputSchemaFunction = OptionalUtils.orElse(actionDefinition.getOutputDefinition(), null);
         this.performFunction = OptionalUtils.orElse(actionDefinition.getPerform(), null);
         this.properties = OptionalUtils.orElse(actionDefinition.getProperties(), null);
         this.title = OptionalUtils.orElse(actionDefinition.getTitle(), null);
@@ -101,12 +97,7 @@ public abstract class AbstractActionDefinitionWrapper implements ActionDefinitio
     }
 
     @Override
-    public Optional<OutputResponse> getOutputResponse() {
-        return Optional.ofNullable(outputResponse);
-    }
-
-    @Override
-    public Optional<OutputFunction> getOutput() {
+    public Optional<OutputDefinition> getOutputDefinition() {
         return Optional.ofNullable(outputSchemaFunction);
     }
 
@@ -128,10 +119,5 @@ public abstract class AbstractActionDefinitionWrapper implements ActionDefinitio
     @Override
     public Optional<ActionWorkflowNodeDescriptionFunction> getWorkflowNodeDescription() {
         return Optional.ofNullable(workflowNodeDescriptionFunction);
-    }
-
-    @Override
-    public boolean isDynamicOutput() {
-        return dynamicOutput;
     }
 }

@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.registry.domain;
-
-import com.bytechef.platform.registry.domain.BaseOutput;
+package com.bytechef.platform.registry.domain;
 
 /**
  * @author Ivica Cardic
  */
-public class Output extends BaseOutput<Property> {
+public record OutputResponse(BaseProperty outputSchema, Object sampleOutput) {
 
-    public Output(Property outputSchema, Object sampleOutput) {
-        super(outputSchema, sampleOutput);
+    public OutputResponse(BaseProperty outputSchema) {
+        this(outputSchema, null);
     }
 }

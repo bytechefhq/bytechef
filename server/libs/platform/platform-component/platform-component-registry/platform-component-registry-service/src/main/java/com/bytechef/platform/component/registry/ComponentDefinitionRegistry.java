@@ -27,7 +27,7 @@ import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ConnectionDefinition;
-import com.bytechef.component.definition.OutputResponse;
+import com.bytechef.component.definition.OutputDefinition;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
@@ -315,7 +315,7 @@ public class ComponentDefinitionRegistry {
                 PropertyUtils.checkInputProperties(
                     OptionalUtils.orElse(actionDefinition.getProperties(), List.of()));
                 PropertyUtils.checkOutputProperty(
-                    OptionalUtils.mapOrElse(actionDefinition.getOutputResponse(), OutputResponse::getOutputSchema,
+                    OptionalUtils.mapOrElse(actionDefinition.getOutputDefinition(), OutputDefinition::getOutputSchema,
                         null));
             }
 
@@ -329,7 +329,7 @@ public class ComponentDefinitionRegistry {
 
                 PropertyUtils.checkInputProperties(OptionalUtils.orElse(triggerDefinition.getProperties(), List.of()));
                 PropertyUtils.checkOutputProperty(
-                    OptionalUtils.mapOrElse(triggerDefinition.getOutputResponse(), OutputResponse::getOutputSchema,
+                    OptionalUtils.mapOrElse(triggerDefinition.getOutputDefinition(), OutputDefinition::getOutputSchema,
                         null));
 
                 if (triggerDefinition.getType() == null) {

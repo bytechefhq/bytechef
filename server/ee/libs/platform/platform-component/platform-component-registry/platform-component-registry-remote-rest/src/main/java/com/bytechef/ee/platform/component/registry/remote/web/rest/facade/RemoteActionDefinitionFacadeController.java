@@ -8,10 +8,10 @@
 package com.bytechef.ee.platform.component.registry.remote.web.rest.facade;
 
 import com.bytechef.platform.component.registry.domain.Option;
-import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.registry.domain.OutputResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -105,7 +105,7 @@ public class RemoteActionDefinitionFacadeController {
         consumes = {
             "application/json"
         })
-    public ResponseEntity<Output> executeOutput(
+    public ResponseEntity<OutputResponse> executeOutput(
         @Valid @RequestBody RemoteActionDefinitionFacadeController.OutputRequest outputRequest) {
 
         return ResponseEntity.ok(

@@ -55,8 +55,9 @@ public abstract class Property extends BaseProperty {
     }
 
     @SuppressWarnings("unchecked")
-    public static <P extends Property> P
-        toProperty(com.bytechef.platform.workflow.task.dispatcher.definition.Property property) {
+    public static <P extends Property> P toProperty(
+        com.bytechef.platform.workflow.task.dispatcher.definition.Property property) {
+
         return switch (property.getType()) {
             case ARRAY -> (P) toArrayProperty(
                 (com.bytechef.platform.workflow.task.dispatcher.definition.Property.ArrayProperty) property);

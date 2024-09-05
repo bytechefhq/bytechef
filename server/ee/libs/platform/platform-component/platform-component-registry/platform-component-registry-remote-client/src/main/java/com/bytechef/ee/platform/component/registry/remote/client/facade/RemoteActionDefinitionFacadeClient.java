@@ -13,10 +13,10 @@ import com.bytechef.ee.platform.component.registry.remote.client.AbstractWorkerC
 import com.bytechef.ee.remote.client.DefaultRestClient;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
-import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.registry.domain.OutputResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
@@ -69,14 +69,13 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     @Override
-    public Output executeOutput(
+    public OutputResponse executeOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, @NonNull Map<String, Long> connectionIds) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-output-schema"),
-            new OutputRequest(
-                componentName, componentVersion, actionName, inputParameters, connectionIds),
+            new OutputRequest(componentName, componentVersion, actionName, inputParameters, connectionIds),
             new ParameterizedTypeReference<>() {});
     }
 

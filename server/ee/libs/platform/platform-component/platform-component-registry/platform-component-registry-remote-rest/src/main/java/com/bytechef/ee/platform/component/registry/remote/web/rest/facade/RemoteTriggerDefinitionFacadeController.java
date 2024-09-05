@@ -10,12 +10,12 @@ package com.bytechef.ee.platform.component.registry.remote.web.rest.facade;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.platform.component.registry.domain.Option;
-import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.registry.domain.OutputResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -156,7 +156,7 @@ public class RemoteTriggerDefinitionFacadeController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<Output> executeOutputSchema(@Valid @RequestBody OutputRequest outputRequest) {
+    public ResponseEntity<OutputResponse> executeOutputSchema(@Valid @RequestBody OutputRequest outputRequest) {
         return ResponseEntity.ok(
             triggerDefinitionFacade.executeOutput(
                 outputRequest.componentName, outputRequest.componentVersion, outputRequest.triggerName,

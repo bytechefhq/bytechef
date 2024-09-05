@@ -22,8 +22,8 @@ import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.registry.domain.ActionDefinition;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
-import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
+import com.bytechef.platform.registry.domain.OutputResponse;
 import java.util.List;
 import java.util.Map;
 import org.springframework.lang.NonNull;
@@ -61,7 +61,7 @@ public interface ActionDefinitionService {
         @NonNull Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths,
         @Nullable ComponentConnection connection, @NonNull ActionContext context);
 
-    Output executeMultipleConnectionsOutput(
+    OutputResponse executeMultipleConnectionsOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, @NonNull Map<String, ComponentConnection> connections,
         @NonNull ActionContext context);
@@ -96,7 +96,7 @@ public interface ActionDefinitionService {
         String componentName, int componentVersion, String actionName, int statusCode, Object body,
         Context actionContext);
 
-    Output executeSingleConnectionOutput(
+    OutputResponse executeSingleConnectionOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context);
 
