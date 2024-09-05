@@ -1030,7 +1030,6 @@ components:
         \ the task inside the workflow."
       type: "object"
       required:
-      - "dynamicOutput"
       - "name"
       - "outputDefined"
       properties:
@@ -1040,9 +1039,6 @@ components:
         componentVersion:
           description: "The component version."
           type: "integer"
-        dynamicOutput:
-          description: "Does action define dynamic output schema."
-          type: "boolean"
         description:
           description: "The description."
           type: "string"
@@ -1732,14 +1728,10 @@ components:
         \ be executed."
       type: "object"
       required:
-      - "dynamicOutput"
       - "name"
       - "outputDefined"
       - "version"
       properties:
-        dynamicOutput:
-          description: "Does task dispatcher define dynamic output schema."
-          type: "boolean"
         description:
           description: "The description."
           type: "string"
@@ -1840,7 +1832,6 @@ components:
         \ outside services."
       type: "object"
       required:
-      - "dynamicOutput"
       - "name"
       - "outputDefined"
       - "type"
@@ -1851,9 +1842,6 @@ components:
         componentVersion:
           description: "The component version."
           type: "integer"
-        dynamicOutput:
-          description: "Does trigger define dynamic output schema."
-          type: "boolean"
         description:
           description: "The description."
           type: "string"
