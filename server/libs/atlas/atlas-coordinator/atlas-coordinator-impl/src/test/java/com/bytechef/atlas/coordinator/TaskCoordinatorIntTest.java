@@ -124,7 +124,7 @@ public class TaskCoordinatorIntTest {
         taskHandlerMap.put("randomHelper/v1/randomInt", taskExecution -> null);
 
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, jobService, objectMapper, List.of(), taskExecutionService,
+            contextService, jobService, List.of(), taskExecutionService,
             EXECUTOR_SERVICE::execute, taskHandlerMap::get, new TaskFileStorageImpl(new Base64FileStorageService()),
             workflowService);
 
