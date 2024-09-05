@@ -4,7 +4,7 @@ import {useMemo} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import ReactFlow, {Controls, Edge, MiniMap, Node} from 'reactflow';
 
-import {ComponentDefinitionBasicModel, WorkflowModel} from '../middleware/platform/configuration';
+import {ComponentDefinitionBasic, Workflow} from '../middleware/platform/configuration';
 import ReadOnlyEdge from './ReadOnlyEdge';
 import ReadOnlyNode from './ReadOnlyNode';
 
@@ -12,8 +12,8 @@ const ReadOnlyWorkflowEditor = ({
     componentDefinitions,
     workflow,
 }: {
-    componentDefinitions: Array<ComponentDefinitionBasicModel>;
-    workflow: WorkflowModel;
+    componentDefinitions: Array<ComponentDefinitionBasic>;
+    workflow: Workflow;
 }) => {
     const nodeTypes = useMemo(
         () => ({

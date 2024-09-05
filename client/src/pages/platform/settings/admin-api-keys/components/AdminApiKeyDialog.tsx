@@ -11,7 +11,7 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {useToast} from '@/components/ui/use-toast';
-import {AdminApiKeyModel} from '@/shared/middleware/platform/user';
+import {AdminApiKey} from '@/shared/middleware/platform/user';
 import {
     useCreateAdminApiKeyMutation,
     useUpdateAdminApiKeyMutation,
@@ -32,7 +32,7 @@ const formSchema = z.object({
 });
 
 interface AdminApiKeyDialogProps {
-    adminApiKey?: AdminApiKeyModel;
+    adminApiKey?: AdminApiKey;
     onClose?: () => void;
     triggerNode?: ReactNode;
 }
@@ -94,12 +94,12 @@ const AdminApiKeyDialog = ({adminApiKey, onClose, triggerNode}: AdminApiKeyDialo
             updateAdminApiKeyMutation.mutate({
                 ...adminApiKey,
                 ...getValues(),
-            } as AdminApiKeyModel);
+            } as AdminApiKey);
         } else {
             createAdminApiKeyMutation.mutate({
                 ...adminApiKey,
                 ...getValues(),
-            } as AdminApiKeyModel);
+            } as AdminApiKey);
         }
     }
 

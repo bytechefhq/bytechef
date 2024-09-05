@@ -2,9 +2,9 @@ import {Button} from '@/components/ui/button';
 import {useConnectionQuery} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
 import ConnectionTabConnectionSelect from '@/pages/platform/workflow-editor/components/node-details-tabs/ConnectionTabConnectionSelect';
 import {
-    ComponentDefinitionModel,
-    WorkflowConnectionModel,
-    WorkflowTestConfigurationConnectionModel,
+    ComponentDefinition,
+    WorkflowConnection,
+    WorkflowTestConfigurationConnection,
 } from '@/shared/middleware/platform/configuration';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import EmptyList from 'components/EmptyList';
@@ -20,11 +20,11 @@ const ConnectionTab = ({
     workflowNodeName,
     workflowTestConfigurationConnections,
 }: {
-    componentDefinition: ComponentDefinitionModel;
-    workflowConnections: WorkflowConnectionModel[];
+    componentDefinition: ComponentDefinition;
+    workflowConnections: WorkflowConnection[];
     workflowNodeName: string;
     workflowId: string;
-    workflowTestConfigurationConnections?: Array<WorkflowTestConfigurationConnectionModel>;
+    workflowTestConfigurationConnections?: Array<WorkflowTestConfigurationConnection>;
 }) => {
     const {setShowConnectionNote, showConnectionNote} = useConnectionNoteStore();
 

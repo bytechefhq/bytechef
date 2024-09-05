@@ -1,10 +1,10 @@
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
-import {IntegrationModel, TagModel} from '@/shared/middleware/embedded/configuration';
+import {Integration, Tag} from '@/shared/middleware/embedded/configuration';
 import IntegrationListItem from 'pages/embedded/integrations/components/IntegrationListItem';
 
 import IntegrationWorkflowList from './IntegrationWorkflowList';
 
-const IntegrationList = ({integrations, tags}: {integrations: IntegrationModel[]; tags: TagModel[]}) => {
+const IntegrationList = ({integrations, tags}: {integrations: Integration[]; tags: Tag[]}) => {
     return (
         <div className="w-full px-2 2xl:mx-auto 2xl:w-4/5">
             {integrations.map((integration) => {

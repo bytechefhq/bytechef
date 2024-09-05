@@ -2,8 +2,8 @@ import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/wo
 import {
     ActionDefinitionApi,
     ComponentDefinitionApi,
-    ComponentDefinitionBasicModel,
-    TaskDispatcherDefinitionBasicModel,
+    ComponentDefinitionBasic,
+    TaskDispatcherDefinitionBasic,
     TriggerDefinitionApi,
 } from '@/shared/middleware/platform/configuration';
 import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
@@ -21,9 +21,9 @@ import getParametersWithDefaultValues from '../utils/getParametersWithDefaultVal
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 
 export default function useHandleDrop(): [
-    (targetNode: Node, droppedNode: ComponentDefinitionBasicModel | TaskDispatcherDefinitionBasicModel) => void,
-    (targetEdge: Edge, droppedNode: ComponentDefinitionBasicModel | TaskDispatcherDefinitionBasicModel) => void,
-    (droppedNode: ComponentDefinitionBasicModel | TaskDispatcherDefinitionBasicModel) => void,
+    (targetNode: Node, droppedNode: ComponentDefinitionBasic | TaskDispatcherDefinitionBasic) => void,
+    (targetEdge: Edge, droppedNode: ComponentDefinitionBasic | TaskDispatcherDefinitionBasic) => void,
+    (droppedNode: ComponentDefinitionBasic | TaskDispatcherDefinitionBasic) => void,
 ] {
     const {setWorkflow, workflow} = useWorkflowDataStore();
 
@@ -41,7 +41,7 @@ export default function useHandleDrop(): [
 
     async function handleDropOnPlaceholderNode(
         targetNode: Node,
-        droppedNode: ComponentDefinitionBasicModel | TaskDispatcherDefinitionBasicModel
+        droppedNode: ComponentDefinitionBasic | TaskDispatcherDefinitionBasic
     ) {
         const newWorkflowNode = {
             ...targetNode,
@@ -147,7 +147,7 @@ export default function useHandleDrop(): [
 
     async function handleDropOnWorkflowEdge(
         targetEdge: Edge,
-        droppedNode: ComponentDefinitionBasicModel | TaskDispatcherDefinitionBasicModel
+        droppedNode: ComponentDefinitionBasic | TaskDispatcherDefinitionBasic
     ) {
         const previousNode = nodes.find((node) => node.id === targetEdge.source);
 
@@ -250,9 +250,7 @@ export default function useHandleDrop(): [
         );
     }
 
-    async function handleDropOnTriggerNode(
-        droppedNode: ComponentDefinitionBasicModel | TaskDispatcherDefinitionBasicModel
-    ) {
+    async function handleDropOnTriggerNode(droppedNode: ComponentDefinitionBasic | TaskDispatcherDefinitionBasic) {
         const {icon, name, title} = droppedNode;
 
         const draggedComponentDefinition = await queryClient.fetchQuery({

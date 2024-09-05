@@ -5,7 +5,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectInstanceListItemAlertDialog from '@/pages/automation/project-instances/components/ProjectInstanceListItemAlertDialog';
 import ProjectInstanceListItemDropdownMenu from '@/pages/automation/project-instances/components/ProjectInstanceListItemDropdownMenu';
 import {useProjectInstancesEnabledStore} from '@/pages/automation/project-instances/stores/useProjectInstancesEnabledStore';
-import {ProjectInstanceModel, TagModel} from '@/shared/middleware/automation/configuration';
+import {ProjectInstance, Tag} from '@/shared/middleware/automation/configuration';
 import {useUpdateProjectInstanceTagsMutation} from '@/shared/mutations/automation/projectInstanceTags.mutations';
 import {
     useDeleteProjectInstanceMutation,
@@ -21,8 +21,8 @@ import TagList from '../../../../components/TagList';
 import ProjectInstanceDialog from './ProjectInstanceDialog';
 
 interface ProjectInstanceListItemProps {
-    projectInstance: ProjectInstanceModel;
-    remainingTags?: TagModel[];
+    projectInstance: ProjectInstance;
+    remainingTags?: Tag[];
 }
 
 const ProjectInstanceListItem = ({projectInstance, remainingTags}: ProjectInstanceListItemProps) => {
@@ -123,7 +123,7 @@ const ProjectInstanceListItem = ({projectInstance, remainingTags}: ProjectInstan
                                         <TagList
                                             getRequest={(id, tags) => ({
                                                 id: id!,
-                                                updateTagsRequestModel: {
+                                                updateTagsRequest: {
                                                     tags: tags || [],
                                                 },
                                             })}

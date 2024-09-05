@@ -1,12 +1,12 @@
 import {Skeleton} from '@/components/ui/skeleton';
 import ProjectWorkflowListItem from '@/pages/automation/projects/components/ProjectWorkflowListItem';
-import {ProjectModel} from '@/shared/middleware/automation/configuration';
-import {ComponentDefinitionBasicModel} from '@/shared/middleware/platform/configuration';
+import {Project} from '@/shared/middleware/automation/configuration';
+import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useGetProjectWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 
-const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
+const ProjectWorkflowList = ({project}: {project: Project}) => {
     const {data: componentDefinitions, isLoading: isComponentDefinitionsLoading} = useGetComponentDefinitionsQuery({
         actionDefinitions: true,
         triggerDefinitions: true,
@@ -16,7 +16,7 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
         useGetTaskDispatcherDefinitionsQuery();
 
     const workflowComponentDefinitions: {
-        [key: string]: ComponentDefinitionBasicModel | undefined;
+        [key: string]: ComponentDefinitionBasic | undefined;
     } = {};
 
     const {data: workflows, isLoading: isProjectWorkflowsLoading} = useGetProjectWorkflowsQuery(
@@ -25,7 +25,7 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
     );
 
     const workflowTaskDispatcherDefinitions: {
-        [key: string]: ComponentDefinitionBasicModel | undefined;
+        [key: string]: ComponentDefinitionBasic | undefined;
     } = {};
 
     return isComponentDefinitionsLoading || isTaskDispatcherDefinitionsLoading || isProjectWorkflowsLoading ? (

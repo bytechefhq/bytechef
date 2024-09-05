@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys */
-import {AppEventApi, AppEventModel} from '@/shared/middleware/embedded/configuration';
+import {AppEvent, AppEventApi} from '@/shared/middleware/embedded/configuration';
 import {useQuery} from '@tanstack/react-query';
 
 export const AppEventKeys = {
@@ -7,7 +7,7 @@ export const AppEventKeys = {
 };
 
 export const useGetAppEventsQuery = () =>
-    useQuery<AppEventModel[], Error>({
+    useQuery<AppEvent[], Error>({
         queryKey: AppEventKeys.appEvents,
         queryFn: () => new AppEventApi().getAppEvents(),
     });

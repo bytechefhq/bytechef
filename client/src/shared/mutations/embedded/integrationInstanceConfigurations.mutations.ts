@@ -1,30 +1,27 @@
 import {
     EnableIntegrationInstanceConfigurationRequest,
     EnableIntegrationInstanceConfigurationWorkflowRequest,
+    IntegrationInstanceConfiguration,
     IntegrationInstanceConfigurationApi,
-    IntegrationInstanceConfigurationModel,
     IntegrationInstanceConfigurationTagApi,
-    IntegrationInstanceConfigurationWorkflowModel,
+    IntegrationInstanceConfigurationWorkflow,
     UpdateIntegrationInstanceConfigurationTagsRequest,
     UpdateIntegrationTagsRequest,
 } from '@/shared/middleware/embedded/configuration';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateIntegrationInstanceMutationProps {
-    onSuccess?: (
-        result: IntegrationInstanceConfigurationModel,
-        variables: IntegrationInstanceConfigurationModel
-    ) => void;
-    onError?: (error: Error, variables: IntegrationInstanceConfigurationModel) => void;
+    onSuccess?: (result: IntegrationInstanceConfiguration, variables: IntegrationInstanceConfiguration) => void;
+    onError?: (error: Error, variables: IntegrationInstanceConfiguration) => void;
 }
 
 export const useCreateIntegrationInstanceConfigurationMutation = (
     mutationProps?: CreateIntegrationInstanceMutationProps
 ) =>
     useMutation({
-        mutationFn: (integrationInstanceConfigurationModel: IntegrationInstanceConfigurationModel) => {
+        mutationFn: (integrationInstanceConfiguration: IntegrationInstanceConfiguration) => {
             return new IntegrationInstanceConfigurationApi().createIntegrationInstanceConfiguration({
-                integrationInstanceConfigurationModel,
+                integrationInstanceConfiguration,
             });
         },
         onError: mutationProps?.onError,
@@ -82,21 +79,18 @@ export const useEnableIntegrationInstanceConfigurationWorkflowMutation = (
     });
 
 interface UpdateIntegrationInstanceConfigurationMutationProps {
-    onSuccess?: (
-        result: IntegrationInstanceConfigurationModel,
-        variables: IntegrationInstanceConfigurationModel
-    ) => void;
-    onError?: (error: Error, variables: IntegrationInstanceConfigurationModel) => void;
+    onSuccess?: (result: IntegrationInstanceConfiguration, variables: IntegrationInstanceConfiguration) => void;
+    onError?: (error: Error, variables: IntegrationInstanceConfiguration) => void;
 }
 
 export const useUpdateIntegrationInstanceConfigurationMutation = (
     mutationProps?: UpdateIntegrationInstanceConfigurationMutationProps
 ) =>
     useMutation({
-        mutationFn: (integrationInstanceConfigurationModel: IntegrationInstanceConfigurationModel) => {
+        mutationFn: (integrationInstanceConfiguration: IntegrationInstanceConfiguration) => {
             return new IntegrationInstanceConfigurationApi().updateIntegrationInstanceConfiguration({
-                id: integrationInstanceConfigurationModel.id!,
-                integrationInstanceConfigurationModel,
+                id: integrationInstanceConfiguration.id!,
+                integrationInstanceConfiguration,
             });
         },
         onError: mutationProps?.onError,
@@ -107,11 +101,11 @@ export const useUpdateIntegrationInstanceConfigurationWorkflowMutation = (
     mutationProps?: UpdateIntegrationInstanceConfigurationWorkflowMutationProps
 ) =>
     useMutation({
-        mutationFn: (integrationInstanceConfigurationWorkflowModel: IntegrationInstanceConfigurationWorkflowModel) => {
+        mutationFn: (integrationInstanceConfigurationWorkflow: IntegrationInstanceConfigurationWorkflow) => {
             return new IntegrationInstanceConfigurationApi().updateIntegrationInstanceConfigurationWorkflow({
-                id: integrationInstanceConfigurationWorkflowModel.integrationInstanceConfigurationId!,
-                integrationInstanceConfigurationWorkflowModel: integrationInstanceConfigurationWorkflowModel,
-                workflowId: integrationInstanceConfigurationWorkflowModel.id!,
+                id: integrationInstanceConfigurationWorkflow.integrationInstanceConfigurationId!,
+                integrationInstanceConfigurationWorkflow: integrationInstanceConfigurationWorkflow,
+                workflowId: integrationInstanceConfigurationWorkflow.id!,
             });
         },
         onError: mutationProps?.onError,
@@ -120,10 +114,10 @@ export const useUpdateIntegrationInstanceConfigurationWorkflowMutation = (
 
 interface UpdateIntegrationInstanceConfigurationWorkflowMutationProps {
     onSuccess?: (
-        result: IntegrationInstanceConfigurationWorkflowModel,
-        variables: IntegrationInstanceConfigurationWorkflowModel
+        result: IntegrationInstanceConfigurationWorkflow,
+        variables: IntegrationInstanceConfigurationWorkflow
     ) => void;
-    onError?: (error: Error, variables: IntegrationInstanceConfigurationWorkflowModel) => void;
+    onError?: (error: Error, variables: IntegrationInstanceConfigurationWorkflow) => void;
 }
 
 interface UpdateIntegrationInstanceConfigurationTagsMutationProps {

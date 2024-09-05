@@ -1,7 +1,7 @@
 import {
     EnableProjectInstanceWorkflowRequest,
     ProjectInstanceApi,
-    ProjectInstanceWorkflowModel,
+    ProjectInstanceWorkflow,
 } from '@/shared/middleware/automation/configuration';
 import {useMutation} from '@tanstack/react-query';
 
@@ -20,17 +20,17 @@ export const useEnableProjectInstanceWorkflowMutation = (mutationProps: EnablePr
     });
 
 interface UpdateProjectInstanceWorkflowMutationProps {
-    onSuccess?: (result: ProjectInstanceWorkflowModel, variables: ProjectInstanceWorkflowModel) => void;
-    onError?: (error: Error, variables: ProjectInstanceWorkflowModel) => void;
+    onSuccess?: (result: ProjectInstanceWorkflow, variables: ProjectInstanceWorkflow) => void;
+    onError?: (error: Error, variables: ProjectInstanceWorkflow) => void;
 }
 
 export const useUpdateProjectInstanceWorkflowMutation = (mutationProps?: UpdateProjectInstanceWorkflowMutationProps) =>
     useMutation({
-        mutationFn: (projectInstanceWorkflowModel: ProjectInstanceWorkflowModel) => {
+        mutationFn: (projectInstanceWorkflow: ProjectInstanceWorkflow) => {
             return new ProjectInstanceApi().updateProjectInstanceWorkflow({
-                id: projectInstanceWorkflowModel.projectInstanceId!,
-                projectInstanceWorkflowId: projectInstanceWorkflowModel.id!,
-                projectInstanceWorkflowModel,
+                id: projectInstanceWorkflow.projectInstanceId!,
+                projectInstanceWorkflow,
+                projectInstanceWorkflowId: projectInstanceWorkflow.id!,
             });
         },
         onError: mutationProps?.onError,

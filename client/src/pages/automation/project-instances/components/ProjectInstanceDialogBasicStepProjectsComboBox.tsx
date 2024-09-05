@@ -1,10 +1,10 @@
 import ComboBox, {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {ProjectModel, ProjectStatusModel} from '@/shared/middleware/automation/configuration';
+import {Project, ProjectStatus} from '@/shared/middleware/automation/configuration';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {FocusEventHandler} from 'react';
 
-const ProjectLabel = ({project}: {project: ProjectModel}) => (
+const ProjectLabel = ({project}: {project: Project}) => (
     <div className="flex items-center">
         <span className="mr-1 ">{project.name}</span>
 
@@ -25,7 +25,7 @@ const ProjectInstanceDialogBasicStepProjectsComboBox = ({
 
     const {data: projects} = useGetWorkspaceProjectsQuery({
         id: currentWorkspaceId!,
-        status: ProjectStatusModel.Published,
+        status: ProjectStatus.Published,
     });
 
     return projects ? (

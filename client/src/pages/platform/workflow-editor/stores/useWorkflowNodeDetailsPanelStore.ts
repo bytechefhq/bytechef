@@ -1,4 +1,4 @@
-import {ComponentDefinitionModel} from '@/shared/middleware/platform/configuration';
+import {ComponentDefinition} from '@/shared/middleware/platform/configuration';
 
 /* eslint-disable sort-keys */
 import {ComponentType, NodeType} from '@/shared/types';
@@ -9,8 +9,8 @@ interface WorkflowNodeDetailsPanelStateI {
     currentComponent: ComponentType | undefined;
     setCurrentComponent: (currentComponent: ComponentType | undefined) => void;
 
-    currentComponentDefinition: ComponentDefinitionModel | undefined;
-    setCurrentComponentDefinition: (currentComponentDefinition: ComponentDefinitionModel | undefined) => void;
+    currentComponentDefinition: ComponentDefinition | undefined;
+    setCurrentComponentDefinition: (currentComponentDefinition: ComponentDefinition | undefined) => void;
 
     currentNode: NodeType | undefined;
     setCurrentNode: (currentNode: NodeType | undefined) => void;

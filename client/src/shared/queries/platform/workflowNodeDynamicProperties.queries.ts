@@ -1,7 +1,7 @@
 /* eslint-disable sort-keys */
 import {
     GetWorkflowNodeDynamicPropertiesRequest,
-    type PropertyModel,
+    type Property,
     WorkflowNodeDynamicPropertiesApi,
 } from '@/shared/middleware/platform/configuration';
 import {useQuery} from '@tanstack/react-query';
@@ -27,7 +27,7 @@ export const useGetWorkflowNodeDynamicPropertiesQuery = (
     }: {lookupDependsOnValuesKey: string; request: GetWorkflowNodeDynamicPropertiesRequest},
     enabled?: boolean
 ) =>
-    useQuery<Array<PropertyModel>, Error>({
+    useQuery<Array<Property>, Error>({
         queryKey: WorkflowNodeDynamicPropertyKeys.propertyWorkflowNodeDynamicProperties(
             request,
             lookupDependsOnValuesKey

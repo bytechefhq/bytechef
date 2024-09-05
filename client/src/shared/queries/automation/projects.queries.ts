@@ -1,4 +1,4 @@
-import {ProjectApi, ProjectModel, type ProjectStatusModel} from '@/shared/middleware/automation/configuration';
+import {Project, ProjectApi, type ProjectStatus} from '@/shared/middleware/automation/configuration';
 
 /* eslint-disable sort-keys */
 import {useQuery} from '@tanstack/react-query';
@@ -11,7 +11,7 @@ export const ProjectKeys = {
                   categoryId?: number;
                   projectInstances?: boolean;
                   tagId?: number;
-                  status?: ProjectStatusModel;
+                  status?: ProjectStatus;
               }
             | undefined
     ) => [...ProjectKeys.projects, filters],
@@ -19,8 +19,8 @@ export const ProjectKeys = {
     projects: ['projects'] as const,
 };
 
-export const useGetProjectQuery = (id: number, initialData?: ProjectModel, enabled?: boolean) =>
-    useQuery<ProjectModel, Error>({
+export const useGetProjectQuery = (id: number, initialData?: Project, enabled?: boolean) =>
+    useQuery<Project, Error>({
         queryKey: ProjectKeys.project(id),
         queryFn: () => new ProjectApi().getProject({id}),
         initialData,
@@ -32,9 +32,9 @@ export const useGetWorkspaceProjectsQuery = (filters: {
     categoryId?: number;
     projectInstances?: boolean;
     tagId?: number;
-    status?: ProjectStatusModel;
+    status?: ProjectStatus;
 }) =>
-    useQuery<ProjectModel[], Error>({
+    useQuery<Project[], Error>({
         queryKey: ProjectKeys.filteredProjects(filters),
         queryFn: () => new ProjectApi().getWorkspaceProjects(filters),
     });

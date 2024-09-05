@@ -1,14 +1,14 @@
 import Properties from '@/pages/platform/workflow-editor/components/Properties/Properties';
-import {IntegrationInstanceConfigurationModel} from '@/shared/middleware/embedded/configuration';
-import {ControlTypeModel, PropertyTypeModel, WorkflowModel} from '@/shared/middleware/platform/configuration';
-import {PropertyType} from '@/shared/types';
+import {IntegrationInstanceConfiguration} from '@/shared/middleware/embedded/configuration';
+import {ControlType, PropertyType, Workflow} from '@/shared/middleware/platform/configuration';
+import {PropertyAllType} from '@/shared/types';
 import {FieldValues} from 'react-hook-form/dist/types';
 import {Control, FormState} from 'react-hook-form/dist/types/form';
 
 export interface IntegrationInstanceConfigurationDialogWorkflowsStepItemConfigurationProps {
-    control: Control<IntegrationInstanceConfigurationModel>;
+    control: Control<IntegrationInstanceConfiguration>;
     formState: FormState<FieldValues>;
-    workflow: WorkflowModel;
+    workflow: Workflow;
     workflowIndex: number;
 }
 
@@ -22,45 +22,45 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItemInputs = ({
         if (input.type === 'boolean') {
             return {
                 ...input,
-                controlType: ControlTypeModel.Select,
-                type: PropertyTypeModel.Boolean,
-            } as PropertyType;
+                controlType: ControlType.Select,
+                type: PropertyType.Boolean,
+            } as PropertyAllType;
         } else if (input.type === 'date') {
             return {
                 ...input,
-                controlType: ControlTypeModel.Date,
-                type: PropertyTypeModel.Date,
-            } as PropertyType;
+                controlType: ControlType.Date,
+                type: PropertyType.Date,
+            } as PropertyAllType;
         } else if (input.type === 'date_time') {
             return {
                 ...input,
-                controlType: ControlTypeModel.DateTime,
-                type: PropertyTypeModel.DateTime,
-            } as PropertyType;
+                controlType: ControlType.DateTime,
+                type: PropertyType.DateTime,
+            } as PropertyAllType;
         } else if (input.type === 'integer') {
             return {
                 ...input,
-                controlType: ControlTypeModel.Integer,
-                type: PropertyTypeModel.Integer,
-            } as PropertyType;
+                controlType: ControlType.Integer,
+                type: PropertyType.Integer,
+            } as PropertyAllType;
         } else if (input.type === 'number') {
             return {
                 ...input,
-                controlType: ControlTypeModel.Number,
-                type: PropertyTypeModel.Number,
-            } as PropertyType;
+                controlType: ControlType.Number,
+                type: PropertyType.Number,
+            } as PropertyAllType;
         } else if (input.type === 'string') {
             return {
                 ...input,
-                controlType: ControlTypeModel.Text,
-                type: PropertyTypeModel.String,
-            } as PropertyType;
+                controlType: ControlType.Text,
+                type: PropertyType.String,
+            } as PropertyAllType;
         } else {
             return {
                 ...input,
-                controlType: ControlTypeModel.Time,
-                type: PropertyTypeModel.Time,
-            } as PropertyType;
+                controlType: ControlType.Time,
+                type: PropertyType.Time,
+            } as PropertyAllType;
         }
     });
 

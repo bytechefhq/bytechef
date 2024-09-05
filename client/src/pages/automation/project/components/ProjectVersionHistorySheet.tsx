@@ -1,7 +1,7 @@
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
 import {Badge} from '@/components/ui/badge';
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
-import {ProjectStatusModel} from '@/shared/middleware/automation/configuration';
+import {ProjectStatus} from '@/shared/middleware/automation/configuration';
 import {useGetProjectVersionsQuery} from '@/shared/queries/automation/projectVersions.queries';
 
 interface ProjectVersionHistorySheetProps {
@@ -31,7 +31,7 @@ const ProjectVersionHistorySheet = ({onClose, projectId}: ProjectVersionHistoryS
                                     key={projectVersion.version}
                                     value={projectVersion.version?.toString() || ''}
                                 >
-                                    <AccordionTrigger disabled={projectVersion.status === ProjectStatusModel.Draft}>
+                                    <AccordionTrigger disabled={projectVersion.status === ProjectStatus.Draft}>
                                         <div className="flex w-full items-center justify-between pr-2">
                                             <span className="text-sm font-semibold">{`V${projectVersion.version}`}</span>
 
@@ -44,12 +44,12 @@ const ProjectVersionHistorySheet = ({onClose, projectId}: ProjectVersionHistoryS
 
                                                 <Badge
                                                     variant={
-                                                        projectVersion.status === ProjectStatusModel.Published
+                                                        projectVersion.status === ProjectStatus.Published
                                                             ? 'success'
                                                             : 'secondary'
                                                     }
                                                 >
-                                                    {projectVersion.status === ProjectStatusModel.Published
+                                                    {projectVersion.status === ProjectStatus.Published
                                                         ? `Published`
                                                         : 'Draft'}
                                                 </Badge>

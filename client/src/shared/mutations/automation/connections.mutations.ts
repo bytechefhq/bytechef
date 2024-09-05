@@ -1,20 +1,20 @@
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {ConnectionApi, ConnectionModel} from '@/shared/middleware/automation/connection';
+import {Connection, ConnectionApi} from '@/shared/middleware/automation/connection';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateConnectionMutationProps {
-    onSuccess?: (result: ConnectionModel, variables: ConnectionModel) => void;
-    onError?: (error: Error, variables: ConnectionModel) => void;
+    onSuccess?: (result: Connection, variables: Connection) => void;
+    onError?: (error: Error, variables: Connection) => void;
 }
 
 export const useCreateConnectionMutation = (mutationProps?: CreateConnectionMutationProps) => {
     const {currentWorkspaceId} = useWorkspaceStore();
 
-    return useMutation<ConnectionModel, Error, ConnectionModel>({
-        mutationFn: (connectionModel: ConnectionModel) => {
+    return useMutation<Connection, Error, Connection>({
+        mutationFn: (connection: Connection) => {
             return new ConnectionApi().createConnection({
-                connectionModel: {
-                    ...connectionModel,
+                connection: {
+                    ...connection,
                     workspaceId: currentWorkspaceId,
                 },
             });
@@ -41,15 +41,15 @@ export const useDeleteConnectionMutation = (mutationProps?: DeleteConnectionMuta
     });
 
 interface UpdateConnectionMutationProps {
-    onSuccess?: (result: ConnectionModel, variables: ConnectionModel) => void;
-    onError?: (error: Error, variables: ConnectionModel) => void;
+    onSuccess?: (result: Connection, variables: Connection) => void;
+    onError?: (error: Error, variables: Connection) => void;
 }
 
 export const useUpdateConnectionMutation = (mutationProps?: UpdateConnectionMutationProps) =>
-    useMutation<ConnectionModel, Error, ConnectionModel>({
-        mutationFn: (connection: ConnectionModel) => {
+    useMutation<Connection, Error, Connection>({
+        mutationFn: (connection: Connection) => {
             return new ConnectionApi().updateConnection({
-                connectionModel: connection,
+                connection: connection,
                 id: connection.id!,
             });
         },

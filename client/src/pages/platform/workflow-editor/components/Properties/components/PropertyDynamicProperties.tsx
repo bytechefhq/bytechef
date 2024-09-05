@@ -1,7 +1,7 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import {PropertyModel} from '@/shared/middleware/platform/configuration';
+import {Property as PropertyModel} from '@/shared/middleware/platform/configuration';
 import {useGetWorkflowNodeDynamicPropertiesQuery} from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
 import {useEffect, useState} from 'react';
 

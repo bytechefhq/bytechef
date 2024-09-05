@@ -1,7 +1,7 @@
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
-import {ControlTypeModel, PropertyTypeModel} from '@/shared/middleware/platform/configuration';
-import {PropertyType, SubPropertyType} from '@/shared/types';
+import {ControlType, PropertyType} from '@/shared/middleware/platform/configuration';
+import {PropertyAllType, SubPropertyType} from '@/shared/types';
 import isObject from 'isobject';
 import resolvePath from 'object-resolve-path';
 import {Fragment, useEffect, useState} from 'react';
@@ -17,11 +17,11 @@ interface ObjectPropertyProps {
     arrayName?: string;
     onDeleteClick?: (path: string) => void;
     path?: string;
-    property: PropertyType;
+    property: PropertyAllType;
 }
 
 const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, path, property}: ObjectPropertyProps) => {
-    const [subProperties, setSubProperties] = useState<Array<PropertyType>>();
+    const [subProperties, setSubProperties] = useState<Array<PropertyAllType>>();
     const [newPropertyName, setNewPropertyName] = useState('');
     const [newPropertyType, setNewPropertyType] = useState<keyof typeof VALUE_PROPERTY_CONTROL_TYPES>(
         (property.additionalProperties?.[0]?.type as keyof typeof VALUE_PROPERTY_CONTROL_TYPES) || 'STRING'
@@ -50,7 +50,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
           }));
 
     if (properties?.length) {
-        const hasCustomProperty = (properties as Array<PropertyType>).find((property) => property.custom);
+        const hasCustomProperty = (properties as Array<PropertyAllType>).find((property) => property.custom);
 
         if (!hasCustomProperty) {
             availablePropertyTypes = [];
@@ -68,7 +68,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
     const handleAddItemClick = () => {
         const newItem: SubPropertyType = {
             additionalProperties,
-            controlType: VALUE_PROPERTY_CONTROL_TYPES[newPropertyType] as ControlTypeModel,
+            controlType: VALUE_PROPERTY_CONTROL_TYPES[newPropertyType] as ControlType,
             custom: true,
             expressionEnabled: true,
             label: newPropertyName,
@@ -112,7 +112,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
             : Object.keys(parameterObject);
 
         const preexistingProperties = objectParameterKeys.map((parameterKey) => {
-            const matchingProperty = (properties as Array<PropertyType>)?.find(
+            const matchingProperty = (properties as Array<PropertyAllType>)?.find(
                 (property) => property.name === parameterKey
             );
 
@@ -135,7 +135,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
                     matchingProperty.controlType ||
                     (VALUE_PROPERTY_CONTROL_TYPES[
                         matchingPropertyType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
-                    ] as ControlTypeModel);
+                    ] as ControlType);
 
                 return {
                     ...matchingProperty,
@@ -148,13 +148,13 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
                     ...property,
                     controlType: VALUE_PROPERTY_CONTROL_TYPES[
                         parameterItemType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
-                    ] as ControlTypeModel,
+                    ] as ControlType,
                     custom: true,
                     defaultValue: parameterKeyValue,
                     expressionEnabled: true,
                     label: parameterKey,
                     name: parameterKey,
-                    type: parameterItemType as PropertyTypeModel,
+                    type: parameterItemType as PropertyType,
                 };
             }
         });
@@ -169,7 +169,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
     // set subProperties in cases where the ObjectProperty has predefined properties
     useEffect(() => {
         if (properties?.length) {
-            setSubProperties(properties as Array<PropertyType>);
+            setSubProperties(properties as Array<PropertyAllType>);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [properties]);

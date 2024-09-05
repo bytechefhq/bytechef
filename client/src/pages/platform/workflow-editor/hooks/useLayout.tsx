@@ -1,9 +1,6 @@
 import defaultNodes from '@/shared/defaultNodes';
-import {WorkflowTaskModel} from '@/shared/middleware/automation/configuration';
-import {
-    ComponentDefinitionBasicModel,
-    TaskDispatcherDefinitionBasicModel,
-} from '@/shared/middleware/platform/configuration';
+import {WorkflowTask} from '@/shared/middleware/automation/configuration';
+import {ComponentDefinitionBasic, TaskDispatcherDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {getRandomId} from '@/shared/util/random-utils';
 import {stratify, tree} from 'd3-hierarchy';
 import {ComponentIcon} from 'lucide-react';
@@ -64,8 +61,8 @@ function layoutNodes(nodes: Node[], edges: Edge[]): Node[] {
 const nodeCountSelector = (state: ReactFlowState) => state.nodeInternals.size;
 
 const convertTaskToNode = (
-    task: WorkflowTaskModel,
-    taskDefinition: ComponentDefinitionBasicModel | TaskDispatcherDefinitionBasicModel,
+    task: WorkflowTask,
+    taskDefinition: ComponentDefinitionBasic | TaskDispatcherDefinitionBasic,
     index: number
 ): Node => {
     const componentName = task.type.split('/')[0];
@@ -96,8 +93,8 @@ export default function useLayout({
     componentDefinitions,
     taskDispatcherDefinitions,
 }: {
-    componentDefinitions: Array<ComponentDefinitionBasicModel>;
-    taskDispatcherDefinitions: Array<TaskDispatcherDefinitionBasicModel>;
+    componentDefinitions: Array<ComponentDefinitionBasic>;
+    taskDispatcherDefinitions: Array<TaskDispatcherDefinitionBasic>;
 }) {
     const nodeCount = useStore(nodeCountSelector);
 

@@ -1,6 +1,6 @@
 import {
-    UpdateWorkflowNodeParameter200ResponseModel,
-    UpdateWorkflowNodeParameterRequest,
+    UpdateWorkflowNodeParameter200Response,
+    UpdateWorkflowNodeParameterOperationRequest,
 } from '@/shared/middleware/platform/configuration';
 import {ComponentType} from '@/shared/types';
 import {UseMutationResult} from '@tanstack/react-query';
@@ -13,9 +13,9 @@ interface SavePropertyProps {
     successCallback?: () => void;
     type: string;
     updateWorkflowNodeParameterMutation: UseMutationResult<
-        UpdateWorkflowNodeParameter200ResponseModel,
+        UpdateWorkflowNodeParameter200Response,
         Error,
-        UpdateWorkflowNodeParameterRequest,
+        UpdateWorkflowNodeParameterOperationRequest,
         unknown
     >;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -39,7 +39,7 @@ export default function saveProperty({
     updateWorkflowNodeParameterMutation.mutate(
         {
             id: workflowId,
-            updateWorkflowNodeParameterRequestModel: {
+            updateWorkflowNodeParameterRequest: {
                 includeInMetadata,
                 path,
                 type,

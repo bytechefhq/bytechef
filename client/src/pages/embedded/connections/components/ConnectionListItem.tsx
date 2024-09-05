@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
-import {ConnectionModel, TagModel} from '@/shared/middleware/embedded/connection';
+import {Connection, Tag} from '@/shared/middleware/embedded/connection';
 import {useUpdateConnectionTagsMutation} from '@/shared/mutations/embedded/connectionTags.mutations';
 import {
     useDeleteConnectionMutation,
@@ -39,8 +39,8 @@ import InlineSVG from 'react-inlinesvg';
 import TagList from '../../../../components/TagList';
 
 interface ConnectionListItemProps {
-    connection: ConnectionModel;
-    remainingTags?: TagModel[];
+    connection: Connection;
+    remainingTags?: Tag[];
 }
 
 const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps) => {
@@ -103,7 +103,7 @@ const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps
                                     <TagList
                                         getRequest={(id, tags) => ({
                                             id: id!,
-                                            updateTagsRequestModel: {
+                                            updateTagsRequest: {
                                                 tags: tags || [],
                                             },
                                         })}

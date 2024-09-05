@@ -2,8 +2,8 @@
 import {
     GetPreviousWorkflowNodeOutputsRequest,
     GetWorkflowNodeOutputRequest,
+    WorkflowNodeOutput,
     WorkflowNodeOutputApi,
-    WorkflowNodeOutputModel,
 } from '@/shared/middleware/platform/configuration';
 import {useQuery} from '@tanstack/react-query';
 
@@ -23,7 +23,7 @@ export const WorkflowNodeOutputKeys = {
 };
 
 export const useGetWorkflowNodeOutputQuery = (request: GetWorkflowNodeOutputRequest, enabled?: boolean) =>
-    useQuery<WorkflowNodeOutputModel, Error>({
+    useQuery<WorkflowNodeOutput, Error>({
         queryKey: WorkflowNodeOutputKeys.workflowNodeOutput(request),
         queryFn: () => new WorkflowNodeOutputApi().getWorkflowNodeOutput(request),
         enabled: enabled === undefined ? true : enabled,
@@ -33,7 +33,7 @@ export const useGetPreviousWorkflowNodeOutputsQuery = (
     request: GetPreviousWorkflowNodeOutputsRequest,
     enabled?: boolean
 ) =>
-    useQuery<WorkflowNodeOutputModel[], Error>({
+    useQuery<WorkflowNodeOutput[], Error>({
         queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs(request),
         queryFn: () => new WorkflowNodeOutputApi().getPreviousWorkflowNodeOutputs(request),
         enabled: enabled === undefined ? true : enabled,

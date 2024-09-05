@@ -1,5 +1,5 @@
 import {Input} from '@/components/ui/input';
-import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/shared/middleware/platform/configuration';
+import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {useEffect, useState} from 'react';
 
 import WorkflowNodesTabs from './WorkflowNodesTabs';
@@ -8,22 +8,22 @@ const WorkflowNodesSidebar = ({
     data,
 }: {
     data: {
-        componentDefinitions: Array<ComponentDefinitionBasicModel>;
-        taskDispatcherDefinitions: Array<TaskDispatcherDefinitionModel>;
+        componentDefinitions: Array<ComponentDefinitionBasic>;
+        taskDispatcherDefinitions: Array<TaskDispatcherDefinition>;
     };
 }) => {
     const [filter, setFilter] = useState('');
 
     const [filteredActionComponentDefinitions, setFilteredActionComponentDefinitions] = useState<
-        Array<ComponentDefinitionBasicModel>
+        Array<ComponentDefinitionBasic>
     >([]);
 
     const [filteredTaskDispatcherDefinitions, setFilteredTaskDispatcherDefinitions] = useState<
-        Array<TaskDispatcherDefinitionModel>
+        Array<TaskDispatcherDefinition>
     >([]);
 
     const [filteredTriggerComponentDefinitions, setFilteredTriggerComponentDefinitions] = useState<
-        Array<ComponentDefinitionBasicModel>
+        Array<ComponentDefinitionBasic>
     >([]);
 
     const {componentDefinitions, taskDispatcherDefinitions} = data;

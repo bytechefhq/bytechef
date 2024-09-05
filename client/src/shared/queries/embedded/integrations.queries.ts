@@ -1,4 +1,4 @@
-import {IntegrationApi, IntegrationModel, IntegrationStatusModel} from '@/shared/middleware/embedded/configuration';
+import {Integration, IntegrationApi, IntegrationStatus} from '@/shared/middleware/embedded/configuration';
 
 /* eslint-disable sort-keys */
 import {useQuery} from '@tanstack/react-query';
@@ -12,8 +12,8 @@ export const IntegrationKeys = {
     integrations: ['integrations'] as const,
 };
 
-export const useGetIntegrationQuery = (id: number, initialData?: IntegrationModel, enabled?: boolean) =>
-    useQuery<IntegrationModel, Error>({
+export const useGetIntegrationQuery = (id: number, initialData?: Integration, enabled?: boolean) =>
+    useQuery<Integration, Error>({
         queryKey: IntegrationKeys.integration(id),
         queryFn: () => new IntegrationApi().getIntegration({id}),
         initialData,
@@ -24,9 +24,9 @@ export const useGetIntegrationsQuery = (filters?: {
     categoryId?: number;
     integrationInstanceConfigurations?: boolean;
     tagId?: number;
-    status?: IntegrationStatusModel;
+    status?: IntegrationStatus;
 }) =>
-    useQuery<IntegrationModel[], Error>({
+    useQuery<Integration[], Error>({
         queryKey: IntegrationKeys.filteredIntegrations(filters ?? {}),
         queryFn: () => new IntegrationApi().getIntegrations(filters),
     });

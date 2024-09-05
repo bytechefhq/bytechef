@@ -15,7 +15,7 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
-import {ProjectModel, WorkflowModel} from '@/shared/middleware/automation/configuration';
+import {Project, Workflow} from '@/shared/middleware/automation/configuration';
 import {WorkflowTestApi} from '@/shared/middleware/platform/workflow/test';
 import {useDeleteProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {
@@ -70,11 +70,7 @@ const ProjectHeader = ({
 
     const {componentNames, nodeNames} = workflow;
 
-    const {data: project} = useGetProjectQuery(
-        projectId,
-        useLoaderData() as ProjectModel,
-        !showDeleteProjectAlertDialog
-    );
+    const {data: project} = useGetProjectQuery(projectId, useLoaderData() as Project, !showDeleteProjectAlertDialog);
 
     const queryClient = useQueryClient();
 
@@ -114,14 +110,11 @@ const ProjectHeader = ({
             setShowDeleteWorkflowAlertDialog(false);
 
             navigate(
-                `/automation/projects/${projectId}/project-workflows/${project?.projectWorkflowIds?.filter((projectWorkflowId) => projectWorkflowId !== (workflow as WorkflowModel).projectWorkflowId)[0]}`
+                `/automation/projects/${projectId}/project-workflows/${project?.projectWorkflowIds?.filter((projectWorkflowId) => projectWorkflowId !== (workflow as Workflow).projectWorkflowId)[0]}`
             );
 
             queryClient.removeQueries({
-                queryKey: ProjectWorkflowKeys.projectWorkflow(
-                    projectId,
-                    (workflow as WorkflowModel).projectWorkflowId!
-                ),
+                queryKey: ProjectWorkflowKeys.projectWorkflow(projectId, (workflow as Workflow).projectWorkflowId!),
             });
             queryClient.removeQueries({queryKey: WorkflowKeys.workflow(workflow.id!)});
 

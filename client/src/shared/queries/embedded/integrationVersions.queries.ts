@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys */
-import {IntegrationApi, IntegrationVersionModel} from '@/shared/middleware/embedded/configuration';
+import {IntegrationApi, IntegrationVersion} from '@/shared/middleware/embedded/configuration';
 import {useQuery} from '@tanstack/react-query';
 
 export const IntegrationVersionKeys = {
@@ -13,7 +13,7 @@ export const IntegrationVersionKeys = {
 };
 
 export const useGetIntegrationVersionsQuery = (integrationId: number, enabled?: boolean) =>
-    useQuery<IntegrationVersionModel[], Error>({
+    useQuery<IntegrationVersion[], Error>({
         queryFn: () => new IntegrationApi().getIntegrationVersions({id: integrationId}),
         queryKey: IntegrationVersionKeys.integrationIntegrationVersions(integrationId),
         enabled: enabled === undefined ? true : enabled,

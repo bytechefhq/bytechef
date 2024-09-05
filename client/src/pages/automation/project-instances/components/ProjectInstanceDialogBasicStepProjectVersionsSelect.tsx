@@ -1,5 +1,5 @@
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {ProjectStatusModel} from '@/shared/middleware/automation/configuration';
+import {ProjectStatus} from '@/shared/middleware/automation/configuration';
 import {useGetProjectVersionsQuery} from '@/shared/queries/automation/projectVersions.queries';
 
 const ProjectInstanceDialogBasicStepProjectVersionsSelect = ({
@@ -28,7 +28,7 @@ const ProjectInstanceDialogBasicStepProjectVersionsSelect = ({
                 {projectVersions &&
                     projectVersions.map(
                         (projectVersion) =>
-                            projectVersion.status == ProjectStatusModel.Published && (
+                            projectVersion.status == ProjectStatus.Published && (
                                 <SelectItem key={projectVersion.version} value={projectVersion.version!.toString()}>
                                     V{projectVersion.version}
                                 </SelectItem>

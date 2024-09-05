@@ -1,5 +1,5 @@
 import {TYPE_ICONS} from '@/shared/typeIcons';
-import {PropertyType} from '@/shared/types';
+import {PropertyAllType} from '@/shared/types';
 import {ClipboardCheck, ClipboardIcon} from 'lucide-react';
 
 import getNestedObject from '../utils/getNestedObject';
@@ -8,7 +8,7 @@ interface PropertyFieldProps {
     copiedValue: string | null;
     copyToClipboard: (text: string) => Promise<void>;
     label: string;
-    property: PropertyType;
+    property: PropertyAllType;
     parentPath?: string;
     /* eslint-disable  @typescript-eslint/no-explicit-any */
     sampleOutput: any;

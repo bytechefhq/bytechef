@@ -1,6 +1,6 @@
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import {useProjectInstancesEnabledStore} from '@/pages/automation/project-instances/stores/useProjectInstancesEnabledStore';
-import {ProjectInstanceModel, ProjectModel, TagModel} from '@/shared/middleware/automation/configuration';
+import {Project, ProjectInstance, Tag} from '@/shared/middleware/automation/configuration';
 
 import ProjectInstanceListItem from './ProjectInstanceListItem';
 import ProjectInstanceWorkflowList from './ProjectInstanceWorkflowList';
@@ -10,9 +10,9 @@ const ProjectInstanceList = ({
     projectInstances,
     tags,
 }: {
-    project: ProjectModel;
-    projectInstances: ProjectInstanceModel[];
-    tags: TagModel[];
+    project: Project;
+    projectInstances: ProjectInstance[];
+    tags: Tag[];
 }) => {
     const projectInstanceMap = useProjectInstancesEnabledStore(({projectInstanceMap}) => projectInstanceMap);
 

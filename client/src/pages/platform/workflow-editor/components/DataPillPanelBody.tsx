@@ -1,24 +1,24 @@
 import DataPillPanelBodyInputsItem from '@/pages/platform/workflow-editor/components/DataPillPanelBodyInputsItem';
 import {
-    ActionDefinitionModel,
-    ComponentDefinitionBasicModel,
-    type PropertyModel,
-    TriggerDefinitionModel,
+    ActionDefinition,
+    ComponentDefinitionBasic,
+    type Property,
+    TriggerDefinition,
 } from '@/shared/middleware/platform/configuration';
 import {Accordion, AccordionItem} from '@radix-ui/react-accordion';
 
 import DataPillPanelBodyPropertiesItem from './DataPillPanelBodyPropertiesItem';
 
-export interface ComponentActionI extends ActionDefinitionModel {
-    componentDefinition: ComponentDefinitionBasicModel;
-    outputSchema: PropertyModel;
+export interface ComponentActionI extends ActionDefinition {
+    componentDefinition: ComponentDefinitionBasic;
+    outputSchema: Property;
     sampleOutput: object;
     workflowNodeName: string;
 }
 
-export interface ComponentTriggerI extends TriggerDefinitionModel {
-    componentDefinition: ComponentDefinitionBasicModel;
-    outputSchema: PropertyModel;
+export interface ComponentTriggerI extends TriggerDefinition {
+    componentDefinition: ComponentDefinitionBasic;
+    outputSchema: Property;
     sampleOutput: object;
     workflowNodeName: string;
 }

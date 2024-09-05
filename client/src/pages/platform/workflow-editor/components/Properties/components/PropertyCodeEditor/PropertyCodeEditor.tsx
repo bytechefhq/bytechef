@@ -4,7 +4,7 @@ import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import PropertyCodeEditorSheet from '@/pages/platform/workflow-editor/components/Properties/components/PropertyCodeEditor/PropertyCodeEditorSheet';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
-import {WorkflowModel} from '@/shared/middleware/platform/configuration';
+import {Workflow} from '@/shared/middleware/platform/configuration';
 import {ExclamationTriangleIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {ReactNode, forwardRef} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -20,7 +20,7 @@ interface PropertyCodeEditorProps {
     required?: boolean;
     name: string;
     value: string;
-    workflow: WorkflowModel;
+    workflow: Workflow;
     workflowNodeName: string;
 }
 

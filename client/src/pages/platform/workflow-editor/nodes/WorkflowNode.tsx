@@ -113,7 +113,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
         updateWorkflowMutation.mutate(
             {
                 id: workflow.id!,
-                workflowModel: {
+                workflow: {
                     definition: JSON.stringify(
                         {
                             ...workflowDefinition,

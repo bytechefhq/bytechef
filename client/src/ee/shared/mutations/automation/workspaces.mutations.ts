@@ -1,16 +1,16 @@
-import {WorkspaceApi, WorkspaceModel} from '@/ee/shared/middleware/automation/configuration';
+import {Workspace, WorkspaceApi} from '@/ee/shared/middleware/automation/configuration';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateWorkspaceMutationProps {
-    onError?: (error: Error, variables: WorkspaceModel) => void;
-    onSuccess?: (result: WorkspaceModel, variables: WorkspaceModel) => void;
+    onError?: (error: Error, variables: Workspace) => void;
+    onSuccess?: (result: Workspace, variables: Workspace) => void;
 }
 
 export const useCreateWorkspaceMutation = (mutationProps?: CreateWorkspaceMutationProps) =>
-    useMutation<WorkspaceModel, Error, WorkspaceModel>({
-        mutationFn: (workspaceModel: WorkspaceModel) => {
+    useMutation<Workspace, Error, Workspace>({
+        mutationFn: (workspace: Workspace) => {
             return new WorkspaceApi().createWorkspace({
-                workspaceModel,
+                workspace,
             });
         },
         onError: mutationProps?.onError,
@@ -34,16 +34,16 @@ export const useDeleteWorkspaceMutation = (mutationProps?: DeleteWorkspaceMutati
     });
 
 interface UpdateWorkspaceMutationProps {
-    onError?: (error: Error, variables: WorkspaceModel) => void;
-    onSuccess?: (result: WorkspaceModel, variables: WorkspaceModel) => void;
+    onError?: (error: Error, variables: Workspace) => void;
+    onSuccess?: (result: Workspace, variables: Workspace) => void;
 }
 
 export const useUpdateWorkspaceMutation = (mutationProps?: UpdateWorkspaceMutationProps) =>
-    useMutation<WorkspaceModel, Error, WorkspaceModel>({
-        mutationFn: (workspaceModel: WorkspaceModel) => {
+    useMutation<Workspace, Error, Workspace>({
+        mutationFn: (workspace: Workspace) => {
             return new WorkspaceApi().updateWorkspace({
-                id: workspaceModel.id!,
-                workspaceModel,
+                id: workspace.id!,
+                workspace,
             });
         },
         onError: mutationProps?.onError,

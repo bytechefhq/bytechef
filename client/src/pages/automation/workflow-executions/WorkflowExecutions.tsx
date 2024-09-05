@@ -9,10 +9,10 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {EnvironmentModel, ProjectModel} from '@/shared/middleware/automation/configuration';
+import {Environment, Project} from '@/shared/middleware/automation/configuration';
 import {
     GetWorkflowExecutionsPageJobStatusEnum,
-    WorkflowExecutionModelFromJSON,
+    WorkflowExecutionFromJSON,
 } from '@/shared/middleware/automation/workflow/execution';
 import {
     useGetProjectInstanceQuery,
@@ -51,7 +51,7 @@ const jobStatusOptions = [
     },
 ];
 
-const ProjectLabel = ({project}: {project: ProjectModel}) => (
+const ProjectLabel = ({project}: {project: Project}) => (
     <div className="flex items-center">
         <span className="mr-1 ">{project.name}</span>
 
@@ -103,7 +103,7 @@ export const WorkflowExecutions = () => {
         error: workflowExecutionsError,
         isLoading: workflowExecutionsIsLoading,
     } = useGetWorkflowExecutionsQuery({
-        environment: filterEnvironment as EnvironmentModel,
+        environment: filterEnvironment as Environment,
         jobEndDate: filterEndDate,
         jobStartDate: filterStartDate,
         jobStatus: filterStatus,
@@ -131,8 +131,8 @@ export const WorkflowExecutions = () => {
             ? "You don't have any executed workflows yet."
             : 'There is no executed workflows for the current criteria.';
 
-    const workflowExecutions = workflowExecutionPage?.content?.map((workflowExecutionModel: object) =>
-        WorkflowExecutionModelFromJSON(workflowExecutionModel)
+    const workflowExecutions = workflowExecutionPage?.content?.map((workflowExecution: object) =>
+        WorkflowExecutionFromJSON(workflowExecution)
     );
 
     function filter(

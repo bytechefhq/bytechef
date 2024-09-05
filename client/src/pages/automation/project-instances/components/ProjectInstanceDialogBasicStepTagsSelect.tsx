@@ -1,5 +1,5 @@
 import CreatableSelect from '@/components/CreatableSelect/CreatableSelect';
-import {ProjectInstanceModel} from '@/shared/middleware/automation/configuration';
+import {ProjectInstance} from '@/shared/middleware/automation/configuration';
 import {useGetProjectInstanceTagsQuery} from '@/shared/queries/automation/projectInstanceTags.queries';
 import {ControllerRenderProps} from 'react-hook-form/dist/types/controller';
 
@@ -8,9 +8,9 @@ const ProjectInstanceDialogBasicStepTagsSelect = ({
     onCreateOption,
     projectInstance,
 }: {
-    field: ControllerRenderProps<ProjectInstanceModel, 'tags'>;
+    field: ControllerRenderProps<ProjectInstance, 'tags'>;
     onCreateOption: (inputValue: string) => void;
-    projectInstance?: ProjectInstanceModel;
+    projectInstance?: ProjectInstance;
 }) => {
     const {data: tags} = useGetProjectInstanceTagsQuery();
 

@@ -1,23 +1,23 @@
 import {
-    DeleteWorkflowNodeParameter200ResponseModel,
-    DeleteWorkflowNodeParameterRequest,
-    UpdateWorkflowNodeParameter200ResponseModel,
-    UpdateWorkflowNodeParameterRequest,
+    DeleteWorkflowNodeParameter200Response,
+    DeleteWorkflowNodeParameterOperationRequest,
+    UpdateWorkflowNodeParameter200Response,
+    UpdateWorkflowNodeParameterOperationRequest,
 } from '@/shared/middleware/platform/configuration';
 import {UseMutationResult} from '@tanstack/react-query';
 import {ReactNode, createContext, useContext} from 'react';
 
 export interface WorkflowNodeParameterMutationStateI {
     deleteWorkflowNodeParameterMutation?: UseMutationResult<
-        DeleteWorkflowNodeParameter200ResponseModel,
+        DeleteWorkflowNodeParameter200Response,
         Error,
-        DeleteWorkflowNodeParameterRequest,
+        DeleteWorkflowNodeParameterOperationRequest,
         unknown
     >;
     updateWorkflowNodeParameterMutation?: UseMutationResult<
-        UpdateWorkflowNodeParameter200ResponseModel,
+        UpdateWorkflowNodeParameter200Response,
         Error,
-        UpdateWorkflowNodeParameterRequest,
+        UpdateWorkflowNodeParameterOperationRequest,
         unknown
     >;
 }

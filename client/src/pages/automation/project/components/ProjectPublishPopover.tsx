@@ -4,14 +4,14 @@ import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Textarea} from '@/components/ui/textarea';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/components/ui/use-toast';
-import {ProjectModel} from '@/shared/middleware/automation/configuration';
+import {Project} from '@/shared/middleware/automation/configuration';
 import {usePublishProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {CircleDotIcon} from 'lucide-react';
 import {useState} from 'react';
 
-const ProjectPublishPopover = ({project}: {project: ProjectModel}) => {
+const ProjectPublishPopover = ({project}: {project: Project}) => {
     const [open, setOpen] = useState(false);
     const [description, setDescription] = useState<string | undefined>(undefined);
 
@@ -61,7 +61,7 @@ const ProjectPublishPopover = ({project}: {project: ProjectModel}) => {
                         onClick={() =>
                             publishProjectMutation.mutate({
                                 id: project.id!,
-                                publishProjectRequestModel: {
+                                publishProjectRequest: {
                                     description,
                                 },
                             })

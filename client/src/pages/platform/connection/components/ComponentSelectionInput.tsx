@@ -1,7 +1,7 @@
 import ComboBox, {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
 import {FormControl, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
-import {ComponentDefinitionBasicModel, ComponentDefinitionModel} from '@/shared/middleware/platform/configuration';
+import {ComponentDefinition, ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {ControllerRenderProps} from 'react-hook-form';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
@@ -15,11 +15,11 @@ const ComponentSelectionInput = ({
     items,
     selectedComponentDefinition,
 }: {
-    componentDefinition?: ComponentDefinitionModel;
+    componentDefinition?: ComponentDefinition;
     field?: ControllerRenderProps<ConnectionDialogFormProps, 'componentName'>;
-    handleComponentDefinitionChange?: (componentDefinition: ComponentDefinitionBasicModel) => void;
+    handleComponentDefinitionChange?: (componentDefinition: ComponentDefinitionBasic) => void;
     items?: Array<ComboBoxItemType>;
-    selectedComponentDefinition?: ComponentDefinitionBasicModel;
+    selectedComponentDefinition?: ComponentDefinitionBasic;
 }) => (
     <FormItem>
         <FormLabel>Component</FormLabel>
@@ -31,7 +31,7 @@ const ComponentSelectionInput = ({
                     name="component"
                     onBlur={field.onBlur}
                     onChange={(item) =>
-                        handleComponentDefinitionChange(item?.componentDefinition as ComponentDefinitionBasicModel)
+                        handleComponentDefinitionChange(item?.componentDefinition as ComponentDefinitionBasic)
                     }
                     value={field.value}
                 />

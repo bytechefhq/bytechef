@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys */
-import {AdminApiKeyApi, AdminApiKeyModel} from '@/shared/middleware/platform/user';
+import {AdminApiKey, AdminApiKeyApi} from '@/shared/middleware/platform/user';
 import {useQuery} from '@tanstack/react-query';
 
 export const AdminApiKeyKeys = {
@@ -7,7 +7,7 @@ export const AdminApiKeyKeys = {
 };
 
 export const useGetAdminApiKeysQuery = () =>
-    useQuery<AdminApiKeyModel[], Error>({
+    useQuery<AdminApiKey[], Error>({
         queryKey: AdminApiKeyKeys.adminApiKeys,
         queryFn: () => new AdminApiKeyApi().getAdminApiKeys(),
     });

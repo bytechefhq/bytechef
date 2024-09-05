@@ -1,6 +1,6 @@
 import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from '@/components/ui/dialog';
 import WorkflowExecutionContentClipboardButton from '@/pages/platform/workflow-executions/components/WorkflowExecutionContentClipboardButton';
-import {ExecutionErrorModel} from '@/shared/middleware/automation/workflow/execution';
+import {ExecutionError} from '@/shared/middleware/automation/workflow/execution';
 import {ExpandIcon} from 'lucide-react';
 import ReactJson from 'react-json-view';
 
@@ -12,7 +12,7 @@ const WorkflowExecutionContent = ({
     startDate,
 }: {
     endDate?: Date;
-    error?: ExecutionErrorModel;
+    error?: ExecutionError;
     input?: {[key: string]: string};
     output?: object;
     startDate?: Date;

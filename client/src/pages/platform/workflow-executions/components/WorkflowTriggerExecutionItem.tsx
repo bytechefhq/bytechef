@@ -1,5 +1,5 @@
 import WorkflowExecutionBadge from '@/pages/platform/workflow-executions/components/WorkflowExecutionBadge';
-import {TriggerExecutionModel} from '@/shared/middleware/automation/workflow/execution';
+import {TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
@@ -9,7 +9,7 @@ const WorkflowTriggerExecutionItem = ({
     triggerExecution,
 }: {
     selected?: boolean;
-    triggerExecution: TriggerExecutionModel;
+    triggerExecution: TriggerExecution;
     onClick?: () => void;
 }) => {
     const {component, endDate, startDate, workflowTrigger} = triggerExecution;

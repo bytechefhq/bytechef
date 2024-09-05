@@ -12,8 +12,8 @@ import {Form} from '@/components/ui/form';
 import IntegrationInstanceConfigurationDialogOauth2Step from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationDialogOauth2Step';
 import {useWorkflowsEnabledStore} from '@/pages/embedded/integration-instance-configurations/stores/useWorkflowsEnabledStore';
 import ConnectionParameters from '@/pages/platform/connection/components/ConnectionParameters';
-import {EnvironmentModel, IntegrationInstanceConfigurationModel} from '@/shared/middleware/embedded/configuration';
-import {AuthorizationTypeModel} from '@/shared/middleware/platform/configuration';
+import {Environment, IntegrationInstanceConfiguration} from '@/shared/middleware/embedded/configuration';
+import {AuthorizationType} from '@/shared/middleware/platform/configuration';
 import {
     useCreateIntegrationInstanceConfigurationMutation,
     useUpdateIntegrationInstanceConfigurationMutation,
@@ -34,7 +34,7 @@ import IntegrationInstanceConfigurationDialogWorkflowsStep from './IntegrationIn
 
 interface IntegrationInstanceConfigurationDialogProps {
     onClose?: () => void;
-    integrationInstanceConfiguration?: IntegrationInstanceConfigurationModel;
+    integrationInstanceConfiguration?: IntegrationInstanceConfiguration;
     triggerNode?: ReactNode;
     updateIntegrationVersion?: boolean;
 }
@@ -55,11 +55,11 @@ const IntegrationInstanceConfigurationDialog = ({
 
     const [resetWorkflowsEnabledStore] = useWorkflowsEnabledStore(useShallow(({reset}) => [reset]));
 
-    const form = useForm<IntegrationInstanceConfigurationModel>({
+    const form = useForm<IntegrationInstanceConfiguration>({
         defaultValues: {
             description: integrationInstanceConfiguration?.description || undefined,
             enabled: integrationInstanceConfiguration?.enabled || false,
-            environment: integrationInstanceConfiguration?.environment || EnvironmentModel.Test,
+            environment: integrationInstanceConfiguration?.environment || Environment.Test,
             integrationId: integrationInstanceConfiguration?.integrationId || undefined,
             integrationInstanceConfigurationWorkflows: [],
             integrationVersion: integrationInstanceConfiguration?.integrationVersion || undefined,
@@ -89,9 +89,9 @@ const IntegrationInstanceConfigurationDialog = ({
 
     const oAuth2Authorization = connectionDefinition?.authorizations?.find(
         (authorization) =>
-            authorization.type === AuthorizationTypeModel.Oauth2AuthorizationCode ||
-            authorization.type === AuthorizationTypeModel.Oauth2AuthorizationCodePkce ||
-            authorization.type === AuthorizationTypeModel.Oauth2ImplicitCode
+            authorization.type === AuthorizationType.Oauth2AuthorizationCode ||
+            authorization.type === AuthorizationType.Oauth2AuthorizationCodePkce ||
+            authorization.type === AuthorizationType.Oauth2ImplicitCode
     );
 
     const queryClient = useQueryClient();
@@ -179,7 +179,7 @@ const IntegrationInstanceConfigurationDialog = ({
 
         setTimeout(() => {
             reset({
-                environment: EnvironmentModel.Test,
+                environment: Environment.Test,
                 integrationInstanceConfigurationWorkflows: [],
             });
 
@@ -197,7 +197,7 @@ const IntegrationInstanceConfigurationDialog = ({
         setActiveStepIndex(activeStepIndex + 1);
     };
 
-    const handleSaveClick = (formData: IntegrationInstanceConfigurationModel) => {
+    const handleSaveClick = (formData: IntegrationInstanceConfiguration) => {
         if (!formData) {
             return;
         }
@@ -219,7 +219,7 @@ const IntegrationInstanceConfigurationDialog = ({
                         };
                     }
                 ),
-            } as IntegrationInstanceConfigurationModel);
+            } as IntegrationInstanceConfiguration);
         } else {
             createIntegrationInstanceConfigurationMutation.mutate({
                 ...formData,

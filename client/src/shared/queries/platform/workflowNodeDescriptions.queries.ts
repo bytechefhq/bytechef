@@ -1,6 +1,6 @@
 /* eslint-disable sort-keys */
 import {
-    type GetWorkflowNodeDescription200ResponseModel,
+    type GetWorkflowNodeDescription200Response,
     GetWorkflowNodeDescriptionRequest,
     GetWorkflowNodeOutputRequest,
     WorkflowNodeDescriptionApi,
@@ -17,7 +17,7 @@ export const WorkflowNodeDescriptionKeys = {
 };
 
 export const useGetWorkflowNodeDescriptionQuery = (request: GetWorkflowNodeDescriptionRequest, enabled?: boolean) =>
-    useQuery<GetWorkflowNodeDescription200ResponseModel, Error>({
+    useQuery<GetWorkflowNodeDescription200Response, Error>({
         queryKey: WorkflowNodeDescriptionKeys.workflowNodeDescription(request),
         queryFn: () => new WorkflowNodeDescriptionApi().getWorkflowNodeDescription(request),
         enabled: enabled === undefined ? true : enabled,

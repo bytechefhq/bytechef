@@ -4,11 +4,7 @@ import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/shee
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import PropertyCodeEditorSheetConnectionsSheet from '@/pages/platform/workflow-editor/components/Properties/components/PropertyCodeEditor/PropertyCodeEditorSheetConnectionsSheet';
 import {RightSidebar} from '@/shared/layout/RightSidebar';
-import {
-    ScriptTestExecutionModel,
-    WorkflowModel,
-    WorkflowNodeScriptApi,
-} from '@/shared/middleware/platform/configuration';
+import {ScriptTestExecution, Workflow, WorkflowNodeScriptApi} from '@/shared/middleware/platform/configuration';
 import Editor from '@monaco-editor/react';
 import {Link2Icon, PlayIcon, RefreshCwIcon, SquareIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
@@ -21,7 +17,7 @@ interface PropertyCodeEditorSheetProps {
     onClose?: () => void;
     onChange: (value: string | undefined) => void;
     value?: string;
-    workflow: WorkflowModel;
+    workflow: Workflow;
     workflowNodeName: string;
 }
 
@@ -36,7 +32,7 @@ const PropertyCodeEditorSheet = ({
     const [dirty, setDirty] = useState<boolean>(false);
     const [newValue, setNewValue] = useState<string | undefined>(value);
     const [scriptIsRunning, setScriptIsRunning] = useState(false);
-    const [scriptTestExecution, setScriptTestExecution] = useState<ScriptTestExecutionModel | undefined>();
+    const [scriptTestExecution, setScriptTestExecution] = useState<ScriptTestExecution | undefined>();
     const [showConnections, setShowConnections] = useState(false);
 
     const currentWorkflowTask = workflow.tasks?.find((task) => task.name === workflowNodeName);

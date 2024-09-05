@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys */
-import {IntegrationTagApi, TagModel} from '@/shared/middleware/embedded/configuration';
+import {IntegrationTagApi, Tag} from '@/shared/middleware/embedded/configuration';
 import {useQuery} from '@tanstack/react-query';
 
 export const IntegrationTagKeys = {
@@ -7,7 +7,7 @@ export const IntegrationTagKeys = {
 };
 
 export const useGetIntegrationTagsQuery = () =>
-    useQuery<TagModel[], Error>({
+    useQuery<Tag[], Error>({
         queryKey: IntegrationTagKeys.integrationTags,
         queryFn: () => new IntegrationTagApi().getIntegrationTags(),
     });

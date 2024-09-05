@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys */
-import {WorkflowApi, WorkflowModel} from '@/shared/middleware/embedded/configuration';
+import {Workflow, WorkflowApi} from '@/shared/middleware/embedded/configuration';
 import {IntegrationKeys} from '@/shared/queries/embedded/integrations.queries';
 import {useQuery} from '@tanstack/react-query';
 
@@ -20,7 +20,7 @@ export const IntegrationWorkflowKeys = {
 };
 
 export const useGetIntegrationWorkflowQuery = (id: number, integrationWorkflowId: number, enabled?: boolean) =>
-    useQuery<WorkflowModel, Error>({
+    useQuery<Workflow, Error>({
         queryKey: IntegrationWorkflowKeys.integrationWorkflow(id, integrationWorkflowId),
         queryFn: () =>
             new WorkflowApi().getIntegrationWorkflow({
@@ -30,7 +30,7 @@ export const useGetIntegrationWorkflowQuery = (id: number, integrationWorkflowId
     });
 
 export const useGetIntegrationWorkflowsQuery = (id: number, enabled?: boolean) =>
-    useQuery<WorkflowModel[], Error>({
+    useQuery<Workflow[], Error>({
         queryKey: IntegrationWorkflowKeys.integrationWorkflows(id),
         queryFn: () =>
             new WorkflowApi().getIntegrationWorkflows({
@@ -40,7 +40,7 @@ export const useGetIntegrationWorkflowsQuery = (id: number, enabled?: boolean) =
     });
 
 export const useGetIntegrationVersionWorkflowsQuery = (id: number, integrationVersion: number, enabled?: boolean) =>
-    useQuery<WorkflowModel[], Error>({
+    useQuery<Workflow[], Error>({
         queryKey: IntegrationWorkflowKeys.integrationVersionWorkflows(id, integrationVersion),
         queryFn: () => new WorkflowApi().getIntegrationVersionWorkflows({id, integrationVersion}),
         enabled: enabled === undefined ? true : enabled,

@@ -3,23 +3,19 @@ import {Switch} from '@/components/ui/switch';
 import ProjectInstanceDialogWorkflowsStepItemConnections from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItemConnections';
 import ProjectInstanceDialogWorkflowsStepItemInputs from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItemInputs';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-instances/stores/useWorkflowsEnabledStore';
-import {
-    ProjectInstanceModel,
-    WorkflowConnectionModel,
-    WorkflowModel,
-} from '@/shared/middleware/automation/configuration';
+import {ProjectInstance, Workflow, WorkflowConnection} from '@/shared/middleware/automation/configuration';
 import {Control, UseFormSetValue} from 'react-hook-form';
 import {FormState} from 'react-hook-form/dist/types/form';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 export interface ProjectInstanceDialogWorkflowListItemProps {
-    control: Control<ProjectInstanceModel>;
-    formState: FormState<ProjectInstanceModel>;
+    control: Control<ProjectInstance>;
+    formState: FormState<ProjectInstance>;
     label?: string;
-    setValue: UseFormSetValue<ProjectInstanceModel>;
+    setValue: UseFormSetValue<ProjectInstance>;
     switchHidden?: boolean;
-    workflow: WorkflowModel;
+    workflow: Workflow;
     workflowIndex: number;
 }
 
@@ -36,7 +32,7 @@ const ProjectInstanceDialogWorkflowsStepItem = ({
         useShallow(({setWorkflowEnabled, workflowEnabledMap}) => [setWorkflowEnabled, workflowEnabledMap])
     );
 
-    const workflowConnections: WorkflowConnectionModel[] = (workflow?.tasks ?? [])
+    const workflowConnections: WorkflowConnection[] = (workflow?.tasks ?? [])
         .flatMap((task) => task.connections ?? [])
         .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []));
 

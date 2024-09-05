@@ -12,7 +12,7 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
-import {WorkflowModel} from '@/shared/middleware/platform/configuration';
+import {Workflow} from '@/shared/middleware/platform/configuration';
 import {UseMutationResult, UseQueryResult} from '@tanstack/react-query';
 import {ReactNode, useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
@@ -27,7 +27,7 @@ interface WorkflowDialogProps {
     triggerNode?: ReactNode;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     updateWorkflowMutation?: UseMutationResult<any, object, any, unknown>;
-    useGetWorkflowQuery: (id: string, enabled?: boolean) => UseQueryResult<WorkflowModel, Error>;
+    useGetWorkflowQuery: (id: string, enabled?: boolean) => UseQueryResult<Workflow, Error>;
     workflowId?: string;
 }
 
@@ -48,7 +48,7 @@ const WorkflowDialog = ({
         defaultValues: {
             description: workflow?.description || '',
             label: workflow?.label || '',
-        } as WorkflowModel,
+        } as Workflow,
     });
 
     const {control, getValues, handleSubmit, reset} = form;
@@ -71,7 +71,7 @@ const WorkflowDialog = ({
         if (workflow) {
             mutate({
                 id: workflow.id,
-                workflowModel: {
+                workflow: {
                     definition: JSON.stringify(
                         {
                             ...JSON.parse(workflow.definition!),
@@ -87,7 +87,7 @@ const WorkflowDialog = ({
         } else {
             mutate({
                 id: parentId,
-                workflowModel: {
+                workflow: {
                     /* eslint-disable sort-keys */
                     definition: JSON.stringify(
                         {

@@ -18,14 +18,10 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ConnectionParameters from '@/pages/platform/connection/components/ConnectionParameters';
 import {TokenPayloadI} from '@/pages/platform/connection/components/oauth2/useOAuth2';
-import {ConnectionModelI} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
+import {ConnectionI} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
 import Properties from '@/pages/platform/workflow-editor/components/Properties/Properties';
-import {
-    AuthorizationModel,
-    ComponentDefinitionBasicModel,
-    ComponentDefinitionModel,
-} from '@/shared/middleware/platform/configuration';
-import {ConnectionEnvironmentModel, TagModel} from '@/shared/middleware/platform/connection';
+import {Authorization, ComponentDefinition, ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
+import {ConnectionEnvironment, Tag} from '@/shared/middleware/platform/connection';
 import {
     ComponentDefinitionKeys,
     useGetComponentDefinitionsQuery,
@@ -50,30 +46,30 @@ import ComponentSelectionInput from './ComponentSelectionInput';
 import OAuth2Button from './OAuth2Button';
 
 interface ConnectionDialogProps {
-    componentDefinition?: ComponentDefinitionModel;
-    connection?: ConnectionModelI | undefined;
+    componentDefinition?: ComponentDefinition;
+    connection?: ConnectionI | undefined;
     connectionTagsQueryKey: QueryKey;
     connectionsQueryKey: QueryKey;
     onClose?: () => void;
     useCreateConnectionMutation?: (mutationProps: {
-        onSuccess?: (result: ConnectionModelI, variables: ConnectionModelI) => void;
-        onError?: (error: Error, variables: ConnectionModelI) => void;
-    }) => UseMutationResult<ConnectionModelI, Error, ConnectionModelI, unknown>;
-    useGetConnectionTagsQuery: () => UseQueryResult<TagModel[], Error>;
+        onSuccess?: (result: ConnectionI, variables: ConnectionI) => void;
+        onError?: (error: Error, variables: ConnectionI) => void;
+    }) => UseMutationResult<ConnectionI, Error, ConnectionI, unknown>;
+    useGetConnectionTagsQuery: () => UseQueryResult<Tag[], Error>;
     useUpdateConnectionMutation?: (mutationProps: {
-        onSuccess?: (result: ConnectionModelI, variables: ConnectionModelI) => void;
-        onError?: (error: Error, variables: ConnectionModelI) => void;
-    }) => UseMutationResult<ConnectionModelI, Error, ConnectionModelI, unknown>;
+        onSuccess?: (result: ConnectionI, variables: ConnectionI) => void;
+        onError?: (error: Error, variables: ConnectionI) => void;
+    }) => UseMutationResult<ConnectionI, Error, ConnectionI, unknown>;
     triggerNode?: ReactNode;
 }
 
 export interface ConnectionDialogFormProps {
     authorizationName: string;
-    environment: ConnectionEnvironmentModel;
+    environment: ConnectionEnvironment;
     componentName: string;
     name: string;
     parameters: {[key: string]: object};
-    tags: Array<TagModel | {label: string; value: string}>;
+    tags: Array<Tag | {label: string; value: string}>;
 }
 
 const ConnectionDialog = ({
@@ -92,7 +88,7 @@ const ConnectionDialog = ({
     const [oAuth2Error, setOAuth2Error] = useState<string>();
     const [wizardStep, setWizardStep] = useState<'configuration_step' | 'oauth_step'>('configuration_step');
     const [selectedComponentDefinition, setSelectedComponentDefinition] = useState<
-        ComponentDefinitionBasicModel | undefined
+        ComponentDefinitionBasic | undefined
     >(componentDefinition);
     const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] = useState(true);
 
@@ -100,7 +96,7 @@ const ConnectionDialog = ({
         defaultValues: {
             authorizationName: '',
             componentName: componentDefinition?.name,
-            environment: connection?.environment || ConnectionEnvironmentModel.Development,
+            environment: connection?.environment || ConnectionEnvironment.Development,
             name: connection?.name || componentDefinition?.title || '',
             tags:
                 connection?.tags?.map((tag) => ({
@@ -257,7 +253,7 @@ const ConnectionDialog = ({
         let authorizationType = '';
 
         if (connectionDefinition?.authorizations) {
-            const authorization: AuthorizationModel = connectionDefinition.authorizations.filter(
+            const authorization: Authorization = connectionDefinition.authorizations.filter(
                 (authorization) => authorization.name === authorizationName
             )[0];
 
@@ -283,7 +279,7 @@ const ConnectionDialog = ({
                 ...additionalParameters,
             },
             tags: tags,
-        } as ConnectionModelI;
+        } as ConnectionI;
     }
 
     function getNewOAuth2AuthorizationParameters() {
@@ -343,13 +339,13 @@ const ConnectionDialog = ({
                 name,
                 tags,
                 version: connection?.version,
-            } as ConnectionModelI);
+            } as ConnectionI);
         } else {
             return connectionMutation.mutateAsync(getNewConnection(additionalParameters));
         }
     }
 
-    const handleComponentDefinitionChange = (componentDefinition?: ComponentDefinitionBasicModel) => {
+    const handleComponentDefinitionChange = (componentDefinition?: ComponentDefinitionBasic) => {
         if (componentDefinition) {
             setValue('componentName', componentDefinition.name);
             setAuthorizationName(undefined);
@@ -607,7 +603,7 @@ const ConnectionDialog = ({
                                                                     },
                                                                 ]);
                                                             }}
-                                                            options={remainingTags!.map((tag: TagModel) => ({
+                                                            options={remainingTags!.map((tag: Tag) => ({
                                                                 label: tag.name,
                                                                 value: tag.name.toLowerCase().replace(/\W/g, ''),
                                                                 ...tag,

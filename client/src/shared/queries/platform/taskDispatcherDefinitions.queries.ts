@@ -1,8 +1,8 @@
 /* eslint-disable sort-keys */
 import {
     GetTaskDispatcherDefinitionRequest,
+    TaskDispatcherDefinition,
     TaskDispatcherDefinitionApi,
-    TaskDispatcherDefinitionModel,
 } from '@/shared/middleware/platform/configuration';
 import {useQuery} from '@tanstack/react-query';
 
@@ -15,13 +15,13 @@ export const TaskDispatcherKeys = {
 };
 
 export const useGetTaskDispatcherDefinitionsQuery = () =>
-    useQuery<TaskDispatcherDefinitionModel[], Error>({
+    useQuery<TaskDispatcherDefinition[], Error>({
         queryKey: TaskDispatcherKeys.taskDispatcherDefinitions,
         queryFn: () => new TaskDispatcherDefinitionApi().getTaskDispatcherDefinitions(),
     });
 
 export const useGetTaskDispatcherDefinitionQuery = (request: GetTaskDispatcherDefinitionRequest, enabled?: boolean) =>
-    useQuery<TaskDispatcherDefinitionModel, Error>({
+    useQuery<TaskDispatcherDefinition, Error>({
         queryKey: TaskDispatcherKeys.taskDispatcherDefinition(request),
         queryFn: () => new TaskDispatcherDefinitionApi().getTaskDispatcherDefinition(request),
         enabled: enabled === undefined ? true : enabled,

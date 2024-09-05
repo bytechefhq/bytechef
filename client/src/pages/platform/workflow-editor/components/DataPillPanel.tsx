@@ -2,7 +2,7 @@ import {Input} from '@/components/ui/input';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import DataPillPanelBody, {ComponentOperationType} from '@/pages/platform/workflow-editor/components/DataPillPanelBody';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
-import {ComponentDefinitionBasicModel, WorkflowNodeOutputModel} from '@/shared/middleware/platform/configuration';
+import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/platform/configuration';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import {useEffect, useState} from 'react';
 
@@ -13,8 +13,8 @@ const DataPillPanel = ({
     previousComponentDefinitions,
     workflowNodeOutputs,
 }: {
-    previousComponentDefinitions: Array<ComponentDefinitionBasicModel>;
-    workflowNodeOutputs: Array<WorkflowNodeOutputModel>;
+    previousComponentDefinitions: Array<ComponentDefinitionBasic>;
+    workflowNodeOutputs: Array<WorkflowNodeOutput>;
 }) => {
     const [dataPillFilterQuery, setDataPillFilterQuery] = useState('');
 

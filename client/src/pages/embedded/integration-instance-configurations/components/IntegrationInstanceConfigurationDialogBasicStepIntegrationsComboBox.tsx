@@ -1,6 +1,6 @@
 import ComboBox, {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
-import {IntegrationModel, IntegrationStatusModel} from '@/shared/middleware/embedded/configuration';
-import {ComponentDefinitionBasicModel} from '@/shared/middleware/platform/configuration';
+import {Integration, IntegrationStatus} from '@/shared/middleware/embedded/configuration';
+import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useGetIntegrationsQuery} from '@/shared/queries/embedded/integrations.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {FocusEventHandler} from 'react';
@@ -10,8 +10,8 @@ const IntegrationLabel = ({
     componentDefinition,
     integration,
 }: {
-    componentDefinition: ComponentDefinitionBasicModel;
-    integration: IntegrationModel;
+    componentDefinition: ComponentDefinitionBasic;
+    integration: Integration;
 }) => (
     <div className="flex items-center gap-2">
         {componentDefinition?.icon && <InlineSVG className="size-6 flex-none" src={componentDefinition.icon} />}
@@ -35,7 +35,7 @@ const IntegrationInstanceConfigurationDialogBasicStepIntegrationsComboBox = ({
         connectionDefinitions: true,
     });
 
-    const {data: integrations} = useGetIntegrationsQuery({status: IntegrationStatusModel.Published});
+    const {data: integrations} = useGetIntegrationsQuery({status: IntegrationStatus.Published});
 
     return integrations && componentDefinitions ? (
         <ComboBox

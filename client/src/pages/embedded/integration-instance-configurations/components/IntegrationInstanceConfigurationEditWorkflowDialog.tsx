@@ -3,10 +3,10 @@ import {Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTi
 import {Form} from '@/components/ui/form';
 import IntegrationInstanceConfigurationDialogWorkflowsStepItem from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationDialogWorkflowsStepItem';
 import {
-    IntegrationInstanceConfigurationModel,
-    IntegrationInstanceConfigurationWorkflowModel,
+    IntegrationInstanceConfiguration,
+    IntegrationInstanceConfigurationWorkflow,
 } from '@/shared/middleware/embedded/configuration';
-import {WorkflowModel} from '@/shared/middleware/platform/configuration';
+import {Workflow} from '@/shared/middleware/platform/configuration';
 import {useUpdateIntegrationInstanceConfigurationWorkflowMutation} from '@/shared/mutations/embedded/integrationInstanceConfigurations.mutations';
 import {IntegrationInstanceConfigurationKeys} from '@/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useQueryClient} from '@tanstack/react-query';
@@ -16,8 +16,8 @@ import {useForm} from 'react-hook-form';
 interface IntegrationInstanceConfigurationEditWorkflowDialogProps {
     onClose?: () => void;
     integrationInstanceConfigurationEnabled: boolean;
-    integrationInstanceConfigurationWorkflow: IntegrationInstanceConfigurationWorkflowModel;
-    workflow: WorkflowModel;
+    integrationInstanceConfigurationWorkflow: IntegrationInstanceConfigurationWorkflow;
+    workflow: Workflow;
 }
 
 const IntegrationInstanceConfigurationEditWorkflowDialog = ({
@@ -28,10 +28,10 @@ const IntegrationInstanceConfigurationEditWorkflowDialog = ({
 }: IntegrationInstanceConfigurationEditWorkflowDialogProps) => {
     const [isOpen, setIsOpen] = useState(true);
 
-    const form = useForm<IntegrationInstanceConfigurationModel>({
+    const form = useForm<IntegrationInstanceConfiguration>({
         defaultValues: {
             integrationInstanceConfigurationWorkflows: [integrationInstanceConfigurationWorkflow],
-        } as IntegrationInstanceConfigurationModel,
+        } as IntegrationInstanceConfiguration,
     });
 
     const {control, formState, getValues, handleSubmit, setValue} = form;

@@ -13,7 +13,7 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {CategoryModel, ProjectModel, TagModel} from '@/shared/middleware/automation/configuration';
+import {Category, Project, Tag} from '@/shared/middleware/automation/configuration';
 import {useCreateProjectMutation, useUpdateProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {ProjectCategoryKeys, useGetProjectCategoriesQuery} from '@/shared/queries/automation/projectCategories.queries';
 import {ProjectTagKeys, useGetProjectTagsQuery} from '@/shared/queries/automation/projectTags.queries';
@@ -24,8 +24,8 @@ import {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
 interface ProjectDialogProps {
-    onClose?: (project?: ProjectModel) => void;
-    project?: ProjectModel;
+    onClose?: (project?: Project) => void;
+    project?: Project;
     triggerNode?: ReactNode;
 }
 
@@ -34,7 +34,7 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
 
     const {currentWorkspaceId} = useWorkspaceStore();
 
-    const form = useForm<ProjectModel>({
+    const form = useForm<Project>({
         defaultValues: {
             category: project?.category
                 ? {
@@ -50,7 +50,7 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
                     label: tag.name,
                 })) || [],
             workspaceId: project?.workspaceId,
-        } as ProjectModel,
+        } as Project,
     });
 
     const {control, getValues, handleSubmit, reset, setValue} = form;
@@ -61,7 +61,7 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
 
     const queryClient = useQueryClient();
 
-    const onSuccess = (project: ProjectModel) => {
+    const onSuccess = (project: Project) => {
         queryClient.invalidateQueries({
             queryKey: ProjectKeys.project(project.id!),
         });
@@ -84,7 +84,7 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
 
     const remainingTags = tags?.filter((tag) => !tagNames?.includes(tag.name));
 
-    function closeDialog(project?: ProjectModel) {
+    function closeDialog(project?: Project) {
         reset();
 
         setIsOpen(false);
@@ -101,7 +101,7 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
             return;
         }
 
-        const tagValues = formData.tags?.map((tag: TagModel) => {
+        const tagValues = formData.tags?.map((tag: Tag) => {
             return {id: tag.id, name: tag.name, version: tag.version};
         });
 
@@ -112,14 +112,14 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
                 ...project,
                 ...formData,
                 category,
-            } as ProjectModel);
+            } as Project);
         } else {
             createProjectMutation.mutate({
                 ...formData,
                 category,
                 tags: tagValues,
                 workspaceId: currentWorkspaceId,
-            } as ProjectModel);
+            } as Project);
         }
     }
 
@@ -206,7 +206,7 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
                                                         /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
                                                     } as any);
                                                 }}
-                                                options={categories!.map((category: CategoryModel) => ({
+                                                options={categories!.map((category: Category) => ({
                                                     label: category.name,
                                                     value: category.name.toLowerCase().replace(/\W/g, ''),
                                                     ...category,
@@ -243,7 +243,7 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
                                                         },
                                                     ] as never[]);
                                                 }}
-                                                options={remainingTags!.map((tag: TagModel) => {
+                                                options={remainingTags!.map((tag: Tag) => {
                                                     return {
                                                         label: tag.name,
                                                         value: tag.name.toLowerCase().replace(/\W/g, ''),

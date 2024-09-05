@@ -1,10 +1,10 @@
 import {
     ComponentDefinitionApi,
     TaskDispatcherDefinitionApi,
-    WorkflowConnectionModel,
-    WorkflowModel,
-    WorkflowTaskModel,
-    WorkflowTriggerModel,
+    Workflow,
+    WorkflowConnection,
+    WorkflowTask,
+    WorkflowTrigger,
 } from '@/shared/middleware/platform/configuration';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {TaskDispatcherKeys} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
@@ -15,12 +15,12 @@ const SPACE = 4;
 
 type UpdateWorkflowRequestType = {
     id: string;
-    workflowModel: WorkflowModel;
+    workflow: Workflow;
 };
 
 type NodeDataType = {
     componentName: string;
-    connections?: Array<WorkflowConnectionModel>;
+    connections?: Array<WorkflowConnection>;
     description?: string;
     icon?: JSX.Element | string;
     label?: string;
@@ -41,15 +41,15 @@ type NodeDataType = {
 
 export default async function saveWorkflowDefinition(
     nodeData: NodeDataType,
-    workflow: WorkflowModel,
-    updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequestType, unknown>,
+    workflow: Workflow,
+    updateWorkflowMutation: UseMutationResult<Workflow, Error, UpdateWorkflowRequestType, unknown>,
     index?: number,
-    onSuccess?: (workflow: WorkflowModel) => void
+    onSuccess?: (workflow: Workflow) => void
 ) {
     const workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow.definition!);
 
     if (nodeData.trigger) {
-        const newTrigger: WorkflowTriggerModel = {
+        const newTrigger: WorkflowTrigger = {
             connections: nodeData.connections,
             description: nodeData.description,
             label: nodeData.label,
@@ -61,7 +61,7 @@ export default async function saveWorkflowDefinition(
         updateWorkflowMutation.mutate(
             {
                 id: workflow.id!,
-                workflowModel: {
+                workflow: {
                     definition: JSON.stringify(
                         {
                             ...workflowDefinition,
@@ -124,7 +124,7 @@ export default async function saveWorkflowDefinition(
         operationName = newNodeComponentDefinition.actions?.[0].name;
     }
 
-    const newTask: WorkflowTaskModel = {
+    const newTask: WorkflowTask = {
         description,
         label,
         metadata,
@@ -145,7 +145,7 @@ export default async function saveWorkflowDefinition(
         return;
     }
 
-    let tasks: WorkflowTaskModel[];
+    let tasks: WorkflowTask[];
 
     if (existingWorkflowTask) {
         const existingTaskIndex = workflowDefinition.tasks?.findIndex(
@@ -167,7 +167,7 @@ export default async function saveWorkflowDefinition(
             ...newTask.parameters,
         };
 
-        const combinedTask: WorkflowTaskModel = {
+        const combinedTask: WorkflowTask = {
             ...existingWorkflowTask,
             ...newTask,
             parameters: combinedParameters,
@@ -185,7 +185,7 @@ export default async function saveWorkflowDefinition(
     updateWorkflowMutation.mutate(
         {
             id: workflow.id!,
-            workflowModel: {
+            workflow: {
                 definition: JSON.stringify(
                     {
                         ...workflowDefinition,

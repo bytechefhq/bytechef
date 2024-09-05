@@ -1,8 +1,8 @@
-import {ConnectionModel, TagModel} from '@/shared/middleware/embedded/connection';
+import {Connection, Tag} from '@/shared/middleware/embedded/connection';
 
 import ConnectionListItem from './ConnectionListItem';
 
-const ConnectionList = ({connections, tags}: {connections: ConnectionModel[]; tags: TagModel[]}) => {
+const ConnectionList = ({connections, tags}: {connections: Connection[]; tags: Tag[]}) => {
     return (
         <ul className="w-full px-2 2xl:mx-auto 2xl:w-4/5" role="list">
             {connections.map((connection) => {

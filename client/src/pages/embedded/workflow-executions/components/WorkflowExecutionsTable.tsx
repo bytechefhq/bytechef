@@ -1,11 +1,11 @@
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import WorkflowExecutionBadge from '@/pages/platform/workflow-executions/components/WorkflowExecutionBadge';
-import {JobBasicModel, WorkflowExecutionModel} from '@/shared/middleware/embedded/workflow/execution';
+import {JobBasic, WorkflowExecution} from '@/shared/middleware/embedded/workflow/execution';
 import {CellContext, createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
 
 import useWorkflowExecutionSheetStore from '../stores/useWorkflowExecutionSheetStore';
 
-const getDuration = (info: CellContext<WorkflowExecutionModel, JobBasicModel | undefined>) => {
+const getDuration = (info: CellContext<WorkflowExecution, JobBasic | undefined>) => {
     const infoValue = info.getValue();
 
     const startDate = infoValue?.startDate?.getTime();
@@ -16,7 +16,7 @@ const getDuration = (info: CellContext<WorkflowExecutionModel, JobBasicModel | u
     }
 };
 
-const columnHelper = createColumnHelper<WorkflowExecutionModel>();
+const columnHelper = createColumnHelper<WorkflowExecution>();
 
 const columns = [
     columnHelper.accessor((row) => row.job, {
@@ -56,8 +56,8 @@ const columns = [
     }),
 ];
 
-const WorkflowExecutionsTable = ({data}: {data: WorkflowExecutionModel[]}) => {
-    const reactTable = useReactTable<WorkflowExecutionModel>({
+const WorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) => {
+    const reactTable = useReactTable<WorkflowExecution>({
         columns,
         data,
         getCoreRowModel: getCoreRowModel(),

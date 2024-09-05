@@ -1,6 +1,6 @@
 import {
-    DeleteWorkflowNodeParameter200ResponseModel,
-    DeleteWorkflowNodeParameterRequest,
+    DeleteWorkflowNodeParameter200Response,
+    DeleteWorkflowNodeParameterOperationRequest,
 } from '@/shared/middleware/platform/configuration';
 
 export default function deleteProperty(
@@ -9,9 +9,9 @@ export default function deleteProperty(
     currentComponent: ComponentType,
     setCurrentComponent: (currentComponent: ComponentType) => void,
     deleteWorkflowNodeParameterMutation: UseMutationResult<
-        DeleteWorkflowNodeParameter200ResponseModel,
+        DeleteWorkflowNodeParameter200Response,
         Error,
-        DeleteWorkflowNodeParameterRequest,
+        DeleteWorkflowNodeParameterOperationRequest,
         unknown
     >
 ) {
@@ -19,7 +19,7 @@ export default function deleteProperty(
 
     deleteWorkflowNodeParameterMutation.mutate(
         {
-            deleteWorkflowNodeParameterRequestModel: {
+            deleteWorkflowNodeParameterRequest: {
                 path,
                 workflowNodeName,
             },

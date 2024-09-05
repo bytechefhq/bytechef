@@ -11,10 +11,7 @@ import {
 import {Switch} from '@/components/ui/switch';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import ConnectedUserDeleteDialog from '@/pages/embedded/connected-users/components/ConnectedUserDeleteDialog';
-import {
-    type ConnectedUserIntegrationInstanceModel,
-    ConnectedUserModel,
-} from '@/shared/middleware/embedded/connected-user';
+import {ConnectedUser, type ConnectedUserIntegrationInstance} from '@/shared/middleware/embedded/connected-user';
 import {useEnableConnectedUserMutation} from '@/shared/mutations/embedded/connectedUsers.mutations';
 import {useEnableIntegrationInstanceWorkflowMutation} from '@/shared/mutations/embedded/integrationInstanceWorkflows.mutations';
 import {useEnableIntegrationInstanceMutation} from '@/shared/mutations/embedded/integrationInstances.mutations';
@@ -29,10 +26,10 @@ import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
 interface ConnectedUserSheetPanelProps {
-    connectedUser: ConnectedUserModel;
+    connectedUser: ConnectedUser;
 }
 
-const Integrations = ({integrationInstances}: {integrationInstances: ConnectedUserIntegrationInstanceModel[]}) => {
+const Integrations = ({integrationInstances}: {integrationInstances: ConnectedUserIntegrationInstance[]}) => {
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({
         connectionDefinitions: true,
     });
@@ -267,7 +264,7 @@ const IntegrationWorkflows = ({
     );
 };
 
-const Profile = ({connectedUser}: {connectedUser: ConnectedUserModel}) => {
+const Profile = ({connectedUser}: {connectedUser: ConnectedUser}) => {
     return (
         <>
             <ProfileRow keyName="Id" value={connectedUser.id?.toString()} />

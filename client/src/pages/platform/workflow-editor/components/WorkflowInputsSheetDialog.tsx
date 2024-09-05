@@ -14,11 +14,7 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
-import {
-    WorkflowInputModel,
-    WorkflowModel,
-    WorkflowTestConfigurationModel,
-} from '@/shared/middleware/platform/configuration';
+import {Workflow, WorkflowInput, WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
 import {useSaveWorkflowTestConfigurationInputsMutation} from '@/shared/mutations/platform/workflowTestConfigurations.mutations';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {WorkflowDefinitionType} from '@/shared/types';
@@ -30,8 +26,8 @@ export interface WorkflowInputsSheetDialogProps {
     inputIndex?: number;
     onClose?: () => void;
     triggerNode?: ReactNode;
-    workflow: WorkflowModel;
-    workflowTestConfiguration?: WorkflowTestConfigurationModel;
+    workflow: Workflow;
+    workflowTestConfiguration?: WorkflowTestConfiguration;
 }
 
 const SPACE = 4;
@@ -45,7 +41,7 @@ const WorkflowInputsSheetDialog = ({
 }: WorkflowInputsSheetDialogProps) => {
     const [isOpen, setIsOpen] = useState(!triggerNode);
 
-    const form = useForm<WorkflowInputModel & {testValue: string}>({
+    const form = useForm<WorkflowInput & {testValue: string}>({
         defaultValues: {
             ...workflow.inputs![inputIndex],
             testValue: workflowTestConfiguration?.inputs
@@ -80,12 +76,12 @@ const WorkflowInputsSheetDialog = ({
         reset();
     }
 
-    function saveWorkflowInputs(input: WorkflowInputModel & {testValue?: string}) {
+    function saveWorkflowInputs(input: WorkflowInput & {testValue?: string}) {
         delete input['testValue'];
 
         const workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow.definition!);
 
-        let inputs: WorkflowInputModel[] = workflowDefinition.inputs ?? [];
+        let inputs: WorkflowInput[] = workflowDefinition.inputs ?? [];
 
         if (inputIndex === -1) {
             inputs = [...(inputs || []), input];
@@ -96,7 +92,7 @@ const WorkflowInputsSheetDialog = ({
         updateWorkflowMutation.mutate(
             {
                 id: workflow.id!,
-                workflowModel: {
+                workflow: {
                     definition: JSON.stringify(
                         {
                             ...workflowDefinition,
@@ -111,7 +107,7 @@ const WorkflowInputsSheetDialog = ({
             {
                 onSuccess: () => {
                     saveWorkflowTestConfigurationInputsMutation.mutate({
-                        saveWorkflowTestConfigurationInputsRequestModel: {
+                        saveWorkflowTestConfigurationInputsRequest: {
                             inputs: {
                                 ...(workflowTestConfiguration ? workflowTestConfiguration.inputs : {}),
                                 [getValues().name]: getValues().testValue,

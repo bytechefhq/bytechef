@@ -5,8 +5,8 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
 import WorkflowTestConfigurationDialog from '@/pages/platform/workflow-editor/components/WorkflowTestConfigurationDialog';
 import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
-import {WorkflowModel, WorkflowTestConfigurationModel} from '@/shared/middleware/platform/configuration';
-import {WorkflowTestApi, WorkflowTestExecutionModel} from '@/shared/middleware/platform/workflow/test';
+import {Workflow, WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
+import {WorkflowTestApi, WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
 import Editor from '@monaco-editor/react';
 import {PlayIcon, RefreshCwIcon, SaveIcon, Settings2Icon, SquareIcon} from 'lucide-react';
 import {useState} from 'react';
@@ -17,8 +17,8 @@ interface WorkflowCodeEditorSheetProps {
     onClose: () => void;
     runDisabled: boolean;
     testConfigurationDisabled: boolean;
-    workflow: WorkflowModel;
-    workflowTestConfiguration?: WorkflowTestConfigurationModel;
+    workflow: Workflow;
+    workflowTestConfiguration?: WorkflowTestConfiguration;
 }
 
 const WorkflowCodeEditorSheet = ({
@@ -30,7 +30,7 @@ const WorkflowCodeEditorSheet = ({
 }: WorkflowCodeEditorSheetProps) => {
     const [dirty, setDirty] = useState<boolean>(false);
     const [definition, setDefinition] = useState<string>(workflow.definition!);
-    const [workflowTestExecution, setWorkflowTestExecution] = useState<WorkflowTestExecutionModel>();
+    const [workflowTestExecution, setWorkflowTestExecution] = useState<WorkflowTestExecution>();
     const [workflowIsRunning, setWorkflowIsRunning] = useState(false);
     const [showWorkflowTestConfigurationDialog, setShowWorkflowTestConfigurationDialog] = useState(false);
 
@@ -56,7 +56,7 @@ const WorkflowCodeEditorSheet = ({
         }
     };
 
-    const handleWorkflowCodeEditorSheetSave = (workflow: WorkflowModel, definition: string) => {
+    const handleWorkflowCodeEditorSheetSave = (workflow: Workflow, definition: string) => {
         if (workflow && workflow.id) {
             try {
                 // validate
@@ -65,7 +65,7 @@ const WorkflowCodeEditorSheet = ({
                 updateWorkflowMutation.mutate(
                     {
                         id: workflow.id,
-                        workflowModel: {
+                        workflow: {
                             definition,
                             version: workflow.version,
                         },

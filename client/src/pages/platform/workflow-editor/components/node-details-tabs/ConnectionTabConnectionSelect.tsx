@@ -4,12 +4,9 @@ import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
 import ConnectionParameters from '@/pages/platform/connection/components/ConnectionParameters';
-import {ConnectionModelI, useConnectionQuery} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
+import {ConnectionI, useConnectionQuery} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import {
-    WorkflowConnectionModel,
-    WorkflowTestConfigurationConnectionModel,
-} from '@/shared/middleware/platform/configuration';
+import {WorkflowConnection, WorkflowTestConfigurationConnection} from '@/shared/middleware/platform/configuration';
 import {useSaveWorkflowTestConfigurationConnectionMutation} from '@/shared/mutations/platform/workflowTestConfigurations.mutations';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
@@ -27,14 +24,14 @@ const ConnectionTabConnectionSelect = ({
     workflowNodeName,
     workflowTestConfigurationConnection,
 }: {
-    workflowConnection: WorkflowConnectionModel;
+    workflowConnection: WorkflowConnection;
     workflowConnectionsCount: number;
     workflowId: string;
     workflowNodeName: string;
-    workflowTestConfigurationConnection?: WorkflowTestConfigurationConnectionModel;
+    workflowTestConfigurationConnection?: WorkflowTestConfigurationConnection;
 }) => {
     const [connectionId, setConnectionId] = useState<number | undefined>();
-    const [currentConnection, setCurrentConnection] = useState<ConnectionModelI>();
+    const [currentConnection, setCurrentConnection] = useState<ConnectionI>();
 
     const {currentNode, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
 
@@ -77,7 +74,7 @@ const ConnectionTabConnectionSelect = ({
 
     const handleValueChange = (connectionId: number, workflowConnectionKey: string) => {
         saveWorkflowTestConfigurationConnectionMutation.mutate({
-            saveWorkflowTestConfigurationConnectionRequestModel: {
+            saveWorkflowTestConfigurationConnectionRequest: {
                 connectionId,
             },
             workflowConnectionKey,

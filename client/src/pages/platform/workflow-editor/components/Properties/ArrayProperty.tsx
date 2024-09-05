@@ -1,8 +1,8 @@
 import {Button} from '@/components/ui/button';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
-import {ControlTypeModel, ObjectPropertyModel, PropertyTypeModel} from '@/shared/middleware/platform/configuration';
-import {ArrayPropertyType, PropertyType} from '@/shared/types';
+import {ControlType, ObjectProperty, PropertyType} from '@/shared/middleware/platform/configuration';
+import {ArrayPropertyType, PropertyAllType} from '@/shared/types';
 import {getRandomId} from '@/shared/util/random-utils';
 import {PlusIcon} from '@radix-ui/react-icons';
 import isObject from 'isobject';
@@ -15,21 +15,23 @@ import SubPropertyPopover from './components/SubPropertyPopover';
 interface ArrayPropertyProps {
     onDeleteClick: (path: string) => void;
     path: string;
-    property: PropertyType;
+    property: PropertyAllType;
 }
 
-type ControlType = keyof typeof VALUE_PROPERTY_CONTROL_TYPES;
+type ValuePropertyControlType = keyof typeof VALUE_PROPERTY_CONTROL_TYPES;
 
 const initialAvailablePropertyTypes = Object.keys(VALUE_PROPERTY_CONTROL_TYPES).map((type) => ({
-    label: type as ControlType,
-    value: type as ControlType,
+    label: type as ValuePropertyControlType,
+    value: type as ValuePropertyControlType,
 }));
 
 const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
     const [arrayItems, setArrayItems] = useState<Array<ArrayPropertyType | Array<ArrayPropertyType>>>([]);
     const [availablePropertyTypes, setAvailablePropertyTypes] =
-        useState<Array<{label: ControlType; value: ControlType}>>(initialAvailablePropertyTypes);
-    const [newPropertyType, setNewPropertyType] = useState<ControlType>();
+        useState<Array<{label: ValuePropertyControlType; value: ValuePropertyControlType}>>(
+            initialAvailablePropertyTypes
+        );
+    const [newPropertyType, setNewPropertyType] = useState<ValuePropertyControlType>();
 
     const {currentComponent} = useWorkflowNodeDetailsPanelStore();
 
@@ -46,7 +48,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
             ...matchingItem,
             controlType: matchingItem
                 ? matchingItem?.controlType
-                : (VALUE_PROPERTY_CONTROL_TYPES[newPropertyType!] as ControlTypeModel),
+                : (VALUE_PROPERTY_CONTROL_TYPES[newPropertyType!] as ControlType),
             custom: true,
             expressionEnabled: true,
             key: getRandomId(),
@@ -73,14 +75,14 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
 
     // get available property types from items and additional properties
     useEffect(() => {
-        let propertyTypes: Array<{label: ControlType; value: ControlType}> = [];
+        let propertyTypes: Array<{label: ValuePropertyControlType; value: ValuePropertyControlType}> = [];
 
-        const processItems = (items: Array<PropertyType>) =>
-            items.reduce((types: Array<{label: ControlType; value: ControlType}>, item) => {
+        const processItems = (items: Array<PropertyAllType>) =>
+            items.reduce((types: Array<{label: ValuePropertyControlType; value: ValuePropertyControlType}>, item) => {
                 if (item.type) {
                     types.push({
-                        label: item.type as ControlType,
-                        value: item.type as ControlType,
+                        label: item.type as ValuePropertyControlType,
+                        value: item.type as ValuePropertyControlType,
                     });
                 }
                 return types;
@@ -91,14 +93,14 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
         }
 
         if (additionalProperties?.length) {
-            const additionalPropertyItems: Array<PropertyType | undefined> = (
-                additionalProperties as Array<PropertyType>
+            const additionalPropertyItems: Array<PropertyAllType | undefined> = (
+                additionalProperties as Array<PropertyAllType>
             )
-                .map((property: PropertyType) => property.items)
+                .map((property: PropertyAllType) => property.items)
                 .flat();
 
             if (additionalPropertyItems) {
-                propertyTypes = processItems(additionalPropertyItems as Array<PropertyType>);
+                propertyTypes = processItems(additionalPropertyItems as Array<PropertyAllType>);
             }
         }
 
@@ -133,7 +135,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
 
         if (items?.length && items[0].type === 'OBJECT' && Array.isArray(parameterValue)) {
             const parameterArrayItems = parameterValue.map((parameterItem: ArrayPropertyType, index: number) => {
-                const subProperties = (items[0] as ObjectPropertyModel).properties?.map((property) =>
+                const subProperties = (items[0] as ObjectProperty).properties?.map((property) =>
                     Object.keys(parameterItem).includes(property.name as keyof ArrayPropertyType)
                         ? {
                               ...property,
@@ -169,14 +171,16 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
 
                 const newSubProperty = {
                     arrayName: name,
-                    controlType: VALUE_PROPERTY_CONTROL_TYPES[parameterItemType as ControlType] as ControlTypeModel,
+                    controlType: VALUE_PROPERTY_CONTROL_TYPES[
+                        parameterItemType as ValuePropertyControlType
+                    ] as ControlType,
                     custom: true,
                     defaultValue: parameterItemValue,
                     expressionEnabled: true,
                     label: `Item ${index}`,
                     name: index.toString(),
                     path: subPropertyPath,
-                    type: parameterItemType as PropertyTypeModel,
+                    type: parameterItemType as PropertyType,
                 };
 
                 if (parameterItemType === 'OBJECT') {
@@ -189,14 +193,14 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                         return {
                             controlType: VALUE_PROPERTY_CONTROL_TYPES[
                                 subPropertyParameterItemType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
-                            ] as ControlTypeModel,
+                            ] as ControlType,
                             custom: true,
                             defaultValue: subPropertyParameterValue,
                             expressionEnabled: true,
                             label: key,
                             name: key,
                             path: `${subPropertyPath}.${key}`,
-                            type: subPropertyParameterItemType as PropertyTypeModel,
+                            type: subPropertyParameterItemType as PropertyType,
                         };
                     });
 

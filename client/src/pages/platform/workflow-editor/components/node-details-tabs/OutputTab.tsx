@@ -3,14 +3,14 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
-import {PropertyModel} from '@/shared/middleware/platform/configuration';
+import {Property} from '@/shared/middleware/platform/configuration';
 import {
     useDeleteWorkflowNodeTestOutputMutation,
     useSaveWorkflowNodeTestOutputMutation,
     useUploadSampleOutputRequestMutation,
 } from '@/shared/mutations/platform/workflowNodeTestOutputs.mutations';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
-import {NodeType, PropertyType} from '@/shared/types';
+import {NodeType, PropertyAllType} from '@/shared/types';
 import {CaretDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
@@ -23,7 +23,7 @@ import OutputTabSampleDataDialog from './OutputTabSampleDataDialog';
 interface OutputTabProps {
     currentNode: NodeType;
     outputDefined: boolean;
-    outputSchema: PropertyModel;
+    outputSchema: Property;
     sampleOutput: object;
     workflowId: string;
 }
@@ -143,22 +143,22 @@ const OutputTab = ({currentNode, outputDefined = false, outputSchema, sampleOutp
                         workflowNodeName={currentNode.name}
                     />
 
-                    {(outputSchema as PropertyType)?.properties && (
+                    {(outputSchema as PropertyAllType)?.properties && (
                         <SchemaProperties
                             copiedValue={copiedValue}
                             copyToClipboard={copyToClipboard}
-                            properties={(outputSchema as PropertyType).properties!}
+                            properties={(outputSchema as PropertyAllType).properties!}
                             sampleOutput={sampleOutput}
                             workflowNodeName={currentNode.name}
                         />
                     )}
 
-                    {(outputSchema as PropertyType)?.items && (
+                    {(outputSchema as PropertyAllType)?.items && (
                         <div className="ml-3 flex flex-col overflow-y-auto border-l border-gray-200 pl-1">
                             <SchemaProperties
                                 copiedValue={copiedValue}
                                 copyToClipboard={copyToClipboard}
-                                properties={(outputSchema as PropertyType).items!}
+                                properties={(outputSchema as PropertyAllType).items!}
                                 sampleOutput={sampleOutput}
                                 workflowNodeName={currentNode.name}
                             />

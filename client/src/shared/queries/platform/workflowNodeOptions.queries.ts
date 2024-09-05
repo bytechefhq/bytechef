@@ -1,7 +1,7 @@
 /* eslint-disable sort-keys */
 import {
     GetWorkflowNodeOptionsRequest,
-    type OptionModel,
+    type Option,
     WorkflowNodeOptionApi,
 } from '@/shared/middleware/platform/configuration';
 import {useQuery} from '@tanstack/react-query';
@@ -22,7 +22,7 @@ export const useGetWorkflowNodeOptionsQuery = (
     {loadDependencyValueKey, request}: {loadDependencyValueKey: string; request: GetWorkflowNodeOptionsRequest},
     enabled?: boolean
 ) =>
-    useQuery<Array<OptionModel>, Error>({
+    useQuery<Array<Option>, Error>({
         queryKey: WorkflowNodeOptionKeys.propertyWorkflowNodeOptions(request, loadDependencyValueKey),
         queryFn: () => new WorkflowNodeOptionApi().getWorkflowNodeOptions(request),
         enabled: enabled === undefined ? true : enabled,

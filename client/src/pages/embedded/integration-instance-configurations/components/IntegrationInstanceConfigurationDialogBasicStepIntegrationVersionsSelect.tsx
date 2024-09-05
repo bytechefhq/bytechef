@@ -1,5 +1,5 @@
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {IntegrationStatusModel} from '@/shared/middleware/embedded/configuration';
+import {IntegrationStatus} from '@/shared/middleware/embedded/configuration';
 import {useGetIntegrationVersionsQuery} from '@/shared/queries/embedded/integrationVersions.queries';
 
 const IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect = ({
@@ -14,7 +14,7 @@ const IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect =
     const {data: integrationVersions} = useGetIntegrationVersionsQuery(integrationId!);
 
     const filteredIntegrationVersions = integrationVersions?.filter(
-        (integrationVersion) => integrationVersion.status === IntegrationStatusModel.Published
+        (integrationVersion) => integrationVersion.status === IntegrationStatus.Published
     );
 
     return (

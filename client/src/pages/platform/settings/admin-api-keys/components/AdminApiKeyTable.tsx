@@ -11,7 +11,7 @@ import {
 import {Button} from '@/components/ui/button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import AdminApiKeyDialog from '@/pages/platform/settings/admin-api-keys/components/AdminApiKeyDialog';
-import {AdminApiKeyModel} from '@/shared/middleware/platform/user';
+import {AdminApiKey} from '@/shared/middleware/platform/user';
 import {useDeleteAdminApiKeyMutation} from '@/shared/mutations/platform/adminApiKeys.mutations';
 import {AdminApiKeyKeys} from '@/shared/queries/platform/adminApiKeys.queries';
 import {useQueryClient} from '@tanstack/react-query';
@@ -20,10 +20,10 @@ import {EditIcon, Trash2Icon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-const columnHelper = createColumnHelper<AdminApiKeyModel>();
+const columnHelper = createColumnHelper<AdminApiKey>();
 
 interface ApiKeyTableProps {
-    adminApiKeys: AdminApiKeyModel[];
+    adminApiKeys: AdminApiKey[];
 }
 
 const ApiKeyDeleteDialog = ({apiKeyId, onClose}: {apiKeyId: number; onClose: () => void}) => {
@@ -68,7 +68,7 @@ const ApiKeyDeleteDialog = ({apiKeyId, onClose}: {apiKeyId: number; onClose: () 
 };
 
 const AdminApiKeyTable = ({adminApiKeys}: ApiKeyTableProps) => {
-    const [currentAdminApiKey, setCurrentAdminApiKey] = useState<AdminApiKeyModel>();
+    const [currentAdminApiKey, setCurrentAdminApiKey] = useState<AdminApiKey>();
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showEditDialog, setShowEditDialog] = useState(false);
 
@@ -124,7 +124,7 @@ const AdminApiKeyTable = ({adminApiKeys}: ApiKeyTableProps) => {
         []
     );
 
-    const reactTable = useReactTable<AdminApiKeyModel>({
+    const reactTable = useReactTable<AdminApiKey>({
         columns,
         data: adminApiKeys,
         getCoreRowModel: getCoreRowModel(),

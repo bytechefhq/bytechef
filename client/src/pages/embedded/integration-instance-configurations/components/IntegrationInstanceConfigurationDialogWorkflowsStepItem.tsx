@@ -3,11 +3,8 @@ import {Switch} from '@/components/ui/switch';
 import IntegrationInstanceConfigurationDialogWorkflowsStepItemConnections from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationDialogWorkflowsStepItemConnections';
 import IntegrationInstanceConfigurationDialogWorkflowsStepItemInputs from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationDialogWorkflowsStepItemInputs';
 import {useWorkflowsEnabledStore} from '@/pages/embedded/integration-instance-configurations/stores/useWorkflowsEnabledStore';
-import {WorkflowModel} from '@/shared/middleware/automation/configuration';
-import {
-    IntegrationInstanceConfigurationModel,
-    WorkflowConnectionModel,
-} from '@/shared/middleware/embedded/configuration';
+import {Workflow} from '@/shared/middleware/automation/configuration';
+import {IntegrationInstanceConfiguration, WorkflowConnection} from '@/shared/middleware/embedded/configuration';
 import {useEffect} from 'react';
 import {Control, UseFormSetValue} from 'react-hook-form';
 import {FormState} from 'react-hook-form/dist/types/form';
@@ -15,12 +12,12 @@ import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 export interface IntegrationInstanceConfigurationDialogWorkflowListItemProps {
-    control: Control<IntegrationInstanceConfigurationModel>;
-    formState: FormState<IntegrationInstanceConfigurationModel>;
+    control: Control<IntegrationInstanceConfiguration>;
+    formState: FormState<IntegrationInstanceConfiguration>;
     label: string;
-    setValue: UseFormSetValue<IntegrationInstanceConfigurationModel>;
+    setValue: UseFormSetValue<IntegrationInstanceConfiguration>;
     switchHidden?: boolean;
-    workflow: WorkflowModel;
+    workflow: Workflow;
     workflowIndex: number;
 }
 
@@ -37,7 +34,7 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItem = ({
         useShallow(({setWorkflowEnabled, workflowEnabledMap}) => [setWorkflowEnabled, workflowEnabledMap])
     );
 
-    const workflowConnections: WorkflowConnectionModel[] = (workflow?.tasks ?? [])
+    const workflowConnections: WorkflowConnection[] = (workflow?.tasks ?? [])
         .flatMap((task) => task.connections ?? [])
         .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []));
 

@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/components/ui/use-toast';
-import {ProjectModel} from '@/shared/middleware/automation/configuration';
+import {Project} from '@/shared/middleware/automation/configuration';
 import {useDuplicateProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {useCreateProjectWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
@@ -24,7 +24,7 @@ const ProjectHeaderProjectDropDownMenu = ({
 }: {
     onDelete: () => void;
     onEdit: () => void;
-    project: ProjectModel;
+    project: Project;
 }) => {
     const hiddenFileInputRef = useRef<HTMLInputElement>(null);
 
@@ -60,7 +60,7 @@ const ProjectHeaderProjectDropDownMenu = ({
         if (e.target.files) {
             importProjectWorkflowMutation.mutate({
                 id: project.id!,
-                workflowModel: {
+                workflow: {
                     definition: await e.target.files[0].text(),
                 },
             });

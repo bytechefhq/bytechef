@@ -1,11 +1,11 @@
-import {ComponentDefinitionBasicModel} from '@/shared/middleware/platform/configuration';
+import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import InlineSVG from 'react-inlinesvg';
 
 const WorkflowOutputValue = ({
     componentDefinitions,
     value,
 }: {
-    componentDefinitions: Array<ComponentDefinitionBasicModel>;
+    componentDefinitions: Array<ComponentDefinitionBasic>;
     value: string;
 }) => {
     const valueParts: Array<string> = value.split(/(\$\{.*?\})/g).filter((value: string) => value !== '');

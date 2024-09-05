@@ -2,18 +2,12 @@ import {Accordion} from '@/components/ui/accordion';
 import WorkflowExecutionContent from '@/pages/platform/workflow-executions/components/WorkflowExecutionContent';
 import WorkflowTaskExecutionItem from '@/pages/platform/workflow-executions/components/WorkflowTaskExecutionItem';
 import WorkflowTriggerExecutionItem from '@/pages/platform/workflow-executions/components/WorkflowTriggerExecutionItem';
-import {JobModel, TriggerExecutionModel} from '@/shared/middleware/automation/workflow/execution';
+import {Job, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {AccordionContent, AccordionItem, AccordionTrigger} from '@radix-ui/react-accordion';
 import {CheckCircledIcon} from '@radix-ui/react-icons';
 import {twMerge} from 'tailwind-merge';
 
-const WorkflowExecutionAccordion = ({
-    job,
-    triggerExecution,
-}: {
-    job: JobModel;
-    triggerExecution?: TriggerExecutionModel;
-}) => {
+const WorkflowExecutionAccordion = ({job, triggerExecution}: {job: Job; triggerExecution?: TriggerExecution}) => {
     const startTime = job?.startDate?.getTime();
     const endTime = job?.endDate?.getTime();
 

@@ -3,11 +3,11 @@ import {Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTi
 import {Form} from '@/components/ui/form';
 import ProjectInstanceDialogWorkflowsStepItem from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItem';
 import {
-    ProjectInstanceModel,
-    ProjectInstanceWorkflowConnectionModel,
-    ProjectInstanceWorkflowModel,
-    WorkflowConnectionModel,
-    WorkflowModel,
+    ProjectInstance,
+    ProjectInstanceWorkflow,
+    ProjectInstanceWorkflowConnection,
+    Workflow,
+    WorkflowConnection,
 } from '@/shared/middleware/automation/configuration';
 import {useUpdateProjectInstanceWorkflowMutation} from '@/shared/mutations/automation/projectInstanceWorkflows.mutations';
 import {ProjectInstanceKeys} from '@/shared/queries/automation/projectInstances.queries';
@@ -18,8 +18,8 @@ import {useForm} from 'react-hook-form';
 interface ProjectInstanceEditWorkflowDialogProps {
     onClose?: () => void;
     projectInstanceEnabled: boolean;
-    projectInstanceWorkflow: ProjectInstanceWorkflowModel;
-    workflow: WorkflowModel;
+    projectInstanceWorkflow: ProjectInstanceWorkflow;
+    workflow: Workflow;
 }
 
 const ProjectInstanceEditWorkflowDialog = ({
@@ -30,10 +30,10 @@ const ProjectInstanceEditWorkflowDialog = ({
 }: ProjectInstanceEditWorkflowDialogProps) => {
     const [isOpen, setIsOpen] = useState(true);
 
-    const form = useForm<ProjectInstanceModel>({
+    const form = useForm<ProjectInstance>({
         defaultValues: {
             projectInstanceWorkflows: undefined,
-        } as ProjectInstanceModel,
+        } as ProjectInstance,
     });
 
     const {control, formState, getValues, handleSubmit, setValue} = form;
@@ -69,9 +69,9 @@ const ProjectInstanceEditWorkflowDialog = ({
     }
 
     useEffect(() => {
-        let newProjectInstanceWorkflowConnections: ProjectInstanceWorkflowConnectionModel[] = [];
+        let newProjectInstanceWorkflowConnections: ProjectInstanceWorkflowConnection[] = [];
 
-        const workflowConnections: WorkflowConnectionModel[] = (workflow?.tasks ?? [])
+        const workflowConnections: WorkflowConnection[] = (workflow?.tasks ?? [])
             .flatMap((task) => task.connections ?? [])
             .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []));
 

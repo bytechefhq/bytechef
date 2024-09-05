@@ -3,7 +3,7 @@ import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessag
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
-import {ProjectInstanceModel, WorkflowConnectionModel} from '@/shared/middleware/automation/configuration';
+import {ProjectInstance, WorkflowConnection} from '@/shared/middleware/automation/configuration';
 import {useCreateConnectionMutation} from '@/shared/mutations/automation/connections.mutations';
 import {
     ConnectionKeys,
@@ -18,8 +18,8 @@ import {Control} from 'react-hook-form';
 import InlineSVG from 'react-inlinesvg';
 
 export interface ProjectInstanceDialogWorkflowsStepItemConnectionProps {
-    control: Control<ProjectInstanceModel>;
-    workflowConnection: WorkflowConnectionModel;
+    control: Control<ProjectInstance>;
+    workflowConnection: WorkflowConnection;
     workflowConnectionIndex: number;
     workflowIndex: number;
 }

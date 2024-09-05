@@ -1,7 +1,7 @@
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import getNestedObject from '@/pages/platform/workflow-editor/utils/getNestedObject';
 import {TYPE_ICONS} from '@/shared/typeIcons';
-import {PropertyType} from '@/shared/types';
+import {PropertyAllType} from '@/shared/types';
 import {MouseEvent} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -17,8 +17,8 @@ const DataPill = ({
     componentIcon?: string;
     workflowNodeName: string;
     onClick?: (event: MouseEvent<HTMLDivElement>) => void;
-    parentProperty?: PropertyType;
-    property?: PropertyType;
+    parentProperty?: PropertyAllType;
+    property?: PropertyAllType;
     path?: string;
     root?: boolean;
     /* eslint-disable  @typescript-eslint/no-explicit-any */

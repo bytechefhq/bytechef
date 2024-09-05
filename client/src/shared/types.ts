@@ -1,25 +1,25 @@
 import {UpdateWorkflowRequestI} from '@/shared//mutations/platform/workflows.mutations';
 import {
-    ArrayPropertyModel,
-    BooleanPropertyModel,
-    ComponentDefinitionBasicModel,
-    ComponentDefinitionModel,
-    ControlTypeModel,
-    DatePropertyModel,
-    DateTimePropertyModel,
-    DynamicPropertiesPropertyModel,
-    FileEntryPropertyModel,
-    IntegerPropertyModel,
-    NullPropertyModel,
-    NumberPropertyModel,
-    ObjectPropertyModel,
-    PropertyModel,
-    StringPropertyModel,
-    TaskDispatcherDefinitionModel,
-    TaskPropertyModel,
-    TimePropertyModel,
-    ValuePropertyModel,
-    WorkflowModel,
+    ArrayProperty,
+    BooleanProperty,
+    ComponentDefinition,
+    ComponentDefinitionBasic,
+    ControlType,
+    DateProperty,
+    DateTimeProperty,
+    DynamicPropertiesProperty,
+    FileEntryProperty,
+    IntegerProperty,
+    NullProperty,
+    NumberProperty,
+    ObjectProperty,
+    Property,
+    StringProperty,
+    TaskDispatcherDefinition,
+    TaskProperty,
+    TimeProperty,
+    ValueProperty,
+    Workflow,
 } from '@/shared/middleware/platform/configuration';
 import {UseMutationResult} from '@tanstack/react-query';
 import {ReactNode} from 'react';
@@ -27,7 +27,7 @@ import {Node} from 'reactflow';
 
 export type DataPillType = {
     componentName?: string;
-    componentDefinition?: ComponentDefinitionModel | string;
+    componentDefinition?: ComponentDefinition | string;
     componentIcon?: string;
     id: string;
     nodeName?: string;
@@ -42,8 +42,8 @@ export type ComponentOperationType = {
 
 export type ComponentPropertiesType =
     | {
-          componentDefinition: ComponentDefinitionBasicModel;
-          properties?: Array<PropertyModel>;
+          componentDefinition: ComponentDefinitionBasic;
+          properties?: Array<Property>;
       }
     | undefined;
 
@@ -80,7 +80,7 @@ export type ClickedItemType = {
     componentName?: string;
     trigger?: boolean;
     taskDispatcher?: boolean;
-} & (ComponentDefinitionBasicModel | TaskDispatcherDefinitionModel);
+} & (ComponentDefinitionBasic | TaskDispatcherDefinition);
 
 export type NodeType = {
     componentName?: string;
@@ -116,7 +116,7 @@ export type NodeWithMetadataType = Node & {
     };
 };
 
-export type SubPropertyType = PropertyType & {custom: boolean};
+export type SubPropertyType = PropertyAllType & {custom: boolean};
 
 export type WorkflowDefinitionType = {
     description?: string;
@@ -175,38 +175,38 @@ export type WorkflowConnectionType = {
     componentVersion: number;
 };
 
-export type ArrayPropertyType = PropertyModel & {
-    additionalProperties?: Array<PropertyModel>;
-    controlType?: ControlTypeModel;
+export type ArrayPropertyType = Property & {
+    additionalProperties?: Array<Property>;
+    controlType?: ControlType;
     custom?: boolean;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     defaultValue?: any;
     key?: string;
     label?: string;
-    properties?: Array<PropertyType>;
+    properties?: Array<PropertyAllType>;
 };
 
-type PropertyTypeAllType = ArrayPropertyModel &
-    BooleanPropertyModel &
-    DatePropertyModel &
-    DateTimePropertyModel &
-    DynamicPropertiesPropertyModel &
-    FileEntryPropertyModel &
-    IntegerPropertyModel &
-    NumberPropertyModel &
-    NullPropertyModel &
-    ObjectPropertyModel &
-    PropertyModel &
-    StringPropertyModel &
-    TaskPropertyModel &
-    TimePropertyModel &
-    ValuePropertyModel;
+type PropertyTypeAllType = ArrayProperty &
+    BooleanProperty &
+    DateProperty &
+    DateTimeProperty &
+    DynamicPropertiesProperty &
+    FileEntryProperty &
+    IntegerProperty &
+    NumberProperty &
+    NullProperty &
+    ObjectProperty &
+    Property &
+    StringProperty &
+    TaskProperty &
+    TimeProperty &
+    ValueProperty;
 
-export type PropertyType = Omit<PropertyTypeAllType, 'controlType'> & {
-    additionalProperties?: Array<PropertyModel>;
-    controlType?: ControlTypeModel;
+export type PropertyAllType = Omit<PropertyTypeAllType, 'controlType'> & {
+    additionalProperties?: Array<Property>;
+    controlType?: ControlType;
     custom?: boolean;
     expressionEnabled?: boolean;
 };
 
-export type UpdateWorkflowMutationType = UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequestI, unknown>;
+export type UpdateWorkflowMutationType = UseMutationResult<Workflow, Error, UpdateWorkflowRequestI, unknown>;
