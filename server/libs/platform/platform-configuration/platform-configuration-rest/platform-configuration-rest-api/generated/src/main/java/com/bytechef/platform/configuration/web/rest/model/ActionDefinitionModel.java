@@ -26,14 +26,12 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ActionDefinition", description = "An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
 @JsonTypeName("ActionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:41.413996+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T08:55:29.450670+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class ActionDefinitionModel {
 
   private String componentName;
 
   private Integer componentVersion;
-
-  private Boolean dynamicOutput;
 
   private String description;
 
@@ -57,8 +55,7 @@ public class ActionDefinitionModel {
   /**
    * Constructor with only required parameters
    */
-  public ActionDefinitionModel(Boolean dynamicOutput, String name, Boolean outputDefined) {
-    this.dynamicOutput = dynamicOutput;
+  public ActionDefinitionModel(String name, Boolean outputDefined) {
     this.name = name;
     this.outputDefined = outputDefined;
   }
@@ -101,26 +98,6 @@ public class ActionDefinitionModel {
 
   public void setComponentVersion(Integer componentVersion) {
     this.componentVersion = componentVersion;
-  }
-
-  public ActionDefinitionModel dynamicOutput(Boolean dynamicOutput) {
-    this.dynamicOutput = dynamicOutput;
-    return this;
-  }
-
-  /**
-   * Does action define dynamic output schema.
-   * @return dynamicOutput
-  */
-  @NotNull 
-  @Schema(name = "dynamicOutput", description = "Does action define dynamic output schema.", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("dynamicOutput")
-  public Boolean getDynamicOutput() {
-    return dynamicOutput;
-  }
-
-  public void setDynamicOutput(Boolean dynamicOutput) {
-    this.dynamicOutput = dynamicOutput;
   }
 
   public ActionDefinitionModel description(String description) {
@@ -282,7 +259,6 @@ public class ActionDefinitionModel {
     ActionDefinitionModel actionDefinition = (ActionDefinitionModel) o;
     return Objects.equals(this.componentName, actionDefinition.componentName) &&
         Objects.equals(this.componentVersion, actionDefinition.componentVersion) &&
-        Objects.equals(this.dynamicOutput, actionDefinition.dynamicOutput) &&
         Objects.equals(this.description, actionDefinition.description) &&
         Objects.equals(this.help, actionDefinition.help) &&
         Objects.equals(this.name, actionDefinition.name) &&
@@ -294,7 +270,7 @@ public class ActionDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, dynamicOutput, description, help, name, outputDefined, properties, title, workflowNodeDescriptionDefined);
+    return Objects.hash(componentName, componentVersion, description, help, name, outputDefined, properties, title, workflowNodeDescriptionDefined);
   }
 
   @Override
@@ -303,7 +279,6 @@ public class ActionDefinitionModel {
     sb.append("class ActionDefinitionModel {\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
     sb.append("    componentVersion: ").append(toIndentedString(componentVersion)).append("\n");
-    sb.append("    dynamicOutput: ").append(toIndentedString(dynamicOutput)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    help: ").append(toIndentedString(help)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
