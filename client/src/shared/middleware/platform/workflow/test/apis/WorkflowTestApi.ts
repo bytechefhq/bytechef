@@ -15,11 +15,11 @@
 
 import * as runtime from '../runtime';
 import type {
-  WorkflowTestExecutionModel,
+  WorkflowTestExecution,
 } from '../models/index';
 import {
-    WorkflowTestExecutionModelFromJSON,
-    WorkflowTestExecutionModelToJSON,
+    WorkflowTestExecutionFromJSON,
+    WorkflowTestExecutionToJSON,
 } from '../models/index';
 
 export interface TestWorkflowRequest {
@@ -35,7 +35,7 @@ export class WorkflowTestApi extends runtime.BaseAPI {
      * Execute a workflow synchronously for testing purposes.
      * Execute a workflow synchronously for testing purpose
      */
-    async testWorkflowRaw(requestParameters: TestWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowTestExecutionModel>> {
+    async testWorkflowRaw(requestParameters: TestWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowTestExecution>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -54,14 +54,14 @@ export class WorkflowTestApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowTestExecutionModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowTestExecutionFromJSON(jsonValue));
     }
 
     /**
      * Execute a workflow synchronously for testing purposes.
      * Execute a workflow synchronously for testing purpose
      */
-    async testWorkflow(requestParameters: TestWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowTestExecutionModel> {
+    async testWorkflow(requestParameters: TestWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowTestExecution> {
         const response = await this.testWorkflowRaw(requestParameters, initOverrides);
         return await response.value();
     }

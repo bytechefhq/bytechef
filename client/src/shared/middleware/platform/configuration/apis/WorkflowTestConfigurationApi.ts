@@ -15,20 +15,20 @@
 
 import * as runtime from '../runtime';
 import type {
-  SaveWorkflowTestConfigurationConnectionRequestModel,
-  SaveWorkflowTestConfigurationInputsRequestModel,
-  WorkflowTestConfigurationConnectionModel,
-  WorkflowTestConfigurationModel,
+  SaveWorkflowTestConfigurationConnectionRequest,
+  SaveWorkflowTestConfigurationInputsRequest,
+  WorkflowTestConfiguration,
+  WorkflowTestConfigurationConnection,
 } from '../models/index';
 import {
-    SaveWorkflowTestConfigurationConnectionRequestModelFromJSON,
-    SaveWorkflowTestConfigurationConnectionRequestModelToJSON,
-    SaveWorkflowTestConfigurationInputsRequestModelFromJSON,
-    SaveWorkflowTestConfigurationInputsRequestModelToJSON,
-    WorkflowTestConfigurationConnectionModelFromJSON,
-    WorkflowTestConfigurationConnectionModelToJSON,
-    WorkflowTestConfigurationModelFromJSON,
-    WorkflowTestConfigurationModelToJSON,
+    SaveWorkflowTestConfigurationConnectionRequestFromJSON,
+    SaveWorkflowTestConfigurationConnectionRequestToJSON,
+    SaveWorkflowTestConfigurationInputsRequestFromJSON,
+    SaveWorkflowTestConfigurationInputsRequestToJSON,
+    WorkflowTestConfigurationFromJSON,
+    WorkflowTestConfigurationToJSON,
+    WorkflowTestConfigurationConnectionFromJSON,
+    WorkflowTestConfigurationConnectionToJSON,
 } from '../models/index';
 
 export interface GetWorkflowTestConfigurationRequest {
@@ -42,19 +42,19 @@ export interface GetWorkflowTestConfigurationConnectionsRequest {
 
 export interface SaveWorkflowTestConfigurationRequest {
     workflowId: string;
-    workflowTestConfigurationModel: Omit<WorkflowTestConfigurationModel, 'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'|'workflowId'>;
+    workflowTestConfiguration: Omit<WorkflowTestConfiguration, 'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'|'workflowId'>;
 }
 
-export interface SaveWorkflowTestConfigurationConnectionRequest {
+export interface SaveWorkflowTestConfigurationConnectionOperationRequest {
     workflowId: string;
     workflowNodeName: string;
     workflowConnectionKey: string;
-    saveWorkflowTestConfigurationConnectionRequestModel: SaveWorkflowTestConfigurationConnectionRequestModel;
+    saveWorkflowTestConfigurationConnectionRequest: SaveWorkflowTestConfigurationConnectionRequest;
 }
 
-export interface SaveWorkflowTestConfigurationInputsRequest {
+export interface SaveWorkflowTestConfigurationInputsOperationRequest {
     workflowId: string;
-    saveWorkflowTestConfigurationInputsRequestModel: SaveWorkflowTestConfigurationInputsRequestModel;
+    saveWorkflowTestConfigurationInputsRequest: SaveWorkflowTestConfigurationInputsRequest;
 }
 
 /**
@@ -66,7 +66,7 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
      * Get a workflow test configuration.
      * Get a workflow test configuration
      */
-    async getWorkflowTestConfigurationRaw(requestParameters: GetWorkflowTestConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowTestConfigurationModel>> {
+    async getWorkflowTestConfigurationRaw(requestParameters: GetWorkflowTestConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowTestConfiguration>> {
         if (requestParameters['workflowId'] == null) {
             throw new runtime.RequiredError(
                 'workflowId',
@@ -85,14 +85,14 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowTestConfigurationModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowTestConfigurationFromJSON(jsonValue));
     }
 
     /**
      * Get a workflow test configuration.
      * Get a workflow test configuration
      */
-    async getWorkflowTestConfiguration(requestParameters: GetWorkflowTestConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowTestConfigurationModel> {
+    async getWorkflowTestConfiguration(requestParameters: GetWorkflowTestConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowTestConfiguration> {
         const response = await this.getWorkflowTestConfigurationRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -101,7 +101,7 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
      * Get a workflow test configuration connections.
      * Get a workflow test configuration connections
      */
-    async getWorkflowTestConfigurationConnectionsRaw(requestParameters: GetWorkflowTestConfigurationConnectionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WorkflowTestConfigurationConnectionModel>>> {
+    async getWorkflowTestConfigurationConnectionsRaw(requestParameters: GetWorkflowTestConfigurationConnectionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WorkflowTestConfigurationConnection>>> {
         if (requestParameters['workflowId'] == null) {
             throw new runtime.RequiredError(
                 'workflowId',
@@ -127,14 +127,14 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(WorkflowTestConfigurationConnectionModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(WorkflowTestConfigurationConnectionFromJSON));
     }
 
     /**
      * Get a workflow test configuration connections.
      * Get a workflow test configuration connections
      */
-    async getWorkflowTestConfigurationConnections(requestParameters: GetWorkflowTestConfigurationConnectionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WorkflowTestConfigurationConnectionModel>> {
+    async getWorkflowTestConfigurationConnections(requestParameters: GetWorkflowTestConfigurationConnectionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WorkflowTestConfigurationConnection>> {
         const response = await this.getWorkflowTestConfigurationConnectionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -143,7 +143,7 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
      * Create new or update an existing workflow test configuration.
      * Create new or update an existing workflow test configuration
      */
-    async saveWorkflowTestConfigurationRaw(requestParameters: SaveWorkflowTestConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowTestConfigurationModel>> {
+    async saveWorkflowTestConfigurationRaw(requestParameters: SaveWorkflowTestConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowTestConfiguration>> {
         if (requestParameters['workflowId'] == null) {
             throw new runtime.RequiredError(
                 'workflowId',
@@ -151,10 +151,10 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['workflowTestConfigurationModel'] == null) {
+        if (requestParameters['workflowTestConfiguration'] == null) {
             throw new runtime.RequiredError(
-                'workflowTestConfigurationModel',
-                'Required parameter "workflowTestConfigurationModel" was null or undefined when calling saveWorkflowTestConfiguration().'
+                'workflowTestConfiguration',
+                'Required parameter "workflowTestConfiguration" was null or undefined when calling saveWorkflowTestConfiguration().'
             );
         }
 
@@ -169,17 +169,17 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: WorkflowTestConfigurationModelToJSON(requestParameters['workflowTestConfigurationModel']),
+            body: WorkflowTestConfigurationToJSON(requestParameters['workflowTestConfiguration']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowTestConfigurationModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowTestConfigurationFromJSON(jsonValue));
     }
 
     /**
      * Create new or update an existing workflow test configuration.
      * Create new or update an existing workflow test configuration
      */
-    async saveWorkflowTestConfiguration(requestParameters: SaveWorkflowTestConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowTestConfigurationModel> {
+    async saveWorkflowTestConfiguration(requestParameters: SaveWorkflowTestConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowTestConfiguration> {
         const response = await this.saveWorkflowTestConfigurationRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -188,7 +188,7 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
      * Save a workflow test configuration connection.
      * Save a workflow test configuration connection
      */
-    async saveWorkflowTestConfigurationConnectionRaw(requestParameters: SaveWorkflowTestConfigurationConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async saveWorkflowTestConfigurationConnectionRaw(requestParameters: SaveWorkflowTestConfigurationConnectionOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['workflowId'] == null) {
             throw new runtime.RequiredError(
                 'workflowId',
@@ -210,10 +210,10 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['saveWorkflowTestConfigurationConnectionRequestModel'] == null) {
+        if (requestParameters['saveWorkflowTestConfigurationConnectionRequest'] == null) {
             throw new runtime.RequiredError(
-                'saveWorkflowTestConfigurationConnectionRequestModel',
-                'Required parameter "saveWorkflowTestConfigurationConnectionRequestModel" was null or undefined when calling saveWorkflowTestConfigurationConnection().'
+                'saveWorkflowTestConfigurationConnectionRequest',
+                'Required parameter "saveWorkflowTestConfigurationConnectionRequest" was null or undefined when calling saveWorkflowTestConfigurationConnection().'
             );
         }
 
@@ -228,7 +228,7 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: SaveWorkflowTestConfigurationConnectionRequestModelToJSON(requestParameters['saveWorkflowTestConfigurationConnectionRequestModel']),
+            body: SaveWorkflowTestConfigurationConnectionRequestToJSON(requestParameters['saveWorkflowTestConfigurationConnectionRequest']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -238,7 +238,7 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
      * Save a workflow test configuration connection.
      * Save a workflow test configuration connection
      */
-    async saveWorkflowTestConfigurationConnection(requestParameters: SaveWorkflowTestConfigurationConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+    async saveWorkflowTestConfigurationConnection(requestParameters: SaveWorkflowTestConfigurationConnectionOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.saveWorkflowTestConfigurationConnectionRaw(requestParameters, initOverrides);
     }
 
@@ -246,7 +246,7 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
      * Save a workflow test configuration inputs.
      * Save a workflow test configuration inputs
      */
-    async saveWorkflowTestConfigurationInputsRaw(requestParameters: SaveWorkflowTestConfigurationInputsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async saveWorkflowTestConfigurationInputsRaw(requestParameters: SaveWorkflowTestConfigurationInputsOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['workflowId'] == null) {
             throw new runtime.RequiredError(
                 'workflowId',
@@ -254,10 +254,10 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['saveWorkflowTestConfigurationInputsRequestModel'] == null) {
+        if (requestParameters['saveWorkflowTestConfigurationInputsRequest'] == null) {
             throw new runtime.RequiredError(
-                'saveWorkflowTestConfigurationInputsRequestModel',
-                'Required parameter "saveWorkflowTestConfigurationInputsRequestModel" was null or undefined when calling saveWorkflowTestConfigurationInputs().'
+                'saveWorkflowTestConfigurationInputsRequest',
+                'Required parameter "saveWorkflowTestConfigurationInputsRequest" was null or undefined when calling saveWorkflowTestConfigurationInputs().'
             );
         }
 
@@ -272,7 +272,7 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: SaveWorkflowTestConfigurationInputsRequestModelToJSON(requestParameters['saveWorkflowTestConfigurationInputsRequestModel']),
+            body: SaveWorkflowTestConfigurationInputsRequestToJSON(requestParameters['saveWorkflowTestConfigurationInputsRequest']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -282,7 +282,7 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
      * Save a workflow test configuration inputs.
      * Save a workflow test configuration inputs
      */
-    async saveWorkflowTestConfigurationInputs(requestParameters: SaveWorkflowTestConfigurationInputsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+    async saveWorkflowTestConfigurationInputs(requestParameters: SaveWorkflowTestConfigurationInputsOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.saveWorkflowTestConfigurationInputsRaw(requestParameters, initOverrides);
     }
 

@@ -15,11 +15,11 @@
 
 import * as runtime from '../runtime';
 import type {
-  OptionModel,
+  Option,
 } from '../models/index';
 import {
-    OptionModelFromJSON,
-    OptionModelToJSON,
+    OptionFromJSON,
+    OptionToJSON,
 } from '../models/index';
 
 export interface GetWorkflowNodeOptionsRequest {
@@ -39,7 +39,7 @@ export class WorkflowNodeOptionApi extends runtime.BaseAPI {
      * Get an action or trigger property options shown in the editor.
      * Get an action or trigger property options shown in the editor
      */
-    async getWorkflowNodeOptionsRaw(requestParameters: GetWorkflowNodeOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<OptionModel>>> {
+    async getWorkflowNodeOptionsRaw(requestParameters: GetWorkflowNodeOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Option>>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -80,14 +80,14 @@ export class WorkflowNodeOptionApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(OptionModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(OptionFromJSON));
     }
 
     /**
      * Get an action or trigger property options shown in the editor.
      * Get an action or trigger property options shown in the editor
      */
-    async getWorkflowNodeOptions(requestParameters: GetWorkflowNodeOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<OptionModel>> {
+    async getWorkflowNodeOptions(requestParameters: GetWorkflowNodeOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Option>> {
         const response = await this.getWorkflowNodeOptionsRaw(requestParameters, initOverrides);
         return await response.value();
     }

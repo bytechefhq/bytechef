@@ -1,3 +1,4 @@
 index.ts
-models/CategoryModel.ts
+models/Category.ts
+models/index.ts
 runtime.ts

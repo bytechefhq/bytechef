@@ -1,5 +1,5 @@
 /* tslint:disable */
 /* eslint-disable */
-export * from './ApiKeyModel';
-export * from './CreateApiKey200ResponseModel';
-export * from './EnvironmentModel';
+export * from './ApiKey';
+export * from './CreateApiKey200Response';
+export * from './Environment';

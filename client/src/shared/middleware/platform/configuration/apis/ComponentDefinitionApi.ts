@@ -15,14 +15,14 @@
 
 import * as runtime from '../runtime';
 import type {
-  ComponentDefinitionBasicModel,
-  ComponentDefinitionModel,
+  ComponentDefinition,
+  ComponentDefinitionBasic,
 } from '../models/index';
 import {
-    ComponentDefinitionBasicModelFromJSON,
-    ComponentDefinitionBasicModelToJSON,
-    ComponentDefinitionModelFromJSON,
-    ComponentDefinitionModelToJSON,
+    ComponentDefinitionFromJSON,
+    ComponentDefinitionToJSON,
+    ComponentDefinitionBasicFromJSON,
+    ComponentDefinitionBasicToJSON,
 } from '../models/index';
 
 export interface GetComponentDefinitionRequest {
@@ -54,7 +54,7 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
      * Get a component definition.
      * Get a component definition
      */
-    async getComponentDefinitionRaw(requestParameters: GetComponentDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ComponentDefinitionModel>> {
+    async getComponentDefinitionRaw(requestParameters: GetComponentDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ComponentDefinition>> {
         if (requestParameters['componentName'] == null) {
             throw new runtime.RequiredError(
                 'componentName',
@@ -77,14 +77,14 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ComponentDefinitionModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ComponentDefinitionFromJSON(jsonValue));
     }
 
     /**
      * Get a component definition.
      * Get a component definition
      */
-    async getComponentDefinition(requestParameters: GetComponentDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ComponentDefinitionModel> {
+    async getComponentDefinition(requestParameters: GetComponentDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ComponentDefinition> {
         const response = await this.getComponentDefinitionRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -93,7 +93,7 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
      * Get all component definition versions of a component.
      * Get all component definition versions of a component
      */
-    async getComponentDefinitionVersionsRaw(requestParameters: GetComponentDefinitionVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComponentDefinitionBasicModel>>> {
+    async getComponentDefinitionVersionsRaw(requestParameters: GetComponentDefinitionVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComponentDefinitionBasic>>> {
         if (requestParameters['componentName'] == null) {
             throw new runtime.RequiredError(
                 'componentName',
@@ -112,14 +112,14 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ComponentDefinitionBasicModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ComponentDefinitionBasicFromJSON));
     }
 
     /**
      * Get all component definition versions of a component.
      * Get all component definition versions of a component
      */
-    async getComponentDefinitionVersions(requestParameters: GetComponentDefinitionVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ComponentDefinitionBasicModel>> {
+    async getComponentDefinitionVersions(requestParameters: GetComponentDefinitionVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ComponentDefinitionBasic>> {
         const response = await this.getComponentDefinitionVersionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -128,7 +128,7 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
      * Get all component definitions.
      * Get all component definitions
      */
-    async getComponentDefinitionsRaw(requestParameters: GetComponentDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComponentDefinitionBasicModel>>> {
+    async getComponentDefinitionsRaw(requestParameters: GetComponentDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComponentDefinitionBasic>>> {
         const queryParameters: any = {};
 
         if (requestParameters['actionDefinitions'] != null) {
@@ -156,14 +156,14 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ComponentDefinitionBasicModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ComponentDefinitionBasicFromJSON));
     }
 
     /**
      * Get all component definitions.
      * Get all component definitions
      */
-    async getComponentDefinitions(requestParameters: GetComponentDefinitionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ComponentDefinitionBasicModel>> {
+    async getComponentDefinitions(requestParameters: GetComponentDefinitionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ComponentDefinitionBasic>> {
         const response = await this.getComponentDefinitionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -172,7 +172,7 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
      * Get all compatible component definitions for a data stream component type.
      * Get all compatible component definitions for a data stream component type
      */
-    async getDataStreamComponentDefinitionsRaw(requestParameters: GetDataStreamComponentDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComponentDefinitionBasicModel>>> {
+    async getDataStreamComponentDefinitionsRaw(requestParameters: GetDataStreamComponentDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComponentDefinitionBasic>>> {
         if (requestParameters['componentType'] == null) {
             throw new runtime.RequiredError(
                 'componentType',
@@ -191,14 +191,14 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ComponentDefinitionBasicModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ComponentDefinitionBasicFromJSON));
     }
 
     /**
      * Get all compatible component definitions for a data stream component type.
      * Get all compatible component definitions for a data stream component type
      */
-    async getDataStreamComponentDefinitions(requestParameters: GetDataStreamComponentDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ComponentDefinitionBasicModel>> {
+    async getDataStreamComponentDefinitions(requestParameters: GetDataStreamComponentDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ComponentDefinitionBasic>> {
         const response = await this.getDataStreamComponentDefinitionsRaw(requestParameters, initOverrides);
         return await response.value();
     }

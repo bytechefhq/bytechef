@@ -15,24 +15,24 @@
 
 import * as runtime from '../runtime';
 import type {
-  ProjectModel,
-  ProjectStatusModel,
-  ProjectVersionModel,
-  PublishProjectRequestModel,
+  Project,
+  ProjectStatus,
+  ProjectVersion,
+  PublishProjectRequest,
 } from '../models/index';
 import {
-    ProjectModelFromJSON,
-    ProjectModelToJSON,
-    ProjectStatusModelFromJSON,
-    ProjectStatusModelToJSON,
-    ProjectVersionModelFromJSON,
-    ProjectVersionModelToJSON,
-    PublishProjectRequestModelFromJSON,
-    PublishProjectRequestModelToJSON,
+    ProjectFromJSON,
+    ProjectToJSON,
+    ProjectStatusFromJSON,
+    ProjectStatusToJSON,
+    ProjectVersionFromJSON,
+    ProjectVersionToJSON,
+    PublishProjectRequestFromJSON,
+    PublishProjectRequestToJSON,
 } from '../models/index';
 
 export interface CreateProjectRequest {
-    projectModel: ProjectModel;
+    project: Project;
 }
 
 export interface DeleteProjectRequest {
@@ -56,17 +56,17 @@ export interface GetWorkspaceProjectsRequest {
     categoryId?: number;
     projectInstances?: boolean;
     tagId?: number;
-    status?: ProjectStatusModel;
+    status?: ProjectStatus;
 }
 
-export interface PublishProjectRequest {
+export interface PublishProjectOperationRequest {
     id: number;
-    publishProjectRequestModel?: PublishProjectRequestModel;
+    publishProjectRequest?: PublishProjectRequest;
 }
 
 export interface UpdateProjectRequest {
     id: number;
-    projectModel: ProjectModel;
+    project: Project;
 }
 
 /**
@@ -78,11 +78,11 @@ export class ProjectApi extends runtime.BaseAPI {
      * Create a new project.
      * Create a new project.
      */
-    async createProjectRaw(requestParameters: CreateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectModel>> {
-        if (requestParameters['projectModel'] == null) {
+    async createProjectRaw(requestParameters: CreateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Project>> {
+        if (requestParameters['project'] == null) {
             throw new runtime.RequiredError(
-                'projectModel',
-                'Required parameter "projectModel" was null or undefined when calling createProject().'
+                'project',
+                'Required parameter "project" was null or undefined when calling createProject().'
             );
         }
 
@@ -97,17 +97,17 @@ export class ProjectApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: ProjectModelToJSON(requestParameters['projectModel']),
+            body: ProjectToJSON(requestParameters['project']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ProjectModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ProjectFromJSON(jsonValue));
     }
 
     /**
      * Create a new project.
      * Create a new project.
      */
-    async createProject(requestParameters: CreateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectModel> {
+    async createProject(requestParameters: CreateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Project> {
         const response = await this.createProjectRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -150,7 +150,7 @@ export class ProjectApi extends runtime.BaseAPI {
      * Duplicates existing project.
      * Duplicates existing project.
      */
-    async duplicateProjectRaw(requestParameters: DuplicateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectModel>> {
+    async duplicateProjectRaw(requestParameters: DuplicateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Project>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -169,14 +169,14 @@ export class ProjectApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ProjectModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ProjectFromJSON(jsonValue));
     }
 
     /**
      * Duplicates existing project.
      * Duplicates existing project.
      */
-    async duplicateProject(requestParameters: DuplicateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectModel> {
+    async duplicateProject(requestParameters: DuplicateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Project> {
         const response = await this.duplicateProjectRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -185,7 +185,7 @@ export class ProjectApi extends runtime.BaseAPI {
      * Get a project by id.
      * Get a project by id.
      */
-    async getProjectRaw(requestParameters: GetProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectModel>> {
+    async getProjectRaw(requestParameters: GetProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Project>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -204,14 +204,14 @@ export class ProjectApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ProjectModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ProjectFromJSON(jsonValue));
     }
 
     /**
      * Get a project by id.
      * Get a project by id.
      */
-    async getProject(requestParameters: GetProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectModel> {
+    async getProject(requestParameters: GetProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Project> {
         const response = await this.getProjectRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -220,7 +220,7 @@ export class ProjectApi extends runtime.BaseAPI {
      * Get a project versions.
      * Get a project versions.
      */
-    async getProjectVersionsRaw(requestParameters: GetProjectVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ProjectVersionModel>>> {
+    async getProjectVersionsRaw(requestParameters: GetProjectVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ProjectVersion>>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -239,14 +239,14 @@ export class ProjectApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ProjectVersionModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ProjectVersionFromJSON));
     }
 
     /**
      * Get a project versions.
      * Get a project versions.
      */
-    async getProjectVersions(requestParameters: GetProjectVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ProjectVersionModel>> {
+    async getProjectVersions(requestParameters: GetProjectVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ProjectVersion>> {
         const response = await this.getProjectVersionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -255,7 +255,7 @@ export class ProjectApi extends runtime.BaseAPI {
      * Get projects by workspace id.
      * Get projects by workspace id
      */
-    async getWorkspaceProjectsRaw(requestParameters: GetWorkspaceProjectsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ProjectModel>>> {
+    async getWorkspaceProjectsRaw(requestParameters: GetWorkspaceProjectsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Project>>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -290,14 +290,14 @@ export class ProjectApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ProjectModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ProjectFromJSON));
     }
 
     /**
      * Get projects by workspace id.
      * Get projects by workspace id
      */
-    async getWorkspaceProjects(requestParameters: GetWorkspaceProjectsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ProjectModel>> {
+    async getWorkspaceProjects(requestParameters: GetWorkspaceProjectsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Project>> {
         const response = await this.getWorkspaceProjectsRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -306,7 +306,7 @@ export class ProjectApi extends runtime.BaseAPI {
      * Publishes existing project.
      * Publishes existing project.
      */
-    async publishProjectRaw(requestParameters: PublishProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async publishProjectRaw(requestParameters: PublishProjectOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -325,7 +325,7 @@ export class ProjectApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: PublishProjectRequestModelToJSON(requestParameters['publishProjectRequestModel']),
+            body: PublishProjectRequestToJSON(requestParameters['publishProjectRequest']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -335,7 +335,7 @@ export class ProjectApi extends runtime.BaseAPI {
      * Publishes existing project.
      * Publishes existing project.
      */
-    async publishProject(requestParameters: PublishProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+    async publishProject(requestParameters: PublishProjectOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.publishProjectRaw(requestParameters, initOverrides);
     }
 
@@ -343,7 +343,7 @@ export class ProjectApi extends runtime.BaseAPI {
      * Update an existing project.
      * Update an existing project.
      */
-    async updateProjectRaw(requestParameters: UpdateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectModel>> {
+    async updateProjectRaw(requestParameters: UpdateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Project>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -351,10 +351,10 @@ export class ProjectApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['projectModel'] == null) {
+        if (requestParameters['project'] == null) {
             throw new runtime.RequiredError(
-                'projectModel',
-                'Required parameter "projectModel" was null or undefined when calling updateProject().'
+                'project',
+                'Required parameter "project" was null or undefined when calling updateProject().'
             );
         }
 
@@ -369,17 +369,17 @@ export class ProjectApi extends runtime.BaseAPI {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: ProjectModelToJSON(requestParameters['projectModel']),
+            body: ProjectToJSON(requestParameters['project']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ProjectModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ProjectFromJSON(jsonValue));
     }
 
     /**
      * Update an existing project.
      * Update an existing project.
      */
-    async updateProject(requestParameters: UpdateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectModel> {
+    async updateProject(requestParameters: UpdateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Project> {
         const response = await this.updateProjectRaw(requestParameters, initOverrides);
         return await response.value();
     }

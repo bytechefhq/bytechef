@@ -15,11 +15,11 @@
 
 import * as runtime from '../runtime';
 import type {
-  GetWorkflowNodeDescription200ResponseModel,
+  GetWorkflowNodeDescription200Response,
 } from '../models/index';
 import {
-    GetWorkflowNodeDescription200ResponseModelFromJSON,
-    GetWorkflowNodeDescription200ResponseModelToJSON,
+    GetWorkflowNodeDescription200ResponseFromJSON,
+    GetWorkflowNodeDescription200ResponseToJSON,
 } from '../models/index';
 
 export interface GetWorkflowNodeDescriptionRequest {
@@ -36,7 +36,7 @@ export class WorkflowNodeDescriptionApi extends runtime.BaseAPI {
      * Get an action description shown in the editor.
      * Get an action description shown in the editor
      */
-    async getWorkflowNodeDescriptionRaw(requestParameters: GetWorkflowNodeDescriptionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetWorkflowNodeDescription200ResponseModel>> {
+    async getWorkflowNodeDescriptionRaw(requestParameters: GetWorkflowNodeDescriptionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetWorkflowNodeDescription200Response>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -62,14 +62,14 @@ export class WorkflowNodeDescriptionApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => GetWorkflowNodeDescription200ResponseModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => GetWorkflowNodeDescription200ResponseFromJSON(jsonValue));
     }
 
     /**
      * Get an action description shown in the editor.
      * Get an action description shown in the editor
      */
-    async getWorkflowNodeDescription(requestParameters: GetWorkflowNodeDescriptionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetWorkflowNodeDescription200ResponseModel> {
+    async getWorkflowNodeDescription(requestParameters: GetWorkflowNodeDescriptionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetWorkflowNodeDescription200Response> {
         const response = await this.getWorkflowNodeDescriptionRaw(requestParameters, initOverrides);
         return await response.value();
     }

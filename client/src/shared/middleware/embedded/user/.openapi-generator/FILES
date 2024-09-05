@@ -2,10 +2,10 @@ apis/ApiKeyApi.ts
 apis/SigningKeyApi.ts
 apis/index.ts
 index.ts
-models/ApiKeyModel.ts
-models/CreateApiKey200ResponseModel.ts
-models/CreateSigningKey200ResponseModel.ts
-models/EnvironmentModel.ts
-models/SigningKeyModel.ts
+models/ApiKey.ts
+models/CreateApiKey200Response.ts
+models/CreateSigningKey200Response.ts
+models/Environment.ts
+models/SigningKey.ts
 models/index.ts
 runtime.ts

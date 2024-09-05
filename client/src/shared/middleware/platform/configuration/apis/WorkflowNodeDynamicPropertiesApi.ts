@@ -15,11 +15,11 @@
 
 import * as runtime from '../runtime';
 import type {
-  PropertyModel,
+  Property,
 } from '../models/index';
 import {
-    PropertyModelFromJSON,
-    PropertyModelToJSON,
+    PropertyFromJSON,
+    PropertyToJSON,
 } from '../models/index';
 
 export interface GetWorkflowNodeDynamicPropertiesRequest {
@@ -38,7 +38,7 @@ export class WorkflowNodeDynamicPropertiesApi extends runtime.BaseAPI {
      * Get dynamic properties for an action or trigger property shown in the editor.
      * Get dynamic properties for an action or trigger property shown in the editor
      */
-    async getWorkflowNodeDynamicPropertiesRaw(requestParameters: GetWorkflowNodeDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PropertyModel>>> {
+    async getWorkflowNodeDynamicPropertiesRaw(requestParameters: GetWorkflowNodeDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Property>>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -75,14 +75,14 @@ export class WorkflowNodeDynamicPropertiesApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(PropertyModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(PropertyFromJSON));
     }
 
     /**
      * Get dynamic properties for an action or trigger property shown in the editor.
      * Get dynamic properties for an action or trigger property shown in the editor
      */
-    async getWorkflowNodeDynamicProperties(requestParameters: GetWorkflowNodeDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PropertyModel>> {
+    async getWorkflowNodeDynamicProperties(requestParameters: GetWorkflowNodeDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Property>> {
         const response = await this.getWorkflowNodeDynamicPropertiesRaw(requestParameters, initOverrides);
         return await response.value();
     }

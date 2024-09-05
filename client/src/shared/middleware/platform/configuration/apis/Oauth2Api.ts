@@ -15,21 +15,21 @@
 
 import * as runtime from '../runtime';
 import type {
-  GetOAuth2AuthorizationParametersRequestModel,
-  OAuth2AuthorizationParametersModel,
-  OAuth2PropertiesModel,
+  GetOAuth2AuthorizationParametersRequest,
+  OAuth2AuthorizationParameters,
+  OAuth2Properties,
 } from '../models/index';
 import {
-    GetOAuth2AuthorizationParametersRequestModelFromJSON,
-    GetOAuth2AuthorizationParametersRequestModelToJSON,
-    OAuth2AuthorizationParametersModelFromJSON,
-    OAuth2AuthorizationParametersModelToJSON,
-    OAuth2PropertiesModelFromJSON,
-    OAuth2PropertiesModelToJSON,
+    GetOAuth2AuthorizationParametersRequestFromJSON,
+    GetOAuth2AuthorizationParametersRequestToJSON,
+    OAuth2AuthorizationParametersFromJSON,
+    OAuth2AuthorizationParametersToJSON,
+    OAuth2PropertiesFromJSON,
+    OAuth2PropertiesToJSON,
 } from '../models/index';
 
-export interface GetOAuth2AuthorizationParametersRequest {
-    getOAuth2AuthorizationParametersRequestModel: GetOAuth2AuthorizationParametersRequestModel;
+export interface GetOAuth2AuthorizationParametersOperationRequest {
+    getOAuth2AuthorizationParametersRequest: GetOAuth2AuthorizationParametersRequest;
 }
 
 /**
@@ -41,11 +41,11 @@ export class Oauth2Api extends runtime.BaseAPI {
      * Retrieves oauth2 authorization parameters.
      * Retrieves oauth2 authorization parameters
      */
-    async getOAuth2AuthorizationParametersRaw(requestParameters: GetOAuth2AuthorizationParametersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OAuth2AuthorizationParametersModel>> {
-        if (requestParameters['getOAuth2AuthorizationParametersRequestModel'] == null) {
+    async getOAuth2AuthorizationParametersRaw(requestParameters: GetOAuth2AuthorizationParametersOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OAuth2AuthorizationParameters>> {
+        if (requestParameters['getOAuth2AuthorizationParametersRequest'] == null) {
             throw new runtime.RequiredError(
-                'getOAuth2AuthorizationParametersRequestModel',
-                'Required parameter "getOAuth2AuthorizationParametersRequestModel" was null or undefined when calling getOAuth2AuthorizationParameters().'
+                'getOAuth2AuthorizationParametersRequest',
+                'Required parameter "getOAuth2AuthorizationParametersRequest" was null or undefined when calling getOAuth2AuthorizationParameters().'
             );
         }
 
@@ -60,17 +60,17 @@ export class Oauth2Api extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: GetOAuth2AuthorizationParametersRequestModelToJSON(requestParameters['getOAuth2AuthorizationParametersRequestModel']),
+            body: GetOAuth2AuthorizationParametersRequestToJSON(requestParameters['getOAuth2AuthorizationParametersRequest']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => OAuth2AuthorizationParametersModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => OAuth2AuthorizationParametersFromJSON(jsonValue));
     }
 
     /**
      * Retrieves oauth2 authorization parameters.
      * Retrieves oauth2 authorization parameters
      */
-    async getOAuth2AuthorizationParameters(requestParameters: GetOAuth2AuthorizationParametersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OAuth2AuthorizationParametersModel> {
+    async getOAuth2AuthorizationParameters(requestParameters: GetOAuth2AuthorizationParametersOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OAuth2AuthorizationParameters> {
         const response = await this.getOAuth2AuthorizationParametersRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -79,7 +79,7 @@ export class Oauth2Api extends runtime.BaseAPI {
      * Get OAuth2 properties.
      * Get OAuth2 properties
      */
-    async getOAuth2PropertiesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OAuth2PropertiesModel>> {
+    async getOAuth2PropertiesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OAuth2Properties>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -91,14 +91,14 @@ export class Oauth2Api extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => OAuth2PropertiesModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => OAuth2PropertiesFromJSON(jsonValue));
     }
 
     /**
      * Get OAuth2 properties.
      * Get OAuth2 properties
      */
-    async getOAuth2Properties(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OAuth2PropertiesModel> {
+    async getOAuth2Properties(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OAuth2Properties> {
         const response = await this.getOAuth2PropertiesRaw(initOverrides);
         return await response.value();
     }

@@ -15,11 +15,11 @@
 
 import * as runtime from '../runtime';
 import type {
-  ScriptTestExecutionModel,
+  ScriptTestExecution,
 } from '../models/index';
 import {
-    ScriptTestExecutionModelFromJSON,
-    ScriptTestExecutionModelToJSON,
+    ScriptTestExecutionFromJSON,
+    ScriptTestExecutionToJSON,
 } from '../models/index';
 
 export interface TestWorkflowNodeScriptRequest {
@@ -36,7 +36,7 @@ export class WorkflowNodeScriptApi extends runtime.BaseAPI {
      * Execute a script for testing purposes.
      * Execute a script for testing purposes
      */
-    async testWorkflowNodeScriptRaw(requestParameters: TestWorkflowNodeScriptRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ScriptTestExecutionModel>> {
+    async testWorkflowNodeScriptRaw(requestParameters: TestWorkflowNodeScriptRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ScriptTestExecution>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -62,14 +62,14 @@ export class WorkflowNodeScriptApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ScriptTestExecutionModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ScriptTestExecutionFromJSON(jsonValue));
     }
 
     /**
      * Execute a script for testing purposes.
      * Execute a script for testing purposes
      */
-    async testWorkflowNodeScript(requestParameters: TestWorkflowNodeScriptRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ScriptTestExecutionModel> {
+    async testWorkflowNodeScript(requestParameters: TestWorkflowNodeScriptRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ScriptTestExecution> {
         const response = await this.testWorkflowNodeScriptRaw(requestParameters, initOverrides);
         return await response.value();
     }

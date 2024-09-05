@@ -15,18 +15,18 @@
 
 import * as runtime from '../runtime';
 import type {
-  CreateSigningKey200ResponseModel,
-  SigningKeyModel,
+  CreateSigningKey200Response,
+  SigningKey,
 } from '../models/index';
 import {
-    CreateSigningKey200ResponseModelFromJSON,
-    CreateSigningKey200ResponseModelToJSON,
-    SigningKeyModelFromJSON,
-    SigningKeyModelToJSON,
+    CreateSigningKey200ResponseFromJSON,
+    CreateSigningKey200ResponseToJSON,
+    SigningKeyFromJSON,
+    SigningKeyToJSON,
 } from '../models/index';
 
 export interface CreateSigningKeyRequest {
-    signingKeyModel: Omit<SigningKeyModel, 'createdBy'|'createdDate'|'id'|'keyId'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'>;
+    signingKey: Omit<SigningKey, 'createdBy'|'createdDate'|'id'|'keyId'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'>;
 }
 
 export interface DeleteSigningKeyRequest {
@@ -39,7 +39,7 @@ export interface GetSigningKeyRequest {
 
 export interface UpdateSigningKeyRequest {
     id: number;
-    signingKeyModel: Omit<SigningKeyModel, 'createdBy'|'createdDate'|'id'|'keyId'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'>;
+    signingKey: Omit<SigningKey, 'createdBy'|'createdDate'|'id'|'keyId'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'>;
 }
 
 /**
@@ -51,11 +51,11 @@ export class SigningKeyApi extends runtime.BaseAPI {
      * Create a new Signing key.
      * Create a new Signing key
      */
-    async createSigningKeyRaw(requestParameters: CreateSigningKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateSigningKey200ResponseModel>> {
-        if (requestParameters['signingKeyModel'] == null) {
+    async createSigningKeyRaw(requestParameters: CreateSigningKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateSigningKey200Response>> {
+        if (requestParameters['signingKey'] == null) {
             throw new runtime.RequiredError(
-                'signingKeyModel',
-                'Required parameter "signingKeyModel" was null or undefined when calling createSigningKey().'
+                'signingKey',
+                'Required parameter "signingKey" was null or undefined when calling createSigningKey().'
             );
         }
 
@@ -70,17 +70,17 @@ export class SigningKeyApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: SigningKeyModelToJSON(requestParameters['signingKeyModel']),
+            body: SigningKeyToJSON(requestParameters['signingKey']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => CreateSigningKey200ResponseModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => CreateSigningKey200ResponseFromJSON(jsonValue));
     }
 
     /**
      * Create a new Signing key.
      * Create a new Signing key
      */
-    async createSigningKey(requestParameters: CreateSigningKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateSigningKey200ResponseModel> {
+    async createSigningKey(requestParameters: CreateSigningKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateSigningKey200Response> {
         const response = await this.createSigningKeyRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -123,7 +123,7 @@ export class SigningKeyApi extends runtime.BaseAPI {
      * Get an Signing key by id.
      * Get an Signing key by id
      */
-    async getSigningKeyRaw(requestParameters: GetSigningKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SigningKeyModel>> {
+    async getSigningKeyRaw(requestParameters: GetSigningKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SigningKey>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -142,14 +142,14 @@ export class SigningKeyApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => SigningKeyModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => SigningKeyFromJSON(jsonValue));
     }
 
     /**
      * Get an Signing key by id.
      * Get an Signing key by id
      */
-    async getSigningKey(requestParameters: GetSigningKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SigningKeyModel> {
+    async getSigningKey(requestParameters: GetSigningKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SigningKey> {
         const response = await this.getSigningKeyRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -158,7 +158,7 @@ export class SigningKeyApi extends runtime.BaseAPI {
      * Get Signing keys.
      * Get Signing keys
      */
-    async getSigningKeysRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<SigningKeyModel>>> {
+    async getSigningKeysRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<SigningKey>>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -170,14 +170,14 @@ export class SigningKeyApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(SigningKeyModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(SigningKeyFromJSON));
     }
 
     /**
      * Get Signing keys.
      * Get Signing keys
      */
-    async getSigningKeys(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<SigningKeyModel>> {
+    async getSigningKeys(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<SigningKey>> {
         const response = await this.getSigningKeysRaw(initOverrides);
         return await response.value();
     }
@@ -186,7 +186,7 @@ export class SigningKeyApi extends runtime.BaseAPI {
      * Update an existing Signing key.
      * Update an existing Signing key
      */
-    async updateSigningKeyRaw(requestParameters: UpdateSigningKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SigningKeyModel>> {
+    async updateSigningKeyRaw(requestParameters: UpdateSigningKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SigningKey>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -194,10 +194,10 @@ export class SigningKeyApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['signingKeyModel'] == null) {
+        if (requestParameters['signingKey'] == null) {
             throw new runtime.RequiredError(
-                'signingKeyModel',
-                'Required parameter "signingKeyModel" was null or undefined when calling updateSigningKey().'
+                'signingKey',
+                'Required parameter "signingKey" was null or undefined when calling updateSigningKey().'
             );
         }
 
@@ -212,17 +212,17 @@ export class SigningKeyApi extends runtime.BaseAPI {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: SigningKeyModelToJSON(requestParameters['signingKeyModel']),
+            body: SigningKeyToJSON(requestParameters['signingKey']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => SigningKeyModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => SigningKeyFromJSON(jsonValue));
     }
 
     /**
      * Update an existing Signing key.
      * Update an existing Signing key
      */
-    async updateSigningKey(requestParameters: UpdateSigningKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SigningKeyModel> {
+    async updateSigningKey(requestParameters: UpdateSigningKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SigningKey> {
         const response = await this.updateSigningKeyRaw(requestParameters, initOverrides);
         return await response.value();
     }

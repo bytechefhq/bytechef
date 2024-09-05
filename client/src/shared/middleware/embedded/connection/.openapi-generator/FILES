@@ -2,11 +2,11 @@ apis/ConnectionApi.ts
 apis/ConnectionTagApi.ts
 apis/index.ts
 index.ts
-models/ConnectionBaseModel.ts
-models/ConnectionEnvironmentModel.ts
-models/ConnectionModel.ts
-models/CredentialStatusModel.ts
-models/TagModel.ts
-models/UpdateTagsRequestModel.ts
+models/Connection.ts
+models/ConnectionBase.ts
+models/ConnectionEnvironment.ts
+models/CredentialStatus.ts
+models/Tag.ts
+models/UpdateTagsRequest.ts
 models/index.ts
 runtime.ts

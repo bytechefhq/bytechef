@@ -2,11 +2,11 @@ apis/AdminApiKeyApi.ts
 apis/AuthorityApi.ts
 apis/index.ts
 index.ts
-models/AdminApiKeyModel.ts
-models/ApiKeyModel.ts
-models/AuthorityModel.ts
-models/CreateAdminApiKey200ResponseModel.ts
-models/EnvironmentModel.ts
-models/SigningKeyModel.ts
+models/AdminApiKey.ts
+models/ApiKey.ts
+models/Authority.ts
+models/CreateAdminApiKey200Response.ts
+models/Environment.ts
+models/SigningKey.ts
 models/index.ts
 runtime.ts

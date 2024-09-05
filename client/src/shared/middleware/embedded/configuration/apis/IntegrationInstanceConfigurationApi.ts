@@ -15,24 +15,24 @@
 
 import * as runtime from '../runtime';
 import type {
-  CreateIntegrationInstanceConfigurationWorkflowJob200ResponseModel,
-  EnvironmentModel,
-  IntegrationInstanceConfigurationModel,
-  IntegrationInstanceConfigurationWorkflowModel,
+  CreateIntegrationInstanceConfigurationWorkflowJob200Response,
+  Environment,
+  IntegrationInstanceConfiguration,
+  IntegrationInstanceConfigurationWorkflow,
 } from '../models/index';
 import {
-    CreateIntegrationInstanceConfigurationWorkflowJob200ResponseModelFromJSON,
-    CreateIntegrationInstanceConfigurationWorkflowJob200ResponseModelToJSON,
-    EnvironmentModelFromJSON,
-    EnvironmentModelToJSON,
-    IntegrationInstanceConfigurationModelFromJSON,
-    IntegrationInstanceConfigurationModelToJSON,
-    IntegrationInstanceConfigurationWorkflowModelFromJSON,
-    IntegrationInstanceConfigurationWorkflowModelToJSON,
+    CreateIntegrationInstanceConfigurationWorkflowJob200ResponseFromJSON,
+    CreateIntegrationInstanceConfigurationWorkflowJob200ResponseToJSON,
+    EnvironmentFromJSON,
+    EnvironmentToJSON,
+    IntegrationInstanceConfigurationFromJSON,
+    IntegrationInstanceConfigurationToJSON,
+    IntegrationInstanceConfigurationWorkflowFromJSON,
+    IntegrationInstanceConfigurationWorkflowToJSON,
 } from '../models/index';
 
 export interface CreateIntegrationInstanceConfigurationRequest {
-    integrationInstanceConfigurationModel: IntegrationInstanceConfigurationModel;
+    integrationInstanceConfiguration: IntegrationInstanceConfiguration;
 }
 
 export interface CreateIntegrationInstanceConfigurationWorkflowJobRequest {
@@ -60,20 +60,20 @@ export interface GetIntegrationInstanceConfigurationRequest {
 }
 
 export interface GetIntegrationInstanceConfigurationsRequest {
-    environment?: EnvironmentModel;
+    environment?: Environment;
     integrationId?: number;
     tagId?: number;
 }
 
 export interface UpdateIntegrationInstanceConfigurationRequest {
     id: number;
-    integrationInstanceConfigurationModel: IntegrationInstanceConfigurationModel;
+    integrationInstanceConfiguration: IntegrationInstanceConfiguration;
 }
 
 export interface UpdateIntegrationInstanceConfigurationWorkflowRequest {
     id: number;
     workflowId: number;
-    integrationInstanceConfigurationWorkflowModel: Omit<IntegrationInstanceConfigurationWorkflowModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'workflowReferenceCode'>;
+    integrationInstanceConfigurationWorkflow: Omit<IntegrationInstanceConfigurationWorkflow, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'workflowReferenceCode'>;
 }
 
 /**
@@ -85,11 +85,11 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
      * Create a new integration instance configuration.
      * Create a new integration instance configuration
      */
-    async createIntegrationInstanceConfigurationRaw(requestParameters: CreateIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IntegrationInstanceConfigurationModel>> {
-        if (requestParameters['integrationInstanceConfigurationModel'] == null) {
+    async createIntegrationInstanceConfigurationRaw(requestParameters: CreateIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IntegrationInstanceConfiguration>> {
+        if (requestParameters['integrationInstanceConfiguration'] == null) {
             throw new runtime.RequiredError(
-                'integrationInstanceConfigurationModel',
-                'Required parameter "integrationInstanceConfigurationModel" was null or undefined when calling createIntegrationInstanceConfiguration().'
+                'integrationInstanceConfiguration',
+                'Required parameter "integrationInstanceConfiguration" was null or undefined when calling createIntegrationInstanceConfiguration().'
             );
         }
 
@@ -104,17 +104,17 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: IntegrationInstanceConfigurationModelToJSON(requestParameters['integrationInstanceConfigurationModel']),
+            body: IntegrationInstanceConfigurationToJSON(requestParameters['integrationInstanceConfiguration']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => IntegrationInstanceConfigurationModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => IntegrationInstanceConfigurationFromJSON(jsonValue));
     }
 
     /**
      * Create a new integration instance configuration.
      * Create a new integration instance configuration
      */
-    async createIntegrationInstanceConfiguration(requestParameters: CreateIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IntegrationInstanceConfigurationModel> {
+    async createIntegrationInstanceConfiguration(requestParameters: CreateIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IntegrationInstanceConfiguration> {
         const response = await this.createIntegrationInstanceConfigurationRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -123,7 +123,7 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
      * Create a request for running a new job.
      * Create a request for running a new job
      */
-    async createIntegrationInstanceConfigurationWorkflowJobRaw(requestParameters: CreateIntegrationInstanceConfigurationWorkflowJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateIntegrationInstanceConfigurationWorkflowJob200ResponseModel>> {
+    async createIntegrationInstanceConfigurationWorkflowJobRaw(requestParameters: CreateIntegrationInstanceConfigurationWorkflowJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateIntegrationInstanceConfigurationWorkflowJob200Response>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -149,14 +149,14 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => CreateIntegrationInstanceConfigurationWorkflowJob200ResponseModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => CreateIntegrationInstanceConfigurationWorkflowJob200ResponseFromJSON(jsonValue));
     }
 
     /**
      * Create a request for running a new job.
      * Create a request for running a new job
      */
-    async createIntegrationInstanceConfigurationWorkflowJob(requestParameters: CreateIntegrationInstanceConfigurationWorkflowJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateIntegrationInstanceConfigurationWorkflowJob200ResponseModel> {
+    async createIntegrationInstanceConfigurationWorkflowJob(requestParameters: CreateIntegrationInstanceConfigurationWorkflowJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateIntegrationInstanceConfigurationWorkflowJob200Response> {
         const response = await this.createIntegrationInstanceConfigurationWorkflowJobRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -288,7 +288,7 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
      * Get an integration instance configuration by id.
      * Get an integration instance configuration by id
      */
-    async getIntegrationInstanceConfigurationRaw(requestParameters: GetIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IntegrationInstanceConfigurationModel>> {
+    async getIntegrationInstanceConfigurationRaw(requestParameters: GetIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IntegrationInstanceConfiguration>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -307,14 +307,14 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => IntegrationInstanceConfigurationModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => IntegrationInstanceConfigurationFromJSON(jsonValue));
     }
 
     /**
      * Get an integration instance configuration by id.
      * Get an integration instance configuration by id
      */
-    async getIntegrationInstanceConfiguration(requestParameters: GetIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IntegrationInstanceConfigurationModel> {
+    async getIntegrationInstanceConfiguration(requestParameters: GetIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IntegrationInstanceConfiguration> {
         const response = await this.getIntegrationInstanceConfigurationRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -323,7 +323,7 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
      * Get integration instance configurations.
      * Get integration instance configurations
      */
-    async getIntegrationInstanceConfigurationsRaw(requestParameters: GetIntegrationInstanceConfigurationsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<IntegrationInstanceConfigurationModel>>> {
+    async getIntegrationInstanceConfigurationsRaw(requestParameters: GetIntegrationInstanceConfigurationsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<IntegrationInstanceConfiguration>>> {
         const queryParameters: any = {};
 
         if (requestParameters['environment'] != null) {
@@ -347,14 +347,14 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(IntegrationInstanceConfigurationModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(IntegrationInstanceConfigurationFromJSON));
     }
 
     /**
      * Get integration instance configurations.
      * Get integration instance configurations
      */
-    async getIntegrationInstanceConfigurations(requestParameters: GetIntegrationInstanceConfigurationsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<IntegrationInstanceConfigurationModel>> {
+    async getIntegrationInstanceConfigurations(requestParameters: GetIntegrationInstanceConfigurationsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<IntegrationInstanceConfiguration>> {
         const response = await this.getIntegrationInstanceConfigurationsRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -363,7 +363,7 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
      * Update an existing integration instance configuration.
      * Update an existing integration instance configuration
      */
-    async updateIntegrationInstanceConfigurationRaw(requestParameters: UpdateIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IntegrationInstanceConfigurationModel>> {
+    async updateIntegrationInstanceConfigurationRaw(requestParameters: UpdateIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IntegrationInstanceConfiguration>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -371,10 +371,10 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['integrationInstanceConfigurationModel'] == null) {
+        if (requestParameters['integrationInstanceConfiguration'] == null) {
             throw new runtime.RequiredError(
-                'integrationInstanceConfigurationModel',
-                'Required parameter "integrationInstanceConfigurationModel" was null or undefined when calling updateIntegrationInstanceConfiguration().'
+                'integrationInstanceConfiguration',
+                'Required parameter "integrationInstanceConfiguration" was null or undefined when calling updateIntegrationInstanceConfiguration().'
             );
         }
 
@@ -389,17 +389,17 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: IntegrationInstanceConfigurationModelToJSON(requestParameters['integrationInstanceConfigurationModel']),
+            body: IntegrationInstanceConfigurationToJSON(requestParameters['integrationInstanceConfiguration']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => IntegrationInstanceConfigurationModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => IntegrationInstanceConfigurationFromJSON(jsonValue));
     }
 
     /**
      * Update an existing integration instance configuration.
      * Update an existing integration instance configuration
      */
-    async updateIntegrationInstanceConfiguration(requestParameters: UpdateIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IntegrationInstanceConfigurationModel> {
+    async updateIntegrationInstanceConfiguration(requestParameters: UpdateIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IntegrationInstanceConfiguration> {
         const response = await this.updateIntegrationInstanceConfigurationRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -408,7 +408,7 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
      * Update an existing integration instance configuration workflow.
      * Update an existing integration instance configuration workflow
      */
-    async updateIntegrationInstanceConfigurationWorkflowRaw(requestParameters: UpdateIntegrationInstanceConfigurationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IntegrationInstanceConfigurationWorkflowModel>> {
+    async updateIntegrationInstanceConfigurationWorkflowRaw(requestParameters: UpdateIntegrationInstanceConfigurationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IntegrationInstanceConfigurationWorkflow>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -423,10 +423,10 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['integrationInstanceConfigurationWorkflowModel'] == null) {
+        if (requestParameters['integrationInstanceConfigurationWorkflow'] == null) {
             throw new runtime.RequiredError(
-                'integrationInstanceConfigurationWorkflowModel',
-                'Required parameter "integrationInstanceConfigurationWorkflowModel" was null or undefined when calling updateIntegrationInstanceConfigurationWorkflow().'
+                'integrationInstanceConfigurationWorkflow',
+                'Required parameter "integrationInstanceConfigurationWorkflow" was null or undefined when calling updateIntegrationInstanceConfigurationWorkflow().'
             );
         }
 
@@ -441,17 +441,17 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: IntegrationInstanceConfigurationWorkflowModelToJSON(requestParameters['integrationInstanceConfigurationWorkflowModel']),
+            body: IntegrationInstanceConfigurationWorkflowToJSON(requestParameters['integrationInstanceConfigurationWorkflow']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => IntegrationInstanceConfigurationWorkflowModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => IntegrationInstanceConfigurationWorkflowFromJSON(jsonValue));
     }
 
     /**
      * Update an existing integration instance configuration workflow.
      * Update an existing integration instance configuration workflow
      */
-    async updateIntegrationInstanceConfigurationWorkflow(requestParameters: UpdateIntegrationInstanceConfigurationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IntegrationInstanceConfigurationWorkflowModel> {
+    async updateIntegrationInstanceConfigurationWorkflow(requestParameters: UpdateIntegrationInstanceConfigurationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IntegrationInstanceConfigurationWorkflow> {
         const response = await this.updateIntegrationInstanceConfigurationWorkflowRaw(requestParameters, initOverrides);
         return await response.value();
     }

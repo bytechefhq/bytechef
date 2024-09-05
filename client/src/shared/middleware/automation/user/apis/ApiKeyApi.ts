@@ -15,18 +15,18 @@
 
 import * as runtime from '../runtime';
 import type {
-  ApiKeyModel,
-  CreateApiKey200ResponseModel,
+  ApiKey,
+  CreateApiKey200Response,
 } from '../models/index';
 import {
-    ApiKeyModelFromJSON,
-    ApiKeyModelToJSON,
-    CreateApiKey200ResponseModelFromJSON,
-    CreateApiKey200ResponseModelToJSON,
+    ApiKeyFromJSON,
+    ApiKeyToJSON,
+    CreateApiKey200ResponseFromJSON,
+    CreateApiKey200ResponseToJSON,
 } from '../models/index';
 
 export interface CreateApiKeyRequest {
-    apiKeyModel: Omit<ApiKeyModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'|'secretKey'>;
+    apiKey: Omit<ApiKey, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'|'secretKey'>;
 }
 
 export interface DeleteApiKeyRequest {
@@ -39,7 +39,7 @@ export interface GetApiKeyRequest {
 
 export interface UpdateApiKeyRequest {
     id: number;
-    apiKeyModel: Omit<ApiKeyModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'|'secretKey'>;
+    apiKey: Omit<ApiKey, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'|'secretKey'>;
 }
 
 /**
@@ -51,11 +51,11 @@ export class ApiKeyApi extends runtime.BaseAPI {
      * Create a new API key.
      * Create a new API key
      */
-    async createApiKeyRaw(requestParameters: CreateApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateApiKey200ResponseModel>> {
-        if (requestParameters['apiKeyModel'] == null) {
+    async createApiKeyRaw(requestParameters: CreateApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateApiKey200Response>> {
+        if (requestParameters['apiKey'] == null) {
             throw new runtime.RequiredError(
-                'apiKeyModel',
-                'Required parameter "apiKeyModel" was null or undefined when calling createApiKey().'
+                'apiKey',
+                'Required parameter "apiKey" was null or undefined when calling createApiKey().'
             );
         }
 
@@ -70,17 +70,17 @@ export class ApiKeyApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: ApiKeyModelToJSON(requestParameters['apiKeyModel']),
+            body: ApiKeyToJSON(requestParameters['apiKey']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => CreateApiKey200ResponseModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => CreateApiKey200ResponseFromJSON(jsonValue));
     }
 
     /**
      * Create a new API key.
      * Create a new API key
      */
-    async createApiKey(requestParameters: CreateApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateApiKey200ResponseModel> {
+    async createApiKey(requestParameters: CreateApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateApiKey200Response> {
         const response = await this.createApiKeyRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -123,7 +123,7 @@ export class ApiKeyApi extends runtime.BaseAPI {
      * Get an API key by id.
      * Get an API key by id
      */
-    async getApiKeyRaw(requestParameters: GetApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ApiKeyModel>> {
+    async getApiKeyRaw(requestParameters: GetApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ApiKey>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -142,14 +142,14 @@ export class ApiKeyApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ApiKeyModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ApiKeyFromJSON(jsonValue));
     }
 
     /**
      * Get an API key by id.
      * Get an API key by id
      */
-    async getApiKey(requestParameters: GetApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ApiKeyModel> {
+    async getApiKey(requestParameters: GetApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ApiKey> {
         const response = await this.getApiKeyRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -158,7 +158,7 @@ export class ApiKeyApi extends runtime.BaseAPI {
      * Get API keys.
      * Get API keys
      */
-    async getApiKeysRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ApiKeyModel>>> {
+    async getApiKeysRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ApiKey>>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -170,14 +170,14 @@ export class ApiKeyApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ApiKeyModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ApiKeyFromJSON));
     }
 
     /**
      * Get API keys.
      * Get API keys
      */
-    async getApiKeys(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ApiKeyModel>> {
+    async getApiKeys(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ApiKey>> {
         const response = await this.getApiKeysRaw(initOverrides);
         return await response.value();
     }
@@ -186,7 +186,7 @@ export class ApiKeyApi extends runtime.BaseAPI {
      * Update an existing API key.
      * Update an existing API key
      */
-    async updateApiKeyRaw(requestParameters: UpdateApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ApiKeyModel>> {
+    async updateApiKeyRaw(requestParameters: UpdateApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ApiKey>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -194,10 +194,10 @@ export class ApiKeyApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['apiKeyModel'] == null) {
+        if (requestParameters['apiKey'] == null) {
             throw new runtime.RequiredError(
-                'apiKeyModel',
-                'Required parameter "apiKeyModel" was null or undefined when calling updateApiKey().'
+                'apiKey',
+                'Required parameter "apiKey" was null or undefined when calling updateApiKey().'
             );
         }
 
@@ -212,17 +212,17 @@ export class ApiKeyApi extends runtime.BaseAPI {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: ApiKeyModelToJSON(requestParameters['apiKeyModel']),
+            body: ApiKeyToJSON(requestParameters['apiKey']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ApiKeyModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ApiKeyFromJSON(jsonValue));
     }
 
     /**
      * Update an existing API key.
      * Update an existing API key
      */
-    async updateApiKey(requestParameters: UpdateApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ApiKeyModel> {
+    async updateApiKey(requestParameters: UpdateApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ApiKey> {
         const response = await this.updateApiKeyRaw(requestParameters, initOverrides);
         return await response.value();
     }

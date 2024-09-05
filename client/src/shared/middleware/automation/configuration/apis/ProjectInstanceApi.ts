@@ -15,24 +15,24 @@
 
 import * as runtime from '../runtime';
 import type {
-  CreateProjectInstanceWorkflowJob200ResponseModel,
-  EnvironmentModel,
-  ProjectInstanceModel,
-  ProjectInstanceWorkflowModel,
+  CreateProjectInstanceWorkflowJob200Response,
+  Environment,
+  ProjectInstance,
+  ProjectInstanceWorkflow,
 } from '../models/index';
 import {
-    CreateProjectInstanceWorkflowJob200ResponseModelFromJSON,
-    CreateProjectInstanceWorkflowJob200ResponseModelToJSON,
-    EnvironmentModelFromJSON,
-    EnvironmentModelToJSON,
-    ProjectInstanceModelFromJSON,
-    ProjectInstanceModelToJSON,
-    ProjectInstanceWorkflowModelFromJSON,
-    ProjectInstanceWorkflowModelToJSON,
+    CreateProjectInstanceWorkflowJob200ResponseFromJSON,
+    CreateProjectInstanceWorkflowJob200ResponseToJSON,
+    EnvironmentFromJSON,
+    EnvironmentToJSON,
+    ProjectInstanceFromJSON,
+    ProjectInstanceToJSON,
+    ProjectInstanceWorkflowFromJSON,
+    ProjectInstanceWorkflowToJSON,
 } from '../models/index';
 
 export interface CreateProjectInstanceRequest {
-    projectInstanceModel: ProjectInstanceModel;
+    projectInstance: ProjectInstance;
 }
 
 export interface CreateProjectInstanceWorkflowJobRequest {
@@ -61,20 +61,20 @@ export interface GetProjectInstanceRequest {
 
 export interface GetWorkspaceProjectInstancesRequest {
     id: number;
-    environment?: EnvironmentModel;
+    environment?: Environment;
     projectId?: number;
     tagId?: number;
 }
 
 export interface UpdateProjectInstanceRequest {
     id: number;
-    projectInstanceModel: ProjectInstanceModel;
+    projectInstance: ProjectInstance;
 }
 
 export interface UpdateProjectInstanceWorkflowRequest {
     id: number;
     projectInstanceWorkflowId: number;
-    projectInstanceWorkflowModel: Omit<ProjectInstanceWorkflowModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'workflowReferenceCode'>;
+    projectInstanceWorkflow: Omit<ProjectInstanceWorkflow, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'workflowReferenceCode'>;
 }
 
 /**
@@ -86,11 +86,11 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
      * Create a new project instance.
      * Create a new project instance
      */
-    async createProjectInstanceRaw(requestParameters: CreateProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectInstanceModel>> {
-        if (requestParameters['projectInstanceModel'] == null) {
+    async createProjectInstanceRaw(requestParameters: CreateProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectInstance>> {
+        if (requestParameters['projectInstance'] == null) {
             throw new runtime.RequiredError(
-                'projectInstanceModel',
-                'Required parameter "projectInstanceModel" was null or undefined when calling createProjectInstance().'
+                'projectInstance',
+                'Required parameter "projectInstance" was null or undefined when calling createProjectInstance().'
             );
         }
 
@@ -105,17 +105,17 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: ProjectInstanceModelToJSON(requestParameters['projectInstanceModel']),
+            body: ProjectInstanceToJSON(requestParameters['projectInstance']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ProjectInstanceModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ProjectInstanceFromJSON(jsonValue));
     }
 
     /**
      * Create a new project instance.
      * Create a new project instance
      */
-    async createProjectInstance(requestParameters: CreateProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectInstanceModel> {
+    async createProjectInstance(requestParameters: CreateProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectInstance> {
         const response = await this.createProjectInstanceRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -124,7 +124,7 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
      * Create a request for running a new job.
      * Create a request for running a new job
      */
-    async createProjectInstanceWorkflowJobRaw(requestParameters: CreateProjectInstanceWorkflowJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateProjectInstanceWorkflowJob200ResponseModel>> {
+    async createProjectInstanceWorkflowJobRaw(requestParameters: CreateProjectInstanceWorkflowJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateProjectInstanceWorkflowJob200Response>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -150,14 +150,14 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => CreateProjectInstanceWorkflowJob200ResponseModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => CreateProjectInstanceWorkflowJob200ResponseFromJSON(jsonValue));
     }
 
     /**
      * Create a request for running a new job.
      * Create a request for running a new job
      */
-    async createProjectInstanceWorkflowJob(requestParameters: CreateProjectInstanceWorkflowJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateProjectInstanceWorkflowJob200ResponseModel> {
+    async createProjectInstanceWorkflowJob(requestParameters: CreateProjectInstanceWorkflowJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateProjectInstanceWorkflowJob200Response> {
         const response = await this.createProjectInstanceWorkflowJobRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -289,7 +289,7 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
      * Get a project instance by id.
      * Get a project instance by id
      */
-    async getProjectInstanceRaw(requestParameters: GetProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectInstanceModel>> {
+    async getProjectInstanceRaw(requestParameters: GetProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectInstance>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -308,14 +308,14 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ProjectInstanceModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ProjectInstanceFromJSON(jsonValue));
     }
 
     /**
      * Get a project instance by id.
      * Get a project instance by id
      */
-    async getProjectInstance(requestParameters: GetProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectInstanceModel> {
+    async getProjectInstance(requestParameters: GetProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectInstance> {
         const response = await this.getProjectInstanceRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -324,7 +324,7 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
      * Get project instances.
      * Get project instances
      */
-    async getWorkspaceProjectInstancesRaw(requestParameters: GetWorkspaceProjectInstancesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ProjectInstanceModel>>> {
+    async getWorkspaceProjectInstancesRaw(requestParameters: GetWorkspaceProjectInstancesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ProjectInstance>>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -355,14 +355,14 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ProjectInstanceModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ProjectInstanceFromJSON));
     }
 
     /**
      * Get project instances.
      * Get project instances
      */
-    async getWorkspaceProjectInstances(requestParameters: GetWorkspaceProjectInstancesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ProjectInstanceModel>> {
+    async getWorkspaceProjectInstances(requestParameters: GetWorkspaceProjectInstancesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ProjectInstance>> {
         const response = await this.getWorkspaceProjectInstancesRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -371,7 +371,7 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
      * Update an existing project instance.
      * Update an existing project instance
      */
-    async updateProjectInstanceRaw(requestParameters: UpdateProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectInstanceModel>> {
+    async updateProjectInstanceRaw(requestParameters: UpdateProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectInstance>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -379,10 +379,10 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['projectInstanceModel'] == null) {
+        if (requestParameters['projectInstance'] == null) {
             throw new runtime.RequiredError(
-                'projectInstanceModel',
-                'Required parameter "projectInstanceModel" was null or undefined when calling updateProjectInstance().'
+                'projectInstance',
+                'Required parameter "projectInstance" was null or undefined when calling updateProjectInstance().'
             );
         }
 
@@ -397,17 +397,17 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: ProjectInstanceModelToJSON(requestParameters['projectInstanceModel']),
+            body: ProjectInstanceToJSON(requestParameters['projectInstance']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ProjectInstanceModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ProjectInstanceFromJSON(jsonValue));
     }
 
     /**
      * Update an existing project instance.
      * Update an existing project instance
      */
-    async updateProjectInstance(requestParameters: UpdateProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectInstanceModel> {
+    async updateProjectInstance(requestParameters: UpdateProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectInstance> {
         const response = await this.updateProjectInstanceRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -416,7 +416,7 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
      * Update an existing project instance workflow.
      * Update an existing project instance workflow
      */
-    async updateProjectInstanceWorkflowRaw(requestParameters: UpdateProjectInstanceWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectInstanceWorkflowModel>> {
+    async updateProjectInstanceWorkflowRaw(requestParameters: UpdateProjectInstanceWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectInstanceWorkflow>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -431,10 +431,10 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['projectInstanceWorkflowModel'] == null) {
+        if (requestParameters['projectInstanceWorkflow'] == null) {
             throw new runtime.RequiredError(
-                'projectInstanceWorkflowModel',
-                'Required parameter "projectInstanceWorkflowModel" was null or undefined when calling updateProjectInstanceWorkflow().'
+                'projectInstanceWorkflow',
+                'Required parameter "projectInstanceWorkflow" was null or undefined when calling updateProjectInstanceWorkflow().'
             );
         }
 
@@ -449,17 +449,17 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: ProjectInstanceWorkflowModelToJSON(requestParameters['projectInstanceWorkflowModel']),
+            body: ProjectInstanceWorkflowToJSON(requestParameters['projectInstanceWorkflow']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ProjectInstanceWorkflowModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ProjectInstanceWorkflowFromJSON(jsonValue));
     }
 
     /**
      * Update an existing project instance workflow.
      * Update an existing project instance workflow
      */
-    async updateProjectInstanceWorkflow(requestParameters: UpdateProjectInstanceWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectInstanceWorkflowModel> {
+    async updateProjectInstanceWorkflow(requestParameters: UpdateProjectInstanceWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectInstanceWorkflow> {
         const response = await this.updateProjectInstanceWorkflowRaw(requestParameters, initOverrides);
         return await response.value();
     }

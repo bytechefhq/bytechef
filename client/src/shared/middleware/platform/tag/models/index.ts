@@ -1,4 +1,4 @@
 /* tslint:disable */
 /* eslint-disable */
-export * from './TagModel';
-export * from './UpdateTagsRequestModel';
+export * from './Tag';
+export * from './UpdateTagsRequest';
