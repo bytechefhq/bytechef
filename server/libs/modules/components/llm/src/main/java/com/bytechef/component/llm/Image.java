@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.llm.util.interfaces;
+package com.bytechef.component.llm;
 
-import static com.bytechef.component.llm.constants.LLMConstants.IMAGE_MESSAGES;
+import static com.bytechef.component.llm.constant.LLMConstants.IMAGE_MESSAGES;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.llm.util.records.ImageMessageRecord;
 import java.util.List;
 import org.springframework.ai.image.ImageGeneration;
-import org.springframework.ai.image.ImageMessage;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImageOptions;
 import org.springframework.ai.image.ImagePrompt;
@@ -34,19 +32,10 @@ import org.springframework.ai.image.ImageResponse;
  */
 public interface Image {
 
-    private static List<ImageMessage> getMessages(Parameters inputParameters) {
-
-        List<ImageMessageRecord> imageMessageList =
-            inputParameters.getList(IMAGE_MESSAGES, new Context.TypeReference<>() {});
-        return imageMessageList.stream()
-            .map(messageRecord -> new ImageMessage(messageRecord.getContent(), messageRecord.getWeight()))
-            .toList();
-    }
-
     static Object getResponse(Image image, Parameters inputParameters, Parameters connectionParameters) {
         ImageModel imageModel = image.createImageModel(inputParameters, connectionParameters);
 
-        List<ImageMessage> messages = getMessages(inputParameters);
+        List<org.springframework.ai.image.ImageMessage> messages = getMessages(inputParameters);
 
         ImageResponse response = imageModel.call(new ImagePrompt(messages));
         ImageGeneration result = response.getResult();
@@ -57,4 +46,18 @@ public interface Image {
     ImageOptions createImageOptions(Parameters inputParameters);
 
     ImageModel createImageModel(Parameters inputParameters, Parameters connectionParameters);
+
+    private static List<org.springframework.ai.image.ImageMessage> getMessages(Parameters inputParameters) {
+
+        List<ImageMessage> imageMessages =
+            inputParameters.getList(IMAGE_MESSAGES, new Context.TypeReference<>() {});
+
+        return imageMessages.stream()
+            .map(messageRecord -> new org.springframework.ai.image.ImageMessage(
+                messageRecord.content(), messageRecord.weight()))
+            .toList();
+    }
+
+    record ImageMessage(String content, Float weight) {
+    }
 }

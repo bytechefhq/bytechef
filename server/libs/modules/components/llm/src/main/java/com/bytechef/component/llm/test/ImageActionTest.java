@@ -16,7 +16,7 @@
 
 package com.bytechef.component.llm.test;
 
-import static com.bytechef.component.llm.constants.LLMConstants.MESSAGES;
+import static com.bytechef.component.llm.constant.LLMConstants.MESSAGES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.llm.util.interfaces.Image;
+import com.bytechef.component.llm.Image;
 import java.util.List;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -41,18 +41,18 @@ import org.springframework.ai.image.ImageResponse;
  */
 public abstract class ImageActionTest extends AbstractLLMActionTest {
 
-    private static final org.springframework.ai.image.Image answer =
+    private static final org.springframework.ai.image.Image ANSWER =
         new org.springframework.ai.image.Image("url", "b64JSON");
 
     protected void performTest(ActionDefinition.SingleConnectionPerformFunction perform) {
         try (MockedStatic<Image> mockedImage = Mockito.mockStatic(Image.class)) {
             mockedImage.when(() -> Image.getResponse(any(Image.class), eq(mockedParameters), eq(mockedParameters)))
-                .thenReturn(answer);
+                .thenReturn(ANSWER);
 
             org.springframework.ai.image.Image result =
                 (org.springframework.ai.image.Image) perform.apply(mockedParameters, mockedParameters, mockedContext);
 
-            assertEquals(answer, result);
+            assertEquals(ANSWER, result);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -63,7 +63,7 @@ public abstract class ImageActionTest extends AbstractLLMActionTest {
             .thenReturn(List.of(new ImageMessage("PROMPT", 1f)));
 
         Image mockedImage = mock(Image.class);
-        ImageResponse imageResponse = new ImageResponse(List.of(new ImageGeneration(answer)));
+        ImageResponse imageResponse = new ImageResponse(List.of(new ImageGeneration(ANSWER)));
         ImageResponse mockedImageResponse = spy(imageResponse);
 
         when(mockedImage.createImageModel(mockedParameters, mockedParameters)).thenReturn(mockedImageModel);
@@ -72,6 +72,6 @@ public abstract class ImageActionTest extends AbstractLLMActionTest {
         org.springframework.ai.image.Image response = (org.springframework.ai.image.Image) Image.getResponse(
             mockedImage, mockedParameters, mockedParameters);
 
-        assertEquals(answer, response);
+        assertEquals(ANSWER, response);
     }
 }

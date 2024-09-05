@@ -21,22 +21,22 @@ import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConsta
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
-import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.MESSAGE_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
-import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE;
-import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.TOP_P;
-import static com.bytechef.component.llm.constants.LLMConstants.TOP_P_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS;
+import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.MESSAGE_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.TEMPERATURE;
+import static com.bytechef.component.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.TOP_P;
+import static com.bytechef.component.llm.constant.LLMConstants.TOP_P_PROPERTY;
 
 import com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.llm.Chat;
 import com.bytechef.component.llm.util.LLMUtils;
-import com.bytechef.component.llm.util.interfaces.Chat;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -46,8 +46,6 @@ import org.springframework.ai.bedrock.llama.api.LlamaChatBedrockApi;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.AwsCredentials;
-import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 
 /**
  * @author Marko Kriskovic
@@ -62,11 +60,14 @@ public class AmazonBedrockLlamaChatAction {
                 .label("Model")
                 .description("ID of the model to use.")
                 .required(true)
-                .options(LLMUtils.getEnumOptions(
-                    Arrays.stream(LlamaChatBedrockApi.LlamaChatModel.values())
-                        .collect(Collectors.toMap(
-                            LlamaChatBedrockApi.LlamaChatModel::getName, LlamaChatBedrockApi.LlamaChatModel::getName,
-                            (f, s) -> f)))),
+                .options(
+                    LLMUtils.getEnumOptions(
+                        Arrays.stream(LlamaChatBedrockApi.LlamaChatModel.values())
+                            .collect(
+                                Collectors.toMap(
+                                    LlamaChatBedrockApi.LlamaChatModel::getName,
+                                    LlamaChatBedrockApi.LlamaChatModel::getName,
+                                    (f, s) -> f)))),
             MESSAGE_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
             MAX_TOKENS_PROPERTY,
@@ -80,6 +81,7 @@ public class AmazonBedrockLlamaChatAction {
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }
 
@@ -95,15 +97,13 @@ public class AmazonBedrockLlamaChatAction {
 
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new BedrockLlamaChatModel(new LlamaChatBedrockApi(inputParameters.getRequiredString(MODEL),
-                new AwsCredentialsProvider() {
-                    @Override
-                    public AwsCredentials resolveCredentials() {
-                        return AwsBasicCredentials.create(connectionParameters.getRequiredString(ACCESS_KEY_ID),
-                            connectionParameters.getRequiredString(SECRET_ACCESS_KEY));
-                    }
-                },
-                connectionParameters.getRequiredString(AmazonBedrockConstants.REGION), new ObjectMapper()),
+            return new BedrockLlamaChatModel(
+                new LlamaChatBedrockApi(
+                    inputParameters.getRequiredString(MODEL),
+                    () -> AwsBasicCredentials.create(
+                        connectionParameters.getRequiredString(ACCESS_KEY_ID),
+                        connectionParameters.getRequiredString(SECRET_ACCESS_KEY)),
+                    connectionParameters.getRequiredString(AmazonBedrockConstants.REGION), new ObjectMapper()),
                 (BedrockLlamaChatOptions) createChatOptions(inputParameters));
         }
     };

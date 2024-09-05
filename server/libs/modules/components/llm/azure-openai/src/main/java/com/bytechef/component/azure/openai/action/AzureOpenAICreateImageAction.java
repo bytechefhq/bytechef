@@ -23,16 +23,16 @@ import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.llm.constants.LLMConstants.CREATE_IMAGE;
-import static com.bytechef.component.llm.constants.LLMConstants.ENDPOINT;
-import static com.bytechef.component.llm.constants.LLMConstants.IMAGE_MESSAGE_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
-import static com.bytechef.component.llm.constants.LLMConstants.N;
-import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT;
-import static com.bytechef.component.llm.constants.LLMConstants.SIZE;
-import static com.bytechef.component.llm.constants.LLMConstants.STYLE;
-import static com.bytechef.component.llm.constants.LLMConstants.USER;
-import static com.bytechef.component.llm.constants.LLMConstants.USER_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.CREATE_IMAGE;
+import static com.bytechef.component.llm.constant.LLMConstants.ENDPOINT;
+import static com.bytechef.component.llm.constant.LLMConstants.IMAGE_MESSAGE_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.llm.constant.LLMConstants.N;
+import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.llm.constant.LLMConstants.SIZE;
+import static com.bytechef.component.llm.constant.LLMConstants.STYLE;
+import static com.bytechef.component.llm.constant.LLMConstants.USER;
+import static com.bytechef.component.llm.constant.LLMConstants.USER_PROPERTY;
 
 import com.azure.ai.openai.OpenAIClient;
 import com.azure.ai.openai.OpenAIClientBuilder;
@@ -41,8 +41,8 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
+import com.bytechef.component.llm.Image;
 import com.bytechef.component.llm.util.LLMUtils;
-import com.bytechef.component.llm.util.interfaces.Image;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import org.springframework.ai.azure.openai.AzureOpenAiImageModel;
@@ -63,11 +63,13 @@ public class AzureOpenAICreateImageAction {
             string(MODEL)
                 .label("Model")
                 .description("The model to use for image generation.")
-                .options(LLMUtils.getEnumOptions(
-                    Arrays.stream(AzureOpenAiImageOptions.ImageModel.values())
-                        .collect(Collectors.toMap(
-                            AzureOpenAiImageOptions.ImageModel::getValue, AzureOpenAiImageOptions.ImageModel::getValue,
-                            (f, s) -> f))))
+                .options(
+                    LLMUtils.getEnumOptions(
+                        Arrays.stream(AzureOpenAiImageOptions.ImageModel.values())
+                            .collect(
+                                Collectors.toMap(
+                                    AzureOpenAiImageOptions.ImageModel::getValue,
+                                    AzureOpenAiImageOptions.ImageModel::getValue, (f, s) -> f))))
                 .required(true),
             IMAGE_MESSAGE_PROPERTY,
             object(SIZE)
@@ -134,6 +136,7 @@ public class AzureOpenAICreateImageAction {
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
         return Image.getResponse(IMAGE, inputParameters, connectionParameters);
     }
 
@@ -161,8 +164,8 @@ public class AzureOpenAICreateImageAction {
                 .endpoint(connectionParameters.getString(ENDPOINT))
                 .buildClient();
 
-            return new AzureOpenAiImageModel(openAIClient,
-                (AzureOpenAiImageOptions) createImageOptions(inputParameters));
+            return new AzureOpenAiImageModel(
+                openAIClient, (AzureOpenAiImageOptions) createImageOptions(inputParameters));
         }
     };
 }

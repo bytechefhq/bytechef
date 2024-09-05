@@ -24,13 +24,13 @@ import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.llm.constants.LLMConstants.CREATE_IMAGE;
-import static com.bytechef.component.llm.constants.LLMConstants.IMAGE_MESSAGE_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
-import static com.bytechef.component.llm.constants.LLMConstants.N;
-import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT;
-import static com.bytechef.component.llm.constants.LLMConstants.SEED;
-import static com.bytechef.component.llm.constants.LLMConstants.STYLE;
+import static com.bytechef.component.llm.constant.LLMConstants.CREATE_IMAGE;
+import static com.bytechef.component.llm.constant.LLMConstants.IMAGE_MESSAGE_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.llm.constant.LLMConstants.N;
+import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.llm.constant.LLMConstants.SEED;
+import static com.bytechef.component.llm.constant.LLMConstants.STYLE;
 import static com.bytechef.component.stability.constant.StabilityConstants.CFG_SCALE;
 import static com.bytechef.component.stability.constant.StabilityConstants.CLIP_GUIDANCE_PRESET;
 import static com.bytechef.component.stability.constant.StabilityConstants.HEIGHT;
@@ -43,8 +43,8 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
+import com.bytechef.component.llm.Image;
 import com.bytechef.component.llm.util.LLMUtils;
-import com.bytechef.component.llm.util.interfaces.Image;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import org.springframework.ai.image.ImageModel;
@@ -101,10 +101,12 @@ public class StabilityCreateImageAction {
                 .label("Style")
                 .description(
                     "Pass in a style preset to guide the image model towards a particular style. This list of style presets is subject to change.")
-                .options(LLMUtils.getEnumOptions(
-                    Arrays.stream(StyleEnum.values())
-                        .collect(Collectors.toMap(
-                            StyleEnum::toString, StyleEnum::toString, (f, s) -> f)))),
+                .options(
+                    LLMUtils.getEnumOptions(
+                        Arrays.stream(StyleEnum.values())
+                            .collect(
+                                Collectors.toMap(
+                                    StyleEnum::toString, StyleEnum::toString, (f, s) -> f)))),
             integer(STEPS)
                 .label("Steps")
                 .description("Number of diffusion steps to run. Valid range: 10 to 50.")

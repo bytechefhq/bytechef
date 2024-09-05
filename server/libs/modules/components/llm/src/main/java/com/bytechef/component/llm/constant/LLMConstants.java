@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.llm.constants;
+package com.bytechef.component.llm.constant;
 
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.integer;

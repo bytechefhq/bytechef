@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.llm.util.interfaces;
+package com.bytechef.component.llm;
 
-import static com.bytechef.component.llm.constants.LLMConstants.MESSAGES;
-import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.llm.constant.LLMConstants.MESSAGES;
+import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.llm.util.LLMUtils.createMessage;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.llm.util.records.MessageRecord;
 import java.util.List;
 import java.util.Map;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.converter.ListOutputConverter;
@@ -37,10 +35,29 @@ import org.springframework.core.convert.support.DefaultConversionService;
  * @author Marko Kriskovic
  */
 public interface Chat {
-    private static List<Message> getMessages(Parameters inputParameters) {
-        List<MessageRecord> messageRecordList = inputParameters.getList(MESSAGES, new Context.TypeReference<>() {});
-        return messageRecordList.stream()
-            .map(messageRecord -> createMessage(messageRecord.getRole(), messageRecord.getContent()))
+
+    static Object getResponse(Chat chat, Parameters inputParameters, Parameters connectionParameters) {
+        ChatModel chatModel = chat.createChatModel(inputParameters, connectionParameters);
+
+        List<org.springframework.ai.chat.messages.Message> messages = getMessages(inputParameters);
+
+        ChatClient.CallResponseSpec call = ChatClient.create(chatModel)
+            .prompt()
+            .messages(messages)
+            .call();
+
+        return returnChatEntity(inputParameters.getInteger(RESPONSE_FORMAT), call);
+    }
+
+    ChatOptions createChatOptions(Parameters inputParameters);
+
+    ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters);
+
+    private static List<org.springframework.ai.chat.messages.Message> getMessages(Parameters inputParameters) {
+        List<Message> messages = inputParameters.getList(MESSAGES, new Context.TypeReference<>() {});
+
+        return messages.stream()
+            .map(message -> createMessage(message.role(), message.content()))
             .toList();
     }
 
@@ -55,20 +72,6 @@ public interface Chat {
         };
     }
 
-    static Object getResponse(Chat chat, Parameters inputParameters, Parameters connectionParameters) {
-        ChatModel chatModel = chat.createChatModel(inputParameters, connectionParameters);
-
-        List<Message> messages = getMessages(inputParameters);
-
-        ChatClient.CallResponseSpec call = ChatClient.create(chatModel)
-            .prompt()
-            .messages(messages)
-            .call();
-
-        return returnChatEntity(inputParameters.getInteger(RESPONSE_FORMAT), call);
+    record Message(String content, String role) {
     }
-
-    ChatOptions createChatOptions(Parameters inputParameters);
-
-    ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters);
 }

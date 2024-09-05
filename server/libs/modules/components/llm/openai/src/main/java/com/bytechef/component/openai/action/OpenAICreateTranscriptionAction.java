@@ -22,20 +22,20 @@ import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.llm.constants.LLMConstants.CREATE_TRANSCRIPTION;
-import static com.bytechef.component.llm.constants.LLMConstants.FILE;
-import static com.bytechef.component.llm.constants.LLMConstants.LANGUAGE;
-import static com.bytechef.component.llm.constants.LLMConstants.LANGUAGE_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
-import static com.bytechef.component.llm.constants.LLMConstants.PROMPT;
-import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT;
-import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE;
+import static com.bytechef.component.llm.constant.LLMConstants.CREATE_TRANSCRIPTION;
+import static com.bytechef.component.llm.constant.LLMConstants.FILE;
+import static com.bytechef.component.llm.constant.LLMConstants.LANGUAGE;
+import static com.bytechef.component.llm.constant.LLMConstants.LANGUAGE_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.llm.constant.LLMConstants.PROMPT;
+import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.llm.constant.LLMConstants.TEMPERATURE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.llm.Transcript;
 import com.bytechef.component.llm.util.LLMUtils;
-import com.bytechef.component.llm.util.interfaces.Transcript;
 import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -66,11 +66,13 @@ public class OpenAICreateTranscriptionAction {
                 .label("Model")
                 .description("ID of the model to use.")
                 .required(true)
-                .options(LLMUtils.getEnumOptions(
-                    Arrays.stream(OpenAiAudioApi.WhisperModel.values())
-                        .collect(Collectors.toMap(
-                            OpenAiAudioApi.WhisperModel::getValue, OpenAiAudioApi.WhisperModel::getValue,
-                            (f, s) -> f)))),
+                .options(
+                    LLMUtils.getEnumOptions(
+                        Arrays.stream(OpenAiAudioApi.WhisperModel.values())
+                            .collect(
+                                Collectors.toMap(
+                                    OpenAiAudioApi.WhisperModel::getValue, OpenAiAudioApi.WhisperModel::getValue,
+                                    (f, s) -> f)))),
             LANGUAGE_PROPERTY,
             string(PROMPT)
                 .label("Prompt")
@@ -81,10 +83,12 @@ public class OpenAICreateTranscriptionAction {
             object(RESPONSE_FORMAT)
                 .label("Response format")
                 .description("The format of the transcript output")
-                .options(LLMUtils.getEnumOptions(
-                    Arrays.stream(OpenAiAudioApi.TranscriptResponseFormat.values())
-                        .collect(Collectors.toMap(
-                            OpenAiAudioApi.TranscriptResponseFormat::getValue, clas -> clas, (f, s) -> f))))
+                .options(
+                    LLMUtils.getEnumOptions(
+                        Arrays.stream(OpenAiAudioApi.TranscriptResponseFormat.values())
+                            .collect(
+                                Collectors.toMap(
+                                    OpenAiAudioApi.TranscriptResponseFormat::getValue, clas -> clas, (f, s) -> f))))
                 .required(true),
             number(TEMPERATURE)
                 .label("Temperature")
@@ -104,6 +108,7 @@ public class OpenAICreateTranscriptionAction {
     public static String perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context)
         throws MalformedURLException {
+
         return Transcript.getResponse(TRANSCRIPT, inputParameters, connectionParameters);
     }
 
@@ -124,7 +129,8 @@ public class OpenAICreateTranscriptionAction {
         public Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> createTranscriptionModel(
             Parameters inputParameters, Parameters connectionParameters) {
 
-            return new OpenAiAudioTranscriptionModel(new OpenAiAudioApi(connectionParameters.getString(TOKEN)),
+            return new OpenAiAudioTranscriptionModel(
+                new OpenAiAudioApi(connectionParameters.getString(TOKEN)),
                 (OpenAiAudioTranscriptionOptions) createTranscriptOptions(inputParameters));
         }
     };
