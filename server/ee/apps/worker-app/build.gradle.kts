@@ -117,6 +117,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:sendgrid"))
     implementation(project(":server:libs:modules:components:shopify"))
     implementation(project(":server:libs:modules:components:slack"))
+    implementation(project(":server:libs:modules:components:spotify"))
     implementation(project(":server:libs:modules:components:teamwork"))
     implementation(project(":server:libs:modules:components:text-helper"))
     implementation(project(":server:libs:modules:components:todoist"))
