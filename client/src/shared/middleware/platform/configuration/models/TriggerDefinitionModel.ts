@@ -51,12 +51,6 @@ export interface TriggerDefinitionModel {
      */
     componentVersion?: number;
     /**
-     * Does trigger define dynamic output schema.
-     * @type {boolean}
-     * @memberof TriggerDefinitionModel
-     */
-    dynamicOutput: boolean;
-    /**
      * The description.
      * @type {string}
      * @memberof TriggerDefinitionModel
@@ -110,7 +104,6 @@ export interface TriggerDefinitionModel {
  * Check if a given object implements the TriggerDefinitionModel interface.
  */
 export function instanceOfTriggerDefinitionModel(value: object): boolean {
-    if (!('dynamicOutput' in value)) return false;
     if (!('name' in value)) return false;
     if (!('outputDefined' in value)) return false;
     if (!('type' in value)) return false;
@@ -129,7 +122,6 @@ export function TriggerDefinitionModelFromJSONTyped(json: any, ignoreDiscriminat
         
         'componentName': json['componentName'] == null ? undefined : json['componentName'],
         'componentVersion': json['componentVersion'] == null ? undefined : json['componentVersion'],
-        'dynamicOutput': json['dynamicOutput'],
         'description': json['description'] == null ? undefined : json['description'],
         'help': json['help'] == null ? undefined : HelpModelFromJSON(json['help']),
         'name': json['name'],
@@ -149,7 +141,6 @@ export function TriggerDefinitionModelToJSON(value?: TriggerDefinitionModel | nu
         
         'componentName': value['componentName'],
         'componentVersion': value['componentVersion'],
-        'dynamicOutput': value['dynamicOutput'],
         'description': value['description'],
         'help': HelpModelToJSON(value['help']),
         'name': value['name'],

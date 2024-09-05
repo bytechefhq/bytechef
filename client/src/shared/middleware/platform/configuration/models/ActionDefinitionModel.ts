@@ -45,12 +45,6 @@ export interface ActionDefinitionModel {
      */
     componentVersion?: number;
     /**
-     * Does action define dynamic output schema.
-     * @type {boolean}
-     * @memberof ActionDefinitionModel
-     */
-    dynamicOutput: boolean;
-    /**
      * The description.
      * @type {string}
      * @memberof ActionDefinitionModel
@@ -98,7 +92,6 @@ export interface ActionDefinitionModel {
  * Check if a given object implements the ActionDefinitionModel interface.
  */
 export function instanceOfActionDefinitionModel(value: object): boolean {
-    if (!('dynamicOutput' in value)) return false;
     if (!('name' in value)) return false;
     if (!('outputDefined' in value)) return false;
     return true;
@@ -116,7 +109,6 @@ export function ActionDefinitionModelFromJSONTyped(json: any, ignoreDiscriminato
         
         'componentName': json['componentName'] == null ? undefined : json['componentName'],
         'componentVersion': json['componentVersion'] == null ? undefined : json['componentVersion'],
-        'dynamicOutput': json['dynamicOutput'],
         'description': json['description'] == null ? undefined : json['description'],
         'help': json['help'] == null ? undefined : HelpModelFromJSON(json['help']),
         'name': json['name'],
@@ -135,7 +127,6 @@ export function ActionDefinitionModelToJSON(value?: ActionDefinitionModel | null
         
         'componentName': value['componentName'],
         'componentVersion': value['componentVersion'],
-        'dynamicOutput': value['dynamicOutput'],
         'description': value['description'],
         'help': HelpModelToJSON(value['help']),
         'name': value['name'],
