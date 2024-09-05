@@ -18,9 +18,9 @@ package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.commons.util.ExceptionUtils;
 import com.bytechef.error.ExecutionError;
-import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.dto.ScriptTestExecutionDTO;
+import com.bytechef.platform.registry.domain.OutputResponse;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,12 +56,13 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
             executionError = new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e)));
         }
 
-        Output output = null;
+        OutputResponse outputResponse = null;
 
         if (workflowNodeTestOutput != null) {
-            output = workflowNodeTestOutput.getOutput();
+            outputResponse = workflowNodeTestOutput.getOutput();
         }
 
-        return new ScriptTestExecutionDTO(executionError, output == null ? null : output.getSampleOutput());
+        return new ScriptTestExecutionDTO(executionError,
+            outputResponse == null ? null : outputResponse.sampleOutput());
     }
 }

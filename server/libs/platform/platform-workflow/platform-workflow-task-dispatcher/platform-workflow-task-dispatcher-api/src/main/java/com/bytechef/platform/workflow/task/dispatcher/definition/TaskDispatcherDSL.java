@@ -16,6 +16,8 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.definition;
 
+import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
+import com.bytechef.definition.BaseOutputDefinition.SampleOutput;
 import com.bytechef.platform.workflow.task.dispatcher.definition.Property.ObjectProperty;
 import com.bytechef.platform.workflow.task.dispatcher.definition.Property.ValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -161,6 +163,14 @@ public final class TaskDispatcherDSL {
 
     public static ModifiableOption<String> option(String label, String value, String description) {
         return new ModifiableOption<>(label, value, description);
+    }
+
+    public static <P extends ValueProperty<?>> OutputSchema<P> outputSchema(P outputSchema) {
+        return new OutputSchema<>(outputSchema);
+    }
+
+    public static SampleOutput sampleOutput(Object sampleOutput) {
+        return new SampleOutput(sampleOutput);
     }
 
     public static ModifiableStringProperty string() {
@@ -1185,13 +1195,11 @@ public final class TaskDispatcherDSL {
         private Help help;
         private String icon;
         private final String name;
-        private OutputResponse outputResponse;
-        private OutputFunction outputFunction;
+        private OutputDefinition outputDefinition;
         private List<? extends Property> properties;
         private Resources resources;
         private List<? extends ModifiableProperty<?>> taskProperties;
         private String title;
-        private ObjectProperty variableProperties;
         private VariablePropertiesFunction variablePropertiesFunction;
         private int version = 1;
 
@@ -1218,23 +1226,25 @@ public final class TaskDispatcherDSL {
         }
 
         public ModifiableTaskDispatcherDefinition output(OutputFunction output) {
-            this.outputFunction = output;
-
-            return this;
-        }
-
-        public ModifiableTaskDispatcherDefinition output(
-            ModifiableValueProperty<?, ?> outputSchema, Map<String, ?> sampleOutput) {
-
-            this.outputResponse = new OutputResponse(outputSchema, sampleOutput);
+            this.outputDefinition = new OutputDefinition(output);
 
             return this;
         }
 
         public <P extends ModifiableValueProperty<?, ?>> ModifiableTaskDispatcherDefinition outputSchema(
-            ModifiableValueProperty<?, ?> outputSchema) {
+            OutputSchema<P> outputSchema) {
 
-            return output(outputSchema, null);
+            this.outputDefinition = new OutputDefinition(outputSchema.outputSchema());
+
+            return this;
+        }
+
+        public <P extends ModifiableValueProperty<?, ?>> ModifiableTaskDispatcherDefinition output(
+            OutputSchema<P> outputSchema, SampleOutput sampleOutput) {
+
+            this.outputDefinition = new OutputDefinition(outputSchema.outputSchema(), sampleOutput.sampleOutput());
+
+            return this;
         }
 
         public ModifiableTaskDispatcherDefinition resources(String documentationUrl) {
@@ -1283,15 +1293,6 @@ public final class TaskDispatcherDSL {
             return this;
         }
 
-        @SafeVarargs
-        public final <P extends ModifiableValueProperty<?, ?>> ModifiableTaskDispatcherDefinition variableProperties(
-            P... variableProperties) {
-
-            this.variableProperties = object().properties(variableProperties);
-
-            return this;
-        }
-
         public ModifiableTaskDispatcherDefinition variableProperties(
             VariablePropertiesFunction variablePropertiesFunction) {
 
@@ -1321,13 +1322,8 @@ public final class TaskDispatcherDSL {
         }
 
         @Override
-        public Optional<OutputResponse> getOutput() {
-            return Optional.ofNullable(outputResponse);
-        }
-
-        @Override
-        public Optional<OutputFunction> getOutputFunction() {
-            return Optional.ofNullable(outputFunction);
+        public Optional<OutputDefinition> getOutputDefinition() {
+            return Optional.ofNullable(outputDefinition);
         }
 
         @Override
@@ -1351,12 +1347,7 @@ public final class TaskDispatcherDSL {
         }
 
         @Override
-        public Optional<ObjectProperty> getVariableProperties() {
-            return Optional.ofNullable(variableProperties);
-        }
-
-        @Override
-        public Optional<VariablePropertiesFunction> getVariablePropertiesFunction() {
+        public Optional<VariablePropertiesFunction> getVariableProperties() {
             return Optional.ofNullable(variablePropertiesFunction);
         }
 

@@ -85,10 +85,10 @@ public class TaskDispatcherJobTestExecutor {
         TaskDispatcherResolverFactoriesFunction taskDispatcherResolverFactoriesFunction,
         TaskHandlerMapSupplier taskHandlerMapSupplier) {
 
-        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, jobService, syncMessageBroker,
+            contextService, jobService,
             taskCompletionHandlerFactoriesFunction.apply(counterService, taskExecutionService), List.of(), List.of(),
             taskDispatcherResolverFactoriesFunction.apply(
                 event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),

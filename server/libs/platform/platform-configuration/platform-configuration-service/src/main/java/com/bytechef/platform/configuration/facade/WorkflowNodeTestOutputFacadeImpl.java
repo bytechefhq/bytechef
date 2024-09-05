@@ -20,19 +20,18 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.platform.component.registry.domain.ActionDefinition;
-import com.bytechef.platform.component.registry.domain.Output;
-import com.bytechef.platform.component.registry.domain.TriggerDefinition;
+import com.bytechef.platform.component.definition.PropertyFactory;
+import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
-import com.bytechef.platform.component.registry.service.ActionDefinitionService;
-import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.registry.domain.OutputResponse;
+import com.bytechef.platform.registry.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.stereotype.Service;
@@ -44,9 +43,7 @@ import org.springframework.stereotype.Service;
 public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputFacade {
 
     private final ActionDefinitionFacade actionDefinitionFacade;
-    private final ActionDefinitionService actionDefinitionService;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
-    private final TriggerDefinitionService triggerDefinitionService;
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
     private final WorkflowService workflowService;
@@ -54,15 +51,12 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
     @SuppressFBWarnings("EI")
     public WorkflowNodeTestOutputFacadeImpl(
-        ActionDefinitionFacade actionDefinitionFacade, ActionDefinitionService actionDefinitionService,
-        TriggerDefinitionFacade triggerDefinitionFacade, TriggerDefinitionService triggerDefinitionService,
+        ActionDefinitionFacade actionDefinitionFacade, TriggerDefinitionFacade triggerDefinitionFacade,
         WorkflowNodeTestOutputService workflowNodeTestOutputService, WorkflowNodeOutputFacade workflowNodeOutputFacade,
         WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.actionDefinitionFacade = actionDefinitionFacade;
-        this.actionDefinitionService = actionDefinitionService;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
-        this.triggerDefinitionService = triggerDefinitionService;
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
         this.workflowNodeTestOutputService = workflowNodeTestOutputService;
         this.workflowService = workflowService;
@@ -96,9 +90,6 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
-        ActionDefinition actionDefinition = actionDefinitionService.getActionDefinition(
-            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-            workflowNodeType.componentOperationName());
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
         Map<String, ?> outputs = workflowNodeOutputFacade.getWorkflowNodeSampleOutputs(
             workflowId, workflowTask.getName());
@@ -106,28 +97,15 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         Map<String, ?> inputParameters = workflowTask.evaluateParameters(
             MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs));
 
-        if (actionDefinition.isDynamicOutput()) {
-            Output output = actionDefinitionFacade.executeOutput(
-                workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                workflowNodeType.componentOperationName(), inputParameters, connectionIds);
+        OutputResponse outputResponse = actionDefinitionFacade.executeOutput(
+            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
+            workflowNodeType.componentOperationName(), inputParameters, connectionIds);
 
-            if (output == null) {
-                return null;
-            }
-
-            return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, output);
-        } else {
-            Object sampleOutput = actionDefinitionFacade.executePerform(
-                workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                workflowNodeType.componentOperationName(), null, null, null, null, inputParameters, connectionIds);
-
-            if (sampleOutput == null) {
-                return null;
-            }
-
-            return workflowNodeTestOutputService.save(
-                workflowId, workflowNodeName, workflowNodeType, sampleOutput);
+        if (outputResponse == null) {
+            return null;
         }
+
+        return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, outputResponse);
     }
 
     @SuppressFBWarnings("NP")
@@ -136,24 +114,13 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
-        TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
+        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
+
+        OutputResponse outputResponse = triggerDefinitionFacade.executeOutput(
             workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-            workflowNodeType.componentOperationName());
+            workflowNodeType.componentOperationName(), workflowTrigger.evaluateParameters(inputs), connectionId);
 
-        if (triggerDefinition.isDynamicOutput()) {
-            Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
-
-            Output output = triggerDefinitionFacade.executeOutput(
-                workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                workflowNodeType.componentOperationName(), workflowTrigger.evaluateParameters(inputs), connectionId);
-
-            return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, output);
-        } else {
-            // TODO
-            Map<String, ?> result = null;
-
-            return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, result);
-        }
+        return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, outputResponse);
     }
 
     @Override
@@ -172,6 +139,11 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
 
-        return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, sampleOutput);
+        Property outputSchema = Property.toProperty(
+            (com.bytechef.component.definition.Property) SchemaUtils.getOutputSchema(
+                sampleOutput, new PropertyFactory(sampleOutput)));
+
+        return workflowNodeTestOutputService.save(
+            workflowId, workflowNodeName, workflowNodeType, new OutputResponse(outputSchema, sampleOutput));
     }
 }

@@ -18,10 +18,11 @@ package com.bytechef.platform.component.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.registry.util.SchemaUtils;
+import com.bytechef.platform.registry.domain.OutputResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -29,9 +30,8 @@ import java.util.Objects;
 @SuppressFBWarnings("EI")
 public class TriggerDefinition extends TriggerDefinitionBasic {
 
-    private Output output;
     private boolean outputDefined;
-    private boolean dynamicOutput;
+    private OutputResponse outputResponse;
     private List<? extends Property> properties;
     private boolean webhookRawBody;
     private boolean workflowNodeDescriptionDefined;
@@ -48,16 +48,10 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
 
         super(triggerDefinition, componentName, componentVersion);
 
-        this.dynamicOutput = OptionalUtils.mapOrElse(
-            triggerDefinition.getOutput(), outputFunction -> true, triggerDefinition.isDynamicOutput());
-        this.output = OptionalUtils.mapOrElse(
-            triggerDefinition.getOutputResponse(),
-            outputResponse -> SchemaUtils.toOutput(
-                outputResponse,
-                (property, sampleOutput) -> new Output(
-                    Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput)),
-            null);
-        this.outputDefined = OptionalUtils.mapOrElse(triggerDefinition.getOutputResponse(), output -> true, false);
+        this.outputDefined = OptionalUtils.mapOrElse(
+            triggerDefinition.getOutputDefinition(), outputDefinition -> true, false);
+        this.outputResponse = OptionalUtils.mapOrElse(
+            triggerDefinition.getOutputDefinition(), TriggerDefinition::toOutputResponse, null);
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(triggerDefinition.getProperties(), List.of()), Property::toProperty);
         this.webhookRawBody = OptionalUtils.orElse(triggerDefinition.getWebhookRawBody(), false);
@@ -83,36 +77,24 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
             return false;
         }
 
-        return dynamicOutput == that.dynamicOutput && output == that.output && outputDefined == that.outputDefined
-            && Objects.equals(properties, that.properties) && webhookRawBody == that.webhookRawBody
-            && workflowNodeDescriptionDefined == that.workflowNodeDescriptionDefined
-            && workflowSyncExecution == that.workflowSyncExecution
-            && workflowSyncValidation == that.workflowSyncValidation
-            && workflowSyncOnEnableValidation == that.workflowSyncOnEnableValidation;
+        return outputDefined == that.outputDefined && Objects.equals(outputResponse, that.outputResponse) &&
+            Objects.equals(properties, that.properties) && webhookRawBody == that.webhookRawBody &&
+            workflowNodeDescriptionDefined == that.workflowNodeDescriptionDefined &&
+            workflowSyncExecution == that.workflowSyncExecution &&
+            workflowSyncValidation == that.workflowSyncValidation &&
+            workflowSyncOnEnableValidation == that.workflowSyncOnEnableValidation;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-            super.hashCode(), dynamicOutput, output, outputDefined, properties,
-            webhookRawBody, workflowNodeDescriptionDefined, workflowSyncExecution, workflowSyncValidation,
+            super.hashCode(), outputDefined, outputResponse, properties, webhookRawBody,
+            workflowNodeDescriptionDefined, workflowSyncExecution, workflowSyncValidation,
             workflowSyncOnEnableValidation);
-    }
-
-    public Output getOutput() {
-        return output;
-    }
-
-    public List<? extends Property> getProperties() {
-        return properties;
     }
 
     public boolean isOutputDefined() {
         return outputDefined;
-    }
-
-    public boolean isDynamicOutput() {
-        return dynamicOutput;
     }
 
     public boolean isWebhookRawBody() {
@@ -135,23 +117,45 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
         return workflowSyncOnEnableValidation;
     }
 
+    @Nullable
+    public OutputResponse getOutputResponse() {
+        return outputResponse;
+    }
+
+    public List<? extends Property> getProperties() {
+        return properties;
+    }
+
     @Override
     public String toString() {
         return "TriggerDefinition{" +
             "name='" + name + '\'' +
-            ", title='" + title + '\'' +
+            ", componentName='" + componentName + '\'' +
+            ", componentVersion=" + componentVersion +
             ", type=" + type +
+            ", batch=" + batch +
+            ", title='" + title + '\'' +
             ", description='" + description + '\'' +
-            ", output=" + output +
             ", outputDefined=" + outputDefined +
-            ", outputFunctionDefined=" + dynamicOutput +
+            ", outputDefinition=" + outputResponse +
             ", properties=" + properties +
             ", webhookRawBody=" + webhookRawBody +
             ", workflowSyncExecution=" + workflowSyncExecution +
             ", workflowSyncValidation=" + workflowSyncValidation +
-            ", batch=" + batch +
             ", help=" + help +
             ", workflowNodeDescriptionDefined=" + workflowNodeDescriptionDefined +
             "} ";
+    }
+
+    private static OutputResponse toOutputResponse(
+        com.bytechef.component.definition.OutputDefinition outputDefinition) {
+
+        return outputDefinition.getOutputResponse()
+            .map(
+                outputResponse -> new OutputResponse(
+                    Property
+                        .toProperty((com.bytechef.component.definition.Property) outputDefinition.getOutputSchema()),
+                    outputDefinition.getSampleOutput()))
+            .orElse(null);
     }
 }

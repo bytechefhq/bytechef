@@ -16,13 +16,13 @@ import com.bytechef.ee.platform.component.registry.remote.client.AbstractWorkerC
 import com.bytechef.ee.remote.client.DefaultRestClient;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
-import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.domain.TriggerDefinition;
 import com.bytechef.platform.component.registry.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
+import com.bytechef.platform.registry.domain.OutputResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
@@ -112,7 +112,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     }
 
     @Override
-    public Output executeOutput(
+    public OutputResponse executeOutput(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull TriggerContext context) {
 

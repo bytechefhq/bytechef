@@ -16,13 +16,15 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.definition;
 
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
+import com.bytechef.definition.BaseOutputFunction;
 import java.util.Map;
 
 /**
  *
  */
 @FunctionalInterface
-public interface OutputFunction {
+public interface OutputFunction extends BaseOutputFunction {
 
     /**
      * @param inputParameters

@@ -23,12 +23,12 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookValidateRespon
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
-import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.domain.TriggerDefinition;
 import com.bytechef.platform.component.registry.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
+import com.bytechef.platform.registry.domain.OutputResponse;
 import java.util.List;
 import java.util.Map;
 import org.springframework.lang.NonNull;
@@ -69,7 +69,7 @@ public interface TriggerDefinitionService {
         @NonNull List<String> lookupDependsOnPaths,
         @Nullable String searchText, @Nullable ComponentConnection connection, @NonNull TriggerContext context);
 
-    Output executeOutput(
+    OutputResponse executeOutput(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
         @NonNull TriggerContext context);

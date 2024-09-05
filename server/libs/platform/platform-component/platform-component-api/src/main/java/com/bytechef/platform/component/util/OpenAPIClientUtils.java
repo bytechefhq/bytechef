@@ -29,10 +29,10 @@ import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
-import com.bytechef.component.definition.OutputResponse;
+import com.bytechef.component.definition.OutputDefinition;
 import com.bytechef.component.definition.Property;
-import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.exception.ProviderException;
+import com.bytechef.definition.BaseProperty.BaseValueProperty;
 import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.exception.ErrorType;
 import java.net.URLEncoder;
@@ -75,10 +75,10 @@ public class OpenAPIClientUtils {
 
     public static Response execute(
         Map<String, ?> inputParameters, List<? extends Property> properties,
-        @Nullable OutputResponse outputResponse, Map<String, Object> metadata,
+        @Nullable OutputDefinition outputDefinition, Map<String, Object> metadata,
         @Nullable ProcessErrorResponseFunction processErrorResponseFunction, ActionContext context) {
 
-        ValueProperty<?> outputSchema = outputResponse == null ? null : outputResponse.getOutputSchema();
+        BaseValueProperty<?> outputSchema = outputDefinition == null ? null : outputDefinition.getOutputSchema();
 
         Response response = context
             .http(http -> http.exchange(

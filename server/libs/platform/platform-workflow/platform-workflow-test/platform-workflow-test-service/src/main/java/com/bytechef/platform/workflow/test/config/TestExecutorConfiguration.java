@@ -82,7 +82,7 @@ public class TestExecutorConfiguration {
 
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
         CounterService counterService = new CounterServiceImpl(new InMemoryCounterRepository());
-        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
         InMemoryTaskExecutionRepository taskExecutionRepository = new InMemoryTaskExecutionRepository();
 
@@ -95,7 +95,7 @@ public class TestExecutorConfiguration {
         return new JobTestExecutor(
             componentDefinitionService, contextService,
             new JobSyncExecutor(
-                contextService, jobService, syncMessageBroker,
+                contextService, jobService,
                 getTaskCompletionHandlerFactories(
                     contextService, counterService, taskExecutionService, taskFileStorage),
                 getTaskDispatcherAdapterFactories(objectMapper),

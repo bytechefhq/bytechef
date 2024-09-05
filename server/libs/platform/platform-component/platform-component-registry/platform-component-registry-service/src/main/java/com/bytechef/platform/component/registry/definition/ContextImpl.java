@@ -20,8 +20,8 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.component.definition.ComponentDSL.ModifiableValueProperty;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OutputResponse;
 import com.bytechef.component.exception.ProviderException;
+import com.bytechef.definition.BaseOutputDefinition;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.registry.util.SchemaUtils;
@@ -90,8 +90,8 @@ public class ContextImpl implements Context {
     }
 
     @Override
-    public OutputResponse output(
-        ContextFunction<Output, OutputResponse> outputFunction) {
+    public BaseOutputDefinition.OutputResponse output(
+        ContextFunction<Output, BaseOutputDefinition.OutputResponse> outputFunction) {
 
         try {
             return outputFunction.apply(this.output);
@@ -540,12 +540,12 @@ public class ContextImpl implements Context {
         }
 
         @Override
-        public OutputResponse get(Object value) {
+        public BaseOutputDefinition.OutputResponse get(Object value) {
             if (value == null) {
                 return null;
             }
 
-            return new OutputResponse(
+            return new BaseOutputDefinition.OutputResponse(
                 (ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(value, new PropertyFactory(value)),
                 value);
         }

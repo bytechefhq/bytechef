@@ -17,9 +17,9 @@
 package com.bytechef.platform.configuration.service;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.registry.domain.OutputResponse;
 import java.util.Optional;
 import org.springframework.lang.NonNull;
 
@@ -36,11 +36,7 @@ public interface WorkflowNodeTestOutputService {
 
     WorkflowNodeTestOutput save(
         @NonNull String workflowId, @NonNull String workflowNodeName, @NonNull WorkflowNodeType workflowNodeType,
-        @NonNull Object sampleOutput);
-
-    WorkflowNodeTestOutput save(
-        @NonNull String workflowId, @NonNull String workflowNodeName, @NonNull WorkflowNodeType workflowNodeType,
-        @NonNull Output output);
+        @NonNull OutputResponse outputResponse);
 
     void updateWorkflowId(String oldWorkflowId, String newWorkflowId);
 }

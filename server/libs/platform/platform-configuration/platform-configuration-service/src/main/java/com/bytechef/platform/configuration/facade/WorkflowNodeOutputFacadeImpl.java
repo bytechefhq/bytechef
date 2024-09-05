@@ -21,7 +21,6 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.platform.component.registry.domain.ActionDefinition;
 import com.bytechef.platform.component.registry.domain.FileEntryProperty;
-import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.TriggerDefinition;
 import com.bytechef.platform.component.registry.service.ActionDefinitionService;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
@@ -30,6 +29,7 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.dto.WorkflowNodeOutputDTO;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.registry.domain.OutputResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -78,13 +78,13 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                     workflowNodeType.componentName(), workflowNodeType.componentVersion(),
                     workflowNodeType.componentOperationName());
 
-                Output output = workflowNodeTestOutputService
+                OutputResponse outputResponse = workflowNodeTestOutputService
                     .fetchWorkflowTestNodeOutput(workflowId, workflowTrigger.getName())
                     .map(WorkflowNodeTestOutput::getOutput)
-                    .orElseGet(() -> checkOutput(triggerDefinition.getOutput()));
+                    .orElseGet(() -> checkOutput(triggerDefinition.getOutputResponse()));
 
                 workflowNodeOutputDTO = new WorkflowNodeOutputDTO(
-                    null, output, null, triggerDefinition, workflowTrigger.getName());
+                    null, outputResponse, null, triggerDefinition, workflowTrigger.getName());
 
                 break;
             }
@@ -101,13 +101,13 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                         workflowNodeType.componentName(), workflowNodeType.componentVersion(),
                         workflowNodeType.componentOperationName());
 
-                    Output output = workflowNodeTestOutputService
+                    OutputResponse outputResponse = workflowNodeTestOutputService
                         .fetchWorkflowTestNodeOutput(workflowId, workflowTask.getName())
                         .map(WorkflowNodeTestOutput::getOutput)
-                        .orElseGet(() -> checkOutput(actionDefinition.getOutput()));
+                        .orElseGet(() -> checkOutput(actionDefinition.getOutputResponse()));
 
                     workflowNodeOutputDTO = new WorkflowNodeOutputDTO(
-                        actionDefinition, output, null, null, workflowTask.getName());
+                        actionDefinition, outputResponse, null, null, workflowTask.getName());
                 }
             }
         }
@@ -134,13 +134,13 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 workflowNodeType.componentName(), workflowNodeType.componentVersion(),
                 workflowNodeType.componentOperationName());
 
-            Output output = workflowNodeTestOutputService
+            OutputResponse outputResponse = workflowNodeTestOutputService
                 .fetchWorkflowTestNodeOutput(workflowId, workflowTrigger.getName())
                 .map(WorkflowNodeTestOutput::getOutput)
-                .orElseGet(() -> checkOutput(triggerDefinition.getOutput()));
+                .orElseGet(() -> checkOutput(triggerDefinition.getOutputResponse()));
 
             workflowNodeOutputDTOs.add(
-                new WorkflowNodeOutputDTO(null, output, null, triggerDefinition, workflowTrigger.getName()));
+                new WorkflowNodeOutputDTO(null, outputResponse, null, triggerDefinition, workflowTrigger.getName()));
         }
 
         List<WorkflowTask> workflowTasks = workflow.getTasks();
@@ -156,13 +156,13 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 workflowNodeType.componentName(), workflowNodeType.componentVersion(),
                 workflowNodeType.componentOperationName());
 
-            Output output = workflowNodeTestOutputService
+            OutputResponse outputResponse = workflowNodeTestOutputService
                 .fetchWorkflowTestNodeOutput(workflowId, workflowTask.getName())
                 .map(WorkflowNodeTestOutput::getOutput)
-                .orElseGet(() -> checkOutput(actionDefinition.getOutput()));
+                .orElseGet(() -> checkOutput(actionDefinition.getOutputResponse()));
 
             workflowNodeOutputDTOs.add(
-                new WorkflowNodeOutputDTO(actionDefinition, output, null, null, workflowTask.getName()));
+                new WorkflowNodeOutputDTO(actionDefinition, outputResponse, null, null, workflowTask.getName()));
         }
 
         return workflowNodeOutputDTOs;
@@ -176,13 +176,13 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             .collect(Collectors.toMap(WorkflowNodeOutputDTO::workflowNodeName, WorkflowNodeOutputDTO::sampleOutput));
     }
 
-    private static Output checkOutput(Output output) {
+    private static OutputResponse checkOutput(OutputResponse outputResponse) {
         // Force UI to test component to get real fileEntry instance
 
-        if (output != null && output.getOutputSchema() instanceof FileEntryProperty) {
+        if (outputResponse != null && outputResponse.outputSchema() instanceof FileEntryProperty) {
             return null;
         }
 
-        return output;
+        return outputResponse;
     }
 }

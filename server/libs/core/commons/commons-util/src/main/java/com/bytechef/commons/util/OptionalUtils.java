@@ -57,6 +57,12 @@ public final class OptionalUtils {
         optional.ifPresent(action);
     }
 
+    public static <T> boolean isEmpty(Optional<T> optional) {
+        Validate.notNull(optional, "'optional' must not be null");
+
+        return optional.isPresent();
+    }
+
     public static <T> boolean isPresent(Optional<T> optional) {
         Validate.notNull(optional, "'optional' must not be null");
 

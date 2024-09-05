@@ -13,12 +13,12 @@ import com.bytechef.component.exception.ProviderException;
 import com.bytechef.ee.platform.component.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.ee.remote.client.DefaultRestClient;
 import com.bytechef.platform.component.registry.domain.Option;
-import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.registry.domain.OutputResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
@@ -107,7 +107,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
     }
 
     @Override
-    public Output executeOutput(
+    public OutputResponse executeOutput(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, Long connectionId) {
 

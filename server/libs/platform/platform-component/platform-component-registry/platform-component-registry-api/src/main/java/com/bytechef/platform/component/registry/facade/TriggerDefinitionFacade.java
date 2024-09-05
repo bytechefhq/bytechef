@@ -19,11 +19,11 @@ package com.bytechef.platform.component.registry.facade;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.platform.component.registry.domain.Option;
-import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.registry.domain.OutputResponse;
 import java.util.List;
 import java.util.Map;
 import org.springframework.lang.NonNull;
@@ -67,7 +67,7 @@ public interface TriggerDefinitionFacade extends OperationDefinitionFacade {
         @NonNull Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths, String searchText,
         Long connectionId);
 
-    Output executeOutput(
+    OutputResponse executeOutput(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, Long connectionId);
 

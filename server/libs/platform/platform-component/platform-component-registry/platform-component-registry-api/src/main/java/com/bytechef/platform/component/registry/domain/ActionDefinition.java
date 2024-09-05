@@ -18,10 +18,11 @@ package com.bytechef.platform.component.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.registry.util.SchemaUtils;
+import com.bytechef.platform.registry.domain.OutputResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -29,9 +30,8 @@ import java.util.Objects;
 @SuppressFBWarnings("EI")
 public class ActionDefinition extends ActionDefinitionBasic {
 
-    private boolean dynamicOutput;
-    private Output output;
     private boolean outputDefined;
+    private OutputResponse outputResponse;
     private List<? extends Property> properties;
     private boolean workflowNodeDescriptionDefined;
 
@@ -44,16 +44,10 @@ public class ActionDefinition extends ActionDefinitionBasic {
 
         super(actionDefinition, componentName, componentVersion);
 
-        this.dynamicOutput = OptionalUtils.mapOrElse(
-            actionDefinition.getOutput(), outputFunction -> true, actionDefinition.isDynamicOutput());
-        this.output = OptionalUtils.mapOrElse(
-            actionDefinition.getOutputResponse(),
-            outputResponse -> SchemaUtils.toOutput(
-                outputResponse,
-                (property, sampleOutput) -> new Output(
-                    Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput)),
-            null);
-        this.outputDefined = OptionalUtils.mapOrElse(actionDefinition.getOutputResponse(), output -> true, false);
+        this.outputDefined = OptionalUtils.mapOrElse(
+            actionDefinition.getOutputDefinition(), outputDefinition -> true, false);
+        this.outputResponse = OptionalUtils.mapOrElse(
+            actionDefinition.getOutputDefinition(), ActionDefinition::toOutputResponse, null);
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(actionDefinition.getProperties(), List.of()), Property::toProperty);
         this.workflowNodeDescriptionDefined = OptionalUtils.mapOrElse(
@@ -74,8 +68,7 @@ public class ActionDefinition extends ActionDefinitionBasic {
             return false;
         }
 
-        return dynamicOutput == that.dynamicOutput &&
-            Objects.equals(output, that.output) && outputDefined == that.outputDefined &&
+        return outputDefined == that.outputDefined && Objects.equals(outputResponse, that.outputResponse) &&
             Objects.equals(properties, that.properties) &&
             workflowNodeDescriptionDefined == that.workflowNodeDescriptionDefined;
     }
@@ -83,19 +76,7 @@ public class ActionDefinition extends ActionDefinitionBasic {
     @Override
     public int hashCode() {
         return Objects.hash(
-            super.hashCode(), dynamicOutput, output, outputDefined, properties, workflowNodeDescriptionDefined);
-    }
-
-    public Output getOutput() {
-        return output;
-    }
-
-    public List<? extends Property> getProperties() {
-        return properties;
-    }
-
-    public boolean isDynamicOutput() {
-        return dynamicOutput;
+            super.hashCode(), outputDefined, outputResponse, properties, workflowNodeDescriptionDefined);
     }
 
     public boolean isOutputDefined() {
@@ -106,20 +87,41 @@ public class ActionDefinition extends ActionDefinitionBasic {
         return workflowNodeDescriptionDefined;
     }
 
+    @Nullable
+    public OutputResponse getOutputResponse() {
+        return outputResponse;
+    }
+
+    public List<? extends Property> getProperties() {
+        return properties;
+    }
+
     @Override
     public String toString() {
-        return "Definition{" +
+        return "ActionDefinition{" +
             "name='" + name + '\'' +
+            ", componentName='" + componentName + '\'' +
+            ", componentVersion=" + componentVersion +
+            ", batch=" + batch +
             ", title='" + title + '\'' +
             ", description='" + description + '\'' +
             ", outputDefined=" + outputDefined +
-            ", dynamicOutput=" + dynamicOutput +
-            ", output=" + output +
+            ", outputResponse=" + outputResponse +
             ", properties=" + properties +
-            ", batch=" + batch +
             ", help=" + help +
             ", workflowNodeDescriptionDefined=" + workflowNodeDescriptionDefined +
             "} ";
     }
 
+    private static OutputResponse toOutputResponse(
+        com.bytechef.component.definition.OutputDefinition outputDefinition) {
+
+        return outputDefinition.getOutputResponse()
+            .map(
+                outputResponse -> new OutputResponse(
+                    Property
+                        .toProperty((com.bytechef.component.definition.Property) outputDefinition.getOutputSchema()),
+                    outputDefinition.getSampleOutput()))
+            .orElse(null);
+    }
 }

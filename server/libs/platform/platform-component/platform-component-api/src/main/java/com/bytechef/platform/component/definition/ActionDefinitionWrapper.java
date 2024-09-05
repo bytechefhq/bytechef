@@ -46,7 +46,6 @@ public class ActionDefinitionWrapper extends AbstractActionDefinitionWrapper imp
             ", batch=" + batch +
             ", deprecated=" + deprecated +
             ", help=" + help +
-            ", outputResponse=" + outputResponse +
             ", properties=" + properties +
             ", metadata=" + metadata +
             "} ";

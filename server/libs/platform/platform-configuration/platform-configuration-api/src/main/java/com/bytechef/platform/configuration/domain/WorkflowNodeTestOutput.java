@@ -18,8 +18,9 @@ package com.bytechef.platform.configuration.domain;
 
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
+import com.bytechef.platform.component.registry.domain.ValueProperty;
+import com.bytechef.platform.registry.domain.OutputResponse;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Objects;
@@ -132,12 +133,12 @@ public class WorkflowNodeTestOutput {
         return lastModifiedDate;
     }
 
-    public Output getOutput() {
-        return new Output(getOutputSchema(), getSampleOutput());
+    public OutputResponse getOutput() {
+        return new OutputResponse(getOutputSchema(), getSampleOutput());
     }
 
-    public Property getOutputSchema() {
-        return MapUtils.get(outputSchema.getMap(), "outputSchema", Property.class);
+    public ValueProperty<?> getOutputSchema() {
+        return MapUtils.get(outputSchema.getMap(), "outputSchema", ValueProperty.class);
     }
 
     public Object getSampleOutput() {

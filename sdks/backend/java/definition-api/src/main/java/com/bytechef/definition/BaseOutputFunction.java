@@ -14,16 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.task.dispatcher.registry.domain;
-
-import com.bytechef.platform.registry.domain.BaseOutput;
+package com.bytechef.definition;
 
 /**
  * @author Ivica Cardic
  */
-public class Output extends BaseOutput<Property> {
-
-    public Output(Property outputSchema, Object sampleOutput) {
-        super(outputSchema, sampleOutput);
-    }
+public interface BaseOutputFunction {
 }

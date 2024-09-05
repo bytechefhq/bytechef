@@ -17,6 +17,8 @@
 package com.bytechef.component.definition;
 
 import com.bytechef.component.exception.ProviderException;
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
+import com.bytechef.definition.BaseOutputFunction;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -179,13 +181,7 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    Optional<TriggerOutputFunction> getOutput();
-
-    /**
-     *
-     * @return
-     */
-    Optional<OutputResponse> getOutputResponse();
+    Optional<OutputDefinition> getOutputDefinition();
 
     /**
      *
@@ -255,12 +251,6 @@ public interface TriggerDefinition {
      * @return
      */
     Optional<Boolean> getWorkflowSyncOnEnableValidation();
-
-    /**
-     *
-     * @return
-     */
-    boolean isDynamicOutput();
 
     /**
      *
@@ -464,7 +454,8 @@ public interface TriggerDefinition {
          * @param context
          * @return
          */
-        OutputResponse apply(Parameters inputParameters, Parameters closureParameters, TriggerContext context)
+        OutputResponse apply(
+            Parameters inputParameters, Parameters closureParameters, TriggerContext context)
             throws Exception;
 
     }
@@ -488,7 +479,7 @@ public interface TriggerDefinition {
     /**
      *
      */
-    interface TriggerOutputFunction {
+    interface TriggerOutputFunction extends BaseOutputFunction {
     }
 
     /**
