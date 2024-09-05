@@ -28,14 +28,12 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerDefinition", description = "A trigger definition defines ways to trigger workflows from the outside services.")
 @JsonTypeName("TriggerDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:41.413996+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T08:55:29.450670+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class TriggerDefinitionModel {
 
   private String componentName;
 
   private Integer componentVersion;
-
-  private Boolean dynamicOutput;
 
   private String description;
 
@@ -61,8 +59,7 @@ public class TriggerDefinitionModel {
   /**
    * Constructor with only required parameters
    */
-  public TriggerDefinitionModel(Boolean dynamicOutput, String name, Boolean outputDefined, TriggerTypeModel type) {
-    this.dynamicOutput = dynamicOutput;
+  public TriggerDefinitionModel(String name, Boolean outputDefined, TriggerTypeModel type) {
     this.name = name;
     this.outputDefined = outputDefined;
     this.type = type;
@@ -106,26 +103,6 @@ public class TriggerDefinitionModel {
 
   public void setComponentVersion(Integer componentVersion) {
     this.componentVersion = componentVersion;
-  }
-
-  public TriggerDefinitionModel dynamicOutput(Boolean dynamicOutput) {
-    this.dynamicOutput = dynamicOutput;
-    return this;
-  }
-
-  /**
-   * Does trigger define dynamic output schema.
-   * @return dynamicOutput
-  */
-  @NotNull 
-  @Schema(name = "dynamicOutput", description = "Does trigger define dynamic output schema.", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("dynamicOutput")
-  public Boolean getDynamicOutput() {
-    return dynamicOutput;
-  }
-
-  public void setDynamicOutput(Boolean dynamicOutput) {
-    this.dynamicOutput = dynamicOutput;
   }
 
   public TriggerDefinitionModel description(String description) {
@@ -307,7 +284,6 @@ public class TriggerDefinitionModel {
     TriggerDefinitionModel triggerDefinition = (TriggerDefinitionModel) o;
     return Objects.equals(this.componentName, triggerDefinition.componentName) &&
         Objects.equals(this.componentVersion, triggerDefinition.componentVersion) &&
-        Objects.equals(this.dynamicOutput, triggerDefinition.dynamicOutput) &&
         Objects.equals(this.description, triggerDefinition.description) &&
         Objects.equals(this.help, triggerDefinition.help) &&
         Objects.equals(this.name, triggerDefinition.name) &&
@@ -320,7 +296,7 @@ public class TriggerDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, dynamicOutput, description, help, name, outputDefined, properties, title, type, workflowNodeDescriptionDefined);
+    return Objects.hash(componentName, componentVersion, description, help, name, outputDefined, properties, title, type, workflowNodeDescriptionDefined);
   }
 
   @Override
@@ -329,7 +305,6 @@ public class TriggerDefinitionModel {
     sb.append("class TriggerDefinitionModel {\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
     sb.append("    componentVersion: ").append(toIndentedString(componentVersion)).append("\n");
-    sb.append("    dynamicOutput: ").append(toIndentedString(dynamicOutput)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    help: ").append(toIndentedString(help)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
