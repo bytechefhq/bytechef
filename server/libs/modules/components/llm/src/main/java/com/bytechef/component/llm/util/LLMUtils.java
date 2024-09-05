@@ -18,8 +18,9 @@ package com.bytechef.component.llm.util;
 
 import static com.bytechef.component.definition.ComponentDSL.option;
 
-import com.bytechef.component.definition.ComponentDSL.ModifiableOption;
+import com.bytechef.component.definition.Option;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
@@ -45,10 +46,11 @@ public class LLMUtils {
         };
     }
 
-    public static <R> ModifiableOption[] getEnumOptions(Map<String, R> map) {
+    @SuppressWarnings("unchecked")
+    public static <R> List<Option<R>> getEnumOptions(Map<String, R> map) {
         return map.entrySet()
             .stream()
-            .map(entry -> option(entry.getKey(), entry.getValue()))
-            .toArray(ModifiableOption[]::new);
+            .map(entry -> (Option<R>) option(entry.getKey(), entry.getValue()))
+            .toList();
     }
 }

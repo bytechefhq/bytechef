@@ -16,7 +16,7 @@
 
 package com.bytechef.component.llm.test;
 
-import static com.bytechef.component.llm.constants.LLMConstants.FILE;
+import static com.bytechef.component.llm.constant.LLMConstants.FILE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.FileEntry;
-import com.bytechef.component.llm.util.interfaces.Transcript;
+import com.bytechef.component.llm.Transcript;
 import java.net.MalformedURLException;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -40,17 +40,17 @@ import org.springframework.ai.model.Model;
  */
 public abstract class TranscriptActionTest extends AbstractLLMActionTest {
 
-    private static final String answer = "ANSWER";
+    private static final String ANSWER = "ANSWER";
 
     protected void performTest(ActionDefinition.SingleConnectionPerformFunction perform) {
         try (MockedStatic<Transcript> mockedTranscript = Mockito.mockStatic(Transcript.class)) {
             mockedTranscript
                 .when(() -> Transcript.getResponse(any(Transcript.class), eq(mockedParameters), eq(mockedParameters)))
-                .thenReturn(answer);
+                .thenReturn(ANSWER);
 
             String result = (String) perform.apply(mockedParameters, mockedParameters, mockedContext);
 
-            assertEquals(answer, result);
+            assertEquals(ANSWER, result);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -85,7 +85,7 @@ public abstract class TranscriptActionTest extends AbstractLLMActionTest {
 
         Transcript mockedTranscription = mock(Transcript.class);
         AudioTranscriptionResponse transcriptionResponse = new AudioTranscriptionResponse(
-            new AudioTranscription(answer));
+            new AudioTranscription(ANSWER));
         AudioTranscriptionResponse mockedTranscriptionResponse = spy(transcriptionResponse);
 
         when(mockedTranscription.createTranscriptionModel(mockedParameters, mockedParameters))
@@ -94,6 +94,6 @@ public abstract class TranscriptActionTest extends AbstractLLMActionTest {
 
         String response = Transcript.getResponse(mockedTranscription, mockedParameters, mockedParameters);
 
-        assertEquals(answer, response);
+        assertEquals(ANSWER, response);
     }
 }

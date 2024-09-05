@@ -22,12 +22,12 @@ import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.llm.constants.LLMConstants.CREATE_SPEECH;
-import static com.bytechef.component.llm.constants.LLMConstants.INPUT;
-import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
-import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT;
-import static com.bytechef.component.llm.constants.LLMConstants.SPEED;
-import static com.bytechef.component.llm.constants.LLMConstants.VOICE;
+import static com.bytechef.component.llm.constant.LLMConstants.CREATE_SPEECH;
+import static com.bytechef.component.llm.constant.LLMConstants.INPUT;
+import static com.bytechef.component.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.llm.constant.LLMConstants.SPEED;
+import static com.bytechef.component.llm.constant.LLMConstants.VOICE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -59,10 +59,13 @@ public class OpenAICreateSpeechAction {
                 .description("ID of the model to use.")
                 .required(true)
                 .description("Text-to-Speech model which will generate the audio.")
-                .options(LLMUtils.getEnumOptions(
-                    Arrays.stream(OpenAiAudioApi.TtsModel.values())
-                        .collect(Collectors.toMap(
-                            OpenAiAudioApi.TtsModel::getValue, OpenAiAudioApi.TtsModel::getValue, (f, s) -> f)))),
+                .options(
+                    LLMUtils.getEnumOptions(
+                        Arrays.stream(
+                            OpenAiAudioApi.TtsModel.values())
+                            .collect(Collectors.toMap(
+                                OpenAiAudioApi.TtsModel::getValue, OpenAiAudioApi.TtsModel::getValue,
+                                (f, s) -> f)))),
             string(INPUT)
                 .label("Input")
                 .description("The text to generate audio for.")
@@ -71,18 +74,23 @@ public class OpenAICreateSpeechAction {
             object(VOICE)
                 .label("Voice")
                 .description("The voice to use when generating the audio.")
-                .options(LLMUtils.getEnumOptions(
-                    Arrays.stream(OpenAiAudioApi.SpeechRequest.Voice.values())
-                        .collect(Collectors.toMap(
-                            OpenAiAudioApi.SpeechRequest.Voice::getValue, clas -> clas, (f, s) -> f))))
+                .options(
+                    LLMUtils.getEnumOptions(
+                        Arrays.stream(OpenAiAudioApi.SpeechRequest.Voice.values())
+                            .collect(
+                                Collectors.toMap(
+                                    OpenAiAudioApi.SpeechRequest.Voice::getValue, clas -> clas, (f, s) -> f))))
                 .required(true),
             object(RESPONSE_FORMAT)
                 .label("Response format")
                 .description("The format to audio in.")
-                .options(LLMUtils.getEnumOptions(
-                    Arrays.stream(OpenAiAudioApi.SpeechRequest.AudioResponseFormat.values())
-                        .collect(Collectors.toMap(
-                            OpenAiAudioApi.SpeechRequest.AudioResponseFormat::getValue, clas -> clas, (f, s) -> f))))
+                .options(
+                    LLMUtils.getEnumOptions(
+                        Arrays.stream(OpenAiAudioApi.SpeechRequest.AudioResponseFormat.values())
+                            .collect(
+                                Collectors.toMap(
+                                    OpenAiAudioApi.SpeechRequest.AudioResponseFormat::getValue, clazz -> clazz,
+                                    (f, s) -> f))))
                 .required(false),
             number(SPEED)
                 .label("Speed")
@@ -111,8 +119,9 @@ public class OpenAICreateSpeechAction {
             .withResponseFormat(audioResponseFormat)
             .withSpeed(inputParameters.getFloat(SPEED))
             .build();
-        SpeechModel speechModel =
-            new OpenAiAudioSpeechModel(new OpenAiAudioApi(connectionParameters.getString(TOKEN)), speechOptions);
+
+        SpeechModel speechModel = new OpenAiAudioSpeechModel(
+            new OpenAiAudioApi(connectionParameters.getString(TOKEN)), speechOptions);
 
         SpeechResponse response = speechModel.call(new SpeechPrompt(input));
 

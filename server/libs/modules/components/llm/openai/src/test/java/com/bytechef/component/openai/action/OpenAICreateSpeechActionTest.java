@@ -16,11 +16,11 @@
 
 package com.bytechef.component.openai.action;
 
-import static com.bytechef.component.llm.constants.LLMConstants.INPUT;
-import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
-import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT;
-import static com.bytechef.component.llm.constants.LLMConstants.SPEED;
-import static com.bytechef.component.llm.constants.LLMConstants.VOICE;
+import static com.bytechef.component.llm.constant.LLMConstants.INPUT;
+import static com.bytechef.component.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.llm.constant.LLMConstants.SPEED;
+import static com.bytechef.component.llm.constant.LLMConstants.VOICE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;

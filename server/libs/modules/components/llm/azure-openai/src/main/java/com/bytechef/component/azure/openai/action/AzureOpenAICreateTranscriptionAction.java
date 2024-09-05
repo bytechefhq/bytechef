@@ -22,15 +22,15 @@ import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.llm.constants.LLMConstants.CREATE_TRANSCRIPTION;
-import static com.bytechef.component.llm.constants.LLMConstants.ENDPOINT;
-import static com.bytechef.component.llm.constants.LLMConstants.FILE;
-import static com.bytechef.component.llm.constants.LLMConstants.LANGUAGE;
-import static com.bytechef.component.llm.constants.LLMConstants.LANGUAGE_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
-import static com.bytechef.component.llm.constants.LLMConstants.PROMPT;
-import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT;
-import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE;
+import static com.bytechef.component.llm.constant.LLMConstants.CREATE_TRANSCRIPTION;
+import static com.bytechef.component.llm.constant.LLMConstants.ENDPOINT;
+import static com.bytechef.component.llm.constant.LLMConstants.FILE;
+import static com.bytechef.component.llm.constant.LLMConstants.LANGUAGE;
+import static com.bytechef.component.llm.constant.LLMConstants.LANGUAGE_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.llm.constant.LLMConstants.PROMPT;
+import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.llm.constant.LLMConstants.TEMPERATURE;
 
 import com.azure.ai.openai.OpenAIClient;
 import com.azure.ai.openai.OpenAIClientBuilder;
@@ -38,8 +38,8 @@ import com.azure.core.credential.KeyCredential;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.llm.Transcript;
 import com.bytechef.component.llm.util.LLMUtils;
-import com.bytechef.component.llm.util.interfaces.Transcript;
 import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -69,11 +69,13 @@ public class AzureOpenAICreateTranscriptionAction {
                 .label("Model")
                 .description("ID of the model to use.")
                 .required(true)
-                .options(LLMUtils.getEnumOptions(
-                    Arrays.stream(AzureOpenAiAudioTranscriptionOptions.WhisperModel.values())
-                        .collect(Collectors.toMap(
-                            AzureOpenAiAudioTranscriptionOptions.WhisperModel::getValue,
-                            AzureOpenAiAudioTranscriptionOptions.WhisperModel::getValue, (f, s) -> f)))),
+                .options(
+                    LLMUtils.getEnumOptions(
+                        Arrays.stream(AzureOpenAiAudioTranscriptionOptions.WhisperModel.values())
+                            .collect(
+                                Collectors.toMap(
+                                    AzureOpenAiAudioTranscriptionOptions.WhisperModel::getValue,
+                                    AzureOpenAiAudioTranscriptionOptions.WhisperModel::getValue, (f, s) -> f)))),
             LANGUAGE_PROPERTY,
             string(PROMPT)
                 .label("Prompt")
@@ -84,12 +86,14 @@ public class AzureOpenAICreateTranscriptionAction {
             object(RESPONSE_FORMAT)
                 .label("Response format")
                 .description("The format of the transcript output")
-                .options(LLMUtils.getEnumOptions(
-                    Arrays.stream(AzureOpenAiAudioTranscriptionOptions.TranscriptResponseFormat.values())
-                        .collect(Collectors.toMap(
-                            clas -> clas.getValue()
-                                .toString(),
-                            AzureOpenAiAudioTranscriptionOptions.TranscriptResponseFormat::getValue, (f, s) -> f))))
+                .options(
+                    LLMUtils.getEnumOptions(
+                        Arrays.stream(AzureOpenAiAudioTranscriptionOptions.TranscriptResponseFormat.values())
+                            .collect(
+                                Collectors.toMap(
+                                    clazz -> String.valueOf(clazz.getValue()),
+                                    AzureOpenAiAudioTranscriptionOptions.TranscriptResponseFormat::getValue,
+                                    (f, s) -> f))))
                 .required(true),
             number(TEMPERATURE)
                 .label("Temperature")
@@ -136,8 +140,8 @@ public class AzureOpenAICreateTranscriptionAction {
                 .endpoint(connectionParameters.getString(ENDPOINT))
                 .buildClient();
 
-            return new AzureOpenAiAudioTranscriptionModel(openAIClient,
-                (AzureOpenAiAudioTranscriptionOptions) createTranscriptOptions(inputParameters));
+            return new AzureOpenAiAudioTranscriptionModel(
+                openAIClient, (AzureOpenAiAudioTranscriptionOptions) createTranscriptOptions(inputParameters));
         }
     };
 }

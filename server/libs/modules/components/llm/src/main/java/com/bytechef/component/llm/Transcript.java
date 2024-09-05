@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.llm.util.interfaces;
+package com.bytechef.component.llm;
 
-import static com.bytechef.component.llm.constants.LLMConstants.FILE;
+import static com.bytechef.component.llm.constant.LLMConstants.FILE;
 
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
@@ -32,14 +32,6 @@ import org.springframework.core.io.UrlResource;
  * @author Marko Kriskovic
  */
 public interface Transcript {
-
-    private static AudioTranscriptionPrompt getTranscriptionPrompt(Parameters inputParameters)
-        throws MalformedURLException {
-
-        FileEntry fileEntry = inputParameters.getFileEntry(FILE);
-
-        return new AudioTranscriptionPrompt(new UrlResource(fileEntry.getUrl()));
-    }
 
     static String getResponse(Transcript transcript, Parameters inputParameters, Parameters connectionParameters)
         throws MalformedURLException {
@@ -60,4 +52,12 @@ public interface Transcript {
 
     Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> createTranscriptionModel(
         Parameters inputParameters, Parameters connectionParameters);
+
+    private static AudioTranscriptionPrompt getTranscriptionPrompt(Parameters inputParameters)
+        throws MalformedURLException {
+
+        FileEntry fileEntry = inputParameters.getFileEntry(FILE);
+
+        return new AudioTranscriptionPrompt(new UrlResource(fileEntry.getUrl()));
+    }
 }

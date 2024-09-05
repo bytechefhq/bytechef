@@ -22,23 +22,23 @@ import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.llm.constants.LLMConstants.ASK;
-import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
-import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.MESSAGE_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
-import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.SEED;
-import static com.bytechef.component.llm.constants.LLMConstants.SEED_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.STOP;
-import static com.bytechef.component.llm.constants.LLMConstants.STOP_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE;
-import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.TOP_K;
-import static com.bytechef.component.llm.constants.LLMConstants.TOP_K_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.TOP_P;
-import static com.bytechef.component.llm.constants.LLMConstants.TOP_P_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.URL;
+import static com.bytechef.component.llm.constant.LLMConstants.ASK;
+import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS;
+import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.MESSAGE_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.SEED;
+import static com.bytechef.component.llm.constant.LLMConstants.SEED_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.STOP;
+import static com.bytechef.component.llm.constant.LLMConstants.STOP_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.TEMPERATURE;
+import static com.bytechef.component.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.TOP_K;
+import static com.bytechef.component.llm.constant.LLMConstants.TOP_K_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.TOP_P;
+import static com.bytechef.component.llm.constant.LLMConstants.TOP_P_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.URL;
 import static com.bytechef.component.watsonx.constant.WatsonxConstants.DECODING_METHOD;
 import static com.bytechef.component.watsonx.constant.WatsonxConstants.MIN_TOKENS;
 import static com.bytechef.component.watsonx.constant.WatsonxConstants.PROJECT_ID;
@@ -50,7 +50,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.llm.util.interfaces.Chat;
+import com.bytechef.component.llm.Chat;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.watsonx.WatsonxAiChatModel;
@@ -126,10 +126,12 @@ public class WatsonxChatAction {
 
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new WatsonxAiChatModel(new WatsonxAiApi(connectionParameters.getString(URL),
-                connectionParameters.getString(STREAM_ENDPOINT), connectionParameters.getString(TEXT_ENDPOINT),
-                connectionParameters.getString(PROJECT_ID), connectionParameters.getString(TOKEN),
-                RestClient.builder()),
+            return new WatsonxAiChatModel(
+                new WatsonxAiApi(
+                    connectionParameters.getString(URL),
+                    connectionParameters.getString(STREAM_ENDPOINT), connectionParameters.getString(TEXT_ENDPOINT),
+                    connectionParameters.getString(PROJECT_ID), connectionParameters.getString(TOKEN),
+                    RestClient.builder()),
                 (WatsonxAiChatOptions) createChatOptions(inputParameters));
         }
     };

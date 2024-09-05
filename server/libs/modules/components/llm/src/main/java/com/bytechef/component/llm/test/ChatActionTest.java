@@ -16,7 +16,7 @@
 
 package com.bytechef.component.llm.test;
 
-import static com.bytechef.component.llm.constants.LLMConstants.MESSAGES;
+import static com.bytechef.component.llm.constant.LLMConstants.MESSAGES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -26,8 +26,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.llm.util.interfaces.Chat;
-import com.bytechef.component.llm.util.records.MessageRecord;
+import com.bytechef.component.llm.Chat;
 import java.util.List;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -42,16 +41,16 @@ import org.springframework.ai.chat.prompt.Prompt;
  */
 public abstract class ChatActionTest extends AbstractLLMActionTest {
 
-    private static final String answer = "ANSWER";
+    private static final String ANSWER = "ANSWER";
 
     protected void performTest(ActionDefinition.SingleConnectionPerformFunction perform) {
         try (MockedStatic<Chat> mockedChat = Mockito.mockStatic(Chat.class)) {
             mockedChat.when(() -> Chat.getResponse(any(Chat.class), eq(mockedParameters), eq(mockedParameters)))
-                .thenReturn(answer);
+                .thenReturn(ANSWER);
 
             String result = (String) perform.apply(mockedParameters, mockedParameters, mockedContext);
 
-            assertEquals(answer, result);
+            assertEquals(ANSWER, result);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -59,10 +58,10 @@ public abstract class ChatActionTest extends AbstractLLMActionTest {
 
     protected void getResponseTest(ChatModel mockedChatModel){
         when(mockedParameters.getList(eq(MESSAGES), any(Context.TypeReference.class)))
-            .thenReturn(List.of(new MessageRecord("QUESTION", "user")));
+            .thenReturn(List.of(new Chat.Message("QUESTION", "user")));
 
         Chat mockedChat = mock(Chat.class);
-        ChatResponse chatResponse = new ChatResponse(List.of(new Generation(new AssistantMessage(answer))));
+        ChatResponse chatResponse = new ChatResponse(List.of(new Generation(new AssistantMessage(ANSWER))));
         ChatResponse mockedChatResponse = spy(chatResponse);
 
         when(mockedChat.createChatModel(mockedParameters, mockedParameters)).thenReturn(mockedChatModel);
@@ -70,6 +69,6 @@ public abstract class ChatActionTest extends AbstractLLMActionTest {
 
         Object response = Chat.getResponse(mockedChat, mockedParameters, mockedParameters);
 
-        assertEquals(answer, response);
+        assertEquals(ANSWER, response);
     }
 }

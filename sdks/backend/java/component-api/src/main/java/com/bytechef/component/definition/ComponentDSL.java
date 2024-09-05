@@ -2441,6 +2441,12 @@ public final class ComponentDSL {
             return this;
         }
 
+        public ModifiableObjectProperty options(List<? extends Option<Object>> options) {
+            this.options = new ArrayList<>(options);
+
+            return this;
+        }
+
         public ModifiableObjectProperty options(OptionsFunction optionsFunction) {
             this.optionsFunction = optionsFunction;
 

@@ -21,28 +21,28 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.llm.constants.LLMConstants.ASK;
-import static com.bytechef.component.llm.constants.LLMConstants.FUNCTIONS;
-import static com.bytechef.component.llm.constants.LLMConstants.FUNCTIONS_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.MAX_TOKENS;
-import static com.bytechef.component.llm.constants.LLMConstants.MESSAGE_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.MODEL;
-import static com.bytechef.component.llm.constants.LLMConstants.RESPONSE_FORMAT_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.STOP;
-import static com.bytechef.component.llm.constants.LLMConstants.STOP_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE;
-import static com.bytechef.component.llm.constants.LLMConstants.TEMPERATURE_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.TOP_K;
-import static com.bytechef.component.llm.constants.LLMConstants.TOP_K_PROPERTY;
-import static com.bytechef.component.llm.constants.LLMConstants.TOP_P;
-import static com.bytechef.component.llm.constants.LLMConstants.TOP_P_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.ASK;
+import static com.bytechef.component.llm.constant.LLMConstants.FUNCTIONS;
+import static com.bytechef.component.llm.constant.LLMConstants.FUNCTIONS_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS;
+import static com.bytechef.component.llm.constant.LLMConstants.MESSAGE_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.STOP;
+import static com.bytechef.component.llm.constant.LLMConstants.STOP_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.TEMPERATURE;
+import static com.bytechef.component.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.TOP_K;
+import static com.bytechef.component.llm.constant.LLMConstants.TOP_K_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.TOP_P;
+import static com.bytechef.component.llm.constant.LLMConstants.TOP_P_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.llm.Chat;
 import com.bytechef.component.llm.util.LLMUtils;
-import com.bytechef.component.llm.util.interfaces.Chat;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -66,10 +66,12 @@ public class AnthropicChatAction {
                 .label("Model")
                 .description("ID of the model to use.")
                 .required(true)
-                .options(LLMUtils.getEnumOptions(
-                    Arrays.stream(AnthropicApi.ChatModel.values())
-                        .collect(Collectors.toMap(
-                            AnthropicApi.ChatModel::getValue, AnthropicApi.ChatModel::getValue, (f, s) -> f)))),
+                .options(
+                    LLMUtils.getEnumOptions(
+                        Arrays.stream(AnthropicApi.ChatModel.values())
+                            .collect(
+                                Collectors.toMap(
+                                    AnthropicApi.ChatModel::getValue, AnthropicApi.ChatModel::getValue, (f, s) -> f)))),
             MESSAGE_PROPERTY,
             integer(MAX_TOKENS)
                 .label("Max tokens")
@@ -112,7 +114,8 @@ public class AnthropicChatAction {
 
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new AnthropicChatModel(new AnthropicApi(connectionParameters.getString(TOKEN)),
+            return new AnthropicChatModel(
+                new AnthropicApi(connectionParameters.getString(TOKEN)),
                 (AnthropicChatOptions) createChatOptions(inputParameters));
         }
     };
