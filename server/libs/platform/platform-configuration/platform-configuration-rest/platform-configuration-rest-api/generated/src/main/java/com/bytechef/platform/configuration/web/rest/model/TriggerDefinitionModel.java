@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerDefinition", description = "A trigger definition defines ways to trigger workflows from the outside services.")
 @JsonTypeName("TriggerDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T08:55:29.450670+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T11:10:11.248638+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class TriggerDefinitionModel {
 
   private String componentName;
@@ -73,7 +73,7 @@ public class TriggerDefinitionModel {
   /**
    * The component name.
    * @return componentName
-  */
+   */
   
   @Schema(name = "componentName", description = "The component name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("componentName")
@@ -93,7 +93,7 @@ public class TriggerDefinitionModel {
   /**
    * The component version.
    * @return componentVersion
-  */
+   */
   
   @Schema(name = "componentVersion", description = "The component version.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("componentVersion")
@@ -113,7 +113,7 @@ public class TriggerDefinitionModel {
   /**
    * The description.
    * @return description
-  */
+   */
   
   @Schema(name = "description", description = "The description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
@@ -133,7 +133,7 @@ public class TriggerDefinitionModel {
   /**
    * Get help
    * @return help
-  */
+   */
   @Valid 
   @Schema(name = "help", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("help")
@@ -153,7 +153,7 @@ public class TriggerDefinitionModel {
   /**
    * The action name.
    * @return name
-  */
+   */
   @NotNull 
   @Schema(name = "name", description = "The action name.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
@@ -173,7 +173,7 @@ public class TriggerDefinitionModel {
   /**
    * Does trigger define output schema.
    * @return outputDefined
-  */
+   */
   @NotNull 
   @Schema(name = "outputDefined", description = "Does trigger define output schema.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("outputDefined")
@@ -201,7 +201,7 @@ public class TriggerDefinitionModel {
   /**
    * The list of action properties.
    * @return properties
-  */
+   */
   @Valid 
   @Schema(name = "properties", description = "The list of action properties.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("properties")
@@ -221,7 +221,7 @@ public class TriggerDefinitionModel {
   /**
    * The title
    * @return title
-  */
+   */
   
   @Schema(name = "title", description = "The title", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("title")
@@ -241,7 +241,7 @@ public class TriggerDefinitionModel {
   /**
    * Get type
    * @return type
-  */
+   */
   @NotNull @Valid 
   @Schema(name = "type", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("type")
@@ -261,7 +261,7 @@ public class TriggerDefinitionModel {
   /**
    * Does trigger define dynamic node description.
    * @return workflowNodeDescriptionDefined
-  */
+   */
   
   @Schema(name = "workflowNodeDescriptionDefined", description = "Does trigger define dynamic node description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowNodeDescriptionDefined")

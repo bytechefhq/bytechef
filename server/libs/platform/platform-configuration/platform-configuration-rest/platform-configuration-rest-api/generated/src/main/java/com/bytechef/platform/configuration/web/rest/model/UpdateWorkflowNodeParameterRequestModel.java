@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("updateWorkflowNodeParameter_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T08:55:29.450670+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T11:10:11.248638+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class UpdateWorkflowNodeParameterRequestModel {
 
   private Boolean includeInMetadata = false;
@@ -54,7 +54,7 @@ public class UpdateWorkflowNodeParameterRequestModel {
   /**
    * If path and value type should be included in metadata 
    * @return includeInMetadata
-  */
+   */
   
   @Schema(name = "includeInMetadata", description = "If path and value type should be included in metadata ", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("includeInMetadata")
@@ -74,7 +74,7 @@ public class UpdateWorkflowNodeParameterRequestModel {
   /**
    * The workflow node parameter path.
    * @return path
-  */
+   */
   @NotNull 
   @Schema(name = "path", description = "The workflow node parameter path.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("path")
@@ -94,7 +94,7 @@ public class UpdateWorkflowNodeParameterRequestModel {
   /**
    * The type of a property.
    * @return type
-  */
+   */
   @NotNull 
   @Schema(name = "type", description = "The type of a property.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("type")
@@ -114,7 +114,7 @@ public class UpdateWorkflowNodeParameterRequestModel {
   /**
    * The value.
    * @return value
-  */
+   */
   
   @Schema(name = "value", description = "The value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("value")
@@ -134,7 +134,7 @@ public class UpdateWorkflowNodeParameterRequestModel {
   /**
    * The workflow node name.
    * @return workflowNodeName
-  */
+   */
   @NotNull 
   @Schema(name = "workflowNodeName", description = "The workflow node name.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("workflowNodeName")

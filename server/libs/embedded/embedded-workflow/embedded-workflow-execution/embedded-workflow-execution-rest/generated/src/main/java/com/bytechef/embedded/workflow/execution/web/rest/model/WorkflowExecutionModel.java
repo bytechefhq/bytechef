@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowExecution", description = "Contains information about execution of a Integration workflow.")
 @JsonTypeName("WorkflowExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:41.203613+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T10:08:04.405111+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class WorkflowExecutionModel {
 
   private Long id;
@@ -46,7 +46,7 @@ public class WorkflowExecutionModel {
   /**
    * The id of a workflow execution.
    * @return id
-  */
+   */
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a workflow execution.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
@@ -66,7 +66,7 @@ public class WorkflowExecutionModel {
   /**
    * Get integration
    * @return integration
-  */
+   */
   @Valid 
   @Schema(name = "integration", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integration")
@@ -86,7 +86,7 @@ public class WorkflowExecutionModel {
   /**
    * Get integrationInstanceConfiguration
    * @return integrationInstanceConfiguration
-  */
+   */
   @Valid 
   @Schema(name = "integrationInstanceConfiguration", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationInstanceConfiguration")
@@ -106,7 +106,7 @@ public class WorkflowExecutionModel {
   /**
    * Get integrationInstance
    * @return integrationInstance
-  */
+   */
   @Valid 
   @Schema(name = "integrationInstance", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationInstance")
@@ -126,7 +126,7 @@ public class WorkflowExecutionModel {
   /**
    * Get job
    * @return job
-  */
+   */
   @Valid 
   @Schema(name = "job", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("job")
@@ -146,7 +146,7 @@ public class WorkflowExecutionModel {
   /**
    * Get triggerExecution
    * @return triggerExecution
-  */
+   */
   @Valid 
   @Schema(name = "triggerExecution", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("triggerExecution")
@@ -166,7 +166,7 @@ public class WorkflowExecutionModel {
   /**
    * Get workflow
    * @return workflow
-  */
+   */
   @Valid 
   @Schema(name = "workflow", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflow")

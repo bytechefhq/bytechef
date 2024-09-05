@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "AdminApiKey", description = "Contains generated key required for calling public Platform API.")
 @JsonTypeName("AdminApiKey")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-23T15:57:36.320238+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T10:08:05.684307+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class AdminApiKeyModel {
 
   private String createdBy;
@@ -65,7 +65,7 @@ public class AdminApiKeyModel {
   /**
    * The created by.
    * @return createdBy
-  */
+   */
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
@@ -85,7 +85,7 @@ public class AdminApiKeyModel {
   /**
    * The created date.
    * @return createdDate
-  */
+   */
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
@@ -105,7 +105,7 @@ public class AdminApiKeyModel {
   /**
    * The id of an admin api key.
    * @return id
-  */
+   */
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an admin api key.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
@@ -125,7 +125,7 @@ public class AdminApiKeyModel {
   /**
    * The last modified by.
    * @return lastModifiedBy
-  */
+   */
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
@@ -145,7 +145,7 @@ public class AdminApiKeyModel {
   /**
    * The last modified date.
    * @return lastModifiedDate
-  */
+   */
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
@@ -165,7 +165,7 @@ public class AdminApiKeyModel {
   /**
    * The last used date.
    * @return lastUsedDate
-  */
+   */
   @Valid 
   @Schema(name = "lastUsedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last used date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastUsedDate")
@@ -185,7 +185,7 @@ public class AdminApiKeyModel {
   /**
    * The name of an admin api key.
    * @return name
-  */
+   */
   @NotNull 
   @Schema(name = "name", description = "The name of an admin api key.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
@@ -205,7 +205,7 @@ public class AdminApiKeyModel {
   /**
    * The preview of secret admin api key.
    * @return secretKey
-  */
+   */
   
   @Schema(name = "secretKey", accessMode = Schema.AccessMode.READ_ONLY, description = "The preview of secret admin api key.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("secretKey")

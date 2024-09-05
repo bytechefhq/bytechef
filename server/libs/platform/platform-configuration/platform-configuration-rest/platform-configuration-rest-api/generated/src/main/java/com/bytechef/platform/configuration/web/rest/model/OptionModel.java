@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Option", description = "Defines valid property value.")
 @JsonTypeName("Option")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T08:55:29.450670+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T11:10:11.248638+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class OptionModel {
 
   private String description;
@@ -41,7 +41,7 @@ public class OptionModel {
   /**
    * Description of the option.
    * @return description
-  */
+   */
   
   @Schema(name = "description", description = "Description of the option.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
@@ -61,7 +61,7 @@ public class OptionModel {
   /**
    * The label of an option.
    * @return label
-  */
+   */
   
   @Schema(name = "label", description = "The label of an option.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("label")
@@ -81,7 +81,7 @@ public class OptionModel {
   /**
    * Can be anything: string, number, array, object, etc. (except `null`)
    * @return value
-  */
+   */
   
   @Schema(name = "value", description = "Can be anything: string, number, array, object, etc. (except `null`)", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("value")

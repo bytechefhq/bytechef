@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ConnectedUserIntegrationInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:39.953199+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T10:08:02.604892+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class ConnectedUserIntegrationInstanceModel {
 
   private String componentName;
@@ -46,7 +46,7 @@ public class ConnectedUserIntegrationInstanceModel {
   /**
    * The name of a component.
    * @return componentName
-  */
+   */
   
   @Schema(name = "componentName", description = "The name of a component.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("componentName")
@@ -66,7 +66,7 @@ public class ConnectedUserIntegrationInstanceModel {
   /**
    * If an integration's instance is enable dor not.
    * @return enabled
-  */
+   */
   
   @Schema(name = "enabled", description = "If an integration's instance is enable dor not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("enabled")
@@ -86,7 +86,7 @@ public class ConnectedUserIntegrationInstanceModel {
   /**
    * The id of an integration instance.
    * @return id
-  */
+   */
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an integration instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
@@ -106,7 +106,7 @@ public class ConnectedUserIntegrationInstanceModel {
   /**
    * The id of an integration.
    * @return integrationId
-  */
+   */
   
   @Schema(name = "integrationId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationId")
@@ -126,7 +126,7 @@ public class ConnectedUserIntegrationInstanceModel {
   /**
    * The version of an integration.
    * @return integrationVersion
-  */
+   */
   
   @Schema(name = "integrationVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The version of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationVersion")
@@ -146,7 +146,7 @@ public class ConnectedUserIntegrationInstanceModel {
   /**
    * The id of a connection.
    * @return connectionId
-  */
+   */
   
   @Schema(name = "connectionId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connectionId")
@@ -166,7 +166,7 @@ public class ConnectedUserIntegrationInstanceModel {
   /**
    * Get credentialStatus
    * @return credentialStatus
-  */
+   */
   @Valid 
   @Schema(name = "credentialStatus", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("credentialStatus")

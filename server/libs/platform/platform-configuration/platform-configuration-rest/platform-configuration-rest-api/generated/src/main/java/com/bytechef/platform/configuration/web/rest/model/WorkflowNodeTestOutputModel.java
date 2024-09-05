@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowNodeTestOutput", description = "Contains test output of a workflow node.")
 @JsonTypeName("WorkflowNodeTestOutput")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T08:55:29.450670+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T11:10:11.248638+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class WorkflowNodeTestOutputModel {
 
   private Long id;
@@ -38,7 +38,7 @@ public class WorkflowNodeTestOutputModel {
   /**
    * The workflow test node output id
    * @return id
-  */
+   */
   
   @Schema(name = "id", description = "The workflow test node output id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
@@ -58,7 +58,7 @@ public class WorkflowNodeTestOutputModel {
   /**
    * The workflow node name.
    * @return workflowNodeName
-  */
+   */
   
   @Schema(name = "workflowNodeName", description = "The workflow node name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowNodeName")
@@ -78,7 +78,7 @@ public class WorkflowNodeTestOutputModel {
   /**
    * The workflow id.
    * @return workflowId
-  */
+   */
   
   @Schema(name = "workflowId", description = "The workflow id.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowId")

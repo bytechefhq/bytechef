@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstanceBasic", description = "Contains configurations and connections required for the execution of project workflows.")
 @JsonTypeName("ProjectInstanceBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:40.306014+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T10:08:03.100799+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class ProjectInstanceBasicModel {
 
   private String createdBy;
@@ -74,7 +74,7 @@ public class ProjectInstanceBasicModel {
   /**
    * The created by.
    * @return createdBy
-  */
+   */
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
@@ -94,7 +94,7 @@ public class ProjectInstanceBasicModel {
   /**
    * The created date.
    * @return createdDate
-  */
+   */
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
@@ -114,7 +114,7 @@ public class ProjectInstanceBasicModel {
   /**
    * The description of a project instance.
    * @return description
-  */
+   */
   
   @Schema(name = "description", description = "The description of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
@@ -134,7 +134,7 @@ public class ProjectInstanceBasicModel {
   /**
    * If a project instance is enabled or not.
    * @return enabled
-  */
+   */
   
   @Schema(name = "enabled", description = "If a project instance is enabled or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("enabled")
@@ -154,7 +154,7 @@ public class ProjectInstanceBasicModel {
   /**
    * Get environment
    * @return environment
-  */
+   */
   @Valid 
   @Schema(name = "environment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("environment")
@@ -174,7 +174,7 @@ public class ProjectInstanceBasicModel {
   /**
    * The id of a project instance.
    * @return id
-  */
+   */
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
@@ -194,7 +194,7 @@ public class ProjectInstanceBasicModel {
   /**
    * The last execution date.
    * @return lastExecutionDate
-  */
+   */
   @Valid 
   @Schema(name = "lastExecutionDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last execution date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastExecutionDate")
@@ -214,7 +214,7 @@ public class ProjectInstanceBasicModel {
   /**
    * The last modified by.
    * @return lastModifiedBy
-  */
+   */
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
@@ -234,7 +234,7 @@ public class ProjectInstanceBasicModel {
   /**
    * The last modified date.
    * @return lastModifiedDate
-  */
+   */
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
@@ -254,7 +254,7 @@ public class ProjectInstanceBasicModel {
   /**
    * The name of a project instance.
    * @return name
-  */
+   */
   @NotNull 
   @Schema(name = "name", description = "The name of a project instance.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
@@ -274,7 +274,7 @@ public class ProjectInstanceBasicModel {
   /**
    * The id of a project.
    * @return projectId
-  */
+   */
   
   @Schema(name = "projectId", description = "The id of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("projectId")
@@ -294,7 +294,7 @@ public class ProjectInstanceBasicModel {
   /**
    * The version of a project.
    * @return projectVersion
-  */
+   */
   
   @Schema(name = "projectVersion", description = "The version of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("projectVersion")

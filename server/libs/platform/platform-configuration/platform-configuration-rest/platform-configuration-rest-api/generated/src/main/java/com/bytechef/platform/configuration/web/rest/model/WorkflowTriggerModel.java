@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTrigger", description = "Represents a definition of a workflow trigger.")
 @JsonTypeName("WorkflowTrigger")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T08:55:29.450670+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T11:10:11.248638+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class WorkflowTriggerModel {
 
   @Valid
@@ -77,7 +77,7 @@ public class WorkflowTriggerModel {
   /**
    * Get connections
    * @return connections
-  */
+   */
   @Valid 
   @Schema(name = "connections", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connections")
@@ -97,7 +97,7 @@ public class WorkflowTriggerModel {
   /**
    * The description of the task.
    * @return description
-  */
+   */
   
   @Schema(name = "description", description = "The description of the task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
@@ -117,7 +117,7 @@ public class WorkflowTriggerModel {
   /**
    * The human-readable description of the task.
    * @return label
-  */
+   */
   
   @Schema(name = "label", description = "The human-readable description of the task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("label")
@@ -145,7 +145,7 @@ public class WorkflowTriggerModel {
   /**
    * Key-value map of metadata.
    * @return metadata
-  */
+   */
   
   @Schema(name = "metadata", description = "Key-value map of metadata.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("metadata")
@@ -165,7 +165,7 @@ public class WorkflowTriggerModel {
   /**
    * The identifier name of the task. Task names are used for assigning the output of one task so it can be later used by subsequent tasks.
    * @return name
-  */
+   */
   @NotNull 
   @Schema(name = "name", description = "The identifier name of the task. Task names are used for assigning the output of one task so it can be later used by subsequent tasks.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
@@ -193,7 +193,7 @@ public class WorkflowTriggerModel {
   /**
    * Key-value map of task parameters.
    * @return parameters
-  */
+   */
   
   @Schema(name = "parameters", description = "Key-value map of task parameters.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("parameters")
@@ -213,7 +213,7 @@ public class WorkflowTriggerModel {
   /**
    * The timeout expression which describes when a trigger should be deemed as timed-out.
    * @return timeout
-  */
+   */
   
   @Schema(name = "timeout", description = "The timeout expression which describes when a trigger should be deemed as timed-out.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("timeout")
@@ -233,7 +233,7 @@ public class WorkflowTriggerModel {
   /**
    * The type of the trigger.
    * @return type
-  */
+   */
   @NotNull 
   @Schema(name = "type", description = "The type of the trigger.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("type")

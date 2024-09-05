@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("WorkflowConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T08:55:29.450670+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T11:10:11.248638+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class WorkflowConnectionModel {
 
   private String componentName;
@@ -56,7 +56,7 @@ public class WorkflowConnectionModel {
   /**
    * The name of the component
    * @return componentName
-  */
+   */
   @NotNull 
   @Schema(name = "componentName", description = "The name of the component", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("componentName")
@@ -76,7 +76,7 @@ public class WorkflowConnectionModel {
   /**
    * The version of the component
    * @return componentVersion
-  */
+   */
   @NotNull 
   @Schema(name = "componentVersion", description = "The version of the component", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("componentVersion")
@@ -96,7 +96,7 @@ public class WorkflowConnectionModel {
   /**
    * The key of the connection
    * @return key
-  */
+   */
   @NotNull 
   @Schema(name = "key", description = "The key of the connection", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("key")
@@ -116,7 +116,7 @@ public class WorkflowConnectionModel {
   /**
    * If the connection is required, or not
    * @return required
-  */
+   */
   @NotNull 
   @Schema(name = "required", description = "If the connection is required, or not", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("required")
@@ -136,7 +136,7 @@ public class WorkflowConnectionModel {
   /**
    * Get workflowNodeName
    * @return workflowNodeName
-  */
+   */
   @NotNull 
   @Schema(name = "workflowNodeName", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("workflowNodeName")

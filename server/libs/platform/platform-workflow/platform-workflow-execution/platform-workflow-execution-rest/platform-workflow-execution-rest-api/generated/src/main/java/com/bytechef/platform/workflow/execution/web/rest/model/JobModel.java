@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Job", description = "Represents an execution of a workflow.")
 @JsonTypeName("Job")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:42.260068+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T10:08:05.971353+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class JobModel {
 
   private String createdBy;
@@ -141,7 +141,7 @@ public class JobModel {
   /**
    * The created by.
    * @return createdBy
-  */
+   */
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
@@ -161,7 +161,7 @@ public class JobModel {
   /**
    * The created date.
    * @return createdDate
-  */
+   */
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
@@ -181,7 +181,7 @@ public class JobModel {
   /**
    * The index of the step on the job's workflow on which the job is working on right now.
    * @return currentTask
-  */
+   */
   
   @Schema(name = "currentTask", accessMode = Schema.AccessMode.READ_ONLY, description = "The index of the step on the job's workflow on which the job is working on right now.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("currentTask")
@@ -201,7 +201,7 @@ public class JobModel {
   /**
    * The time execution entered end status COMPLETED, STOPPED, FAILED
    * @return endDate
-  */
+   */
   @Valid 
   @Schema(name = "endDate", description = "The time execution entered end status COMPLETED, STOPPED, FAILED", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("endDate")
@@ -221,7 +221,7 @@ public class JobModel {
   /**
    * Get error
    * @return error
-  */
+   */
   @Valid 
   @Schema(name = "error", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("error")
@@ -241,7 +241,7 @@ public class JobModel {
   /**
    * The id of a job.
    * @return id
-  */
+   */
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a job.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
@@ -269,7 +269,7 @@ public class JobModel {
   /**
    * The key-value map of the inputs passed to the job when it was created.
    * @return inputs
-  */
+   */
   
   @Schema(name = "inputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The key-value map of the inputs passed to the job when it was created.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("inputs")
@@ -289,7 +289,7 @@ public class JobModel {
   /**
    * The job's human-readable name.
    * @return label
-  */
+   */
   
   @Schema(name = "label", accessMode = Schema.AccessMode.READ_ONLY, description = "The job's human-readable name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("label")
@@ -309,7 +309,7 @@ public class JobModel {
   /**
    * The last modified by.
    * @return lastModifiedBy
-  */
+   */
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
@@ -329,7 +329,7 @@ public class JobModel {
   /**
    * The last modified date.
    * @return lastModifiedDate
-  */
+   */
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
@@ -357,7 +357,7 @@ public class JobModel {
   /**
    * The key-value map of the outputs returned.
    * @return outputs
-  */
+   */
   
   @Schema(name = "outputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The key-value map of the outputs returned.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("outputs")
@@ -377,7 +377,7 @@ public class JobModel {
   /**
    * The id of the parent task that created this job. Required for sub-flows.
    * @return parentTaskExecutionId
-  */
+   */
   
   @Schema(name = "parentTaskExecutionId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of the parent task that created this job. Required for sub-flows.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("parentTaskExecutionId")
@@ -397,7 +397,7 @@ public class JobModel {
   /**
    * The priority value.
    * @return priority
-  */
+   */
   
   @Schema(name = "priority", accessMode = Schema.AccessMode.READ_ONLY, description = "The priority value.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("priority")
@@ -417,7 +417,7 @@ public class JobModel {
   /**
    * The time of when the job began.
    * @return startDate
-  */
+   */
   @Valid 
   @Schema(name = "startDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The time of when the job began.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("startDate")
@@ -437,7 +437,7 @@ public class JobModel {
   /**
    * The job's status.
    * @return status
-  */
+   */
   
   @Schema(name = "status", accessMode = Schema.AccessMode.READ_ONLY, description = "The job's status.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("status")
@@ -465,7 +465,7 @@ public class JobModel {
   /**
    * Get taskExecutions
    * @return taskExecutions
-  */
+   */
   @Valid 
   @Schema(name = "taskExecutions", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("taskExecutions")
@@ -493,7 +493,7 @@ public class JobModel {
   /**
    * The list of the webhooks configured.
    * @return webhooks
-  */
+   */
   @Valid 
   @Schema(name = "webhooks", accessMode = Schema.AccessMode.READ_ONLY, description = "The list of the webhooks configured.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("webhooks")
@@ -513,7 +513,7 @@ public class JobModel {
   /**
    * Get workflowId
    * @return workflowId
-  */
+   */
   
   @Schema(name = "workflowId", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowId")

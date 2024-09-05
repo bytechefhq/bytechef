@@ -47,7 +47,7 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = ValuePropertyModel.class, name = "ValueProperty")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T08:55:29.450670+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T11:10:11.248638+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class PropertyModel {
 
   private Boolean advancedOption = false;
@@ -85,7 +85,7 @@ public class PropertyModel {
   /**
    * If the property should be grouped under advanced options.
    * @return advancedOption
-  */
+   */
   
   @Schema(name = "advancedOption", description = "If the property should be grouped under advanced options.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("advancedOption")
@@ -105,7 +105,7 @@ public class PropertyModel {
   /**
    * The property description.
    * @return description
-  */
+   */
   
   @Schema(name = "description", description = "The property description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
@@ -125,7 +125,7 @@ public class PropertyModel {
   /**
    * Defines rules when the property should be shown or hidden.
    * @return displayCondition
-  */
+   */
   
   @Schema(name = "displayCondition", description = "Defines rules when the property should be shown or hidden.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("displayCondition")
@@ -145,7 +145,7 @@ public class PropertyModel {
   /**
    * Defines if the property can contain expressions or only constant values. Defaults to true.
    * @return expressionEnabled
-  */
+   */
   
   @Schema(name = "expressionEnabled", description = "Defines if the property can contain expressions or only constant values. Defaults to true.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("expressionEnabled")
@@ -165,7 +165,7 @@ public class PropertyModel {
   /**
    * If the property should be visible or not.
    * @return hidden
-  */
+   */
   
   @Schema(name = "hidden", description = "If the property should be visible or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("hidden")
@@ -185,7 +185,7 @@ public class PropertyModel {
   /**
    * The property name.
    * @return name
-  */
+   */
   
   @Schema(name = "name", description = "The property name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("name")
@@ -205,7 +205,7 @@ public class PropertyModel {
   /**
    * If the property is required or not.
    * @return required
-  */
+   */
   
   @Schema(name = "required", description = "If the property is required or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("required")
@@ -225,7 +225,7 @@ public class PropertyModel {
   /**
    * Get type
    * @return type
-  */
+   */
   @NotNull @Valid 
   @Schema(name = "type", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("type")

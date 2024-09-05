@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("WorkflowInput")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T08:55:29.450670+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T11:10:11.248638+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class WorkflowInputModel {
 
   private String label;
@@ -50,7 +50,7 @@ public class WorkflowInputModel {
   /**
    * The descriptive name of an input
    * @return label
-  */
+   */
   
   @Schema(name = "label", description = "The descriptive name of an input", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("label")
@@ -70,7 +70,7 @@ public class WorkflowInputModel {
   /**
    * The name of an input
    * @return name
-  */
+   */
   @NotNull 
   @Schema(name = "name", description = "The name of an input", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
@@ -90,7 +90,7 @@ public class WorkflowInputModel {
   /**
    * If an input is required, or not
    * @return required
-  */
+   */
   
   @Schema(name = "required", description = "If an input is required, or not", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("required")
@@ -110,7 +110,7 @@ public class WorkflowInputModel {
   /**
    * The type of an input, for example \\\"string\\\"
    * @return type
-  */
+   */
   
   @Schema(name = "type", description = "The type of an input, for example \\\"string\\\"", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("type")

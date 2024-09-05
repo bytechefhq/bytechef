@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:40.820234+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T10:08:03.892557+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class IntegrationModel {
 
   private Boolean allowMultipleInstances = false;
@@ -92,7 +92,7 @@ public class IntegrationModel {
   /**
    * If multiple instances of an integration are allowed or not.
    * @return allowMultipleInstances
-  */
+   */
   @NotNull 
   @Schema(name = "allowMultipleInstances", description = "If multiple instances of an integration are allowed or not.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("allowMultipleInstances")
@@ -112,7 +112,7 @@ public class IntegrationModel {
   /**
    * The name of the integration's component.
    * @return componentName
-  */
+   */
   @NotNull 
   @Schema(name = "componentName", description = "The name of the integration's component.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("componentName")
@@ -132,7 +132,7 @@ public class IntegrationModel {
   /**
    * The version of the integration's component.
    * @return componentVersion
-  */
+   */
   @NotNull 
   @Schema(name = "componentVersion", description = "The version of the integration's component.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("componentVersion")
@@ -152,7 +152,7 @@ public class IntegrationModel {
   /**
    * The created by.
    * @return createdBy
-  */
+   */
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
@@ -172,7 +172,7 @@ public class IntegrationModel {
   /**
    * The created date.
    * @return createdDate
-  */
+   */
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
@@ -192,7 +192,7 @@ public class IntegrationModel {
   /**
    * The description of an integration.
    * @return description
-  */
+   */
   
   @Schema(name = "description", description = "The description of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
@@ -212,7 +212,7 @@ public class IntegrationModel {
   /**
    * The id of an integration.
    * @return id
-  */
+   */
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
@@ -232,7 +232,7 @@ public class IntegrationModel {
   /**
    * The last modified by.
    * @return lastModifiedBy
-  */
+   */
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
@@ -252,7 +252,7 @@ public class IntegrationModel {
   /**
    * The last modified date.
    * @return lastModifiedDate
-  */
+   */
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
@@ -272,7 +272,7 @@ public class IntegrationModel {
   /**
    * The last published date.
    * @return lastPublishedDate
-  */
+   */
   @Valid 
   @Schema(name = "lastPublishedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last published date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastPublishedDate")
@@ -292,7 +292,7 @@ public class IntegrationModel {
   /**
    * Get lastStatus
    * @return lastStatus
-  */
+   */
   @Valid 
   @Schema(name = "lastStatus", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastStatus")
@@ -312,7 +312,7 @@ public class IntegrationModel {
   /**
    * The last version of an integration.
    * @return lastIntegrationVersion
-  */
+   */
   
   @Schema(name = "lastIntegrationVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The last version of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastIntegrationVersion")
@@ -332,7 +332,7 @@ public class IntegrationModel {
   /**
    * The name of an integration.
    * @return name
-  */
+   */
   
   @Schema(name = "name", description = "The name of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("name")
@@ -352,7 +352,7 @@ public class IntegrationModel {
   /**
    * Get category
    * @return category
-  */
+   */
   @Valid 
   @Schema(name = "category", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("category")
@@ -380,7 +380,7 @@ public class IntegrationModel {
   /**
    * The integration workflow ids belonging to this integration.
    * @return integrationWorkflowIds
-  */
+   */
   
   @Schema(name = "integrationWorkflowIds", description = "The integration workflow ids belonging to this integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationWorkflowIds")
@@ -408,7 +408,7 @@ public class IntegrationModel {
   /**
    * Get tags
    * @return tags
-  */
+   */
   @Valid 
   @Schema(name = "tags", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("tags")
@@ -428,7 +428,7 @@ public class IntegrationModel {
   /**
    * Get version
    * @return version
-  */
+   */
   
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("__version")

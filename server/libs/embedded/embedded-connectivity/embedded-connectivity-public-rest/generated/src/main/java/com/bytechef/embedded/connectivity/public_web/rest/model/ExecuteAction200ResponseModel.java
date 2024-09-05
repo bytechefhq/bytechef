@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("executeAction_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:40.093184+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T10:08:02.832388+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class ExecuteAction200ResponseModel {
 
   private Object output;
@@ -33,7 +33,7 @@ public class ExecuteAction200ResponseModel {
   /**
    * The result of the action call.
    * @return output
-  */
+   */
   
   @Schema(name = "output", description = "The result of the action call.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("output")

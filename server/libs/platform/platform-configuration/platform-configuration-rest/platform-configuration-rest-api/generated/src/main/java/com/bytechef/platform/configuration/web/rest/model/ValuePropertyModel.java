@@ -48,7 +48,7 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = TimePropertyModel.class, name = "TIME")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T08:55:29.450670+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T11:10:11.248638+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class ValuePropertyModel extends PropertyModel {
 
   private ControlTypeModel controlType;
@@ -77,7 +77,7 @@ public class ValuePropertyModel extends PropertyModel {
   /**
    * Get controlType
    * @return controlType
-  */
+   */
   @NotNull @Valid 
   @Schema(name = "controlType", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("controlType")
@@ -97,7 +97,7 @@ public class ValuePropertyModel extends PropertyModel {
   /**
    * The property label.
    * @return label
-  */
+   */
   
   @Schema(name = "label", description = "The property label.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("label")
@@ -117,7 +117,7 @@ public class ValuePropertyModel extends PropertyModel {
   /**
    * The property placeholder.
    * @return placeholder
-  */
+   */
   
   @Schema(name = "placeholder", description = "The property placeholder.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("placeholder")

@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstanceWorkflow", description = "Contains configuration and connections required for the execution of a particular project workflow.")
 @JsonTypeName("ProjectInstanceWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:40.306014+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T10:08:03.100799+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class ProjectInstanceWorkflowModel {
 
   private String createdBy;
@@ -73,7 +73,7 @@ public class ProjectInstanceWorkflowModel {
   /**
    * The created by.
    * @return createdBy
-  */
+   */
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
@@ -93,7 +93,7 @@ public class ProjectInstanceWorkflowModel {
   /**
    * The created date.
    * @return createdDate
-  */
+   */
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
@@ -121,7 +121,7 @@ public class ProjectInstanceWorkflowModel {
   /**
    * The input parameters of an project instance used as workflow input values.
    * @return inputs
-  */
+   */
   
   @Schema(name = "inputs", description = "The input parameters of an project instance used as workflow input values.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("inputs")
@@ -149,7 +149,7 @@ public class ProjectInstanceWorkflowModel {
   /**
    * The connections used by a project instance.
    * @return connections
-  */
+   */
   @Valid 
   @Schema(name = "connections", description = "The connections used by a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connections")
@@ -169,7 +169,7 @@ public class ProjectInstanceWorkflowModel {
   /**
    * If a workflow is enabled or not in the project instance workflow.
    * @return enabled
-  */
+   */
   
   @Schema(name = "enabled", description = "If a workflow is enabled or not in the project instance workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("enabled")
@@ -189,7 +189,7 @@ public class ProjectInstanceWorkflowModel {
   /**
    * The id of a project instance workflow.
    * @return id
-  */
+   */
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a project instance workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
@@ -209,7 +209,7 @@ public class ProjectInstanceWorkflowModel {
   /**
    * The last execution date of a project instance.
    * @return lastExecutionDate
-  */
+   */
   @Valid 
   @Schema(name = "lastExecutionDate", description = "The last execution date of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastExecutionDate")
@@ -229,7 +229,7 @@ public class ProjectInstanceWorkflowModel {
   /**
    * The last modified by.
    * @return lastModifiedBy
-  */
+   */
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
@@ -249,7 +249,7 @@ public class ProjectInstanceWorkflowModel {
   /**
    * The last modified date.
    * @return lastModifiedDate
-  */
+   */
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
@@ -269,7 +269,7 @@ public class ProjectInstanceWorkflowModel {
   /**
    * The id of a project instance.
    * @return projectInstanceId
-  */
+   */
   
   @Schema(name = "projectInstanceId", description = "The id of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("projectInstanceId")
@@ -289,7 +289,7 @@ public class ProjectInstanceWorkflowModel {
   /**
    * The url of a static url used to trigger a workflow.
    * @return staticWebhookUrl
-  */
+   */
   
   @Schema(name = "staticWebhookUrl", description = "The url of a static url used to trigger a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("staticWebhookUrl")
@@ -309,7 +309,7 @@ public class ProjectInstanceWorkflowModel {
   /**
    * The id of a workflow.
    * @return workflowId
-  */
+   */
   
   @Schema(name = "workflowId", description = "The id of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowId")
@@ -329,7 +329,7 @@ public class ProjectInstanceWorkflowModel {
   /**
    * The workflow reference code
    * @return workflowReferenceCode
-  */
+   */
   
   @Schema(name = "workflowReferenceCode", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow reference code", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowReferenceCode")
@@ -349,7 +349,7 @@ public class ProjectInstanceWorkflowModel {
   /**
    * Get version
    * @return version
-  */
+   */
   
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("__version")

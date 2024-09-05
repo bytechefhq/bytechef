@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskDispatcherDefinition", description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
 @JsonTypeName("TaskDispatcherDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T08:55:29.450670+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T11:10:11.248638+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class TaskDispatcherDefinitionModel {
 
   private String description;
@@ -58,8 +58,9 @@ public class TaskDispatcherDefinitionModel {
   /**
    * Constructor with only required parameters
    */
-  public TaskDispatcherDefinitionModel(String name, Integer version) {
+  public TaskDispatcherDefinitionModel(String name, Boolean outputDefined, Integer version) {
     this.name = name;
+    this.outputDefined = outputDefined;
     this.version = version;
   }
 
@@ -71,7 +72,7 @@ public class TaskDispatcherDefinitionModel {
   /**
    * The description.
    * @return description
-  */
+   */
   
   @Schema(name = "description", description = "The description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
@@ -91,7 +92,7 @@ public class TaskDispatcherDefinitionModel {
   /**
    * The icon.
    * @return icon
-  */
+   */
   
   @Schema(name = "icon", description = "The icon.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("icon")
@@ -111,7 +112,7 @@ public class TaskDispatcherDefinitionModel {
   /**
    * The task dispatcher name..
    * @return name
-  */
+   */
   @NotNull 
   @Schema(name = "name", description = "The task dispatcher name..", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
@@ -131,7 +132,7 @@ public class TaskDispatcherDefinitionModel {
   /**
    * Does task dispatcher define output schema.
    * @return outputDefined
-  */
+   */
   @NotNull 
   @Schema(name = "outputDefined", description = "Does task dispatcher define output schema.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("outputDefined")
@@ -159,7 +160,7 @@ public class TaskDispatcherDefinitionModel {
   /**
    * The list of task dispatcher properties.
    * @return properties
-  */
+   */
   @Valid 
   @Schema(name = "properties", description = "The list of task dispatcher properties.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("properties")
@@ -179,7 +180,7 @@ public class TaskDispatcherDefinitionModel {
   /**
    * Get resources
    * @return resources
-  */
+   */
   @Valid 
   @Schema(name = "resources", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("resources")
@@ -207,7 +208,7 @@ public class TaskDispatcherDefinitionModel {
   /**
    * Properties used to define tasks to be dispatched.
    * @return taskProperties
-  */
+   */
   @Valid 
   @Schema(name = "taskProperties", description = "Properties used to define tasks to be dispatched.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("taskProperties")
@@ -227,7 +228,7 @@ public class TaskDispatcherDefinitionModel {
   /**
    * The title
    * @return title
-  */
+   */
   
   @Schema(name = "title", description = "The title", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("title")
@@ -247,7 +248,7 @@ public class TaskDispatcherDefinitionModel {
   /**
    * Does task dispatcher define dynamic variable properties.
    * @return variablePropertiesDefined
-  */
+   */
   
   @Schema(name = "variablePropertiesDefined", description = "Does task dispatcher define dynamic variable properties.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("variablePropertiesDefined")
@@ -267,7 +268,7 @@ public class TaskDispatcherDefinitionModel {
   /**
    * The version of a task dispatcher.
    * @return version
-  */
+   */
   @NotNull 
   @Schema(name = "version", description = "The version of a task dispatcher.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("version")

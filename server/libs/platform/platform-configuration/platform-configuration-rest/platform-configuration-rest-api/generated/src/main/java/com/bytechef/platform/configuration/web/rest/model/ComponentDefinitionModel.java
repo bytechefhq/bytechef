@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinition", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T08:55:29.450670+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T11:10:11.248638+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class ComponentDefinitionModel {
 
   @Valid
@@ -89,7 +89,7 @@ public class ComponentDefinitionModel {
   /**
    * The list of all available actions the component can perform.
    * @return actions
-  */
+   */
   @Valid 
   @Schema(name = "actions", description = "The list of all available actions the component can perform.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("actions")
@@ -117,7 +117,7 @@ public class ComponentDefinitionModel {
   /**
    * The list of categories the component belongs to.
    * @return categories
-  */
+   */
   @Valid 
   @Schema(name = "categories", description = "The list of categories the component belongs to.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("categories")
@@ -137,7 +137,7 @@ public class ComponentDefinitionModel {
   /**
    * Get connection
    * @return connection
-  */
+   */
   @Valid 
   @Schema(name = "connection", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connection")
@@ -157,7 +157,7 @@ public class ComponentDefinitionModel {
   /**
    * If connection is required or not if it is defined.
    * @return connectionRequired
-  */
+   */
   @NotNull 
   @Schema(name = "connectionRequired", description = "If connection is required or not if it is defined.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("connectionRequired")
@@ -177,7 +177,7 @@ public class ComponentDefinitionModel {
   /**
    * The description.
    * @return description
-  */
+   */
   
   @Schema(name = "description", description = "The description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
@@ -197,7 +197,7 @@ public class ComponentDefinitionModel {
   /**
    * The icon.
    * @return icon
-  */
+   */
   
   @Schema(name = "icon", description = "The icon.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("icon")
@@ -217,7 +217,7 @@ public class ComponentDefinitionModel {
   /**
    * The name.
    * @return name
-  */
+   */
   @NotNull 
   @Schema(name = "name", description = "The name.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
@@ -237,7 +237,7 @@ public class ComponentDefinitionModel {
   /**
    * Get resources
    * @return resources
-  */
+   */
   @Valid 
   @Schema(name = "resources", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("resources")
@@ -265,7 +265,7 @@ public class ComponentDefinitionModel {
   /**
    * Tags for categorization.
    * @return tags
-  */
+   */
   
   @Schema(name = "tags", description = "Tags for categorization.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("tags")
@@ -285,7 +285,7 @@ public class ComponentDefinitionModel {
   /**
    * The title
    * @return title
-  */
+   */
   
   @Schema(name = "title", description = "The title", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("title")
@@ -313,7 +313,7 @@ public class ComponentDefinitionModel {
   /**
    * The list of all available triggers the component can perform.
    * @return triggers
-  */
+   */
   @Valid 
   @Schema(name = "triggers", description = "The list of all available triggers the component can perform.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("triggers")
@@ -333,7 +333,7 @@ public class ComponentDefinitionModel {
   /**
    * The version of a component.
    * @return version
-  */
+   */
   @NotNull 
   @Schema(name = "version", description = "The version of a component.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("version")

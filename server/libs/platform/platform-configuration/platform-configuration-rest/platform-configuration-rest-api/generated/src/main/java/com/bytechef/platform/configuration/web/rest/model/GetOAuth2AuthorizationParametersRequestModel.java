@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "getOAuth2AuthorizationParameters_request", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("getOAuth2AuthorizationParameters_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T08:55:29.450670+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T11:10:11.248638+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class GetOAuth2AuthorizationParametersRequestModel {
 
   private String authorizationName;
@@ -55,7 +55,7 @@ public class GetOAuth2AuthorizationParametersRequestModel {
   /**
    * The name of an authorization used by this connection. Used for HTTP based services.
    * @return authorizationName
-  */
+   */
   
   @Schema(name = "authorizationName", description = "The name of an authorization used by this connection. Used for HTTP based services.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("authorizationName")
@@ -75,7 +75,7 @@ public class GetOAuth2AuthorizationParametersRequestModel {
   /**
    * The name of a component that uses this connection.
    * @return componentName
-  */
+   */
   @NotNull 
   @Schema(name = "componentName", description = "The name of a component that uses this connection.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("componentName")
@@ -95,7 +95,7 @@ public class GetOAuth2AuthorizationParametersRequestModel {
   /**
    * The version of a connection.
    * @return connectionVersion
-  */
+   */
   
   @Schema(name = "connectionVersion", description = "The version of a connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connectionVersion")
@@ -123,7 +123,7 @@ public class GetOAuth2AuthorizationParametersRequestModel {
   /**
    * The parameters of a connection.
    * @return parameters
-  */
+   */
   @NotNull 
   @Schema(name = "parameters", description = "The parameters of a connection.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("parameters")

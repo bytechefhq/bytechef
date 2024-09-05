@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceConfiguration", description = "Contains configurations and connections required for the execution of integration workflows.")
 @JsonTypeName("IntegrationInstanceConfiguration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-26T07:29:40.820234+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T10:08:03.892557+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class IntegrationInstanceConfigurationModel {
 
   private String createdBy;
@@ -100,7 +100,7 @@ public class IntegrationInstanceConfigurationModel {
   /**
    * The created by.
    * @return createdBy
-  */
+   */
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
@@ -120,7 +120,7 @@ public class IntegrationInstanceConfigurationModel {
   /**
    * The created date.
    * @return createdDate
-  */
+   */
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
@@ -140,7 +140,7 @@ public class IntegrationInstanceConfigurationModel {
   /**
    * The description of an integration configuration.
    * @return description
-  */
+   */
   
   @Schema(name = "description", description = "The description of an integration configuration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
@@ -160,7 +160,7 @@ public class IntegrationInstanceConfigurationModel {
   /**
    * If an integration instance configuration is enabled or not.
    * @return enabled
-  */
+   */
   
   @Schema(name = "enabled", description = "If an integration instance configuration is enabled or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("enabled")
@@ -180,7 +180,7 @@ public class IntegrationInstanceConfigurationModel {
   /**
    * Get environment
    * @return environment
-  */
+   */
   @Valid 
   @Schema(name = "environment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("environment")
@@ -200,7 +200,7 @@ public class IntegrationInstanceConfigurationModel {
   /**
    * The id of an integration instance configuration.
    * @return id
-  */
+   */
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an integration instance configuration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
@@ -220,7 +220,7 @@ public class IntegrationInstanceConfigurationModel {
   /**
    * Th id of an integration.
    * @return integrationId
-  */
+   */
   
   @Schema(name = "integrationId", description = "Th id of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationId")
@@ -240,7 +240,7 @@ public class IntegrationInstanceConfigurationModel {
   /**
    * The version of an integration.
    * @return integrationVersion
-  */
+   */
   
   @Schema(name = "integrationVersion", description = "The version of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationVersion")
@@ -260,7 +260,7 @@ public class IntegrationInstanceConfigurationModel {
   /**
    * The last execution date.
    * @return lastExecutionDate
-  */
+   */
   @Valid 
   @Schema(name = "lastExecutionDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last execution date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastExecutionDate")
@@ -280,7 +280,7 @@ public class IntegrationInstanceConfigurationModel {
   /**
    * The last modified by.
    * @return lastModifiedBy
-  */
+   */
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
@@ -300,7 +300,7 @@ public class IntegrationInstanceConfigurationModel {
   /**
    * The last modified date.
    * @return lastModifiedDate
-  */
+   */
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
@@ -320,7 +320,7 @@ public class IntegrationInstanceConfigurationModel {
   /**
    * The name of an integration instance configuration.
    * @return name
-  */
+   */
   @NotNull 
   @Schema(name = "name", description = "The name of an integration instance configuration.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
@@ -348,7 +348,7 @@ public class IntegrationInstanceConfigurationModel {
   /**
    * The authorization parameters of a connection.
    * @return connectionAuthorizationParameters
-  */
+   */
   
   @Schema(name = "connectionAuthorizationParameters", accessMode = Schema.AccessMode.READ_ONLY, description = "The authorization parameters of a connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connectionAuthorizationParameters")
@@ -376,7 +376,7 @@ public class IntegrationInstanceConfigurationModel {
   /**
    * The authorization parameters of a connection.
    * @return connectionConnectionParameters
-  */
+   */
   
   @Schema(name = "connectionConnectionParameters", accessMode = Schema.AccessMode.READ_ONLY, description = "The authorization parameters of a connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connectionConnectionParameters")
@@ -404,7 +404,7 @@ public class IntegrationInstanceConfigurationModel {
   /**
    * The parameters of an integration connection, usually oauth2 related data.
    * @return connectionParameters
-  */
+   */
   
   @Schema(name = "connectionParameters", description = "The parameters of an integration connection, usually oauth2 related data.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connectionParameters")
@@ -424,7 +424,7 @@ public class IntegrationInstanceConfigurationModel {
   /**
    * Get integration
    * @return integration
-  */
+   */
   
   @Schema(name = "integration", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integration")
@@ -452,7 +452,7 @@ public class IntegrationInstanceConfigurationModel {
   /**
    * The array of integration instance configuration workflows.
    * @return integrationInstanceConfigurationWorkflows
-  */
+   */
   @Valid 
   @Schema(name = "integrationInstanceConfigurationWorkflows", description = "The array of integration instance configuration workflows.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationInstanceConfigurationWorkflows")
@@ -480,7 +480,7 @@ public class IntegrationInstanceConfigurationModel {
   /**
    * The array of tags.
    * @return tags
-  */
+   */
   @Valid 
   @Schema(name = "tags", description = "The array of tags.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("tags")
@@ -500,7 +500,7 @@ public class IntegrationInstanceConfigurationModel {
   /**
    * Get version
    * @return version
-  */
+   */
   
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("__version")
