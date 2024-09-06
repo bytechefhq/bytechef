@@ -286,18 +286,15 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
 
     // Update nodeNames and componentActions when workflow definition changes
     useEffect(() => {
-        setWorkflow({
-            ...workflow,
-            nodeNames: [
-                ...(workflow.tasks?.map((task) => task.name) || []),
-                ...(workflow.triggers?.map((trigger) => trigger.name) || []),
-            ],
-        });
-
         const workflowComponents: Array<WorkflowTrigger & WorkflowTask> = [
             workflow.triggers?.[0] || defaultNodes[0].data,
             ...(workflow?.tasks || []),
         ];
+
+        setWorkflow({
+            ...workflow,
+            nodeNames: workflowComponents?.map((component) => component.name),
+        });
 
         setComponentActions(
             workflowComponents.map((component) => {
