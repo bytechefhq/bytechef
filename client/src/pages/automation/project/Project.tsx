@@ -122,7 +122,11 @@ const Project = () => {
         isLoading: taskDispatcherDefinitionsLoading,
     } = useGetTaskDispatcherDefinitionsQuery();
 
-    const {data: currentWorkflow} = useGetProjectWorkflowQuery(+projectId!, +projectWorkflowId!);
+    const {
+        data: currentWorkflow,
+        isFetched: isCurrentWorkflowFetched,
+        isFetching: isCurrentWorkflowFetching,
+    } = useGetProjectWorkflowQuery(+projectId!, +projectWorkflowId!);
 
     /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
     const {data: workflowTestConfiguration} = useGetWorkflowTestConfigurationQuery({workflowId: workflow?.id!});
@@ -304,11 +308,13 @@ const Project = () => {
                                                 updateWorkflowNodeParameterMutation,
                                             }}
                                         >
-                                            <WorkflowEditorLayout
-                                                componentDefinitions={componentDefinitions}
-                                                taskDispatcherDefinitions={taskDispatcherDefinitions}
-                                                updateWorkflowMutation={updateWorkflowMutation}
-                                            />
+                                            {!isCurrentWorkflowFetching && isCurrentWorkflowFetched && (
+                                                <WorkflowEditorLayout
+                                                    componentDefinitions={componentDefinitions}
+                                                    taskDispatcherDefinitions={taskDispatcherDefinitions}
+                                                    updateWorkflowMutation={updateWorkflowMutation}
+                                                />
+                                            )}
                                         </WorkflowNodeParameterMutationProvider>
                                     </WorkflowMutationProvider>
                                 </ConnectionReactQueryProvider>
