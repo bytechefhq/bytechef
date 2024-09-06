@@ -61,7 +61,7 @@ public class ScriptRubyAction {
                         .description("Add your Ruby custom logic here.")
                         .controlType(Property.ControlType.CODE_EDITOR)
                         .languageId("ruby")
-                        .defaultValue("def perform(input)\n\treturn null;\nend")
+                        .defaultValue("def perform(input, context)\n\treturn null;\nend")
                         .required(true))
                 .output(),
             "ruby", polyglotEngine);

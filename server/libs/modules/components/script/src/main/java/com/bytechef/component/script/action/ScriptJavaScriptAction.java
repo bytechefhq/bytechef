@@ -61,7 +61,7 @@ public class ScriptJavaScriptAction {
                         .description("Add your JavaScript custom logic here.")
                         .controlType(Property.ControlType.CODE_EDITOR)
                         .languageId("javascript")
-                        .defaultValue("function perform(input) {\n\treturn null;\n}")
+                        .defaultValue("function perform(input, context) {\n\treturn null;\n}")
                         .required(true))
                 .output(),
             "js", polyglotEngine);

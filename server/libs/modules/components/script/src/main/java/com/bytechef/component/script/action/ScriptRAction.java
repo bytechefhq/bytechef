@@ -61,7 +61,7 @@ public class ScriptRAction {
                         .description("Add your R custom logic here.")
                         .controlType(Property.ControlType.CODE_EDITOR)
                         .languageId("R")
-                        .defaultValue("perform <- function(input) {\n\treturn null\n}")
+                        .defaultValue("perform <- function(input, context) {\n\treturn null\n}")
                         .required(true))
                 .output(),
             "R", polyglotEngine);
