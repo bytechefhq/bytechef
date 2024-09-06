@@ -74,21 +74,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             if (Objects.equals(workflowTrigger.getName(), workflowNodeName)) {
-                WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
-
-                TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-                    workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                    workflowNodeType.componentOperationName());
-
-                OutputResponse outputResponse = workflowNodeTestOutputService
-                    .fetchWorkflowTestNodeOutput(workflowId, workflowTrigger.getName())
-                    .map(WorkflowNodeTestOutput::getOutput)
-                    .orElseGet(() -> checkOutput(triggerDefinition.getOutputResponse()));
-
-                outputResponse = checkTriggerOutput(outputResponse, triggerDefinition);
-
-                workflowNodeOutputDTO = new WorkflowNodeOutputDTO(
-                    null, outputResponse, null, triggerDefinition, workflowTrigger.getName());
+                workflowNodeOutputDTO = getWorkflowNodeOutputDTO(workflowId, workflowTrigger);
 
                 break;
             }
@@ -99,36 +85,12 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
             for (WorkflowTask workflowTask : workflowTasks) {
                 if (Objects.equals(workflowTask.getName(), workflowNodeName)) {
-                    WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
-
-                    ActionDefinition actionDefinition = actionDefinitionService.getActionDefinition(
-                        workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                        workflowNodeType.componentOperationName());
-
-                    OutputResponse outputResponse = workflowNodeTestOutputService
-                        .fetchWorkflowTestNodeOutput(workflowId, workflowTask.getName())
-                        .map(WorkflowNodeTestOutput::getOutput)
-                        .orElseGet(() -> checkOutput(actionDefinition.getOutputResponse()));
-
-                    workflowNodeOutputDTO = new WorkflowNodeOutputDTO(
-                        actionDefinition, outputResponse, null, null, workflowTask.getName());
+                    workflowNodeOutputDTO = getWorkflowNodeOutputDTO(workflowId, workflowTask);
                 }
             }
         }
 
         return workflowNodeOutputDTO;
-    }
-
-    private OutputResponse checkTriggerOutput(OutputResponse outputResponse, TriggerDefinition triggerDefinition) {
-        if (!triggerDefinition.isBatch() && outputResponse.outputSchema() instanceof ArrayProperty arrayProperty) {
-            List<?> list = arrayProperty.getItems();
-
-            if (!list.isEmpty()) {
-                outputResponse = new OutputResponse((BaseProperty) list.getFirst(), outputResponse.sampleOutput()); ;
-            }
-        }
-
-        return outputResponse;
     }
 
     @Override
@@ -144,21 +106,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 break;
             }
 
-            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
-
-            TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-                workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                workflowNodeType.componentOperationName());
-
-            OutputResponse outputResponse = workflowNodeTestOutputService
-                .fetchWorkflowTestNodeOutput(workflowId, workflowTrigger.getName())
-                .map(WorkflowNodeTestOutput::getOutput)
-                .orElseGet(() -> checkOutput(triggerDefinition.getOutputResponse()));
-
-            outputResponse = checkTriggerOutput(outputResponse, triggerDefinition);
-
-            workflowNodeOutputDTOs.add(
-                new WorkflowNodeOutputDTO(null, outputResponse, null, triggerDefinition, workflowTrigger.getName()));
+            workflowNodeOutputDTOs.add(getWorkflowNodeOutputDTO(workflowId, workflowTrigger));
         }
 
         List<WorkflowTask> workflowTasks = workflow.getTasks();
@@ -168,19 +116,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 break;
             }
 
-            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
-
-            ActionDefinition actionDefinition = actionDefinitionService.getActionDefinition(
-                workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                workflowNodeType.componentOperationName());
-
-            OutputResponse outputResponse = workflowNodeTestOutputService
-                .fetchWorkflowTestNodeOutput(workflowId, workflowTask.getName())
-                .map(WorkflowNodeTestOutput::getOutput)
-                .orElseGet(() -> checkOutput(actionDefinition.getOutputResponse()));
-
-            workflowNodeOutputDTOs.add(
-                new WorkflowNodeOutputDTO(actionDefinition, outputResponse, null, null, workflowTask.getName()));
+            workflowNodeOutputDTOs.add(getWorkflowNodeOutputDTO(workflowId, workflowTask));
         }
 
         return workflowNodeOutputDTOs;
@@ -202,5 +138,50 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         }
 
         return outputResponse;
+    }
+
+    private OutputResponse checkTriggerOutput(OutputResponse outputResponse, TriggerDefinition triggerDefinition) {
+        if (!triggerDefinition.isBatch() && outputResponse.outputSchema() instanceof ArrayProperty arrayProperty) {
+            List<?> list = arrayProperty.getItems();
+
+            if (!list.isEmpty()) {
+                outputResponse = new OutputResponse((BaseProperty) list.getFirst(), outputResponse.sampleOutput());
+            }
+        }
+
+        return outputResponse;
+    }
+
+    private WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(String workflowId, WorkflowTask workflowTask) {
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+
+        ActionDefinition actionDefinition = actionDefinitionService.getActionDefinition(
+            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
+            workflowNodeType.componentOperationName());
+
+        OutputResponse outputResponse = workflowNodeTestOutputService
+            .fetchWorkflowTestNodeOutput(workflowId, workflowTask.getName())
+            .map(WorkflowNodeTestOutput::getOutput)
+            .orElseGet(() -> checkOutput(actionDefinition.getOutputResponse()));
+
+        return new WorkflowNodeOutputDTO(
+            actionDefinition, outputResponse, null, null, workflowTask.getName());
+    }
+
+    private WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(String workflowId, WorkflowTrigger workflowTrigger) {
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
+
+        TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
+            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
+            workflowNodeType.componentOperationName());
+
+        OutputResponse outputResponse = workflowNodeTestOutputService
+            .fetchWorkflowTestNodeOutput(workflowId, workflowTrigger.getName())
+            .map(WorkflowNodeTestOutput::getOutput)
+            .orElseGet(() -> checkOutput(triggerDefinition.getOutputResponse()));
+
+        outputResponse = checkTriggerOutput(outputResponse, triggerDefinition);
+
+        return new WorkflowNodeOutputDTO(null, outputResponse, null, triggerDefinition, workflowTrigger.getName());
     }
 }
