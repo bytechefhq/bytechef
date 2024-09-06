@@ -1351,6 +1351,7 @@ components:
       - "NULL"
       - "PASSWORD"
       - "PHONE"
+      - "RICH_TEXT"
       - "SELECT"
       - "TEXT"
       - "TEXT_AREA"
