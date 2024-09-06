@@ -31,6 +31,7 @@ export const ControlType = {
     Null: 'NULL',
     Password: 'PASSWORD',
     Phone: 'PHONE',
+    RichText: 'RICH_TEXT',
     Select: 'SELECT',
     Text: 'TEXT',
     TextArea: 'TEXT_AREA',
