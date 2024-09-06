@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
-import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.llm.constant.LLMConstants.ASK;
@@ -225,7 +224,7 @@ public class OllamaChatAction {
             bool(TRUNCATE)
                 .label("Truncate")
                 .advancedOption(true))
-        .outputSchema(object())
+        .output()
         .perform(OllamaChatAction::perform);
 
     private OllamaChatAction() {

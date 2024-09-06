@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.llm.constant.LLMConstants.CREATE_SPEECH;
 import static com.bytechef.component.llm.constant.LLMConstants.INPUT;
@@ -99,7 +100,7 @@ public class OpenAICreateSpeechAction {
                 .minValue(0.25)
                 .maxValue(4.0)
                 .required(false))
-        .outputSchema(fileEntry())
+        .output(outputSchema(fileEntry()))
         .perform(OpenAICreateSpeechAction::perform);
 
     private OpenAICreateSpeechAction() {

@@ -20,7 +20,6 @@ import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConsta
 import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.SECRET_ACCESS_KEY;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.llm.constant.LLMConstants.MESSAGE_PROPERTY;
@@ -82,7 +81,7 @@ public class AmazonBedrockAnthropic2ChatAction {
             TOP_P_PROPERTY,
             TOP_K_PROPERTY,
             STOP_PROPERTY)
-        .outputSchema(object())
+        .output()
         .perform(AmazonBedrockAnthropic2ChatAction::perform);
 
     private AmazonBedrockAnthropic2ChatAction() {

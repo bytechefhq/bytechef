@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.llm.constant.LLMConstants.CREATE_IMAGE;
 import static com.bytechef.component.llm.constant.LLMConstants.ENDPOINT;
@@ -117,18 +118,19 @@ public class AzureOpenAICreateImageAction {
                     option("natural", "natural"))
                 .advancedOption(true),
             USER_PROPERTY)
-        .outputSchema(
-            object()
-                .properties(
-                    integer("created"),
-                    array("data")
-                        .items(
-                            object()
-                                .properties(
-                                    string("url")
-                                        .controlType(Property.ControlType.URL),
-                                    string("b64Json"),
-                                    string("revisedPrompt")))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        integer("created"),
+                        array("data")
+                            .items(
+                                object()
+                                    .properties(
+                                        string("url")
+                                            .controlType(Property.ControlType.URL),
+                                        string("b64Json"),
+                                        string("revisedPrompt"))))))
         .perform(AzureOpenAICreateImageAction::perform);
 
     private AzureOpenAICreateImageAction() {
