@@ -20,6 +20,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.platform.component.registry.domain.ActionDefinition;
+import com.bytechef.platform.component.registry.domain.ArrayProperty;
 import com.bytechef.platform.component.registry.domain.FileEntryProperty;
 import com.bytechef.platform.component.registry.domain.TriggerDefinition;
 import com.bytechef.platform.component.registry.service.ActionDefinitionService;
@@ -29,6 +30,7 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.dto.WorkflowNodeOutputDTO;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.registry.domain.BaseProperty;
 import com.bytechef.platform.registry.domain.OutputResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
@@ -83,6 +85,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                     .map(WorkflowNodeTestOutput::getOutput)
                     .orElseGet(() -> checkOutput(triggerDefinition.getOutputResponse()));
 
+                outputResponse = checkTriggerOutput(outputResponse, triggerDefinition);
+
                 workflowNodeOutputDTO = new WorkflowNodeOutputDTO(
                     null, outputResponse, null, triggerDefinition, workflowTrigger.getName());
 
@@ -115,6 +119,18 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         return workflowNodeOutputDTO;
     }
 
+    private OutputResponse checkTriggerOutput(OutputResponse outputResponse, TriggerDefinition triggerDefinition) {
+        if (!triggerDefinition.isBatch() && outputResponse.outputSchema() instanceof ArrayProperty arrayProperty) {
+            List<?> list = arrayProperty.getItems();
+
+            if (!list.isEmpty()) {
+                outputResponse = new OutputResponse((BaseProperty) list.getFirst(), outputResponse.sampleOutput()); ;
+            }
+        }
+
+        return outputResponse;
+    }
+
     @Override
     public List<WorkflowNodeOutputDTO> getPreviousWorkflowNodeOutputs(String workflowId, String lastWorkflowNodeName) {
         List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = new ArrayList<>();
@@ -138,6 +154,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 .fetchWorkflowTestNodeOutput(workflowId, workflowTrigger.getName())
                 .map(WorkflowNodeTestOutput::getOutput)
                 .orElseGet(() -> checkOutput(triggerDefinition.getOutputResponse()));
+
+            outputResponse = checkTriggerOutput(outputResponse, triggerDefinition);
 
             workflowNodeOutputDTOs.add(
                 new WorkflowNodeOutputDTO(null, outputResponse, null, triggerDefinition, workflowTrigger.getName()));
