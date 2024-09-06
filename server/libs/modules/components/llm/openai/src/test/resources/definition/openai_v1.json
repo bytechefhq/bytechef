@@ -15,14 +15,68 @@
   "resources" : null,
   "version" : 1,
   "title" : "OpenAI",
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "bearer_token",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "token",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Token",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "Bearer Token",
+      "type" : "BEARER_TOKEN",
+      "acquire" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
+      "apply" : null,
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "tokenUrl" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
-    "dynamicOutput" : true,
     "deprecated" : null,
     "description" : "Ask anything you want.",
     "help" : null,
     "metadata" : null,
     "name" : "ask",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : null,
+      "outputSchema" : null,
+      "sampleOutput" : null
+    },
     "properties" : [ {
       "advancedOption" : null,
       "description" : "ID of the model to use.",
@@ -179,15 +233,15 @@
           } ],
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "In which format do you want the response to be in?",
@@ -217,8 +271,8 @@
         "label" : "List",
         "value" : 2
       } ],
-      "controlType" : "SELECT",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "SELECT"
     }, {
       "advancedOption" : true,
       "description" : "The maximum number of tokens to generate in the chat completion.",
@@ -236,8 +290,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : true,
       "description" : "How many chat completion choices to generate for each input message.",
@@ -255,8 +309,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : true,
       "description" : "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",
@@ -277,8 +331,8 @@
       "minValue" : 0.0,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     }, {
       "advancedOption" : true,
       "description" : "An alternative to sampling with temperature, called nucleus sampling,  where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.",
@@ -299,8 +353,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     }, {
       "advancedOption" : true,
       "description" : "Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.",
@@ -321,8 +375,8 @@
       "minValue" : -2.0,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     }, {
       "advancedOption" : true,
       "description" : "Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics.",
@@ -343,8 +397,8 @@
       "minValue" : -2.0,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     }, {
       "advancedOption" : true,
       "description" : "Modify the likelihood of specified tokens appearing in the completion.",
@@ -379,14 +433,14 @@
         "minValue" : null,
         "numberPrecision" : null,
         "options" : null,
-        "controlType" : "NUMBER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "NUMBER"
       } ],
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     }, {
       "advancedOption" : true,
       "description" : "Up to 4 sequences where the API will stop generating further tokens.",
@@ -426,8 +480,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : true,
       "description" : "Enter the names of functions you want to use.",
@@ -467,8 +521,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : true,
       "description" : "A unique identifier representing your end-user, which can help admins to monitor and detect abuse.",
@@ -491,9 +545,162 @@
       "optionsDataSource" : null
     } ],
     "title" : "Ask",
-    "output" : null,
-    "perform" : { },
-    "outputResponse" : {
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "perform" : { }
+  }, {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Create an image using text-to-image models",
+    "help" : null,
+    "metadata" : null,
+    "name" : "createImage",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "OBJECT",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "additionalProperties" : null,
+          "multipleValues" : null,
+          "options" : null,
+          "properties" : [ {
+            "advancedOption" : null,
+            "description" : null,
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : "created",
+            "type" : "INTEGER",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "maxValue" : null,
+            "minValue" : null,
+            "options" : null,
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
+          }, {
+            "advancedOption" : null,
+            "description" : null,
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : "data",
+            "type" : "ARRAY",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "items" : [ {
+              "advancedOption" : null,
+              "description" : null,
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : null,
+              "name" : null,
+              "type" : "OBJECT",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "additionalProperties" : null,
+              "multipleValues" : null,
+              "options" : null,
+              "properties" : [ {
+                "advancedOption" : null,
+                "description" : null,
+                "displayCondition" : null,
+                "expressionEnabled" : null,
+                "hidden" : null,
+                "metadata" : { },
+                "required" : null,
+                "name" : "url",
+                "type" : "STRING",
+                "defaultValue" : null,
+                "exampleValue" : null,
+                "label" : null,
+                "placeholder" : null,
+                "controlType" : "URL",
+                "languageId" : null,
+                "maxLength" : null,
+                "minLength" : null,
+                "options" : null,
+                "optionsDataSource" : null
+              }, {
+                "advancedOption" : null,
+                "description" : null,
+                "displayCondition" : null,
+                "expressionEnabled" : null,
+                "hidden" : null,
+                "metadata" : { },
+                "required" : null,
+                "name" : "b64Json",
+                "type" : "STRING",
+                "defaultValue" : null,
+                "exampleValue" : null,
+                "label" : null,
+                "placeholder" : null,
+                "controlType" : "TEXT",
+                "languageId" : null,
+                "maxLength" : null,
+                "minLength" : null,
+                "options" : null,
+                "optionsDataSource" : null
+              }, {
+                "advancedOption" : null,
+                "description" : null,
+                "displayCondition" : null,
+                "expressionEnabled" : null,
+                "hidden" : null,
+                "metadata" : { },
+                "required" : null,
+                "name" : "revisedPrompt",
+                "type" : "STRING",
+                "defaultValue" : null,
+                "exampleValue" : null,
+                "label" : null,
+                "placeholder" : null,
+                "controlType" : "TEXT",
+                "languageId" : null,
+                "maxLength" : null,
+                "minLength" : null,
+                "options" : null,
+                "optionsDataSource" : null
+              } ],
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
+            } ],
+            "maxItems" : null,
+            "minItems" : null,
+            "multipleValues" : null,
+            "options" : null,
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
+          } ],
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
+        },
+        "sampleOutput" : null
+      },
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -511,22 +718,132 @@
         "additionalProperties" : null,
         "multipleValues" : null,
         "options" : null,
-        "properties" : null,
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "properties" : [ {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : "created",
+          "type" : "INTEGER",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "maxValue" : null,
+          "minValue" : null,
+          "options" : null,
+          "optionsDataSource" : null,
+          "controlType" : "INTEGER"
+        }, {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : "data",
+          "type" : "ARRAY",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "items" : [ {
+            "advancedOption" : null,
+            "description" : null,
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : null,
+            "type" : "OBJECT",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "additionalProperties" : null,
+            "multipleValues" : null,
+            "options" : null,
+            "properties" : [ {
+              "advancedOption" : null,
+              "description" : null,
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : null,
+              "name" : "url",
+              "type" : "STRING",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "controlType" : "URL",
+              "languageId" : null,
+              "maxLength" : null,
+              "minLength" : null,
+              "options" : null,
+              "optionsDataSource" : null
+            }, {
+              "advancedOption" : null,
+              "description" : null,
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : null,
+              "name" : "b64Json",
+              "type" : "STRING",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "controlType" : "TEXT",
+              "languageId" : null,
+              "maxLength" : null,
+              "minLength" : null,
+              "options" : null,
+              "optionsDataSource" : null
+            }, {
+              "advancedOption" : null,
+              "description" : null,
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : null,
+              "name" : "revisedPrompt",
+              "type" : "STRING",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "controlType" : "TEXT",
+              "languageId" : null,
+              "maxLength" : null,
+              "minLength" : null,
+              "options" : null,
+              "optionsDataSource" : null
+            } ],
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
+          } ],
+          "maxItems" : null,
+          "minItems" : null,
+          "multipleValues" : null,
+          "options" : null,
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
+        } ],
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
-  }, {
-    "batch" : null,
-    "dynamicOutput" : true,
-    "deprecated" : null,
-    "description" : "Create an image using text-to-image models",
-    "help" : null,
-    "metadata" : null,
-    "name" : "createImage",
     "properties" : [ {
       "advancedOption" : null,
       "description" : "The model to use for image generation.",
@@ -626,18 +943,18 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "controlType" : "NUMBER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "NUMBER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "The size of the generated images.",
@@ -676,8 +993,8 @@
         "value" : [ 1024, 1792 ]
       } ],
       "properties" : null,
-      "controlType" : "SELECT",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "SELECT"
     }, {
       "advancedOption" : true,
       "description" : "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported.",
@@ -695,8 +1012,8 @@
       "maxValue" : 10,
       "minValue" : 1,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : true,
       "description" : "The format in which the generated images are returned.",
@@ -803,27 +1120,20 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create image",
-    "output" : null,
-    "perform" : { },
-    "outputResponse" : {
-      "outputSchema" : {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : null,
-        "name" : null,
-        "type" : "OBJECT",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : null,
-        "placeholder" : null,
-        "additionalProperties" : null,
-        "multipleValues" : null,
-        "options" : null,
-        "properties" : [ {
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "perform" : { }
+  }, {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Generate an audio recording from the input text",
+    "help" : null,
+    "metadata" : null,
+    "name" : "createSpeech",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
           "advancedOption" : null,
           "description" : null,
           "displayCondition" : null,
@@ -831,289 +1141,97 @@
           "hidden" : null,
           "metadata" : { },
           "required" : null,
-          "name" : "created",
-          "type" : "INTEGER",
+          "name" : null,
+          "type" : "FILE_ENTRY",
           "defaultValue" : null,
           "exampleValue" : null,
           "label" : null,
           "placeholder" : null,
-          "maxValue" : null,
-          "minValue" : null,
-          "options" : null,
-          "controlType" : "INTEGER",
-          "optionsDataSource" : null
-        }, {
-          "advancedOption" : null,
-          "description" : null,
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : null,
-          "name" : "data",
-          "type" : "ARRAY",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : null,
-          "placeholder" : null,
-          "items" : [ {
+          "properties" : [ {
             "advancedOption" : null,
             "description" : null,
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
             "metadata" : { },
-            "required" : null,
-            "name" : null,
-            "type" : "OBJECT",
+            "required" : true,
+            "name" : "extension",
+            "type" : "STRING",
             "defaultValue" : null,
             "exampleValue" : null,
             "label" : null,
             "placeholder" : null,
-            "additionalProperties" : null,
-            "multipleValues" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
             "options" : null,
-            "properties" : [ {
-              "advancedOption" : null,
-              "description" : null,
-              "displayCondition" : null,
-              "expressionEnabled" : null,
-              "hidden" : null,
-              "metadata" : { },
-              "required" : null,
-              "name" : "url",
-              "type" : "STRING",
-              "defaultValue" : null,
-              "exampleValue" : null,
-              "label" : null,
-              "placeholder" : null,
-              "controlType" : "URL",
-              "languageId" : null,
-              "maxLength" : null,
-              "minLength" : null,
-              "options" : null,
-              "optionsDataSource" : null
-            }, {
-              "advancedOption" : null,
-              "description" : null,
-              "displayCondition" : null,
-              "expressionEnabled" : null,
-              "hidden" : null,
-              "metadata" : { },
-              "required" : null,
-              "name" : "b64Json",
-              "type" : "STRING",
-              "defaultValue" : null,
-              "exampleValue" : null,
-              "label" : null,
-              "placeholder" : null,
-              "controlType" : "TEXT",
-              "languageId" : null,
-              "maxLength" : null,
-              "minLength" : null,
-              "options" : null,
-              "optionsDataSource" : null
-            }, {
-              "advancedOption" : null,
-              "description" : null,
-              "displayCondition" : null,
-              "expressionEnabled" : null,
-              "hidden" : null,
-              "metadata" : { },
-              "required" : null,
-              "name" : "revisedPrompt",
-              "type" : "STRING",
-              "defaultValue" : null,
-              "exampleValue" : null,
-              "label" : null,
-              "placeholder" : null,
-              "controlType" : "TEXT",
-              "languageId" : null,
-              "maxLength" : null,
-              "minLength" : null,
-              "options" : null,
-              "optionsDataSource" : null
-            } ],
-            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
+          }, {
+            "advancedOption" : null,
+            "description" : null,
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : true,
+            "name" : "mimeType",
+            "type" : "STRING",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
+            "options" : null,
+            "optionsDataSource" : null
+          }, {
+            "advancedOption" : null,
+            "description" : null,
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : true,
+            "name" : "name",
+            "type" : "STRING",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
+            "options" : null,
+            "optionsDataSource" : null
+          }, {
+            "advancedOption" : null,
+            "description" : null,
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : true,
+            "name" : "url",
+            "type" : "STRING",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
+            "options" : null,
             "optionsDataSource" : null
           } ],
-          "maxItems" : null,
-          "minItems" : null,
-          "multipleValues" : null,
-          "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
-        } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+          "controlType" : "FILE_ENTRY"
+        },
+        "sampleOutput" : null
       },
-      "sampleOutput" : null
-    },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
-  }, {
-    "batch" : null,
-    "dynamicOutput" : true,
-    "deprecated" : null,
-    "description" : "Generate an audio recording from the input text",
-    "help" : null,
-    "metadata" : null,
-    "name" : "createSpeech",
-    "properties" : [ {
-      "advancedOption" : null,
-      "description" : "Text-to-Speech model which will generate the audio.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "model",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Model",
-      "placeholder" : null,
-      "controlType" : "SELECT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : [ {
-        "description" : null,
-        "label" : "tts-1-hd",
-        "value" : "tts-1-hd"
-      }, {
-        "description" : null,
-        "label" : "tts-1",
-        "value" : "tts-1"
-      } ],
-      "optionsDataSource" : null
-    }, {
-      "advancedOption" : null,
-      "description" : "The text to generate audio for.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "input",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Input",
-      "placeholder" : null,
-      "controlType" : "TEXT",
-      "languageId" : null,
-      "maxLength" : 4096,
-      "minLength" : null,
-      "options" : null,
-      "optionsDataSource" : null
-    }, {
-      "advancedOption" : null,
-      "description" : "The voice to use when generating the audio.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "voice",
-      "type" : "OBJECT",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Voice",
-      "placeholder" : null,
-      "additionalProperties" : null,
-      "multipleValues" : null,
-      "options" : [ {
-        "description" : null,
-        "label" : "alloy",
-        "value" : "alloy"
-      }, {
-        "description" : null,
-        "label" : "onyx",
-        "value" : "onyx"
-      }, {
-        "description" : null,
-        "label" : "fable",
-        "value" : "fable"
-      }, {
-        "description" : null,
-        "label" : "echo",
-        "value" : "echo"
-      }, {
-        "description" : null,
-        "label" : "shimmer",
-        "value" : "shimmer"
-      }, {
-        "description" : null,
-        "label" : "nova",
-        "value" : "nova"
-      } ],
-      "properties" : null,
-      "controlType" : "SELECT",
-      "optionsDataSource" : null
-    }, {
-      "advancedOption" : null,
-      "description" : "The format to audio in.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : false,
-      "name" : "responseFormat",
-      "type" : "OBJECT",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Response format",
-      "placeholder" : null,
-      "additionalProperties" : null,
-      "multipleValues" : null,
-      "options" : [ {
-        "description" : null,
-        "label" : "mp3",
-        "value" : "mp3"
-      }, {
-        "description" : null,
-        "label" : "aac",
-        "value" : "aac"
-      }, {
-        "description" : null,
-        "label" : "flac",
-        "value" : "flac"
-      }, {
-        "description" : null,
-        "label" : "opus",
-        "value" : "opus"
-      } ],
-      "properties" : null,
-      "controlType" : "SELECT",
-      "optionsDataSource" : null
-    }, {
-      "advancedOption" : null,
-      "description" : "The speed of the generated audio.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : false,
-      "name" : "speed",
-      "type" : "NUMBER",
-      "defaultValue" : 1.0,
-      "exampleValue" : null,
-      "label" : "Speed",
-      "placeholder" : null,
-      "maxNumberPrecision" : null,
-      "maxValue" : 4.0,
-      "minNumberPrecision" : null,
-      "minValue" : 0.25,
-      "numberPrecision" : null,
-      "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
-    } ],
-    "title" : "Text-To-Speech",
-    "output" : null,
-    "perform" : { },
-    "outputResponse" : {
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -1213,16 +1331,174 @@
       },
       "sampleOutput" : null
     },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "Text-to-Speech model which will generate the audio.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "model",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Model",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "tts-1-hd",
+        "value" : "tts-1-hd"
+      }, {
+        "description" : null,
+        "label" : "tts-1",
+        "value" : "tts-1"
+      } ],
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "The text to generate audio for.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "input",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Input",
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : 4096,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "The voice to use when generating the audio.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "voice",
+      "type" : "OBJECT",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Voice",
+      "placeholder" : null,
+      "additionalProperties" : null,
+      "multipleValues" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "alloy",
+        "value" : "alloy"
+      }, {
+        "description" : null,
+        "label" : "onyx",
+        "value" : "onyx"
+      }, {
+        "description" : null,
+        "label" : "fable",
+        "value" : "fable"
+      }, {
+        "description" : null,
+        "label" : "echo",
+        "value" : "echo"
+      }, {
+        "description" : null,
+        "label" : "shimmer",
+        "value" : "shimmer"
+      }, {
+        "description" : null,
+        "label" : "nova",
+        "value" : "nova"
+      } ],
+      "properties" : null,
+      "optionsDataSource" : null,
+      "controlType" : "SELECT"
+    }, {
+      "advancedOption" : null,
+      "description" : "The format to audio in.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "responseFormat",
+      "type" : "OBJECT",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Response format",
+      "placeholder" : null,
+      "additionalProperties" : null,
+      "multipleValues" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "mp3",
+        "value" : "mp3"
+      }, {
+        "description" : null,
+        "label" : "aac",
+        "value" : "aac"
+      }, {
+        "description" : null,
+        "label" : "flac",
+        "value" : "flac"
+      }, {
+        "description" : null,
+        "label" : "opus",
+        "value" : "opus"
+      } ],
+      "properties" : null,
+      "optionsDataSource" : null,
+      "controlType" : "SELECT"
+    }, {
+      "advancedOption" : null,
+      "description" : "The speed of the generated audio.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "speed",
+      "type" : "NUMBER",
+      "defaultValue" : 1.0,
+      "exampleValue" : null,
+      "label" : "Speed",
+      "placeholder" : null,
+      "maxNumberPrecision" : null,
+      "maxValue" : 4.0,
+      "minNumberPrecision" : null,
+      "minValue" : 0.25,
+      "numberPrecision" : null,
+      "options" : null,
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
+    } ],
+    "title" : "Text-To-Speech",
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
-    "dynamicOutput" : true,
     "deprecated" : null,
     "description" : "Transcribes audio into the input language.",
     "help" : null,
     "metadata" : null,
     "name" : "createTranscription",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : null,
+      "outputSchema" : null,
+      "sampleOutput" : null
+    },
     "properties" : [ {
       "advancedOption" : null,
       "description" : "The audio file object to transcribe, in one of these formats: flac, mp3, mp4, mpeg, mpga, m4a, ogg, wav, or webm.",
@@ -1649,8 +1925,8 @@
         "value" : "verbose_json"
       } ],
       "properties" : null,
-      "controlType" : "SELECT",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "SELECT"
     }, {
       "advancedOption" : null,
       "description" : "The sampling temperature, between 0 and 1. Higher values like will make the output more random, while lower values will make it more focused and deterministic. ",
@@ -1671,86 +1947,13 @@
       "minValue" : 0.0,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     } ],
     "title" : "Create transcriptions",
-    "output" : null,
-    "perform" : { },
-    "outputResponse" : {
-      "outputSchema" : {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : null,
-        "name" : null,
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : null,
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      },
-      "sampleOutput" : null
-    },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "bearer_token",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "token",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Token",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "Bearer Token",
-      "type" : "BEARER_TOKEN",
-      "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientId" : null,
-      "clientSecret" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "triggers" : null
 }
