@@ -30,6 +30,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.constant.AppType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -45,17 +46,20 @@ public class ComponentJobTestExecutor {
 
     private final ContextService contextService;
     private final JobService jobService;
+    private final ObjectMapper objectMapper;
     private final TaskExecutionService taskExecutionService;
     private final Map<String, TaskHandler<?>> taskHandlerMap;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public ComponentJobTestExecutor(
-        ContextService contextService, JobService jobService, TaskExecutionService taskExecutionService,
-        Map<String, TaskHandler<?>> taskHandlerMap, WorkflowService workflowService) {
+        ContextService contextService, JobService jobService, ObjectMapper objectMapper,
+        TaskExecutionService taskExecutionService, Map<String, TaskHandler<?>> taskHandlerMap,
+        WorkflowService workflowService) {
 
         this.contextService = contextService;
         this.jobService = jobService;
+        this.objectMapper = objectMapper;
         this.taskExecutionService = taskExecutionService;
         this.taskHandlerMap = taskHandlerMap;
         this.workflowService = workflowService;

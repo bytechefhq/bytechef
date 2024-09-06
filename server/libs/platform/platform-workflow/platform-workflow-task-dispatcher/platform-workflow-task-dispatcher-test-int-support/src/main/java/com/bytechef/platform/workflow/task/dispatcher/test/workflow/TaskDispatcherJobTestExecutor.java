@@ -32,6 +32,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,7 @@ public class TaskDispatcherJobTestExecutor {
     private final ContextService contextService;
     private final CounterService counterService;
     private final JobService jobService;
+    private final ObjectMapper objectMapper;
     private final TaskExecutionService taskExecutionService;
     private final TaskFileStorage taskFileStorage;
     private final WorkflowService workflowService;
@@ -55,11 +57,13 @@ public class TaskDispatcherJobTestExecutor {
     @SuppressFBWarnings("EI")
     public TaskDispatcherJobTestExecutor(
         ContextService contextService, CounterService counterService, JobService jobService,
-        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
+        ObjectMapper objectMapper, TaskExecutionService taskExecutionService,
+        TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         this.contextService = contextService;
         this.counterService = counterService;
         this.jobService = jobService;
+        this.objectMapper = objectMapper;
         this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
         this.workflowService = workflowService;

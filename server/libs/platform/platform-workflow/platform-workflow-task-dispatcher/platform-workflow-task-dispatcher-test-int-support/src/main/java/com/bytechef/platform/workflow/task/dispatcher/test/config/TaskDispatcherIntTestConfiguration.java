@@ -102,11 +102,11 @@ public class TaskDispatcherIntTestConfiguration {
     @Bean
     TaskDispatcherJobTestExecutor taskDispatcherWorkflowTestSupport(
         ContextService contextService, CounterService counterService, JobService jobService,
-        TaskExecutionService taskExecutionService,
+        ObjectMapper objectMapper, TaskExecutionService taskExecutionService,
         TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         return new TaskDispatcherJobTestExecutor(
-            contextService, counterService, jobService, taskExecutionService,
+            contextService, counterService, jobService, objectMapper, taskExecutionService,
             taskFileStorage, workflowService);
     }
 

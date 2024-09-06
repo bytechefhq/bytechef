@@ -56,6 +56,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
@@ -82,20 +83,20 @@ public class JobSyncExecutor {
     private final WorkflowService workflowService;
 
     public JobSyncExecutor(
-        ContextService contextService, JobService jobService,
+        ContextService contextService, JobService jobService, ObjectMapper objectMapper,
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors, TaskExecutionService taskExecutionService,
         AsyncTaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry, TaskFileStorage taskFileStorage,
         WorkflowService workflowService) {
 
         this(
-            contextService, jobService, List.of(), List.of(),
+            contextService, jobService, new SyncMessageBroker(objectMapper), List.of(), List.of(),
             taskDispatcherPreSendProcessors, List.of(), taskExecutionService, taskExecutor, taskHandlerRegistry,
             taskFileStorage, workflowService);
     }
 
     @SuppressFBWarnings("EI")
     public JobSyncExecutor(
-        ContextService contextService, JobService jobService,
+        ContextService contextService, JobService jobService, SyncMessageBroker syncMessageBroker,
         List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories,
         List<TaskDispatcherAdapterFactory> taskDispatcherAdapterFactories,
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
@@ -104,13 +105,11 @@ public class JobSyncExecutor {
         WorkflowService workflowService) {
 
         this.contextService = contextService;
-
-        SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
-
         this.eventPublisher = createEventPublisher(syncMessageBroker);
 
         this.jobFacade = new JobFacadeImpl(
             eventPublisher, contextService, jobService, taskExecutionService, taskFileStorage, workflowService);
+
         this.jobService = jobService;
         this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
@@ -136,9 +135,7 @@ public class JobSyncExecutor {
 
         TaskWorker worker = new TaskWorker(eventPublisher, taskExecutor, taskHandlerResolverChain, taskFileStorage);
 
-        SyncMessageBroker coordinatorMessageBroker = new SyncMessageBroker();
-
-        coordinatorMessageBroker.receive(
+        syncMessageBroker.receive(
             TaskWorkerMessageRoute.TASK_EXECUTION_EVENTS, e -> worker.onTaskExecutionEvent((TaskExecutionEvent) e));
 
         TaskDispatcherChain taskDispatcherChain = new TaskDispatcherChain();
@@ -146,9 +143,7 @@ public class JobSyncExecutor {
         taskDispatcherChain.setTaskDispatcherResolvers(
             CollectionUtils.concat(
                 getTaskDispatcherResolverStream(taskDispatcherResolverFactories, taskDispatcherChain),
-                Stream.of(
-                    new DefaultTaskDispatcher(
-                        createEventPublisher(coordinatorMessageBroker), taskDispatcherPreSendProcessors))));
+                Stream.of(new DefaultTaskDispatcher(eventPublisher, taskDispatcherPreSendProcessors))));
 
         JobExecutor jobExecutor = new JobExecutor(
             contextService, taskDispatcherChain, taskExecutionService, taskFileStorage, workflowService);

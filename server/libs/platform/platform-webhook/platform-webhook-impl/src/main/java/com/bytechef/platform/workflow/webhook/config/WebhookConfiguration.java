@@ -77,16 +77,16 @@ public class WebhookConfiguration {
         WebhookTriggerSyncExecutor webhookTriggerSyncExecutor, TaskFileStorage taskFileStorage,
         WorkflowService workflowService) {
 
-        SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
 
         return new WebhookExecutorImpl(
             eventPublisher, instanceAccessorRegistry,
             instanceJobFacade,
             new JobSyncExecutor(
-                contextService, jobService,
+                contextService, jobService, syncMessageBroker,
                 getTaskCompletionHandlerFactories(
                     contextService, counterService, taskExecutionService, taskFileStorage),
-                getTaskDispatcherAdapterFactories(), taskDispatcherPreSendProcessors,
+                getTaskDispatcherAdapterFactories(objectMapper), taskDispatcherPreSendProcessors,
                 getTaskDispatcherResolverFactories(
                     contextService, counterService, syncMessageBroker, taskExecutionService, taskFileStorage),
                 taskExecutionService, (AsyncTaskExecutor) taskExecutor, taskHandlerRegistry, taskFileStorage,
@@ -120,14 +120,14 @@ public class WebhookConfiguration {
                 taskCompletionHandler, taskExecutionService));
     }
 
-    private List<TaskDispatcherAdapterFactory> getTaskDispatcherAdapterFactories() {
+    private List<TaskDispatcherAdapterFactory> getTaskDispatcherAdapterFactories(ObjectMapper objectMapper) {
 
         return List.of(
             new TaskDispatcherAdapterFactory() {
 
                 @Override
                 public TaskHandler<?> create(TaskHandlerResolver taskHandlerResolver) {
-                    return new MapTaskDispatcherAdapterTaskHandler(taskHandlerResolver);
+                    return new MapTaskDispatcherAdapterTaskHandler(objectMapper, taskHandlerResolver);
                 }
 
                 @Override
