@@ -43,7 +43,6 @@ import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.task.dispatcher.map.MapTaskDispatcher;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,12 +58,10 @@ import org.springframework.context.ApplicationEventPublisher;
 public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>> {
 
     private final CurrentThreadExecutorService currentThreadExecutorService = new CurrentThreadExecutorService();
-    private final ObjectMapper objectMapper;
     private final TaskHandlerResolver taskHandlerResolver;
 
     @SuppressFBWarnings("EI")
-    public MapTaskDispatcherAdapterTaskHandler(ObjectMapper objectMapper, TaskHandlerResolver taskHandlerResolver) {
-        this.objectMapper = objectMapper;
+    public MapTaskDispatcherAdapterTaskHandler(TaskHandlerResolver taskHandlerResolver) {
         this.taskHandlerResolver = taskHandlerResolver;
     }
 

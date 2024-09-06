@@ -41,10 +41,6 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -64,20 +60,13 @@ public class TaskWorkerTest {
 
     private static final ExecutorService NEW_FIXED_THREAD_POOL = Executors.newFixedThreadPool(2);
     private static final ExecutorService NEW_SINGLE_THREAD_EXECUTOR = Executors.newSingleThreadExecutor();
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper() {
-        {
-            disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-            registerModule(new JavaTimeModule());
-            registerModule(new Jdk8Module());
-        }
-    };
 
     private final TaskFileStorage taskFileStorage = new TaskFileStorageImpl(
         new Base64FileStorageService());
 
     @Test
     public void test1() {
-        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(OBJECT_MAPPER);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
         syncMessageBroker.receive(
             TaskCoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
@@ -105,7 +94,7 @@ public class TaskWorkerTest {
 
     @Test
     public void test2() {
-        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(OBJECT_MAPPER);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
         syncMessageBroker.receive(
             TaskCoordinatorMessageRoute.ERROR_EVENTS,
@@ -134,7 +123,7 @@ public class TaskWorkerTest {
 
     @Test
     public void test3() {
-        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(OBJECT_MAPPER);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
         syncMessageBroker.receive(
             TaskCoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
@@ -191,7 +180,7 @@ public class TaskWorkerTest {
 
         String tempDir = tempFile.getAbsolutePath();
 
-        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(OBJECT_MAPPER);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
         syncMessageBroker.receive(
             TaskCoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
@@ -253,7 +242,7 @@ public class TaskWorkerTest {
 
         String tempDir = tempFile.getAbsolutePath();
 
-        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(OBJECT_MAPPER);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
         syncMessageBroker.receive(
             TaskCoordinatorMessageRoute.ERROR_EVENTS,
@@ -311,7 +300,7 @@ public class TaskWorkerTest {
     @Test
     public void test6() throws InterruptedException {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
-        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(OBJECT_MAPPER);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
         syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
 
@@ -357,7 +346,7 @@ public class TaskWorkerTest {
     @Test
     public void test7() throws InterruptedException {
         ExecutorService executorService = Executors.newFixedThreadPool(2);
-        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(OBJECT_MAPPER);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
         syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
 
@@ -413,7 +402,7 @@ public class TaskWorkerTest {
     @Test
     public void test8() throws InterruptedException {
         ExecutorService executorService = Executors.newFixedThreadPool(2);
-        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(OBJECT_MAPPER);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
         syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
 
