@@ -19,6 +19,7 @@ package com.bytechef.component.spotify.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.spotify.constant.SpotifyConstants.ID;
 import static com.bytechef.component.spotify.constant.SpotifyConstants.NAME;
@@ -62,26 +63,27 @@ public class SpotifyCreatePlaylistAction {
                 .description("If the playlist is collaborative or not.")
                 .defaultValue(false)
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    bool(COLLABORATIVE),
-                    string(DESCRIPTION),
-                    object("external_urls")
-                        .properties(
-                            string("spotify")),
-                    string("href"),
-                    string(ID),
-                    string(NAME),
-                    string("type"),
-                    string("uri"),
-                    object("owner")
-                        .properties(
-                            string("href"),
-                            string(ID),
-                            string("type"),
-                            string("uri")),
-                    bool(PUBLIC)))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        bool(COLLABORATIVE),
+                        string(DESCRIPTION),
+                        object("external_urls")
+                            .properties(
+                                string("spotify")),
+                        string("href"),
+                        string(ID),
+                        string(NAME),
+                        string("type"),
+                        string("uri"),
+                        object("owner")
+                            .properties(
+                                string("href"),
+                                string(ID),
+                                string("type"),
+                                string("uri")),
+                        bool(PUBLIC))))
         .perform(SpotifyCreatePlaylistAction::perform);
 
     private SpotifyCreatePlaylistAction() {
