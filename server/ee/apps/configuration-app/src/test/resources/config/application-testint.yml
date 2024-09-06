@@ -15,9 +15,11 @@ spring:
 bytechef:
   encryption:
     provider: filesystem
+  file-storage:
+    provider: jdbc
   workflow:
     repository:
       jdbc:
         enabled: true
     output-storage:
-      provider: base64
+      provider: jdbc

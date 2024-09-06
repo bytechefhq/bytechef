@@ -29,7 +29,7 @@ import org.springframework.lang.NonNull;
  */
 public class TriggerFileStorageImpl implements TriggerFileStorage {
 
-    private static final String TRIGGER_EXECUTION_FILES_DIR = "workflow_outputs_trigger_executions";
+    private static final String TRIGGER_EXECUTION_FILES_DIR = "outputs/workflow_trigger_executions";
 
     private final FileStorageService fileStorageService;
 

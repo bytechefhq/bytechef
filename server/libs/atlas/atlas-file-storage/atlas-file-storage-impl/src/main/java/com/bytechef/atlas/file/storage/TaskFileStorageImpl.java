@@ -32,9 +32,9 @@ import org.springframework.lang.NonNull;
  */
 public class TaskFileStorageImpl implements TaskFileStorage {
 
-    private static final String CONTEXT_FILES_DIR = "workflow_outputs_contexts";
-    private static final String JOB_FILES_DIR = "workflow_outputs_jobs";
-    private static final String TASK_EXECUTION_FILES_DIR = "workflow_outputs_task_executions";
+    private static final String CONTEXT_FILES_DIR = "outputs/workflow_contexts";
+    private static final String JOB_FILES_DIR = "outputs/workflow_jobs";
+    private static final String TASK_EXECUTION_FILES_DIR = "outputs/workflow_task_executions";
 
     private final FileStorageService fileStorageService;
 

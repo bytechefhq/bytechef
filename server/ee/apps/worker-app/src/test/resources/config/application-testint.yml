@@ -7,9 +7,9 @@ bytechef:
   data-storage:
     provider: jdbc
   file-storage:
-    provider: base64
+    provider: jdbc
   message-broker:
     provider: jms
   workflow:
     output-storage:
-      provider: base64
+      provider: jdbc
