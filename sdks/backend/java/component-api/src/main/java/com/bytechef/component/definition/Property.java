@@ -49,6 +49,7 @@ public interface Property extends BaseProperty {
         OBJECT_BUILDER,
         PASSWORD,
         PHONE,
+        RICH_TEXT,
         SELECT,
         TEXT,
         TEXT_AREA,
