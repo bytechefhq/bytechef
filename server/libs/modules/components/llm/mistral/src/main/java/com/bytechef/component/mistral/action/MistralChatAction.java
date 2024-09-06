@@ -19,7 +19,6 @@ package com.bytechef.component.mistral.action;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.bool;
-import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.llm.constant.LLMConstants.ASK;
 import static com.bytechef.component.llm.constant.LLMConstants.FUNCTIONS;
@@ -88,7 +87,7 @@ public class MistralChatAction {
                 .description("Should the prompt be safe for work?")
                 .defaultValue(true)
                 .advancedOption(true))
-        .outputSchema(object())
+        .output()
         .perform(MistralChatAction::perform);
 
     private MistralChatAction() {

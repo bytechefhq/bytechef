@@ -104,7 +104,7 @@ public class AzureOpenAICreateTranscriptionAction {
                 .minValue(0)
                 .maxValue(1)
                 .required(false))
-        .outputSchema(string())
+        .output()
         .perform(AzureOpenAICreateTranscriptionAction::perform);
 
     private AzureOpenAICreateTranscriptionAction() {

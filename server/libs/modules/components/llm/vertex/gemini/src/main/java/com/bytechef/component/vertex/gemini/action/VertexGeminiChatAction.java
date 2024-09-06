@@ -18,7 +18,6 @@ package com.bytechef.component.vertex.gemini.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.llm.constant.LLMConstants.ASK;
 import static com.bytechef.component.llm.constant.LLMConstants.FUNCTIONS;
@@ -94,7 +93,7 @@ public class VertexGeminiChatAction {
             TOP_K_PROPERTY,
             STOP_PROPERTY,
             FUNCTIONS_PROPERTY)
-        .outputSchema(object())
+        .output()
         .perform(VertexGeminiChatAction::perform);
 
     private VertexGeminiChatAction() {

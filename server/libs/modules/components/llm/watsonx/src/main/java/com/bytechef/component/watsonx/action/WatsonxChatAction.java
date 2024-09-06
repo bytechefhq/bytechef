@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
-import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.llm.constant.LLMConstants.ASK;
 import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS;
@@ -94,7 +93,7 @@ public class WatsonxChatAction {
             TOP_K_PROPERTY,
             STOP_PROPERTY,
             SEED_PROPERTY)
-        .outputSchema(object())
+        .output()
         .perform(WatsonxChatAction::perform);
 
     private WatsonxChatAction() {

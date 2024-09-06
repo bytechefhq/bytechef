@@ -18,7 +18,6 @@ package com.bytechef.component.groq.action;
 
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.llm.constant.LLMConstants.ASK;
 import static com.bytechef.component.llm.constant.LLMConstants.FREQUENCY_PENALTY;
@@ -84,7 +83,7 @@ public class GroqChatAction {
             STOP_PROPERTY,
             FUNCTIONS_PROPERTY,
             USER_PROPERTY)
-        .outputSchema(object())
+        .output()
         .perform(GroqChatAction::perform);
 
     private GroqChatAction() {

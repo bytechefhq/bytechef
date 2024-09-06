@@ -119,7 +119,7 @@ public class AmazonBedrockCohereChatAction {
                                 Collectors.toMap(
                                     CohereChatBedrockApi.CohereChatRequest.Truncate::name, clazz -> clazz,
                                     (f, s) -> f)))))
-        .outputSchema(object())
+        .output()
         .perform(AmazonBedrockCohereChatAction::perform);
 
     private AmazonBedrockCohereChatAction() {

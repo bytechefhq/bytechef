@@ -22,7 +22,6 @@ import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConsta
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
-import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.llm.constant.LLMConstants.FREQUENCY_PENALTY;
 import static com.bytechef.component.llm.constant.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
@@ -101,7 +100,7 @@ public class AmazonBedrockJurassic2ChatAction {
                 .label("Count penalty")
                 .description("Penalty object for count.")
                 .advancedOption(true))
-        .outputSchema(object())
+        .output()
         .perform(AmazonBedrockJurassic2ChatAction::perform);
 
     private AmazonBedrockJurassic2ChatAction() {

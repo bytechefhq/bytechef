@@ -19,7 +19,6 @@ package com.bytechef.component.amazon.bedrock.action;
 import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.ACCESS_KEY_ID;
 import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.SECRET_ACCESS_KEY;
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
@@ -77,7 +76,7 @@ public class AmazonBedrockTitanChatAction {
             TEMPERATURE_PROPERTY,
             TOP_P_PROPERTY,
             STOP_PROPERTY)
-        .outputSchema(object())
+        .output()
         .perform(AmazonBedrockTitanChatAction::perform);
 
     private AmazonBedrockTitanChatAction() {
