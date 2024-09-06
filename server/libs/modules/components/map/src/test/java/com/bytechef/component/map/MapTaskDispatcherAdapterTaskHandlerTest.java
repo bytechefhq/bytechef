@@ -39,6 +39,10 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +57,13 @@ import org.junit.jupiter.api.Test;
 public class MapTaskDispatcherAdapterTaskHandlerTest {
 
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper() {
+        {
+            disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+            registerModule(new JavaTimeModule());
+            registerModule(new Jdk8Module());
+        }
+    };
 
     private final TaskFileStorage taskFileStorage = new TaskFileStorageImpl(
         new Base64FileStorageService());
@@ -61,7 +72,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
     public void test1() {
         TaskHandlerResolver resolver = task -> t -> MapUtils.get(t.getParameters(), "value");
         MapTaskDispatcherAdapterTaskHandler taskHandler = new MapTaskDispatcherAdapterTaskHandler(
-            resolver);
+            OBJECT_MAPPER, resolver);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(
@@ -92,7 +103,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
                 throw new IllegalStateException("i'm rogue");
             };
             MapTaskDispatcherAdapterTaskHandler taskHandler = new MapTaskDispatcherAdapterTaskHandler(
-                taskHandlerResolver);
+                OBJECT_MAPPER, taskHandlerResolver);
 
             TaskExecution taskExecution = TaskExecution.builder()
                 .workflowTask(
@@ -150,7 +161,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
             event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
             EXECUTOR_SERVICE::execute, taskHandlerResolver, taskFileStorage);
 
-        mapAdapterTaskHandlerRefs[0] = new MapTaskDispatcherAdapterTaskHandler(taskHandlerResolver);
+        mapAdapterTaskHandlerRefs[0] = new MapTaskDispatcherAdapterTaskHandler(OBJECT_MAPPER, taskHandlerResolver);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(

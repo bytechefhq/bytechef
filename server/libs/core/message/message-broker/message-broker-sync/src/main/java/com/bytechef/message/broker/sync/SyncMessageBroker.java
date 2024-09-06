@@ -18,10 +18,11 @@
 
 package com.bytechef.message.broker.sync;
 
-import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.route.MessageRoute;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +37,13 @@ import org.apache.commons.lang3.Validate;
  */
 public class SyncMessageBroker implements MessageBroker {
 
+    private final ObjectMapper objectMapper;
     private final Map<MessageRoute, List<Receiver>> receiverMap = new HashMap<>();
+
+    @SuppressFBWarnings("EI")
+    public SyncMessageBroker(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public void send(MessageRoute messageRoute, Object message) {
@@ -47,7 +54,7 @@ public class SyncMessageBroker implements MessageBroker {
         Validate.isTrue(receivers != null && !receivers.isEmpty(), "no listeners subscribed for: " + messageRoute);
 
         for (Receiver receiver : Validate.notNull(receivers, "receivers")) {
-            receiver.receive(ConvertUtils.convertValue(JsonUtils.read(JsonUtils.write(message)), message.getClass()));
+            receiver.receive(objectMapper.convertValue(JsonUtils.read(JsonUtils.write(message)), message.getClass()));
         }
     }
 
