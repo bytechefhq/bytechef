@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID_PROPERTY;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CREATE_QUICK_EVENT;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SEND_UPDATES;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SEND_UPDATES_PROPERTY;
@@ -40,7 +39,7 @@ import java.io.IOException;
  */
 public class GoogleCalendarCreateQuickEventAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_QUICK_EVENT)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createQuickEvent")
         .title("Create Quick Event")
         .description("Add Quick Calendar Event")
         .properties(

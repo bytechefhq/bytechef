@@ -32,7 +32,6 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ATTENDEES;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID_PROPERTY;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CREATE_EVENT;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DESCRIPTION;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EMAIL;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.END;
@@ -71,7 +70,7 @@ import java.util.List;
  */
 public class GoogleCalendarCreateEventAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_EVENT)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createEvent")
         .title("Create event")
         .description("Creates an event")
         .properties(
