@@ -16,11 +16,9 @@
 
 package com.bytechef.async.config;
 
-import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.concurrent.TenantThreadPoolTaskExecutor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
@@ -32,7 +30,6 @@ import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.util.concurrent.ListenableFuture;
 
 /**
  * @author Ivica Cardic
@@ -71,64 +68,5 @@ public class AsyncConfiguration implements AsyncConfigurer {
     @Override
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
         return new SimpleAsyncUncaughtExceptionHandler();
-    }
-
-    private static class TenantThreadPoolTaskExecutor extends ThreadPoolTaskExecutor {
-        @Override
-        public void execute(Runnable task) {
-            super.execute(getTenantRunnable(task));
-        }
-
-        @Override
-        public Future<?> submit(Runnable task) {
-            return super.submit(getTenantRunnable(task));
-        }
-
-        @Override
-        public <T> Future<T> submit(Callable<T> task) {
-            return super.submit(getTenantCallable(task));
-        }
-
-        @Override
-        public ListenableFuture<?> submitListenable(Runnable task) {
-            return super.submitListenable(getTenantRunnable(task));
-        }
-
-        @Override
-        public <T> ListenableFuture<T> submitListenable(Callable<T> task) {
-            return super.submitListenable(getTenantCallable(task));
-        }
-
-        private Runnable getTenantRunnable(Runnable task) {
-            String tenantId = TenantContext.getCurrentTenantId();
-
-            return () -> {
-                String currentTenantId = TenantContext.getCurrentTenantId();
-
-                try {
-                    TenantContext.setCurrentTenantId(tenantId);
-
-                    task.run();
-                } finally {
-                    TenantContext.setCurrentTenantId(currentTenantId);
-                }
-            };
-        }
-
-        private <V> Callable<V> getTenantCallable(Callable<V> task) {
-            String tenantId = TenantContext.getCurrentTenantId();
-
-            return () -> {
-                String currentTenantId = TenantContext.getCurrentTenantId();
-
-                try {
-                    TenantContext.setCurrentTenantId(tenantId);
-
-                    return task.call();
-                } finally {
-                    TenantContext.setCurrentTenantId(currentTenantId);
-                }
-            };
-        }
     }
 }
