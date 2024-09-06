@@ -104,26 +104,30 @@ public class PolyglotEngine {
      * @return
      */
     private static Object copyFromPolyglotContext(Object object) {
-        if (object == null) {
-            return null;
-        }
-
-        if (object instanceof Map<?, ?> map) {
-            Map<String, Object> hashMap = new HashMap<>();
-
-            for (Map.Entry<?, ?> entry : map.entrySet()) {
-                hashMap.put((String) entry.getKey(), copyFromPolyglotContext(entry.getValue()));
+        switch (object) {
+            case null -> {
+                return null;
             }
+            case Map<?, ?> map -> {
+                Map<String, Object> hashMap = new HashMap<>();
 
-            return hashMap;
-        } else if (object instanceof List<?> list) {
-            List<Object> arrayList = new ArrayList<>();
+                for (Map.Entry<?, ?> entry : map.entrySet()) {
+                    hashMap.put((String) entry.getKey(), copyFromPolyglotContext(entry.getValue()));
+                }
 
-            for (Object item : list) {
-                arrayList.add(copyFromPolyglotContext(item));
+                return hashMap;
             }
+            case List<?> list -> {
+                List<Object> arrayList = new ArrayList<>();
 
-            return arrayList;
+                for (Object item : list) {
+                    arrayList.add(copyFromPolyglotContext(item));
+                }
+
+                return arrayList;
+            }
+            default -> {
+            }
         }
 
         return object;
@@ -225,8 +229,11 @@ public class PolyglotEngine {
         })
         public ProxyExecutable getMember(String actionName) {
             return arguments -> {
-                Map<String, ?> inputParameters = arguments.length == 0
-                    ? Map.of() : (Map<String, ?>) copyToJavaValue(arguments[0]);
+                Map<String, ?> inputParameters = Map.of();
+
+                if (arguments.length > 0) {
+                    inputParameters = (Map<String, ?>) copyToJavaValue(arguments[0]);
+                }
 
                 ComponentConnection componentConnection = null;
 
@@ -264,8 +271,7 @@ public class PolyglotEngine {
 
         @Override
         public boolean hasMember(String actionName) {
-            return componentDefinition
-                .getActions()
+            return componentDefinition.getActions()
                 .stream()
                 .anyMatch(actionDefinition -> Objects.equals(actionDefinition.getName(), actionName));
         }
@@ -286,8 +292,7 @@ public class PolyglotEngine {
         }
 
         private Map.Entry<String, ComponentConnection> getFirstComponentConnectionEntry() {
-            return parameterConnections
-                .entrySet()
+            return parameterConnections.entrySet()
                 .stream()
                 .filter(entry -> {
                     ParameterConnection parameterConnection = entry.getValue();
