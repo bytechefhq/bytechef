@@ -71,27 +71,22 @@ public class PolyglotEngine {
         String languageId, Parameters inputParameters, Map<String, ? extends ParameterConnection> parameterConnections,
         ActionContext actionContext) {
 
-        try (Context polyglotContext = Context.newBuilder()
-            .engine(engine)
-            .build()) {
-
-            polyglotContext.getBindings(languageId)
-                .putMember(
-                    "component",
-                    new ComponentProxyObject(actionContext, applicationContext, languageId, parameterConnections));
-
+        try (Context polyglotContext = getContext()) {
             polyglotContext.eval(languageId, inputParameters.getString(SCRIPT, switch (languageId) {
-                case "java" -> "public static Object perform(Map<String, ?> input) {\n\treturn null;\n}";
-                case "js" -> "function perform(input) {\n\treturn null;\n}";
-                case "python" -> "def perform(input):\n\treturn null";
-                case "R" -> "perform <- function(input) {\n\treturn null\n}";
-                case "ruby" -> "def perform(input)\n\treturn null;\nend";
+                case "java" ->
+                    "public static Object perform(Map<String, ?> input, Context context) {\n\treturn null;\n}";
+                case "js" -> "function perform(input, context) {\n\treturn null;\n}";
+                case "python" -> "def perform(input, context):\n\treturn null";
+                case "R" -> "perform <- function(input, context) {\n\treturn null\n}";
+                case "ruby" -> "def perform(input, context)\n\treturn null;\nend";
                 default -> throw new IllegalArgumentException("languageId: %s does not exist".formatted(languageId));
             }));
 
             Value value = polyglotContext.getBindings(languageId)
                 .getMember("perform")
-                .execute(copyToGuestValue(inputParameters.getMap(INPUT, Object.class), languageId));
+                .execute(
+                    copyToGuestValue(inputParameters.getMap(INPUT, Object.class), languageId),
+                    new ContextProxyObject(actionContext, applicationContext, languageId, parameterConnections));
 
             return copyFromPolyglotContext(copyToJavaValue(value));
         }
@@ -217,6 +212,12 @@ public class PolyglotEngine {
         } else {
             throw new IllegalArgumentException("Cannot copy value %s to %s type.".formatted(value, languageId));
         }
+    }
+
+    private static Context getContext() {
+        return Context.newBuilder()
+            .engine(engine)
+            .build();
     }
 
     private record ActionProxyObject(
@@ -351,6 +352,35 @@ public class PolyglotEngine {
                 componentName, key -> componentDefinitionService.getComponentDefinition(key, null));
 
             return componentDefinitionMap.containsKey(componentName);
+        }
+
+        @Override
+        public void putMember(String key, Value value) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    private record ContextProxyObject(
+        ActionContext actionContext, ApplicationContext applicationContext, String languageId,
+        Map<String, ? extends ParameterConnection> parameterConnections) implements ProxyObject {
+
+        @Override
+        public Object getMember(String name) {
+            if (Objects.equals(name, "component")) {
+                return new ComponentProxyObject(actionContext, applicationContext, languageId, parameterConnections);
+            }
+
+            return null;
+        }
+
+        @Override
+        public Object getMemberKeys() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean hasMember(String name) {
+            return Objects.equals(name, "component");
         }
 
         @Override

@@ -59,7 +59,8 @@ public class ScriptJavaAction {
                         .label("Java code")
                         .description("Add your Java custom logic here.")
                         .controlType(Property.ControlType.CODE_EDITOR)
-                        .defaultValue("public static Object perform(Map<String, ?> input) {\n\treturn null;\n}")
+                        .defaultValue(
+                            "public static Object perform(Map<String, ?> input, Context context) {\n\treturn null;\n}")
                         .required(true))
                 .output(),
             "java", polyglotEngine);
