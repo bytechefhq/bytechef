@@ -30,36 +30,28 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.constant.AppType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * @author Ivica Cardic
  */
 public class ComponentJobTestExecutor {
 
-    private static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
-
     private final ContextService contextService;
     private final JobService jobService;
-    private final ObjectMapper objectMapper;
     private final TaskExecutionService taskExecutionService;
     private final Map<String, TaskHandler<?>> taskHandlerMap;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public ComponentJobTestExecutor(
-        ContextService contextService, JobService jobService, ObjectMapper objectMapper,
-        TaskExecutionService taskExecutionService, Map<String, TaskHandler<?>> taskHandlerMap,
-        WorkflowService workflowService) {
+        ContextService contextService, JobService jobService, TaskExecutionService taskExecutionService,
+        Map<String, TaskHandler<?>> taskHandlerMap, WorkflowService workflowService) {
 
         this.contextService = contextService;
         this.jobService = jobService;
-        this.objectMapper = objectMapper;
         this.taskExecutionService = taskExecutionService;
         this.taskHandlerMap = taskHandlerMap;
         this.workflowService = workflowService;
@@ -72,7 +64,7 @@ public class ComponentJobTestExecutor {
     public Job execute(String workflowId, Map<String, Object> inputs, Map<String, TaskHandler<?>> taskHandlerMap) {
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
             contextService, jobService, getTaskDispatcherPreSendProcessors(), taskExecutionService,
-            EXECUTOR_SERVICE::execute, MapUtils.concat(this.taskHandlerMap, taskHandlerMap)::get,
+            MapUtils.concat(this.taskHandlerMap, taskHandlerMap)::get,
             new TaskFileStorageImpl(new Base64FileStorageService()), workflowService);
 
         return jobSyncExecutor.execute(new JobParameters(workflowId, inputs));

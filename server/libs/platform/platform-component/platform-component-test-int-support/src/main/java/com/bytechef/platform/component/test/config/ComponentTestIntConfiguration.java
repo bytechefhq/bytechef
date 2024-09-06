@@ -107,12 +107,12 @@ public class ComponentTestIntConfiguration {
 
     @Bean
     ComponentJobTestExecutor componentWorkflowTestSupport(
-        ContextService contextService, JobService jobService, ObjectMapper objectMapper,
+        ContextService contextService, JobService jobService,
         TaskExecutionService taskExecutionService, Map<String, TaskHandler<?>> taskHandlerMap,
         TaskHandlerFactory taskHandlerFactory, WorkflowService workflowService) {
 
         return new ComponentJobTestExecutor(
-            contextService, jobService, objectMapper, taskExecutionService,
+            contextService, jobService, taskExecutionService,
             MapUtils.concat(taskHandlerMap, taskHandlerFactory.getTaskHandlerMap()), workflowService);
     }
 

@@ -56,10 +56,12 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,6 +76,29 @@ public class JobSyncExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(JobSyncExecutor.class);
 
+    private static final AsyncTaskExecutor EXECUTOR = new AsyncTaskExecutor() {
+
+        private static final Executor executor = Executors.newCachedThreadPool();
+
+        @Override
+        public void execute(Runnable task) {
+            String tenantId = TenantContext.getCurrentTenantId();
+
+            executor.execute(
+                () -> {
+                    String currentTenantId = TenantContext.getCurrentTenantId();
+
+                    try {
+                        TenantContext.setCurrentTenantId(tenantId);
+
+                        task.run();
+                    } finally {
+                        TenantContext.setCurrentTenantId(currentTenantId);
+                    }
+                });
+        }
+    };
+
     private final ContextService contextService;
     private final ApplicationEventPublisher eventPublisher;
     private final JobFacade jobFacade;
@@ -83,15 +108,14 @@ public class JobSyncExecutor {
     private final WorkflowService workflowService;
 
     public JobSyncExecutor(
-        ContextService contextService, JobService jobService, ObjectMapper objectMapper,
+        ContextService contextService, JobService jobService,
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors, TaskExecutionService taskExecutionService,
-        AsyncTaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry, TaskFileStorage taskFileStorage,
-        WorkflowService workflowService) {
+        TaskHandlerRegistry taskHandlerRegistry, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         this(
-            contextService, jobService, new SyncMessageBroker(objectMapper), List.of(), List.of(),
-            taskDispatcherPreSendProcessors, List.of(), taskExecutionService, taskExecutor, taskHandlerRegistry,
-            taskFileStorage, workflowService);
+            contextService, jobService, new SyncMessageBroker(), List.of(), List.of(),
+            taskDispatcherPreSendProcessors, List.of(), taskExecutionService, taskHandlerRegistry, taskFileStorage,
+            workflowService);
     }
 
     @SuppressFBWarnings("EI")
@@ -101,8 +125,7 @@ public class JobSyncExecutor {
         List<TaskDispatcherAdapterFactory> taskDispatcherAdapterFactories,
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories, TaskExecutionService taskExecutionService,
-        AsyncTaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry, TaskFileStorage taskFileStorage,
-        WorkflowService workflowService) {
+        TaskHandlerRegistry taskHandlerRegistry, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         this.contextService = contextService;
         this.eventPublisher = createEventPublisher(syncMessageBroker);
@@ -133,7 +156,7 @@ public class JobSyncExecutor {
                 new TaskDispatcherAdapterTaskHandlerResolver(taskDispatcherAdapterFactories, taskHandlerResolverChain),
                 new DefaultTaskHandlerResolver(taskHandlerRegistry)));
 
-        TaskWorker worker = new TaskWorker(eventPublisher, taskExecutor, taskHandlerResolverChain, taskFileStorage);
+        TaskWorker worker = new TaskWorker(eventPublisher, EXECUTOR, taskHandlerResolverChain, taskFileStorage);
 
         syncMessageBroker.receive(
             TaskWorkerMessageRoute.TASK_EXECUTION_EVENTS, e -> worker.onTaskExecutionEvent((TaskExecutionEvent) e));

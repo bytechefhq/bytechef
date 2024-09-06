@@ -63,11 +63,9 @@ import com.bytechef.task.dispatcher.parallel.ParallelTaskDispatcher;
 import com.bytechef.task.dispatcher.parallel.completion.ParallelTaskCompletionHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
-import java.util.concurrent.Executor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.task.AsyncTaskExecutor;
 
 /**
  * @author Ivica Cardic
@@ -77,7 +75,7 @@ public class TestExecutorConfiguration {
 
     @Bean
     JobTestExecutor jobTestExecutor(
-        ComponentDefinitionService componentDefinitionService, ObjectMapper objectMapper, Executor taskExecutor,
+        ComponentDefinitionService componentDefinitionService, ObjectMapper objectMapper,
         TaskHandlerRegistry taskHandlerRegistry, WorkflowService workflowService) {
 
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
@@ -95,14 +93,14 @@ public class TestExecutorConfiguration {
         return new JobTestExecutor(
             componentDefinitionService, contextService,
             new JobSyncExecutor(
-                contextService, jobService,
+                contextService, jobService, syncMessageBroker,
                 getTaskCompletionHandlerFactories(
                     contextService, counterService, taskExecutionService, taskFileStorage),
-                getTaskDispatcherAdapterFactories(objectMapper),
+                getTaskDispatcherAdapterFactories(),
                 List.of(new TestTaskDispatcherPreSendProcessor(jobService)),
                 getTaskDispatcherResolverFactories(
                     syncMessageBroker, contextService, counterService, taskExecutionService, taskFileStorage),
-                taskExecutionService, (AsyncTaskExecutor) taskExecutor, taskHandlerRegistry, taskFileStorage,
+                taskExecutionService, taskHandlerRegistry, taskFileStorage,
                 workflowService),
             taskExecutionService, taskFileStorage);
     }
@@ -133,13 +131,13 @@ public class TestExecutorConfiguration {
                 taskCompletionHandler, taskExecutionService));
     }
 
-    private List<TaskDispatcherAdapterFactory> getTaskDispatcherAdapterFactories(ObjectMapper objectMapper) {
+    private List<TaskDispatcherAdapterFactory> getTaskDispatcherAdapterFactories() {
         return List.of(
             new TaskDispatcherAdapterFactory() {
 
                 @Override
                 public TaskHandler<?> create(TaskHandlerResolver taskHandlerResolver) {
-                    return new MapTaskDispatcherAdapterTaskHandler(objectMapper, taskHandlerResolver);
+                    return new MapTaskDispatcherAdapterTaskHandler(taskHandlerResolver);
                 }
 
                 @Override
