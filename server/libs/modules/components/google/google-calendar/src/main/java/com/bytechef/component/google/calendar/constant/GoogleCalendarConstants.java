@@ -86,8 +86,8 @@ public class GoogleCalendarConstants {
     public static final String STATUS = "status";
     public static final String SUMMARY = "summary";
     public static final String TEXT = "text";
-    public static final String TIME_MAX = "timeMax";
-    public static final String TIME_MIN = "timeMin";
+    public static final String FROM = "from";
+    public static final String TO = "to";
     public static final String TIME_ZONE = "timeZone";
     public static final String TITLE = "title";
     public static final String TYPE = "type";
