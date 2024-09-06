@@ -18,7 +18,6 @@ package com.bytechef.component.google.calendar;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.google.calendar.connection.GoogleCalendarConnection.CONNECTION_DEFINITION;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.GOOGLE_CALENDAR;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -35,7 +34,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class GoogleCalendarComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(GOOGLE_CALENDAR)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("googleCalendar")
         .title("Google Calendar")
         .description(
             "Google Calendar is a web-based application that allows users to schedule and organize events, " +

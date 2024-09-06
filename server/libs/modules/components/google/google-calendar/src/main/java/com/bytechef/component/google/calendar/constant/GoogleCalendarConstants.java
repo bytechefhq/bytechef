@@ -30,53 +30,37 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class GoogleCalendarConstants {
 
     private GoogleCalendarConstants() {
     }
 
-    public static final String ACCESS_ROLE = "accessRole";
     public static final String ALL_DAY = "allDay";
-    public static final String ANYONE_CAN_ADD_SELF = "anyoneCanAddSelf";
     public static final String ATTACHMENTS = "attachments";
     public static final String ATTENDEES = "attendees";
     public static final String AUTO_DECLINE_MODE = "autoDeclineMode";
     public static final String CALENDAR_ID = "calendarId";
-    public static final String CREATE_EVENT = "createEvent";
-    public static final String CREATE_QUICK_EVENT = "createQuickEvent";
     public static final String DATE = "date";
     public static final String DATE_TIME = "dateTime";
     public static final String DECLINE_MESSAGE = "declineMessage";
-    public static final String DEFAULT = "default";
-    public static final String DEFAULT_REMINDERS = "defaultReminders";
     public static final String DESCRIPTION = "description";
     public static final String DISPLAY_NAME = "displayName";
     public static final String EMAIL = "email";
     public static final String END = "end";
-    public static final String ETAG = "etag";
-    public static final String EVENT = "event";
     public static final String EVENT_TYPE = "eventType";
-    public static final String FOCUS_TIME = "focusTime";
-    public static final String FIND_EVENTS = "findEvents";
-    public static final String GOOGLE_CALENDAR = "googleCalendar";
     public static final String GUEST_CAN_INVITE_OTHERS = "guestsCanInviteOthers";
     public static final String GUEST_CAN_MODIFY = "guestsCanModify";
     public static final String GUEST_CAN_SEE_OTHER_GUESTS = "guestsCanSeeOtherGuests";
     public static final String ICON_LINK = "iconLink";
     public static final String ID = "id";
-    public static final String KIND = "kind";
     public static final String LABEL = "label";
     public static final String LOCATION = "location";
     public static final String MAX_RESULTS = "maxResults";
     public static final String METHOD = "method";
     public static final String MINUTES = "minutes";
-    public static final String NEW_OR_UPDATED_EVENT = "newOrUpdatedEvent";
-    public static final String NEXT_PAGE_TOKEN = "nextPageToken";
-    public static final String NEXT_SYNC_TOKEN = "nextSyncToken";
     public static final String ORGANIZER = "organizer";
-    public static final String OUT_OF_OFFICE = "outOfOffice";
     public static final String PARAMETERS = "parameters";
     public static final String Q = "q";
     public static final String REMINDERS = "reminders";
@@ -92,7 +76,6 @@ public class GoogleCalendarConstants {
     public static final String TITLE = "title";
     public static final String TYPE = "type";
     public static final String START = "start";
-    public static final String UPDATED = "updated";
     public static final String USE_DEFAULT = "useDefault";
 
     public static final ModifiableStringProperty CALENDAR_ID_PROPERTY = string(CALENDAR_ID)
@@ -102,7 +85,7 @@ public class GoogleCalendarConstants {
 
     public static final ModifiableObjectProperty EVENT_PROPERTY = object()
         .properties(
-            bool(ANYONE_CAN_ADD_SELF),
+            bool("anyoneCanAddSelf"),
             array(ATTACHMENTS)
                 .items(
                     object()
@@ -214,7 +197,7 @@ public class GoogleCalendarConstants {
             string("htmlLink"),
             string("iCalUID"),
             string(ID),
-            string(KIND),
+            string("kind"),
             string(LOCATION),
             bool("locked"),
             object(ORGANIZER)
@@ -258,7 +241,7 @@ public class GoogleCalendarConstants {
             string(STATUS),
             string(SUMMARY),
             string("transparency"),
-            dateTime(UPDATED),
+            dateTime("updated"),
             string("visibility"),
             object("workingLocationProperties")
                 .properties(

@@ -23,7 +23,6 @@ import static com.bytechef.component.definition.ComponentDSL.trigger;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ID;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.NEW_OR_UPDATED_EVENT;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.RESOURCE_ID;
 
 import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
@@ -51,7 +50,7 @@ import java.util.UUID;
  */
 public class GoogleCalendarEventTrigger {
 
-    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger(NEW_OR_UPDATED_EVENT)
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newOrUpdatedEvent")
         .title("New or Updated Event")
         .description("Triggers when an event is added or updated")
         .type(TriggerType.DYNAMIC_WEBHOOK)

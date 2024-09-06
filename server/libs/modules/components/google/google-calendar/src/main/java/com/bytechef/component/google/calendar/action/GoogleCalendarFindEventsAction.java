@@ -26,14 +26,10 @@ import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID_PROPERTY;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DEFAULT;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_TYPE;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FIND_EVENTS;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FOCUS_TIME;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FROM;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.MAX_RESULTS;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.OUT_OF_OFFICE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.Q;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TO;
 
@@ -53,12 +49,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class GoogleCalendarFindEventsAction {
 
     protected static final String DATE_RANGE = "dateRange";
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(FIND_EVENTS)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("findEvents")
         .title("Find events")
         .description("Find events in your calendar")
         .properties(
@@ -69,9 +65,9 @@ public class GoogleCalendarFindEventsAction {
                 .items(
                     string()
                         .options(
-                            option("Default", DEFAULT),
-                            option("Out of office", OUT_OF_OFFICE),
-                            option("Focus time", FOCUS_TIME)))
+                            option("Default", "default"),
+                            option("Out of office", "outOfOffice"),
+                            option("Focus time", "focusTime")))
                 .required(false),
             integer(MAX_RESULTS)
                 .label("Max results")
