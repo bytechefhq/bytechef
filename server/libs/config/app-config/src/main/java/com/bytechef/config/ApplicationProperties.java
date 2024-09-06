@@ -564,7 +564,7 @@ public class ApplicationProperties {
     public static class FileStorage {
 
         public enum Provider {
-            AWS, BASE64, FILESYSTEM, NOOP
+            AWS, FILESYSTEM, JDBC
         }
 
         private Filesystem filesystem;
@@ -845,7 +845,7 @@ public class ApplicationProperties {
         public static class OutputStorage {
 
             public enum Provider {
-                AWS, BASE64, FILESYSTEM, NOOP
+                AWS, FILESYSTEM, JDBC
             }
 
             private Provider provider;

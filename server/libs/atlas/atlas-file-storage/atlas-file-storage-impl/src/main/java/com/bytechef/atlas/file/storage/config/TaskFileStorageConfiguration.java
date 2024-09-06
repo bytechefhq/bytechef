@@ -22,7 +22,6 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Workflow.OutputStorage.Provider;
 import com.bytechef.ee.file.storage.aws.service.AwsFileStorageService;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
-import com.bytechef.file.storage.base64.service.NoopFileStorageService;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -62,9 +61,8 @@ public class TaskFileStorageConfiguration {
     private FileStorageService getFileStorageService(Provider provider) {
         return switch (provider) {
             case Provider.AWS -> new AwsFileStorageService();
-            case Provider.BASE64 -> new Base64FileStorageService();
             case Provider.FILESYSTEM -> new FilesystemFileStorageService(getBasedir());
-            case Provider.NOOP -> new NoopFileStorageService();
+            case Provider.JDBC -> new Base64FileStorageService();
         };
     }
 

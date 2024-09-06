@@ -2,10 +2,10 @@ server:
   port: 9999
 
 bytechef:
-  file-storage:
-    provider: base64
   message-broker:
     provider: jms
+  file-storage:
+    provider: jdbc
   workflow:
     output-storage:
-      provider: base64
+      provider: jdbc

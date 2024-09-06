@@ -103,6 +103,7 @@ bytechef:
     # Cache provider (redis | simple) default: simple
     provider: redis
   data-storage:
+    # Data storage provider for files (aws(ee) | filesystem | jdbc) default: jdbc
     provider: jdbc
   discovery-service:
     provider: redis
@@ -112,7 +113,7 @@ bytechef:
   encryption:
     provider: filesystem
   file-storage:
-    # File storage provider for files (base64 | filesystem) default: filesystem
+    # File storage provider for files  (aws(ee) | filesystem | jdbc) default: filesystem
     provider: filesystem
     filesystem:
       basedir: ${user.home}/bytechef/data/file-storage
@@ -151,8 +152,8 @@ bytechef:
         default: "10"
   workflow:
     output-storage:
-      # Output storage provider for workflow output data (base64 | filesystem) default: base64
-      provider: base64
+      # Output storage provider for workflow output data (aws(ee) | filesystem | jdbc) default: jdbc
+      provider: jdbc
     repository:
       jdbc:
         enabled: true

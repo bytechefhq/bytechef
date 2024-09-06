@@ -17,10 +17,10 @@
 package com.bytechef.platform.file.storage.config;
 
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.config.ApplicationProperties.Workflow.OutputStorage.Provider;
+import com.bytechef.config.ApplicationProperties.FileStorage;
+import com.bytechef.config.ApplicationProperties.Workflow.OutputStorage;
 import com.bytechef.ee.file.storage.aws.service.AwsFileStorageService;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
-import com.bytechef.file.storage.base64.service.NoopFileStorageService;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.file.storage.FilesFileStorage;
@@ -50,20 +50,19 @@ public class PlatformFileStorageConfiguration {
 
     @Bean
     FilesFileStorage filesFileStorage(ApplicationProperties applicationProperties) {
-        Provider provider = applicationProperties.getWorkflow()
-            .getOutputStorage()
+        FileStorage.Provider provider = applicationProperties.getFileStorage()
             .getProvider();
 
         if (logger.isInfoEnabled()) {
             logger.info("Workflow trigger output storage provider type enabled: %s".formatted(provider));
         }
 
-        return new FilesFileStorageImpl(getFileStorageService(provider));
+        return new FilesFileStorageImpl(getFilesFileStorageService(provider));
     }
 
     @Bean
     TriggerFileStorage triggerFileStorage(ApplicationProperties applicationProperties) {
-        Provider provider = applicationProperties.getWorkflow()
+        OutputStorage.Provider provider = applicationProperties.getWorkflow()
             .getOutputStorage()
             .getProvider();
 
@@ -71,15 +70,22 @@ public class PlatformFileStorageConfiguration {
             logger.info("Files storage provider type enabled: %s".formatted(provider));
         }
 
-        return new TriggerFileStorageImpl(getFileStorageService(provider));
+        return new TriggerFileStorageImpl(getTriggerFileStorageService(provider));
     }
 
-    private FileStorageService getFileStorageService(Provider provider) {
+    private FileStorageService getFilesFileStorageService(FileStorage.Provider provider) {
         return switch (provider) {
-            case Provider.AWS -> new AwsFileStorageService();
-            case Provider.BASE64 -> new Base64FileStorageService();
-            case Provider.FILESYSTEM -> new FilesystemFileStorageService(getBasedir());
-            case Provider.NOOP -> new NoopFileStorageService();
+            case FileStorage.Provider.AWS -> new AwsFileStorageService();
+            case FileStorage.Provider.FILESYSTEM -> new FilesystemFileStorageService(getBasedir());
+            case FileStorage.Provider.JDBC -> new Base64FileStorageService();
+        };
+    }
+
+    private FileStorageService getTriggerFileStorageService(OutputStorage.Provider provider) {
+        return switch (provider) {
+            case OutputStorage.Provider.AWS -> new AwsFileStorageService();
+            case OutputStorage.Provider.FILESYSTEM -> new FilesystemFileStorageService(getBasedir());
+            case OutputStorage.Provider.JDBC -> new Base64FileStorageService();
         };
     }
 

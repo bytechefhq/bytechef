@@ -25,7 +25,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
  * Configuration annotation for a conditional element that depends on the property <code>data-storage.provider</code>
- * containing the value <code>db</code>
+ * containing the value <code>jdbc</code>
  *
  * @author Ivica Cardic
  */
