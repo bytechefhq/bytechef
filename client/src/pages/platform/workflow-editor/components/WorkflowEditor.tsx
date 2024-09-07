@@ -10,7 +10,6 @@ import {
 import {ComponentOperationType} from '@/shared/types';
 import {usePrevious} from '@uidotdev/usehooks';
 import {DragEventHandler, useCallback, useEffect, useMemo, useState} from 'react';
-import {useParams} from 'react-router-dom';
 import ReactFlow, {Controls, MiniMap, useReactFlow, useStore} from 'reactflow';
 
 import ConditionChildEdge from '../edges/ConditionChildEdge';
@@ -47,8 +46,6 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
     const {getEdge, getNode, getNodes, setViewport} = useReactFlow();
 
     const [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge, handleDropOnTriggerNode] = useHandleDrop();
-
-    const {projectId, projectWorkflowId} = useParams();
 
     const previousComponentNames: Array<string> | undefined = usePrevious(componentNames || []);
 
@@ -173,14 +170,6 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
             }
         }
     };
-
-    // Reset workflow data store when projectWorkflowId changes
-    useEffect(() => {
-        useWorkflowDataStore.getState().reset();
-        useWorkflowNodeDetailsPanelStore.getState().reset();
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [projectId, projectWorkflowId]);
 
     // Set workflowComponentWithAlias when latestComponentDefinition is changed
     useEffect(() => {
