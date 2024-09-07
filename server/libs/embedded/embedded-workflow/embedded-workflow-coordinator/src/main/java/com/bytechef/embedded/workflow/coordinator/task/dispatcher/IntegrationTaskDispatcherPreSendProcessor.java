@@ -29,11 +29,12 @@ import com.bytechef.platform.workflow.execution.service.InstanceJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-// TODD @Component
+@Component
 public class IntegrationTaskDispatcherPreSendProcessor extends AbstractDispatcherPreSendProcessor
     implements TaskDispatcherPreSendProcessor {
 

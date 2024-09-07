@@ -24,11 +24,13 @@ import com.bytechef.platform.workflow.coordinator.trigger.dispatcher.TriggerDisp
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Map;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-// TODD @Component
+@Component
 public class IntegrationTriggerDispatcherPreSendProcessor extends AbstractDispatcherPreSendProcessor
     implements TriggerDispatcherPreSendProcessor {
 
@@ -51,10 +53,12 @@ public class IntegrationTriggerDispatcherPreSendProcessor extends AbstractDispat
         String workflowId = integrationWorkflowService.getIntegrationWorkflowId(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
 
-        triggerExecution.putMetadata(
-            MetadataConstants.CONNECTION_IDS,
-            getConnectionIdMap(
-                workflowExecutionId.getInstanceId(), workflowId, triggerExecution.getName()));
+        Map<String, Long> connectionIdMap = getConnectionIdMap(
+            workflowExecutionId.getInstanceId(), workflowId, triggerExecution.getName());
+
+        if (!connectionIdMap.isEmpty()) {
+            triggerExecution.putMetadata(MetadataConstants.CONNECTION_IDS, connectionIdMap);
+        }
 
         return triggerExecution;
     }
