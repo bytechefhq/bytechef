@@ -11,7 +11,6 @@ export * from './JobParameters';
 export * from './Page';
 export * from './TaskExecution';
 export * from './TriggerExecution';
-export * from './TriggerOutput';
 export * from './Webhook';
 export * from './WebhookRetry';
 export * from './WorkflowConnection';
