@@ -13,7 +13,6 @@ models/JobParameters.ts
 models/Page.ts
 models/TaskExecution.ts
 models/TriggerExecution.ts
-models/TriggerOutput.ts
 models/Webhook.ts
 models/WebhookRetry.ts
 models/WorkflowConnection.ts
