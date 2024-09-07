@@ -3,7 +3,6 @@ package com.bytechef.platform.workflow.execution.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.platform.workflow.execution.web.rest.model.JobConnectionModel;
-import com.bytechef.platform.workflow.execution.web.rest.model.TriggerOutputModel;
 import com.bytechef.platform.workflow.execution.web.rest.model.WebhookModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -29,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "JobParameters", description = "Defines parameters used to execute a job.")
 @JsonTypeName("JobParameters")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T10:08:05.971353+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-07T07:16:44.877542+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class JobParametersModel {
 
   @Valid
@@ -43,9 +42,6 @@ public class JobParametersModel {
   private String parentTaskExecutionId;
 
   private Integer priority;
-
-  @Valid
-  private List<@Valid TriggerOutputModel> triggerOutputs = new ArrayList<>();
 
   private String workflowId;
 
@@ -179,34 +175,6 @@ public class JobParametersModel {
     this.priority = priority;
   }
 
-  public JobParametersModel triggerOutputs(List<@Valid TriggerOutputModel> triggerOutputs) {
-    this.triggerOutputs = triggerOutputs;
-    return this;
-  }
-
-  public JobParametersModel addTriggerOutputsItem(TriggerOutputModel triggerOutputsItem) {
-    if (this.triggerOutputs == null) {
-      this.triggerOutputs = new ArrayList<>();
-    }
-    this.triggerOutputs.add(triggerOutputsItem);
-    return this;
-  }
-
-  /**
-   * Get triggerOutputs
-   * @return triggerOutputs
-   */
-  @Valid 
-  @Schema(name = "triggerOutputs", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("triggerOutputs")
-  public List<@Valid TriggerOutputModel> getTriggerOutputs() {
-    return triggerOutputs;
-  }
-
-  public void setTriggerOutputs(List<@Valid TriggerOutputModel> triggerOutputs) {
-    this.triggerOutputs = triggerOutputs;
-  }
-
   public JobParametersModel workflowId(String workflowId) {
     this.workflowId = workflowId;
     return this;
@@ -269,14 +237,13 @@ public class JobParametersModel {
         Objects.equals(this.label, jobParameters.label) &&
         Objects.equals(this.parentTaskExecutionId, jobParameters.parentTaskExecutionId) &&
         Objects.equals(this.priority, jobParameters.priority) &&
-        Objects.equals(this.triggerOutputs, jobParameters.triggerOutputs) &&
         Objects.equals(this.workflowId, jobParameters.workflowId) &&
         Objects.equals(this.webhooks, jobParameters.webhooks);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(connections, inputs, label, parentTaskExecutionId, priority, triggerOutputs, workflowId, webhooks);
+    return Objects.hash(connections, inputs, label, parentTaskExecutionId, priority, workflowId, webhooks);
   }
 
   @Override
@@ -288,7 +255,6 @@ public class JobParametersModel {
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    parentTaskExecutionId: ").append(toIndentedString(parentTaskExecutionId)).append("\n");
     sb.append("    priority: ").append(toIndentedString(priority)).append("\n");
-    sb.append("    triggerOutputs: ").append(toIndentedString(triggerOutputs)).append("\n");
     sb.append("    workflowId: ").append(toIndentedString(workflowId)).append("\n");
     sb.append("    webhooks: ").append(toIndentedString(webhooks)).append("\n");
     sb.append("}");
