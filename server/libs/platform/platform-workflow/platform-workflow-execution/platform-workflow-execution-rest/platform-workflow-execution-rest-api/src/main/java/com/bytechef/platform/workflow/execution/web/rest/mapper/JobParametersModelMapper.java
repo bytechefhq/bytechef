@@ -21,7 +21,6 @@ import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.execution.web.rest.mapper.config.PlatformWorkflowExecutionMapperSpringConfig;
 import com.bytechef.platform.workflow.execution.web.rest.model.JobConnectionModel;
 import com.bytechef.platform.workflow.execution.web.rest.model.JobParametersModel;
-import com.bytechef.platform.workflow.execution.web.rest.model.TriggerOutputModel;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,9 +42,7 @@ public abstract class JobParametersModelMapper implements Converter<JobParameter
 
     @Named("inputs")
     public Map<String, Object> getInputs(JobParametersModel jobParametersModel) {
-        return getInputs(
-            jobParametersModel.getInputs() == null ? Map.of() : jobParametersModel.getInputs(),
-            jobParametersModel.getTriggerOutputs() == null ? List.of() : jobParametersModel.getTriggerOutputs());
+        return jobParametersModel.getInputs() == null ? Map.of() : jobParametersModel.getInputs();
     }
 
     @Named("metadata")
@@ -65,17 +62,5 @@ public abstract class JobParametersModelMapper implements Converter<JobParameter
         }
 
         return Map.of(MetadataConstants.CONNECTION_IDS, connectionIdsMap);
-    }
-
-    private static Map<String, Object> getInputs(
-        Map<String, Object> inputs, List<TriggerOutputModel> triggerOutputModels) {
-
-        inputs = new HashMap<>(inputs);
-
-        for (TriggerOutputModel triggerOutputModel : triggerOutputModels) {
-            inputs.put(triggerOutputModel.getTriggerName(), triggerOutputModel.getValue());
-        }
-
-        return inputs;
     }
 }
