@@ -99,8 +99,8 @@ public class WebhookConfiguration {
     }
 
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
-        ContextService contextService, CounterService counterService,
-        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
+        ContextService contextService, CounterService counterService, TaskExecutionService taskExecutionService,
+        TaskFileStorage taskFileStorage) {
 
         return List.of(
             (taskCompletionHandler, taskDispatcher) -> new BranchTaskCompletionHandler(
