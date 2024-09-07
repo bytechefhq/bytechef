@@ -93,14 +93,13 @@ const WorkflowNodeDetailsPanel = ({
         workflowNodeDetailsPanelOpen,
     } = useWorkflowNodeDetailsPanelStore();
 
-    const {componentActions, latestComponentDefinition, setComponentActions, setDataPills, workflow} =
-        useWorkflowDataStore();
+    const {componentActions, setComponentActions, setDataPills, workflow} = useWorkflowDataStore();
 
     const {data: currentComponentDefinition} = useGetComponentDefinitionQuery(
         {
             componentName: currentNode?.componentName || currentNode?.id || '',
         },
-        !!currentNode && !currentNode.taskDispatcher && latestComponentDefinition?.name !== currentNode?.componentName
+        !!currentNode && !currentNode.taskDispatcher
     );
 
     const {data: workflowTestConfigurationConnections} = useGetWorkflowTestConfigurationConnectionsQuery(
@@ -434,7 +433,7 @@ const WorkflowNodeDetailsPanel = ({
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [componentActions]);
+    }, [componentActions, currentNode?.name]);
 
     const data = currentComponentDefinition || currentTaskDispatcherDefinition;
 

@@ -1,14 +1,12 @@
 import defaultEdges from '@/shared/defaultEdges';
 import defaultNodes from '@/shared/defaultNodes';
 import {
-    ActionDefinitionBasic,
     ComponentDefinitionBasic,
     TaskDispatcherDefinitionBasic,
     WorkflowTask,
     WorkflowTrigger,
 } from '@/shared/middleware/platform/configuration';
 import {ComponentOperationType} from '@/shared/types';
-import {usePrevious} from '@uidotdev/usehooks';
 import {DragEventHandler, useCallback, useEffect, useMemo, useState} from 'react';
 import ReactFlow, {Controls, MiniMap, useReactFlow, useStore} from 'reactflow';
 
@@ -30,24 +28,17 @@ export interface WorkflowEditorProps {
 }
 
 const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: WorkflowEditorProps) => {
-    const [latestComponentName, setLatestComponentName] = useState('');
     const [nodeOperations] = useState<Array<ComponentOperationType>>([]);
     const [viewportWidth, setViewportWidth] = useState(0);
-    const [workflowComponentWithAlias, setWorkflowComponentWithAlias] = useState<
-        (ComponentDefinitionBasic & {actions?: Array<ActionDefinitionBasic>; workflowNodeName: string}) | undefined
-    >();
 
     const {workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
-    const {componentActions, latestComponentDefinition, setComponentActions, setWorkflow, workflow} =
-        useWorkflowDataStore();
+    const {setComponentActions, setWorkflow, workflow} = useWorkflowDataStore();
 
     const {componentNames} = workflow;
 
     const {getEdge, getNode, getNodes, setViewport} = useReactFlow();
 
     const [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge, handleDropOnTriggerNode] = useHandleDrop();
-
-    const previousComponentNames: Array<string> | undefined = usePrevious(componentNames || []);
 
     const nodeTypes = useMemo(
         () => ({
@@ -171,21 +162,6 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
         }
     };
 
-    // Set workflowComponentWithAlias when latestComponentDefinition is changed
-    useEffect(() => {
-        if (!latestComponentDefinition || !componentNames?.length || !latestComponentName) {
-            return;
-        }
-
-        const sameComponentNames = componentNames.filter((nodeName) => nodeName === latestComponentDefinition.name);
-
-        setWorkflowComponentWithAlias({
-            ...latestComponentDefinition,
-            workflowNodeName: `${latestComponentDefinition.name}_${sameComponentNames.length}`,
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [latestComponentDefinition?.name, componentNames]);
-
     // Update workflow node names when nodes change
     useEffect(() => {
         const workflowNodes = getNodes();
@@ -205,58 +181,11 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [setWorkflow, componentNames]);
 
-    // Set latest component name when component names change
-    useEffect(() => {
-        if (componentNames && previousComponentNames?.length) {
-            const latestName = componentNames.find((componentName) => {
-                const currentNameCount = componentNames.filter((name) => name === componentName).length;
-
-                const previousNameCount = previousComponentNames?.filter((name) => name === componentName).length;
-
-                return currentNameCount > previousNameCount;
-            });
-
-            if (latestName) {
-                setLatestComponentName(latestName);
-            }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [previousComponentNames, componentNames]);
-
     // Set component actions when node actions change
     useEffect(() => {
         setComponentActions(nodeOperations);
-    }, [nodeOperations, setComponentActions]);
-
-    // Append counter to workflowNodeName when a new node with the same name is added
-    useEffect(() => {
-        if (workflowComponentWithAlias?.actions) {
-            const {actions, name} = workflowComponentWithAlias;
-
-            let workflowNodeName = `${name}_1`;
-            let index = 2;
-
-            while (componentActions.some((action) => action.workflowNodeName === workflowNodeName)) {
-                workflowNodeName = `${name}_${index}`;
-
-                index++;
-            }
-
-            const operationNames = componentActions.map((action) => action.operationName);
-
-            if (actions.length && !operationNames.includes(actions[0].name)) {
-                setComponentActions([
-                    ...componentActions,
-                    {
-                        componentName: name,
-                        operationName: actions[0].name,
-                        workflowNodeName,
-                    },
-                ]);
-            }
-        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [workflowComponentWithAlias?.workflowNodeName]);
+    }, [nodeOperations]);
 
     // Set viewport width and position
     useEffect(() => {
