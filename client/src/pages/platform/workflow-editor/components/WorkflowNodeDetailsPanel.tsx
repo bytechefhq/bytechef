@@ -93,14 +93,15 @@ const WorkflowNodeDetailsPanel = ({
         workflowNodeDetailsPanelOpen,
     } = useWorkflowNodeDetailsPanelStore();
 
+    const {componentActions, latestComponentDefinition, setComponentActions, setDataPills, workflow} =
+        useWorkflowDataStore();
+
     const {data: currentComponentDefinition} = useGetComponentDefinitionQuery(
         {
             componentName: currentNode?.componentName || currentNode?.id || '',
         },
-        !!currentNode && !currentNode.taskDispatcher
+        !!currentNode && !currentNode.taskDispatcher && latestComponentDefinition?.name !== currentNode?.componentName
     );
-
-    const {componentActions, setComponentActions, setDataPills, workflow} = useWorkflowDataStore();
 
     const {data: workflowTestConfigurationConnections} = useGetWorkflowTestConfigurationConnectionsQuery(
         {
@@ -298,19 +299,6 @@ const WorkflowNodeDetailsPanel = ({
         }
     }, [currentNodeDefinition?.properties, currentNode?.trigger, currentTriggerDefinition?.properties]);
 
-    // Set currentOperationName depending on the currentComponentAction.operationName
-    useEffect(() => {
-        if (componentActions?.length) {
-            const currentComponentAction = componentActions.find(
-                (action) => action.workflowNodeName === currentNode?.name
-            );
-
-            if (currentComponentAction) {
-                setCurrentOperationName(currentComponentAction.operationName);
-            }
-        }
-    }, [componentActions, currentNode?.name]);
-
     // Set availableDataPills depending on previousComponentProperties
     useEffect(() => {
         if (!previousComponentProperties) {
@@ -389,7 +377,8 @@ const WorkflowNodeDetailsPanel = ({
     // Update outputSchema to match the current action definition
     useEffect(() => {
         refetchWorkflowNodeOutput();
-    }, [currentOperationName, refetchWorkflowNodeOutput]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentOperationName]);
 
     useEffect(() => {
         if (currentNode && workflowTestConfigurationConnections?.[0]?.connectionId) {
@@ -433,12 +422,19 @@ const WorkflowNodeDetailsPanel = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentOperationName]);
 
-    // Set the currentOperationName to the currentNode.operationName
+    // Set currentOperationName depending on the currentComponentAction.operationName
     useEffect(() => {
-        if (currentNode?.operationName) {
-            setCurrentOperationName(currentNode?.operationName);
+        if (componentActions?.length) {
+            const currentComponentAction = componentActions.find(
+                (action) => action.workflowNodeName === currentNode?.name
+            );
+
+            if (currentComponentAction) {
+                setCurrentOperationName(currentComponentAction.operationName);
+            }
         }
-    }, [currentNode?.operationName, currentOperationName]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [componentActions]);
 
     const data = currentComponentDefinition || currentTaskDispatcherDefinition;
 
