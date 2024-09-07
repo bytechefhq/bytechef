@@ -19,11 +19,17 @@ export const ProjectWorkflowKeys = {
     projectWorkflows: (projectId: number) => [...ProjectKeys.projects, projectId, 'projectWorkflows'],
 };
 
-export const useGetProjectWorkflowQuery = (id: number, projectWorkflowId: number, enabled?: boolean) =>
+export const useGetProjectWorkflowQuery = (
+    id: number,
+    projectWorkflowId: number,
+    enabled?: boolean,
+    placeholderData?: Workflow
+) =>
     useQuery<Workflow, Error>({
         queryKey: ProjectWorkflowKeys.projectWorkflow(id, projectWorkflowId),
         queryFn: () => new WorkflowApi().getProjectWorkflow({projectWorkflowId}),
         enabled: enabled === undefined ? true : enabled,
+        placeholderData,
     });
 
 export const useGetProjectWorkflowsQuery = (id: number, enabled?: boolean) =>

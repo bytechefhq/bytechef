@@ -90,7 +90,6 @@ const WorkflowNodeDetailsPanel = ({
         setCurrentComponent,
         setCurrentComponentDefinition,
         setCurrentNode,
-        setWorkflowNodeDetailsPanelOpen,
         workflowNodeDetailsPanelOpen,
     } = useWorkflowNodeDetailsPanelStore();
 
@@ -374,7 +373,7 @@ const WorkflowNodeDetailsPanel = ({
         if (!currentNode?.name || !nodeNames.includes(currentNode?.name)) {
             useWorkflowNodeDetailsPanelStore.getState().reset();
         }
-    }, [currentNode?.name, nodeNames, setWorkflowNodeDetailsPanelOpen]);
+    }, [currentNode?.name, nodeNames]);
 
     // If the current component requires a connection, set the active tab to 'connection'
     useEffect(() => {
