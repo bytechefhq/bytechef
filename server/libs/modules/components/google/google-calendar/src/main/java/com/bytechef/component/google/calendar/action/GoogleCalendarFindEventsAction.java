@@ -26,24 +26,24 @@ import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID_PROPERTY;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_PROPERTY;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_TYPE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FROM;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.MAX_RESULTS;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.Q;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TO;
+import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.convertEventDateTimeToLocalDateTime;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
+import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
-import com.google.api.services.calendar.model.EventDateTime;
 import java.io.IOException;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -105,13 +105,13 @@ public class GoogleCalendarFindEventsAction {
         .output(
             outputSchema(
                 array()
-                    .items(EVENT_PROPERTY)))
+                    .items(EVENT_OUTPUT_PROPERTY)))
         .perform(GoogleCalendarFindEventsAction::perform);
 
     private GoogleCalendarFindEventsAction() {
     }
 
-    public static List<Event> perform(
+    public static List<CustomEvent> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
 
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
@@ -130,51 +130,26 @@ public class GoogleCalendarFindEventsAction {
         LocalDateTime to = timePeriod.get(TO);
 
         if (from == null && to == null) {
-            return items;
+            return getEvents(items);
         } else if (from != null && to == null) {
-            List<Event> result = new ArrayList<>();
+            List<Event> result = items.stream()
+                .filter(event -> convertEventDateTimeToLocalDateTime(event.getEnd()).isAfter(from))
+                .toList();
 
-            for (Event event : items) {
-                EventDateTime endEventDateTime = event.getEnd();
-
-                LocalDateTime endLocalDateTime = LocalDateTime.ofInstant(Instant.parse(endEventDateTime.getDateTime()
-                    .toString()), ZoneId.systemDefault());
-
-                if (endLocalDateTime.isAfter(from)) {
-                    result.add(event);
-                }
-            }
-
-            return result;
+            return getEvents(result);
 
         } else if (from == null) {
-            List<Event> result = new ArrayList<>();
+            List<Event> result = items.stream()
+                .filter(event -> convertEventDateTimeToLocalDateTime(event.getStart()).isBefore(to))
+                .toList();
 
-            for (Event event : items) {
-                EventDateTime startEventDateTime = event.getStart();
-
-                LocalDateTime startLocalDateTime =
-                    LocalDateTime.ofInstant(Instant.parse(startEventDateTime.getDateTime()
-                        .toString()), ZoneId.systemDefault());
-
-                if (startLocalDateTime.isBefore(to)) {
-                    result.add(event);
-                }
-            }
-
-            return result;
+            return getEvents(result);
         } else {
             List<Event> result = new ArrayList<>();
 
             for (Event event : items) {
-                EventDateTime startEventDateTime = event.getStart();
-                EventDateTime endEventDateTime = event.getEnd();
-
-                LocalDateTime startLocalDateTime =
-                    LocalDateTime.ofInstant(Instant.parse(startEventDateTime.getDateTime()
-                        .toString()), ZoneId.systemDefault());
-                LocalDateTime endLocalDateTime = LocalDateTime.ofInstant(Instant.parse(endEventDateTime.getDateTime()
-                    .toString()), ZoneId.systemDefault());
+                LocalDateTime startLocalDateTime = convertEventDateTimeToLocalDateTime(event.getStart());
+                LocalDateTime endLocalDateTime = convertEventDateTimeToLocalDateTime(event.getEnd());
 
                 if ((startLocalDateTime.isAfter(from) && startLocalDateTime.isBefore(to)) ||
                     (endLocalDateTime.isAfter(from) && endLocalDateTime.isBefore(to)) ||
@@ -183,7 +158,13 @@ public class GoogleCalendarFindEventsAction {
                 }
             }
 
-            return result;
+            return getEvents(result);
         }
+    }
+
+    private static List<CustomEvent> getEvents(List<Event> eventList) {
+        return eventList.stream()
+            .map(GoogleCalendarUtils::createEventRecord)
+            .toList();
     }
 }
