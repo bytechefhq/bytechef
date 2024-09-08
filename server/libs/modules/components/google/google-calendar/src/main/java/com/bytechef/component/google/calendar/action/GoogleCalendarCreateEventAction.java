@@ -35,7 +35,7 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DESCRIPTION;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EMAIL;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.END;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_PROPERTY;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.GUEST_CAN_INVITE_OTHERS;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.GUEST_CAN_MODIFY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.GUEST_CAN_SEE_OTHER_GUESTS;
@@ -49,11 +49,13 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SUMMARY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.USE_DEFAULT;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createEventDateTime;
+import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createEventRecord;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
@@ -66,7 +68,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class GoogleCalendarCreateEventAction {
 
@@ -169,13 +171,13 @@ public class GoogleCalendarCreateEventAction {
                                 .maxValue(40320)
                                 .required(true)))
                 .required(false))
-        .output(outputSchema(EVENT_PROPERTY))
+        .output(outputSchema(EVENT_OUTPUT_PROPERTY))
         .perform(GoogleCalendarCreateEventAction::perform);
 
     private GoogleCalendarCreateEventAction() {
     }
 
-    public static Event perform(
+    public static CustomEvent perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
 
         EventDateTime startEventDateTime = createEventDateTime(inputParameters, START);
@@ -214,9 +216,11 @@ public class GoogleCalendarCreateEventAction {
 
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
 
-        return calendar.events()
+        Event newEvent = calendar.events()
             .insert(inputParameters.getRequiredString(CALENDAR_ID), event)
             .setSendUpdates(inputParameters.getString(SEND_UPDATES))
             .execute();
+
+        return createEventRecord(newEvent);
     }
 }

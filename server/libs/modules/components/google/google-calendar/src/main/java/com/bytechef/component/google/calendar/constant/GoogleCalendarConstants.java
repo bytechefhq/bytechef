@@ -40,11 +40,9 @@ public class GoogleCalendarConstants {
     public static final String ALL_DAY = "allDay";
     public static final String ATTACHMENTS = "attachments";
     public static final String ATTENDEES = "attendees";
-    public static final String AUTO_DECLINE_MODE = "autoDeclineMode";
     public static final String CALENDAR_ID = "calendarId";
     public static final String DATE = "date";
     public static final String DATE_TIME = "dateTime";
-    public static final String DECLINE_MESSAGE = "declineMessage";
     public static final String DESCRIPTION = "description";
     public static final String DISPLAY_NAME = "displayName";
     public static final String EMAIL = "email";
@@ -55,13 +53,11 @@ public class GoogleCalendarConstants {
     public static final String GUEST_CAN_SEE_OTHER_GUESTS = "guestsCanSeeOtherGuests";
     public static final String ICON_LINK = "iconLink";
     public static final String ID = "id";
-    public static final String LABEL = "label";
     public static final String LOCATION = "location";
     public static final String MAX_RESULTS = "maxResults";
     public static final String METHOD = "method";
     public static final String MINUTES = "minutes";
     public static final String ORGANIZER = "organizer";
-    public static final String PARAMETERS = "parameters";
     public static final String Q = "q";
     public static final String REMINDERS = "reminders";
     public static final String RESOURCE_ID = "resourceId";
@@ -72,9 +68,7 @@ public class GoogleCalendarConstants {
     public static final String TEXT = "text";
     public static final String FROM = "from";
     public static final String TO = "to";
-    public static final String TIME_ZONE = "timeZone";
     public static final String TITLE = "title";
-    public static final String TYPE = "type";
     public static final String START = "start";
     public static final String USE_DEFAULT = "useDefault";
 
@@ -83,17 +77,19 @@ public class GoogleCalendarConstants {
         .options((ActionOptionsFunction<String>) GoogleCalendarUtils::getCalendarIdOptions)
         .required(true);
 
-    public static final ModifiableObjectProperty EVENT_PROPERTY = object()
+    public static final ModifiableObjectProperty EVENT_OUTPUT_PROPERTY = object()
         .properties(
-            bool("anyoneCanAddSelf"),
-            array(ATTACHMENTS)
-                .items(
-                    object()
-                        .properties(string("fileId"),
-                            string("fileUrl"),
-                            string(ICON_LINK),
-                            string("mimeType"),
-                            string(TITLE))),
+            string("iCalUID"),
+            string(ID),
+            string(SUMMARY),
+            dateTime("startTime"),
+            dateTime("endTime"),
+            string("etag"),
+            string(EVENT_TYPE),
+            string("htmlLink"),
+            string(STATUS),
+            string(LOCATION),
+            string("hangoutLink"),
             array(ATTENDEES)
                 .items(
                     object()
@@ -108,117 +104,14 @@ public class GoogleCalendarConstants {
                             bool("resource"),
                             string("responseStatus"),
                             bool(SELF))),
-            bool("attendeesOmitted"),
-            string("colorId"),
-            object("conferenceData")
-                .properties(
-                    string("conferenceId"),
-                    object("conferenceSolution")
-                        .properties(
-                            string("iconUri"),
-                            object("key")
-                                .properties(
-                                    string(TYPE)),
-                            string("name")),
-                    object("createRequest")
-                        .properties(
-                            object("conferenceSolutionKey")
-                                .properties(
-                                    string(TYPE)),
-                            string("requestId"),
-                            object(STATUS)
-                                .properties(
-                                    string("statusCode"))),
-                    array("entryPoints")
-                        .items(
-                            object()
-                                .properties(
-                                    string("accessCode"),
-                                    array("entryPointFeatures")
-                                        .items(string()),
-                                    string("entryPointType"),
-                                    string(LABEL),
-                                    string("meetingCode"),
-                                    string("passcode"),
-                                    string("password"),
-                                    string("pin"),
-                                    string("regionCode"),
-                                    string("uri"))),
-                    string("notes"),
-                    object(PARAMETERS)
-                        .properties(
-                            object("addOnParameters")
-                                .properties(
-                                    object(PARAMETERS)
-                                        .additionalProperties(string()))),
-                    string("signature")),
-            dateTime("created"),
-            object("creator")
-                .properties(
-                    string(DISPLAY_NAME),
-                    string(EMAIL),
-                    string(ID),
-                    bool(SELF)),
-            string(DESCRIPTION),
-            object(END)
-                .properties(
-                    dateTime(DATE),
-                    dateTime(DATE_TIME),
-                    string(TIME_ZONE)),
-            bool("endTimeUnspecified"),
-            string("etag"),
-            string(EVENT_TYPE),
-            object("extendedProperties")
-                .properties(
-                    object("private")
-                        .additionalProperties(string()),
-                    object("shared")
-                        .additionalProperties(string())),
-            object("focusTimeProperties")
-                .properties(
-                    string(AUTO_DECLINE_MODE),
-                    string("chatStatus"),
-                    string(DECLINE_MESSAGE)),
-            object("gadget")
-                .properties(
-                    string("display"),
-                    integer("height"),
-                    string(ICON_LINK),
-                    string("link"),
-                    object("preferences")
-                        .additionalProperties(string()),
-                    string(TITLE),
-                    string(TYPE),
-                    string("width")),
-            bool(GUEST_CAN_INVITE_OTHERS),
-            bool(GUEST_CAN_MODIFY),
-            bool(GUEST_CAN_SEE_OTHER_GUESTS),
-            string("hangoutLink"),
-            string("htmlLink"),
-            string("iCalUID"),
-            string(ID),
-            string("kind"),
-            string(LOCATION),
-            bool("locked"),
-            object(ORGANIZER)
-                .properties(
-                    string(DISPLAY_NAME),
-                    string(EMAIL),
-                    string(ID),
-                    bool(SELF)),
-            object("originalStartTime")
-                .properties(
-                    dateTime(DATE),
-                    dateTime(DATE_TIME),
-                    string(TIME_ZONE)),
-            object("outOfOfficeProperties")
-                .properties(
-                    string(AUTO_DECLINE_MODE),
-                    string(DECLINE_MESSAGE)),
-            bool("privateCopy"),
-            array("recurrence")
-                .items(string()),
-            string("recurringEventId"),
+            array(ATTACHMENTS)
+                .items(
+                    object()
+                        .properties(string("fileId"),
+                            string("fileUrl"),
+                            string(ICON_LINK),
+                            string("mimeType"),
+                            string(TITLE))),
             object(REMINDERS)
                 .properties(
                     array("overrides")
@@ -227,36 +120,7 @@ public class GoogleCalendarConstants {
                                 .properties(
                                     string(METHOD),
                                     integer(MINUTES))),
-                    bool(USE_DEFAULT)),
-            integer("sequence"),
-            object("source")
-                .properties(
-                    string(TITLE),
-                    string("url")),
-            object(START)
-                .properties(
-                    dateTime(DATE),
-                    dateTime(DATE_TIME),
-                    string(TIME_ZONE)),
-            string(STATUS),
-            string(SUMMARY),
-            string("transparency"),
-            dateTime("updated"),
-            string("visibility"),
-            object("workingLocationProperties")
-                .properties(
-                    object("customLocation")
-                        .properties(
-                            string(LABEL)),
-                    object("homeOffice"),
-                    object("officeLocation")
-                        .properties(
-                            string("buildingId"),
-                            string("deskId"),
-                            string("floorId"),
-                            string("floorSectionId"),
-                            string(LABEL)),
-                    string(TYPE)));
+                    bool(USE_DEFAULT)));
 
     public static final ModifiableStringProperty SEND_UPDATES_PROPERTY =
         string(SEND_UPDATES)

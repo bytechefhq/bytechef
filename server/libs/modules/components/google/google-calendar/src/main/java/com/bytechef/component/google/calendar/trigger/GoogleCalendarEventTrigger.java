@@ -21,9 +21,10 @@ import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_PROPERTY;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.RESOURCE_ID;
+import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createEventRecord;
 
 import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
@@ -36,6 +37,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
+import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Channel;
@@ -46,7 +48,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class GoogleCalendarEventTrigger {
 
@@ -62,7 +64,7 @@ public class GoogleCalendarEventTrigger {
                         inputParameters, connectionParameters, arrayIndex, searchText, context) -> GoogleCalendarUtils
                             .getCalendarIdOptions(inputParameters, connectionParameters, null, null, context))
                 .required(true))
-        .output(outputSchema(EVENT_PROPERTY))
+        .output(outputSchema(EVENT_OUTPUT_PROPERTY))
         .webhookEnable(GoogleCalendarEventTrigger::webhookEnable)
         .webhookDisable(GoogleCalendarEventTrigger::webhookDisable)
         .webhookRequest(GoogleCalendarEventTrigger::webhookRequest);
@@ -114,7 +116,7 @@ public class GoogleCalendarEventTrigger {
         }
     }
 
-    protected static Event webhookRequest(
+    protected static CustomEvent webhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
         WebhookBody body, WebhookMethod method, WebhookEnableOutput output, TriggerContext context)
         throws IOException {
@@ -128,6 +130,6 @@ public class GoogleCalendarEventTrigger {
             .execute()
             .getItems();
 
-        return events.getLast();
+        return createEventRecord(events.getLast());
     }
 }

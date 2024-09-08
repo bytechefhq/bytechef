@@ -21,21 +21,23 @@ import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID_PROPERTY;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_PROPERTY;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SEND_UPDATES;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SEND_UPDATES_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TEXT;
+import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createEventRecord;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import java.io.IOException;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class GoogleCalendarCreateQuickEventAction {
 
@@ -49,20 +51,22 @@ public class GoogleCalendarCreateQuickEventAction {
                 .description("The text describing the event to be created.")
                 .required(true),
             SEND_UPDATES_PROPERTY)
-        .output(outputSchema(EVENT_PROPERTY))
+        .output(outputSchema(EVENT_OUTPUT_PROPERTY))
         .perform(GoogleCalendarCreateQuickEventAction::perform);
 
     private GoogleCalendarCreateQuickEventAction() {
     }
 
-    public static Event perform(
+    public static CustomEvent perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
 
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
 
-        return calendar.events()
+        Event event = calendar.events()
             .quickAdd(inputParameters.getRequiredString(CALENDAR_ID), inputParameters.getRequiredString(TEXT))
             .setSendUpdates(inputParameters.getString(SEND_UPDATES))
             .execute();
+
+        return createEventRecord(event);
     }
 }

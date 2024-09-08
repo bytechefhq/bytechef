@@ -25,21 +25,32 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.CalendarListEntry;
+import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventAttachment;
+import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.EventDateTime;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class GoogleCalendarUtils {
 
     private GoogleCalendarUtils() {
+    }
+
+    public static LocalDateTime convertEventDateTimeToLocalDateTime(EventDateTime eventDateTime) {
+        DateTime dateTime = eventDateTime.getDateTime();
+
+        return LocalDateTime.ofInstant(Instant.parse(dateTime.toString()), ZoneId.systemDefault());
     }
 
     public static Date convertToDateViaSqlTimestamp(LocalDateTime dateToConvert) {
@@ -82,5 +93,19 @@ public class GoogleCalendarUtils {
         }
 
         return options;
+    }
+
+    public static CustomEvent createEventRecord(Event event) {
+        return new CustomEvent(
+            event.getICalUID(), event.getId(), event.getSummary(), event.getDescription(),
+            convertEventDateTimeToLocalDateTime(event.getStart()), convertEventDateTimeToLocalDateTime(event.getEnd()),
+            event.getEtag(), event.getEventType(), event.getHtmlLink(), event.getStatus(), event.getLocation(),
+            event.getHangoutLink(), event.getAttendees(), event.getAttachments(), event.getReminders());
+    }
+
+    public record CustomEvent(
+        String iCalUID, String id, String summary, String description, LocalDateTime startTime, LocalDateTime endTime,
+        String etag, String eventType, String htmlLink, String status, String location, String hangoutLink,
+        List<EventAttendee> attendeeList, List<EventAttachment> attachments, Event.Reminders reminders) {
     }
 }
