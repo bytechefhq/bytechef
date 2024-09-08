@@ -164,7 +164,7 @@ public class GoogleCalendarFindEventsAction {
 
     private static List<CustomEvent> getEvents(List<Event> eventList) {
         return eventList.stream()
-            .map(GoogleCalendarUtils::createEventRecord)
+            .map(GoogleCalendarUtils::createCustomEvent)
             .toList();
     }
 }

@@ -25,7 +25,7 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SEND_UPDATES;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SEND_UPDATES_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TEXT;
-import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createEventRecord;
+import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createCustomEvent;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -67,6 +67,6 @@ public class GoogleCalendarCreateQuickEventAction {
             .setSendUpdates(inputParameters.getString(SEND_UPDATES))
             .execute();
 
-        return createEventRecord(event);
+        return createCustomEvent(event);
     }
 }

@@ -48,8 +48,8 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.START;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SUMMARY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.USE_DEFAULT;
+import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createCustomEvent;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createEventDateTime;
-import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createEventRecord;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -61,7 +61,6 @@ import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttachment;
 import com.google.api.services.calendar.model.EventAttendee;
-import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.EventReminder;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -180,9 +179,6 @@ public class GoogleCalendarCreateEventAction {
     public static CustomEvent perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
 
-        EventDateTime startEventDateTime = createEventDateTime(inputParameters, START);
-        EventDateTime endEventDateTime = createEventDateTime(inputParameters, END);
-
         List<EventAttachment> eventAttachments = new ArrayList<>();
 
         for (FileEntry fileEntry : inputParameters.getFileEntries(ATTACHMENTS, List.of())) {
@@ -202,7 +198,7 @@ public class GoogleCalendarCreateEventAction {
             .setAttachments(eventAttachments)
             .setAttendees(eventAttendees)
             .setDescription(inputParameters.getString(DESCRIPTION))
-            .setEnd(endEventDateTime)
+            .setEnd(createEventDateTime(inputParameters, END))
             .setGuestsCanInviteOthers(inputParameters.getBoolean(GUEST_CAN_INVITE_OTHERS))
             .setGuestsCanModify(inputParameters.getBoolean(GUEST_CAN_MODIFY))
             .setGuestsCanSeeOtherGuests(inputParameters.getBoolean(GUEST_CAN_SEE_OTHER_GUESTS))
@@ -211,7 +207,7 @@ public class GoogleCalendarCreateEventAction {
                 new Event.Reminders()
                     .setUseDefault(inputParameters.getRequiredBoolean(USE_DEFAULT))
                     .setOverrides(inputParameters.getList(REMINDERS, EventReminder.class, List.of())))
-            .setStart(startEventDateTime)
+            .setStart(createEventDateTime(inputParameters, START))
             .setSummary(inputParameters.getString(SUMMARY));
 
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
@@ -221,6 +217,6 @@ public class GoogleCalendarCreateEventAction {
             .setSendUpdates(inputParameters.getString(SEND_UPDATES))
             .execute();
 
-        return createEventRecord(newEvent);
+        return createCustomEvent(newEvent);
     }
 }
