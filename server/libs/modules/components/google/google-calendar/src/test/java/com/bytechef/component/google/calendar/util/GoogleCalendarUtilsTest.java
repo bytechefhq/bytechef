@@ -18,6 +18,8 @@ package com.bytechef.component.google.calendar.util;
 
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ALL_DAY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.START;
+import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.convertToDateViaSqlTimestamp;
+import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createEventDateTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -33,6 +35,9 @@ import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.CalendarListEntry;
+import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventAttachment;
+import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.EventDateTime;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -45,7 +50,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 class GoogleCalendarUtilsTest {
 
@@ -57,10 +62,22 @@ class GoogleCalendarUtilsTest {
     private final ArgumentCaptor<String> minAccessRoleArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
+    void testConvertEventDateTimeToLocalDateTime() {
+        LocalDateTime localDateTime = LocalDateTime.of(2000, 1, 1, 1, 1, 1);
+
+        EventDateTime eventDateTime =
+            new EventDateTime().setDateTime(new DateTime(convertToDateViaSqlTimestamp(localDateTime)));
+
+        LocalDateTime convertedDateTime = GoogleCalendarUtils.convertEventDateTimeToLocalDateTime(eventDateTime);
+
+        assertEquals(localDateTime, convertedDateTime);
+    }
+
+    @Test
     void testConvertToDateViaSqlTimestamp() {
         LocalDateTime dateToConvert = LocalDateTime.of(2010, 11, 10, 8, 20);
 
-        Date date = GoogleCalendarUtils.convertToDateViaSqlTimestamp(dateToConvert);
+        Date date = convertToDateViaSqlTimestamp(dateToConvert);
         java.util.Calendar calendar = java.util.Calendar.getInstance();
         calendar.setTime(date);
 
@@ -81,7 +98,7 @@ class GoogleCalendarUtilsTest {
         when(mockedParameters.getRequiredDate(START))
             .thenReturn(date);
 
-        EventDateTime eventDateTime = GoogleCalendarUtils.createEventDateTime(mockedParameters, START);
+        EventDateTime eventDateTime = createEventDateTime(mockedParameters, START);
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -99,9 +116,9 @@ class GoogleCalendarUtilsTest {
         when(mockedParameters.getRequiredLocalDateTime(START))
             .thenReturn(localDateTime);
 
-        EventDateTime eventDateTime = GoogleCalendarUtils.createEventDateTime(mockedParameters, START);
+        EventDateTime eventDateTime = createEventDateTime(mockedParameters, START);
 
-        assertEquals(new DateTime(GoogleCalendarUtils.convertToDateViaSqlTimestamp(localDateTime)),
+        assertEquals(new DateTime(convertToDateViaSqlTimestamp(localDateTime)),
             eventDateTime.getDateTime());
         assertNull(eventDateTime.getDate());
         assertNull(eventDateTime.getTimeZone());
@@ -142,4 +159,42 @@ class GoogleCalendarUtilsTest {
         }
     }
 
+    @Test
+    void testCreateCustomEvent() {
+        LocalDateTime startTime = LocalDateTime.of(2000, 1, 1, 1, 1, 1);
+        LocalDateTime endTime = LocalDateTime.of(2000, 2, 2, 2, 2, 2);
+
+        Event event = new Event()
+            .setICalUID("icaluid")
+            .setId("id")
+            .setSummary("summary")
+            .setDescription("description")
+            .setStart(new EventDateTime().setDateTime(new DateTime(convertToDateViaSqlTimestamp(startTime))))
+            .setEnd(new EventDateTime().setDateTime(new DateTime(convertToDateViaSqlTimestamp(endTime))))
+            .setEtag("etag")
+            .setEventType("eventType")
+            .setHtmlLink("htmlLink")
+            .setHangoutLink("hangoutLink")
+            .setStatus("status")
+            .setAttachments(List.of(new EventAttachment().setTitle("title")))
+            .setAttendees(List.of(new EventAttendee()))
+            .setReminders(new Event.Reminders().setUseDefault(false));
+
+        GoogleCalendarUtils.CustomEvent customEvent = GoogleCalendarUtils.createCustomEvent(event);
+
+        assertEquals(event.getICalUID(), customEvent.iCalUID());
+        assertEquals(event.getId(), customEvent.id());
+        assertEquals(event.getSummary(), customEvent.summary());
+        assertEquals(event.getDescription(), customEvent.description());
+        assertEquals(startTime, customEvent.startTime());
+        assertEquals(endTime, customEvent.endTime());
+        assertEquals(event.getEtag(), customEvent.etag());
+        assertEquals(event.getEventType(), customEvent.eventType());
+        assertEquals(event.getHtmlLink(), customEvent.htmlLink());
+        assertEquals(event.getHangoutLink(), customEvent.hangoutLink());
+        assertEquals(event.getStatus(), customEvent.status());
+        assertEquals(event.getAttachments(), customEvent.attachments());
+        assertEquals(event.getAttendees(), customEvent.attendeeList());
+        assertEquals(event.getReminders(), customEvent.reminders());
+    }
 }
