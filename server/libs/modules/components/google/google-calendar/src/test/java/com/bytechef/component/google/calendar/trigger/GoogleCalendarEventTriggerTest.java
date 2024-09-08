@@ -19,6 +19,7 @@ package com.bytechef.component.google.calendar.trigger;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.RESOURCE_ID;
+import static com.bytechef.component.google.calendar.trigger.GoogleCalendarEventTrigger.webhookRequest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
@@ -32,6 +33,8 @@ import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
+import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
+import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.Calendar.Channels;
@@ -51,7 +54,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 class GoogleCalendarEventTriggerTest {
 
@@ -60,6 +63,7 @@ class GoogleCalendarEventTriggerTest {
     private final Calendar mockedCalendar = mock(Calendar.class);
     private final Channel mockedChannel = mock(Channel.class);
     private final Channels mockedChannels = mock(Channels.class);
+    private final CustomEvent mockedCustomEvent = mock(CustomEvent.class);
     private final WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
     private final Events mockedEvents = mock(Events.class);
     private final com.google.api.services.calendar.model.Events mockedEvents2 = mock(
@@ -168,13 +172,20 @@ class GoogleCalendarEventTriggerTest {
         when(mockedEvents2.getItems())
             .thenReturn(events);
 
-        Event result = GoogleCalendarEventTrigger.webhookRequest(
-            mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
+        try (
+            MockedStatic<GoogleCalendarUtils> googleCalendarUtilsMockedStatic = mockStatic(GoogleCalendarUtils.class)) {
+            googleCalendarUtilsMockedStatic
+                .when(() -> GoogleCalendarUtils.createCustomEvent(event))
+                .thenReturn(mockedCustomEvent);
 
-        assertEquals(event, result);
+            CustomEvent result = webhookRequest(
+                mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
+                mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
 
-        assertEquals("calendar_id", calendarIdArgumentCaptor.getValue());
-        assertEquals("updated", orderByArgumentCaptor.getValue());
+            assertEquals(mockedCustomEvent, result);
+
+            assertEquals("calendar_id", calendarIdArgumentCaptor.getValue());
+            assertEquals("updated", orderByArgumentCaptor.getValue());
+        }
     }
 }
