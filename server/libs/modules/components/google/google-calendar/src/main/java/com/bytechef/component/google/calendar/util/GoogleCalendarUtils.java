@@ -78,14 +78,14 @@ public class GoogleCalendarUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) throws IOException {
 
-        List<Option<String>> options = new ArrayList<>();
-
         List<CalendarListEntry> calendarListEntries = GoogleServices.getCalendar(connectionParameters)
             .calendarList()
             .list()
             .setMinAccessRole("writer")
             .execute()
             .getItems();
+
+        List<Option<String>> options = new ArrayList<>();
 
         for (CalendarListEntry calendarListEntry : calendarListEntries) {
             options.add(
@@ -95,7 +95,7 @@ public class GoogleCalendarUtils {
         return options;
     }
 
-    public static CustomEvent createEventRecord(Event event) {
+    public static CustomEvent createCustomEvent(Event event) {
         return new CustomEvent(
             event.getICalUID(), event.getId(), event.getSummary(), event.getDescription(),
             convertEventDateTimeToLocalDateTime(event.getStart()), convertEventDateTimeToLocalDateTime(event.getEnd()),

@@ -24,7 +24,7 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.RESOURCE_ID;
-import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createEventRecord;
+import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createCustomEvent;
 
 import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
@@ -121,15 +121,14 @@ public class GoogleCalendarEventTrigger {
         WebhookBody body, WebhookMethod method, WebhookEnableOutput output, TriggerContext context)
         throws IOException {
 
-        String calendarId = inputParameters.getRequiredString(CALENDAR_ID);
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
 
         List<Event> events = calendar.events()
-            .list(calendarId)
+            .list(inputParameters.getRequiredString(CALENDAR_ID))
             .setOrderBy("updated")
             .execute()
             .getItems();
 
-        return createEventRecord(events.getLast());
+        return createCustomEvent(events.getLast());
     }
 }
