@@ -49,7 +49,7 @@ const WorkflowNodesPopoverMenuList = memo(
         triggerComponentDefinitions,
     }: WorkflowNodesListProps) => {
         const {setLatestComponentDefinition, setWorkflow, workflow} = useWorkflowDataStore();
-        const {currentNode, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
+        const {currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
 
         const {getEdge, getNode, getNodes, setEdges, setNodes} = useReactFlow();
 
@@ -132,13 +132,6 @@ const WorkflowNodesPopoverMenuList = memo(
                                 type: 'workflow',
                             };
 
-                            setWorkflow({
-                                ...workflow,
-                                componentNames: [clickedItem.name, ...componentNames.slice(1)],
-                            });
-
-                            setCurrentNode(newTriggerNode.data);
-
                             saveWorkflowDefinition(
                                 newTriggerNode.data,
                                 workflow,
@@ -151,6 +144,26 @@ const WorkflowNodesPopoverMenuList = memo(
                                             lastWorkflowNodeName: currentNode?.name,
                                         }),
                                     });
+
+                                    setWorkflow({
+                                        ...workflow,
+                                        componentNames: [clickedItem.name, ...componentNames.slice(1)],
+                                    });
+
+                                    if (currentNode?.trigger) {
+                                        setCurrentNode(newTriggerNode.data);
+                                    }
+
+                                    if (clickedItem.trigger) {
+                                        setCurrentComponent({
+                                            componentName: newTriggerNode.data.componentName,
+                                            notes: newTriggerNode.data.description,
+                                            operationName: newTriggerNode.data.operationName,
+                                            title: newTriggerNode.data.label,
+                                            type: newTriggerNode.data.type,
+                                            workflowNodeName: newTriggerNode.data.workflowNodeName,
+                                        });
+                                    }
                                 }
                             );
 
