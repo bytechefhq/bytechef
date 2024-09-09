@@ -29,6 +29,7 @@ import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttachment;
 import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.EventDateTime;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -103,6 +104,7 @@ public class GoogleCalendarUtils {
             event.getHangoutLink(), event.getAttendees(), event.getAttachments(), event.getReminders());
     }
 
+    @SuppressFBWarnings("EI")
     public record CustomEvent(
         String iCalUID, String id, String summary, String description, LocalDateTime startTime, LocalDateTime endTime,
         String etag, String eventType, String htmlLink, String status, String location, String hangoutLink,
