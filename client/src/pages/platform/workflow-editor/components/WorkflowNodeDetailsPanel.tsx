@@ -283,6 +283,8 @@ const WorkflowNodeDetailsPanel = ({
                 });
 
                 setComponentActions(formattedComponentActions);
+
+                refetchWorkflowNodeOutput();
             }
         );
     };
@@ -372,12 +374,6 @@ const WorkflowNodeDetailsPanel = ({
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentComponentDefinition]);
-
-    // Update outputSchema to match the current action definition
-    useEffect(() => {
-        refetchWorkflowNodeOutput();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentOperationName]);
 
     useEffect(() => {
         if (currentNode && workflowTestConfigurationConnections?.[0]?.connectionId) {
