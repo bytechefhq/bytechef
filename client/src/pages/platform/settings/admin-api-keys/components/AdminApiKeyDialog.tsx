@@ -89,7 +89,6 @@ const AdminApiKeyDialog = ({adminApiKey, onClose, triggerNode}: AdminApiKeyDialo
     }
 
     function saveApiKey() {
-        console.log(adminApiKey);
         if (adminApiKey?.id) {
             updateAdminApiKeyMutation.mutate({
                 ...adminApiKey,
