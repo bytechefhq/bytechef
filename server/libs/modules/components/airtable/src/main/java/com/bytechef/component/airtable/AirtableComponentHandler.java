@@ -20,6 +20,7 @@ import static com.bytechef.component.airtable.constant.AirtableConstants.BASE_ID
 import static com.bytechef.component.airtable.constant.AirtableConstants.TABLE_ID;
 
 import com.bytechef.component.OpenAPIComponentHandler;
+import com.bytechef.component.airtable.datastream.AirtableDataStream;
 import com.bytechef.component.airtable.trigger.AirtableNewRecordTrigger;
 import com.bytechef.component.airtable.util.AirtableUtils;
 import com.bytechef.component.definition.ActionDefinition;
@@ -30,7 +31,6 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableDynamicPropertie
 import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
-import com.bytechef.component.definition.DataStreamItemReader;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.exception.ProviderException;
 import com.google.auto.service.AutoService;
@@ -73,7 +73,7 @@ public class AirtableComponentHandler extends AbstractAirtableComponentHandler {
             .customAction(true)
             .icon("path:assets/airtable.svg")
             .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
-            .dataStreamItemReader(new DataStreamItemReader() {});
+            .dataStream(AirtableDataStream.DATA_STREAM_DEFINITION);
     }
 
     @Override
