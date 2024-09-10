@@ -17,6 +17,8 @@
 package com.bytechef.component.definition;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.DataStreamReaderDefinition.DataStreamItemReaderSupplier;
+import com.bytechef.component.definition.DataStreamWriterDefinition.DataStreamItemWriterSupplier;
 import com.bytechef.component.definition.OptionsDataSource.OptionsFunction;
 import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.component.definition.PropertiesDataSource.TriggerPropertiesFunction;
@@ -246,11 +248,39 @@ public final class ComponentDSL {
         return new ModifiableTriggerDefinition(name);
     }
 
-    public static ModifiableDataStreamReaderDefinition reader(DataStreamItemReader dataStreamItemReader) {
-        return new ModifiableDataStreamReaderDefinition(dataStreamItemReader);
+    public static ModifiableDataStreamReaderDefinition reader(
+        Class<? extends DataStreamItemReader> dataStreamItemReader) {
+
+        return new ModifiableDataStreamReaderDefinition(() -> {
+            try {
+                return dataStreamItemReader.getDeclaredConstructor()
+                    .newInstance();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
-    public static ModifiableDataStreamWriterDefinition writer(DataStreamItemWriter dataStreamItemWriter) {
+    public static ModifiableDataStreamReaderDefinition reader(
+        DataStreamItemReaderSupplier dataStreamItemReaderClass) {
+
+        return new ModifiableDataStreamReaderDefinition(dataStreamItemReaderClass);
+    }
+
+    public static ModifiableDataStreamWriterDefinition writer(
+        Class<? extends DataStreamItemWriter> dataStreamItemReaderClass) {
+
+        return new ModifiableDataStreamWriterDefinition(() -> {
+            try {
+                return dataStreamItemReaderClass.getDeclaredConstructor()
+                    .newInstance();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    public static ModifiableDataStreamWriterDefinition writer(DataStreamItemWriterSupplier dataStreamItemWriter) {
         return new ModifiableDataStreamWriterDefinition(dataStreamItemWriter);
     }
 
@@ -1607,11 +1637,11 @@ public final class ComponentDSL {
 
     public static final class ModifiableDataStreamReaderDefinition implements DataStreamReaderDefinition {
 
-        private DataStreamItemReader dataStreamItemReader;
+        private final DataStreamItemReaderSupplier dataStreamItemReaderSupplier;
         private List<? extends Property> properties;
 
-        public ModifiableDataStreamReaderDefinition(DataStreamItemReader dataStreamItemReader) {
-            this.dataStreamItemReader = dataStreamItemReader;
+        public ModifiableDataStreamReaderDefinition(DataStreamItemReaderSupplier dataStreamItemReaderSupplier) {
+            this.dataStreamItemReaderSupplier = dataStreamItemReaderSupplier;
         }
 
         public ModifiableDataStreamReaderDefinition properties(Property... properties) {
@@ -1632,13 +1662,13 @@ public final class ComponentDSL {
                 return false;
             }
 
-            return Objects.equals(dataStreamItemReader, that.dataStreamItemReader)
+            return Objects.equals(dataStreamItemReaderSupplier, that.dataStreamItemReaderSupplier)
                 && Objects.equals(properties, that.properties);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(dataStreamItemReader, properties);
+            return Objects.hash(dataStreamItemReaderSupplier, properties);
         }
 
         @Override
@@ -1647,25 +1677,19 @@ public final class ComponentDSL {
         }
 
         @Override
-        public DataStreamItemReader getDataStreamItemReader() {
-            return Objects.requireNonNull(dataStreamItemReader);
+        public DataStreamItemReaderSupplier getDataStreamItemReader() {
+            return Objects.requireNonNull(dataStreamItemReaderSupplier);
         }
     }
 
     public static final class ModifiableDataStreamWriterDefinition implements DataStreamWriterDefinition {
 
-        private DataStreamItemWriter dataStreamItemWriter;
+        private final DataStreamItemWriterSupplier dataStreamItemWriterSupplier;
         private List<? extends Property> properties;
         private List<StreamType> streamTypes;
 
-        public ModifiableDataStreamWriterDefinition(DataStreamItemWriter dataStreamItemWriter) {
-            this.dataStreamItemWriter = dataStreamItemWriter;
-        }
-
-        public ModifiableDataStreamWriterDefinition dataStreamItemWriter(DataStreamItemWriter writer) {
-            this.dataStreamItemWriter = writer;
-
-            return this;
+        private ModifiableDataStreamWriterDefinition(DataStreamItemWriterSupplier dataStreamItemWriterSupplier) {
+            this.dataStreamItemWriterSupplier = dataStreamItemWriterSupplier;
         }
 
         public ModifiableDataStreamWriterDefinition properties(Property... properties) {
@@ -1694,13 +1718,13 @@ public final class ComponentDSL {
                 return false;
             }
 
-            return Objects.equals(dataStreamItemWriter, that.dataStreamItemWriter)
+            return Objects.equals(dataStreamItemWriterSupplier, that.dataStreamItemWriterSupplier)
                 && Objects.equals(properties, that.properties) && Objects.equals(streamTypes, that.streamTypes);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(dataStreamItemWriter, properties, streamTypes);
+            return Objects.hash(dataStreamItemWriterSupplier, properties, streamTypes);
         }
 
         @Override
@@ -1714,8 +1738,8 @@ public final class ComponentDSL {
         }
 
         @Override
-        public DataStreamItemWriter getDataStreamItemWriter() {
-            return Objects.requireNonNull(dataStreamItemWriter);
+        public DataStreamItemWriterSupplier getDataStreamItemWriter() {
+            return Objects.requireNonNull(dataStreamItemWriterSupplier);
         }
     }
 

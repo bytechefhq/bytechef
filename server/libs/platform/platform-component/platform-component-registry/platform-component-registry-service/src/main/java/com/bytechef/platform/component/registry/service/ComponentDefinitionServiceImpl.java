@@ -115,7 +115,8 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
             .orElseThrow(() -> new IllegalArgumentException(
                 "Data stream item reader for component: %s, version: %d not found".formatted(
                     componentName, componentVersion)))
-            .getDataStreamItemReader();
+            .getDataStreamItemReader()
+            .get();
     }
 
     @Override
@@ -128,7 +129,8 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
             .orElseThrow(() -> new IllegalArgumentException(
                 "Data stream item writer with component: %s, version: %d not found".formatted(
                     componentName, componentVersion)))
-            .getDataStreamItemWriter();
+            .getDataStreamItemWriter()
+            .get();
     }
 
     @Override

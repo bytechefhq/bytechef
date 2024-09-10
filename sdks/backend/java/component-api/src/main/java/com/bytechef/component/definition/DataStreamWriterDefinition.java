@@ -32,7 +32,7 @@ public interface DataStreamWriterDefinition {
      *
      * @return
      */
-    DataStreamItemWriter getDataStreamItemWriter();
+    DataStreamItemWriterSupplier getDataStreamItemWriter();
 
     /**
      *
@@ -45,4 +45,13 @@ public interface DataStreamWriterDefinition {
      * @return
      */
     Optional<List<StreamType>> getStreamTypes();
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface DataStreamItemWriterSupplier {
+
+        DataStreamItemWriter get();
+    }
 }

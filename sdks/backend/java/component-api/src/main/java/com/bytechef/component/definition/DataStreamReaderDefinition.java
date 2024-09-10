@@ -28,11 +28,20 @@ public interface DataStreamReaderDefinition {
      *
      * @return
      */
-    DataStreamItemReader getDataStreamItemReader();
+    DataStreamItemReaderSupplier getDataStreamItemReader();
 
     /**
      *
      * @return
      */
     Optional<List<? extends Property>> getProperties();
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface DataStreamItemReaderSupplier {
+
+        DataStreamItemReader get();
+    }
 }

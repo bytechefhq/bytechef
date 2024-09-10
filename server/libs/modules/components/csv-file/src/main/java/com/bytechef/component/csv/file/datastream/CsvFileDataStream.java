@@ -28,5 +28,5 @@ import com.bytechef.component.definition.DataStreamDefinition;
 public class CsvFileDataStream {
 
     public static final DataStreamDefinition DATA_STREAM_DEFINITION = dataStream(
-        reader(new CsvFileDataStreamItemReader()), writer(new CsvFileDataStreamItemWriter()));
+        reader(CsvFileDataStreamItemReader.class), writer(CsvFileDataStreamItemWriter.class));
 }

@@ -28,6 +28,6 @@ import com.bytechef.component.definition.DataStreamDefinition;
 public class AirtableDataStream {
 
     public static final DataStreamDefinition DATA_STREAM_DEFINITION = dataStream(
-        reader(new AirtableDataStreamItemReader()), writer(new AirtableDataStreamItemWriter()));
+        reader(AirtableDataStreamItemReader.class), writer(AirtableDataStreamItemWriter.class));
 
 }
