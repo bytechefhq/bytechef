@@ -22,7 +22,7 @@ export default function getDataPillsFromProperties(
     const dataPills: Array<DataPillType> = [];
 
     properties.forEach((componentProperty, index) => {
-        if (!componentProperty || !componentProperty.properties?.length) {
+        if (!componentProperty?.properties?.length) {
             return;
         }
 
