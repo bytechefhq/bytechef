@@ -85,7 +85,7 @@ public class MondayCreateColumnAction {
             .formatted(inputParameters.getRequiredString(BOARD_ID), inputParameters.getRequiredString(TITLE),
                 inputParameters.getRequiredString(COLUMN_TYPE));
 
-        Map<String, Object> body = executeGraphQLQuery(actionContext, query);
+        Map<String, Object> body = executeGraphQLQuery(query, actionContext);
 
         return body.get(DATA);
     }

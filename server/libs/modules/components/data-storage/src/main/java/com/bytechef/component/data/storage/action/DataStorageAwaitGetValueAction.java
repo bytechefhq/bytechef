@@ -122,8 +122,7 @@ public class DataStorageAwaitGetValueAction {
                 .minValue(1)
                 .maxValue(300)
                 .required(true))
-        .output((inputParameters, connectionParameters, context) -> context.output(
-            output -> output.get(inputParameters.getRequired(DEFAULT_VALUE))))
+        .output()
         .perform(DataStorageAwaitGetValueAction::perform);
 
     protected static Object perform(
@@ -135,7 +134,7 @@ public class DataStorageAwaitGetValueAction {
         Optional<Object> optional = Optional.empty();
 
         for (int i = 0; i < inputParameters.getRequiredInteger(TIMEOUT); i = i + 5) {
-            optional = context.data(data -> data.fetchValue(
+            optional = context.data(data -> data.fetch(
                 Scope.valueOf(inputParameters.getRequiredString(SCOPE)), inputParameters.getRequiredString(KEY)));
 
             if (optional.isPresent()) {

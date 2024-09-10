@@ -23,9 +23,9 @@ import static com.bytechef.component.shopify.constant.ShopifyConstants.PRODUCT_I
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -96,7 +96,7 @@ public class ShopifyUtils {
         return options;
     }
 
-    public static Long subscribeWebhook(String webhookUrl, Context context, String topic) {
+    public static Long subscribeWebhook(String webhookUrl, String topic, Context context) {
 
         Map<String, ?> body = context.http(http -> http.post("/webhooks.json"))
             .body(Http.Body.of(

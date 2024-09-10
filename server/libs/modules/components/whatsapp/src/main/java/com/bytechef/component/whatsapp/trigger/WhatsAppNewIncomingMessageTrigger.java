@@ -31,11 +31,11 @@ import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.RECEIVE
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.SENDER_NUMBER;
 
 import com.bytechef.component.definition.ComponentDSL;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.whatsapp.util.WhatsAppUtils;
 import java.util.List;
 import java.util.Map;
@@ -122,7 +122,7 @@ public class WhatsAppNewIncomingMessageTrigger {
                         "sources", Map.of("api", true))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new Context.TypeReference<>() {});
+            .getBody(new TypeReference<>() {});
 
         if (response.containsKey("errors")) {
             List<?> errors = (List<?>) response.get("errors");

@@ -23,7 +23,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +39,7 @@ public class MondayUtils {
     public static List<?> getBoardColumns(String boardId, ActionContext context) {
         String query = "query{boards(ids: %s){columns{id title type settings_str description}}}".formatted(boardId);
 
-        Map<String, Object> result = executeGraphQLQuery(context, query);
+        Map<String, Object> result = executeGraphQLQuery(query, context);
 
         if (result.get(DATA) instanceof Map<?, ?> map &&
             map.get(BOARDS) instanceof List<?> list &&
@@ -52,7 +52,7 @@ public class MondayUtils {
         throw new ProviderException("Failed to get board columns");
     }
 
-    public static Map<String, Object> executeGraphQLQuery(Context context, String query) {
+    public static Map<String, Object> executeGraphQLQuery(String query, Context context) {
         return context
             .http(http -> http.post(""))
             .body(Body.of(Map.of("query", query)))

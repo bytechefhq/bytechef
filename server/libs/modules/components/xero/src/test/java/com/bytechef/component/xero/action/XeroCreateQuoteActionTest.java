@@ -35,7 +35,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.definition.TypeReference;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;

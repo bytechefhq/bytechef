@@ -29,8 +29,8 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 
 /**
  * @author Monika Domiter

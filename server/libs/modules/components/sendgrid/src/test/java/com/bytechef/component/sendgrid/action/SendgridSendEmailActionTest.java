@@ -30,10 +30,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +63,7 @@ class SendgridSendEmailActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(Context.TypeReference.class)))
+        when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responeseMap);
 
 

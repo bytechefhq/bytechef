@@ -20,14 +20,14 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.vtiger.constant.VTigerConstants.GET_ME;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 
 /**
  * @author Luka Ljubić

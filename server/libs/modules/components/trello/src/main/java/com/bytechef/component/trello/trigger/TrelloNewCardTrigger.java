@@ -26,8 +26,7 @@ import static com.bytechef.component.trello.constant.TrelloConstants.ID_BOARD;
 import static com.bytechef.component.trello.constant.TrelloConstants.ID_LIST;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
-import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
@@ -38,6 +37,7 @@ import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.trello.util.TrelloUtils;
 import java.util.Map;
 import java.util.Objects;
@@ -80,7 +80,7 @@ public class TrelloNewCardTrigger {
             .queryParameters(
                 "callbackURL", webhookUrl,
                 "idModel", idList == null ? inputParameters.getRequiredString(ID_BOARD) : idList)
-            .configuration(responseType(Http.ResponseType.JSON))
+            .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
@@ -93,7 +93,7 @@ public class TrelloNewCardTrigger {
 
         context
             .http(http -> http.delete("/webhooks/" + outputParameters.getString(ID)))
-            .configuration(responseType(Http.ResponseType.JSON))
+            .configuration(responseType(ResponseType.JSON))
             .execute();
     }
 
@@ -105,8 +105,7 @@ public class TrelloNewCardTrigger {
 
         Map<String, Object> action = content.get("action");
 
-        if (Objects.equals(action.get("type"), "createCard") &&
-            action.get("data") instanceof Map<?, ?> map &&
+        if (Objects.equals(action.get("type"), "createCard") && action.get("data") instanceof Map<?, ?> map &&
             map.get("card") instanceof Map<?, ?> cardMap) {
 
             return getCard(context, (String) cardMap.get(ID));
@@ -118,7 +117,7 @@ public class TrelloNewCardTrigger {
     private static Object getCard(TriggerContext context, String cardId) {
         return context
             .http(http -> http.get("/cards/" + cardId))
-            .configuration(responseType(Http.ResponseType.JSON))
+            .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
     }

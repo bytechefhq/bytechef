@@ -29,9 +29,9 @@ import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static com.bytechef.component.github.util.GithubUtils.getOwnerName;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.github.util.GithubUtils;
 import java.util.Map;
 

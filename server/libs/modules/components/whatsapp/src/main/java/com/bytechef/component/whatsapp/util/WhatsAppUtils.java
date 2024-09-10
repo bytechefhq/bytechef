@@ -19,16 +19,18 @@ package com.bytechef.component.whatsapp.util;
 import static com.bytechef.component.definition.Authorization.AUTHORIZATION;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
 
 public class WhatsAppUtils {
 
     public static String getWhatsappServer(String accessToken, Context context) {
         Map<?, ?> response = context.http(http -> http.get("/metadata")
-            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .header(AUTHORIZATION, "OAuth " + accessToken)
             .execute()
-            .getBody(new Context.TypeReference<>() {}));
+            .getBody(new TypeReference<>() {}));
 
         if (!response.containsKey("dc")) {
             throw new IllegalStateException(

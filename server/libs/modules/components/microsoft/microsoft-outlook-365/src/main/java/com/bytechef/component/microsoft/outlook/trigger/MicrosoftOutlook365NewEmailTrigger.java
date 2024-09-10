@@ -26,11 +26,11 @@ import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365U
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.component.definition.TypeReference;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -79,7 +79,7 @@ public class MicrosoftOutlook365NewEmailTrigger {
             }
         }
 
-        List<Map<?, ?>> otherItems = getItemsFromNextPage(context, (String) body.get(ODATA_NEXT_LINK));
+        List<Map<?, ?>> otherItems = getItemsFromNextPage((String) body.get(ODATA_NEXT_LINK), context);
 
         for (Map<?, ?> map : otherItems) {
             addValidEmail(map, startDate, endDate, maps);

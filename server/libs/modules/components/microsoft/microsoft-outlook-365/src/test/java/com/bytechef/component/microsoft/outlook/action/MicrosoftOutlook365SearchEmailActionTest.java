@@ -31,8 +31,8 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils;
 import java.util.Arrays;
 import java.util.List;
@@ -81,7 +81,7 @@ class MicrosoftOutlook365SearchEmailActionTest {
         try (MockedStatic<MicrosoftOutlook365Utils> microsoftOutlook365UtilsMockedStatic =
             mockStatic(MicrosoftOutlook365Utils.class)) {
             microsoftOutlook365UtilsMockedStatic
-                .when(() -> MicrosoftOutlook365Utils.getItemsFromNextPage(mockedContext, "link"))
+                .when(() -> MicrosoftOutlook365Utils.getItemsFromNextPage("link", mockedContext))
                 .thenReturn(List.of());
 
             Object result =

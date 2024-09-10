@@ -23,9 +23,9 @@ import static com.bytechef.component.gitlab.constant.GitlabConstants.ID;
 import static com.bytechef.component.gitlab.constant.GitlabConstants.PROJECT_ID;
 
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

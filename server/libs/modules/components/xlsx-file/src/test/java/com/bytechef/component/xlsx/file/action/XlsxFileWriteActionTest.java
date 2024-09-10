@@ -23,6 +23,7 @@ import static com.bytechef.component.xlsx.file.constant.XlsxFileConstants.SHEET_
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.xlsx.file.XlsxFileComponentHandlerTest;
 import com.bytechef.component.xlsx.file.action.XlsxFileReadAction.ReadConfiguration;
 import com.bytechef.component.xlsx.file.constant.XlsxFileConstants;
@@ -89,7 +90,7 @@ public class XlsxFileWriteActionTest {
         Mockito.when(parameters.getString(Mockito.eq(FILENAME), Mockito.anyString()))
             .thenReturn("file.xlsx");
         Mockito.when(
-            parameters.getList(Mockito.eq(ROWS), Mockito.any(Context.TypeReference.class), Mockito.eq(List.of())))
+            parameters.getList(Mockito.eq(ROWS), Mockito.any(TypeReference.class), Mockito.eq(List.of())))
             .thenReturn(items);
         Mockito.when(parameters.getString(Mockito.eq(SHEET_NAME), Mockito.eq("Sheet")))
             .thenReturn("Sheet");

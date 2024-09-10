@@ -26,11 +26,11 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -60,11 +60,11 @@ public class ClickupUtils {
 
     private static List<Option<String>> getListsWithinFolder(ActionContext context, String folderId) {
 
-        return getOptions(fetchDataFromHttpEndpoint(context, "/folder/" + folderId + "/list"), "lists");
+        return getOptions(fetchDataFromHttpEndpoint("/folder/" + folderId + "/list", context), "lists");
     }
 
     private static List<Option<String>> getFolderlessLists(ActionContext context, String spaceId) {
-        return getOptions(fetchDataFromHttpEndpoint(context, "/space/" + spaceId + "/list"), "lists");
+        return getOptions(fetchDataFromHttpEndpoint("/space/" + spaceId + "/list", context), "lists");
     }
 
     public static List<Option<String>> getFolderIdOptions(
@@ -72,7 +72,7 @@ public class ClickupUtils {
         String searchText, ActionContext context) {
 
         return getOptions(
-            fetchDataFromHttpEndpoint(context, "/space/" + inputParameters.getRequiredString(SPACE_ID) + "/folder"),
+            fetchDataFromHttpEndpoint("/space/" + inputParameters.getRequiredString(SPACE_ID) + "/folder", context),
             "folders");
     }
 
@@ -81,7 +81,7 @@ public class ClickupUtils {
         String searchText, ActionContext context) {
 
         return getOptions(
-            fetchDataFromHttpEndpoint(context, "/team/" + inputParameters.getRequiredString(WORKSPACE_ID) + "/space"),
+            fetchDataFromHttpEndpoint("/team/" + inputParameters.getRequiredString(WORKSPACE_ID) + "/space", context),
             "spaces");
     }
 
@@ -89,7 +89,7 @@ public class ClickupUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
-        return getOptions(fetchDataFromHttpEndpoint(context, "/team"), "teams");
+        return getOptions(fetchDataFromHttpEndpoint("/team", context), "teams");
     }
 
     private static List<Option<String>> getOptions(Map<String, List<Map<String, Object>>> body, String resource) {
@@ -102,7 +102,9 @@ public class ClickupUtils {
         return options;
     }
 
-    private static Map<String, List<Map<String, Object>>> fetchDataFromHttpEndpoint(Context context, String path) {
+    private static Map<String, List<Map<String, Object>>> fetchDataFromHttpEndpoint(
+        String path, Context context) {
+
         return context
             .http(http -> http.get(path))
             .configuration(Http.responseType(Http.ResponseType.JSON))

@@ -27,7 +27,6 @@ import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_OUTPUT_PR
 import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
 import static com.bytechef.component.jira.constant.JiraConstants.UPDATED_ISSUE;
 
-import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
@@ -37,6 +36,7 @@ import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.jira.util.JiraOptionsUtils;
 import com.bytechef.component.jira.util.JiraUtils;
 import java.util.Map;

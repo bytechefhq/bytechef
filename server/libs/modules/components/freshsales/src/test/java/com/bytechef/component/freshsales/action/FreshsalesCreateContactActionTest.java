@@ -34,7 +34,7 @@ import static com.bytechef.component.freshsales.constant.FreshsalesConstants.ZIP
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -83,7 +83,7 @@ class FreshsalesCreateContactActionTest extends AbstractFreshsalesActionTest {
 
         assertEquals(responeseMap, result);
 
-        Context.Http.Body body = bodyArgumentCaptor.getValue();
+        Http.Body body = bodyArgumentCaptor.getValue();
 
         assertEquals(propertyStubsMap, body.getContent());
     }

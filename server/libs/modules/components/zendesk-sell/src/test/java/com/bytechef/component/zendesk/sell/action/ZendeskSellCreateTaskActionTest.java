@@ -22,7 +22,7 @@ import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Monika Domiter
  */
-class ZendeskSellCreateTaskActionTest extends AbstractZendeskSellctionTest {
+class ZendeskSellCreateTaskActionTest extends AbstractZendeskSelectionTest {
 
     @Test
     void testPerform() {
@@ -46,7 +46,7 @@ class ZendeskSellCreateTaskActionTest extends AbstractZendeskSellctionTest {
 
         assertEquals(responseMap, result);
 
-        Context.Http.Body body = bodyArgumentCaptor.getValue();
+        Http.Body body = bodyArgumentCaptor.getValue();
 
         assertEquals(Map.of(DATA, propertyStubsMap), body.getContent());
     }

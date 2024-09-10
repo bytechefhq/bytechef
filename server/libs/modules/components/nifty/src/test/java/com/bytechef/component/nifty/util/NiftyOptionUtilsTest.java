@@ -21,9 +21,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -39,9 +40,9 @@ import org.mockito.Mockito;
 class NiftyOptionUtilsTest {
 
     private final ActionContext mockedContext = Mockito.mock(ActionContext.class);
-    private final Context.Http.Executor mockedExecutor = Mockito.mock(Context.Http.Executor.class);
+    private final Http.Executor mockedExecutor = Mockito.mock(Http.Executor.class);
     private final Parameters mockedParameters = Mockito.mock(Parameters.class);
-    private final Context.Http.Response mockedResponse = Mockito.mock(Context.Http.Response.class);
+    private final Http.Response mockedResponse = Mockito.mock(Http.Response.class);
 
     @BeforeEach
     public void beforeEach() {
@@ -64,7 +65,7 @@ class NiftyOptionUtilsTest {
         task.put("id", "123");
         body.put("items", List.of(task));
 
-        Mockito.when(mockedResponse.getBody(any(Context.TypeReference.class)))
+        Mockito.when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(body);
 
         List<Option<String>> expectedOptions = new ArrayList<>();
@@ -83,7 +84,7 @@ class NiftyOptionUtilsTest {
         task.put("id", "123");
         body.put("projects", List.of(task));
 
-        Mockito.when(mockedResponse.getBody(any(Context.TypeReference.class)))
+        Mockito.when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(body);
 
         List<Option<String>> expectedOptions = new ArrayList<>();

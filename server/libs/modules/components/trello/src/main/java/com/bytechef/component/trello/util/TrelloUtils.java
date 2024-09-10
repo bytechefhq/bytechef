@@ -23,10 +23,10 @@ import static com.bytechef.component.trello.constant.TrelloConstants.ID_BOARD;
 import static com.bytechef.component.trello.constant.TrelloConstants.NAME;
 
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +45,7 @@ public class TrelloUtils {
 
         List<Map<String, Object>> body = context
             .http(http -> http.get("/members/" + getAuthorisedUserId(context) + "/boards"))
-            .configuration(responseType(Http.ResponseType.JSON))
+            .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
@@ -58,7 +58,7 @@ public class TrelloUtils {
 
         List<Map<String, Object>> body = context
             .http(http -> http.get("/boards/" + inputParameters.getRequiredString(ID_BOARD) + "/lists"))
-            .configuration(responseType(Http.ResponseType.JSON))
+            .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
@@ -68,7 +68,7 @@ public class TrelloUtils {
     private static String getAuthorisedUserId(Context context) {
         Map<String, Object> body = context
             .http(http -> http.get("/members/me"))
-            .configuration(responseType(Http.ResponseType.JSON))
+            .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 

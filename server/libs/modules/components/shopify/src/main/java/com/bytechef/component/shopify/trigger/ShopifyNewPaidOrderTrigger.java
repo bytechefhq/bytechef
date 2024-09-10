@@ -57,7 +57,7 @@ public class ShopifyNewPaidOrderTrigger {
         String workflowExecutionId, TriggerContext context) {
 
         return new WebhookEnableOutput(
-            Map.of(ID, ShopifyUtils.subscribeWebhook(webhookUrl, context, "orders/paid")), null);
+            Map.of(ID, ShopifyUtils.subscribeWebhook(webhookUrl, "orders/paid", context)), null);
     }
 
     protected static void webhookDisable(

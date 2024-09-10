@@ -26,7 +26,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
@@ -73,7 +72,7 @@ class TypeformNewSubmissionTriggerTest {
             WebhookEnableOutput webhookEnableOutput = TypeformNewSubmissionTrigger.webhookEnable(parameters, parameters,
                 webhookUrl, "", mockedTriggerContext);
 
-            Context.Http.Body body = bodyArgumentCaptor.getValue();
+            Http.Body body = bodyArgumentCaptor.getValue();
 
             Object content = body.getContent();
 

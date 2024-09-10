@@ -20,8 +20,8 @@ import static com.bytechef.component.llm.constant.LLMConstants.MESSAGES;
 import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.llm.util.LLMUtils.createMessage;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import java.util.List;
 import java.util.Map;
 import org.springframework.ai.chat.client.ChatClient;
@@ -54,7 +54,7 @@ public interface Chat {
     ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters);
 
     private static List<org.springframework.ai.chat.messages.Message> getMessages(Parameters inputParameters) {
-        List<Message> messages = inputParameters.getList(MESSAGES, new Context.TypeReference<>() {});
+        List<Message> messages = inputParameters.getList(MESSAGES, new TypeReference<>() {});
 
         return messages.stream()
             .map(message -> createMessage(message.role(), message.content()))

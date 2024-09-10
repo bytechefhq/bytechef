@@ -29,8 +29,8 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.TypeReference;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +68,7 @@ class MicrosoftOutlook365OptionUtilsTest {
             mockStatic(MicrosoftOutlook365Utils.class)) {
 
             microsoftOutlook365UtilsMockedStatic
-                .when(() -> MicrosoftOutlook365Utils.getItemsFromNextPage(mockedContext, "link"))
+                .when(() -> MicrosoftOutlook365Utils.getItemsFromNextPage("link", mockedContext))
                 .thenReturn(List.of(Map.of("displayName", "cde")));
 
             List<Option<String>> categoryOptions = MicrosoftOutlook365OptionUtils.getCategoryOptions(
@@ -99,7 +99,7 @@ class MicrosoftOutlook365OptionUtilsTest {
             mockStatic(MicrosoftOutlook365Utils.class)) {
 
             microsoftOutlook365UtilsMockedStatic
-                .when(() -> MicrosoftOutlook365Utils.getItemsFromNextPage(mockedContext, "link"))
+                .when(() -> MicrosoftOutlook365Utils.getItemsFromNextPage("link", mockedContext))
                 .thenReturn(List.of(Map.of(ID, "cde")));
 
             List<Option<String>> messageIdOptions = MicrosoftOutlook365OptionUtils.getMessageIdOptions(

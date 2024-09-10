@@ -31,7 +31,6 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
@@ -39,6 +38,7 @@ import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.monday.util.MondayUtils;
 import com.bytechef.test.component.properties.ParametersFactory;
 import java.time.LocalDate;
@@ -65,7 +65,8 @@ class MondayNewItemInBoardTriggerTest {
     @Test
     void testWebhookEnable() {
         try (MockedStatic<MondayUtils> mondayUtilsMockedStatic = mockStatic(MondayUtils.class)) {
-            mondayUtilsMockedStatic.when(() -> MondayUtils.executeGraphQLQuery(any(Context.class), anyString()))
+            mondayUtilsMockedStatic
+                .when(() -> MondayUtils.executeGraphQLQuery(anyString(), any(Context.class)))
                 .thenReturn(Map.of(DATA, Map.of("create_webhook", Map.of(ID, "123"))));
 
             WebhookEnableOutput dynamicWebhookEnableOutput = MondayNewItemInBoardTrigger.webhookEnable(
@@ -90,7 +91,8 @@ class MondayNewItemInBoardTriggerTest {
             .thenReturn(Map.of("event", eventMap));
 
         try (MockedStatic<MondayUtils> mondayUtilsMockedStatic = mockStatic(MondayUtils.class)) {
-            mondayUtilsMockedStatic.when(() -> MondayUtils.executeGraphQLQuery(any(Context.class), anyString()))
+            mondayUtilsMockedStatic
+                .when(() -> MondayUtils.executeGraphQLQuery(anyString(), any(Context.class)))
                 .thenReturn(
                     Map.of(
                         DATA,

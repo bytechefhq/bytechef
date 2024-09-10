@@ -16,10 +16,6 @@
 
 package com.bytechef.component.intercom.action;
 
-import static com.bytechef.component.definition.Context.Http.Body;
-import static com.bytechef.component.definition.Context.Http.Executor;
-import static com.bytechef.component.definition.Context.Http.Response;
-import static com.bytechef.component.definition.Context.TypeReference;
 import static com.bytechef.component.intercom.action.IntercomCreateContactAction.POST_CONTACTS_CONTEXT_FUNCTION;
 import static com.bytechef.component.intercom.constant.IntercomConstants.AVATAR;
 import static com.bytechef.component.intercom.constant.IntercomConstants.EMAIL;
@@ -32,7 +28,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;

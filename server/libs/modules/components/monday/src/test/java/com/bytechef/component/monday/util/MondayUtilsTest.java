@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.definition.TypeReference;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -84,7 +84,7 @@ class MondayUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
 
-        Map<String, Object> result = MondayUtils.executeGraphQLQuery(mockedContext, "test query");
+        Map<String, Object> result = MondayUtils.executeGraphQLQuery("test query", mockedContext);
 
         assertEquals(responseMap, result);
 

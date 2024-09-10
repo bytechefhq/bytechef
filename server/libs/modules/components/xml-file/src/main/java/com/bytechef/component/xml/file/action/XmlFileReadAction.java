@@ -30,9 +30,9 @@ import static com.bytechef.component.xml.file.constant.XmlFileConstants.READ;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
@@ -94,7 +94,7 @@ public class XmlFileReadAction {
                     items = stream.toList();
                 }
             } else {
-                items = context.xml(xml -> xml.readList(inputStream, path, new Context.TypeReference<>() {}));
+                items = context.xml(xml -> xml.readList(inputStream, path, new TypeReference<>() {}));
             }
 
             Integer pageSize = inputParameters.getInteger(PAGE_SIZE);

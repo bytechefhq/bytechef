@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.TypeReference;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -46,7 +46,7 @@ class JiraSearchForissuesUsingJqlActionTest extends AbstractJiraActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(Context.TypeReference.class)))
+        when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(ISSUES, List.of()));
 
         Object result = JiraSearchForIssuesUsingJqlAction.perform(mockedParameters, mockedParameters, mockedContext);

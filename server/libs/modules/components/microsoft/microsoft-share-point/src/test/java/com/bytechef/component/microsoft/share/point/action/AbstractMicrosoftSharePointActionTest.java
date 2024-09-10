@@ -21,9 +21,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.ArgumentCaptor;
@@ -50,7 +50,7 @@ public abstract class AbstractMicrosoftSharePointActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(Context.TypeReference.class)))
+        when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
     }
 }

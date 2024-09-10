@@ -33,9 +33,9 @@ import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365U
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365OptionUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -99,7 +99,7 @@ public class MicrosoftOutlook365SearchEmailAction {
             }
         }
 
-        emails.addAll(getItemsFromNextPage(context, (String) body.get(ODATA_NEXT_LINK)));
+        emails.addAll(getItemsFromNextPage((String) body.get(ODATA_NEXT_LINK), context));
 
         return emails;
     }

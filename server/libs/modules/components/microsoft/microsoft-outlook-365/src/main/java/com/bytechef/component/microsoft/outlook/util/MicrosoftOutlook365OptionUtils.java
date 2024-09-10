@@ -23,9 +23,9 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +61,7 @@ public class MicrosoftOutlook365OptionUtils {
         }
 
         List<Map<?, ?>> categoriesFromNextPage =
-            MicrosoftOutlook365Utils.getItemsFromNextPage(context, (String) body.get(ODATA_NEXT_LINK));
+            MicrosoftOutlook365Utils.getItemsFromNextPage((String) body.get(ODATA_NEXT_LINK), context);
 
         for (Map<?, ?> map : categoriesFromNextPage) {
             String displayName = (String) map.get("displayName");
@@ -95,7 +95,7 @@ public class MicrosoftOutlook365OptionUtils {
         }
 
         List<Map<?, ?>> messagesFromNextPage =
-            MicrosoftOutlook365Utils.getItemsFromNextPage(context, (String) body.get(ODATA_NEXT_LINK));
+            MicrosoftOutlook365Utils.getItemsFromNextPage((String) body.get(ODATA_NEXT_LINK), context);
 
         for (Map<?, ?> map : messagesFromNextPage) {
             String id = (String) map.get(ID);

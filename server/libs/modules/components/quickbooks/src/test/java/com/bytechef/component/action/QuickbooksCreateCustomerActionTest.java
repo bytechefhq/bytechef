@@ -27,7 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.quickbooks.action.QuickbooksCreateCustomerAction;
 import java.util.HashMap;
 import java.util.Map;

@@ -47,7 +47,7 @@ class MondayCreateColumnActionTest {
             Map.of(BOARD_ID, "board", TITLE, "title", COLUMN_TYPE, "date"));
 
         try (MockedStatic<MondayUtils> mondayUtilsMockedStatic = mockStatic(MondayUtils.class)) {
-            mondayUtilsMockedStatic.when(() -> MondayUtils.executeGraphQLQuery(any(ActionContext.class), anyString()))
+            mondayUtilsMockedStatic.when(() -> MondayUtils.executeGraphQLQuery(anyString(), any(ActionContext.class)))
                 .thenReturn(Map.of("data", Map.of(ID, "abc")));
 
             Object result = MondayCreateColumnAction.perform(parameters, parameters, mockedActionContext);
@@ -55,8 +55,8 @@ class MondayCreateColumnActionTest {
             assertEquals(Map.of(ID, "abc"), result);
 
             mondayUtilsMockedStatic.verify(() -> MondayUtils.executeGraphQLQuery(
-                mockedActionContext,
-                "mutation{create_column(board_id: board, title: \"title\", column_type: date){id title}}"));
+                "mutation{create_column(board_id: board, title: \"title\", column_type: date){id title}}",
+                mockedActionContext));
         }
     }
 }

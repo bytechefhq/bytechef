@@ -24,11 +24,11 @@ import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

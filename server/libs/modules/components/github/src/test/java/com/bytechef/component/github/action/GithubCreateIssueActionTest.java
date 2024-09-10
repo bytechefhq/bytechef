@@ -16,12 +16,12 @@
 
 package com.bytechef.component.github.action;
 
-import static com.bytechef.component.definition.Context.Http.Body;
 import static com.bytechef.component.github.constant.GithubConstants.BODY;
 import static com.bytechef.component.github.constant.GithubConstants.TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context.Http.Body;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;

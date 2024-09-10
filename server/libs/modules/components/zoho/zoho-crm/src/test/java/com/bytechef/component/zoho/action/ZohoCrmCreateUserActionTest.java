@@ -27,8 +27,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -39,12 +40,12 @@ import org.mockito.ArgumentCaptor;
  */
 class ZohoCrmCreateUserActionTest {
 
-    private final ArgumentCaptor<Context.Http.Body> bodyArgumentCaptor =
-        ArgumentCaptor.forClass(Context.Http.Body.class);
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor =
+        ArgumentCaptor.forClass(Http.Body.class);
     private final ActionContext mockedContext = mock(ActionContext.class);
-    private final Context.Http.Executor mockedExecutor = mock(Context.Http.Executor.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);
-    private final Context.Http.Response mockedResponse = mock(Context.Http.Response.class);
+    private final Http.Response mockedResponse = mock(Http.Response.class);
     private final Map<String, Object> responeseMap = Map.of("key", "value");
 
     @Test
@@ -57,7 +58,7 @@ class ZohoCrmCreateUserActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(Context.TypeReference.class)))
+        when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responeseMap);
 
         Map<String, Object> propertyStubsMap = createPropertyStubsMap();
@@ -77,7 +78,7 @@ class ZohoCrmCreateUserActionTest {
 
         assertEquals(responeseMap, result);
 
-        Context.Http.Body body = bodyArgumentCaptor.getValue();
+        Http.Body body = bodyArgumentCaptor.getValue();
 
         assertEquals(propertyStubsMap, body.getContent());
     }

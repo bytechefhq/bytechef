@@ -50,7 +50,7 @@ public class MondayOptionUtils {
         String query = "query{boards(workspace_ids: [%s], order_by: created_at){id name}}"
             .formatted(inputParameters.getRequiredString(WORKSPACE_ID));
 
-        Map<String, Object> body = MondayUtils.executeGraphQLQuery(context, query);
+        Map<String, Object> body = MondayUtils.executeGraphQLQuery(query, context);
 
         List<Option<String>> options = new ArrayList<>();
 
@@ -78,7 +78,7 @@ public class MondayOptionUtils {
         String query =
             "query{boards(ids: [%s]){groups{id title}}}".formatted(inputParameters.getRequiredString(BOARD_ID));
 
-        Map<String, Object> body = MondayUtils.executeGraphQLQuery(context, query);
+        Map<String, Object> body = MondayUtils.executeGraphQLQuery(query, context);
 
         List<Option<String>> options = new ArrayList<>();
 
@@ -102,7 +102,7 @@ public class MondayOptionUtils {
 
         String query = "query{workspaces{id name}}";
 
-        Map<String, Object> body = MondayUtils.executeGraphQLQuery(context, query);
+        Map<String, Object> body = MondayUtils.executeGraphQLQuery(query, context);
 
         List<Option<String>> options = new ArrayList<>();
 

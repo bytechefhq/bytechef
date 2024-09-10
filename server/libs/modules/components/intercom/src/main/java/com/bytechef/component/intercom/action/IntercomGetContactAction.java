@@ -31,9 +31,9 @@ import static com.bytechef.component.intercom.constant.IntercomConstants.TYPE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.intercom.util.IntercomUtils;
 
 /**
@@ -69,7 +69,7 @@ public class IntercomGetContactAction {
             .http(http -> http.get("/contacts/" + inputParameters.getRequiredString(CONTACT_NAME)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new Context.TypeReference<>() {});
+            .getBody(new TypeReference<>() {});
     }
 
     private IntercomGetContactAction() {

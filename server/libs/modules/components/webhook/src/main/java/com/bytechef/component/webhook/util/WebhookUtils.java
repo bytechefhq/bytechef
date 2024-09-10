@@ -31,7 +31,6 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateFunction;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
-import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -41,16 +40,6 @@ import java.util.stream.Collectors;
  * @author Ivica Cardic
  */
 public class WebhookUtils {
-
-    public static OutputResponse getOutput(
-        Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
-        WebhookBody body, WebhookMethod method, WebhookEnableOutput webhookEnableOutput, TriggerContext context) {
-
-        return context.output(output -> output.get(
-            getWebhookResult(
-                inputParameters, connectionParameters, headers, parameters, body, method, webhookEnableOutput,
-                context)));
-    }
 
     public static Map<String, ?> getWebhookResult(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,

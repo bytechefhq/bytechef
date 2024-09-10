@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

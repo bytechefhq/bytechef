@@ -42,8 +42,8 @@ import static com.bytechef.component.vertex.gemini.constant.VertexGeminiConstant
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.llm.Chat;
 import com.bytechef.component.llm.util.LLMUtils;
 import com.google.cloud.vertexai.VertexAI;

@@ -25,16 +25,17 @@ import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableOption;
 import com.bytechef.component.definition.ComponentDSL.ModifiableValueProperty;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +55,7 @@ public class AirtableUtils {
             .http(http -> http.get("https://api.airtable.com/v0/meta/bases"))
             .configuration(Http.responseType(ResponseType.JSON))
             .execute()
-            .getBody(new Context.TypeReference<>() {});
+            .getBody(new TypeReference<>() {});
 
         context.logger(
             logger -> logger.debug("Response for url='https://api.airtable.com/v0/meta/bases': " + body));
@@ -84,7 +85,7 @@ public class AirtableUtils {
                     (String) ((Map<?, ?>) body.get("error")).get("message"));
             }
 
-            Map<String, List<AirtableTable>> tablesMap = response.getBody(new Context.TypeReference<>() {});
+            Map<String, List<AirtableTable>> tablesMap = response.getBody(new TypeReference<>() {});
 
             context.logger(logger -> logger.debug("Response for url='%s': %s".formatted(url, tablesMap)));
 
@@ -150,7 +151,7 @@ public class AirtableUtils {
         Map<String, ?> body = context.http(http -> http.get(url)
             .configuration(Http.responseType(ResponseType.JSON))
             .execute()
-            .getBody(new Context.TypeReference<>() {}));
+            .getBody(new TypeReference<>() {}));
 
         if (body.containsKey("error")) {
             throw new ProviderException.BadRequestException((String) ((Map<?, ?>) body.get("error")).get("message"));

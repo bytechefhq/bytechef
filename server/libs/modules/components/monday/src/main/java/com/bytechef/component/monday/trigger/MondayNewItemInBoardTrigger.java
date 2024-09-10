@@ -41,7 +41,6 @@ import static com.bytechef.component.monday.constant.MondayConstants.VALUE;
 import static com.bytechef.component.monday.constant.MondayConstants.WORKSPACE_ID;
 import static com.bytechef.component.monday.util.MondayUtils.executeGraphQLQuery;
 
-import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
@@ -52,6 +51,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.component.monday.constant.MondayColumnType;
 import com.bytechef.component.monday.util.MondayOptionUtils;
@@ -116,7 +116,7 @@ public class MondayNewItemInBoardTrigger {
         String query = "mutation{create_webhook(board_id: %s, url: \"%s\", event: create_item){id}}"
             .formatted(inputParameters.getRequiredString(BOARD_ID), webhookUrl);
 
-        Map<String, Object> body = executeGraphQLQuery(context, query);
+        Map<String, Object> body = executeGraphQLQuery(query, context);
 
         if (body.get(DATA) instanceof Map<?, ?> map && map.get("create_webhook") instanceof Map<?, ?> webhookMap) {
             return new WebhookEnableOutput(Map.of(ID, webhookMap.get(ID)), null);
@@ -131,7 +131,7 @@ public class MondayNewItemInBoardTrigger {
 
         String query = "mutation{delete_webhook(id: " + outputParameters.getString(ID) + "){id}}";
 
-        executeGraphQLQuery(context, query);
+        executeGraphQLQuery(query, context);
     }
 
     protected static Map<String, Object> webhookRequest(
@@ -153,7 +153,7 @@ public class MondayNewItemInBoardTrigger {
     }
 
     private static Map<String, Object> transformColumnValues(TriggerContext context, String query) {
-        Map<String, Object> result = executeGraphQLQuery(context, query);
+        Map<String, Object> result = executeGraphQLQuery(query, context);
 
         Map<String, Object> transformedValues = new HashMap<>();
 

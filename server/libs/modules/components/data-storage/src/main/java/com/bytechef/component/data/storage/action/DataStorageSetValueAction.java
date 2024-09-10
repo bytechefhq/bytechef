@@ -119,7 +119,7 @@ public class DataStorageSetValueAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        context.data(data -> data.setValue(
+        context.data(data -> data.put(
             Scope.valueOf(inputParameters.getRequiredString(SCOPE)), inputParameters.getRequiredString(KEY),
             DataStorageUtils.getValue(inputParameters)));
 

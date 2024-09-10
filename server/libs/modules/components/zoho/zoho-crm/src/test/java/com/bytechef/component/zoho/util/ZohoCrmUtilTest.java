@@ -23,9 +23,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -39,9 +40,9 @@ import org.junit.jupiter.api.Test;
 class ZohoCrmUtilTest {
 
     private final ActionContext mockedContext = mock(ActionContext.class);
-    private final Context.Http.Executor mockedExecutor = mock(Context.Http.Executor.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);
-    private final Context.Http.Response mockedResponse = mock(Context.Http.Response.class);
+    private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @BeforeEach
     public void beforeEach() {
@@ -65,7 +66,7 @@ class ZohoCrmUtilTest {
 
         body.add(items);
 
-        when(mockedResponse.getBody(any(Context.TypeReference.class)))
+        when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(body);
 
         List<Option<String>> expectedOptions = new ArrayList<>();
@@ -85,7 +86,7 @@ class ZohoCrmUtilTest {
         items.put("id", "123");
         body.add(items);
 
-        when(mockedResponse.getBody(any(Context.TypeReference.class)))
+        when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(body);
 
         List<Option<String>> expectedOptions = new ArrayList<>();

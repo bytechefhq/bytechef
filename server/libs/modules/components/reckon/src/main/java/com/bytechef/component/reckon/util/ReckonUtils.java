@@ -24,11 +24,11 @@ import static com.bytechef.component.reckon.constant.ReckonConstants.NAME;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
+import com.bytechef.component.definition.TypeReference;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;

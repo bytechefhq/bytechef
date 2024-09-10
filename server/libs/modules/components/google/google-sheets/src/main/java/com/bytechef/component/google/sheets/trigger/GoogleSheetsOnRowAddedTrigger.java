@@ -140,7 +140,7 @@ public class GoogleSheetsOnRowAddedTrigger {
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
 
         Optional<Object> currentRowNumOptional =
-            context.data(data -> data.fetchValue(WORKFLOW, "currentRow"));
+            context.data(data -> data.fetch(WORKFLOW, "currentRow"));
 
         int currentRowNum = currentRowNumOptional.map(o -> Integer.parseInt(o.toString()))
             .orElse(0);
@@ -152,7 +152,7 @@ public class GoogleSheetsOnRowAddedTrigger {
         if (values == null)
             return Collections.emptyList();
 
-        context.data(data -> data.setValue(WORKFLOW, "currentRow", values.size()));
+        context.data(data -> data.put(WORKFLOW, "currentRow", values.size()));
 
         return getMapOfValuesForRowAndColumn(inputParameters, sheets, values, currentRowNum, values.size());
     }
