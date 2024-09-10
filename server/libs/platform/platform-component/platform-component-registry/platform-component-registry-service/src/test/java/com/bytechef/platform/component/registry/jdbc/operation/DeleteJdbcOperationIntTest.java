@@ -17,7 +17,7 @@
 package com.bytechef.platform.component.registry.jdbc.operation;
 
 import static com.bytechef.platform.component.registry.jdbc.constant.JdbcConstants.DELETE_KEY;
-import static com.bytechef.platform.component.registry.jdbc.constant.JdbcConstants.FIELD_VALUES;
+import static com.bytechef.platform.component.registry.jdbc.constant.JdbcConstants.ROWS;
 import static com.bytechef.platform.component.registry.jdbc.constant.JdbcConstants.SCHEMA;
 import static com.bytechef.platform.component.registry.jdbc.constant.JdbcConstants.TABLE;
 
@@ -79,7 +79,7 @@ public class DeleteJdbcOperationIntTest {
     @Test
     public void testDelete() {
         Map<String, ?> inputParameters = Map.of(
-            FIELD_VALUES, List.of(Map.of("id", "id1"), Map.of("id", "id2")),
+            ROWS, List.of(Map.of("id", "id1"), Map.of("id", "id2")),
             DELETE_KEY, "id",
             SCHEMA, "public",
             TABLE, "test");
