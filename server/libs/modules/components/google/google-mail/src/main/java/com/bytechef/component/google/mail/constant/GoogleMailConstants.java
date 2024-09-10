@@ -44,7 +44,6 @@ public class GoogleMailConstants {
     public static final String FORMAT = "format";
     public static final String FROM = "from";
     public static final String FULL = "full";
-    public static final String GOOGLE_MAIL = "googleMail";
     public static final String HEADERS = "headers";
     public static final String HISTORY_ID = "historyId";
     public static final String ID = "id";
@@ -67,7 +66,6 @@ public class GoogleMailConstants {
     public static final String REPLY_TO = "replyTo";
     public static final String RESULT_SIZE_ESTIMATE = "resultSizeEstimate";
     public static final String SEARCH_EMAIL = "searchEmail";
-    public static final String SEND_EMAIL = "sendEmail";
     public static final String SIMPLE = "simple";
     public static final String SIZE_ESTIMATE = "sizeEstimate";
     public static final String SNIPPET = "snippet";
