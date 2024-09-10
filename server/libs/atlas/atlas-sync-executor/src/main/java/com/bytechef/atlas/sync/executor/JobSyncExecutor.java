@@ -47,7 +47,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.atlas.worker.event.TaskExecutionEvent;
 import com.bytechef.atlas.worker.message.route.TaskWorkerMessageRoute;
-import com.bytechef.atlas.worker.task.factory.TaskDispatcherAdapterFactory;
+import com.bytechef.atlas.worker.task.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;

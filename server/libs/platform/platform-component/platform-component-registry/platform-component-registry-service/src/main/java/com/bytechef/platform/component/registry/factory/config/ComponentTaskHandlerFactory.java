@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.component.registry.factory.config;
 
-import com.bytechef.atlas.worker.task.factory.TaskHandlerFactory;
+import com.bytechef.atlas.worker.task.TaskHandlerFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;

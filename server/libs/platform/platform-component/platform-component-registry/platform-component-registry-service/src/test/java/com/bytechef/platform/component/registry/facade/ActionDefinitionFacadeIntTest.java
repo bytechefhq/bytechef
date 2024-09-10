@@ -20,7 +20,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.http.client.action.HttpClientGetAction;
 import com.bytechef.platform.component.registry.config.JacksonConfiguration;
 import com.bytechef.platform.component.registry.config.PlatformIntTestConfiguration;
-import com.bytechef.platform.component.registry.definition.factory.ContextFactory;
+import com.bytechef.platform.component.registry.definition.ContextFactory;
 import com.bytechef.platform.component.registry.helper.TokenRefreshHelper;
 import com.bytechef.platform.component.registry.service.ActionDefinitionService;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;

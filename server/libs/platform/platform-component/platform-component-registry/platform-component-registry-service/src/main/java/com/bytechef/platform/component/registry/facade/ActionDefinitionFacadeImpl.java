@@ -20,7 +20,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.registry.definition.ActionContextImpl;
-import com.bytechef.platform.component.registry.definition.factory.ContextFactory;
+import com.bytechef.platform.component.registry.definition.ContextFactory;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.component.registry.domain.Property;
@@ -128,7 +128,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         } else {
             return actionDefinitionService.executeMultipleConnectionsOutput(
                 componentName, componentVersion, actionName, inputParameters,
-                executeFunctionData.componentConnections(), actionContext);
+                executeFunctionData.componentConnections(), Map.of(), actionContext);
         }
     }
 
@@ -136,7 +136,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     public Object executePerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull AppType type,
         Long instanceId, Long instanceWorkflowId, Long jobId, @NonNull Map<String, ?> inputParameters,
-        @NonNull Map<String, Long> connectionIds) {
+        @NonNull Map<String, Long> connectionIds, Map<String, ?> extensions) {
 
         ExecuteFunctionData executeFunctionData = getExecuteFunctionData(
             componentName, componentVersion, actionName, connectionIds);
@@ -158,7 +158,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         } else {
             return actionDefinitionService.executeMultipleConnectionsPerform(
                 componentName, componentVersion, actionName, inputParameters, executeFunctionData.componentConnections,
-                actionContext);
+                extensions, actionContext);
         }
     }
 
@@ -177,7 +177,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
                 componentName, componentVersion, actionName, inputParameters, componentConnection1,
                 actionContext1),
             componentConnection1 -> contextFactory.createActionContext(
-                componentName, componentVersion, actionName, actionContextImpl.getAppType(),
+                componentName, componentVersion, actionName, actionContextImpl.getType(),
                 actionContextImpl.getInstanceId(), actionContextImpl.getInstanceWorkflowId(),
                 actionContextImpl.getJobId(), componentConnection));
     }

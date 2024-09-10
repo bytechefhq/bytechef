@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.worker.trigger.factory;
+package com.bytechef.platform.component;
 
-import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandler;
-import java.util.Map;
+import com.bytechef.component.ComponentHandler;
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-public interface TriggerHandlerFactory {
+public interface ComponentHandlerFactory {
 
-    Map<String, TriggerHandler> getTriggerHandlerMap();
+    List<? extends ComponentHandler> getComponentHandlers();
 }

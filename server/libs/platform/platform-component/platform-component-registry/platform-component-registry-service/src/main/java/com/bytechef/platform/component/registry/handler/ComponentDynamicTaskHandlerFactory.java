@@ -5,12 +5,11 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.platform.component.registry.handler.factory;
+package com.bytechef.platform.component.registry.handler;
 
-import com.bytechef.atlas.worker.task.factory.DynamicTaskHandlerFactory;
+import com.bytechef.atlas.worker.task.DynamicTaskHandlerFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
-import com.bytechef.platform.component.registry.handler.ComponentTaskHandler;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.annotation.Order;
