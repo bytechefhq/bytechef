@@ -20,6 +20,7 @@ import {
     TimeProperty,
     ValueProperty,
     Workflow,
+    WorkflowConnection,
 } from '@/shared/middleware/platform/configuration';
 import {UseMutationResult} from '@tanstack/react-query';
 import {ReactNode} from 'react';
@@ -56,6 +57,7 @@ export type TaskDispatcherType = {
 
 export type ComponentType = {
     componentName: string;
+    description?: string;
     displayConditions?: {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         [key: string]: boolean;
@@ -81,6 +83,28 @@ export type ClickedItemType = {
     trigger?: boolean;
     taskDispatcher?: boolean;
 } & (ComponentDefinitionBasic | TaskDispatcherDefinition);
+
+export type NodeDataType = {
+    componentName: string;
+    connections?: Array<WorkflowConnection>;
+    description?: string;
+    icon?: JSX.Element | ReactNode | string;
+    label?: string;
+    metadata?: {
+        ui?: {
+            dynamicPropertyTypes?: {[key: string]: string};
+        };
+    };
+    name: string;
+    operationName?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    parameters?: {[key: string]: any};
+    taskDispatcher?: boolean;
+    trigger?: boolean;
+    type?: string;
+    version?: number;
+    workflowNodeName?: string;
+};
 
 export type NodeType = {
     componentName?: string;
@@ -108,6 +132,7 @@ export type NodeType = {
     trigger?: boolean;
     type: string;
     version: number;
+    workflowNodeName?: string;
 };
 
 export type NodeWithMetadataType = Node & {

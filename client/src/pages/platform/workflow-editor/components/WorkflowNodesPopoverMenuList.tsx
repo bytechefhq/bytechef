@@ -108,7 +108,6 @@ const WorkflowNodesPopoverMenuList = memo(
                                     ...node.data,
                                     componentName: clickedItem.name,
                                     connections: undefined,
-                                    description: clickedItem.description,
                                     icon: (
                                         <>
                                             {clickedItem.icon ? (

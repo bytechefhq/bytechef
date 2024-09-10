@@ -3,7 +3,7 @@ import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import {UpdateWorkflowMutationType} from '@/shared/types';
+import {NodeDataType, UpdateWorkflowMutationType} from '@/shared/types';
 import {ChangeEvent} from 'react';
 import {useDebouncedCallback} from 'use-debounce';
 
@@ -13,56 +13,57 @@ const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: Updat
     const {workflow} = useWorkflowDataStore();
     const {currentComponent, currentNode, setCurrentComponent} = useWorkflowNodeDetailsPanelStore();
 
+    const componentData: NodeDataType = {
+        componentName: currentComponent!.componentName!,
+        description: currentComponent?.notes,
+        icon: currentNode?.icon,
+        label: currentComponent?.title,
+        name: currentNode!.workflowNodeName!,
+        operationName: currentComponent?.operationName,
+        trigger: !!currentNode?.trigger,
+        type: currentComponent?.type,
+        workflowNodeName: currentNode?.workflowNodeName,
+    };
+
     const handleLabelChange = useDebouncedCallback((event: ChangeEvent<HTMLInputElement>) => {
-        if (!currentComponent) {
+        if (!currentComponent || !currentNode) {
             return;
         }
 
-        if (currentComponent?.componentName) {
-            saveWorkflowDefinition(
-                {
-                    componentName: currentComponent.componentName as string,
-                    description: currentComponent?.notes,
-                    icon: undefined,
-                    label: event.target.value,
-                    name: currentComponent.workflowNodeName,
-                },
-                workflow,
-                updateWorkflowMutation,
-                undefined,
-                () => {
-                    setCurrentComponent({
-                        ...currentComponent,
-                        title: event.target.value,
-                    });
-                }
-            );
-        }
+        saveWorkflowDefinition(
+            {...componentData, label: event.target.value},
+            workflow,
+            updateWorkflowMutation,
+            undefined,
+            () => {
+                setCurrentComponent({
+                    ...currentComponent,
+                    title: event.target.value,
+                });
+            }
+        );
     }, 200);
 
     const handleNotesChange = useDebouncedCallback((event: ChangeEvent<HTMLTextAreaElement>) => {
-        if (currentComponent?.componentName) {
-            saveWorkflowDefinition(
-                {
-                    componentName: currentComponent.componentName as string,
-                    description: event.target.value,
-                    icon: undefined,
-                    label: currentComponent?.title,
-                    name: currentComponent.workflowNodeName,
-                    operationName: currentComponent.operationName,
-                    trigger: !!currentNode?.trigger,
-                },
-                workflow,
-                updateWorkflowMutation,
-                undefined,
-                () => {
-                    setCurrentComponent({
-                        ...currentComponent,
-                        notes: event.target.value,
-                    });
-                }
-            );
+        if (!currentComponent || !currentNode) {
+            return;
         }
+
+        saveWorkflowDefinition(
+            {
+                ...componentData,
+                description: event.target.value,
+            },
+            workflow,
+            updateWorkflowMutation,
+            undefined,
+            () => {
+                setCurrentComponent({
+                    ...currentComponent,
+                    notes: event.target.value,
+                });
+            }
+        );
     }, 200);
 
     return (
