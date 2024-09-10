@@ -14,29 +14,23 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.definition;
+package com.bytechef.platform.component.registry.definition;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Parameters;
-import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
-import com.bytechef.definition.BaseOutputFunction;
-import java.util.Map;
+import com.bytechef.platform.constant.AppType;
 
 /**
  * @author Ivica Cardic
  */
-@FunctionalInterface
-public interface MultipleConnectionsOutputFunction extends BaseOutputFunction {
+public interface ActionContextAware extends ActionContext {
 
-    /**
-     *
-     * @param inputParameters
-     * @param parameterConnections
-     * @param context
-     * @return
-     * @throws Exception
-     */
-    OutputResponse apply(
-        Parameters inputParameters, Map<String, ? extends ParameterConnection> parameterConnections,
-        Parameters extensions, ActionContext context) throws Exception;
+    String getActionName();
+
+    AppType getType();
+
+    Long getInstanceId();
+
+    Long getInstanceWorkflowId();
+
+    Long getJobId();
 }

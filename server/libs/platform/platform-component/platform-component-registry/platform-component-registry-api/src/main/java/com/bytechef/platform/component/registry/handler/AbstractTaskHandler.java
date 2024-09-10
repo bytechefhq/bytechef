@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.component.registry.handler;
 
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
@@ -53,12 +54,15 @@ public abstract class AbstractTaskHandler implements TaskHandler<Object> {
             taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class, Map.of());
 
         try {
+            WorkflowTask workflowTask = taskExecution.getWorkflowTask();
+
             return actionDefinitionFacade.executePerform(
                 componentName, componentVersion, actionName,
                 MapUtils.get(taskExecution.getMetadata(), MetadataConstants.TYPE, AppType.class),
                 MapUtils.getLong(taskExecution.getMetadata(), MetadataConstants.INSTANCE_ID),
                 MapUtils.getLong(taskExecution.getMetadata(), MetadataConstants.INSTANCE_WORKFLOW_ID),
-                Validate.notNull(taskExecution.getJobId(), "jobId"), taskExecution.getParameters(), connectIdMap);
+                Validate.notNull(taskExecution.getJobId(), "jobId"), taskExecution.getParameters(), connectIdMap,
+                workflowTask.getExtensions());
         } catch (Exception e) {
             throw new TaskExecutionException(e.getMessage(), e);
         }

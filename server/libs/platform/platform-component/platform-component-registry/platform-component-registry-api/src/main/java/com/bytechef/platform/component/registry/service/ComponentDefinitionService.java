@@ -16,6 +16,8 @@
 
 package com.bytechef.platform.component.registry.service;
 
+import com.bytechef.component.definition.DataStreamItemReader;
+import com.bytechef.component.definition.DataStreamItemWriter;
 import com.bytechef.platform.component.definition.DataStreamComponentDefinition.ComponentType;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
 import java.util.List;
@@ -35,6 +37,10 @@ public interface ComponentDefinitionService {
     List<ComponentDefinition> getComponentDefinitionVersions(String name);
 
     List<ComponentDefinition> getDataStreamComponentDefinitions(ComponentType componentType);
+
+    DataStreamItemReader getDataStreamItemReader(String componentName, int componentVersion);
+
+    DataStreamItemWriter getDataStreamItemWriter(String componentName, int componentVersion);
 
     boolean hasComponentDefinition(String name, Integer version);
 }

@@ -55,7 +55,8 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     public OutputResponse executeMultipleConnectionsOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters,
-        @NonNull Map<String, ComponentConnection> connections, @NonNull ActionContext context) {
+        @NonNull Map<String, ComponentConnection> connections, @NonNull Map<String, ?> extensions,
+        @NonNull ActionContext context) {
 
         throw new UnsupportedOperationException();
     }
@@ -73,6 +74,7 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     public ProviderException executeProcessErrorResponse(
         String componentName, int componentVersion, String actionName, int statusCode, Object body,
         Context actionContext) {
+
         throw new UnsupportedOperationException();
     }
 
@@ -88,19 +90,18 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     @Override
     public Object executeSingleConnectionPerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters,
-        ComponentConnection connection, @NonNull ActionContext context) {
+        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
 
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Object executeMultipleConnectionsPerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters,
-        @NonNull Map<String, ComponentConnection> connections, @NonNull ActionContext context) {
+        @NonNull Map<String, ?> inputParameters, @NonNull Map<String, ComponentConnection> connections,
+        @NonNull Map<String, ?> extensions, @NonNull ActionContext context) {
 
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -134,8 +135,9 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     }
 
     @Override
-    public boolean
-        isSingleConnectionPerform(@NonNull String componentName, int componentVersion, @NonNull String actionName) {
-        return false;
+    public boolean isSingleConnectionPerform(
+        @NonNull String componentName, int componentVersion, @NonNull String actionName) {
+
+        throw new UnsupportedOperationException();
     }
 }

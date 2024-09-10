@@ -96,7 +96,8 @@ public class RemoteActionDefinitionFacadeController {
             actionDefinitionFacade.executePerform(
                 performRequest.componentName, performRequest.componentVersion, performRequest.actionName,
                 performRequest.type, performRequest.instanceId, Long.getLong(performRequest.workflowId),
-                performRequest.jobId, performRequest.inputParameters, performRequest.connectionIds));
+                performRequest.jobId, performRequest.inputParameters, performRequest.connectionIds,
+                performRequest.extensions));
     }
 
     @RequestMapping(
@@ -143,6 +144,6 @@ public class RemoteActionDefinitionFacadeController {
     public record PerformRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName, AppType type,
         Long instanceId, @NonNull String workflowId, long jobId, @NotNull Map<String, ?> inputParameters,
-        @NotNull Map<String, Long> connectionIds) {
+        @NotNull Map<String, Long> connectionIds, @NotNull Map<String, Long> extensions) {
     }
 }

@@ -47,7 +47,7 @@ public interface ActionDefinitionFacade extends OperationDefinitionFacade {
     Object executePerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, AppType type, Long instanceId,
         Long instanceWorkflowId, Long jobId, @NonNull Map<String, ?> inputParameters,
-        @NonNull Map<String, Long> connectionIds);
+        @NonNull Map<String, Long> connectionIds, Map<String, ?> extensions);
 
     Object executePerformForPolyglot(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,

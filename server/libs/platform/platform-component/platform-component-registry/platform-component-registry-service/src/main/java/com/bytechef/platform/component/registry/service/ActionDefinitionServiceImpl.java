@@ -36,12 +36,14 @@ import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseOutputDefinition;
 import com.bytechef.definition.BaseOutputFunction;
+import com.bytechef.definition.BaseProperty.BaseValueProperty;
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
+import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.exception.ComponentConfigurationException;
 import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
-import com.bytechef.platform.component.registry.definition.ParametersImpl;
+import com.bytechef.platform.component.registry.definition.ParametersFactory;
 import com.bytechef.platform.component.registry.domain.ActionDefinition;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
@@ -82,8 +84,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         try {
             return propertiesFunction
                 .apply(
-                    new ParametersImpl(inputParameters),
-                    new ParametersImpl(connection == null ? Map.of() : connection.parameters()),
+                    ParametersFactory.createParameters(inputParameters),
+                    ParametersFactory.createParameters(connection == null ? Map.of() : connection.parameters()),
                     getLookupDependsOnPathsMap(lookupDependsOnPaths), context)
                 .stream()
                 .map(valueProperty -> (Property) Property.toProperty(valueProperty))
@@ -102,14 +104,15 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     public OutputResponse executeMultipleConnectionsOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, @NonNull Map<String, ComponentConnection> connections,
-        @NonNull ActionContext context) {
+        @NonNull Map<String, ?> extensions, @NonNull ActionContext context) {
 
         MultipleConnectionsOutputFunction multipleConnectionsOutputFunction =
             (MultipleConnectionsOutputFunction) getOutputFunction(componentName, componentVersion, actionName);
 
         try {
             BaseOutputDefinition.OutputResponse outputDefinition = multipleConnectionsOutputFunction.apply(
-                new ParametersImpl(inputParameters), connections, context);
+                ParametersFactory.createParameters(inputParameters), connections,
+                ParametersFactory.createParameters(extensions), context);
 
             if (outputDefinition == null) {
                 return null;
@@ -128,7 +131,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     public Object executeMultipleConnectionsPerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, @NonNull Map<String, ComponentConnection> connections,
-        @NonNull ActionContext context) {
+        Map<String, ?> extensions, @NonNull ActionContext context) {
 
         com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
@@ -138,7 +141,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         try {
             return multipleConnectionsPerformFunction.apply(
-                new ParametersImpl(inputParameters), connections, context);
+                ParametersFactory.createParameters(inputParameters), connections,
+                ParametersFactory.createParameters(extensions), context);
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
         }
@@ -156,8 +160,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         try {
             return optionsFunction
                 .apply(
-                    new ParametersImpl(inputParameters),
-                    new ParametersImpl(connection == null ? Map.of() : connection.parameters()),
+                    ParametersFactory.createParameters(inputParameters),
+                    ParametersFactory.createParameters(connection == null ? Map.of() : connection.parameters()),
                     getLookupDependsOnPathsMap(lookupDependsOnPaths), searchText, context)
                 .stream()
                 .map(Option::new)
@@ -256,7 +260,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             componentName, componentVersion, actionName);
 
         try {
-            return workflowNodeDescriptionFunction.apply(new ParametersImpl(inputParameters), context);
+            return workflowNodeDescriptionFunction.apply(ParametersFactory.createParameters(inputParameters), context);
         } catch (Exception e) {
             throw new ComponentConfigurationException(
                 e, inputParameters, ActionDefinitionErrorType.EXECUTE_WORKFLOW_NODE_DESCRIPTION);

@@ -51,8 +51,7 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
     @Override
     public Map<String, ?> executeAcquire(
         @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
-        @NonNull Map<String, ?> connectionParameters,
-        @NonNull Context context) {
+        @NonNull Map<String, ?> connectionParameters, @NonNull Context context) {
 
         throw new UnsupportedOperationException();
     }

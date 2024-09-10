@@ -65,7 +65,7 @@ public class ActionDefinitionFacadeIntTest {
 
         Object result = actionDefinitionFacade.executePerform(
             "httpClient", 1, HttpClientGetAction.ACTION_DEFINITION.getName(), AppType.AUTOMATION, 1000L, 1000L, 1000L,
-            Map.of("uri", "https://api.hnb.hr/o/tecajn-eur/v3"), Map.of());
+            Map.of("uri", "https://api.hnb.hr/o/tecajn-eur/v3"), Map.of(), Map.of());
 
         Assertions.assertNotNull(result);
         Assertions.assertInstanceOf(List.class, result);
@@ -76,7 +76,7 @@ public class ActionDefinitionFacadeIntTest {
 
         Context.Http.Response response = (Context.Http.Response) actionDefinitionFacade.executePerform(
             "httpClient", 1, HttpClientGetAction.ACTION_DEFINITION.getName(), AppType.AUTOMATION, 1000L, 1000L, 1000L,
-            Map.of("uri", "https://api.hnb.hr/o/tecajn-eur/v2", "fullResponse", "true"), Map.of());
+            Map.of("uri", "https://api.hnb.hr/o/tecajn-eur/v2", "fullResponse", "true"), Map.of(), Map.of());
 
         Assertions.assertNull(response.getBody());
         Assertions.assertEquals(404, response.getStatusCode());

@@ -46,7 +46,7 @@ import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.registry.definition.HttpHeadersImpl;
 import com.bytechef.platform.component.registry.definition.HttpParametersImpl;
-import com.bytechef.platform.component.registry.definition.ParametersImpl;
+import com.bytechef.platform.component.registry.definition.ParametersFactory;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.component.registry.domain.Property;
@@ -102,8 +102,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         try {
             return CollectionUtils.map(
                 propertiesFunction.apply(
-                    new ParametersImpl(inputParameters),
                     connection == null ? null : new ParametersImpl(connection.parameters()),
+                    ParametersFactory.createParameters(inputParameters),
                     MapUtils.toMap(
                         lookupDependsOnPaths,
                         item -> item.substring(item.lastIndexOf(".") + 1),
@@ -140,8 +140,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         try {
             listenerDisableConsumer.accept(
-                new ParametersImpl(inputParameters),
                 connection == null ? null : new ParametersImpl(connection.parameters()), workflowExecutionId,
+                ParametersFactory.createParameters(inputParameters),
                 context);
         } catch (Exception e) {
             throw new ComponentExecutionException(
@@ -160,8 +160,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         try {
             listenerEnableConsumer.accept(
-                new ParametersImpl(inputParameters),
                 connection == null ? null : new ParametersImpl(connection.parameters()),
+                ParametersFactory.createParameters(inputParameters),
                 workflowExecutionId,
                 output -> eventPublisher.publishEvent(
                     new TriggerListenerEvent(
@@ -187,8 +187,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         try {
             return CollectionUtils.map(
                 optionsFunction.apply(
-                    new ParametersImpl(inputParameters),
                     connection == null ? null : new ParametersImpl(connection.parameters()),
+                    ParametersFactory.createParameters(inputParameters),
                     MapUtils.toMap(
                         lookupDependsOnPaths,
                         item -> item.substring(item.lastIndexOf(".") + 1),
@@ -225,7 +225,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         if (TriggerType.DYNAMIC_WEBHOOK == triggerType || TriggerType.STATIC_WEBHOOK == triggerType) {
             WebhookValidateResponse response = executeWebhookValidate(
-                triggerDefinition, new ParametersImpl(inputParameters), webhookRequest, context);
+                triggerDefinition, ParametersFactory.createParameters(inputParameters), webhookRequest, context);
 
             if (response.status() != HttpStatus.OK.getValue()) {
                 throw new IllegalStateException("Invalid trigger signature.");
@@ -262,9 +262,9 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         try {
             webhookDisableConsumer.accept(
-                new ParametersImpl(inputParameters),
                 connection == null ? null : new ParametersImpl(connection.parameters()),
                 new ParametersImpl(outputParameters), workflowExecutionId, context);
+                ParametersFactory.createParameters(inputParameters),
         } catch (Exception e) {
             throw new ComponentExecutionException(
                 e, inputParameters, TriggerDefinitionErrorType.EXECUTE_DYNAMIC_WEBHOOK_DISABLE);
@@ -282,8 +282,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         try {
             return webhookEnableFunction.apply(
-                new ParametersImpl(inputParameters),
                 connection == null ? null : new ParametersImpl(connection.parameters()),
+                ParametersFactory.createParameters(inputParameters),
                 webhookUrl, workflowExecutionId, context);
         } catch (Exception e) {
             throw new ComponentExecutionException(
@@ -300,7 +300,9 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         com.bytechef.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
-        return executeWebhookValidate(triggerDefinition, new ParametersImpl(inputParameters), webhookRequest, context);
+        return executeWebhookValidate(triggerDefinition, ParametersFactory.createParameters(inputParameters),
+            webhookRequest,
+            context);
     }
 
     @Override
@@ -313,7 +315,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         return executeWebhookValidateOnEnable(
-            triggerDefinition, new ParametersImpl(inputParameters), webhookRequest, context);
+            triggerDefinition, ParametersFactory.createParameters(inputParameters), webhookRequest, context);
     }
 
     @Override
@@ -325,7 +327,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             componentName, componentVersion, triggerName);
 
         try {
-            return workflowNodeDescriptionFunction.apply(new ParametersImpl(inputParameters), context);
+            return workflowNodeDescriptionFunction.apply(ParametersFactory.createParameters(inputParameters), context);
         } catch (Exception e) {
             throw new ComponentConfigurationException(
                 e, inputParameters, TriggerDefinitionErrorType.EXECUTE_WORKFLOW_NODE_DESCRIPTION);
@@ -393,8 +395,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         try {
             pollOutput = pollFunction.apply(
-                new ParametersImpl(inputParameters), connectionParameters,
-                new ParametersImpl(closureParameters), triggerContext);
+                ParametersFactory.createParameters(inputParameters), connectionParameters,
+                ParametersFactory.createParameters(closureParameters), triggerContext);
         } catch (Exception e) {
             throw new ComponentExecutionException(
                 e, inputParameters, TriggerDefinitionErrorType.EXECUTE_POLLING_TRIGGER);
@@ -406,8 +408,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         while (pollOutput.pollImmediately()) {
             try {
                 pollOutput = pollFunction.apply(
-                    new ParametersImpl(inputParameters), connectionParameters,
-                    new ParametersImpl(pollOutput.closureParameters()), triggerContext);
+                    ParametersFactory.createParameters(inputParameters), connectionParameters,
+                    ParametersFactory.createParameters(pollOutput.closureParameters()), triggerContext);
             } catch (Exception e) {
                 throw new ComponentExecutionException(
                     e, inputParameters, TriggerDefinitionErrorType.EXECUTE_POLLING_TRIGGER);
@@ -430,8 +432,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         try {
             webhookOutput = webhookRequestFunction.apply(
-                new ParametersImpl(inputParameters),
                 connection == null ? null : new ParametersImpl(connection.parameters()),
+                ParametersFactory.createParameters(inputParameters),
                 new HttpHeadersImpl(webhookRequest.headers()),
                 new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(), webhookRequest.method(),
                 output, triggerContext);

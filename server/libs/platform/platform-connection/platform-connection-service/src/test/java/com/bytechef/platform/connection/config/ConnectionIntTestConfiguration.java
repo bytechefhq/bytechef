@@ -23,8 +23,7 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ConnectionDefinition;
-import com.bytechef.component.definition.DataStreamItemReader;
-import com.bytechef.component.definition.DataStreamItemWriter;
+import com.bytechef.component.definition.DataStreamDefinition;
 import com.bytechef.component.definition.Help;
 import com.bytechef.component.definition.Resources;
 import com.bytechef.component.definition.TriggerDefinition;
@@ -85,12 +84,7 @@ public class ConnectionIntTestConfiguration {
             }
 
             @Override
-            public Optional<DataStreamItemReader> getDataStreamItemReader() {
-                return Optional.empty();
-            }
-
-            @Override
-            public Optional<DataStreamItemWriter> getDataStreamItemWriter() {
+            public Optional<DataStreamDefinition> getDataStream() {
                 return Optional.empty();
             }
 
