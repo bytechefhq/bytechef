@@ -71,6 +71,20 @@ public interface Context {
      */
     <R> R xml(ContextFunction<Xml, R> xmlFunction);
 
+    @FunctionalInterface
+    interface ContextConsumer<T> {
+
+        void accept(T t) throws Exception;
+
+    }
+
+    @FunctionalInterface
+    interface ContextFunction<T, R> {
+
+        R apply(T t) throws Exception;
+
+    }
+
     /**
      *
      */
@@ -96,8 +110,7 @@ public interface Context {
          * @param inputStream
          * @return
          */
-        FileEntry storeContent(String fileName, InputStream inputStream)
-            throws IOException;
+        FileEntry storeContent(String fileName, InputStream inputStream) throws IOException;
 
         /**
          *
@@ -126,18 +139,6 @@ public interface Context {
          * @return
          */
         byte[] readAllBytes(FileEntry fileEntry) throws IOException;
-    }
-
-    @FunctionalInterface
-    interface ContextConsumer<T> {
-
-        void accept(T t) throws Exception;
-    }
-
-    @FunctionalInterface
-    interface ContextFunction<T, R> {
-
-        R apply(T t) throws Exception;
     }
 
     /**

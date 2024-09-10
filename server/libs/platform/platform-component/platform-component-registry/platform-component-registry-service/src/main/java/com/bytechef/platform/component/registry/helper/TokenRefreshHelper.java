@@ -68,11 +68,11 @@ public class TokenRefreshHelper {
 
     public <V, C extends Context> V executeSingleConnectionFunction(
         String componentName, int componentVersion, ComponentConnection componentConnection,
-        C actionContext, ErrorType errorType, BiFunction<ComponentConnection, C, V> performFunction,
+        C context, ErrorType errorType, BiFunction<ComponentConnection, C, V> performFunction,
         Function<ComponentConnection, C> contextFunction) {
 
         try {
-            return performFunction.apply(componentConnection, actionContext);
+            return performFunction.apply(componentConnection, context);
         } catch (Exception exception) {
             if (componentConnection == null || componentConnection.authorizationName() == null) {
                 throw exception;
@@ -85,7 +85,7 @@ public class TokenRefreshHelper {
             if (componentConnection.canCredentialsBeRefreshed() &&
                 RefreshCredentialsUtils.matches(refreshOn, exception)) {
 
-                componentConnection = getRefreshedCredentialsComponentConnection(componentConnection, actionContext);
+                componentConnection = getRefreshedCredentialsComponentConnection(componentConnection, context);
 
                 return performFunction.apply(componentConnection, contextFunction.apply(componentConnection));
             }
@@ -105,7 +105,7 @@ public class TokenRefreshHelper {
     }
 
     private ComponentConnection getRefreshedCredentialsComponentConnection(
-        ComponentConnection componentConnection, Context actionContext) {
+        ComponentConnection componentConnection, Context context) {
 
         Connection connection;
         Map<String, ?> parameters;
@@ -116,7 +116,7 @@ public class TokenRefreshHelper {
                     connectionDefinitionService.executeRefresh(
                         componentConnection.componentName(), componentConnection.version(),
                         Objects.requireNonNull(componentConnection.authorizationName()),
-                        componentConnection.getParameters(), actionContext);
+                        componentConnection.getParameters(), context);
 
                 parameters = new HashMap<>() {
                     {
@@ -135,7 +135,7 @@ public class TokenRefreshHelper {
                 parameters = connectionDefinitionService.executeAcquire(
                     componentConnection.componentName(), componentConnection.version(),
                     Objects.requireNonNull(componentConnection.authorizationName()),
-                    componentConnection.getParameters(), actionContext);
+                    componentConnection.getParameters(), context);
             }
 
             ReentrantLock reentrantLock = REENTRANT_LOCK_CACHE.get(

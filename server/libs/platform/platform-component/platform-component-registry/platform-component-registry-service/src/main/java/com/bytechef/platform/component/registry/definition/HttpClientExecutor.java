@@ -16,6 +16,8 @@
 
 package com.bytechef.platform.component.registry.definition;
 
+import static com.bytechef.component.definition.Context.Http.ResponseType;
+
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MimeTypeUtils;
 import com.bytechef.commons.util.OptionalUtils;
@@ -27,7 +29,6 @@ import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.RequestMethod;
 import com.bytechef.component.definition.Context.Http.Response;
-import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
@@ -85,7 +86,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class HttpClientExecutor implements ApplicationContextAware {
+class HttpClientExecutor implements ApplicationContextAware {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpClientExecutor.class);
 
@@ -107,7 +108,8 @@ public class HttpClientExecutor implements ApplicationContextAware {
     public Response execute(
         String urlString, Map<String, List<String>> headers, Map<String, List<String>> queryParameters, Body body,
         Configuration configuration, RequestMethod requestMethod, String componentName, int componentVersion,
-        String componentOperationName, ComponentConnection componentConnection, Context context) throws Exception {
+        String componentOperationName, ComponentConnection componentConnection, Context context)
+        throws Exception {
 
         HttpResponse<?> httpResponse;
 
@@ -529,7 +531,7 @@ public class HttpClientExecutor implements ApplicationContextAware {
         }
 
         @Override
-        public <T> T getBody(Context.TypeReference<T> valueTypeRef) {
+        public <T> T getBody(com.bytechef.component.definition.TypeReference<T> valueTypeRef) {
             return objectMapper.convertValue(body, new TypeReference<>() {
 
                 @Override
