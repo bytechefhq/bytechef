@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.test.component.properties.ParametersFactory;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +35,7 @@ class TrelloCreateBoardActionTest extends AbstractTrelloActionTest {
 
     @Test
     void testPerform() {
-        Parameters parameters = ParametersFactory.createParameters(
+        Parameters parameters = MockParametersFactory.create(
             Map.of(NAME, "new board", DESC, "new board description"));
 
         assertNull(TrelloCreateBoardAction.perform(parameters, parameters, mockedActionContext));

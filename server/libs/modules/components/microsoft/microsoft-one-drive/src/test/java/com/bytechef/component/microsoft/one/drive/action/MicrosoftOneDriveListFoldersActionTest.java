@@ -26,7 +26,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.test.component.properties.ParametersFactory;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +41,7 @@ class MicrosoftOneDriveListFoldersActionTest {
     private final ActionContext mockedContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final Parameters parameters = ParametersFactory.createParameters(Map.of());
+    private final Parameters parameters = MockParametersFactory.create(Map.of());
     private final ArgumentCaptor<Object[]> queryArgumentCaptor = ArgumentCaptor.forClass(Object[].class);
 
     @Test

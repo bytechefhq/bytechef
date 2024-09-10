@@ -28,8 +28,8 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.sheets.util.GoogleSheetsRowUtils;
 import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
-import com.bytechef.test.component.properties.ParametersFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +47,7 @@ class GoogleSheetsFindRowByNumActionTest {
     private final ArgumentCaptor<Integer> rowNumberArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
     private final ArgumentCaptor<String> sheetNameArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<String> spreadsheetIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final Parameters parameters = ParametersFactory.createParameters(
+    private final Parameters parameters = MockParametersFactory.create(
         Map.of(SPREADSHEET_ID, "spreadsheetId", SHEET_NAME, "sheetName", ROW_NUMBER, 2));
 
     @Test

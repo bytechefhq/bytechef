@@ -25,7 +25,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.test.component.properties.ParametersFactory;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -38,7 +38,7 @@ class MicrosoftOneDriveDownloadFileActionTest {
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final Parameters parameters = ParametersFactory.createParameters(Map.of());
+    private final Parameters parameters = MockParametersFactory.create(Map.of());
 
     @Test
     void testPerform() {

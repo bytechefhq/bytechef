@@ -27,8 +27,8 @@ import static org.mockito.Mockito.mockStatic;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
-import com.bytechef.test.component.properties.ParametersFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import java.util.List;
@@ -48,7 +48,7 @@ class GoogleSheetsInsertRowActionTest {
     private final ArgumentCaptor<String> spreadsheetIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<String> sheetNameArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<String> valueInputOptionArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final Parameters parameters = ParametersFactory.createParameters(
+    private final Parameters parameters = MockParametersFactory.create(
         Map.of(SPREADSHEET_ID, "spreadsheetId", SHEET_NAME, "sheetName", VALUE_INPUT_OPTION, "USER_ENTERED"));
     private final ArgumentCaptor<String> rangeArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<ValueRange> valueRangeArgumentCaptor = ArgumentCaptor.forClass(ValueRange.class);

@@ -29,8 +29,8 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
-import com.bytechef.test.component.properties.ParametersFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.AddSheetResponse;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
@@ -66,7 +66,7 @@ class GoogleSheetsCreateSheetActionTest {
     @Test
     void perform() throws Exception {
         List<Object> headers = List.of("header1", "header2");
-        Parameters parameters = ParametersFactory.createParameters(
+        Parameters parameters = MockParametersFactory.create(
             Map.of(SPREADSHEET_ID, "spreadsheetId", SHEET_ID, 123, SHEET_NAME, "sheetName", HEADERS, headers));
 
         BatchUpdateSpreadsheetResponse batchUpdateSpreadsheetResponse = new BatchUpdateSpreadsheetResponse()

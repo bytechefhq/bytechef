@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;
 import com.bytechef.component.google.mail.util.GoogleMailUtils.SimpleMessage;
-import com.bytechef.test.component.properties.ParametersFactory;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import com.google.api.services.gmail.model.Thread;
@@ -61,7 +61,7 @@ class GoogleMailGetThreadActionTest extends AbstractGoogleMailActionTest {
 
     @Test
     void testPerform() throws IOException {
-        Parameters parameters = ParametersFactory.createParameters(
+        Parameters parameters = MockParametersFactory.create(
             Map.of(ID, "id", FORMAT, MINIMAL, METADATA_HEADERS, List.of("metadata")));
 
         when(mockedGmail.users())
@@ -89,7 +89,7 @@ class GoogleMailGetThreadActionTest extends AbstractGoogleMailActionTest {
 
     @Test
     void testPerformForSimpleFormat() throws IOException {
-        Parameters parameters = ParametersFactory.createParameters(
+        Parameters parameters = MockParametersFactory.create(
             Map.of(ID, "id", FORMAT, SIMPLE, METADATA_HEADERS, List.of("metadata")));
 
         when(mockedGmail.users())

@@ -28,7 +28,7 @@ import static org.mockito.Mockito.mockStatic;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.monday.util.MondayUtils;
-import com.bytechef.test.component.properties.ParametersFactory;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -42,7 +42,7 @@ class MondayCreateGroupActionTest {
 
     @Test
     void testPerform() {
-        Parameters parameters = ParametersFactory.createParameters(
+        Parameters parameters = MockParametersFactory.create(
             Map.of(BOARD_ID, "board", GROUP_NAME, "name"));
 
         try (MockedStatic<MondayUtils> mondayUtilsMockedStatic = mockStatic(MondayUtils.class)) {

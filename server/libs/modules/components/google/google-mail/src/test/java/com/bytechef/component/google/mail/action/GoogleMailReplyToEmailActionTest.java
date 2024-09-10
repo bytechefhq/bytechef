@@ -23,7 +23,7 @@ import static org.mockito.Mockito.mockStatic;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;
-import com.bytechef.test.component.properties.ParametersFactory;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import jakarta.mail.MessagingException;
@@ -44,7 +44,7 @@ class GoogleMailReplyToEmailActionTest extends AbstractGoogleMailActionTest {
 
     @Test
     void testPerform() throws IOException, MessagingException {
-        Parameters parameters = ParametersFactory.createParameters(Map.of());
+        Parameters parameters = MockParametersFactory.create(Map.of());
         Message message = new Message().setThreadId("id")
             .setHistoryId(new BigInteger("123"));
 

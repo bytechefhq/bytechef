@@ -30,7 +30,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
-import com.bytechef.test.component.properties.ParametersFactory;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +48,7 @@ class TypeformNewSubmissionTriggerTest {
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final Parameters parameters = ParametersFactory.createParameters(Map.of());
+    private final Parameters parameters = MockParametersFactory.create(Map.of());
 
     @Test
     void testWebhookEnable() {

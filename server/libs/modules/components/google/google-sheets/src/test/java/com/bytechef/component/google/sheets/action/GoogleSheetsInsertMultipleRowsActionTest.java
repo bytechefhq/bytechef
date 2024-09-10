@@ -30,8 +30,8 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
-import com.bytechef.test.component.properties.ParametersFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import java.util.List;
@@ -62,7 +62,7 @@ class GoogleSheetsInsertMultipleRowsActionTest {
         Map<Object, Object> responseMap = Map.of();
         List<Object> row = List.of("abc", "sheetName", false);
 
-        Parameters parameters = ParametersFactory.createParameters(
+        Parameters parameters = MockParametersFactory.create(
             Map.of(SPREADSHEET_ID, "spreadsheetId", SHEET_NAME, "sheetName", VALUE_INPUT_OPTION, "USER_ENTERED", ROWS,
                 Map.of(VALUES, List.of(row))));
 
