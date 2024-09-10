@@ -1,15 +1,15 @@
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import ProjectHeaderDeleteProjectAlertDialog from '@/pages/automation/project/components/ProjectHeaderDeleteProjectAlertDialog';
-import ProjectHeaderDeleteWorkflowAlertDialog from '@/pages/automation/project/components/ProjectHeaderDeleteWorkflowAlertDialog';
-import ProjectHeaderDropdownMenu from '@/pages/automation/project/components/ProjectHeaderDropDownMenu';
-import ProjectHeaderOutputButton from '@/pages/automation/project/components/ProjectHeaderOutputButton';
-import ProjectHeaderProjectDropDownMenu from '@/pages/automation/project/components/ProjectHeaderProjectDropDownMenu';
-import ProjectHeaderRunButton from '@/pages/automation/project/components/ProjectHeaderRunButton';
-import ProjectHeaderStopButton from '@/pages/automation/project/components/ProjectHeaderStopButton';
-import ProjectHeaderWorkflowDropDownMenu from '@/pages/automation/project/components/ProjectHeaderWorkflowDropDownMenu';
-import ProjectHeaderWorkflowSelect from '@/pages/automation/project/components/ProjectHeaderWorkflowSelect';
-import ProjectPublishPopover from '@/pages/automation/project/components/ProjectPublishPopover';
+import ProjectHeaderDeleteProjectAlertDialog from '@/pages/automation/project/components/project-header/ProjectHeaderDeleteProjectAlertDialog';
+import ProjectHeaderDeleteWorkflowAlertDialog from '@/pages/automation/project/components/project-header/ProjectHeaderDeleteWorkflowAlertDialog';
+import ProjectHeaderDropdownMenu from '@/pages/automation/project/components/project-header/ProjectHeaderDropDownMenu';
+import ProjectHeaderOutputButton from '@/pages/automation/project/components/project-header/ProjectHeaderOutputButton';
+import ProjectHeaderProjectDropDownMenu from '@/pages/automation/project/components/project-header/ProjectHeaderProjectDropDownMenu';
+import ProjectHeaderPublishPopover from '@/pages/automation/project/components/project-header/ProjectHeaderPublishPopover';
+import ProjectHeaderRunButton from '@/pages/automation/project/components/project-header/ProjectHeaderRunButton';
+import ProjectHeaderStopButton from '@/pages/automation/project/components/project-header/ProjectHeaderStopButton';
+import ProjectHeaderWorkflowDropDownMenu from '@/pages/automation/project/components/project-header/ProjectHeaderWorkflowDropDownMenu';
+import ProjectHeaderWorkflowSelect from '@/pages/automation/project/components/project-header/ProjectHeaderWorkflowSelect';
 import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
@@ -222,7 +222,7 @@ const ProjectHeader = ({
 
                 {project && (
                     <div className="flex space-x-1">
-                        <ProjectPublishPopover project={project} />
+                        <ProjectHeaderPublishPopover project={project} />
 
                         <ProjectHeaderProjectDropDownMenu
                             onDelete={() => setShowDeleteProjectAlertDialog(true)}
