@@ -91,24 +91,26 @@ const OutputTab = ({currentNode, outputDefined = false, outputSchema, sampleOutp
                         <div className="text-sm font-semibold">Output Schema</div>
 
                         <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button disabled={saveWorkflowNodeTestOutputMutation.isPending} variant="outline">
-                                    {(saveWorkflowNodeTestOutputMutation.isPending ||
-                                        uploadSampleOutputRequestMutation.isPending) && (
-                                        <>
-                                            <LoadingIcon />
-                                            Testing...
-                                        </>
-                                    )}
-
-                                    {!saveWorkflowNodeTestOutputMutation.isPending &&
-                                        !uploadSampleOutputRequestMutation.isPending && (
+                            {!currentNode.trigger && (
+                                <DropdownMenuTrigger asChild>
+                                    <Button disabled={saveWorkflowNodeTestOutputMutation.isPending} variant="outline">
+                                        {(saveWorkflowNodeTestOutputMutation.isPending ||
+                                            uploadSampleOutputRequestMutation.isPending) && (
                                             <>
-                                                Regenerate <CaretDownIcon className="ml-0.5" />
+                                                <LoadingIcon />
+                                                Testing...
                                             </>
                                         )}
-                                </Button>
-                            </DropdownMenuTrigger>
+
+                                        {!saveWorkflowNodeTestOutputMutation.isPending &&
+                                            !uploadSampleOutputRequestMutation.isPending && (
+                                                <>
+                                                    Regenerate <CaretDownIcon className="ml-0.5" />
+                                                </>
+                                            )}
+                                    </Button>
+                                </DropdownMenuTrigger>
+                            )}
 
                             <DropdownMenuContent align="end" className="w-60 cursor-pointer">
                                 {outputDefined && (
@@ -168,43 +170,45 @@ const OutputTab = ({currentNode, outputDefined = false, outputSchema, sampleOutp
             ) : (
                 <div className="flex size-full items-center justify-center">
                     <div className="flex flex-col items-center gap-4">
-                        <span>Generate Schema</span>
+                        <span className="self-center">Generate Schema</span>
 
-                        <div className="inline-flex flex-col gap-3 rounded-md shadow-sm">
-                            <Button
-                                disabled={saveWorkflowNodeTestOutputMutation.isPending}
-                                onClick={handleTestComponentClick}
-                                type="button"
-                            >
-                                {saveWorkflowNodeTestOutputMutation.isPending && (
-                                    <>
-                                        <LoadingIcon />
+                        {!currentNode.trigger && (
+                            <div className="flex w-full flex-col gap-3">
+                                <Button
+                                    disabled={saveWorkflowNodeTestOutputMutation.isPending}
+                                    onClick={handleTestComponentClick}
+                                    type="button"
+                                >
+                                    {saveWorkflowNodeTestOutputMutation.isPending && (
+                                        <>
+                                            <LoadingIcon />
 
-                                        <span>Testing...</span>
-                                    </>
-                                )}
+                                            <span>Testing...</span>
+                                        </>
+                                    )}
 
-                                {!saveWorkflowNodeTestOutputMutation.isPending && <>Test component</>}
-                            </Button>
+                                    {!saveWorkflowNodeTestOutputMutation.isPending && <>Test component</>}
+                                </Button>
 
-                            <span className="text-center">or</span>
+                                <span className="text-center">or</span>
+                            </div>
+                        )}
 
-                            <Button
-                                disabled={uploadSampleOutputRequestMutation.isPending}
-                                onClick={() => setShowUploadDialog(true)}
-                                type="button"
-                            >
-                                {uploadSampleOutputRequestMutation.isPending && (
-                                    <>
-                                        <LoadingIcon />
+                        <Button
+                            disabled={uploadSampleOutputRequestMutation.isPending}
+                            onClick={() => setShowUploadDialog(true)}
+                            type="button"
+                        >
+                            {uploadSampleOutputRequestMutation.isPending && (
+                                <>
+                                    <LoadingIcon />
 
-                                        <span>Uploading...</span>
-                                    </>
-                                )}
+                                    <span>Uploading...</span>
+                                </>
+                            )}
 
-                                {!uploadSampleOutputRequestMutation.isPending && <span>Upload Sample Output Data</span>}
-                            </Button>
-                        </div>
+                            {!uploadSampleOutputRequestMutation.isPending && <span>Upload Sample Output Data</span>}
+                        </Button>
                     </div>
                 </div>
             )}
