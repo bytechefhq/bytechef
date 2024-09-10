@@ -356,9 +356,9 @@ public class GoogleMailUtils {
 
         String subject = null;
         String from = null;
-        List<String> to = null;
-        List<String> cc = null;
-        List<String> bcc = null;
+        List<String> to = new ArrayList<>();
+        List<String> cc = new ArrayList<>();
+        List<String> bcc = new ArrayList<>();
 
         for (MessagePartHeader messagePartHeader : messagePartHeaders) {
             if ("Subject".equals(messagePartHeader.getName())) {
