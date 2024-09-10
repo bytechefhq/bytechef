@@ -77,7 +77,7 @@ public interface Parameters extends Map<String, Object> {
 
     <T> List<T> getList(String key, Class<T> elementType);
 
-    <T> List<T> getList(String key, Context.TypeReference<T> elementTypeReference);
+    <T> List<T> getList(String key, TypeReference<T> elementTypeReference);
 
     <T> List<T> getList(String key, Class<T> elementType, List<T> defaultValue);
 
@@ -85,7 +85,7 @@ public interface Parameters extends Map<String, Object> {
 
     List<?> getList(String key, List<Class<?>> elementTypes, List<?> defaultValue);
 
-    <T> List<T> getList(String rows, Context.TypeReference<T> typeReference, List<T> defaultValue);
+    <T> List<T> getList(String rows, TypeReference<T> typeReference, List<T> defaultValue);
 
     LocalDate getLocalDate(String key);
 
@@ -109,11 +109,11 @@ public interface Parameters extends Map<String, Object> {
 
     <V> Map<String, V> getMap(String key, Class<V> valueType);
 
-    <V> Map<String, V> getMap(String key, Context.TypeReference<V> valueTypeReference);
+    <V> Map<String, V> getMap(String key, TypeReference<V> valueTypeReference);
 
     <V> Map<String, V> getMap(String key, Class<V> valueType, Map<String, V> defaultValue);
 
-    <V> Map<String, V> getMap(String key, Context.TypeReference<V> valueTypeReference, Map<String, V> defaultValue);
+    <V> Map<String, V> getMap(String key, TypeReference<V> valueTypeReference, Map<String, V> defaultValue);
 
     Map<String, ?> getMap(String key, List<Class<?>> valueTypes);
 
@@ -145,7 +145,7 @@ public interface Parameters extends Map<String, Object> {
 
     <T> List<T> getRequiredList(String key, Class<T> elementType);
 
-    <T> List<T> getRequiredList(String key, Context.TypeReference<T> elementTypeReference);
+    <T> List<T> getRequiredList(String key, TypeReference<T> elementTypeReference);
 
     LocalDate getRequiredLocalDate(String key);
 
@@ -159,7 +159,7 @@ public interface Parameters extends Map<String, Object> {
 
     <V> Map<String, V> getRequiredMap(String key, Class<V> valueType);
 
-    <V> Map<String, V> getRequiredMap(String key, Context.TypeReference<V> valueTypeReference);
+    <V> Map<String, V> getRequiredMap(String key, TypeReference<V> valueTypeReference);
 
     String getRequiredString(String key);
 

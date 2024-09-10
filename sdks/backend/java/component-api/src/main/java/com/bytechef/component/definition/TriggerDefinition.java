@@ -495,7 +495,7 @@ public interface TriggerDefinition {
 
         <T> T getContent(Class<T> valueType);
 
-        <T> T getContent(Context.TypeReference<T> valueTypeRef);
+        <T> T getContent(TypeReference<T> valueTypeRef);
 
         /**
          *

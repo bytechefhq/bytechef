@@ -20,8 +20,6 @@ import com.bytechef.component.definition.Context.Http.Configuration.Configuratio
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.HashMap;
@@ -1117,53 +1115,6 @@ public interface Context {
          * @param exception
          */
         void trace(String message, Exception exception);
-    }
-
-    /**
-     *
-     */
-    interface Output {
-
-        /**
-         *
-         * @param value
-         * @return
-         */
-        OutputResponse get(Object value);
-    }
-
-    /**
-     *
-     * @param <T>
-     */
-    abstract class TypeReference<T> implements Comparable<TypeReference<T>> {
-
-        protected final Type type;
-
-        @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
-        protected TypeReference() {
-            Type superClass = getClass().getGenericSuperclass();
-
-            if (superClass instanceof Class<?>) { // sanity check, should never happen
-                throw new IllegalArgumentException(
-                    "Internal error: TypeReference constructed without actual type information");
-            }
-
-            type = ((ParameterizedType) superClass).getActualTypeArguments()[0];
-        }
-
-        public Type getType() {
-            return type;
-        }
-
-        /**
-         * The only reason we define this method (and require implementation of <code>Comparable</code>) is to prevent
-         * constructing a reference without type information.
-         */
-        @Override
-        public int compareTo(TypeReference<T> o) {
-            return 0;
-        }
     }
 
     /**
