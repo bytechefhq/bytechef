@@ -75,7 +75,7 @@ public interface ActionContext extends Context {
          * @param key
          * @return
          */
-        <T> Optional<T> fetchValue(Data.Scope scope, String key);
+        <T> Optional<T> fetch(Data.Scope scope, String key);
 
         /**
          * @param <T>
@@ -83,7 +83,7 @@ public interface ActionContext extends Context {
          * @param key
          * @return
          */
-        <T> T getValue(Data.Scope scope, String key);
+        <T> T get(Data.Scope scope, String key);
 
         /**
          * @param <T>
@@ -97,12 +97,12 @@ public interface ActionContext extends Context {
          * @param key
          * @param data
          */
-        Void setValue(Data.Scope scope, String key, Object data);
+        Void put(Data.Scope scope, String key, Object data);
 
         /**
          * @param scope
          * @param key
          */
-        Void deleteValue(Data.Scope scope, String key);
+        Void remove(Data.Scope scope, String key);
     }
 }

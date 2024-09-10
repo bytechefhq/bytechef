@@ -88,18 +88,22 @@ public class ActionContextImpl extends ContextImpl implements ActionContext, Act
         return actionName;
     }
 
-    public AppType getAppType() {
+    @Override
+    public AppType getType() {
         return type;
     }
 
+    @Override
     public Long getInstanceId() {
         return instanceId;
     }
 
+    @Override
     public Long getInstanceWorkflowId() {
         return instanceWorkflowId;
     }
 
+    @Override
     public Long getJobId() {
         return jobId;
     }
@@ -109,12 +113,12 @@ public class ActionContextImpl extends ContextImpl implements ActionContext, Act
         long instanceWorkflowId, long jobId, DataStorage dataStorage) implements Data {
 
         @Override
-        public <T> Optional<T> fetchValue(Scope scope, String key) {
+        public <T> Optional<T> fetch(Scope scope, String key) {
             return dataStorage.fetch(componentName, getDataStorageScope(scope), getScopeId(scope), key, type);
         }
 
         @Override
-        public <T> T getValue(Scope scope, String key) {
+        public <T> T get(Scope scope, String key) {
             return dataStorage.get(componentName, getDataStorageScope(scope), getScopeId(scope), key, type);
         }
 
@@ -124,14 +128,14 @@ public class ActionContextImpl extends ContextImpl implements ActionContext, Act
         }
 
         @Override
-        public Void setValue(Scope scope, String key, Object value) {
+        public Void put(Scope scope, String key, Object value) {
             dataStorage.put(componentName, getDataStorageScope(scope), getScopeId(scope), key, type, value);
 
             return null;
         }
 
         @Override
-        public Void deleteValue(Scope scope, String key) {
+        public Void remove(Scope scope, String key) {
             dataStorage.delete(componentName, getDataStorageScope(scope), getScopeId(scope), key, type);
 
             return null;
@@ -168,12 +172,12 @@ public class ActionContextImpl extends ContextImpl implements ActionContext, Act
     private record NoOpDataImpl() implements Data {
 
         @Override
-        public <T> Optional<T> fetchValue(Scope scope, String key) {
+        public <T> Optional<T> fetch(Scope scope, String key) {
             return Optional.empty();
         }
 
         @Override
-        public <T> T getValue(Scope scope, String key) {
+        public <T> T get(Scope scope, String key) {
             return null;
         }
 
@@ -183,13 +187,14 @@ public class ActionContextImpl extends ContextImpl implements ActionContext, Act
         }
 
         @Override
-        public Void setValue(Scope scope, String key, Object data) {
+        public Void put(Scope scope, String key, Object data) {
             return null;
         }
 
         @Override
-        public Void deleteValue(Scope scope, String key) {
+        public Void remove(Scope scope, String key) {
             return null;
         }
+
     }
 }
