@@ -27,13 +27,12 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BC
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BODY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.CC;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.EMAIL_PROPERTY;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FULL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.LABEL_IDS;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.THREAD_ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TO;
 import static com.bytechef.component.google.mail.util.GoogleMailUtils.getEncodedEmail;
+import static com.bytechef.component.google.mail.util.GoogleMailUtils.getMessage;
 import static com.bytechef.component.google.mail.util.GoogleMailUtils.sendMail;
 
 import com.bytechef.component.definition.ActionContext;
@@ -103,11 +102,7 @@ public class GoogleMailReplyToEmailAction {
 
         Gmail gmail = GoogleServices.getMail(connectionParameters);
 
-        Message message = gmail.users()
-            .messages()
-            .get(ME, inputParameters.getRequiredString(ID))
-            .setFormat(FULL)
-            .execute();
+        Message message = getMessage(inputParameters, gmail);
 
         Message newMessage = new Message();
 

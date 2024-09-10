@@ -31,11 +31,11 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.IN
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.LABEL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.LABEL_IDS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MAX_RESULTS;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MESSAGES;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.NEXT_PAGE_TOKEN;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.PAGE_TOKEN;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.RESULT_SIZE_ESTIMATE;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SEARCH_EMAIL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SUBJECT;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.THREAD_ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TO;
@@ -52,10 +52,10 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class GoogleMailSearchEmailAction {
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEARCH_EMAIL)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("searchEmail")
         .title("Search Email")
         .description("Lists the messages in the user's mailbox.")
         .properties(
@@ -134,7 +134,7 @@ public class GoogleMailSearchEmailAction {
 
         return service.users()
             .messages()
-            .list("me")
+            .list(ME)
             .setMaxResults(inputParameters.getLong(MAX_RESULTS))
             .setPageToken(inputParameters.getString(PAGE_TOKEN))
             .setQ(query.toString())

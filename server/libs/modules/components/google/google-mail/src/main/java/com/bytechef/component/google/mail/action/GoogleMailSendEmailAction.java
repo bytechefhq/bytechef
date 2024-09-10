@@ -103,13 +103,12 @@ public class GoogleMailSendEmailAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws IOException, MessagingException {
 
-        Gmail service = GoogleServices.getMail(connectionParameters);
+        Gmail gmail = GoogleServices.getMail(connectionParameters);
 
         Message message = new Message();
 
         message.setRaw(getEncodedEmail(inputParameters, actionContext, null));
 
-        return sendMail(service, message);
+        return sendMail(gmail, message);
     }
-
 }

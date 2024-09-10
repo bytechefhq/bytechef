@@ -65,7 +65,6 @@ public class GoogleMailConstants {
     public static final String RAW = "raw";
     public static final String REPLY_TO = "replyTo";
     public static final String RESULT_SIZE_ESTIMATE = "resultSizeEstimate";
-    public static final String SEARCH_EMAIL = "searchEmail";
     public static final String SIMPLE = "simple";
     public static final String SIZE_ESTIMATE = "sizeEstimate";
     public static final String SNIPPET = "snippet";
