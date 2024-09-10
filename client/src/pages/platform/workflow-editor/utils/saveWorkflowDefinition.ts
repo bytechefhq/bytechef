@@ -2,13 +2,12 @@ import {
     ComponentDefinitionApi,
     TaskDispatcherDefinitionApi,
     Workflow,
-    WorkflowConnection,
     WorkflowTask,
     WorkflowTrigger,
 } from '@/shared/middleware/platform/configuration';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {TaskDispatcherKeys} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
-import {WorkflowDefinitionType} from '@/shared/types';
+import {NodeDataType, WorkflowDefinitionType} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
 const SPACE = 4;
@@ -16,27 +15,6 @@ const SPACE = 4;
 type UpdateWorkflowRequestType = {
     id: string;
     workflow: Workflow;
-};
-
-type NodeDataType = {
-    componentName: string;
-    connections?: Array<WorkflowConnection>;
-    description?: string;
-    icon?: JSX.Element | string;
-    label?: string;
-    metadata?: {
-        ui?: {
-            dynamicPropertyTypes?: {[key: string]: string};
-        };
-    };
-    name: string;
-    operationName?: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    parameters?: {[key: string]: any};
-    taskDispatcher?: boolean;
-    trigger?: boolean;
-    type?: string;
-    version?: number;
 };
 
 export default async function saveWorkflowDefinition(
