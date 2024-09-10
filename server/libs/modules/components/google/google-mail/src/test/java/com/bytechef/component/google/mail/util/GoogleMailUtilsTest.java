@@ -219,7 +219,7 @@ class GoogleMailUtilsTest {
 
         GoogleMailUtils.SimpleMessage expectedSimpleMessage =
             new GoogleMailUtils.SimpleMessage("id", "threadId", new BigInteger("123"),
-                "email subject", null, null, null, null, "email body", "",
+                "email subject", null, List.of(), List.of(), List.of(), "email body", "",
                 List.of());
         assertEquals(expectedSimpleMessage, result);
     }
