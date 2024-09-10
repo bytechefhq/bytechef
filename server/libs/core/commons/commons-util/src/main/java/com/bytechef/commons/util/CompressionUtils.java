@@ -19,14 +19,22 @@ package com.bytechef.commons.util;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import javax.annotation.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public class CompressionUtils {
+
+    public static final int BUFFER_SIZE = 8192;
+
+    private static final byte[] EMPTY_CONTENT = new byte[0];
 
     public static byte[] compress(final String data) {
         return compress(data.getBytes(StandardCharsets.UTF_8));
@@ -49,7 +57,7 @@ public class CompressionUtils {
 
     public static byte[] decompress(final byte[] bytes) {
         try (GZIPInputStream gzipInputStream = new GZIPInputStream(new ByteArrayInputStream(bytes))) {
-            return StreamUtils.copyToByteArray(gzipInputStream);
+            return copyToByteArray(gzipInputStream);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -57,9 +65,32 @@ public class CompressionUtils {
 
     public static String decompressToString(final byte[] bytes) {
         try (GZIPInputStream gzipInputStream = new GZIPInputStream(new ByteArrayInputStream(bytes))) {
-            return StreamUtils.copyToString(gzipInputStream, StandardCharsets.UTF_8);
+            return copyToString(gzipInputStream, StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static byte[] copyToByteArray(@Nullable InputStream in) throws IOException {
+        if (in == null) {
+            return EMPTY_CONTENT;
+        }
+
+        return in.readAllBytes();
+    }
+
+    public static String copyToString(@Nullable InputStream in, Charset charset) throws IOException {
+        if (in == null) {
+            return "";
+        }
+
+        StringBuilder out = new StringBuilder();
+        InputStreamReader reader = new InputStreamReader(in, charset);
+        char[] buffer = new char[BUFFER_SIZE];
+        int charsRead;
+        while ((charsRead = reader.read(buffer)) != -1) {
+            out.append(buffer, 0, charsRead);
+        }
+        return out.toString();
     }
 }

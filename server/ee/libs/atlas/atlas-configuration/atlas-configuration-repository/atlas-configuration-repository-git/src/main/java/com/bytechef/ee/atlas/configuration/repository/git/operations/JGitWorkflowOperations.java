@@ -11,7 +11,6 @@ import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.workflow.mapper.WorkflowResource;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.FileSystemUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.IOException;
@@ -214,7 +213,7 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
 
     private void clear() {
         if (repositoryDir != null) {
-            FileSystemUtils.deleteRecursively(repositoryDir);
+            org.springframework.util.FileSystemUtils.deleteRecursively(repositoryDir);
         }
 
         Path path;

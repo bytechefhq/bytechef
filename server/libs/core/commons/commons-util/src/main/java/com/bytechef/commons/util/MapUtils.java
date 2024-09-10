@@ -38,11 +38,10 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.lang.Nullable;
-import org.springframework.util.MultiValueMap;
 
 /**
  * @author Ivica Cardic
@@ -743,10 +742,6 @@ public class MapUtils {
         }
 
         return newMap;
-    }
-
-    public static <K, V> MultiValueMap<K, V> toMultiValueMap(Map<K, List<V>> targetMap) {
-        return org.springframework.util.CollectionUtils.toMultiValueMap(targetMap);
     }
 
     public static String toString(Map<String, ?> map) {

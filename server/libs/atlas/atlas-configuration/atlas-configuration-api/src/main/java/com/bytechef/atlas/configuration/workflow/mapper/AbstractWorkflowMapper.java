@@ -20,7 +20,6 @@ import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.workflow.contributor.WorkflowReservedWordContributor;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.FileCopyUtils;
 import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -126,7 +125,8 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
 
     private String readDefinition(Resource resource) throws IOException {
         try (InputStream in = resource.getInputStream()) {
-            return FileCopyUtils.copyToString(new InputStreamReader(in, StandardCharsets.UTF_8));
+            return org.springframework.util.FileCopyUtils.copyToString(
+                new InputStreamReader(in, StandardCharsets.UTF_8));
         }
     }
 

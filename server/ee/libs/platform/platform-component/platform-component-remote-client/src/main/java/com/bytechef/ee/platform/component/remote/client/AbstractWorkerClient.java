@@ -7,7 +7,6 @@
 
 package com.bytechef.ee.platform.component.remote.client;
 
-import com.bytechef.commons.util.MapUtils;
 import com.bytechef.ee.discovery.util.WorkerDiscoveryUtils;
 import com.bytechef.ee.remote.client.DefaultRestClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -53,7 +52,7 @@ public abstract class AbstractWorkerClient {
         Map<String, List<String>> queryParams) {
 
         return build(uriBuilder, serviceInstance, path)
-            .queryParams(MapUtils.toMultiValueMap(queryParams))
+            .queryParams(org.springframework.util.CollectionUtils.toMultiValueMap(queryParams))
             .build(uriVariables);
     }
 

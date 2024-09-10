@@ -21,7 +21,6 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MimeTypeUtils;
-import com.bytechef.commons.util.StreamUtils;
 import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody.ContentType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
@@ -320,7 +319,8 @@ public class WebhookController {
                 List<Object> value = multipartFormDataMap.getOrDefault(part.getName(), new ArrayList<>());
 
                 if (part.getContentType() == null) {
-                    value.add(StreamUtils.copyToString(part.getInputStream(), StandardCharsets.UTF_8));
+                    value.add(org.springframework.util.StreamUtils.copyToString(part.getInputStream(),
+                        StandardCharsets.UTF_8));
                 } else {
                     value.add(
                         filesFileStorage.storeFileContent(part.getSubmittedFileName(), part.getInputStream()));
@@ -352,7 +352,8 @@ public class WebhookController {
             parameters = toMap(queryParams);
         } else if (contentType.startsWith(MimeTypeUtils.MIME_APPLICATION_JSON)) {
             Object content;
-            String rawContent = StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8);
+            String rawContent = org.springframework.util.StreamUtils.copyToString(
+                httpServletRequest.getInputStream(), StandardCharsets.UTF_8);
 
             if (webhookTriggerFlags.webhookRawBody()) {
                 content = rawContent;
@@ -363,7 +364,8 @@ public class WebhookController {
             body = new WebhookBodyImpl(content, ContentType.JSON, httpServletRequest.getContentType(), rawContent);
         } else if (contentType.startsWith(MimeTypeUtils.MIME_APPLICATION_XML)) {
             Object content;
-            String rawContent = StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8);
+            String rawContent = org.springframework.util.StreamUtils.copyToString(
+                httpServletRequest.getInputStream(), StandardCharsets.UTF_8);
 
             if (webhookTriggerFlags.webhookRawBody()) {
                 content = rawContent;
@@ -378,7 +380,8 @@ public class WebhookController {
                     getFilename(httpServletRequest.getContentType()), httpServletRequest.getInputStream()),
                 ContentType.BINARY, httpServletRequest.getContentType(), null);
         } else {
-            String rawContent = StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8);
+            String rawContent = org.springframework.util.StreamUtils.copyToString(
+                httpServletRequest.getInputStream(), StandardCharsets.UTF_8);
 
             body = new WebhookBodyImpl(rawContent, ContentType.RAW, httpServletRequest.getContentType(), null);
         }
@@ -395,7 +398,7 @@ public class WebhookController {
     }
 
     private static String getFilename(String mimeTypeString) {
-        MimeType mimeType = MimeTypeUtils.parseMimeType(mimeTypeString);
+        MimeType mimeType = org.springframework.util.MimeTypeUtils.parseMimeType(mimeTypeString);
 
         String subtype = mimeType.getSubtype();
 
