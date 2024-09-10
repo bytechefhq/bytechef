@@ -103,8 +103,8 @@ public class GoogleMailUtils {
             array(TO).items(string()),
             array(CC).items(string()),
             array(BCC).items(string()),
-            string("body_plain"),
-            string("body_html"),
+            string("bodyPlain"),
+            string("bodyHtml"),
             array(ATTACHMENTS).items(fileEntry()));
 
     protected static final ModifiableObjectProperty RAW_MESSAGE_OUTPUT_PROPERTY = object()
