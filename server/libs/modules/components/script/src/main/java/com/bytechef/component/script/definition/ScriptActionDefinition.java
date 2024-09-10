@@ -45,7 +45,7 @@ public class ScriptActionDefinition extends AbstractActionDefinitionWrapper {
 
     protected Object perform(
         Parameters inputParameters, Map<String, ? extends ParameterConnection> connectionParameters,
-        ActionContext actionContext) {
+        Parameters extensions, ActionContext actionContext) {
 
         return polyglotEngine.execute(languageId, inputParameters, connectionParameters, actionContext);
     }

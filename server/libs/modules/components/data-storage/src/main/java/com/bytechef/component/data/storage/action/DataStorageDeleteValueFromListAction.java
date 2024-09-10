@@ -60,7 +60,7 @@ public class DataStorageDeleteValueFromListAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return context.data(data -> data.setValue(
+        return context.data(data -> data.put(
             Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
             inputParameters.getRequiredString(KEY), getValues(inputParameters, context)));
     }
@@ -70,7 +70,7 @@ public class DataStorageDeleteValueFromListAction {
         List<Object> list;
 
         Optional<Object> optionalList = context
-            .data(data -> data.fetchValue(Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
+            .data(data -> data.fetch(Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
                 inputParameters.getRequiredString(KEY)));
         if (optionalList.isPresent() && optionalList.get() instanceof List<?> curList) {
             list = (List<Object>) curList;

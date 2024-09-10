@@ -28,10 +28,9 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.time;
-import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Property;
 import java.util.Arrays;
 import java.util.Collections;
@@ -133,7 +132,7 @@ public class HttpClientComponentConstants {
                         "The response is automatically converted to object/array."),
                     option(
                         "XML",
-                        Context.Http.ResponseType.XML.name(),
+                        ResponseType.XML.name(),
                         "The response is automatically converted to object/array."),
                     option("Text", ResponseType.TEXT.name(), "The response is returned as a text."),
                     option(

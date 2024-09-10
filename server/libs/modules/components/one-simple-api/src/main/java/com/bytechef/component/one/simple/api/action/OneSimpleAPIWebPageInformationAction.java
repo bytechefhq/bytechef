@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.ACCESS_TOKEN;
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.DESC;
@@ -29,10 +30,9 @@ import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConsta
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.WEB_INFORMATION;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 
 /**
  * @author Luka Ljubić
@@ -76,7 +76,7 @@ public class OneSimpleAPIWebPageInformationAction {
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return context.http(http -> http.get("/page_info"))
             .body(
-                Context.Http.Body.of(
+                Http.Body.of(
                     ACCESS_TOKEN, connectionParameters.getRequiredString(ACCESS_TOKEN),
                     URL, inputParameters.getRequiredString(URL),
                     "output", "json"))

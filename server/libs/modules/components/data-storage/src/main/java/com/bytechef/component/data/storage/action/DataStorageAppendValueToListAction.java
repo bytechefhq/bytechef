@@ -127,7 +127,7 @@ public class DataStorageAppendValueToListAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return context.data(data -> data.setValue(
+        return context.data(data -> data.put(
             Scope.valueOf(inputParameters.getRequiredString(SCOPE)), inputParameters.getRequiredString(KEY),
             getValues(inputParameters, context, DataStorageUtils.getValue(inputParameters))));
     }
@@ -135,7 +135,7 @@ public class DataStorageAppendValueToListAction {
     @SuppressWarnings("unchecked")
     private static List<Object> getValues(Parameters inputParameters, ActionContext context, Object value) {
         List<Object> list;
-        Optional<Object> optionalList = context.data(data -> data.fetchValue(
+        Optional<Object> optionalList = context.data(data -> data.fetch(
             Scope.valueOf(inputParameters.getRequiredString(SCOPE)), inputParameters.getRequiredString(KEY)));
 
         if (optionalList.isPresent() && optionalList.get() instanceof List<?> curList) {

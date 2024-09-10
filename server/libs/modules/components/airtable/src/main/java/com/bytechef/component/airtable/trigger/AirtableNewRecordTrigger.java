@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDSL.trigger;
 
 import com.bytechef.component.airtable.util.AirtableUtils;
 import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
@@ -29,6 +28,7 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.PollTriggerOutputFunction;
+import com.bytechef.component.definition.TypeReference;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -95,7 +95,7 @@ public class AirtableNewRecordTrigger {
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
 
-        Map<String, List<?>> body = response.getBody(new Context.TypeReference<>() {});
+        Map<String, List<?>> body = response.getBody(new TypeReference<>() {});
 
         return new PollOutput(body.get("records"), Map.of(LAST_TIME_CHECKED, endDate), false);
     }

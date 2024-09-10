@@ -74,7 +74,7 @@ public class DataStorageAtomicIncrementAction {
 
                 if (value != null) {
                     context.data(
-                        data -> data.setValue(
+                        data -> data.put(
                             Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
                             inputParameters.getRequiredString(KEY), value));
 
@@ -94,7 +94,7 @@ public class DataStorageAtomicIncrementAction {
         int number;
 
         Optional<Object> optionalList = context.data(
-            data -> data.fetchValue(
+            data -> data.fetch(
                 Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
                 inputParameters.getRequiredString(KEY)));
         if (optionalList.isPresent() && optionalList.get() instanceof Number cuNumber) {

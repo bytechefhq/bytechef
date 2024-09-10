@@ -128,7 +128,7 @@ public class GoogleMailNewEmailTrigger {
 
         Gmail gmail = GoogleServices.getMail(connectionParameters);
 
-        Optional<Object> historyIdOptional = context.data(data -> data.fetchValue(WORKFLOW, HISTORY_ID));
+        Optional<Object> historyIdOptional = context.data(data -> data.fetch(WORKFLOW, HISTORY_ID));
 
         Map<String, ?> outputParameters = output.parameters();
 
@@ -166,7 +166,7 @@ public class GoogleMailNewEmailTrigger {
             }
         }
 
-        context.data(data -> data.setValue(WORKFLOW, HISTORY_ID, listHistoryResponse.getHistoryId()));
+        context.data(data -> data.put(WORKFLOW, HISTORY_ID, listHistoryResponse.getHistoryId()));
 
         return newEmails;
     }

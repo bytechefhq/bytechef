@@ -17,9 +17,9 @@
 package com.bytechef.component.http.client.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.Context.Http.RequestMethod;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context.Http.RequestMethod;
 import com.bytechef.component.http.client.constant.HttpClientComponentConstants;
 import com.bytechef.component.http.client.util.HttpClientActionUtils;
 

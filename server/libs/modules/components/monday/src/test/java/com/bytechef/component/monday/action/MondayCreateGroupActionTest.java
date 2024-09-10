@@ -46,7 +46,7 @@ class MondayCreateGroupActionTest {
             Map.of(BOARD_ID, "board", GROUP_NAME, "name"));
 
         try (MockedStatic<MondayUtils> mondayUtilsMockedStatic = mockStatic(MondayUtils.class)) {
-            mondayUtilsMockedStatic.when(() -> MondayUtils.executeGraphQLQuery(any(ActionContext.class), anyString()))
+            mondayUtilsMockedStatic.when(() -> MondayUtils.executeGraphQLQuery(anyString(), any(ActionContext.class)))
                 .thenReturn(Map.of("data", Map.of(ID, "abc")));
 
             Object result = MondayCreateGroupAction.perform(parameters, parameters, mockedActionContext);
@@ -54,8 +54,7 @@ class MondayCreateGroupActionTest {
             assertEquals(Map.of(ID, "abc"), result);
 
             mondayUtilsMockedStatic.verify(() -> MondayUtils.executeGraphQLQuery(
-                mockedActionContext,
-                "mutation{create_group(board_id: board, group_name: \"name\"){id title}}"));
+                "mutation{create_group(board_id: board, group_name: \"name\"){id title}}", mockedActionContext));
         }
     }
 }

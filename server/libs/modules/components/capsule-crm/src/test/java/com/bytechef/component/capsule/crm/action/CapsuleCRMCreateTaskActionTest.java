@@ -26,7 +26,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,7 +56,7 @@ class CapsuleCRMCreateTaskActionTest extends AbstractCapsuleCRMActionTest {
 
         verify(mockedContext, times(1)).http(POST_TASKS_CONTEXT_FUNCTION);
 
-        Context.Http.Body body = bodyArgumentCaptor.getValue();
+        Http.Body body = bodyArgumentCaptor.getValue();
 
         assertEquals(Map.of("task", propertyStubsMap), body.getContent());
     }

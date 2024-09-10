@@ -28,7 +28,7 @@ import static com.bytechef.component.jira.constant.JiraConstants.YOUR_DOMAIN;
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.definition.TypeReference;
 import java.util.List;
 import java.util.Map;
 

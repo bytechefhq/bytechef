@@ -51,7 +51,7 @@ public class DataStorageDeleteValueAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return context.data(data -> data.deleteValue(
+        return context.data(data -> data.remove(
             Scope.valueOf(inputParameters.getRequiredString(SCOPE)), inputParameters.getRequiredString(KEY)));
     }
 }

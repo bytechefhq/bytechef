@@ -21,7 +21,7 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,11 +31,10 @@ import java.util.Map;
  */
 public class MicrosoftOutlook365Utils {
 
-    public static List<Map<?, ?>> getItemsFromNextPage(Context context, String link) {
+    public static List<Map<?, ?>> getItemsFromNextPage(String link, Context context) {
         List<Map<?, ?>> otherItems = new ArrayList<>();
 
         while (link != null && !link.isEmpty()) {
-
             String finalLink = link;
 
             Map<String, Object> body = context.http(http -> http.get(finalLink))
@@ -50,6 +49,7 @@ public class MicrosoftOutlook365Utils {
                     }
                 }
             }
+
             link = (String) body.get(ODATA_NEXT_LINK);
         }
 

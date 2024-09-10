@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -27,7 +28,6 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.RequestMethod;
-import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
@@ -123,7 +123,9 @@ public class HttpClientActionUtils {
         "rawtypes", "unchecked"
     })
     public static Object execute(
-        Parameters inputParameters, RequestMethod requestMethod, Context context, Parameters connectionParameters) {
+        Parameters inputParameters, Parameters connectionParameters, RequestMethod requestMethod,
+        Context context) {
+
         Http.Response response =
             context
                 .http(http -> http.exchange(inputParameters.getRequiredString(HttpClientComponentConstants.URI),
@@ -155,7 +157,7 @@ public class HttpClientActionUtils {
 
     public static ActionDefinition.SingleConnectionPerformFunction getPerform(RequestMethod requestMethod) {
         return (inputParameters, connectionParameters, context) -> execute(
-            inputParameters, requestMethod, context, connectionParameters);
+            inputParameters, connectionParameters, requestMethod, context);
     }
 
     @SafeVarargs
@@ -194,7 +196,8 @@ public class HttpClientActionUtils {
                 body =
                     Http.Body.of(inputParameters.getMap(HttpClientComponentConstants.BODY_CONTENT, Map.of()),
                         bodyContentType);
-            } else if (bodyContentType == Http.BodyContentType.JSON || bodyContentType == Http.BodyContentType.XML) {
+            } else if (bodyContentType == Http.BodyContentType.JSON
+                || bodyContentType == Http.BodyContentType.XML) {
                 body = Http.Body.of(
                     inputParameters.getMap(HttpClientComponentConstants.BODY_CONTENT, Map.of()), bodyContentType);
             } else {

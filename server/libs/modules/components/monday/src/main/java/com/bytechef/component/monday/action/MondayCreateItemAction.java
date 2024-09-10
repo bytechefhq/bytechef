@@ -100,7 +100,7 @@ public class MondayCreateItemAction {
                     inputParameters.getRequiredString(ITEM_NAME),
                     jsonMondayColumnValues.replace("\"", "\\\""));
 
-        Map<String, Object> body = executeGraphQLQuery(actionContext, query);
+        Map<String, Object> body = executeGraphQLQuery(query, actionContext);
 
         return body.get(DATA);
     }

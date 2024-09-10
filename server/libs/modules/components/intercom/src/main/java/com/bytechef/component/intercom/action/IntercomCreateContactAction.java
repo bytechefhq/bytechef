@@ -22,10 +22,8 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.Context.Http.Body;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.definition.Context.TypeReference;
 import static com.bytechef.component.intercom.constant.IntercomConstants.AVATAR;
 import static com.bytechef.component.intercom.constant.IntercomConstants.CREATE_CONTACT;
 import static com.bytechef.component.intercom.constant.IntercomConstants.EMAIL;
@@ -39,7 +37,9 @@ import static com.bytechef.component.intercom.constant.IntercomConstants.USER;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 
 /**
  * @author Luka Ljubić

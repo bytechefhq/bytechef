@@ -77,7 +77,7 @@ public class MondayCreateGroupAction {
         String query = "mutation{create_group(board_id: %s, group_name: \"%s\"){id title}}"
             .formatted(inputParameters.getRequiredString(BOARD_ID), inputParameters.getRequiredString(GROUP_NAME));
 
-        Map<String, Object> body = executeGraphQLQuery(actionContext, query);
+        Map<String, Object> body = executeGraphQLQuery(query, actionContext);
 
         return body.get(DATA);
     }

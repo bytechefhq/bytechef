@@ -132,7 +132,7 @@ public class DataStorageSetValueInListAction {
             return null;
         }
 
-        context.data(data -> data.setValue(
+        context.data(data -> data.put(
             Scope.valueOf(inputParameters.getRequiredString(SCOPE)), inputParameters.getRequiredString(KEY),
             values));
 
@@ -144,7 +144,7 @@ public class DataStorageSetValueInListAction {
         List<Object> list;
 
         Optional<Object> optionalList = context.data(
-            data -> data.fetchValue(
+            data -> data.fetch(
                 Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
                 inputParameters.getRequiredString(KEY)));
 

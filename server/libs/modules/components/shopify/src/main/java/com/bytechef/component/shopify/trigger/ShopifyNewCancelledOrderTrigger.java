@@ -57,7 +57,7 @@ public class ShopifyNewCancelledOrderTrigger {
         String workflowExecutionId, TriggerContext context) {
 
         return new WebhookEnableOutput(
-            Map.of(ID, ShopifyUtils.subscribeWebhook(webhookUrl, context, "orders/cancelled")),
+            Map.of(ID, ShopifyUtils.subscribeWebhook(webhookUrl, "orders/cancelled", context)),
             null);
     }
 

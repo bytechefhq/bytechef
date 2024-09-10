@@ -28,9 +28,10 @@ import static com.bytechef.component.vtiger.constant.VTigerConstants.FIRSTNAME;
 import static com.bytechef.component.vtiger.constant.VTigerConstants.LASTNAME;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -83,8 +84,8 @@ public class VTigerCreateContactAction {
                 Body.of(
                     "elementType", "Contacts",
                     "element", paramMap))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
+            .configuration(responseType(ResponseType.JSON))
             .execute()
-            .getBody(new Context.TypeReference<>() {});
+            .getBody(new TypeReference<>() {});
     }
 }

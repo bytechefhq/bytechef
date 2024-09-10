@@ -28,10 +28,10 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -72,7 +72,7 @@ class MicrosoftOutlook365NewEmailTriggerTest {
             Map<String, String> secondMail = Map.of(ID, "cdf", "receivedDateTime", "2024-01-01T18:23:44Z");
 
             microsoftOutlook365UtilsMockedStatic
-                .when(() -> MicrosoftOutlook365Utils.getItemsFromNextPage(mockedTriggerContext, "link"))
+                .when(() -> MicrosoftOutlook365Utils.getItemsFromNextPage("link", mockedTriggerContext))
                 .thenReturn(List.of(secondMail));
 
             when(parameters.getLocalDateTime(LAST_TIME_CHECKED, LocalDateTime.now()))

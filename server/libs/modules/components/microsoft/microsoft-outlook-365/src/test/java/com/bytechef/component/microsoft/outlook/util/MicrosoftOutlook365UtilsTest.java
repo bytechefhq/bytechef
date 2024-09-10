@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.definition.TypeReference;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -53,7 +53,7 @@ class MicrosoftOutlook365UtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(body);
 
-        List<Map<?, ?>> result = MicrosoftOutlook365Utils.getItemsFromNextPage(mockedContext, "link");
+        List<Map<?, ?>> result = MicrosoftOutlook365Utils.getItemsFromNextPage("link", mockedContext);
 
         assertEquals(items, result);
     }

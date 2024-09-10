@@ -23,7 +23,7 @@ import static com.bytechef.component.accelo.constant.AcceloConstants.TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,7 +53,7 @@ class AcceloCreateTaskActionTest extends AbstractAcceloActionTest {
 
         assertEquals(responeseMap, result);
 
-        Context.Http.Body body = bodyArgumentCaptor.getValue();
+        Http.Body body = bodyArgumentCaptor.getValue();
 
         assertEquals(propertyStubsMap, body.getContent());
     }

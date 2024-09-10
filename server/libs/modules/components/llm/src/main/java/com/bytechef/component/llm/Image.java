@@ -18,8 +18,8 @@ package com.bytechef.component.llm;
 
 import static com.bytechef.component.llm.constant.LLMConstants.IMAGE_MESSAGES;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import java.util.List;
 import org.springframework.ai.image.ImageGeneration;
 import org.springframework.ai.image.ImageModel;
@@ -50,7 +50,7 @@ public interface Image {
     private static List<org.springframework.ai.image.ImageMessage> getMessages(Parameters inputParameters) {
 
         List<ImageMessage> imageMessages =
-            inputParameters.getList(IMAGE_MESSAGES, new Context.TypeReference<>() {});
+            inputParameters.getList(IMAGE_MESSAGES, new TypeReference<>() {});
 
         return imageMessages.stream()
             .map(messageRecord -> new org.springframework.ai.image.ImageMessage(

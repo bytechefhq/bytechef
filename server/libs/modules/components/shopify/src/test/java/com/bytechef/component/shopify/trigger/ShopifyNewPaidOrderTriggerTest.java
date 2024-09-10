@@ -38,7 +38,7 @@ class ShopifyNewPaidOrderTriggerTest extends AbstractShopifyTriggerTest {
 
         shopifyUtilsMockedStatic
             .when(
-                () -> ShopifyUtils.subscribeWebhook(webhookUrl, mockedTriggerContext, "orders/paid"))
+                () -> ShopifyUtils.subscribeWebhook(webhookUrl, "orders/paid", mockedTriggerContext))
             .thenReturn(123L);
 
         WebhookEnableOutput webhookEnableOutput = ShopifyNewPaidOrderTrigger.webhookEnable(

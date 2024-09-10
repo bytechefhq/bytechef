@@ -24,6 +24,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +39,7 @@ public class MailchimpUtils {
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .header(AUTHORIZATION, "OAuth " + accessToken)
             .execute()
-            .getBody(new Context.TypeReference<>() {}));
+            .getBody(new TypeReference<>() {}));
 
         if (!response.containsKey("dc")) {
             throw new IllegalStateException(
@@ -62,7 +63,7 @@ public class MailchimpUtils {
                     "count", List.of("1000")))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new Context.TypeReference<>() {});
+            .getBody(new TypeReference<>() {});
 
         context.logger(logger -> logger.debug("Response for url='%s': %s".formatted(url, response)));
 

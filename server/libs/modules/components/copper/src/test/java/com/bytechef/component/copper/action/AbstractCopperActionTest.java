@@ -22,8 +22,8 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.ArgumentCaptor;
@@ -33,8 +33,7 @@ import org.mockito.ArgumentCaptor;
  */
 public abstract class AbstractCopperActionTest {
 
-    protected ArgumentCaptor<Http.Body> bodyArgumentCaptor =
-        ArgumentCaptor.forClass(Http.Body.class);
+    protected ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
     protected ActionContext mockedContext = mock(ActionContext.class);
     protected Http.Executor mockedExecutor = mock(Http.Executor.class);
     protected Parameters mockedParameters = mock(Parameters.class);

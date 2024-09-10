@@ -115,8 +115,7 @@ public class DataStorageGetValueAction {
                 .description("The default value to return if no value exists under the given key.")
                 .displayCondition("type == 10")
                 .required(true))
-        .output((inputParameters, connectionParameters, context) -> context.output(
-            output -> output.get(inputParameters.getRequired(DEFAULT_VALUE))))
+        .output()
         .perform(DataStorageGetValueAction::perform);
 
     protected static Object perform(
@@ -125,7 +124,7 @@ public class DataStorageGetValueAction {
 
         Class<?> type = DataStorageUtils.getType(inputParameters);
 
-        Optional<Object> optional = context.data(data -> data.fetchValue(
+        Optional<Object> optional = context.data(data -> data.fetch(
             Scope.valueOf(inputParameters.getRequiredString(SCOPE)), inputParameters.getRequiredString(KEY)));
 
         if (optional.isEmpty()) {

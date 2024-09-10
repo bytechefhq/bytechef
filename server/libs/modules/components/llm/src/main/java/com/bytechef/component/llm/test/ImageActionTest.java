@@ -25,7 +25,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.llm.Image;
 import java.util.List;
 import org.mockito.MockedStatic;
@@ -59,7 +59,7 @@ public abstract class ImageActionTest extends AbstractLLMActionTest {
     }
 
     protected void getResponseTest(ImageModel mockedImageModel){
-        when(mockedParameters.getList(eq(MESSAGES), any(Context.TypeReference.class)))
+        when(mockedParameters.getList(eq(MESSAGES), any(TypeReference.class)))
             .thenReturn(List.of(new ImageMessage("PROMPT", 1f)));
 
         Image mockedImage = mock(Image.class);

@@ -18,9 +18,10 @@ package com.bytechef.component.keap.util;
 
 import static com.bytechef.component.definition.ComponentDSL.option;
 
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,9 +40,9 @@ public class KeapUtils {
             Map<String, ?> body = context
                 .http(http -> http.get("https://api.infusionsoft.com/crm/rest/v1/companies"))
                 .header("Content-Type", "application/json")
-                .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+                .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute()
-                .getBody(new Context.TypeReference<>() {});
+                .getBody(new TypeReference<>() {});
 
             if (body.containsKey("error")) {
                 throw new IllegalStateException((String) ((Map<?, ?>) body.get("error")).get("message"));

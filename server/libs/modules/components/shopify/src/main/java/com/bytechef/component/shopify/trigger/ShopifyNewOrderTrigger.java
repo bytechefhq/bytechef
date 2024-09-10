@@ -57,7 +57,7 @@ public class ShopifyNewOrderTrigger {
         String workflowExecutionId, TriggerContext context) {
 
         return new WebhookEnableOutput(
-            Map.of(ID, ShopifyUtils.subscribeWebhook(webhookUrl, context, "orders/create")),
+            Map.of(ID, ShopifyUtils.subscribeWebhook(webhookUrl, "orders/create", context)),
             null);
     }
 

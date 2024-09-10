@@ -75,7 +75,7 @@ class MondayCreateItemActionTest {
                     () -> MondayPropertiesUtils.convertPropertyToMondayColumnValue(
                         columnValueMap, "board", mockedActionContext))
                 .thenReturn(Map.of());
-            mondayUtilsMockedStatic.when(() -> MondayUtils.executeGraphQLQuery(any(ActionContext.class), anyString()))
+            mondayUtilsMockedStatic.when(() -> MondayUtils.executeGraphQLQuery(anyString(), any(ActionContext.class)))
                 .thenReturn(Map.of("data", Map.of(ID, "abc")));
 
             String jsonString = "{\"date_id\":{\"date\":\"2024-08-21\"},\"status_id\":{\"label\":\"Stuck\"}," +
@@ -91,10 +91,10 @@ class MondayCreateItemActionTest {
             assertEquals(Map.of(ID, "abc"), result);
 
             mondayUtilsMockedStatic.verify(() -> MondayUtils.executeGraphQLQuery(
-                mockedActionContext,
                 "mutation{create_item(board_id: board, group_id: \"group\", item_name: \"name\", " +
                     "column_values:\"%s\"){id name}}"
-                        .formatted(jsonString.replace("\"", "\\\""))));
+                        .formatted(jsonString.replace("\"", "\\\"")),
+                mockedActionContext));
         }
     }
 }

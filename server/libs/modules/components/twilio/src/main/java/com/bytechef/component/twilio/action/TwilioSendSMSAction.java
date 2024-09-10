@@ -26,6 +26,7 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.twilio.constant.TwilioConstants.ACCOUNT_SID;
 import static com.bytechef.component.twilio.constant.TwilioConstants.ADDRESS_RETENTION;
@@ -61,11 +62,10 @@ import static com.bytechef.component.twilio.constant.TwilioConstants.ZONE_ID;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.twilio.util.TwilioUtils;
 import java.util.List;
 import java.util.Map;
@@ -352,7 +352,8 @@ public class TwilioSendSMSAction {
         return context
             .http(http -> http.post(connectionParameters.getRequiredString(ACCOUNT_SID) + "/Messages.json"))
             .headers(
-                Map.of("username", List.of(connectionParameters.getRequiredString(ACCOUNT_SID)),
+                Map.of(
+                    "username", List.of(connectionParameters.getRequiredString(ACCOUNT_SID)),
                     "password", List.of(connectionParameters.getRequiredString(AUTH_TOKEN))))
             .body(
                 Body.of(

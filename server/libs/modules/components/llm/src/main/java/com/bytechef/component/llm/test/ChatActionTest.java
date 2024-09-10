@@ -25,7 +25,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.llm.Chat;
 import java.util.List;
 import org.mockito.MockedStatic;
@@ -57,7 +57,7 @@ public abstract class ChatActionTest extends AbstractLLMActionTest {
     }
 
     protected void getResponseTest(ChatModel mockedChatModel){
-        when(mockedParameters.getList(eq(MESSAGES), any(Context.TypeReference.class)))
+        when(mockedParameters.getList(eq(MESSAGES), any(TypeReference.class)))
             .thenReturn(List.of(new Chat.Message("QUESTION", "user")));
 
         Chat mockedChat = mock(Chat.class);
