@@ -24,7 +24,8 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ATTACHMENTS;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BCC;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.CC;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FROM;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FULL_MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.HEADERS;
@@ -46,30 +47,42 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TO
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.VALUE;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionDefinition.SingleConnectionOutputFunction;
 import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.google.commons.GoogleServices;
+import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Label;
 import com.google.api.services.gmail.model.Message;
+import com.google.api.services.gmail.model.MessagePart;
+import com.google.api.services.gmail.model.MessagePartBody;
+import com.google.api.services.gmail.model.MessagePartHeader;
 import com.google.api.services.gmail.model.Thread;
 import java.io.IOException;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class GoogleMailUtils {
 
-    protected static final ModifiableObjectProperty PARSED_MESSAGE_OUTPUT_PROPERTY = object()
+    protected static final ModifiableObjectProperty SIMPLE_MESSAGE_OUTPUT_PROPERTY = object()
         .properties(
+            string(ID),
+            string(THREAD_ID),
+            number(HISTORY_ID),
             string(SUBJECT),
             string(FROM),
-            string(TO),
+            array(TO).items(string()),
+            array(CC).items(string()),
+            array(BCC).items(string()),
             string("body_plain"),
             string("body_html"),
             array(ATTACHMENTS).items(fileEntry()));
@@ -179,20 +192,139 @@ public class GoogleMailUtils {
         return options;
     }
 
-    public static SingleConnectionOutputFunction getOutput() {
-        return (inputParameters, connectionParameters, context) -> {
-
-            String format = inputParameters.getRequiredString(FORMAT);
-
-            ModifiableObjectProperty bodyPlain = switch (format) {
-                case SIMPLE -> PARSED_MESSAGE_OUTPUT_PROPERTY;
-                case RAW -> RAW_MESSAGE_OUTPUT_PROPERTY;
-                case MINIMAL -> MINIMAL_MESSAGE_OUTPUT_PROPERTY;
-                case METADATA -> METADATA_MESSAGE_OUTPUT_PROPERTY;
-                default -> FULL_MESSAGE_OUTPUT_PROPERTY;
-            };
-
-            return new OutputResponse(bodyPlain);
+    public static ModifiableObjectProperty getMessageOutputProperty(String format) {
+        return switch (format) {
+            case SIMPLE -> SIMPLE_MESSAGE_OUTPUT_PROPERTY;
+            case RAW -> RAW_MESSAGE_OUTPUT_PROPERTY;
+            case MINIMAL -> MINIMAL_MESSAGE_OUTPUT_PROPERTY;
+            case METADATA -> METADATA_MESSAGE_OUTPUT_PROPERTY;
+            default -> FULL_MESSAGE_OUTPUT_PROPERTY;
         };
+    }
+
+    public static MessageCustom getCustomMessage(Message message, ActionContext actionContext, Gmail service)
+        throws IOException {
+        MessagePart payload = message.getPayload();
+        List<MessagePart> parts = payload.getParts();
+
+        MessagePart multipartAlternative = parts.stream()
+            .filter(part -> part.getMimeType()
+                .startsWith("multipart/alternative"))
+            .findFirst()
+            .orElse(null);
+
+        List<MessagePart> messageParts = (multipartAlternative != null && multipartAlternative.getParts() != null)
+            ? multipartAlternative.getParts() : parts;
+
+        String bodyPlain = "";
+        String bodyHtml = "";
+
+        List<MessagePartHeader> messagePartHeaders = payload.getHeaders();
+
+        String contentType = messagePartHeaders.stream()
+            .filter(header -> Objects.equals(header.getName(), "Content-Type"))
+            .map(MessagePartHeader::getValue)
+            .findFirst()
+            .orElse("text/plain");
+
+        if (contentType.startsWith("multipart/")) {
+            for (MessagePart messagePart : messageParts) {
+                String mimeType = messagePart.getMimeType();
+
+                if (mimeType.equals("text/plain")) {
+                    bodyPlain = new String(messagePart.getBody()
+                        .decodeData(), StandardCharsets.UTF_8);
+                } else if (mimeType.equals("text/html")) {
+                    bodyHtml = new String(messagePart.getBody()
+                        .decodeData(), StandardCharsets.UTF_8);
+                }
+            }
+        } else {
+            MessagePartBody messagePartBody = payload.getBody();
+
+            bodyPlain = new String(messagePartBody.decodeData(), StandardCharsets.UTF_8);
+        }
+
+        List<FileEntry> fileEntries = getFileEntries(message, actionContext, service);
+
+        return createCustomMessage(message, messagePartHeaders, bodyPlain, bodyHtml, fileEntries);
+    }
+
+    private static List<FileEntry> getFileEntries(
+        Message message, ActionContext actionContext, Gmail service)
+        throws IOException {
+
+        MessagePart payload = message.getPayload();
+        List<MessagePart> parts = payload.getParts();
+
+        List<FileEntry> fileEntries = new ArrayList<>();
+
+        for (MessagePart messagePart : parts) {
+            String mimeType = messagePart.getMimeType();
+
+            if (!mimeType.startsWith("multipart/alternative") &&
+                !mimeType.startsWith("text/plain") &&
+                !mimeType.startsWith("text/html")) {
+                MessagePartBody messagePartBody = messagePart.getBody();
+
+                MessagePartBody attachment = getAttachment(service, message.getId(),
+                    messagePartBody.getAttachmentId());
+
+                fileEntries.add(actionContext.file(
+                    file -> file.storeContent(messagePart.getFilename(), attachment.getData())));
+            }
+        }
+        return fileEntries;
+    }
+
+    private static MessagePartBody getAttachment(Gmail service, String messageId, String attachmentId)
+        throws IOException {
+
+        return service.users()
+            .messages()
+            .attachments()
+            .get("me", messageId, attachmentId)
+            .execute();
+    }
+
+    private static MessageCustom createCustomMessage(
+        Message message, List<MessagePartHeader> messagePartHeaders, String bodyPlain, String bodyHtml,
+        List<FileEntry> fileEntries) {
+
+        String subject = null;
+        String from = null;
+        List<String> to = null;
+        List<String> cc = null;
+        List<String> bcc = null;
+
+        for (MessagePartHeader messagePartHeader : messagePartHeaders) {
+            if ("Subject".equals(messagePartHeader.getName())) {
+                subject = messagePartHeader.getValue();
+            } else if ("From".equals(messagePartHeader.getName())) {
+                from = messagePartHeader.getValue();
+            } else if ("To".equals(messagePartHeader.getName())) {
+                to = Arrays.stream(messagePartHeader.getValue()
+                    .split(","))
+                    .toList();
+            } else if ("Cc".equals(messagePartHeader.getName())) {
+                cc = Arrays.stream(messagePartHeader.getValue()
+                    .split(","))
+                    .toList();
+            } else if ("Bcc".equals(messagePartHeader.getName())) {
+                bcc = Arrays.stream(messagePartHeader.getValue()
+                    .split(","))
+                    .toList();
+            }
+        }
+
+        return new MessageCustom(
+            message.getId(), message.getThreadId(), message.getHistoryId(), subject, from, to, cc, bcc, bodyPlain,
+            bodyHtml, fileEntries);
+    }
+
+    public record MessageCustom(
+        String id, String threadId, BigInteger historyId, String subject, String from, List<String> to,
+        List<String> cc, List<String> bcc, String bodyPlain, String bodyHtml,
+        List<FileEntry> attachments) {
     }
 }
