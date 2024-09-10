@@ -34,6 +34,7 @@ import com.bytechef.platform.registry.domain.OutputResponse;
 import com.bytechef.platform.registry.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 /**
@@ -67,19 +68,23 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     public WorkflowNodeTestOutput saveWorkflowNodeTestOutput(String workflowId, String workflowNodeName) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
-        return WorkflowTrigger.fetch(workflow, workflowNodeName)
-            .map(workflowTrigger -> saveTriggerWorkflowNodeTestOutput(
-                workflowId, workflowNodeName, workflowTrigger,
+        Optional<WorkflowTrigger> workflowTrigger = WorkflowTrigger.fetch(workflow, workflowNodeName);
+
+        if (workflowTrigger.isPresent()) {
+            return saveTriggerWorkflowNodeTestOutput(
+                workflowId, workflowNodeName, workflowTrigger.get(),
                 workflowTestConfigurationService
                     .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowNodeName)
-                    .orElse(null)))
-            .orElseGet(() -> saveActionWorkflowNodeTestOutput(
+                    .orElse(null));
+        } else {
+            return saveActionWorkflowNodeTestOutput(
                 workflowId, workflowNodeName, workflow,
                 MapUtils.toMap(
                     workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
                         workflowId, workflowNodeName),
                     WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
-                    WorkflowTestConfigurationConnection::getConnectionId)));
+                    WorkflowTestConfigurationConnection::getConnectionId));
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -119,6 +124,10 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         OutputResponse outputResponse = triggerDefinitionFacade.executeOutput(
             workflowNodeType.componentName(), workflowNodeType.componentVersion(),
             workflowNodeType.componentOperationName(), workflowTrigger.evaluateParameters(inputs), connectionId);
+
+        if (outputResponse == null) {
+            return null;
+        }
 
         return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, outputResponse);
     }
