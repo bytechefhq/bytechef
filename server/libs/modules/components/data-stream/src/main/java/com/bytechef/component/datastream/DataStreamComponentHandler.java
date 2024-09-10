@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.data.stream;
+package com.bytechef.component.datastream;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.platform.component.definition.DataStreamComponentDefinition.DATA_STREAM;
 
 import com.bytechef.component.ComponentHandler;
-import com.bytechef.component.data.stream.action.DataStreamSyncAction;
+import com.bytechef.component.datastream.action.DataStreamStreamAction;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.DataStreamComponentDefinition;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.stereotype.Component;
 
@@ -36,14 +37,14 @@ public class DataStreamComponentHandler implements ComponentHandler {
 
     private final DataStreamComponentDefinition componentDefinition;
 
-    public DataStreamComponentHandler(JobLauncher jobLauncher) {
+    public DataStreamComponentHandler(Job job, JobLauncher jobLauncher) {
         this.componentDefinition = new DataStreamComponentDefinitionImpl(
             component(DATA_STREAM)
                 .title("Data Stream")
                 .description("With the Data Stream, you can transfer large amounts of data efficiently.")
                 .icon("path:assets/data-stream.svg")
                 .categories(ComponentCategory.HELPERS)
-                .actions(new DataStreamSyncAction(jobLauncher).actionDefinition));
+                .actions(new DataStreamStreamAction(job, jobLauncher).actionDefinition));
     }
 
     @Override

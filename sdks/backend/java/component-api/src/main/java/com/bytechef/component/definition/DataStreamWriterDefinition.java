@@ -24,10 +24,8 @@ import java.util.Optional;
  */
 public interface DataStreamWriterDefinition {
 
-    enum SyncType {
-        CREATE,
-        CREATE_UPDATE,
-        UPDATE
+    enum StreamType {
+        CREATE, DELETE, UPDATE,
     }
 
     /**
@@ -46,5 +44,5 @@ public interface DataStreamWriterDefinition {
      *
      * @return
      */
-    Optional<SyncType> getSyncType();
+    Optional<List<StreamType>> getStreamTypes();
 }
