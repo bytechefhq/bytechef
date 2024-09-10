@@ -29,7 +29,7 @@ import org.apache.commons.lang3.Validate;
 /**
  * @author Ivica Cardic
  */
-public class TriggerContextImpl extends ContextImpl implements TriggerContext {
+class TriggerContextImpl extends ContextImpl implements TriggerContext {
 
     private final Data data;
 
@@ -59,19 +59,19 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
         String workflowReferenceCode, DataStorage dataStorage) implements Data {
 
         @Override
-        public <T> Optional<T> fetchValue(Data.Scope scope, String key) {
+        public <T> Optional<T> fetch(Data.Scope scope, String key) {
             return dataStorage.fetch(
                 componentName, getDataStorageScope(scope), getScopeId(scope), key, type);
         }
 
         @Override
-        public <T> T getValue(Data.Scope scope, String key) {
+        public <T> T get(Data.Scope scope, String key) {
             return dataStorage.get(
                 componentName, getDataStorageScope(scope), getScopeId(scope), key, type);
         }
 
         @Override
-        public Void setValue(Data.Scope scope, String key, Object value) {
+        public Void put(Data.Scope scope, String key, Object value) {
             dataStorage.put(
                 componentName, getDataStorageScope(scope), getScopeId(scope), key, type, value);
 
@@ -79,7 +79,7 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
         }
 
         @Override
-        public Void deleteValue(Data.Scope scope, String key) {
+        public Void remove(Data.Scope scope, String key) {
             dataStorage.delete(
                 componentName, getDataStorageScope(scope), getScopeId(scope), key, type);
 
@@ -105,21 +105,21 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
     private record NoOpDataImpl() implements Data {
 
         @Override
-        public <T> Optional<T> fetchValue(Data.Scope scope, String key) {
+        public <T> Optional<T> fetch(Data.Scope scope, String key) {
             return Optional.empty();
         }
 
         @Override
-        public <T> T getValue(Data.Scope scope, String key) {
+        public <T> T get(Data.Scope scope, String key) {
             return null;
         }
 
         @Override
-        public Void setValue(Data.Scope scope, String key, Object data) {
+        public Void put(Data.Scope scope, String key, Object data) {
             return null;
         }
 
-        public Void deleteValue(Data.Scope scope, String key) {
+        public Void remove(Data.Scope scope, String key) {
             return null;
         }
     }
