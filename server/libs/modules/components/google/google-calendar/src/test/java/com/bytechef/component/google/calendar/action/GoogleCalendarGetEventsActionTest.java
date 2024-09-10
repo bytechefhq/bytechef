@@ -16,7 +16,7 @@
 
 package com.bytechef.component.google.calendar.action;
 
-import static com.bytechef.component.google.calendar.action.GoogleCalendarFindEventsAction.DATE_RANGE;
+import static com.bytechef.component.google.calendar.action.GoogleCalendarGetEventsAction.DATE_RANGE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_TYPE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FROM;
@@ -51,7 +51,7 @@ import org.mockito.MockedStatic;
 /**
  * @author Monika Kušter
  */
-class GoogleCalendarFindEventsActionTest {
+class GoogleCalendarGetEventsActionTest {
 
     private final ArgumentCaptor<String> calendarIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
     @SuppressWarnings("rawtypes")
@@ -141,7 +141,7 @@ class GoogleCalendarFindEventsActionTest {
                 .thenReturn(new Events().setItems(List.of(e1, e2, e3, e4, e5, e6, e7, e8)));
 
             List<CustomEvent> result =
-                GoogleCalendarFindEventsAction.perform(mockedParameters, mockedParameters, mock(ActionContext.class));
+                GoogleCalendarGetEventsAction.perform(mockedParameters, mockedParameters, mock(ActionContext.class));
 
             assertEquals(
                 List.of(createCustomEvent(e1), createCustomEvent(e2), createCustomEvent(e3), createCustomEvent(e4)),

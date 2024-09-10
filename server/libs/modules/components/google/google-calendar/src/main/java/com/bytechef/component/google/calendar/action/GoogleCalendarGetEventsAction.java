@@ -51,12 +51,12 @@ import java.util.Map;
 /**
  * @author Monika Kušter
  */
-public class GoogleCalendarFindEventsAction {
+public class GoogleCalendarGetEventsAction {
 
     protected static final String DATE_RANGE = "dateRange";
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("findEvents")
-        .title("Find events")
-        .description("Find events in your calendar")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getEvents")
+        .title("Get Events")
+        .description("List events from the specified Google Calendar.")
         .properties(
             CALENDAR_ID_PROPERTY,
             array(EVENT_TYPE)
@@ -106,9 +106,9 @@ public class GoogleCalendarFindEventsAction {
             outputSchema(
                 array()
                     .items(EVENT_OUTPUT_PROPERTY)))
-        .perform(GoogleCalendarFindEventsAction::perform);
+        .perform(GoogleCalendarGetEventsAction::perform);
 
-    private GoogleCalendarFindEventsAction() {
+    private GoogleCalendarGetEventsAction() {
     }
 
     public static List<CustomEvent> perform(
