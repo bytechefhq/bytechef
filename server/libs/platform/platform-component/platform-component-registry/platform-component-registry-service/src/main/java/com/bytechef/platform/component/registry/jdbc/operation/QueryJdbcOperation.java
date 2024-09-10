@@ -24,25 +24,20 @@ import java.sql.ResultSetMetaData;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.sql.DataSource;
 
 /**
  * @author Ivica Cardic
  */
 public class QueryJdbcOperation implements JdbcOperation<List<Map<String, Object>>> {
 
-    private final JdbcExecutor jdbcExecutor;
-
-    public QueryJdbcOperation(JdbcExecutor jdbcExecutor) {
-        this.jdbcExecutor = jdbcExecutor;
-    }
-
     @Override
-    public List<Map<String, Object>> execute(Map<String, ?> inputParameters, Map<String, ?> connectionParameters) {
+    public List<Map<String, Object>> execute(Map<String, ?> inputParameters, DataSource dataSource) {
         Map<String, ?> paramMap = MapUtils.getMap(inputParameters, JdbcConstants.PARAMETERS, Map.of());
         String queryStatement = MapUtils.getRequiredString(inputParameters, JdbcConstants.QUERY);
 
-        return jdbcExecutor.query(
-            connectionParameters, queryStatement, paramMap, (ResultSet rs, int rowNum) -> {
+        return JdbcExecutor.query(
+            queryStatement, paramMap, (ResultSet rs, int rowNum) -> {
                 Map<String, Object> row = new HashMap<>();
 
                 ResultSetMetaData rsMetaData = rs.getMetaData();
@@ -55,6 +50,6 @@ public class QueryJdbcOperation implements JdbcOperation<List<Map<String, Object
                 }
 
                 return row;
-            });
+            }, dataSource);
     }
 }

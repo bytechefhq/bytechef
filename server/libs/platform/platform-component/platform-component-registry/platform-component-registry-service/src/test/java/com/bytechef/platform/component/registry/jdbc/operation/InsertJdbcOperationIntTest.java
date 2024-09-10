@@ -22,10 +22,9 @@ import static com.bytechef.platform.component.registry.jdbc.constant.JdbcConstan
 import static com.bytechef.platform.component.registry.jdbc.constant.JdbcConstants.TABLE;
 
 import com.bytechef.platform.component.registry.config.JacksonConfiguration;
-import com.bytechef.platform.component.registry.jdbc.DataSourceFactory;
-import com.bytechef.platform.component.registry.jdbc.JdbcExecutor;
 import com.bytechef.platform.component.registry.jdbc.operation.config.JdbcOperationIntTestConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
@@ -34,10 +33,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 /**
  * @author Ivica Cardic
@@ -50,9 +48,6 @@ public class InsertJdbcOperationIntTest {
 
     @Autowired
     private DataSource dataSource;
-
-    @Autowired
-    private InsertJdbcOperation insertJdbcOperation;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -73,38 +68,16 @@ public class InsertJdbcOperationIntTest {
     }
 
     @Test
-    public void testInsert() {
+    public void testInsert() throws SQLException {
         Map<String, ?> inputParameters = Map.of(
             COLUMNS, List.of("id", "name"),
             ROWS, List.of(Map.of("id", "id1", "name", "name1"), Map.of("id", "id2", "name", "name2")),
             SCHEMA, "public",
             TABLE, "test");
 
-        Map<String, Integer> result = insertJdbcOperation.execute(inputParameters, Map.of());
+        Map<String, Integer> result = new InsertJdbcOperation().execute(
+            inputParameters, new SingleConnectionDataSource(dataSource.getConnection(), false));
 
         Assertions.assertEquals(2, result.get("rows"));
-    }
-
-    @TestConfiguration
-    public static class InsertJdbcActionIntTestConfiguration {
-
-        @Autowired
-        private DataSource dataSource;
-
-        @Bean
-        InsertJdbcOperation insertJdbcOperation() {
-            return new InsertJdbcOperation(new JdbcExecutor(
-                null,
-                new DataSourceFactory() {
-
-                    @Override
-                    public DataSource getDataSource(
-                        Map<String, ?> connectionParameters, String databaseJdbcName, String jdbcDriverClassNamee) {
-
-                        return dataSource;
-                    }
-                },
-                null));
-        }
     }
 }

@@ -23,10 +23,9 @@ import static com.bytechef.platform.component.registry.jdbc.constant.JdbcConstan
 import static com.bytechef.platform.component.registry.jdbc.constant.JdbcConstants.UPDATE_KEY;
 
 import com.bytechef.platform.component.registry.config.JacksonConfiguration;
-import com.bytechef.platform.component.registry.jdbc.DataSourceFactory;
-import com.bytechef.platform.component.registry.jdbc.JdbcExecutor;
 import com.bytechef.platform.component.registry.jdbc.operation.config.JdbcOperationIntTestConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
@@ -35,10 +34,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 /**
  * @author Ivica Cardic
@@ -51,9 +49,6 @@ public class UpdateJdbcOperationIntTest {
 
     @Autowired
     private DataSource dataSource;
-
-    @Autowired
-    private UpdateJdbcOperation updateJdbcOperation;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -78,7 +73,7 @@ public class UpdateJdbcOperationIntTest {
     }
 
     @Test
-    public void testUpdate() {
+    public void testUpdate() throws SQLException {
         Map<String, ?> inputParameters = Map.of(
             COLUMNS, List.of("name"),
             ROWS, List.of(Map.of("id", "id2", "name", "name3")),
@@ -86,33 +81,11 @@ public class UpdateJdbcOperationIntTest {
             TABLE, "test",
             UPDATE_KEY, "id");
 
-        Map<String, Integer> result = updateJdbcOperation.execute(inputParameters, Map.of());
+        Map<String, Integer> result = new UpdateJdbcOperation().execute(
+            inputParameters, new SingleConnectionDataSource(dataSource.getConnection(), false));
 
         Assertions.assertEquals(1, result.get("rows"));
         Assertions.assertEquals(
             "name3", jdbcTemplate.queryForObject("SELECT name FROM test WHERE id='id2'", String.class));
-    }
-
-    @TestConfiguration
-    public static class UpdateJdbcActionIntTestConfiguration {
-
-        @Autowired
-        private DataSource dataSource;
-
-        @Bean
-        UpdateJdbcOperation updateJdbcOperation() {
-            return new UpdateJdbcOperation(new JdbcExecutor(
-                null,
-                new DataSourceFactory() {
-
-                    @Override
-                    public DataSource getDataSource(
-                        Map<String, ?> connectionParameters, String databaseJdbcName, String jdbcDriverClassName) {
-
-                        return dataSource;
-                    }
-                },
-                null));
-        }
     }
 }

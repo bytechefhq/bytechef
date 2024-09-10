@@ -22,10 +22,9 @@ import static com.bytechef.platform.component.registry.jdbc.constant.JdbcConstan
 import static com.bytechef.platform.component.registry.jdbc.constant.JdbcConstants.TABLE;
 
 import com.bytechef.platform.component.registry.config.JacksonConfiguration;
-import com.bytechef.platform.component.registry.jdbc.DataSourceFactory;
-import com.bytechef.platform.component.registry.jdbc.JdbcExecutor;
 import com.bytechef.platform.component.registry.jdbc.operation.config.JdbcOperationIntTestConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
@@ -34,10 +33,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 /**
  * @author Ivica Cardic
@@ -50,9 +48,6 @@ public class DeleteJdbcOperationIntTest {
 
     @Autowired
     private DataSource dataSource;
-
-    @Autowired
-    private DeleteJdbcOperation deleteJdbcOperation;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -77,37 +72,16 @@ public class DeleteJdbcOperationIntTest {
     }
 
     @Test
-    public void testDelete() {
+    public void testDelete() throws SQLException {
         Map<String, ?> inputParameters = Map.of(
             ROWS, List.of(Map.of("id", "id1"), Map.of("id", "id2")),
             DELETE_KEY, "id",
             SCHEMA, "public",
             TABLE, "test");
 
-        Map<String, Integer> result = deleteJdbcOperation.execute(inputParameters, Map.of());
+        Map<String, Integer> result = new DeleteJdbcOperation().execute(
+            inputParameters, new SingleConnectionDataSource(dataSource.getConnection(), false));
 
         Assertions.assertEquals(2, result.get("rows"));
-    }
-
-    @TestConfiguration
-    public static class DeleteJdbcActionIntTestConfiguration {
-
-        @Autowired
-        private DataSource dataSource;
-
-        @Bean
-        DeleteJdbcOperation deleteJdbcOperation() {
-            return new DeleteJdbcOperation(new JdbcExecutor(
-                null,
-                new DataSourceFactory() {
-                    @Override
-                    public DataSource getDataSource(
-                        Map<String, ?> connectionParameters, String databaseJdbcName, String jdbcDriverClassName) {
-
-                        return dataSource;
-                    }
-                },
-                null));
-        }
     }
 }

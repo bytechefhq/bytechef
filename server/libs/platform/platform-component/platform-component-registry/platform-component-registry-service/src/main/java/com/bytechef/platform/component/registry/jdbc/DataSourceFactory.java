@@ -19,19 +19,15 @@ package com.bytechef.platform.component.registry.jdbc;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.registry.jdbc.constant.JdbcConstants;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import javax.sql.DataSource;
 import org.apache.commons.lang3.Validate;
-import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 /**
  * @author Ivica Cardic
  */
 public class DataSourceFactory {
 
-    private static final Map<String, DataSource> DATA_SOURCE_MAP = new ConcurrentHashMap<>();
-
-    public DataSource getDataSource(
+    public static SingleConnectionDataSource getDataSource(
         Map<String, ?> connectionParameters, String databaseJdbcName, String jdbcDriverClassName) {
 
         Validate.notNull(databaseJdbcName, "'databaseJdbcName' must not be null");
@@ -44,16 +40,8 @@ public class DataSourceFactory {
             + "/"
             + MapUtils.getString(connectionParameters, JdbcConstants.DATABASE);
         String username = MapUtils.getString(connectionParameters, JdbcConstants.USERNAME);
+        String password = MapUtils.getString(connectionParameters, JdbcConstants.PASSWORD);
 
-        return DATA_SOURCE_MAP.computeIfAbsent(url + username, key -> {
-            DataSourceBuilder<?> dataSourceBuilder = DataSourceBuilder.create();
-
-            dataSourceBuilder.driverClassName(jdbcDriverClassName);
-            dataSourceBuilder.url(url);
-            dataSourceBuilder.username(username);
-            dataSourceBuilder.password(MapUtils.getString(connectionParameters, JdbcConstants.PASSWORD));
-
-            return dataSourceBuilder.build();
-        });
+        return new SingleConnectionDataSource(url, username, password, false);
     }
 }

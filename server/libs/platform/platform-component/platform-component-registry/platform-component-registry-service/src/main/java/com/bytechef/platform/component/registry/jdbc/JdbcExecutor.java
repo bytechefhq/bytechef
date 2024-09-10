@@ -31,20 +31,7 @@ import org.springframework.transaction.support.TransactionTemplate;
  */
 public class JdbcExecutor {
 
-    private final String databaseJdbcName;
-    private final DataSourceFactory dataSourceFactory;
-    private final String jdbcDriverClassName;
-
-    public JdbcExecutor(String databaseJdbcName, DataSourceFactory dataSourceFactory, String jdbcDriverClassName) {
-        this.databaseJdbcName = databaseJdbcName;
-        this.dataSourceFactory = dataSourceFactory;
-        this.jdbcDriverClassName = jdbcDriverClassName;
-    }
-
-    public int[] batchUpdate(Map<String, ?> connectionParameters, String sql, SqlParameterSource[] batchArgs) {
-        DataSource dataSource = dataSourceFactory.getDataSource(
-            connectionParameters, databaseJdbcName, jdbcDriverClassName);
-
+    public static int[] batchUpdate(String sql, SqlParameterSource[] batchArgs, DataSource dataSource) {
         TransactionTemplate transactionTemplate = new TransactionTemplate(new DataSourceTransactionManager(dataSource));
 
         NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
@@ -52,25 +39,22 @@ public class JdbcExecutor {
         return transactionTemplate.execute(status -> jdbcTemplate.batchUpdate(sql, batchArgs));
     }
 
-    public <T> List<T> query(
-        Map<String, ?> connectionParameters, String sql, Map<String, ?> paramMap, RowMapper<T> rowMapper)
+    public static <T> List<T> query(
+        String sql, Map<String, ?> paramMap, RowMapper<T> rowMapper, DataSource dataSource)
         throws DataAccessException {
 
-        NamedParameterJdbcTemplate jdbcTemplate = getJdbcTemplate(connectionParameters);
+        NamedParameterJdbcTemplate jdbcTemplate = getJdbcTemplate(dataSource);
 
         return jdbcTemplate.query(sql, paramMap, rowMapper);
     }
 
-    public int update(
-        Map<String, ?> connectionParameters, String sql, Map<String, ?> paramMap) throws DataAccessException {
-
-        NamedParameterJdbcTemplate jdbcTemplate = getJdbcTemplate(connectionParameters);
+    public static int update(String sql, Map<String, ?> paramMap, DataSource dataSource) throws DataAccessException {
+        NamedParameterJdbcTemplate jdbcTemplate = getJdbcTemplate(dataSource);
 
         return jdbcTemplate.update(sql, paramMap);
     }
 
-    private NamedParameterJdbcTemplate getJdbcTemplate(Map<String, ?> connectionParameters) {
-        return new NamedParameterJdbcTemplate(
-            dataSourceFactory.getDataSource(connectionParameters, databaseJdbcName, jdbcDriverClassName));
+    private static NamedParameterJdbcTemplate getJdbcTemplate(DataSource dataSource) {
+        return new NamedParameterJdbcTemplate(dataSource);
     }
 }

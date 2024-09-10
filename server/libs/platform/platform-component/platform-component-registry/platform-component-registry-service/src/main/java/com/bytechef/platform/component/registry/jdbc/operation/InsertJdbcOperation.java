@@ -23,6 +23,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import javax.sql.DataSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 
 /**
@@ -30,38 +33,24 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
  */
 public class InsertJdbcOperation implements JdbcOperation<Map<String, Integer>> {
 
-    private final JdbcExecutor jdbcExecutor;
-
-    public InsertJdbcOperation(JdbcExecutor jdbcExecutor) {
-        this.jdbcExecutor = jdbcExecutor;
-    }
-
     @Override
-    public Map<String, Integer> execute(Map<String, ?> inputParameters, Map<String, ?> connectionParameters) {
-        List<String> columns = MapUtils.getList(inputParameters, JdbcConstants.FIELDS, String.class, List.of());
+    public Map<String, Integer> execute(Map<String, ?> inputParameters, DataSource dataSource) {
+        List<String> columns = MapUtils.getList(inputParameters, JdbcConstants.COLUMNS, String.class, List.of());
         List<Map<String, ?>> rows = MapUtils.getList(
-            inputParameters, JdbcConstants.FIELD_VALUES, new TypeReference<>() {}, List.of());
+            inputParameters, JdbcConstants.ROWS, new TypeReference<>() {}, List.of());
         String schema = MapUtils.getString(inputParameters, JdbcConstants.SCHEMA, "public");
         String table = MapUtils.getRequiredString(inputParameters, JdbcConstants.TABLE);
 
-        int[] rowsAffected = jdbcExecutor.batchUpdate(
-            connectionParameters,
-            "INSERT INTO "
-                + schema
-                + "."
-                + table
-                + " ("
-                + String.join(",", columns)
-                + ") VALUES( "
-                + String.join(
-                    ",",
-                    columns.stream()
-                        .map(column -> ":" + column)
-                        .toList())
-                + ")",
-            SqlParameterSourceUtils.createBatch(rows.toArray()));
+        String values = columns.stream()
+            .map(column -> ":" + column)
+            .collect(Collectors.joining(","));
 
-        return Map.of("rows", Arrays.stream(rowsAffected)
-            .sum());
+        int[] rowsAffected = JdbcExecutor.batchUpdate(
+            "INSERT INTO " + schema + "." + table + " (" + String.join(",", columns) + ") VALUES( " + values + ")",
+            SqlParameterSourceUtils.createBatch(rows.toArray()), dataSource);
+
+        IntStream stream = Arrays.stream(rowsAffected);
+
+        return Map.of("rows", stream.sum());
     }
 }
