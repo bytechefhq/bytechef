@@ -17,11 +17,8 @@
 package com.bytechef.platform.component.registry.definition;
 
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.component.definition.Authorization;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Type;
@@ -49,18 +46,6 @@ public final class ParametersImpl implements Parameters {
         this.map = Collections.unmodifiableMap(map);
     }
 
-    public static ParametersImpl getConnectionParameters(ComponentConnection componentConnection) {
-        if (componentConnection == null) {
-            return new ParametersImpl(Map.of());
-        }
-
-        return new ParametersImpl(
-            MapUtils.concatDifferentTypes(
-                componentConnection.getParameters(),
-                componentConnection.authorizationName() == null ? Map.of()
-                    : Map.of(Authorization.AUTHORIZATION_TYPE, componentConnection.authorizationName())));
-    }
-
     @Override
     public boolean containsKey(Object key) {
         return map.containsKey(key);
@@ -78,7 +63,7 @@ public final class ParametersImpl implements Parameters {
 
     @Override
     @NonNull
-    public Set<Entry<String, Object>> entrySet() {
+    public Set<Map.Entry<String, Object>> entrySet() {
         return map.entrySet();
     }
 
@@ -208,7 +193,7 @@ public final class ParametersImpl implements Parameters {
     }
 
     @Override
-    public <T> List<T> getList(String key, Context.TypeReference<T> elementTypeReference) {
+    public <T> List<T> getList(String key, com.bytechef.component.definition.TypeReference<T> elementTypeReference) {
         return MapUtils.getList(map, key, new TypeReference<>() {
 
             @Override
@@ -225,7 +210,8 @@ public final class ParametersImpl implements Parameters {
     }
 
     @Override
-    public <T> List<T> getList(String key, Context.TypeReference<T> elementTypeReference, List<T> defaultValue) {
+    public <T> List<T> getList(
+        String key, com.bytechef.component.definition.TypeReference<T> elementTypeReference, List<T> defaultValue) {
         return MapUtils.getList(map, key, new TypeReference<>() {
 
             @Override
@@ -302,7 +288,8 @@ public final class ParametersImpl implements Parameters {
     }
 
     @Override
-    public <V> Map<String, V> getMap(String key, Context.TypeReference<V> valueTypeReference) {
+    public <V> Map<String, V>
+        getMap(String key, com.bytechef.component.definition.TypeReference<V> valueTypeReference) {
         return MapUtils.getMap(map, key, new TypeReference<>() {
 
             @Override
@@ -320,7 +307,9 @@ public final class ParametersImpl implements Parameters {
 
     @Override
     public <V> Map<String, V>
-        getMap(String key, Context.TypeReference<V> valueTypeReference, Map<String, V> defaultValue) {
+        getMap(
+            String key, com.bytechef.component.definition.TypeReference<V> valueTypeReference,
+            Map<String, V> defaultValue) {
         return MapUtils.getMap(map, key, new TypeReference<>() {
 
             @Override
@@ -409,7 +398,8 @@ public final class ParametersImpl implements Parameters {
     }
 
     @Override
-    public <T> List<T> getRequiredList(String key, Context.TypeReference<T> elementTypeReference) {
+    public <T> List<T>
+        getRequiredList(String key, com.bytechef.component.definition.TypeReference<T> elementTypeReference) {
         return MapUtils.getRequiredList(map, key, new TypeReference<>() {
 
             @Override
@@ -451,7 +441,8 @@ public final class ParametersImpl implements Parameters {
     }
 
     @Override
-    public <V> Map<String, V> getRequiredMap(String key, Context.TypeReference<V> valueTypeReference) {
+    public <V> Map<String, V>
+        getRequiredMap(String key, com.bytechef.component.definition.TypeReference<V> valueTypeReference) {
         return MapUtils.getRequiredMap(map, key, new TypeReference<>() {
 
             @Override
