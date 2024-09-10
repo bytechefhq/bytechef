@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.test.component.properties;
+package com.bytechef.component.test.definition;
 
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.platform.component.definition.ParametersImpl;
 import java.util.Map;
 
 /**
  * @author Igor Beslic
  */
-public class ParametersFactory {
+public class MockParametersFactory {
 
-    public static Parameters createParameters(Map<String, Object> map) {
+    public static Parameters create(Map<String, Object> map) {
         try {
-            return new ParametersImpl(map);
+            return new MockParametersImpl(map);
         } catch (Exception exception) {
             throw new RuntimeException("Unable to instantiate Parameters", exception);
         }
