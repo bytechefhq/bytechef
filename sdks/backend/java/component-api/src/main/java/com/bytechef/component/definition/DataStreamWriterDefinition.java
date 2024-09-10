@@ -17,12 +17,34 @@
 package com.bytechef.component.definition;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-public interface DataStreamItemWriter extends DataStreamItemStream {
+public interface DataStreamWriterDefinition {
 
-    void write(List<? extends Map<String, ?>> items, DataStreamContext context) throws Exception;
+    enum SyncType {
+        CREATE,
+        CREATE_UPDATE,
+        UPDATE
+    }
+
+    /**
+     *
+     * @return
+     */
+    DataStreamItemWriter getDataStreamItemWriter();
+
+    /**
+     *
+     * @return
+     */
+    Optional<List<? extends Property>> getProperties();
+
+    /**
+     *
+     * @return
+     */
+    Optional<SyncType> getSyncType();
 }

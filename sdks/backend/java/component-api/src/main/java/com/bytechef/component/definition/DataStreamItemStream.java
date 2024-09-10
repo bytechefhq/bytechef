@@ -16,13 +16,17 @@
 
 package com.bytechef.component.definition;
 
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author Ivica Cardic
  */
-public interface DataStreamItemWriter extends DataStreamItemStream {
+public interface DataStreamItemStream {
 
-    void write(List<? extends Map<String, ?>> items, DataStreamContext context) throws Exception;
+    default void open(Parameters inputParameters, Parameters connectionParameters, DataStreamContext context) {
+    }
+
+    default void update(DataStreamContext context) {
+    }
+
+    default void close() {
+    }
 }

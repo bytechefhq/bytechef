@@ -76,6 +76,20 @@ public final class ComponentDSL {
         return new ModifiableConnectionDefinition();
     }
 
+    public static ModifiableDataStreamDefinition dataStream(DataStreamReaderDefinition reader) {
+        return new ModifiableDataStreamDefinition(reader, null);
+    }
+
+    public static ModifiableDataStreamDefinition dataStream(
+        DataStreamReaderDefinition reader, DataStreamWriterDefinition writer) {
+
+        return new ModifiableDataStreamDefinition(reader, writer);
+    }
+
+    public static ModifiableDataStreamDefinition dataStream(DataStreamWriterDefinition writer) {
+        return new ModifiableDataStreamDefinition(null, writer);
+    }
+
     public static ModifiableDateProperty date() {
         return new ModifiableDateProperty();
     }
@@ -230,6 +244,14 @@ public final class ComponentDSL {
 
     public static ModifiableTriggerDefinition trigger(String name) {
         return new ModifiableTriggerDefinition(name);
+    }
+
+    public static ModifiableDataStreamReaderDefinition reader(DataStreamItemReader dataStreamItemReader) {
+        return new ModifiableDataStreamReaderDefinition(dataStreamItemReader);
+    }
+
+    public static ModifiableDataStreamWriterDefinition writer(DataStreamItemWriter dataStreamItemWriter) {
+        return new ModifiableDataStreamWriterDefinition(dataStreamItemWriter);
     }
 
     public static final class ModifiableActionDefinition implements ActionDefinition {
@@ -1105,8 +1127,7 @@ public final class ComponentDSL {
         private Boolean connectionRequired;
         private Boolean customAction;
         private Help customActionHelp;
-        private DataStreamItemReader dataStreamItemReader;
-        private DataStreamItemWriter dataStreamItemWriter;
+        private DataStreamDefinition dataStreamDefinition;
         private String description;
         private String icon;
         private List<String> tags;
@@ -1183,14 +1204,8 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableComponentDefinition dataStreamItemReader(DataStreamItemReader dataStreamItemReader) {
-            this.dataStreamItemReader = dataStreamItemReader;
-
-            return this;
-        }
-
-        public ModifiableComponentDefinition dataStreamItemWriter(DataStreamItemWriter dataStreamItemWriter) {
-            this.dataStreamItemWriter = dataStreamItemWriter;
+        public ModifiableComponentDefinition dataStream(DataStreamDefinition dataStream) {
+            this.dataStreamDefinition = dataStream;
 
             return this;
         }
@@ -1301,13 +1316,8 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<DataStreamItemReader> getDataStreamItemReader() {
-            return Optional.ofNullable(dataStreamItemReader);
-        }
-
-        @Override
-        public Optional<DataStreamItemWriter> getDataStreamItemWriter() {
-            return Optional.ofNullable(dataStreamItemWriter);
+        public Optional<DataStreamDefinition> getDataStream() {
+            return Optional.ofNullable(dataStreamDefinition);
         }
 
         @Override
@@ -1373,6 +1383,7 @@ public final class ComponentDSL {
                 && Objects.equals(connectionRequired, that.connectionRequired)
                 && Objects.equals(customAction, that.customAction)
                 && Objects.equals(customActionHelp, that.customActionHelp)
+                && Objects.equals(dataStreamDefinition, that.dataStreamDefinition)
                 && Objects.equals(description, that.description) && Objects.equals(icon, that.icon)
                 && Objects.equals(tags, that.tags)
                 && Objects.equals(metadata, that.metadata) && Objects.equals(name, that.name)
@@ -1411,8 +1422,7 @@ public final class ComponentDSL {
                 ", connectionRequired=" + connectionRequired +
                 ", customAction=" + customAction +
                 ", customActionHelp=" + customActionHelp +
-                ", dataStreamItemReader=" + dataStreamItemReader +
-                ", dataStreamItemWriter=" + dataStreamItemWriter +
+                ", dataStream=" + dataStreamDefinition +
                 ", metadata=" + metadata +
                 ", resources=" + resources +
                 ", tags=" + tags +
@@ -1549,6 +1559,161 @@ public final class ComponentDSL {
                 ", authorizations=" + authorizations +
                 ", properties=" + properties +
                 '}';
+        }
+    }
+
+    public static final class ModifiableDataStreamDefinition implements DataStreamDefinition {
+
+        private DataStreamReaderDefinition dataStreamReaderDefinition;
+        private DataStreamWriterDefinition dataStreamWriterDefinition;
+
+        public ModifiableDataStreamDefinition(
+            DataStreamReaderDefinition dataStreamReaderDefinition,
+            DataStreamWriterDefinition dataStreamWriterDefinition) {
+
+            this.dataStreamReaderDefinition = dataStreamReaderDefinition;
+            this.dataStreamWriterDefinition = dataStreamWriterDefinition;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof ModifiableDataStreamDefinition that)) {
+                return false;
+            }
+
+            return Objects.equals(dataStreamReaderDefinition, that.dataStreamReaderDefinition)
+                && Objects.equals(dataStreamWriterDefinition, that.dataStreamWriterDefinition);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(dataStreamReaderDefinition, dataStreamWriterDefinition);
+        }
+
+        @Override
+        public Optional<DataStreamReaderDefinition> getReader() {
+            return Optional.ofNullable(dataStreamReaderDefinition);
+        }
+
+        @Override
+        public Optional<DataStreamWriterDefinition> getWriter() {
+            return Optional.ofNullable(dataStreamWriterDefinition);
+        }
+    }
+
+    public static final class ModifiableDataStreamReaderDefinition implements DataStreamReaderDefinition {
+
+        private DataStreamItemReader dataStreamItemReader;
+        private List<? extends Property> properties;
+
+        public ModifiableDataStreamReaderDefinition(DataStreamItemReader dataStreamItemReader) {
+            this.dataStreamItemReader = dataStreamItemReader;
+        }
+
+        public ModifiableDataStreamReaderDefinition properties(Property... properties) {
+            if (properties != null) {
+                this.properties = List.of(properties);
+            }
+
+            return this;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof ModifiableDataStreamReaderDefinition that)) {
+                return false;
+            }
+
+            return Objects.equals(dataStreamItemReader, that.dataStreamItemReader)
+                && Objects.equals(properties, that.properties);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(dataStreamItemReader, properties);
+        }
+
+        @Override
+        public Optional<List<? extends Property>> getProperties() {
+            return Optional.ofNullable(properties);
+        }
+
+        @Override
+        public DataStreamItemReader getDataStreamItemReader() {
+            return Objects.requireNonNull(dataStreamItemReader);
+        }
+    }
+
+    public static final class ModifiableDataStreamWriterDefinition implements DataStreamWriterDefinition {
+
+        private DataStreamItemWriter dataStreamItemWriter;
+        private List<? extends Property> properties;
+        private SyncType syncType;
+
+        public ModifiableDataStreamWriterDefinition(DataStreamItemWriter dataStreamItemWriter) {
+            this.dataStreamItemWriter = dataStreamItemWriter;
+        }
+
+        public ModifiableDataStreamWriterDefinition dataStreamItemWriter(DataStreamItemWriter writer) {
+            this.dataStreamItemWriter = writer;
+
+            return this;
+        }
+
+        public ModifiableDataStreamWriterDefinition properties(Property... properties) {
+            if (properties != null) {
+                this.properties = List.of(properties);
+            }
+
+            return this;
+        }
+
+        public ModifiableDataStreamWriterDefinition syncType(SyncType syncType) {
+            this.syncType = syncType;
+
+            return this;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof ModifiableDataStreamWriterDefinition that)) {
+                return false;
+            }
+
+            return Objects.equals(dataStreamItemWriter, that.dataStreamItemWriter)
+                && Objects.equals(properties, that.properties) && Objects.equals(syncType, that.syncType);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(dataStreamItemWriter, properties, syncType);
+        }
+
+        @Override
+        public Optional<List<? extends Property>> getProperties() {
+            return Optional.ofNullable(properties);
+        }
+
+        @Override
+        public Optional<SyncType> getSyncType() {
+            return Optional.ofNullable(syncType);
+        }
+
+        @Override
+        public DataStreamItemWriter getDataStreamItemWriter() {
+            return Objects.requireNonNull(dataStreamItemWriter);
         }
     }
 

@@ -60,13 +60,7 @@ public interface ComponentDefinition {
      *
      * @return
      */
-    Optional<DataStreamItemReader> getDataStreamItemReader();
-
-    /**
-     *
-     * @return
-     */
-    Optional<DataStreamItemWriter> getDataStreamItemWriter();
+    Optional<DataStreamDefinition> getDataStream();
 
     /**
      *
