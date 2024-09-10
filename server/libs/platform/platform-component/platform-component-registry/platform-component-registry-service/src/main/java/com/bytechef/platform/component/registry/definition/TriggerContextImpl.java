@@ -16,8 +16,6 @@
 
 package com.bytechef.platform.component.registry.definition;
 
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.constant.AppType;
@@ -25,13 +23,7 @@ import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.Optional;
-import java.util.function.Consumer;
 import org.apache.commons.lang3.Validate;
 
 /**
@@ -40,7 +32,6 @@ import org.apache.commons.lang3.Validate;
 public class TriggerContextImpl extends ContextImpl implements TriggerContext {
 
     private final Data data;
-    private final File file;
 
     @SuppressFBWarnings("EI")
     public TriggerContextImpl(
@@ -48,31 +39,16 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
         String workflowReferenceCode, ComponentConnection connection, DataStorage dataStorage,
         FilesFileStorage filesFileStorage, HttpClientExecutor httpClientExecutor) {
 
-        super(componentName, componentVersion, triggerName, connection, httpClientExecutor);
+        super(componentName, componentVersion, triggerName, filesFileStorage, connection, httpClientExecutor);
 
         this.data = type == null ? new NoOpDataImpl() : new DataImpl(
             componentName, componentVersion, triggerName, type, workflowReferenceCode, dataStorage);
-        this.file = new FileImpl(filesFileStorage);
     }
 
     @Override
     public <R> R data(ContextFunction<Data, R> dataFunction) {
         try {
             return dataFunction.apply(data);
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public void event(Consumer<ActionContext.Event> eventConsumer) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public <R> R file(ContextFunction<File, R> fileFunction) {
-        try {
-            return fileFunction.apply(file);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -123,70 +99,6 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
                     case WORKFLOW -> workflowReferenceCode;
                     case ACCOUNT -> null;
                 }, "scope");
-        }
-    }
-
-    private record FileImpl(FilesFileStorage filesFileStorage) implements File {
-
-        @Override
-        public InputStream getStream(FileEntry fileEntry) {
-            return filesFileStorage.getFileStream(((FileEntryImpl) fileEntry).getFileEntry());
-        }
-
-        @Override
-        public String readToString(FileEntry fileEntry) {
-            return filesFileStorage.readFileToString(((FileEntryImpl) fileEntry).getFileEntry());
-        }
-
-        @Override
-        public FileEntry storeContent(String fileName, String data) {
-            return new FileEntryImpl(filesFileStorage.storeFileContent(fileName, data));
-        }
-
-        @Override
-        public java.io.File toTempFile(FileEntry fileEntry) {
-            Path path = toTempFilePath(fileEntry);
-
-            return path.toFile();
-        }
-
-        @Override
-        public Path toTempFilePath(FileEntry fileEntry) {
-            Path tempFilePath;
-
-            try {
-                tempFilePath = Files.createTempFile("trigger_context_", fileEntry.getName());
-
-                Files.copy(
-                    filesFileStorage.getFileStream(toFileEntry(fileEntry)),
-                    tempFilePath,
-                    StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            return tempFilePath;
-        }
-
-        @Override
-        public byte[] readAllBytes(FileEntry fileEntry) throws IOException {
-            InputStream inputStream = getStream(fileEntry);
-
-            return inputStream.readAllBytes();
-        }
-
-        @Override
-        public FileEntry storeContent(String fileName, InputStream inputStream) {
-            try {
-                return new FileEntryImpl(filesFileStorage.storeFileContent(fileName, inputStream));
-            } catch (Exception exception) {
-                throw new RuntimeException("Unable to store file " + fileName);
-            }
-        }
-
-        private static com.bytechef.file.storage.domain.FileEntry toFileEntry(FileEntry fileEntry) {
-            return new com.bytechef.file.storage.domain.FileEntry(
-                fileEntry.getName(), fileEntry.getExtension(), fileEntry.getMimeType(), fileEntry.getUrl());
         }
     }
 

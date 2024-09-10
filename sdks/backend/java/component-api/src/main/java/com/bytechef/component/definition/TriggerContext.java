@@ -31,18 +31,6 @@ public interface TriggerContext extends Context {
      */
     <R> R data(ContextFunction<Data, R> dataFunction);
 
-    /**
-     * @param eventConsumer
-     */
-    void event(Consumer<ActionContext.Event> eventConsumer);
-
-    /**
-     * @param fileFunction
-     * @param <R>
-     * @return
-     */
-    <R> R file(ContextFunction<File, R> fileFunction);
-
     interface Data {
 
         enum Scope {
