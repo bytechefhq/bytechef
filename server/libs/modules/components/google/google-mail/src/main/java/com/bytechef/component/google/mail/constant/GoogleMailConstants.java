@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableArrayProperty;
@@ -28,7 +29,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
 import com.bytechef.component.definition.Property;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class GoogleMailConstants {
 
@@ -43,8 +44,6 @@ public class GoogleMailConstants {
     public static final String FORMAT = "format";
     public static final String FROM = "from";
     public static final String FULL = "full";
-    public static final String GET_MAIL = "getMail";
-    public static final String GET_THREAD = "getThread";
     public static final String GOOGLE_MAIL = "googleMail";
     public static final String HEADERS = "headers";
     public static final String HISTORY_ID = "historyId";
@@ -63,13 +62,13 @@ public class GoogleMailConstants {
     public static final String NEW_EMAIL = "newEmail";
     public static final String NEXT_PAGE_TOKEN = "nextPageToken";
     public static final String PAGE_TOKEN = "pageToken";
-    public static final String SIMPLE = "parsed";
     public static final String PAYLOAD = "payload";
     public static final String RAW = "raw";
     public static final String REPLY_TO = "replyTo";
     public static final String RESULT_SIZE_ESTIMATE = "resultSizeEstimate";
     public static final String SEARCH_EMAIL = "searchEmail";
     public static final String SEND_EMAIL = "sendEmail";
+    public static final String SIMPLE = "simple";
     public static final String SIZE_ESTIMATE = "sizeEstimate";
     public static final String SNIPPET = "snippet";
     public static final String SUBJECT = "subject";
@@ -81,6 +80,21 @@ public class GoogleMailConstants {
     public static final ModifiableStringProperty EMAIL_PROPERTY = string("email")
         .label("Email address")
         .controlType(Property.ControlType.EMAIL);
+
+    public static final ModifiableStringProperty FORMAT_PROPERTY = string(FORMAT)
+        .label("Format")
+        .description("The format to return the message in.")
+        .options(
+            option("Simple", SIMPLE, "Returns email message's from, to, subject, body and attachments."),
+            option("Minimal", MINIMAL,
+                "Returns only email message ID and labels; does not return the email headers, body, or payload."),
+            option("Full", FULL,
+                "Returns the full email message data with body content parsed in the payload field; the raw field is not used. Format cannot be used when accessing the api using the gmail.metadata scope."),
+            option("Raw", RAW,
+                "Returns the full email message data with body content in the raw field as a base64url encoded string; the payload field is not used. Format cannot be used when accessing the api using the gmail.metadata scope."),
+            option("Metadata", "metadata", "Returns only email message ID, labels, and email headers."))
+        .defaultValue(SIMPLE)
+        .required(false);
 
     public static final ModifiableObjectProperty FULL_MESSAGE_OUTPUT_PROPERTY = object()
         .properties(
