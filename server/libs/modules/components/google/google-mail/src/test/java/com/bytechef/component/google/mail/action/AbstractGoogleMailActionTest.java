@@ -29,12 +29,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.mockito.MockedStatic;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
-public abstract class AbstractGoogleMailActionTest {
+abstract class AbstractGoogleMailActionTest {
 
     protected MockedStatic<GoogleServices> googleServicesMockedStatic;
-    protected ActionContext mockedContext = mock(ActionContext.class);
+    protected ActionContext mockedActionContext = mock(ActionContext.class);
     protected Gmail mockedGmail = mock(Gmail.class);
 
     @BeforeEach
