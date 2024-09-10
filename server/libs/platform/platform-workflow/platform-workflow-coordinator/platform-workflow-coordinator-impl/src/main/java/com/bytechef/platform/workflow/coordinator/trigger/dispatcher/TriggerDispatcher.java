@@ -17,8 +17,8 @@
 package com.bytechef.platform.workflow.coordinator.trigger.dispatcher;
 
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
-import com.bytechef.platform.workflow.worker.trigger.event.TriggerExecutionEvent;
-import com.bytechef.platform.workflow.worker.trigger.message.route.TriggerWorkerMessageRoute;
+import com.bytechef.platform.workflow.worker.event.TriggerExecutionEvent;
+import com.bytechef.platform.workflow.worker.message.route.TriggerWorkerMessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.slf4j.Logger;

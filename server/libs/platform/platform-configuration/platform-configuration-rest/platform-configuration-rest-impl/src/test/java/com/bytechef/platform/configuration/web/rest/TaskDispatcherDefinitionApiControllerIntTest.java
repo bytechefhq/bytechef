@@ -16,12 +16,12 @@
 
 package com.bytechef.platform.configuration.web.rest;
 
-import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
-import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
-import com.bytechef.platform.component.registry.service.ActionDefinitionService;
-import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
-import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
-import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
+import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
+import com.bytechef.platform.component.service.ActionDefinitionService;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.component.service.ConnectionDefinitionService;
+import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.web.rest.config.WorkflowConfigurationRestTestConfiguration;
 import com.bytechef.platform.workflow.task.dispatcher.registry.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.registry.service.TaskDispatcherDefinitionService;

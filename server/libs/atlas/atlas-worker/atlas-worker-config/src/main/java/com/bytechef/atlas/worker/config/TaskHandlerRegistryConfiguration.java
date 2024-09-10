@@ -16,9 +16,9 @@
 
 package com.bytechef.atlas.worker.config;
 
-import com.bytechef.atlas.worker.task.DynamicTaskHandlerFactory;
-import com.bytechef.atlas.worker.task.TaskHandlerFactory;
+import com.bytechef.atlas.worker.task.handler.DynamicTaskHandlerFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
+import com.bytechef.atlas.worker.task.handler.TaskHandlerFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.commons.util.MapUtils;
 import java.util.List;

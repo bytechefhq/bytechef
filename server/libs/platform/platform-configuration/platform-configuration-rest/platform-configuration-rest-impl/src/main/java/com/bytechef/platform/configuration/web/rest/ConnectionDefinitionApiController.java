@@ -17,7 +17,7 @@
 package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
+import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.web.rest.model.ConnectionDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.ConnectionDefinitionModel;
 import java.util.List;

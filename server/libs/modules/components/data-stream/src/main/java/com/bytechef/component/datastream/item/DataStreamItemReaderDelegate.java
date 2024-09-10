@@ -19,8 +19,8 @@ package com.bytechef.component.datastream.item;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.SOURCE;
 
 import com.bytechef.component.definition.DataStreamItemReader;
-import com.bytechef.platform.component.registry.definition.ContextFactory;
-import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
+import com.bytechef.platform.component.definition.ContextFactory;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.tenant.util.TenantUtils;
 import java.util.Map;
 import org.springframework.batch.core.StepExecution;

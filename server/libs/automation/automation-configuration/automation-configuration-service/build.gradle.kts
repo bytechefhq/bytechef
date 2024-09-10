@@ -19,7 +19,7 @@ dependencies {
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:platform:platform-category:platform-category-service"))
-    testImplementation(project(":server:libs:platform:platform-component:platform-component-registry:platform-component-registry-service"))
+    testImplementation(project(":server:libs:platform:platform-component:platform-component-service"))
     testImplementation(project(":server:libs:platform:platform-configuration:platform-configuration-service"))
     testImplementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
     testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))

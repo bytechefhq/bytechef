@@ -19,7 +19,7 @@ package com.bytechef.platform.workflow.execution.dto;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.error.ExecutionError;
-import com.bytechef.platform.component.registry.domain.ComponentDefinition;
+import com.bytechef.platform.component.domain.ComponentDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.Map;

@@ -17,7 +17,7 @@
 package com.bytechef.test.component.properties;
 
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.platform.component.registry.definition.ParametersImpl;
+import com.bytechef.platform.component.definition.ParametersImpl;
 import java.util.Map;
 
 /**

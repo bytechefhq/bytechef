@@ -19,7 +19,7 @@ package com.bytechef.platform.configuration.service;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.component.registry.domain.Property;
+import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.repository.WorkflowNodeTestOutputRepository;

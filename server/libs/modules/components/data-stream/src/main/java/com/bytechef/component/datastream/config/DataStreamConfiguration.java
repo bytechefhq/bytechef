@@ -22,9 +22,10 @@ import com.bytechef.component.datastream.item.DataStreamItemProcessor;
 import com.bytechef.component.datastream.item.DataStreamItemReaderDelegate;
 import com.bytechef.component.datastream.item.DataStreamItemWriterDelegate;
 import com.bytechef.component.datastream.listener.DataStreamJobExecutionListener;
-import com.bytechef.platform.component.registry.definition.ContextFactory;
-import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
+import com.bytechef.platform.component.definition.ContextFactory;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -46,6 +47,7 @@ public class DataStreamConfiguration extends DefaultBatchConfiguration {
 
     private final ObjectMapper objectMapper;
 
+    @SuppressFBWarnings("EI")
     public DataStreamConfiguration(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }

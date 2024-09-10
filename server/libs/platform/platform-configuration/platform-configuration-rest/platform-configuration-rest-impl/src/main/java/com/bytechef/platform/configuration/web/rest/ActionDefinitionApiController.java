@@ -17,7 +17,7 @@
 package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.platform.component.registry.service.ActionDefinitionService;
+import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.configuration.web.rest.model.ActionDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.ActionDefinitionModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

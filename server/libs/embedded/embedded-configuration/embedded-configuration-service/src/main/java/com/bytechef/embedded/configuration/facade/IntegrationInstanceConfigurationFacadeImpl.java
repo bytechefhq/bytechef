@@ -39,10 +39,10 @@ import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurat
 import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.embedded.configuration.service.IntegrationService;
 import com.bytechef.embedded.configuration.service.IntegrationWorkflowService;
-import com.bytechef.platform.component.registry.domain.ConnectionDefinition;
-import com.bytechef.platform.component.registry.domain.TriggerDefinition;
-import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
-import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
+import com.bytechef.platform.component.domain.ConnectionDefinition;
+import com.bytechef.platform.component.domain.TriggerDefinition;
+import com.bytechef.platform.component.service.ConnectionDefinitionService;
+import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;

@@ -16,9 +16,9 @@
 
 package com.bytechef.platform.configuration.dto;
 
-import com.bytechef.platform.component.registry.domain.ActionDefinition;
-import com.bytechef.platform.component.registry.domain.Property;
-import com.bytechef.platform.component.registry.domain.TriggerDefinition;
+import com.bytechef.platform.component.domain.ActionDefinition;
+import com.bytechef.platform.component.domain.Property;
+import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.registry.domain.OutputResponse;
 import com.bytechef.platform.workflow.task.dispatcher.registry.domain.TaskDispatcherDefinition;
 

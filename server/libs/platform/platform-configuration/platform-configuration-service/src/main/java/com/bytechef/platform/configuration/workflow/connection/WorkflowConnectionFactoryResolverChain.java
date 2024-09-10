@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.configuration.workflow.connection;
 
-import com.bytechef.platform.component.registry.domain.ComponentDefinition;
+import com.bytechef.platform.component.domain.ComponentDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;

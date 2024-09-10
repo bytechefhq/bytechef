@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.configuration.facade;
 
-import com.bytechef.platform.component.registry.domain.OAuth2AuthorizationParameters;
+import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import java.util.Map;
 
 /**
