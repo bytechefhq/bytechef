@@ -122,43 +122,47 @@ const WorkflowExecutionsTestOutput = ({
                         </div>
                     )}
 
-                    {!workflowIsRunning && workflowTestExecution?.job ? (
-                        <ResizablePanelGroup direction="horizontal">
-                            <ResizablePanel className="overflow-y-auto py-4" defaultSize={resizablePanelSize}>
-                                <ul className="divide-y divide-gray-100">
-                                    {triggerExecution && (
-                                        <WorkflowTriggerExecutionItem
-                                            key={triggerExecution.id}
-                                            onClick={() => setContent(triggerExecution)}
-                                            selected={content?.id === triggerExecution.id}
-                                            triggerExecution={triggerExecution}
-                                        />
-                                    )}
+                    {!workflowIsRunning && (
+                        <>
+                            {workflowTestExecution?.job ? (
+                                <ResizablePanelGroup direction="horizontal">
+                                    <ResizablePanel className="overflow-y-auto py-4" defaultSize={resizablePanelSize}>
+                                        <ul className="divide-y divide-gray-100">
+                                            {triggerExecution && (
+                                                <WorkflowTriggerExecutionItem
+                                                    key={triggerExecution.id}
+                                                    onClick={() => setContent(triggerExecution)}
+                                                    selected={content?.id === triggerExecution.id}
+                                                    triggerExecution={triggerExecution}
+                                                />
+                                            )}
 
-                                    {job?.taskExecutions &&
-                                        job?.taskExecutions.map((taskExecution) => (
-                                            <WorkflowTaskExecutionItem
-                                                key={taskExecution.id}
-                                                onClick={() => setContent(taskExecution)}
-                                                selected={content?.id === taskExecution.id}
-                                                taskExecution={taskExecution}
-                                            />
-                                        ))}
-                                </ul>
-                            </ResizablePanel>
+                                            {job?.taskExecutions &&
+                                                job?.taskExecutions.map((taskExecution) => (
+                                                    <WorkflowTaskExecutionItem
+                                                        key={taskExecution.id}
+                                                        onClick={() => setContent(taskExecution)}
+                                                        selected={content?.id === taskExecution.id}
+                                                        taskExecution={taskExecution}
+                                                    />
+                                                ))}
+                                        </ul>
+                                    </ResizablePanel>
 
-                            <ResizableHandle />
+                                    <ResizableHandle />
 
-                            <ResizablePanel className="space-y-4 overflow-y-auto p-4">
-                                <WorkflowExecutionContent {...content} />
-                            </ResizablePanel>
-                        </ResizablePanelGroup>
-                    ) : (
-                        <div className="flex size-full items-center justify-center gap-x-1 p-3 text-muted-foreground">
-                            <RefreshCwOffIcon className="size-5" />
+                                    <ResizablePanel className="space-y-4 overflow-y-auto p-4">
+                                        <WorkflowExecutionContent {...content} />
+                                    </ResizablePanel>
+                                </ResizablePanelGroup>
+                            ) : (
+                                <div className="flex size-full items-center justify-center gap-x-1 p-3 text-muted-foreground">
+                                    <RefreshCwOffIcon className="size-5" />
 
-                            <span>The workflow has not yet been executed.</span>
-                        </div>
+                                    <span>The workflow has not yet been executed.</span>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </div>
