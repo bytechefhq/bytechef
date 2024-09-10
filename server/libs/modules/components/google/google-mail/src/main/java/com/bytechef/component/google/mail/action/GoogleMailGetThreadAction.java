@@ -45,6 +45,7 @@ import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import com.google.api.services.gmail.model.Thread;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -103,6 +104,7 @@ public class GoogleMailGetThreadAction {
             .execute();
     }
 
+    @SuppressFBWarnings("EI")
     protected record ThreadCustom(
         String id, String snippet, BigInteger historyId, List<SimpleMessage> messages) {
     }

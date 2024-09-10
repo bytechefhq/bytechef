@@ -65,6 +65,7 @@ import com.google.api.services.gmail.model.MessagePart;
 import com.google.api.services.gmail.model.MessagePartBody;
 import com.google.api.services.gmail.model.MessagePartHeader;
 import com.google.api.services.gmail.model.Thread;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.activation.DataHandler;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Multipart;
@@ -449,6 +450,7 @@ public class GoogleMailUtils {
             .execute();
     }
 
+    @SuppressFBWarnings("EI")
     public record SimpleMessage(
         String id, String threadId, BigInteger historyId, String subject, String from, List<String> to,
         List<String> cc, List<String> bcc, String bodyPlain, String bodyHtml,
