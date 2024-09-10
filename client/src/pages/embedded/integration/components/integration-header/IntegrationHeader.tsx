@@ -1,15 +1,15 @@
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import IntegrationHeaderDeleteIntegrationAlertDialog from '@/pages/embedded/integration/components/IntegrationHeaderDeleteIntegrationAlertDialog';
-import IntegrationHeaderDeleteWorkflowAlertDialog from '@/pages/embedded/integration/components/IntegrationHeaderDeleteWorkflowAlertDialog';
-import IntegrationHeaderDropDownMenu from '@/pages/embedded/integration/components/IntegrationHeaderDropDownMenu';
-import IntegrationHeaderIntegrationDropDownMenu from '@/pages/embedded/integration/components/IntegrationHeaderIntegrationDropDownMenu';
-import IntegrationHeaderOutputButton from '@/pages/embedded/integration/components/IntegrationHeaderOutputButton';
-import IntegrationHeaderRunButton from '@/pages/embedded/integration/components/IntegrationHeaderRunButton';
-import IntegrationHeaderStopButton from '@/pages/embedded/integration/components/IntegrationHeaderStopButton';
-import IntegrationHeaderWorkflowDropDownMenu from '@/pages/embedded/integration/components/IntegrationHeaderWorkflowDropDownMenu';
-import IntegrationHeaderWorkflowSelect from '@/pages/embedded/integration/components/IntegrationHeaderWorkflowSelect';
-import IntegrationPublishPopover from '@/pages/embedded/integration/components/IntegrationPublishPopover';
+import IntegrationHeaderDeleteIntegrationAlertDialog from '@/pages/embedded/integration/components/integration-header/IntegrationHeaderDeleteIntegrationAlertDialog';
+import IntegrationHeaderDeleteWorkflowAlertDialog from '@/pages/embedded/integration/components/integration-header/IntegrationHeaderDeleteWorkflowAlertDialog';
+import IntegrationHeaderDropDownMenu from '@/pages/embedded/integration/components/integration-header/IntegrationHeaderDropDownMenu';
+import IntegrationHeaderIntegrationDropDownMenu from '@/pages/embedded/integration/components/integration-header/IntegrationHeaderIntegrationDropDownMenu';
+import IntegrationHeaderOutputButton from '@/pages/embedded/integration/components/integration-header/IntegrationHeaderOutputButton';
+import IntegrationHeaderPublishPopover from '@/pages/embedded/integration/components/integration-header/IntegrationHeaderPublishPopover';
+import IntegrationHeaderRunButton from '@/pages/embedded/integration/components/integration-header/IntegrationHeaderRunButton';
+import IntegrationHeaderStopButton from '@/pages/embedded/integration/components/integration-header/IntegrationHeaderStopButton';
+import IntegrationHeaderWorkflowDropDownMenu from '@/pages/embedded/integration/components/integration-header/IntegrationHeaderWorkflowDropDownMenu';
+import IntegrationHeaderWorkflowSelect from '@/pages/embedded/integration/components/integration-header/IntegrationHeaderWorkflowSelect';
 import IntegrationDialog from '@/pages/embedded/integrations/components/IntegrationDialog';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
@@ -224,7 +224,7 @@ const IntegrationHeader = ({
 
                 {integration && (
                     <div className="flex space-x-1">
-                        <IntegrationPublishPopover integration={integration} />
+                        <IntegrationHeaderPublishPopover integration={integration} />
 
                         <IntegrationHeaderIntegrationDropDownMenu
                             integrationId={integrationId}

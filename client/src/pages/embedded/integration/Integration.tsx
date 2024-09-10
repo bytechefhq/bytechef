@@ -1,7 +1,7 @@
 import PageLoader from '@/components/PageLoader';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
-import IntegrationHeader from '@/pages/embedded/integration/components/IntegrationHeader';
 import IntegrationVersionHistorySheet from '@/pages/embedded/integration/components/IntegrationVersionHistorySheet';
+import IntegrationHeader from '@/pages/embedded/integration/components/integration-header/IntegrationHeader';
 import {ConnectionReactQueryProvider} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
 import WorkflowCodeEditorSheet from '@/pages/platform/workflow-editor/components/WorkflowCodeEditorSheet';
 import WorkflowEditorLayout from '@/pages/platform/workflow-editor/components/WorkflowEditorLayout';
