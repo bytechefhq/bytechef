@@ -107,6 +107,7 @@ const Property = ({
         focusedInput,
         setCurrentComponent,
         setFocusedInput,
+        workflowNodeDetailsPanelOpen,
     } = useWorkflowNodeDetailsPanelStore();
     const {setDataPillPanelOpen} = useDataPillPanelStore();
     const {componentDefinitions, workflow} = useWorkflowDataStore();
@@ -394,7 +395,9 @@ const Property = ({
 
                 editorRef.current?.focus();
 
-                setDataPillPanelOpen(true);
+                if (workflowNodeDetailsPanelOpen) {
+                    setDataPillPanelOpen(true);
+                }
             }, 50);
         }
 

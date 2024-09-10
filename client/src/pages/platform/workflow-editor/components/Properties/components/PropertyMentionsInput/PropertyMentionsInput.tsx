@@ -86,7 +86,7 @@ const PropertyMentionsInput = forwardRef(
         const [mentionOccurences, setMentionOccurences] = useState(0);
 
         let {dataPills} = useWorkflowDataStore();
-        const {focusedInput, setFocusedInput} = useWorkflowNodeDetailsPanelStore();
+        const {focusedInput, setFocusedInput, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
         const {setDataPillPanelOpen} = useDataPillPanelStore();
 
         const elementId = useMemo(() => `mentions-input-${getRandomId()}`, []);
@@ -231,7 +231,9 @@ const PropertyMentionsInput = forwardRef(
 
                     setIsFocused(true);
 
-                    setDataPillPanelOpen(true);
+                    if (workflowNodeDetailsPanelOpen) {
+                        setDataPillPanelOpen(true);
+                    }
                 }, 50);
             }
         };
