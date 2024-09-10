@@ -11,7 +11,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {CircleDotIcon} from 'lucide-react';
 import {useState} from 'react';
 
-const IntegrationPublishPopover = ({integration}: {integration: Integration}) => {
+const IntegrationHeaderPublishPopover = ({integration}: {integration: Integration}) => {
     const [open, setOpen] = useState(false);
     const [description, setDescription] = useState<string | undefined>(undefined);
 
@@ -76,4 +76,4 @@ const IntegrationPublishPopover = ({integration}: {integration: Integration}) =>
     );
 };
 
-export default IntegrationPublishPopover;
+export default IntegrationHeaderPublishPopover;
