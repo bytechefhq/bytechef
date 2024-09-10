@@ -198,7 +198,17 @@ public class WebhookTriggerSyncExecutor {
     }
 
     private TriggerExecution preProcess(TriggerExecution triggerExecution) {
-        for (TriggerDispatcherPreSendProcessor triggerDispatcherPreSendProcessor : triggerDispatcherPreSendProcessors) {
+        TriggerDispatcherPreSendProcessor triggerDispatcherPreSendProcessor = null;
+
+        for (TriggerDispatcherPreSendProcessor curTriggerDispatcherPreSendProcessor : triggerDispatcherPreSendProcessors) {
+            if (triggerDispatcherPreSendProcessor.canProcess(triggerExecution)) {
+                triggerDispatcherPreSendProcessor = curTriggerDispatcherPreSendProcessor;
+
+                break;
+            }
+        }
+
+        if (triggerDispatcherPreSendProcessor != null) {
             triggerExecution = triggerDispatcherPreSendProcessor.process(triggerExecution);
         }
 

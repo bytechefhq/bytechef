@@ -98,4 +98,15 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
 
         return taskExecution;
     }
+
+    @Override
+    public boolean canProcess(TaskExecution taskExecution) {
+        Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
+
+        Long projectInstanceId = OptionalUtils.orElse(
+            instanceJobService.fetchJobInstanceId(Validate.notNull(job.getId(), "id"), AppType.AUTOMATION),
+            null);
+
+        return projectInstanceId != null;
+    }
 }

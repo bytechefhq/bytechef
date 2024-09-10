@@ -52,4 +52,9 @@ public class TestTaskDispatcherPreSendProcessor implements TaskDispatcherPreSend
 
         return taskExecution;
     }
+
+    @Override
+    public boolean canProcess(TaskExecution taskExecution) {
+        return true;
+    }
 }

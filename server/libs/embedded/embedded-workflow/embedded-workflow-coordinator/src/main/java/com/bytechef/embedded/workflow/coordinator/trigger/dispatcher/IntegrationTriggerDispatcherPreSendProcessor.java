@@ -20,6 +20,7 @@ import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurat
 import com.bytechef.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.embedded.workflow.coordinator.AbstractDispatcherPreSendProcessor;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.workflow.coordinator.trigger.dispatcher.TriggerDispatcherPreSendProcessor;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
@@ -61,5 +62,12 @@ public class IntegrationTriggerDispatcherPreSendProcessor extends AbstractDispat
         }
 
         return triggerExecution;
+    }
+
+    @Override
+    public boolean canProcess(TriggerExecution triggerExecution) {
+        WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
+
+        return workflowExecutionId.getType() == AppType.EMBEDDED;
     }
 }

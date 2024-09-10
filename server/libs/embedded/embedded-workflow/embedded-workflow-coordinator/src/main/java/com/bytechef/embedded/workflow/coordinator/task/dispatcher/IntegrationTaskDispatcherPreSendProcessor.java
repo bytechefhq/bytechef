@@ -76,4 +76,14 @@ public class IntegrationTaskDispatcherPreSendProcessor extends AbstractDispatche
 
         return taskExecution;
     }
+
+    @Override
+    public boolean canProcess(TaskExecution taskExecution) {
+        Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
+
+        Long integrationInstanceId = OptionalUtils.orElse(
+            instanceJobService.fetchJobInstanceId(Validate.notNull(job.getId(), "id"), AppType.EMBEDDED), null);
+
+        return integrationInstanceId != null;
+    }
 }
