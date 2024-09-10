@@ -16,10 +16,12 @@
 
 package com.bytechef.component.definition;
 
+import java.util.Map;
+
 /**
  * @author Ivica Cardic
- *
- *         TODO
  */
-public interface DataStreamItemReader {
+public interface DataStreamItemReader extends DataStreamItemStream {
+
+    Map<String, ?> read(DataStreamContext context) throws Exception;
 }
