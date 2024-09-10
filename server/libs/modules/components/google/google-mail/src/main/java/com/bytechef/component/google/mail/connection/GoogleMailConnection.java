@@ -21,7 +21,7 @@ import com.bytechef.google.commons.GoogleConnection;
 import java.util.List;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class GoogleMailConnection {
 
@@ -30,5 +30,6 @@ public class GoogleMailConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
         (connection, context) -> List.of(
-            "https://www.googleapis.com/auth/gmail.send", "https://www.googleapis.com/auth/gmail.readonly"));
+            "https://www.googleapis.com/auth/gmail.send", "https://www.googleapis.com/auth/gmail.readonly",
+            "https://www.googleapis.com/auth/gmail.compose", "email"));
 }
