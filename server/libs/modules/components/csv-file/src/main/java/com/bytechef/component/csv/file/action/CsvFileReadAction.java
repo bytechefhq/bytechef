@@ -34,24 +34,21 @@ import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.csv.file.constant.CsvFileConstants;
+import com.bytechef.component.csv.file.util.CsvFileReadUtils;
+import com.bytechef.component.csv.file.util.ReadConfiguration;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.fasterxml.jackson.databind.MappingIterator;
-import com.fasterxml.jackson.dataformat.csv.CsvParser;
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Ivica Cardic
@@ -113,33 +110,13 @@ public class CsvFileReadAction {
     protected static List<Map<String, Object>> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
-        String delimiter = inputParameters.getString(DELIMITER, ",");
-        String enclosingCharacter = inputParameters.getString(ENCLOSING_CHARACTER, "");
-        boolean headerRow = inputParameters.getBoolean(HEADER_ROW, true);
-        boolean includeEmptyCells = inputParameters.getBoolean(INCLUDE_EMPTY_CELLS, false);
-        Integer pageNumber = inputParameters.getInteger(PAGE_NUMBER);
-        Integer pageSize = inputParameters.getInteger(PAGE_SIZE);
-        boolean readAsString = inputParameters.getBoolean(READ_AS_STRING, false);
+        ReadConfiguration readConfiguration = CsvFileReadUtils.getReadConfiguration(inputParameters);
 
         try (
             InputStream inputStream = context.file(
                 file -> file.getStream(inputParameters.getRequiredFileEntry(FILE_ENTRY)))) {
-            Integer rangeStartRow = null;
-            Integer rangeEndRow = null;
 
-            if (pageSize != null && pageNumber != null) {
-                rangeStartRow = pageSize * pageNumber - pageSize;
-
-                rangeEndRow = rangeStartRow + pageSize;
-            }
-
-            return read(
-                inputStream,
-                new ReadConfiguration(
-                    delimiter, enclosingCharacter, headerRow, includeEmptyCells,
-                    rangeStartRow == null ? 0 : rangeStartRow,
-                    rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow, readAsString),
-                context);
+            return read(inputStream, readConfiguration, context);
         }
     }
 
@@ -153,39 +130,19 @@ public class CsvFileReadAction {
         try (BufferedReader bufferedReader = new BufferedReader(
             new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
 
-            char enclosingCharacter = (char) -1;
+            char enclosingCharacter = CsvFileReadUtils.getEnclosingCharacter(configuration);
 
-            if (!StringUtils.isEmpty(configuration.enclosingCharacter)) {
-                enclosingCharacter = configuration.enclosingCharacter.charAt(0);
-            }
+            MappingIterator<Object> iterator = CsvFileReadUtils.getIterator(bufferedReader, configuration);
 
             if (configuration.headerRow()) {
-                CsvSchema headerSchema = CsvSchema
-                    .emptySchema()
-                    .withHeader()
-                    .withColumnSeparator(configuration.delimiter.charAt(0));
-
-                MappingIterator<Map<String, String>> iterator = CsvFileConstants.CSV_MAPPER
-                    .readerForMapOf(String.class)
-                    .with(headerSchema)
-                    .readValues(bufferedReader);
-
                 while (iterator.hasNext()) {
-                    Map<String, String> row = iterator.nextValue();
+                    Map<String, String> row = (Map<String, String>) iterator.nextValue();
 
                     context.logger(logger -> logger.trace("row: {}", row));
 
                     if (count >= configuration.rangeStartRow() && count < configuration.rangeEndRow()) {
-                        Map<String, Object> map = new LinkedHashMap<>();
-
-                        for (Map.Entry<String, String> entry : row.entrySet()) {
-                            map.put(
-                                strip(entry.getKey(), enclosingCharacter),
-                                processValue(
-                                    entry.getValue(), enclosingCharacter, configuration.includeEmptyCells(),
-                                    configuration.readAsString(),
-                                    context));
-                        }
+                        Map<String, Object> map = CsvFileReadUtils.getHeaderRow(
+                            configuration, context, row, enclosingCharacter);
 
                         rows.add(map);
                     } else {
@@ -197,27 +154,14 @@ public class CsvFileReadAction {
                     count++;
                 }
             } else {
-                MappingIterator<List<String>> iterator = CsvFileConstants.CSV_MAPPER
-                    .readerForListOf(String.class)
-                    .with(CsvParser.Feature.WRAP_AS_ARRAY)
-                    .readValues(bufferedReader);
-
                 while (iterator.hasNext()) {
-                    List<String> row = iterator.nextValue();
+                    List<String> row = (List<String>) iterator.nextValue();
 
                     context.logger(logger -> logger.trace("row: {}", row));
 
                     if (count >= configuration.rangeStartRow() && count < configuration.rangeEndRow()) {
-                        Map<String, Object> map = new LinkedHashMap<>();
-
-                        for (int i = 0; i < row.size(); i++) {
-                            map.put(
-                                "column_" + (i + 1),
-                                processValue(
-                                    row.get(i), enclosingCharacter, configuration.includeEmptyCells(),
-                                    configuration.readAsString(),
-                                    context));
-                        }
+                        Map<String, Object> map = CsvFileReadUtils.getColumnRow(
+                            configuration, context, row, enclosingCharacter);
 
                         rows.add(map);
                     } else {
@@ -232,77 +176,5 @@ public class CsvFileReadAction {
         }
 
         return rows;
-    }
-
-    private static Object processValue(
-        String valueString, char enclosingCharacter, boolean includeEmptyCells, boolean readAsString, Context context) {
-
-        Object value = null;
-
-        if (valueString == null || valueString.isEmpty()) {
-            if (includeEmptyCells) {
-                value = "";
-            }
-        } else {
-            if (enclosingCharacter != (char) -1) {
-                valueString = strip(valueString, enclosingCharacter);
-            }
-
-            if (readAsString) {
-                value = valueString;
-            } else {
-                value = valueOF(valueString, context);
-            }
-        }
-
-        return value;
-    }
-
-    private static String strip(String valueString, char enclosingCharacter) {
-        valueString = valueString.strip();
-        valueString = StringUtils.removeStart(valueString, enclosingCharacter);
-        return StringUtils.removeEnd(valueString, String.valueOf(enclosingCharacter));
-    }
-
-    private static Object valueOF(String string, Context context) {
-        Object value = null;
-
-        try {
-            value = Integer.parseInt(string);
-        } catch (NumberFormatException nfe) {
-            context.logger(logger -> logger.trace(nfe.getMessage(), nfe));
-        }
-
-        if (value == null) {
-            try {
-                value = Long.parseLong(string);
-            } catch (NumberFormatException nfe) {
-                context.logger(logger -> logger.trace(nfe.getMessage(), nfe));
-            }
-        }
-
-        if (value == null) {
-            try {
-                value = Double.parseDouble(string);
-            } catch (NumberFormatException nfe) {
-                context.logger(logger -> logger.trace(nfe.getMessage(), nfe));
-            }
-        }
-
-        if (value == null) {
-            value = BooleanUtils.toBooleanObject(string);
-        }
-
-        if (value == null) {
-            value = string;
-        }
-
-        return value;
-    }
-
-    protected record ReadConfiguration(
-        String delimiter, String enclosingCharacter, boolean headerRow, boolean includeEmptyCells, long rangeStartRow,
-        long rangeEndRow,
-        boolean readAsString) {
     }
 }
