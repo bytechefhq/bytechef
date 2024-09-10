@@ -92,8 +92,7 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
         ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
             workflowNodeType.componentName(), workflowNodeType.componentVersion());
 
-        return workflowConnectionFactoryResolver
-            .resolve(componentDefinition)
+        return workflowConnectionFactoryResolver.resolve(componentDefinition)
             .map(workflowConnectionFactory -> workflowConnectionFactory.create(
                 workflowNodeName, extensions, componentDefinition))
             .orElse(List.of());

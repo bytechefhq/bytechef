@@ -389,8 +389,8 @@ public interface Authorization {
          * @return
          */
         AuthorizationCallbackResponse apply(
-            Parameters connectionParameters, String code, String redirectUri, String codeVerifier, Context context)
-            throws Exception;
+            Parameters connectionParameters, String code, String redirectUri, String codeVerifier,
+            Context context) throws Exception;
     }
 
     /**

@@ -62,7 +62,7 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
             outputResponse = workflowNodeTestOutput.getOutput();
         }
 
-        return new ScriptTestExecutionDTO(executionError,
-            outputResponse == null ? null : outputResponse.sampleOutput());
+        return new ScriptTestExecutionDTO(
+            executionError, outputResponse == null ? null : outputResponse.sampleOutput());
     }
 }

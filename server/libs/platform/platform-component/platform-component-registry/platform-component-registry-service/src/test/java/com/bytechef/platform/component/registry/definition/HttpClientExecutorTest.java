@@ -19,6 +19,7 @@ package com.bytechef.platform.component.registry.definition;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
@@ -59,7 +60,7 @@ public class HttpClientExecutorTest {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private final ActionContext context = Mockito.mock(ActionContext.class);
-    private final Context.Http.Configuration configuration = Context.Http.Configuration.newConfiguration()
+    private final Http.Configuration configuration = Http.Configuration.newConfiguration()
         .build();
     private final Base64.Encoder encoder = Base64.getEncoder();
     private final HttpClientExecutor httpClientExecutor =
@@ -76,7 +77,7 @@ public class HttpClientExecutorTest {
         //
 
         bodyHandler = httpClientExecutor.createBodyHandler(
-            Context.Http.responseType(Context.Http.ResponseType.BINARY)
+            Http.responseType(Http.ResponseType.BINARY)
                 .build());
 
         Assertions.assertEquals(bodyHandler, HttpResponse.BodyHandlers.ofInputStream());
@@ -84,7 +85,7 @@ public class HttpClientExecutorTest {
         //
 
         bodyHandler = httpClientExecutor.createBodyHandler(
-            Context.Http.responseType(Context.Http.ResponseType.XML)
+            Http.responseType(Http.ResponseType.XML)
                 .build());
 
         Assertions.assertEquals(bodyHandler, HttpResponse.BodyHandlers.ofString());
@@ -103,8 +104,8 @@ public class HttpClientExecutorTest {
 
         MultipartBodyPublisher multipartBodyPublisher =
             (MultipartBodyPublisher) httpClientExecutor.createBodyPublisher(
-                Context.Http.Body.of(
-                    Map.of("key1", "value1", "key2", fileEntry), Context.Http.BodyContentType.FORM_DATA));
+                Http.Body.of(
+                    Map.of("key1", "value1", "key2", fileEntry), Http.BodyContentType.FORM_DATA));
 
         Assertions.assertTrue(multipartBodyPublisher.mediaType()
             .toString()
@@ -122,8 +123,8 @@ public class HttpClientExecutorTest {
         //
 
         FormBodyPublisher formBodyPublisher = (FormBodyPublisher) httpClientExecutor.createBodyPublisher(
-            Context.Http.Body.of(
-                Map.of("key1", "value1", "key2", "value2"), Context.Http.BodyContentType.FORM_URL_ENCODED));
+            Http.Body.of(
+                Map.of("key1", "value1", "key2", "value2"), Http.BodyContentType.FORM_URL_ENCODED));
 
         Assertions.assertEquals(MediaType.APPLICATION_FORM_URLENCODED, formBodyPublisher.mediaType());
 
@@ -135,21 +136,21 @@ public class HttpClientExecutorTest {
         //
 
         mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) httpClientExecutor.createBodyPublisher(
-            Context.Http.Body.of(Map.of("key1", "value1"), Context.Http.BodyContentType.JSON));
+            Http.Body.of(Map.of("key1", "value1"), Http.BodyContentType.JSON));
 
         Assertions.assertEquals(MediaType.APPLICATION_JSON, mimeBodyPublisherAdapter.mediaType());
 
         //
 
         mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) httpClientExecutor.createBodyPublisher(
-            Context.Http.Body.of(Map.of("key1", "value1"), Context.Http.BodyContentType.XML));
+            Http.Body.of(Map.of("key1", "value1"), Http.BodyContentType.XML));
 
         Assertions.assertEquals(MediaType.APPLICATION_XML, mimeBodyPublisherAdapter.mediaType());
 
         //
 
         mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) httpClientExecutor.createBodyPublisher(
-            Context.Http.Body.of("text"));
+            Http.Body.of("text"));
 
         Assertions.assertEquals(MediaType.TEXT_PLAIN, mimeBodyPublisherAdapter.mediaType());
 
@@ -169,7 +170,7 @@ public class HttpClientExecutorTest {
             .thenReturn("base64:text");
 
         mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) httpClientExecutor.createBodyPublisher(
-            Context.Http.Body.of(fileEntry));
+            Http.Body.of(fileEntry));
 
         Assertions.assertEquals(MediaType.TEXT_PLAIN, mimeBodyPublisherAdapter.mediaType());
 
@@ -186,7 +187,7 @@ public class HttpClientExecutorTest {
     @SuppressWarnings("checkstyle:methodlengthcheck")
     public void testCreateHTTPClient() {
         HttpClient httpClient = httpClientExecutor.createHttpClient(
-            new HashMap<>(), new HashMap<>(), Context.Http.allowUnauthorizedCerts(true)
+            new HashMap<>(), new HashMap<>(), Http.allowUnauthorizedCerts(true)
                 .build(),
             "componentName", 1, "componentOperationName",
             new ComponentConnection("componentName", 1, -1, Map.of(), Authorization.AuthorizationType.NONE.name()),
@@ -326,7 +327,7 @@ public class HttpClientExecutorTest {
         //
 
         httpClient = httpClientExecutor.createHttpClient(
-            new HashMap<>(), new HashMap<>(), Context.Http.followRedirect(true)
+            new HashMap<>(), new HashMap<>(), Http.followRedirect(true)
                 .build(),
             "componentName", 1, "componentOperationName",
             new ComponentConnection("componentName", 1, -1, Map.of(), Authorization.AuthorizationType.NONE.name()),
@@ -337,7 +338,7 @@ public class HttpClientExecutorTest {
         //
 
         httpClient = httpClientExecutor.createHttpClient(
-            new HashMap<>(), new HashMap<>(), Context.Http.followAllRedirects(true)
+            new HashMap<>(), new HashMap<>(), Http.followAllRedirects(true)
                 .build(),
             "componentName", 1, "componentOperationName",
             new ComponentConnection("componentName", 1, -1, Map.of(), Authorization.AuthorizationType.NONE.name()),
@@ -348,7 +349,7 @@ public class HttpClientExecutorTest {
         //
 
         httpClient = httpClientExecutor.createHttpClient(
-            new HashMap<>(), new HashMap<>(), Context.Http.proxy("10.11.12.13:30")
+            new HashMap<>(), new HashMap<>(), Http.proxy("10.11.12.13:30")
                 .build(),
             "componentName", 1, "componentOperationName",
             new ComponentConnection("componentName", 1, -1, Map.of(), Authorization.AuthorizationType.NONE.name()),
@@ -360,7 +361,7 @@ public class HttpClientExecutorTest {
         //
 
         httpClient = httpClientExecutor.createHttpClient(
-            new HashMap<>(), new HashMap<>(), Context.Http
+            new HashMap<>(), new HashMap<>(), Http
                 .timeout(Duration.ofMillis(2000))
                 .build(),
             "componentName", 1, "componentOperationName",
@@ -375,12 +376,12 @@ public class HttpClientExecutorTest {
     @Test
     public void testCreateHTTPRequest() {
         HttpRequest httpRequest = httpClientExecutor.createHTTPRequest(
-            "http://localhost:8080", Context.Http.RequestMethod.DELETE, Map.of("header1", List.of("value1")),
+            "http://localhost:8080", Http.RequestMethod.DELETE, Map.of("header1", List.of("value1")),
             Map.of("param1", List.of("value1")), null, "componentName",
             new ComponentConnection("componentName", 1, -1L, Map.of(), Authorization.AuthorizationType.NONE.name()),
             Mockito.mock(Context.class));
 
-        Assertions.assertEquals(Context.Http.RequestMethod.DELETE.name(), httpRequest.method());
+        Assertions.assertEquals(Http.RequestMethod.DELETE.name(), httpRequest.method());
 
         HttpHeaders httpHeaders = httpRequest.headers();
 
@@ -409,8 +410,7 @@ public class HttpClientExecutorTest {
             httpClientExecutor
                 .handleResponse(
                     new TestHttpResponse(new ByteArrayInputStream("text".getBytes(StandardCharsets.UTF_8))),
-                    Context.Http
-                        .responseType(Context.Http.ResponseType.BINARY)
+                    Http.responseType(Http.ResponseType.BINARY)
                         .build())
                 .getBody());
 
@@ -426,8 +426,7 @@ public class HttpClientExecutorTest {
                                 "key1": "value1"
                             }
                             """),
-                    Context.Http
-                        .responseType(Context.Http.ResponseType.JSON)
+                    Http.responseType(Http.ResponseType.JSON)
                         .build())
                 .getBody());
 
@@ -438,8 +437,7 @@ public class HttpClientExecutorTest {
             httpClientExecutor
                 .handleResponse(
                     new TestHttpResponse("text"),
-                    Context.Http
-                        .responseType(Context.Http.ResponseType.TEXT)
+                    Http.responseType(Http.ResponseType.TEXT)
                         .build())
                 .getBody());
 
@@ -458,15 +456,14 @@ public class HttpClientExecutorTest {
                             </root>
 
                             """),
-                    Context.Http
-                        .responseType(Context.Http.ResponseType.XML)
+                    Http.responseType(Http.ResponseType.XML)
                         .build())
                 .getBody());
 
         //
 
-        Context.Http.Configuration.ConfigurationBuilder configurationBuilder =
-            Context.Http.responseType(Context.Http.ResponseType.TEXT);
+        Http.Configuration.ConfigurationBuilder configurationBuilder =
+            Http.responseType(Http.ResponseType.TEXT);
 
         Assertions.assertEquals(
             new TestResponseImpl(Map.of(), "text", 200),
@@ -479,11 +476,11 @@ public class HttpClientExecutorTest {
             "IncompatibleResponseType body - text instead of JSON",
             HttpHeaders.of(Map.of("content-type", List.of("text/html;charset=UTF-8")), (s, s2) -> true), 404);
 
-        Context.Http.Configuration.ConfigurationBuilder configurationBuilder =
-            Context.Http.Configuration.newConfiguration()
-                .responseType(Context.Http.ResponseType.JSON);
+        Http.Configuration.ConfigurationBuilder configurationBuilder =
+            Http.Configuration.newConfiguration()
+                .responseType(Http.ResponseType.JSON);
 
-        Context.Http.Response response =
+        Http.Response response =
             httpClientExecutor.handleResponse(testHttpResponse, configurationBuilder.build());
 
         Assertions.assertNull(response.getBody());
@@ -511,7 +508,7 @@ public class HttpClientExecutorTest {
             HttpHeaders.of(Map.of("content-type", List.of("application/xml")), (s, s2) -> true), 200);
 
         response = httpClientExecutor.handleResponse(
-            testHttpResponse, configurationBuilder.responseType(Context.Http.ResponseType.XML)
+            testHttpResponse, configurationBuilder.responseType(Http.ResponseType.XML)
                 .build());
 
         Assertions.assertNotNull(response.getBody());
@@ -519,7 +516,7 @@ public class HttpClientExecutorTest {
         Assertions.assertEquals(Map.of("key1", "value1", "key2", "value2"), response.getBody());
     }
 
-    private static class TestResponseImpl implements Context.Http.Response {
+    private static class TestResponseImpl implements Http.Response {
 
         private final Map<String, List<String>> headers;
         private final Object body;
@@ -547,7 +544,7 @@ public class HttpClientExecutorTest {
         }
 
         @Override
-        public <T> T getBody(Context.TypeReference<T> valueTypeRef) {
+        public <T> T getBody(com.bytechef.component.definition.TypeReference<T> valueTypeRef) {
             return objectMapper.convertValue(body, new TypeReference<>() {
 
                 @Override

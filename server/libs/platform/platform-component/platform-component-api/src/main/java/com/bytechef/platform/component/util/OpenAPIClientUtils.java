@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.util;
 
 import static com.bytechef.component.definition.Context.Http.RequestMethod;
+import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.OpenAPIComponentHandler.PropertyType;
@@ -27,7 +28,6 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Response;
-import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.OutputDefinition;
 import com.bytechef.component.definition.Property;

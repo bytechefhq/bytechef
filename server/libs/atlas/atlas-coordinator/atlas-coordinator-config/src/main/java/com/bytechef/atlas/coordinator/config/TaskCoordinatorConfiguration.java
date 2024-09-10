@@ -158,10 +158,12 @@ public class TaskCoordinatorConfiguration {
     TaskDispatcher<? super Task> taskDispatcher() {
         TaskDispatcherChain taskDispatcherChain = new TaskDispatcherChain();
 
-        List<TaskDispatcherResolver> resolvers = Stream.concat(
-            taskDispatcherResolverFactories.stream()
-                .map(taskDispatcherFactory -> taskDispatcherFactory.createTaskDispatcherResolver(taskDispatcherChain)),
-            Stream.of(controlTaskDispatcher(), defaultTaskDispatcher()))
+        List<TaskDispatcherResolver> resolvers = Stream
+            .concat(
+                taskDispatcherResolverFactories.stream()
+                    .map(taskDispatcherFactory -> taskDispatcherFactory.createTaskDispatcherResolver(
+                        taskDispatcherChain)),
+                Stream.of(controlTaskDispatcher(), defaultTaskDispatcher()))
             .toList();
 
         taskDispatcherChain.setTaskDispatcherResolvers(resolvers);

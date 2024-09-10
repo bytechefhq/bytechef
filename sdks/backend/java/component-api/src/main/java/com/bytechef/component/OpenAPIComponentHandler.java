@@ -22,7 +22,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinit
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Property;
 import java.util.Arrays;
 import java.util.List;
@@ -125,7 +125,7 @@ public interface OpenAPIComponentHandler extends ComponentHandler {
      * @param response
      * @return
      */
-    default Context.Http.Response postExecute(String actionName, Context.Http.Response response) {
+    default Http.Response postExecute(String actionName, Http.Response response) {
         return response;
     }
 }

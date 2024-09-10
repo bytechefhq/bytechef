@@ -54,7 +54,10 @@ public class PlatformFileStorageConfiguration {
             .getProvider();
 
         if (logger.isInfoEnabled()) {
-            logger.info("Workflow trigger output storage provider type enabled: %s".formatted(provider));
+            String providerName = provider.name();
+
+            logger.info(
+                "Workflow trigger output storage provider type enabled: %s".formatted(providerName.toLowerCase()));
         }
 
         return new FilesFileStorageImpl(getFilesFileStorageService(provider));
@@ -67,7 +70,9 @@ public class PlatformFileStorageConfiguration {
             .getProvider();
 
         if (logger.isInfoEnabled()) {
-            logger.info("Files storage provider type enabled: %s".formatted(provider));
+            String providerName = provider.name();
+
+            logger.info("Files storage provider type enabled: %s".formatted(providerName.toLowerCase()));
         }
 
         return new TriggerFileStorageImpl(getTriggerFileStorageService(provider));

@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.component.registry.facade;
 
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.http.client.action.HttpClientGetAction;
 import com.bytechef.platform.component.registry.config.JacksonConfiguration;
 import com.bytechef.platform.component.registry.config.PlatformIntTestConfiguration;
@@ -74,7 +74,7 @@ public class ActionDefinitionFacadeIntTest {
 
         Assertions.assertFalse(results.isEmpty());
 
-        Context.Http.Response response = (Context.Http.Response) actionDefinitionFacade.executePerform(
+        Http.Response response = (Http.Response) actionDefinitionFacade.executePerform(
             "httpClient", 1, HttpClientGetAction.ACTION_DEFINITION.getName(), AppType.AUTOMATION, 1000L, 1000L, 1000L,
             Map.of("uri", "https://api.hnb.hr/o/tecajn-eur/v2", "fullResponse", "true"), Map.of(), Map.of());
 
