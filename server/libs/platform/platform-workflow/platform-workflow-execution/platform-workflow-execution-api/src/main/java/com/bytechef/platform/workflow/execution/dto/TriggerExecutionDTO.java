@@ -17,7 +17,7 @@
 package com.bytechef.platform.workflow.execution.dto;
 
 import com.bytechef.error.ExecutionError;
-import com.bytechef.platform.component.registry.domain.ComponentDefinition;
+import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;

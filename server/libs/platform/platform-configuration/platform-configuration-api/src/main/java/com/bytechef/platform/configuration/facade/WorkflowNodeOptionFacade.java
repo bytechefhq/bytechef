@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.configuration.facade;
 
-import com.bytechef.platform.component.registry.domain.Option;
+import com.bytechef.platform.component.domain.Option;
 import java.util.List;
 import org.springframework.lang.NonNull;
 

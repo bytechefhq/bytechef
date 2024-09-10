@@ -28,11 +28,12 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.datastream.constant.DataStreamConstants;
 import com.bytechef.component.definition.DataStreamContext;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.platform.component.registry.definition.ContextFactory;
-import com.bytechef.platform.component.registry.definition.ParametersFactory;
+import com.bytechef.platform.component.definition.ContextFactory;
+import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.constant.AppType;
 import java.util.Map;
 import java.util.Objects;
+import org.apache.commons.lang3.Validate;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
@@ -98,11 +99,13 @@ public abstract class AbstractDataStreamItemDelegate {
 
         jobParameter = jobParameters.getParameter(JOB_ID);
 
-        long jobId = (Long) jobParameter.getValue();
+        long jobId = (Long) Validate.notNull(jobParameter, "jobId is required")
+            .getValue();
 
         jobParameter = jobParameters.getParameter(TENANT_ID);
 
-        tenantId = (String) jobParameter.getValue();
+        tenantId = (String) Validate.notNull(jobParameter, "tenantId is required")
+            .getValue();
 
         jobParameter = jobParameters.getParameter(TYPE);
 
@@ -115,8 +118,7 @@ public abstract class AbstractDataStreamItemDelegate {
         context = new DataStreamContextImpl(
             contextFactory.createActionContext(
                 componentName, componentVersion, DataStreamConstants.STREAM, type, instanceId, instanceWorkflowId,
-                jobId,
-                null));
+                jobId, null));
 
         doBeforeStep(stepExecution);
     }

@@ -27,9 +27,9 @@ import com.bytechef.platform.workflow.coordinator.event.TriggerExecutionErrorEve
 import com.bytechef.platform.workflow.coordinator.event.TriggerStartedApplicationEvent;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
+import com.bytechef.platform.workflow.worker.event.CancelControlTriggerEvent;
+import com.bytechef.platform.workflow.worker.event.TriggerExecutionEvent;
 import com.bytechef.platform.workflow.worker.executor.TriggerWorkerExecutor;
-import com.bytechef.platform.workflow.worker.trigger.event.CancelControlTriggerEvent;
-import com.bytechef.platform.workflow.worker.trigger.event.TriggerExecutionEvent;
 import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandler;
 import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandlerResolver;
 import java.time.Duration;

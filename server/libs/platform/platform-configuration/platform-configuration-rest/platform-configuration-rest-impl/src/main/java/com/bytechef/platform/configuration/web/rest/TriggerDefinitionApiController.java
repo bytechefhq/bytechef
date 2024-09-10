@@ -17,7 +17,7 @@
 package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
+import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.web.rest.model.TriggerDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.TriggerDefinitionModel;
 import java.util.List;

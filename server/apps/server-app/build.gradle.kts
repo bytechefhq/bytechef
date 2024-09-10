@@ -81,7 +81,7 @@ dependencies {
     implementation(project(":server:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-rest"))
     implementation(project(":server:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-service"))
     implementation(project(":server:libs:platform:platform-category:platform-category-service"))
-    implementation(project(":server:libs:platform:platform-component:platform-component-registry:platform-component-registry-service"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-service"))
     implementation(project(":server:libs:platform:platform-component:platform-component-rest"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-service"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-rest:platform-configuration-rest-impl"))

@@ -22,7 +22,7 @@ import com.bytechef.platform.workflow.coordinator.event.TriggerStartedApplicatio
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution.Status;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
-import com.bytechef.platform.workflow.worker.trigger.event.CancelControlTriggerEvent;
+import com.bytechef.platform.workflow.worker.event.CancelControlTriggerEvent;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

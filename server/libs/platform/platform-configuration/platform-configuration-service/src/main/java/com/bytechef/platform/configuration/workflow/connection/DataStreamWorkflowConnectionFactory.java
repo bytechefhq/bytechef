@@ -17,8 +17,8 @@
 package com.bytechef.platform.configuration.workflow.connection;
 
 import com.bytechef.platform.component.definition.DataStreamComponentDefinition;
-import com.bytechef.platform.component.registry.domain.ComponentDefinition;
-import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
+import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.DataStream;
 import com.bytechef.platform.configuration.domain.WorkflowConnection;
 import java.util.ArrayList;

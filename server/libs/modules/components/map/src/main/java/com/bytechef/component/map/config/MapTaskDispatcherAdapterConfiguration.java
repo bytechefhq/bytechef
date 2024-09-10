@@ -16,7 +16,7 @@
 
 package com.bytechef.component.map.config;
 
-import com.bytechef.atlas.worker.task.TaskDispatcherAdapterFactory;
+import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;

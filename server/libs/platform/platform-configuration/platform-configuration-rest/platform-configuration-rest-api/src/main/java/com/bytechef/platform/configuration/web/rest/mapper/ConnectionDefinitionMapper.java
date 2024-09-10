@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.configuration.web.rest.mapper;
 
-import com.bytechef.platform.component.registry.domain.ConnectionDefinition;
-import com.bytechef.platform.component.registry.domain.ConnectionDefinitionBasic;
+import com.bytechef.platform.component.domain.ConnectionDefinition;
+import com.bytechef.platform.component.domain.ConnectionDefinitionBasic;
 import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
 import com.bytechef.platform.configuration.web.rest.model.ConnectionDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.ConnectionDefinitionModel;

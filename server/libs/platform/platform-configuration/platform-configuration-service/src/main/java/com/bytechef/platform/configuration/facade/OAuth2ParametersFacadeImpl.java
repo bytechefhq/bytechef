@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.configuration.facade;
 
-import com.bytechef.platform.component.registry.domain.OAuth2AuthorizationParameters;
-import com.bytechef.platform.component.registry.facade.ConnectionDefinitionFacade;
+import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
+import com.bytechef.platform.component.facade.ConnectionDefinitionFacade;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;

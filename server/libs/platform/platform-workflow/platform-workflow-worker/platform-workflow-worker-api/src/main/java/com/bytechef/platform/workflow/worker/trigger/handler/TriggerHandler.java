@@ -18,7 +18,7 @@ package com.bytechef.platform.workflow.worker.trigger.handler;
 
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
-import com.bytechef.platform.workflow.worker.trigger.exception.TriggerExecutionException;
+import com.bytechef.platform.workflow.worker.exception.TriggerExecutionException;
 
 /**
  * A strategy interface used for executing a {@link TriggerExecution}.

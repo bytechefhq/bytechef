@@ -18,7 +18,7 @@ package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.component.definition.DataStreamComponentDefinition.ComponentType;
-import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

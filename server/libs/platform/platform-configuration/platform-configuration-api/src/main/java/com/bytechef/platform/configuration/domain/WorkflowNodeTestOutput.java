@@ -18,8 +18,8 @@ package com.bytechef.platform.configuration.domain;
 
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.platform.component.registry.domain.Property;
-import com.bytechef.platform.component.registry.domain.ValueProperty;
+import com.bytechef.platform.component.domain.Property;
+import com.bytechef.platform.component.domain.ValueProperty;
 import com.bytechef.platform.registry.domain.OutputResponse;
 import java.time.LocalDateTime;
 import java.util.Map;

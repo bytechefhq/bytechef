@@ -18,8 +18,8 @@ package com.bytechef.component.datastream.handler;
 
 import static com.bytechef.platform.component.definition.DataStreamComponentDefinition.DATA_STREAM;
 
-import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
-import com.bytechef.platform.component.registry.handler.AbstractTaskHandler;
+import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.task.handler.AbstractTaskHandler;
 import org.springframework.stereotype.Component;
 
 /**

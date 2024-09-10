@@ -20,7 +20,7 @@ import com.bytechef.embedded.configuration.domain.Integration;
 import com.bytechef.embedded.configuration.domain.IntegrationVersion;
 import com.bytechef.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.platform.category.domain.Category;
-import com.bytechef.platform.component.registry.domain.ComponentDefinition;
+import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;

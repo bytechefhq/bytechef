@@ -16,7 +16,7 @@
 
 package com.bytechef.embedded.connectivity.facade;
 
-import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.constant.AppType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;

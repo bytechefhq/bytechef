@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.configuration.web.rest.mapper;
 
-import com.bytechef.platform.component.registry.domain.TriggerDefinition;
+import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
 import com.bytechef.platform.configuration.web.rest.model.TriggerDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.TriggerDefinitionModel;
