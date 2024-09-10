@@ -19,6 +19,7 @@ package com.bytechef.platform.component.test;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
@@ -71,10 +72,21 @@ public class ComponentJobTestExecutor {
     }
 
     private static List<TaskDispatcherPreSendProcessor> getTaskDispatcherPreSendProcessors() {
-        return List.of(taskExecution -> {
+        return List.of(new TaskDispatcherPreSendProcessorImpl());
+    }
+
+    private static class TaskDispatcherPreSendProcessorImpl implements TaskDispatcherPreSendProcessor {
+
+        @Override
+        public TaskExecution process(TaskExecution taskExecution) {
             taskExecution.putMetadata(MetadataConstants.TYPE, AppType.AUTOMATION);
 
             return taskExecution;
-        });
+        }
+
+        @Override
+        public boolean canProcess(TaskExecution taskExecution) {
+            return true;
+        }
     }
 }
