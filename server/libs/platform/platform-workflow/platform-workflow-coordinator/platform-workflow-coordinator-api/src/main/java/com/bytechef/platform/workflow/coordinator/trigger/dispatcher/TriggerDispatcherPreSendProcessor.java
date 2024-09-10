@@ -24,4 +24,6 @@ import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 public interface TriggerDispatcherPreSendProcessor {
 
     TriggerExecution process(TriggerExecution triggerExecution);
+
+    boolean canProcess(TriggerExecution triggerExecution);
 }

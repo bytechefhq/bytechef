@@ -24,4 +24,6 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 public interface TaskDispatcherPreSendProcessor {
 
     TaskExecution process(TaskExecution taskExecution);
+
+    boolean canProcess(TaskExecution taskExecution);
 }

@@ -83,7 +83,17 @@ public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
     }
 
     private TaskExecution preProcess(TaskExecution taskExecution) {
-        for (TaskDispatcherPreSendProcessor taskDispatcherPreSendProcessor : taskDispatcherPreSendProcessors) {
+        TaskDispatcherPreSendProcessor taskDispatcherPreSendProcessor = null;
+
+        for (TaskDispatcherPreSendProcessor curTaskDispatcherPreSendProcessor : taskDispatcherPreSendProcessors) {
+            if (curTaskDispatcherPreSendProcessor.canProcess(taskExecution)) {
+                taskDispatcherPreSendProcessor = curTaskDispatcherPreSendProcessor;
+
+                break;
+            }
+        }
+
+        if (taskDispatcherPreSendProcessor != null) {
             taskExecution = taskDispatcherPreSendProcessor.process(taskExecution);
         }
 
