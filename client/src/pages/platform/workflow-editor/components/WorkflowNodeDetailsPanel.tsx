@@ -2,8 +2,7 @@ import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import Properties from '@/pages/platform/workflow-editor/components/Properties/Properties';
-import DestinationTab from '@/pages/platform/workflow-editor/components/node-details-tabs/DestinationTab';
-import SourceTab from '@/pages/platform/workflow-editor/components/node-details-tabs/SourceTab';
+import DataStreamComponentsTab from '@/pages/platform/workflow-editor/components/node-details-tabs/DataStreamComponentsTab';
 import {
     ComponentDefinition,
     ComponentDefinitionBasic,
@@ -48,12 +47,8 @@ const TABS = [
         name: 'description',
     },
     {
-        label: 'Source',
-        name: 'source',
-    },
-    {
-        label: 'Destination',
-        name: 'destination',
+        label: 'Components',
+        name: 'dataStreamComponents',
     },
     {
         label: 'Connection',
@@ -208,7 +203,7 @@ const WorkflowNodeDetailsPanel = ({
             return workflowConnections.length > 0;
         }
 
-        if (name === 'source' || name === 'destination') {
+        if (name === 'dataStreamComponents') {
             return currentComponentDefinition?.name === 'dataStream';
         }
 
@@ -326,10 +321,7 @@ const WorkflowNodeDetailsPanel = ({
             setActiveTab('description');
         }
 
-        if (
-            (activeTab === 'source' || activeTab === 'destination') &&
-            currentComponentDefinition?.name !== 'dataStream'
-        ) {
+        if (activeTab === 'dataStreamComponents' && currentComponentDefinition?.name !== 'dataStream') {
             setActiveTab('description');
         }
 
@@ -528,9 +520,7 @@ const WorkflowNodeDetailsPanel = ({
                                     />
                                 )}
 
-                                {activeTab === 'source' && <SourceTab />}
-
-                                {activeTab === 'destination' && <DestinationTab />}
+                                {activeTab === 'dataStreamComponents' && <DataStreamComponentsTab />}
 
                                 {activeTab === 'connection' &&
                                     workflowConnections.length > 0 &&
