@@ -23,6 +23,7 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.IN
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.LABEL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.LABEL_IDS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MAX_RESULTS;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.PAGE_TOKEN;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SUBJECT;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TO;
@@ -41,7 +42,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 class GoogleMailSearchEmailActionTest extends AbstractGoogleMailActionTest {
 
@@ -85,10 +86,10 @@ class GoogleMailSearchEmailActionTest extends AbstractGoogleMailActionTest {
             .thenReturn(mockedListMessagesResponse);
 
         ListMessagesResponse response = GoogleMailSearchEmailAction.perform(
-            parameters, parameters, mockedContext);
+            parameters, parameters, mockedActionContext);
 
         assertEquals(mockedListMessagesResponse, response);
-        assertEquals("me", userIdArgumentCaptor.getValue());
+        assertEquals(ME, userIdArgumentCaptor.getValue());
         assertEquals(1, maxResultsArgumentCaptor.getValue());
         assertEquals("pageToken", pageTokenArgumentCaptor.getValue());
         assertEquals(" from:from@mail.com to:to@mail.com subject:subject category:social label:label",
