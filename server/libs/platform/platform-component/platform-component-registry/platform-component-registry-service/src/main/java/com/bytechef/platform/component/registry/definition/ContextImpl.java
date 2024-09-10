@@ -46,7 +46,6 @@ public class ContextImpl implements Context {
     private final Http http;
     private final Json json;
     private final Logger logger;
-    private final Output output;
     private final Xml xml;
 
     @SuppressFBWarnings("EI")
@@ -531,23 +530,6 @@ public class ContextImpl implements Context {
             if (logger.isTraceEnabled()) {
                 logger.trace(message, exception);
             }
-        }
-    }
-
-    private static class OutputImpl implements Output {
-
-        private OutputImpl() {
-        }
-
-        @Override
-        public BaseOutputDefinition.OutputResponse get(Object value) {
-            if (value == null) {
-                return null;
-            }
-
-            return new BaseOutputDefinition.OutputResponse(
-                (ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(value, new PropertyFactory(value)),
-                value);
         }
     }
 

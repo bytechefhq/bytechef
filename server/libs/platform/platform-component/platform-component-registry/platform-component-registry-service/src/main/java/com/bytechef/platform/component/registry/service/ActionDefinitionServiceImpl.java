@@ -366,14 +366,28 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
                 return switch (performFunction) {
                     case SingleConnectionPerformFunction singleConnectionPerformFunction ->
-                        (SingleConnectionOutputFunction) (inputParameters, connectionParameters, context) -> context
-                            .output(output -> output.get(
-                                singleConnectionPerformFunction.apply(inputParameters, connectionParameters, context)));
+                        (SingleConnectionOutputFunction) (inputParameters, connectionParameters, context) -> {
+
+                            Object value = singleConnectionPerformFunction.apply(
+                                inputParameters, connectionParameters, context);
+
+                            return new BaseOutputDefinition.OutputResponse(
+                                (BaseValueProperty<?>) SchemaUtils.getOutputSchema(
+                                    value, new PropertyFactory(value)),
+                                value);
+
+                        };
                     case MultipleConnectionsPerformFunction multipleConnectionsPerformFunction ->
-                        (MultipleConnectionsOutputFunction) (inputParameters, connectionParameters, context) -> context
-                            .output(output -> output.get(
-                                multipleConnectionsPerformFunction.apply(
-                                    inputParameters, connectionParameters, context)));
+                        (MultipleConnectionsOutputFunction) (
+                            inputParameters, connectionParameters, extension, context) -> {
+                            Object value = multipleConnectionsPerformFunction.apply(
+                                inputParameters, connectionParameters, extension, context);
+
+                            return new BaseOutputDefinition.OutputResponse(
+                                (BaseValueProperty<?>) SchemaUtils.getOutputSchema(
+                                    value, new PropertyFactory(value)),
+                                value);
+                        };
                     default -> throw new IllegalStateException();
                 };
             }))
