@@ -59,8 +59,8 @@ public class DataStreamStreamAction {
     public DataStreamStreamAction(Job job, JobLauncher jobLauncher) {
         actionDefinition = new SyncActionDefinition(
             action(DataStreamConstants.STREAM)
-                .title("Sync Data Stream")
-                .description("Sync large volume of data between source and destination applications.")
+                .title("Stream Data")
+                .description("Stream large volume of data between source and destination applications.")
                 .properties(
                     integer("transformation")
                         .description(
