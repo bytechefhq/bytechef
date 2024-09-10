@@ -20,14 +20,11 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT_PROPERTY;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FULL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA_HEADERS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA_HEADERS_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SIMPLE;
-import static com.bytechef.component.google.mail.util.GoogleMailUtils.getCustomMessage;
 import static com.bytechef.component.google.mail.util.GoogleMailUtils.getMessageOutputProperty;
+import static com.bytechef.component.google.mail.util.GoogleMailUtils.getSimpleMessage;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -39,7 +36,6 @@ import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * @author Monika Kušter
@@ -65,31 +61,20 @@ public class GoogleMailGetMailAction {
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
-        Gmail service = GoogleServices.getMail(connectionParameters);
+        Gmail gmail = GoogleServices.getMail(connectionParameters);
 
         String format = inputParameters.getRequiredString(FORMAT);
 
-        Message message = getMessage(inputParameters, service);
+        Message message = GoogleMailUtils.getMessage(inputParameters, gmail);
 
         if (format.equals(SIMPLE)) {
-            return getCustomMessage(message, actionContext, service);
+            return getSimpleMessage(message, actionContext, gmail);
         } else {
             return message;
         }
     }
 
-    private static Message getMessage(Parameters inputParameters, Gmail service) throws IOException {
-        String format = inputParameters.getRequiredString(FORMAT);
-
-        return service.users()
-            .messages()
-            .get(ME, inputParameters.getRequiredString(ID))
-            .setFormat(format.equals(SIMPLE) ? FULL : format)
-            .setMetadataHeaders(inputParameters.getList(METADATA_HEADERS, String.class, List.of()))
-            .execute();
-    }
-
-    private static OutputResponse getOutput(
+    public static OutputResponse getOutput(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         return new OutputResponse(getMessageOutputProperty(inputParameters.getRequiredString(FORMAT)));

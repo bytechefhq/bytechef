@@ -23,6 +23,7 @@ import static com.bytechef.component.definition.ComponentDSL.outputSchema;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.THREAD_ID;
 
 import com.bytechef.component.definition.Parameters;
@@ -76,7 +77,7 @@ public class GoogleMailNewEmailPollingTrigger {
             ListMessagesResponse listMessagesResponse = gmail
                 .users()
                 .messages()
-                .list("me")
+                .list(ME)
                 .setQ("is:unread after:" + zonedDateTime.toEpochSecond())
                 .execute();
 

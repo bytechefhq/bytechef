@@ -31,15 +31,15 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA_HEADERS_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SIMPLE;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SNIPPET;
-import static com.bytechef.component.google.mail.util.GoogleMailUtils.getCustomMessage;
 import static com.bytechef.component.google.mail.util.GoogleMailUtils.getMessageOutputProperty;
+import static com.bytechef.component.google.mail.util.GoogleMailUtils.getSimpleMessage;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;
-import com.bytechef.component.google.mail.util.GoogleMailUtils.MessageCustom;
+import com.bytechef.component.google.mail.util.GoogleMailUtils.SimpleMessage;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
@@ -82,13 +82,13 @@ public class GoogleMailGetThreadAction {
         Thread thread = getThread(inputParameters, gmail, format);
 
         if (format.equals(SIMPLE)) {
-            List<MessageCustom> messageCustoms = new ArrayList<>();
+            List<SimpleMessage> simpleMessages = new ArrayList<>();
 
             for (Message message : thread.getMessages()) {
-                messageCustoms.add(getCustomMessage(message, actionContext, gmail));
+                simpleMessages.add(getSimpleMessage(message, actionContext, gmail));
             }
 
-            return new ThreadCustom(thread.getId(), thread.getSnippet(), thread.getHistoryId(), messageCustoms);
+            return new ThreadCustom(thread.getId(), thread.getSnippet(), thread.getHistoryId(), simpleMessages);
         } else {
             return thread;
         }
@@ -103,11 +103,11 @@ public class GoogleMailGetThreadAction {
             .execute();
     }
 
-    private record ThreadCustom(
-        String id, String snippet, BigInteger historyId, List<MessageCustom> messages) {
+    protected record ThreadCustom(
+        String id, String snippet, BigInteger historyId, List<SimpleMessage> messages) {
     }
 
-    private static OutputResponse getOutput(
+    public static OutputResponse getOutput(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         return new OutputResponse(

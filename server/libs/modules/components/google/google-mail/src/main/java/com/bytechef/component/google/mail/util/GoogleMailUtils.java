@@ -27,7 +27,9 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.AT
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BCC;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BODY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.CC;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FROM;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FULL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FULL_MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.HEADERS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.HISTORY_ID;
@@ -36,6 +38,7 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.IN
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.LABEL_IDS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA_HEADERS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MINIMAL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.NAME;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.PAYLOAD;
@@ -146,201 +149,9 @@ public class GoogleMailUtils {
     private GoogleMailUtils() {
     }
 
-    public static List<Option<String>> getLabelIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context)
-        throws IOException {
-
-        List<Option<String>> options = new ArrayList<>();
-
-        List<Label> labels = GoogleServices.getMail(connectionParameters)
-            .users()
-            .labels()
-            .list("me")
-            .execute()
-            .getLabels();
-
-        for (Label label : labels) {
-            options.add(option(label.getName(), label.getName()));
-        }
-
-        return options;
-    }
-
-    public static List<Option<String>> getMessageIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context)
-        throws IOException {
-
-        List<Message> messages = GoogleServices.getMail(connectionParameters)
-            .users()
-            .messages()
-            .list("me")
-            .execute()
-            .getMessages();
-
-        List<Option<String>> options = new ArrayList<>();
-
-        for (Message message : messages) {
-            options.add(option(message.getId(), message.getId()));
-        }
-
-        return options;
-    }
-
-    public static List<Option<String>> getThreadIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) throws IOException {
-
-        List<Thread> threads = GoogleServices.getMail(connectionParameters)
-            .users()
-            .threads()
-            .list("me")
-            .execute()
-            .getThreads();
-
-        List<Option<String>> options = new ArrayList<>();
-
-        for (Thread thread : threads) {
-            options.add(option(thread.getId(), thread.getId()));
-        }
-
-        return options;
-    }
-
-    public static ModifiableObjectProperty getMessageOutputProperty(String format) {
-        return switch (format) {
-            case SIMPLE -> SIMPLE_MESSAGE_OUTPUT_PROPERTY;
-            case RAW -> RAW_MESSAGE_OUTPUT_PROPERTY;
-            case MINIMAL -> MINIMAL_MESSAGE_OUTPUT_PROPERTY;
-            case METADATA -> METADATA_MESSAGE_OUTPUT_PROPERTY;
-            default -> FULL_MESSAGE_OUTPUT_PROPERTY;
-        };
-    }
-
-    public static MessageCustom getCustomMessage(Message message, ActionContext actionContext, Gmail service)
-        throws IOException {
-        MessagePart payload = message.getPayload();
-        List<MessagePart> parts = payload.getParts();
-
-        MessagePart multipartAlternative = parts.stream()
-            .filter(part -> part.getMimeType()
-                .startsWith("multipart/alternative"))
-            .findFirst()
-            .orElse(null);
-
-        List<MessagePart> messageParts = (multipartAlternative != null && multipartAlternative.getParts() != null)
-            ? multipartAlternative.getParts() : parts;
-
-        String bodyPlain = "";
-        String bodyHtml = "";
-
-        List<MessagePartHeader> messagePartHeaders = payload.getHeaders();
-
-        String contentType = messagePartHeaders.stream()
-            .filter(header -> Objects.equals(header.getName(), "Content-Type"))
-            .map(MessagePartHeader::getValue)
-            .findFirst()
-            .orElse("text/plain");
-
-        if (contentType.startsWith("multipart/")) {
-            for (MessagePart messagePart : messageParts) {
-                String mimeType = messagePart.getMimeType();
-
-                if (mimeType.equals("text/plain")) {
-                    bodyPlain = new String(messagePart.getBody()
-                        .decodeData(), StandardCharsets.UTF_8);
-                } else if (mimeType.equals("text/html")) {
-                    bodyHtml = new String(messagePart.getBody()
-                        .decodeData(), StandardCharsets.UTF_8);
-                }
-            }
-        } else {
-            MessagePartBody messagePartBody = payload.getBody();
-
-            bodyPlain = new String(messagePartBody.decodeData(), StandardCharsets.UTF_8);
-        }
-
-        List<FileEntry> fileEntries = getFileEntries(message, actionContext, service);
-
-        return createCustomMessage(message, messagePartHeaders, bodyPlain, bodyHtml, fileEntries);
-    }
-
-    private static List<FileEntry> getFileEntries(
-        Message message, ActionContext actionContext, Gmail service)
-        throws IOException {
-
-        MessagePart payload = message.getPayload();
-        List<MessagePart> parts = payload.getParts();
-
-        List<FileEntry> fileEntries = new ArrayList<>();
-
-        for (MessagePart messagePart : parts) {
-            String mimeType = messagePart.getMimeType();
-
-            if (!mimeType.startsWith("multipart/alternative") &&
-                !mimeType.startsWith("text/plain") &&
-                !mimeType.startsWith("text/html")) {
-                MessagePartBody messagePartBody = messagePart.getBody();
-
-                MessagePartBody attachment = getAttachment(service, message.getId(),
-                    messagePartBody.getAttachmentId());
-
-                fileEntries.add(actionContext.file(
-                    file -> file.storeContent(messagePart.getFilename(), attachment.getData())));
-            }
-        }
-        return fileEntries;
-    }
-
-    private static MessagePartBody getAttachment(Gmail service, String messageId, String attachmentId)
-        throws IOException {
-
-        return service.users()
-            .messages()
-            .attachments()
-            .get("me", messageId, attachmentId)
-            .execute();
-    }
-
-    private static MessageCustom createCustomMessage(
-        Message message, List<MessagePartHeader> messagePartHeaders, String bodyPlain, String bodyHtml,
-        List<FileEntry> fileEntries) {
-
-        String subject = null;
-        String from = null;
-        List<String> to = null;
-        List<String> cc = null;
-        List<String> bcc = null;
-
-        for (MessagePartHeader messagePartHeader : messagePartHeaders) {
-            if ("Subject".equals(messagePartHeader.getName())) {
-                subject = messagePartHeader.getValue();
-            } else if ("From".equals(messagePartHeader.getName())) {
-                from = messagePartHeader.getValue();
-            } else if ("To".equals(messagePartHeader.getName())) {
-                to = Arrays.stream(messagePartHeader.getValue()
-                    .split(","))
-                    .toList();
-            } else if ("Cc".equals(messagePartHeader.getName())) {
-                cc = Arrays.stream(messagePartHeader.getValue()
-                    .split(","))
-                    .toList();
-            } else if ("Bcc".equals(messagePartHeader.getName())) {
-                bcc = Arrays.stream(messagePartHeader.getValue()
-                    .split(","))
-                    .toList();
-            }
-        }
-
-        return new MessageCustom(
-            message.getId(), message.getThreadId(), message.getHistoryId(), subject, from, to, cc, bcc, bodyPlain,
-            bodyHtml, fileEntries);
-    }
-
-    public static String
-        getEncodedEmail(Parameters inputParameters, ActionContext actionContext, Message messageToReply)
-            throws MessagingException, IOException {
+    public static String getEncodedEmail(
+        Parameters inputParameters, ActionContext actionContext, Message messageToReply)
+        throws MessagingException, IOException {
 
         MimeMessage mimeMessage = getMimeMessage(inputParameters, messageToReply);
 
@@ -377,6 +188,7 @@ public class GoogleMailUtils {
 
     private static MimeMessage getMimeMessage(Parameters inputParameters, Message messageToReply)
         throws MessagingException {
+
         Properties properties = new Properties();
 
         Session session = Session.getDefaultInstance(properties, null);
@@ -426,6 +238,209 @@ public class GoogleMailUtils {
         return mimeMessage;
     }
 
+    public static List<Option<String>> getLabelIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context)
+        throws IOException {
+
+        List<Option<String>> options = new ArrayList<>();
+
+        List<Label> labels = GoogleServices.getMail(connectionParameters)
+            .users()
+            .labels()
+            .list(ME)
+            .execute()
+            .getLabels();
+
+        for (Label label : labels) {
+            options.add(option(label.getName(), label.getName()));
+        }
+
+        return options;
+    }
+
+    public static Message getMessage(Parameters inputParameters, Gmail service) throws IOException {
+        String format = inputParameters.getString(FORMAT);
+
+        return service.users()
+            .messages()
+            .get(ME, inputParameters.getRequiredString(ID))
+            .setFormat(format == null || format.equals(SIMPLE) ? FULL : format)
+            .setMetadataHeaders(inputParameters.getList(METADATA_HEADERS, String.class, List.of()))
+            .execute();
+    }
+
+    public static List<Option<String>> getMessageIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context)
+        throws IOException {
+
+        List<Message> messages = GoogleServices.getMail(connectionParameters)
+            .users()
+            .messages()
+            .list(ME)
+            .execute()
+            .getMessages();
+
+        List<Option<String>> options = new ArrayList<>();
+
+        for (Message message : messages) {
+            options.add(option(message.getId(), message.getId()));
+        }
+
+        return options;
+    }
+
+    public static ModifiableObjectProperty getMessageOutputProperty(String format) {
+        return switch (format) {
+            case SIMPLE -> SIMPLE_MESSAGE_OUTPUT_PROPERTY;
+            case RAW -> RAW_MESSAGE_OUTPUT_PROPERTY;
+            case MINIMAL -> MINIMAL_MESSAGE_OUTPUT_PROPERTY;
+            case METADATA -> METADATA_MESSAGE_OUTPUT_PROPERTY;
+            default -> FULL_MESSAGE_OUTPUT_PROPERTY;
+        };
+    }
+
+    public static SimpleMessage getSimpleMessage(Message message, ActionContext actionContext, Gmail service)
+        throws IOException {
+        MessagePart payload = message.getPayload();
+        List<MessagePart> parts = payload.getParts();
+
+        MessagePart multipartAlternative = parts.stream()
+            .filter(part -> part.getMimeType()
+                .startsWith("multipart/alternative"))
+            .findFirst()
+            .orElse(null);
+
+        List<MessagePart> messageParts = (multipartAlternative != null && multipartAlternative.getParts() != null)
+            ? multipartAlternative.getParts() : parts;
+
+        String bodyPlain = "";
+        String bodyHtml = "";
+
+        List<MessagePartHeader> messagePartHeaders = payload.getHeaders();
+
+        String contentType = messagePartHeaders.stream()
+            .filter(header -> Objects.equals(header.getName(), "Content-Type"))
+            .map(MessagePartHeader::getValue)
+            .findFirst()
+            .orElse("text/plain");
+
+        if (contentType.startsWith("multipart/")) {
+            for (MessagePart messagePart : messageParts) {
+                String mimeType = messagePart.getMimeType();
+
+                if (mimeType.equals("text/plain")) {
+                    bodyPlain = new String(messagePart.getBody()
+                        .decodeData(), StandardCharsets.UTF_8);
+                } else if (mimeType.equals("text/html")) {
+                    bodyHtml = new String(messagePart.getBody()
+                        .decodeData(), StandardCharsets.UTF_8);
+                }
+            }
+        } else {
+            MessagePartBody messagePartBody = payload.getBody();
+
+            bodyPlain = new String(messagePartBody.decodeData(), StandardCharsets.UTF_8);
+        }
+
+        List<FileEntry> fileEntries = getFileEntries(message, actionContext, service);
+
+        return createSimpleMessage(message, messagePartHeaders, bodyPlain, bodyHtml, fileEntries);
+    }
+
+    private static SimpleMessage createSimpleMessage(
+        Message message, List<MessagePartHeader> messagePartHeaders, String bodyPlain, String bodyHtml,
+        List<FileEntry> fileEntries) {
+
+        String subject = null;
+        String from = null;
+        List<String> to = null;
+        List<String> cc = null;
+        List<String> bcc = null;
+
+        for (MessagePartHeader messagePartHeader : messagePartHeaders) {
+            if ("Subject".equals(messagePartHeader.getName())) {
+                subject = messagePartHeader.getValue();
+            } else if ("From".equals(messagePartHeader.getName())) {
+                from = messagePartHeader.getValue();
+            } else if ("To".equals(messagePartHeader.getName())) {
+                to = Arrays.stream(messagePartHeader.getValue()
+                    .split(","))
+                    .toList();
+            } else if ("Cc".equals(messagePartHeader.getName())) {
+                cc = Arrays.stream(messagePartHeader.getValue()
+                    .split(","))
+                    .toList();
+            } else if ("Bcc".equals(messagePartHeader.getName())) {
+                bcc = Arrays.stream(messagePartHeader.getValue()
+                    .split(","))
+                    .toList();
+            }
+        }
+
+        return new SimpleMessage(
+            message.getId(), message.getThreadId(), message.getHistoryId(), subject, from, to, cc, bcc, bodyPlain,
+            bodyHtml, fileEntries);
+    }
+
+    private static List<FileEntry> getFileEntries(
+        Message message, ActionContext actionContext, Gmail service)
+        throws IOException {
+
+        MessagePart payload = message.getPayload();
+        List<MessagePart> parts = payload.getParts();
+
+        List<FileEntry> fileEntries = new ArrayList<>();
+
+        for (MessagePart messagePart : parts) {
+            String mimeType = messagePart.getMimeType();
+
+            if (!mimeType.startsWith("multipart/alternative") &&
+                !mimeType.startsWith("text/plain") &&
+                !mimeType.startsWith("text/html")) {
+                MessagePartBody messagePartBody = messagePart.getBody();
+
+                MessagePartBody attachment = getAttachment(service, message.getId(),
+                    messagePartBody.getAttachmentId());
+
+                fileEntries.add(actionContext.file(
+                    file -> file.storeContent(messagePart.getFilename(), attachment.getData())));
+            }
+        }
+        return fileEntries;
+    }
+
+    private static MessagePartBody getAttachment(Gmail service, String messageId, String attachmentId)
+        throws IOException {
+
+        return service.users()
+            .messages()
+            .attachments()
+            .get(ME, messageId, attachmentId)
+            .execute();
+    }
+
+    public static List<Option<String>> getThreadIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) throws IOException {
+
+        List<Thread> threads = GoogleServices.getMail(connectionParameters)
+            .users()
+            .threads()
+            .list(ME)
+            .execute()
+            .getThreads();
+
+        List<Option<String>> options = new ArrayList<>();
+
+        for (Thread thread : threads) {
+            options.add(option(thread.getId(), thread.getId()));
+        }
+
+        return options;
+    }
+
     public static Message sendMail(Gmail service, Message message) throws IOException {
         return service
             .users()
@@ -434,7 +449,7 @@ public class GoogleMailUtils {
             .execute();
     }
 
-    public record MessageCustom(
+    public record SimpleMessage(
         String id, String threadId, BigInteger historyId, String subject, String from, List<String> to,
         List<String> cc, List<String> bcc, String bodyPlain, String bodyHtml,
         List<FileEntry> attachments) {
