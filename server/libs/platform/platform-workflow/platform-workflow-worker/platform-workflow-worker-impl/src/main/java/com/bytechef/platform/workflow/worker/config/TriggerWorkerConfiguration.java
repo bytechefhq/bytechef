@@ -21,7 +21,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.worker.TriggerWorker;
 import com.bytechef.platform.workflow.worker.executor.TriggerWorkerExecutor;
-import com.bytechef.platform.workflow.worker.trigger.factory.TriggerHandlerFactory;
+import com.bytechef.platform.workflow.worker.trigger.TriggerHandlerFactory;
 import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandler;
 import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandlerRegistry;
 import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandlerResolver;

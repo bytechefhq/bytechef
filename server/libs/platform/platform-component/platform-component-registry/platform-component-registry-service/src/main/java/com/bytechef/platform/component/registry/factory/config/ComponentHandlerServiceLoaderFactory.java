@@ -17,7 +17,7 @@
 package com.bytechef.platform.component.registry.factory.config;
 
 import com.bytechef.component.ComponentHandler;
-import com.bytechef.platform.component.factory.ComponentHandlerFactory;
+import com.bytechef.platform.component.ComponentHandlerFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 

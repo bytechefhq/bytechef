@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.worker.task.factory;
+package com.bytechef.atlas.worker.task;
 
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 
 /**
  * @author Ivica Cardic
  */
-public interface TaskDispatcherAdapterFactory {
+public interface DynamicTaskHandlerFactory {
 
-    TaskHandler<?> create(TaskHandlerResolver taskHandlerResolver);
-
-    String getName();
+    TaskHandler<?> getTaskHandler(String type);
 }

@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.registry.definition.factory;
+package com.bytechef.platform.component.registry.definition;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.platform.component.registry.definition.ActionContextImpl;
-import com.bytechef.platform.component.registry.definition.ContextImpl;
-import com.bytechef.platform.component.registry.definition.HttpClientExecutor;
-import com.bytechef.platform.component.registry.definition.TriggerContextImpl;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.data.storage.DataStorage;
@@ -30,14 +26,13 @@ import com.bytechef.platform.file.storage.FilesFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
 @Component
-public class ContextFactory {
+public class ContextFactoryImpl implements ContextFactory {
 
     private final DataStorage dataStorage;
     private final ApplicationEventPublisher eventPublisher;
@@ -45,9 +40,9 @@ public class ContextFactory {
     private final HttpClientExecutor httpClientExecutor;
 
     @SuppressFBWarnings("EI")
-    public ContextFactory(
-        DataStorage dataStorage, ApplicationEventPublisher eventPublisher,
-        FilesFileStorage filesFileStorage, HttpClientExecutor httpClientExecutor) {
+    public ContextFactoryImpl(
+        DataStorage dataStorage, ApplicationEventPublisher eventPublisher, FilesFileStorage filesFileStorage,
+        HttpClientExecutor httpClientExecutor) {
 
         this.dataStorage = dataStorage;
         this.eventPublisher = eventPublisher;
@@ -55,23 +50,27 @@ public class ContextFactory {
         this.httpClientExecutor = httpClientExecutor;
     }
 
+    @Override
     public ActionContext createActionContext(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, @Nullable AppType type,
-        @Nullable Long instanceId, @Nullable Long instanceWorkflowId, @Nullable Long jobId,
-        @Nullable ComponentConnection connection) {
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, AppType type,
+        Long instanceId, Long instanceWorkflowId, Long jobId, ComponentConnection connection) {
 
         return new ActionContextImpl(
             componentName, componentVersion, actionName, type, instanceId, instanceWorkflowId, jobId,
             connection, dataStorage, eventPublisher, filesFileStorage, httpClientExecutor);
     }
 
-    public Context createContext(@NonNull String componentName, @Nullable ComponentConnection connection) {
-        return new ContextImpl(componentName, -1, null, connection, httpClientExecutor);
+    @Override
+    public Context createContext(
+        @NonNull String componentName, ComponentConnection connection) {
+
+        return new ContextImpl(componentName, -1, null, filesFileStorage, connection, httpClientExecutor);
     }
 
+    @Override
     public TriggerContext createTriggerContext(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName, @Nullable AppType type,
-        @Nullable String workflowReferenceCode, @Nullable ComponentConnection connection) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName, AppType type,
+        String workflowReferenceCode, ComponentConnection connection) {
 
         return new TriggerContextImpl(
             componentName, componentVersion, triggerName, type, workflowReferenceCode, connection, dataStorage,
