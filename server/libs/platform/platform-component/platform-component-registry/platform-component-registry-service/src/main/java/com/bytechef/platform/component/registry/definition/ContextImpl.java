@@ -18,17 +18,20 @@ package com.bytechef.platform.component.registry.definition;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.XmlUtils;
-import com.bytechef.component.definition.ComponentDSL.ModifiableValueProperty;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.FileEntry;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
-import com.bytechef.definition.BaseOutputDefinition;
-import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
-import com.bytechef.platform.registry.util.SchemaUtils;
+import com.bytechef.platform.file.storage.FilesFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +46,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ContextImpl implements Context {
 
+    private final File file;
     private final Http http;
     private final Json json;
     private final Logger logger;
@@ -50,15 +54,24 @@ public class ContextImpl implements Context {
 
     @SuppressFBWarnings("EI")
     public ContextImpl(
-        String componentName, int componentVersion, String componentOperationName, ComponentConnection connection,
-        HttpClientExecutor httpClientExecutor) {
+        String componentName, int componentVersion, String componentOperationName, FilesFileStorage filesFileStorage,
+        ComponentConnection connection, HttpClientExecutor httpClientExecutor) {
 
+        this.file = new FileImpl(filesFileStorage);
         this.http = new HttpImpl(
             componentName, componentVersion, componentOperationName, connection, this, httpClientExecutor);
         this.json = new JsonImpl();
         this.logger = new LoggerImpl(componentName, componentOperationName);
-        this.output = new OutputImpl();
         this.xml = new XmlImpl();
+    }
+
+    @Override
+    public <R> R file(ContextFunction<File, R> fileFunction) {
+        try {
+            return fileFunction.apply(file);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     @Override
@@ -83,17 +96,6 @@ public class ContextImpl implements Context {
     public void logger(ContextConsumer<Logger> loggerConsumer) {
         try {
             loggerConsumer.accept(logger);
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public BaseOutputDefinition.OutputResponse output(
-        ContextFunction<Output, BaseOutputDefinition.OutputResponse> outputFunction) {
-
-        try {
-            return outputFunction.apply(this.output);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -270,6 +272,69 @@ public class ContextImpl implements Context {
         }
     }
 
+    private record FileImpl(FilesFileStorage filesFileStorage) implements File {
+
+        @Override
+        public InputStream getStream(FileEntry fileEntry) {
+            return filesFileStorage.getFileStream(((FileEntryImpl) fileEntry).getFileEntry());
+        }
+
+        @Override
+        public String readToString(FileEntry fileEntry) {
+            return filesFileStorage.readFileToString(((FileEntryImpl) fileEntry).getFileEntry());
+        }
+
+        @Override
+        public FileEntry storeContent(String fileName, String data) {
+            return new FileEntryImpl(filesFileStorage.storeFileContent(fileName, data));
+        }
+
+        @Override
+        public java.io.File toTempFile(FileEntry fileEntry) {
+            Path path = toTempFilePath(fileEntry);
+
+            return path.toFile();
+        }
+
+        @Override
+        public Path toTempFilePath(FileEntry fileEntry) {
+            Path tempFilePath;
+
+            try {
+                tempFilePath = Files.createTempFile("context_", fileEntry.getName());
+
+                Files.copy(
+                    filesFileStorage.getFileStream(toFileEntry(fileEntry)), tempFilePath,
+                    StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            return tempFilePath;
+        }
+
+        @Override
+        public byte[] readAllBytes(FileEntry fileEntry) throws IOException {
+            InputStream inputStream = getStream(fileEntry);
+
+            return inputStream.readAllBytes();
+        }
+
+        @Override
+        public FileEntry storeContent(String fileName, InputStream inputStream) {
+            try {
+                return new FileEntryImpl(filesFileStorage.storeFileContent(fileName, inputStream));
+            } catch (Exception exception) {
+                throw new RuntimeException("Unable to store file " + fileName);
+            }
+        }
+
+        private static com.bytechef.file.storage.domain.FileEntry toFileEntry(FileEntry fileEntry) {
+            return new com.bytechef.file.storage.domain.FileEntry(
+                fileEntry.getName(), fileEntry.getExtension(), fileEntry.getMimeType(), fileEntry.getUrl());
+        }
+    }
+
     private record JsonImpl() implements Json {
 
         @Override
@@ -423,8 +488,8 @@ public class ContextImpl implements Context {
         private final org.slf4j.Logger logger;
 
         public LoggerImpl(String componentName, String componentOperationName) {
-            logger = LoggerFactory
-                .getLogger(componentName + (componentOperationName == null ? "" : "." + componentOperationName));
+            logger = LoggerFactory.getLogger(
+                componentName + (componentOperationName == null ? "" : "." + componentOperationName));
         }
 
         @Override
@@ -595,5 +660,4 @@ public class ContextImpl implements Context {
             return XmlUtils.write(object, rootName);
         }
     }
-
 }

@@ -37,6 +37,13 @@ import java.util.stream.Stream;
 public interface Context {
 
     /**
+     * @param fileFunction
+     * @param <R>
+     * @return
+     */
+    <R> R file(ContextFunction<File, R> fileFunction);
+
+    /**
      *
      * @param httpFunction
      * @return

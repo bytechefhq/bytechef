@@ -38,12 +38,8 @@ public interface ActionContext extends Context {
     void event(Consumer<Event> eventConsumer);
 
     /**
-     * @param fileFunction
-     * @param <R>
-     * @return
+     *
      */
-    <R> R file(ContextFunction<File, R> fileFunction);
-
     interface Event {
         /**
          * @param progress
