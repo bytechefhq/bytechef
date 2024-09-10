@@ -19,7 +19,7 @@ package com.bytechef.platform.component.facade;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.exception.ProviderException;
-import com.bytechef.platform.component.definition.ActionContextImpl;
+import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ContextFactory;
 import com.bytechef.platform.component.domain.ComponentConnection;
 import com.bytechef.platform.component.domain.Option;
@@ -168,7 +168,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         @NonNull Map<String, ?> inputParameters, ComponentConnection componentConnection,
         @NonNull ActionContext actionContext) {
 
-        ActionContextImpl actionContextImpl = (ActionContextImpl) actionContext;
+        ActionContextAware actionContextAware = (ActionContextAware) actionContext;
 
         return tokenRefreshHelper.executeSingleConnectionFunction(
             componentName, componentVersion, componentConnection, actionContext,
@@ -177,9 +177,9 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
                 componentName, componentVersion, actionName, inputParameters, componentConnection1,
                 actionContext1),
             componentConnection1 -> contextFactory.createActionContext(
-                componentName, componentVersion, actionName, actionContextImpl.getType(),
-                actionContextImpl.getInstanceId(), actionContextImpl.getInstanceWorkflowId(),
-                actionContextImpl.getJobId(), componentConnection));
+                componentName, componentVersion, actionName, actionContextAware.getType(),
+                actionContextAware.getInstanceId(), actionContextAware.getInstanceWorkflowId(),
+                actionContextAware.getJobId(), componentConnection));
     }
 
     @Override

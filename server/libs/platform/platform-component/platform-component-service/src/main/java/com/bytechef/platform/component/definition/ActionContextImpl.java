@@ -33,7 +33,7 @@ import org.springframework.context.ApplicationEventPublisher;
 /**
  * @author Ivica Cardic
  */
-public class ActionContextImpl extends ContextImpl implements ActionContext, ActionContextAware {
+class ActionContextImpl extends ContextImpl implements ActionContext, ActionContextAware {
 
     private final Data data;
     private final Event event;
