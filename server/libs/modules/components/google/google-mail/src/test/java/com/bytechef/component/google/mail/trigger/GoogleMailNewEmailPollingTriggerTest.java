@@ -27,8 +27,8 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
-import com.bytechef.test.component.properties.ParametersFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.Gmail.Users;
 import com.google.api.services.gmail.Gmail.Users.Messages;
@@ -62,7 +62,7 @@ class GoogleMailNewEmailPollingTriggerTest {
         List<Message> messages = List.of(new Message().setId("abc"));
         LocalDateTime startDate = LocalDateTime.of(2000, 1, 1, 1, 1, 1);
 
-        Parameters parameters = ParametersFactory.createParameters(Map.of(LAST_TIME_CHECKED, startDate));
+        Parameters parameters = MockParametersFactory.create(Map.of(LAST_TIME_CHECKED, startDate));
 
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
             googleServicesMockedStatic

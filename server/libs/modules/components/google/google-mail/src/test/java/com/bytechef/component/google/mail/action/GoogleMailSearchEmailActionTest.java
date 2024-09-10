@@ -32,7 +32,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.test.component.properties.ParametersFactory;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.ListMessagesResponse;
 import java.io.IOException;
@@ -61,7 +61,7 @@ class GoogleMailSearchEmailActionTest extends AbstractGoogleMailActionTest {
     void testPerform() throws IOException {
         List<String> labelIDs = List.of("id1", "id2");
 
-        Parameters parameters = ParametersFactory.createParameters(
+        Parameters parameters = MockParametersFactory.create(
             Map.of(FROM, "from@mail.com", TO, "to@mail.com", SUBJECT, "subject", BODY, "body", MAX_RESULTS, 1L,
                 PAGE_TOKEN, "pageToken", CATEGORY, "social", LABEL, "label", LABEL_IDS, List.of("id1", "id2"),
                 INCLUDE_SPAM_TRASH, true));

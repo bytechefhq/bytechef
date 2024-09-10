@@ -37,7 +37,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.monday.constant.MondayColumnType;
-import com.bytechef.test.component.properties.ParametersFactory;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -50,7 +50,7 @@ class MondayOptionUtilsTest {
 
     private final List<Option<String>> expectedOptions = List.of(option("name", "123"));
     private final Context mockedContext = mock(Context.class);
-    private final Parameters parameters = ParametersFactory.createParameters(
+    private final Parameters parameters = MockParametersFactory.create(
         Map.of(WORKSPACE_ID, "abc", BOARD_ID, "abc"));
 
     @Test

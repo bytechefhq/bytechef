@@ -29,8 +29,8 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.sheets.util.GoogleSheetsRowUtils;
 import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
-import com.bytechef.test.component.properties.ParametersFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import java.util.HashMap;
@@ -59,7 +59,7 @@ class GoogleSheetsCreateColumnActionTest {
     void perform() throws Exception {
         List<Object> newHeaders = List.of("header1", "header2", "header3", "new column");
 
-        Parameters parameters = ParametersFactory.createParameters(
+        Parameters parameters = MockParametersFactory.create(
             Map.of(SPREADSHEET_ID, "spreadsheetId", SHEET_NAME, "name", COLUMN_NAME, "new column"));
 
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);

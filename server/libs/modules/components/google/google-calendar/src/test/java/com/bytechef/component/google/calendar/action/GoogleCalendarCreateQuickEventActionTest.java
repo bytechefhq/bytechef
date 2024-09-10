@@ -28,8 +28,8 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
-import com.bytechef.test.component.properties.ParametersFactory;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import java.io.IOException;
@@ -51,7 +51,7 @@ class GoogleCalendarCreateQuickEventActionTest {
     private final Calendar.Events mockedEvents = mock(Calendar.Events.class);
     private final Calendar.Events.QuickAdd mockedQuickAdd = mock(Calendar.Events.QuickAdd.class);
     private final ArgumentCaptor<String> sendUpdatesArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final Parameters parameters = ParametersFactory.createParameters(
+    private final Parameters parameters = MockParametersFactory.create(
         Map.of(CALENDAR_ID, "calendarId", TEXT, "text", SEND_UPDATES, "sendUpdates"));
 
     @Test

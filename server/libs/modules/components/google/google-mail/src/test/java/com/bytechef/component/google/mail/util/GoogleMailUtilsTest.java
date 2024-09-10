@@ -43,8 +43,8 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
-import com.bytechef.test.component.properties.ParametersFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Label;
 import com.google.api.services.gmail.model.ListLabelsResponse;
@@ -107,7 +107,7 @@ class GoogleMailUtilsTest {
 
     @Test
     void testGetLabelIdOptions() throws IOException {
-        parameters = ParametersFactory.createParameters(Map.of(ACCESS_TOKEN, "id"));
+        parameters = MockParametersFactory.create(Map.of(ACCESS_TOKEN, "id"));
 
         List<Label> labels = List.of(new Label().setName("label1"), new Label().setName("label2"));
 
@@ -141,7 +141,7 @@ class GoogleMailUtilsTest {
 
     @Test
     void testGetMessage() throws IOException {
-        parameters = ParametersFactory.createParameters(
+        parameters = MockParametersFactory.create(
             Map.of(FORMAT, FULL, ID, "id", METADATA_HEADERS, List.of("metadata")));
 
         Message message = new Message().setId("id");
@@ -169,7 +169,7 @@ class GoogleMailUtilsTest {
 
     @Test
     void testGetMessageIdOptions() throws IOException {
-        parameters = ParametersFactory.createParameters(Map.of(ACCESS_TOKEN, "id"));
+        parameters = MockParametersFactory.create(Map.of(ACCESS_TOKEN, "id"));
 
         List<Message> messages = List.of(new Message().setId("id1"), new Message().setId("id2"));
 
@@ -226,7 +226,7 @@ class GoogleMailUtilsTest {
 
     @Test
     void testGetThreadIdOptions() throws IOException {
-        parameters = ParametersFactory.createParameters(Map.of(ACCESS_TOKEN, "id"));
+        parameters = MockParametersFactory.create(Map.of(ACCESS_TOKEN, "id"));
 
         List<Thread> threads = List.of(new Thread().setId("id1"), new Thread().setId("id2"));
 

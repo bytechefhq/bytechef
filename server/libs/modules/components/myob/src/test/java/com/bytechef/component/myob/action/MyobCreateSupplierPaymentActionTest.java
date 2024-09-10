@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.test.component.properties.ParametersFactory;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -46,7 +46,7 @@ class MyobCreateSupplierPaymentActionTest {
 
     @Test
     void testPerform() {
-        Parameters parameters = ParametersFactory.createParameters(Map.of(PAY_FROM, ACCOUNT,
+        Parameters parameters = MockParametersFactory.create(Map.of(PAY_FROM, ACCOUNT,
             ACCOUNT, "123", SUPPLIER, "abc"));
 
         when(mockedContext.http(any()))

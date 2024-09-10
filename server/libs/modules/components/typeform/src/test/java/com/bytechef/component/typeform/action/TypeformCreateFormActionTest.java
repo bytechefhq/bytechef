@@ -29,7 +29,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.test.component.properties.ParametersFactory;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -47,7 +47,7 @@ class TypeformCreateFormActionTest {
 
     @Test
     void testPerform() {
-        Parameters parameters = ParametersFactory.createParameters(
+        Parameters parameters = MockParametersFactory.create(
             Map.of(TITLE, "new form", TYPE, "quiz", WORKSPACE, "url"));
 
         when(mockedActionContext.http(any()))

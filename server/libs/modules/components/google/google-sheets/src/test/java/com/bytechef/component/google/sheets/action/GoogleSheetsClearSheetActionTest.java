@@ -26,8 +26,8 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
-import com.bytechef.test.component.properties.ParametersFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetResponse;
@@ -53,7 +53,7 @@ class GoogleSheetsClearSheetActionTest {
     private final ActionContext mockedContext = mock(ActionContext.class);
     private final Sheets mockedSheets = mock(Sheets.class);
     private final Sheets.Spreadsheets mockedSpreadsheets = mock(Sheets.Spreadsheets.class);
-    private final Parameters parameters = ParametersFactory.createParameters(
+    private final Parameters parameters = MockParametersFactory.create(
         Map.of(SPREADSHEET_ID, "spreadsheetId", SHEET_ID, 123, IS_THE_FIRST_ROW_HEADER, true));
     private final ArgumentCaptor<String> spreadsheetIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
 

@@ -48,7 +48,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.monday.constant.MondayColumnType;
-import com.bytechef.test.component.properties.ParametersFactory;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +63,7 @@ class MondayPropertiesUtilsTest {
     private static final String LABEL = "label";
 
     private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Parameters parameters = ParametersFactory.createParameters(Map.of(BOARD_ID, "board"));
+    private final Parameters parameters = MockParametersFactory.create(Map.of(BOARD_ID, "board"));
 
     @Test
     void testCreatePropertiesForItem() {

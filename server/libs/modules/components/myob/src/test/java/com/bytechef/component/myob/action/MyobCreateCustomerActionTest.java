@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.test.component.properties.ParametersFactory;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -48,7 +48,7 @@ class MyobCreateCustomerActionTest {
     @Test
     void testPerform() {
         Map<String, Object> propertyStubsMap = createPropertyStubsMap();
-        Parameters parameters = ParametersFactory.createParameters(propertyStubsMap);
+        Parameters parameters = MockParametersFactory.create(propertyStubsMap);
 
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);

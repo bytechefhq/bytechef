@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.test.component.properties.ParametersFactory;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +41,7 @@ class TrelloCreateCardActionTest extends AbstractTrelloActionTest {
 
     @Test
     void testPerform() {
-        Parameters parameters = ParametersFactory.createParameters(
+        Parameters parameters = MockParametersFactory.create(
             Map.of(ID_LIST, "abc", NAME, "new card", DESC, "new card description"));
 
         when(mockedResponse.getBody(any(TypeReference.class)))

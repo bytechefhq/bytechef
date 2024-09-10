@@ -40,7 +40,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.monday.util.MondayUtils;
-import com.bytechef.test.component.properties.ParametersFactory;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -60,7 +60,7 @@ class MondayNewItemInBoardTriggerTest {
     private final HttpParameters mockedHttpParameters = mock(HttpParameters.class);
     private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    private final Parameters parameters = ParametersFactory.createParameters(Map.of(BOARD_ID, "board"));
+    private final Parameters parameters = MockParametersFactory.create(Map.of(BOARD_ID, "board"));
 
     @Test
     void testWebhookEnable() {

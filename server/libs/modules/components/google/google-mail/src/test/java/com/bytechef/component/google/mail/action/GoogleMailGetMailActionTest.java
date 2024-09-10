@@ -25,7 +25,7 @@ import static org.mockito.Mockito.mockStatic;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;
-import com.bytechef.test.component.properties.ParametersFactory;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import com.google.api.services.gmail.model.Message;
 import java.io.IOException;
 import java.util.Map;
@@ -42,7 +42,7 @@ class GoogleMailGetMailActionTest extends AbstractGoogleMailActionTest {
 
     @Test
     void testPerform() throws IOException {
-        Parameters parameters = ParametersFactory.createParameters(Map.of(FORMAT, MINIMAL));
+        Parameters parameters = MockParametersFactory.create(Map.of(FORMAT, MINIMAL));
 
         try (MockedStatic<GoogleMailUtils> googleMailUtilsMockedStatic = mockStatic(GoogleMailUtils.class)) {
             googleMailUtilsMockedStatic.when(() -> GoogleMailUtils.getMessage(parameters, mockedGmail))
@@ -56,7 +56,7 @@ class GoogleMailGetMailActionTest extends AbstractGoogleMailActionTest {
 
     @Test
     void testPerformForSimpleFormat() throws IOException {
-        Parameters parameters = ParametersFactory.createParameters(Map.of(FORMAT, SIMPLE));
+        Parameters parameters = MockParametersFactory.create(Map.of(FORMAT, SIMPLE));
 
         try (MockedStatic<GoogleMailUtils> googleMailUtilsMockedStatic = mockStatic(GoogleMailUtils.class)) {
             googleMailUtilsMockedStatic.when(() -> GoogleMailUtils.getMessage(parameters, mockedGmail))

@@ -34,8 +34,8 @@ import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
-import com.bytechef.test.component.properties.ParametersFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.Gmail.Users;
 import com.google.api.services.gmail.Gmail.Users.Messages;
@@ -97,7 +97,7 @@ class GoogleMailNewEmailTriggerTest {
         mockedGoogleServices.when(() -> GoogleServices.getMail(any(Parameters.class)))
             .thenReturn(mockedGmail);
 
-        parameters = ParametersFactory.createParameters(Map.of(ACCESS_TOKEN, "id", TOPIC_NAME, "topic"));
+        parameters = MockParametersFactory.create(Map.of(ACCESS_TOKEN, "id", TOPIC_NAME, "topic"));
     }
 
     @AfterEach
