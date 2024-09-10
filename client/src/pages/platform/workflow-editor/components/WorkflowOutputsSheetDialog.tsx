@@ -117,26 +117,24 @@ const WorkflowOutputsSheetDialog = ({
         );
     }
 
-    const actionDefinitions = workflowNodeOutputs
-        ?.filter((workflowNodeOutput) => workflowNodeOutput?.actionDefinition)
-        .map((workflowNodeOutput) => workflowNodeOutput.actionDefinition!);
+    const componentProperties = componentDefinitions
+        ?.filter((componentDefinition) => componentDefinition.name !== 'manual')
+        ?.map((componentDefinition, index) => {
+            if (componentDefinition.name === 'manual') {
+                return;
+            }
 
-    const componentProperties = componentDefinitions?.map((componentDefinition, index) => {
-        if (!actionDefinitions) {
-            return;
-        }
+            const outputSchemaDefinition: PropertyAllType | undefined = workflowNodeOutputs?.[index]?.outputSchema;
 
-        const outputSchemaDefinition: PropertyAllType | undefined = workflowNodeOutputs?.[index]?.outputSchema;
+            const properties = outputSchemaDefinition?.properties?.length
+                ? outputSchemaDefinition.properties
+                : outputSchemaDefinition?.items;
 
-        const properties = outputSchemaDefinition?.properties?.length
-            ? outputSchemaDefinition.properties
-            : outputSchemaDefinition?.items;
-
-        return {
-            componentDefinition,
-            properties,
-        };
-    });
+            return {
+                componentDefinition,
+                properties,
+            };
+        });
 
     const dataPills = componentProperties
         ? getDataPillsFromProperties(componentProperties, workflow, currentWorkflow.nodeNames)
