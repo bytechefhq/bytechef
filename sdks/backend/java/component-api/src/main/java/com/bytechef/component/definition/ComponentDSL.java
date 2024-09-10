@@ -1656,7 +1656,7 @@ public final class ComponentDSL {
 
         private DataStreamItemWriter dataStreamItemWriter;
         private List<? extends Property> properties;
-        private SyncType syncType;
+        private List<StreamType> streamTypes;
 
         public ModifiableDataStreamWriterDefinition(DataStreamItemWriter dataStreamItemWriter) {
             this.dataStreamItemWriter = dataStreamItemWriter;
@@ -1676,8 +1676,10 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableDataStreamWriterDefinition syncType(SyncType syncType) {
-            this.syncType = syncType;
+        public ModifiableDataStreamWriterDefinition syncType(StreamType... streamTypes) {
+            if (streamTypes != null) {
+                this.streamTypes = List.of(streamTypes);
+            }
 
             return this;
         }
@@ -1693,12 +1695,12 @@ public final class ComponentDSL {
             }
 
             return Objects.equals(dataStreamItemWriter, that.dataStreamItemWriter)
-                && Objects.equals(properties, that.properties) && Objects.equals(syncType, that.syncType);
+                && Objects.equals(properties, that.properties) && Objects.equals(streamTypes, that.streamTypes);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(dataStreamItemWriter, properties, syncType);
+            return Objects.hash(dataStreamItemWriter, properties, streamTypes);
         }
 
         @Override
@@ -1707,8 +1709,8 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<SyncType> getSyncType() {
-            return Optional.ofNullable(syncType);
+        public Optional<List<StreamType>> getStreamTypes() {
+            return Optional.ofNullable(streamTypes);
         }
 
         @Override

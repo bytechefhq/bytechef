@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.data.stream.item;
+package com.bytechef.component.datastream.handler;
 
-import java.util.Map;
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.ItemStreamWriter;
+import static com.bytechef.platform.component.definition.DataStreamComponentDefinition.DATA_STREAM;
+
+import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.registry.handler.AbstractTaskHandler;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-public class DataStreamItemWriter implements ItemStreamWriter<Map<String, ?>> {
+@Component(DATA_STREAM + "/v1/sync")
+public class DataStreamSyncTaskHandler extends AbstractTaskHandler {
 
-    @Override
-    public void write(Chunk<? extends Map<String, ?>> chunk) throws Exception {
-
+    public DataStreamSyncTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
+        super("dataStream", 1, "sync", actionDefinitionFacade);
     }
 }

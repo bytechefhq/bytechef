@@ -14,24 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.data.stream.item;
+package com.bytechef.component.datastream.item;
 
 import java.util.Map;
-import org.springframework.batch.item.ItemStreamReader;
-import org.springframework.batch.item.ItemStreamSupport;
-import org.springframework.batch.item.NonTransientResourceException;
-import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.batch.item.ItemProcessor;
 
 /**
  * @author Ivica Cardic
  */
-public class DataStreamItemReader extends ItemStreamSupport implements ItemStreamReader<Map<String, ?>> {
+public class DataStreamItemProcessor implements ItemProcessor<Map<String, ?>, Map<String, ?>> {
 
     @Override
-    public Map<String, ?> read()
-        throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
-
-        return null;
+    public Map<String, ?> process(Map<String, ?> item) throws Exception {
+        return item;
     }
 }

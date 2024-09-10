@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.data.stream.listener;
+package com.bytechef.component.datastream.listener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
