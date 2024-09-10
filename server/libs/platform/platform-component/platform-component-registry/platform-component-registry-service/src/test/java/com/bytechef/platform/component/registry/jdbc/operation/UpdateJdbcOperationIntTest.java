@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.component.registry.jdbc.operation;
 
-import static com.bytechef.platform.component.registry.jdbc.constant.JdbcConstants.FIELDS;
-import static com.bytechef.platform.component.registry.jdbc.constant.JdbcConstants.FIELD_VALUES;
+import static com.bytechef.platform.component.registry.jdbc.constant.JdbcConstants.COLUMNS;
+import static com.bytechef.platform.component.registry.jdbc.constant.JdbcConstants.ROWS;
 import static com.bytechef.platform.component.registry.jdbc.constant.JdbcConstants.SCHEMA;
 import static com.bytechef.platform.component.registry.jdbc.constant.JdbcConstants.TABLE;
 import static com.bytechef.platform.component.registry.jdbc.constant.JdbcConstants.UPDATE_KEY;
@@ -80,8 +80,8 @@ public class UpdateJdbcOperationIntTest {
     @Test
     public void testUpdate() {
         Map<String, ?> inputParameters = Map.of(
-            FIELDS, List.of("name"),
-            FIELD_VALUES, List.of(Map.of("id", "id2", "name", "name3")),
+            COLUMNS, List.of("name"),
+            ROWS, List.of(Map.of("id", "id2", "name", "name3")),
             SCHEMA, "public",
             TABLE, "test",
             UPDATE_KEY, "id");
