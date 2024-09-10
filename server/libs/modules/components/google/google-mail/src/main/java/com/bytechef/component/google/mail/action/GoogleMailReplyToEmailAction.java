@@ -27,10 +27,10 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BC
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BODY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.CC;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.EMAIL_PROPERTY;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FULL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.LABEL_IDS;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.REPLY_TO;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SUBJECT;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.THREAD_ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TO;
 import static com.bytechef.component.google.mail.util.GoogleMailUtils.getEncodedEmail;
@@ -38,7 +38,9 @@ import static com.bytechef.component.google.mail.util.GoogleMailUtils.sendMail;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.google.mail.util.GoogleMailUtils;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
@@ -48,20 +50,21 @@ import java.io.IOException;
 /**
  * @author Monika Kušter
  */
-public class GoogleMailSendEmailAction {
+public class GoogleMailReplyToEmailAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendEmail")
-        .title("Send Email")
-        .description("Sends the specified message to the recipients in the To, Cc, and Bcc headers.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("replyToEmail")
+        .title("Reply to Email")
+        .description("Send a reply to an email message.")
         .properties(
+            string(ID)
+                .label("Message ID")
+                .description("The ID of the message to reply to.")
+                .options((ActionOptionsFunction<String>) GoogleMailUtils::getMessageIdOptions)
+                .required(true),
             array(TO)
                 .label("To")
                 .description("Recipients email addresses.")
                 .items(EMAIL_PROPERTY)
-                .required(true),
-            string(SUBJECT)
-                .label("Subject")
-                .description("Subject of the email.")
                 .required(true),
             array(BCC)
                 .label("Bcc")
@@ -71,11 +74,6 @@ public class GoogleMailSendEmailAction {
             array(CC)
                 .label("Cc")
                 .description("Cc recipients email addresses.")
-                .items(EMAIL_PROPERTY)
-                .required(false),
-            array(REPLY_TO)
-                .label("Reply to")
-                .description("Reply-to email addresses.")
                 .items(EMAIL_PROPERTY)
                 .required(false),
             string(BODY)
@@ -94,22 +92,29 @@ public class GoogleMailSendEmailAction {
                         array(LABEL_IDS)
                             .items(string()),
                         string(THREAD_ID))))
-        .perform(GoogleMailSendEmailAction::perform);
+        .perform(GoogleMailReplyToEmailAction::perform);
 
-    private GoogleMailSendEmailAction() {
+    private GoogleMailReplyToEmailAction() {
     }
 
     public static Message perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws IOException, MessagingException {
 
-        Gmail service = GoogleServices.getMail(connectionParameters);
+        Gmail gmail = GoogleServices.getMail(connectionParameters);
 
-        Message message = new Message();
+        Message message = gmail.users()
+            .messages()
+            .get(ME, inputParameters.getRequiredString(ID))
+            .setFormat(FULL)
+            .execute();
 
-        message.setRaw(getEncodedEmail(inputParameters, actionContext, null));
+        Message newMessage = new Message();
 
-        return sendMail(service, message);
+        newMessage.setRaw(getEncodedEmail(inputParameters, actionContext, message));
+        newMessage.setThreadId(message.getThreadId());
+        newMessage.setHistoryId(message.getHistoryId());
+
+        return sendMail(gmail, newMessage);
     }
-
 }

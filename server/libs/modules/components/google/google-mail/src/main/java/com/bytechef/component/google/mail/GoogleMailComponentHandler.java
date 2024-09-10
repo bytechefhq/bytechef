@@ -18,13 +18,13 @@ package com.bytechef.component.google.mail;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.google.mail.connection.GoogleMailConnection.CONNECTION_DEFINITION;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.GOOGLE_MAIL;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.google.mail.action.GoogleMailGetMailAction;
 import com.bytechef.component.google.mail.action.GoogleMailGetThreadAction;
+import com.bytechef.component.google.mail.action.GoogleMailReplyToEmailAction;
 import com.bytechef.component.google.mail.action.GoogleMailSearchEmailAction;
 import com.bytechef.component.google.mail.action.GoogleMailSendEmailAction;
 import com.bytechef.component.google.mail.trigger.GoogleMailNewEmailPollingTrigger;
@@ -32,12 +32,12 @@ import com.bytechef.component.google.mail.trigger.GoogleMailNewEmailTrigger;
 import com.google.auto.service.AutoService;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 @AutoService(ComponentHandler.class)
 public class GoogleMailComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(GOOGLE_MAIL)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("googleMail")
         .title("Google Mail")
         .description(
             "Google Mail, commonly known as Gmail, is a widely used email service by Google, offering free and " +
@@ -48,6 +48,7 @@ public class GoogleMailComponentHandler implements ComponentHandler {
         .connection(CONNECTION_DEFINITION)
         .actions(GoogleMailGetMailAction.ACTION_DEFINITION,
             GoogleMailGetThreadAction.ACTION_DEFINITION,
+            GoogleMailReplyToEmailAction.ACTION_DEFINITION,
             GoogleMailSearchEmailAction.ACTION_DEFINITION,
             GoogleMailSendEmailAction.ACTION_DEFINITION)
         .triggers(
