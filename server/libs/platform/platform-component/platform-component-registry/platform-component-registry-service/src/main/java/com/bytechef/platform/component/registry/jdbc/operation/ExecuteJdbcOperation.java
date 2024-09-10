@@ -20,24 +20,19 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.registry.jdbc.JdbcExecutor;
 import com.bytechef.platform.component.registry.jdbc.constant.JdbcConstants;
 import java.util.Map;
+import javax.sql.DataSource;
 
 /**
  * @author Ivica Cardic
  */
 public class ExecuteJdbcOperation implements JdbcOperation<Map<String, Integer>> {
 
-    private final JdbcExecutor jdbcExecutor;
-
-    public ExecuteJdbcOperation(JdbcExecutor jdbcExecutor) {
-        this.jdbcExecutor = jdbcExecutor;
-    }
-
     @Override
-    public Map<String, Integer> execute(Map<String, ?> inputParameters, Map<String, ?> connectionParameters) {
+    public Map<String, Integer> execute(Map<String, ?> inputParameters, DataSource dataSource) {
         String executeStatement = MapUtils.getRequiredString(inputParameters, JdbcConstants.EXECUTE);
         Map<String, ?> parameterMap = MapUtils.getMap(inputParameters, JdbcConstants.PARAMETERS, Map.of());
 
-        int rowsAffected = jdbcExecutor.update(connectionParameters, executeStatement, parameterMap);
+        int rowsAffected = JdbcExecutor.update(executeStatement, parameterMap, dataSource);
 
         return Map.of("rows", rowsAffected);
     }

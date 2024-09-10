@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.registry.jdbc.operation;
+package com.bytechef.platform.component.registry.datastream;
 
-import java.util.Map;
-import javax.sql.DataSource;
+import static com.bytechef.component.definition.ComponentDSL.writer;
+
+import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.DataStreamDefinition;
 
 /**
  * @author Ivica Cardic
- *
- * @param <T>
  */
-public interface JdbcOperation<T> {
+public class JdbcDataStream {
 
-    T execute(Map<String, ?> inputParameters, DataSource dataSource);
+    public static DataStreamDefinition dataStream(String databaseJdbcName, String jdbcDriverClassName) {
+        return ComponentDSL.dataStream(writer(new JdbcDataStreamItemWriter(databaseJdbcName, jdbcDriverClassName)));
+    };
 }

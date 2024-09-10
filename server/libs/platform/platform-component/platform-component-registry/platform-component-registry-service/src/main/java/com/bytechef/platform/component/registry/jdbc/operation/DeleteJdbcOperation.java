@@ -24,6 +24,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
+import javax.sql.DataSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 
 /**
@@ -31,32 +33,26 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
  */
 public class DeleteJdbcOperation implements JdbcOperation<Map<String, Integer>> {
 
-    private final JdbcExecutor jdbcExecutor;
-
-    public DeleteJdbcOperation(JdbcExecutor jdbcExecutor) {
-        this.jdbcExecutor = jdbcExecutor;
-    }
-
     @Override
-    public Map<String, Integer> execute(Map<String, ?> inputParameters, Map<String, ?> connectionParameters) {
+    public Map<String, Integer> execute(Map<String, ?> inputParameters, DataSource dataSource) {
         Map<String, Integer> result;
 
         String deleteKey = MapUtils.getString(inputParameters, JdbcConstants.DELETE_KEY, "id");
         List<Map<String, ?>> rows = MapUtils.getList(
-            inputParameters, JdbcConstants.FIELD_VALUES, new TypeReference<>() {}, Collections.emptyList());
+            inputParameters, JdbcConstants.ROWS, new TypeReference<>() {}, Collections.emptyList());
         String schema = MapUtils.getString(inputParameters, JdbcConstants.SCHEMA, "public");
         String table = MapUtils.getRequiredString(inputParameters, JdbcConstants.TABLE);
 
         if (rows.isEmpty()) {
             result = Map.of("rows", 0);
         } else {
-            int[] rowsAffected = jdbcExecutor.batchUpdate(
-                connectionParameters,
+            int[] rowsAffected = JdbcExecutor.batchUpdate(
                 "DELETE FROM %s.%s WHERE %s=:%s".formatted(schema, table, deleteKey, deleteKey),
-                SqlParameterSourceUtils.createBatch(rows.toArray()));
+                SqlParameterSourceUtils.createBatch(rows.toArray()), dataSource);
 
-            result = Map.of("rows", Arrays.stream(rowsAffected)
-                .sum());
+            IntStream stream = Arrays.stream(rowsAffected);
+
+            result = Map.of("rows", stream.sum());
         }
 
         return result;

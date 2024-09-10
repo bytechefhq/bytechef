@@ -17,11 +17,10 @@
 package com.bytechef.platform.component.registry.jdbc.operation;
 
 import com.bytechef.platform.component.registry.config.JacksonConfiguration;
-import com.bytechef.platform.component.registry.jdbc.DataSourceFactory;
-import com.bytechef.platform.component.registry.jdbc.JdbcExecutor;
 import com.bytechef.platform.component.registry.jdbc.constant.JdbcConstants;
 import com.bytechef.platform.component.registry.jdbc.operation.config.JdbcOperationIntTestConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
@@ -30,10 +29,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 /**
  * @author Ivica Cardic
@@ -46,9 +44,6 @@ public class QueryJdbcOperationIntTest {
 
     @Autowired
     private DataSource dataSource;
-
-    @Autowired
-    private QueryJdbcOperation queryJdbcOperation;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -73,36 +68,14 @@ public class QueryJdbcOperationIntTest {
     }
 
     @Test
-    public void testQuery() {
+    public void testQuery() throws SQLException {
         Map<String, ?> inputParameters = Map.of(
             JdbcConstants.PARAMETERS, Map.of("id", "id2"),
             JdbcConstants.QUERY, "SELECT count(*) FROM test where id=:id");
 
-        List<Map<String, Object>> result = queryJdbcOperation.execute(inputParameters, Map.of());
+        List<Map<String, Object>> result = new QueryJdbcOperation().execute(
+            inputParameters, new SingleConnectionDataSource(dataSource.getConnection(), false));
 
         Assertions.assertEquals(1, result.size());
-    }
-
-    @TestConfiguration
-    public static class InsertJdbcActionIntTestConfiguration {
-
-        @Autowired
-        private DataSource dataSource;
-
-        @Bean
-        QueryJdbcOperation queryJdbcOperation() {
-            return new QueryJdbcOperation(new JdbcExecutor(
-                null,
-                new DataSourceFactory() {
-
-                    @Override
-                    public DataSource getDataSource(
-                        Map<String, ?> connectionParameters, String databaseJdbcName, String jdbcDriverClassNamee) {
-
-                        return dataSource;
-                    }
-                },
-                null));
-        }
     }
 }
