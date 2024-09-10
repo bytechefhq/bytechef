@@ -88,8 +88,6 @@ dependencies {
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-service"))
     implementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-file-storage:platform-data-storage-file-storage-service"))
     implementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-jdbc:platform-data-storage-jdbc-service"))
-    implementation(project(":server:libs:platform:platform-data-sync:platform-data-sync-configuration:platform-data-sync-configuration-rest"))
-    implementation(project(":server:libs:platform:platform-data-sync:platform-data-sync-configuration:platform-data-sync-configuration-service"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-service"))
     implementation(project(":server:libs:platform:platform-rest:platform-rest-impl"))
