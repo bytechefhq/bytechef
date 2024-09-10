@@ -1,7 +1,7 @@
 import PageLoader from '@/components/PageLoader';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
-import ProjectHeader from '@/pages/automation/project/components/ProjectHeader';
 import ProjectVersionHistorySheet from '@/pages/automation/project/components/ProjectVersionHistorySheet';
+import ProjectHeader from '@/pages/automation/project/components/project-header/ProjectHeader';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {
     ConnectionReactQueryProvider,
