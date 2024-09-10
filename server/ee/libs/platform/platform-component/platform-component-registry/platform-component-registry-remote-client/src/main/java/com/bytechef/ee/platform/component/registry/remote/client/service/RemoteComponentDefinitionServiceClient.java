@@ -8,6 +8,8 @@
 package com.bytechef.ee.platform.component.registry.remote.client.service;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.component.definition.DataStreamItemReader;
+import com.bytechef.component.definition.DataStreamItemWriter;
 import com.bytechef.ee.discovery.util.WorkerDiscoveryUtils;
 import com.bytechef.ee.platform.component.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.ee.remote.client.DefaultRestClient;
@@ -96,6 +98,16 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
     public List<ComponentDefinition> getDataStreamComponentDefinitions(ComponentType componentType) {
         // TODO
 
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public DataStreamItemReader getDataStreamItemReader(String componentName, int componentVersion) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public DataStreamItemWriter getDataStreamItemWriter(String componentName, int componentVersion) {
         throw new UnsupportedOperationException();
     }
 

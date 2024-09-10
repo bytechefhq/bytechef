@@ -17,7 +17,9 @@
 package com.bytechef.platform.component.registry.service;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.component.definition.DataStreamDefinition;
+import com.bytechef.component.definition.DataStreamItemReader;
+import com.bytechef.component.definition.DataStreamItemWriter;
 import com.bytechef.platform.component.definition.DataStreamComponentDefinition.ComponentType;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
@@ -90,13 +92,43 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
             .stream()
             .filter(componentDefinition -> {
                 if (componentType == ComponentType.SOURCE) {
-                    return OptionalUtils.isPresent(componentDefinition.getDataStreamItemReader());
+                    return componentDefinition.getDataStream()
+                        .flatMap(DataStreamDefinition::getReader)
+                        .isPresent();
                 } else {
-                    return OptionalUtils.isPresent(componentDefinition.getDataStreamItemWriter());
+                    return componentDefinition.getDataStream()
+                        .flatMap(DataStreamDefinition::getWriter)
+                        .isPresent();
                 }
             })
             .map(ComponentDefinition::new)
             .toList();
+    }
+
+    @Override
+    public DataStreamItemReader getDataStreamItemReader(String componentName, int componentVersion) {
+        com.bytechef.component.definition.ComponentDefinition componentDefinition =
+            componentDefinitionRegistry.getComponentDefinition(componentName, componentVersion);
+
+        return componentDefinition.getDataStream()
+            .flatMap(DataStreamDefinition::getReader)
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Data stream item reader for component: %s, version: %d not found".formatted(
+                    componentName, componentVersion)))
+            .getDataStreamItemReader();
+    }
+
+    @Override
+    public DataStreamItemWriter getDataStreamItemWriter(String componentName, int componentVersion) {
+        com.bytechef.component.definition.ComponentDefinition componentDefinition =
+            componentDefinitionRegistry.getComponentDefinition(componentName, componentVersion);
+
+        return componentDefinition.getDataStream()
+            .flatMap(DataStreamDefinition::getWriter)
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Data stream item writer with component: %s, version: %d not found".formatted(
+                    componentName, componentVersion)))
+            .getDataStreamItemWriter();
     }
 
     @Override

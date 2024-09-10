@@ -48,7 +48,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ScriptComponentDefinition;
 import com.bytechef.platform.component.exception.ComponentConfigurationException;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
-import com.bytechef.platform.component.registry.definition.ParametersImpl;
+import com.bytechef.platform.component.registry.definition.ParametersFactory;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.ConnectionDefinition;
 import com.bytechef.platform.component.registry.domain.OAuth2AuthorizationParameters;
@@ -95,7 +95,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
         try {
             return OptionalUtils.get(authorization.getAcquire())
-                .apply(new ParametersImpl(connectionParameters), context);
+                .apply(ParametersFactory.createParameters(connectionParameters), context);
         } catch (Exception e) {
             throw new ComponentConfigurationException(e, ConnectionDefinitionErrorType.EXECUTE_ACQUIRE);
         }
@@ -113,7 +113,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             authorization.getApply(), getDefaultApply(authorization.getType()));
 
         try {
-            return applyFunction.apply(new ParametersImpl(connectionParameters), context);
+            return applyFunction.apply(ParametersFactory.createParameters(connectionParameters), context);
         } catch (Exception e) {
             throw new ComponentConfigurationException(e, ConnectionDefinitionErrorType.EXECUTE_AUTHORIZATION_APPLY);
         }
@@ -163,8 +163,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
         try {
             return authorizationCallbackFunction.apply(
-                new ParametersImpl(connectionParameters), MapUtils.getString(connectionParameters, CODE),
-                redirectUri, verifier, context);
+                ParametersFactory.createParameters(connectionParameters),
+                MapUtils.getString(connectionParameters, CODE), redirectUri, verifier, context);
         } catch (Exception e) {
             throw new ComponentConfigurationException(
                 e, ConnectionDefinitionErrorType.EXECUTE_AUTHORIZATION_CALLBACK);
@@ -183,7 +183,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 connectionDefinition.getBaseUri(),
                 (connectionParameters, context1) -> getDefaultBaseUri(connectionParameters));
 
-        return Optional.ofNullable(baseUriFunction.apply(new ParametersImpl(connection.parameters()), context));
+        return Optional.ofNullable(
+            baseUriFunction.apply(ParametersFactory.createParameters(connection.parameters()), context));
     }
 
     @Override
@@ -216,7 +217,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                         context1))));
 
         try {
-            return refreshFunction.apply(new ParametersImpl(connectionParameters), context);
+            return refreshFunction.apply(ParametersFactory.createParameters(connectionParameters), context);
 
         } catch (Exception exception) {
             throw new ComponentConfigurationException(
@@ -311,7 +312,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 authorization.getOAuth2AuthorizationExtraQueryParameters(),
                 (connectionParameters, context1) -> Map.of());
 
-        ParametersImpl connectionParameters = new ParametersImpl(authorizationParams);
+        Parameters connectionParameters = ParametersFactory.createParameters(authorizationParams);
 
         try {
             return new OAuth2AuthorizationParameters(

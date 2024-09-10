@@ -36,6 +36,5 @@ public interface MultipleConnectionsPerformFunction extends ActionDefinition.Per
      */
     Object apply(
         Parameters inputParameters, Map<String, ? extends ParameterConnection> parameterConnections,
-        ActionContext context)
-        throws Exception;
+        Parameters extensions, ActionContext context) throws Exception;
 }

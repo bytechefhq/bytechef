@@ -67,8 +67,7 @@ public class ComponentDefinitionWrapper extends AbstractComponentDefinitionWrapp
             ", triggers=" + triggers +
             ", resources=" + resources +
             ", tags=" + tags +
-            ", dataStreamItemReader=" + dataStreamItemReader +
-            ", dataStreamItemWriter=" + dataStreamItemWriter +
+            ", dataStreamDefinition=" + dataStreamDefinition +
             ", metadata=" + metadata +
             ", icon='" + icon + '\'' +
             "} ";

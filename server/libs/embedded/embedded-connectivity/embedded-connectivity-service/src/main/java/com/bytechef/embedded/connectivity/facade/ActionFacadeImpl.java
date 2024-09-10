@@ -39,6 +39,6 @@ public class ActionFacadeImpl implements ActionFacade {
         // TODO connection
 
         return actionDefinitionFacade.executePerform(
-            componentName, componentVersion, actionName, AppType.EMBEDDED, null, null, null, input, Map.of());
+            componentName, componentVersion, actionName, AppType.EMBEDDED, null, null, null, input, Map.of(), Map.of());
     }
 }

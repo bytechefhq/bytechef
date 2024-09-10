@@ -37,8 +37,8 @@ public interface ActionDefinitionService {
     /**
      * Executes the routine for dynamic resolution of particular properties required for component action to properly
      * execute {@link #executeSingleConnectionPerform(String, int, String, Map, ComponentConnection, ActionContext)} or
-     * {@link #executeMultipleConnectionsPerform(String, int, String, Map, Map, ActionContext)} methods. Duration is
-     * unpredictable as it may require connecting to outer APIs/microservices/platforms. Method is only called in
+     * {@link #executeMultipleConnectionsPerform(String, int, String, Map, Map, Map, ActionContext)} methods. Duration
+     * is unpredictable as it may require connecting to outer APIs/microservices/platforms. Method is only called in
      * designTime, never in runtime. Every change of lookupDependsOnPaths parameter triggers this method to
      * automatically update the dependent propertyName.
      *
@@ -64,7 +64,7 @@ public interface ActionDefinitionService {
     OutputResponse executeMultipleConnectionsOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, @NonNull Map<String, ComponentConnection> connections,
-        @NonNull ActionContext context);
+        @NonNull Map<String, ?> extensions, @NonNull ActionContext context);
 
     /**
      * Executes the action of particular component version which define perform function via
@@ -76,6 +76,7 @@ public interface ActionDefinitionService {
      * @param actionName       action name
      * @param inputParameters  key-value collection of parameters required by business logic
      * @param connections      collection of connections used to connect to outer sources
+     * @param extensions
      * @param context          additional technical data required by some actions
      * @return result of execution or throws exceptions
      * @throws {@link com.bytechef.platform.component.exception.ComponentExecutionException} - if procession breaks
@@ -85,7 +86,7 @@ public interface ActionDefinitionService {
     Object executeMultipleConnectionsPerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, @NonNull Map<String, ComponentConnection> connections,
-        @NonNull ActionContext context);
+        Map<String, ?> extensions, @NonNull ActionContext context);
 
     List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
