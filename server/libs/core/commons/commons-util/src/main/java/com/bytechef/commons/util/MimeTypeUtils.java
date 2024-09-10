@@ -18,7 +18,7 @@ package com.bytechef.commons.util;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
-import org.springframework.util.MimeType;
+//import org.springframework.util.MimeType;
 
 /**
  * Map file extensions to MIME types. Based on the Apache mime.types file. http://www.iana.org/assignments/media-types/
@@ -493,13 +493,11 @@ public class MimeTypeUtils {
      */
     public static String getDefaultExt(String mimeType) {
         String ext = lookupExt(mimeType);
+
         if (ext == null) {
             ext = "unknown";
         }
-        return ext;
-    }
 
-    public static MimeType parseMimeType(String mimeType) {
-        return org.springframework.util.MimeTypeUtils.parseMimeType(mimeType);
+        return ext;
     }
 }

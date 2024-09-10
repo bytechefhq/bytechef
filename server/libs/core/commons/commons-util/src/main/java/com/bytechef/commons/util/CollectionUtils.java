@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.apache.commons.lang3.Validate;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -194,7 +193,7 @@ public final class CollectionUtils {
                 .findFirst());
     }
 
-    public static boolean isEmpty(@Nullable Collection<?> collection) {
+    public static boolean isEmpty(Collection<?> collection) {
         return collection == null || collection.isEmpty();
     }
 

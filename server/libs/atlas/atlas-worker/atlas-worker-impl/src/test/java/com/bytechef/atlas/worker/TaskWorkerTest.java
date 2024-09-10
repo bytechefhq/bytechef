@@ -36,7 +36,6 @@ import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.atlas.worker.event.CancelControlTaskEvent;
 import com.bytechef.atlas.worker.event.TaskExecutionEvent;
 import com.bytechef.atlas.worker.exception.TaskExecutionException;
-import com.bytechef.commons.util.FileSystemUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
@@ -199,7 +198,7 @@ public class TaskWorkerTest {
                     return taskExecution -> new File(MapUtils.getString(taskExecution.getParameters(), "path"))
                         .mkdirs();
                 } else if ("rm".equals(type)) {
-                    return taskExecution -> FileSystemUtils.deleteRecursively(
+                    return taskExecution -> org.springframework.util.FileSystemUtils.deleteRecursively(
                         new File(MapUtils.getString(taskExecution.getParameters(), "path")));
                 } else if ("pass".equals(type)) {
                     Assertions.assertTrue(new File(tempDir).exists());
@@ -260,7 +259,7 @@ public class TaskWorkerTest {
                     return taskExecution -> new File(MapUtils.getString(taskExecution.getParameters(), "path"))
                         .mkdirs();
                 } else if ("rm".equals(type)) {
-                    return taskExecution -> FileSystemUtils.deleteRecursively(
+                    return taskExecution -> org.springframework.util.FileSystemUtils.deleteRecursively(
                         new File(MapUtils.getString(taskExecution.getParameters(), "path")));
                 } else if ("rogue".equals(type)) {
                     Assertions.assertTrue(new File(tempDir).exists());
