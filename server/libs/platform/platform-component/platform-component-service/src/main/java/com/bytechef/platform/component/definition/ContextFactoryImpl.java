@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class ContextFactoryImpl implements ContextFactory {
+class ContextFactoryImpl implements ContextFactory {
 
     private final DataStorage dataStorage;
     private final ApplicationEventPublisher eventPublisher;

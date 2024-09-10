@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Ivica Cardic
  */
-public class ContextImpl implements Context {
+class ContextImpl implements Context {
 
     private final File file;
     private final Http http;
