@@ -19,6 +19,7 @@ package com.bytechef.platform.component.registry.domain;
 import static com.bytechef.component.definition.Authorization.AuthorizationType.CUSTOM;
 
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.component.definition.ParameterConnection;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -44,6 +45,12 @@ public record ComponentConnection(
                 throw new IllegalArgumentException("Authorization name must not be empty or blank");
             }
         }
+    }
+
+    public Map<String, ?> getConnectionParameters() {
+        return MapUtils.concatDifferentTypes(
+            getParameters(),
+            authorizationName() == null ? Map.of() : Map.of(Authorization.AUTHORIZATION_TYPE, authorizationName()));
     }
 
     @Override

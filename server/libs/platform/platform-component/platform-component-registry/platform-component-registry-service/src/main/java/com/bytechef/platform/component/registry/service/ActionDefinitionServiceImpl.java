@@ -207,7 +207,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         try {
             BaseOutputDefinition.OutputResponse outputResponse = singleConnectionOutputFunction.apply(
-                new ParametersImpl(inputParameters), ParametersImpl.getConnectionParameters(connection), context);
+                ParametersFactory.createParameters(inputParameters),
+                connection == null ? null : ParametersFactory.createParameters(connection.getConnectionParameters()),
+                context);
 
             if (outputResponse == null) {
                 return null;
@@ -240,7 +242,10 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         try {
             return singleConnectionPerformFunction.apply(
-                new ParametersImpl(inputParameters), ParametersImpl.getConnectionParameters(connection), context);
+                ParametersFactory.createParameters(inputParameters),
+                connection == null
+                    ? null : ParametersFactory.createParameters(connection.getConnectionParameters()),
+                context);
         } catch (Exception e) {
             if (e instanceof ProviderException) {
                 throw (ProviderException) e;
