@@ -21,6 +21,7 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.definition.PropertyFactory;
+import com.bytechef.platform.component.domain.NullProperty;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
@@ -106,7 +107,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             workflowNodeType.componentName(), workflowNodeType.componentVersion(),
             workflowNodeType.componentOperationName(), inputParameters, connectionIds);
 
-        if (outputResponse == null) {
+        if (outputResponse == null || outputResponse.outputSchema() instanceof NullProperty) {
+
             return null;
         }
 
