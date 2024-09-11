@@ -18,12 +18,20 @@ package com.bytechef.component.google.calendar.util;
 
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ALL_DAY;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_TYPE;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FROM;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.MAX_RESULTS;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.Q;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TO;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.google.calendar.constant.GoogleCalendarConstants;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.client.util.DateTime;
+import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.CalendarListEntry;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttachment;
@@ -75,6 +83,14 @@ public class GoogleCalendarUtils {
         return eventDateTime;
     }
 
+    public static CustomEvent createCustomEvent(Event event) {
+        return new CustomEvent(
+            event.getICalUID(), event.getId(), event.getSummary(), event.getDescription(),
+            convertEventDateTimeToLocalDateTime(event.getStart()), convertEventDateTimeToLocalDateTime(event.getEnd()),
+            event.getEtag(), event.getEventType(), event.getHtmlLink(), event.getStatus(), event.getLocation(),
+            event.getHangoutLink(), event.getAttendees(), event.getAttachments(), event.getReminders());
+    }
+
     public static List<Option<String>> getCalendarIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) throws IOException {
@@ -96,12 +112,62 @@ public class GoogleCalendarUtils {
         return options;
     }
 
-    public static CustomEvent createCustomEvent(Event event) {
-        return new CustomEvent(
-            event.getICalUID(), event.getId(), event.getSummary(), event.getDescription(),
-            convertEventDateTimeToLocalDateTime(event.getStart()), convertEventDateTimeToLocalDateTime(event.getEnd()),
-            event.getEtag(), event.getEventType(), event.getHtmlLink(), event.getStatus(), event.getLocation(),
-            event.getHangoutLink(), event.getAttendees(), event.getAttachments(), event.getReminders());
+    public static List<CustomEvent> getCustomEvents(Parameters inputParameters, Parameters connectionParameters)
+        throws IOException {
+
+        Calendar calendar = GoogleServices.getCalendar(connectionParameters);
+
+        List<Event> items = calendar.events()
+            .list(inputParameters.getRequiredString(CALENDAR_ID))
+            .setEventTypes(inputParameters.getList(EVENT_TYPE, String.class, List.of()))
+            .setMaxResults(inputParameters.getInteger(MAX_RESULTS))
+            .setQ(inputParameters.getString(Q))
+            .execute()
+            .getItems();
+
+        Map<String, LocalDateTime> timePeriod =
+            inputParameters.getMap(GoogleCalendarConstants.DATE_RANGE, LocalDateTime.class, Map.of());
+
+        LocalDateTime from = timePeriod.get(FROM);
+        LocalDateTime to = timePeriod.get(TO);
+
+        if (from == null && to == null) {
+            return convertToCustomEvents(items);
+        } else if (from != null && to == null) {
+            List<Event> result = items.stream()
+                .filter(event -> convertEventDateTimeToLocalDateTime(event.getEnd()).isAfter(from))
+                .toList();
+
+            return convertToCustomEvents(result);
+
+        } else if (from == null) {
+            List<Event> result = items.stream()
+                .filter(event -> convertEventDateTimeToLocalDateTime(event.getStart()).isBefore(to))
+                .toList();
+
+            return convertToCustomEvents(result);
+        } else {
+            List<Event> result = new ArrayList<>();
+
+            for (Event event : items) {
+                LocalDateTime startLocalDateTime = convertEventDateTimeToLocalDateTime(event.getStart());
+                LocalDateTime endLocalDateTime = convertEventDateTimeToLocalDateTime(event.getEnd());
+
+                if ((startLocalDateTime.isAfter(from) && startLocalDateTime.isBefore(to)) ||
+                    (endLocalDateTime.isAfter(from) && endLocalDateTime.isBefore(to)) ||
+                    (startLocalDateTime.isBefore(from) && endLocalDateTime.isAfter(to))) {
+                    result.add(event);
+                }
+            }
+
+            return convertToCustomEvents(result);
+        }
+    }
+
+    private static List<CustomEvent> convertToCustomEvents(List<Event> eventList) {
+        return eventList.stream()
+            .map(GoogleCalendarUtils::createCustomEvent)
+            .toList();
     }
 
     @SuppressFBWarnings("EI")
