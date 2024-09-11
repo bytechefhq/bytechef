@@ -46,6 +46,7 @@ public class GoogleCalendarConstants {
     public static final String DISPLAY_NAME = "displayName";
     public static final String EMAIL = "email";
     public static final String END = "end";
+    public static final String EVENT_ID = "eventId";
     public static final String EVENT_TYPE = "eventType";
     public static final String GUEST_CAN_INVITE_OTHERS = "guestsCanInviteOthers";
     public static final String GUEST_CAN_MODIFY = "guestsCanModify";

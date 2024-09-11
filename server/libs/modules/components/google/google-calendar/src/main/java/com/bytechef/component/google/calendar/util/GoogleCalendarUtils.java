@@ -170,6 +170,30 @@ public class GoogleCalendarUtils {
             .toList();
     }
 
+    public static List<Option<String>> getEventIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) throws IOException {
+
+        Calendar calendar = GoogleServices.getCalendar(connectionParameters);
+
+        List<Event> events = calendar
+            .events()
+            .list(inputParameters.getRequiredString(CALENDAR_ID))
+            .execute()
+            .getItems();
+
+        List<Option<String>> options = new ArrayList<>();
+
+        for (Event event : events) {
+            String id = event.getId();
+            String summary = event.getSummary();
+
+            options.add(option(summary != null && !summary.isEmpty() ? summary : id, id));
+        }
+
+        return options;
+    }
+
     @SuppressFBWarnings("EI")
     public record CustomEvent(
         String iCalUID, String id, String summary, String description, LocalDateTime startTime, LocalDateTime endTime,
