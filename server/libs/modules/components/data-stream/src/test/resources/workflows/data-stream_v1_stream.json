@@ -1,0 +1,50 @@
+{
+  "label" : "Data Stream - Stream operation",
+  "description" : "",
+  "inputs" : [ ],
+  "triggers" : [ {
+    "label" : "Manual",
+    "name" : "trigger_1",
+    "type" : "manual/v1/manual"
+  } ],
+  "tasks" : [ {
+    "label" : "Filesystem",
+    "name" : "filesystem_1",
+    "parameters" : {
+      "filename" : "/tmp/data.csv"
+    },
+    "type" : "filesystem/v1/readFile",
+    "metadata" : {
+      "ui" : {
+        "dynamicPropertyTypes" : { }
+      }
+    }
+  }, {
+    "label" : "Data Stream",
+    "name" : "dataStream_1",
+    "parameters" : {
+      "transformation" : 2,
+      "source" : {
+        "fileEntry" : "${filesystem_1}"
+      },
+      "destination" : {
+        "table" : "csv",
+        "columns" : [ "column1", "column2" ]
+      }
+    },
+    "type" : "dataStream/v1/stream",
+    "source" : {
+      "componentName" : "csvFile",
+      "componentVersion" : 1
+    },
+    "destination" : {
+      "componentName" : "postgresql",
+      "componentVersion" : 1
+    },
+    "metadata" : {
+      "ui" : {
+        "dynamicPropertyTypes" : { }
+      }
+    }
+  } ]
+}
