@@ -17,6 +17,7 @@
 package com.bytechef.embedded.configuration.connected.user.token.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.embedded.configuration.connected.user.token.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.embedded.configuration.facade.IntegrationFacade;
 import com.bytechef.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.embedded.configuration.public_.web.rest.model.IntegrationModel;
@@ -25,6 +26,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -55,5 +58,10 @@ public class IntegrationApiController implements IntegrationApi {
                 .stream()
                 .map(integrationDTO -> conversionService.convert(integrationDTO, IntegrationModel.class))
                 .toList());
+    }
+
+    @InitBinder
+    public void initBinder(WebDataBinder dataBinder) {
+        dataBinder.registerCustomEditor(EnvironmentModel.class, new CaseInsensitiveEnumPropertyEditorSupport());
     }
 }
