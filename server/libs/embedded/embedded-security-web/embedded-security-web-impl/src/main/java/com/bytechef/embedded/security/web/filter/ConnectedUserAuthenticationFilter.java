@@ -18,8 +18,7 @@ package com.bytechef.embedded.security.web.filter;
 
 import com.bytechef.embedded.security.web.authentication.ConnectedUserAuthenticationToken;
 import com.bytechef.platform.constant.Environment;
-import com.bytechef.platform.security.web.util.AuthTokenUtils;
-import com.bytechef.platform.security.web.util.AuthTokenUtils.AuthToken;
+import com.bytechef.platform.security.web.filter.AbstractApiKeyAuthenticationFilter;
 import com.bytechef.platform.user.service.SigningKeyService;
 import com.bytechef.tenant.TenantKey;
 import com.bytechef.tenant.util.TenantUtils;
@@ -30,66 +29,39 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Locator;
-import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.security.Key;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
-import org.springframework.security.web.util.matcher.RegexRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
  * @author Ivica Cardic
  */
-public class ConnectedUserAuthenticationFilter extends OncePerRequestFilter {
+public class ConnectedUserAuthenticationFilter extends AbstractApiKeyAuthenticationFilter {
 
-    private static final Pattern PATH_PATTERN =
-        Pattern.compile("^/api/embedded/by-connected-user-token/v[0-9]+/([^/]+)");
-    private static final RequestMatcher REQUEST_MATCHER = new NegatedRequestMatcher(
-        RegexRequestMatcher.regexMatcher("^/api/embedded/by-connected-user-token/v[0-9]+/.+"));
-
-    private final AuthenticationManager authenticationManager;
     private final SigningKeyService signingKeyService;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserAuthenticationFilter(
         AuthenticationManager authenticationManager, SigningKeyService signingKeyService) {
 
-        this.authenticationManager = authenticationManager;
+        super(
+            "/api/embedded/by-connected-user-token/v([0-9]+)/(.+)/.+", authenticationManager,
+            ConnectedUserAuthenticationFilter::getUrlItems);
+
         this.signingKeyService = signingKeyService;
     }
 
-    @Override
-    protected void doFilterInternal(
-        HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) {
+    protected Authentication getAuthentication(
+        Pattern pathPattern, UrlItemsExtractFunction urlItemsExtractFunction, HttpServletRequest request) {
 
-        Authentication authentication = getAuthentication(httpServletRequest);
+        String token = getAuthToken(request);
 
-        String tenantId = ((ConnectedUserAuthenticationToken) authentication).getTenantId();
+        UrlItems urlItems = urlItemsExtractFunction.apply(pathPattern, request);
 
-        TenantUtils.runWithTenantId(
-            tenantId,
-            () -> {
-                Authentication authenticatedAuthentication = authenticationManager.authenticate(authentication);
-
-                SecurityContext context = SecurityContextHolder.getContext();
-
-                context.setAuthentication(authenticatedAuthentication);
-
-                filterChain.doFilter(httpServletRequest, httpServletResponse);
-            });
-    }
-
-    private Authentication getAuthentication(HttpServletRequest request) {
-        AuthToken authToken = AuthTokenUtils.getAuthToken(PATH_PATTERN, request);
-
-        Jws<Claims> jws = getJws(authToken);
+        Jws<Claims> jws = getJws(urlItems.environment(), token);
 
         Claims payload = jws.getPayload();
 
@@ -100,19 +72,33 @@ public class ConnectedUserAuthenticationFilter extends OncePerRequestFilter {
         TenantKey tenantKey = TenantKey.parse(header.getKeyId());
 
         return new ConnectedUserAuthenticationToken(
-            authToken.environment(), externalUserId, tenantKey.getTenantId());
+            urlItems.environment(), urlItems.version(), externalUserId, tenantKey.getTenantId());
     }
 
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        return REQUEST_MATCHER.matches(request);
-    }
-
-    private Jws<Claims> getJws(AuthToken authToken) {
+    private Jws<Claims> getJws(Environment environment, String secretKey) {
         return Jwts.parser()
-            .keyLocator(new SigningKeyLocator(authToken.environment()))
+            .keyLocator(new SigningKeyLocator(environment))
             .build()
-            .parseSignedClaims(authToken.token());
+            .parseSignedClaims(secretKey);
+    }
+
+    private static UrlItems getUrlItems(Pattern pathPattern, HttpServletRequest request) {
+        Matcher matcher = pathPattern.matcher(request.getRequestURI());
+
+        Environment environment = null;
+        int version = 0;
+
+        if (matcher.find()) {
+            String group = matcher.group(1);
+
+            version = Integer.parseInt(group);
+
+            group = matcher.group(2);
+
+            environment = Environment.valueOf(group.toUpperCase());
+        }
+
+        return new UrlItems(environment, version);
     }
 
     private class SigningKeyLocator implements Locator<Key> {
