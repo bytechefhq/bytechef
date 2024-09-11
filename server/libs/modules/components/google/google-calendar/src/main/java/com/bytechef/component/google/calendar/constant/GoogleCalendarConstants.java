@@ -41,8 +41,7 @@ public class GoogleCalendarConstants {
     public static final String ATTACHMENTS = "attachments";
     public static final String ATTENDEES = "attendees";
     public static final String CALENDAR_ID = "calendarId";
-    public static final String DATE = "date";
-    public static final String DATE_TIME = "dateTime";
+    public static final String DATE_RANGE = "dateRange";
     public static final String DESCRIPTION = "description";
     public static final String DISPLAY_NAME = "displayName";
     public static final String EMAIL = "email";
