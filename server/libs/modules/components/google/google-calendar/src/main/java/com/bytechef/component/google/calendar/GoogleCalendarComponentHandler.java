@@ -22,6 +22,7 @@ import static com.bytechef.component.google.calendar.connection.GoogleCalendarCo
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.google.calendar.action.GoogleCalendarAddAttendeesToEventAction;
 import com.bytechef.component.google.calendar.action.GoogleCalendarCreateEventAction;
 import com.bytechef.component.google.calendar.action.GoogleCalendarCreateQuickEventAction;
 import com.bytechef.component.google.calendar.action.GoogleCalendarDeleteEventAction;
@@ -31,7 +32,7 @@ import com.bytechef.component.google.calendar.trigger.GoogleCalendarEventTrigger
 import com.google.auto.service.AutoService;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 @AutoService(ComponentHandler.class)
 public class GoogleCalendarComponentHandler implements ComponentHandler {
@@ -45,6 +46,7 @@ public class GoogleCalendarComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.CALENDARS_AND_SCHEDULING)
         .connection(CONNECTION_DEFINITION)
         .actions(
+            GoogleCalendarAddAttendeesToEventAction.ACTION_DEFINITION,
             GoogleCalendarCreateEventAction.ACTION_DEFINITION,
             GoogleCalendarCreateQuickEventAction.ACTION_DEFINITION,
             GoogleCalendarDeleteEventAction.ACTION_DEFINITION,
