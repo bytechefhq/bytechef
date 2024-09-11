@@ -5,8 +5,6 @@
   } ],
   "customAction" : true,
   "customActionHelp" : null,
-  "dataStreamItemReader" : null,
-  "dataStreamItemWriter" : null,
   "description" : "ClickUp is a cloud-based collaboration tool that offers task management, document sharing, goal tracking, and other productivity features for teams.",
   "icon" : "path:assets/clickup.svg",
   "tags" : null,
@@ -65,6 +63,8 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -74,9 +74,7 @@
       "tokenUrl" : { },
       "authorizationUrl" : { },
       "clientSecret" : null,
-      "refreshToken" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "refreshToken" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -630,9 +628,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create List",
-    "perform" : null,
+    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1384,9 +1382,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Task",
-    "perform" : null,
+    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1788,9 +1786,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Folder",
-    "perform" : null,
+    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "perform" : null
   } ],
   "triggers" : [ {
     "batch" : null,
@@ -2197,6 +2195,10 @@
     "workflowSyncExecution" : null,
     "workflowSyncValidation" : null,
     "workflowSyncOnEnableValidation" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null,
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
     "deduplicate" : null,
     "poll" : null,
     "webhookDisable" : { },
@@ -2204,11 +2206,7 @@
     "listenerDisable" : null,
     "listenerEnable" : null,
     "dwebhookRequest" : { },
-    "webhookValidate" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "webhookValidate" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2814,6 +2812,10 @@
     "workflowSyncExecution" : null,
     "workflowSyncValidation" : null,
     "workflowSyncOnEnableValidation" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null,
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
     "deduplicate" : null,
     "poll" : null,
     "webhookDisable" : { },
@@ -2821,10 +2823,7 @@
     "listenerDisable" : null,
     "listenerEnable" : null,
     "dwebhookRequest" : { },
-    "webhookValidate" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
-  } ]
+    "webhookValidate" : null
+  } ],
+  "dataStream" : null
 }

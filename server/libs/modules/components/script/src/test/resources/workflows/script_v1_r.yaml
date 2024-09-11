@@ -19,5 +19,5 @@ tasks:
     input:
       factor: "${factor}"
       var: "${var1}"
-    script: "perform <- function(input) {\n  return (2 * input$var * input$factor)\n\
+    script: "perform <- function(input, context) {\n  return (2 * input$var * input$factor)\n\
       }"

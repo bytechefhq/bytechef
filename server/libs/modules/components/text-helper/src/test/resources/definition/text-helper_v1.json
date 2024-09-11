@@ -5,8 +5,6 @@
   } ],
   "customAction" : null,
   "customActionHelp" : null,
-  "dataStreamItemReader" : null,
-  "dataStreamItemWriter" : null,
   "description" : "Helper component which contains operations to help you work with text.",
   "icon" : "path:assets/text-helper.svg",
   "tags" : null,
@@ -217,5 +215,6 @@
     "workflowNodeDescription" : null,
     "perform" : { }
   } ],
+  "dataStream" : null,
   "triggers" : null
 }

@@ -5,8 +5,6 @@
   } ],
   "customAction" : true,
   "customActionHelp" : null,
-  "dataStreamItemReader" : null,
-  "dataStreamItemWriter" : null,
   "description" : "Todoist is a task management application that helps users organize and prioritize their to-do lists.",
   "icon" : "path:assets/todoist.svg",
   "tags" : null,
@@ -1030,5 +1028,6 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "triggers" : [ ]
+  "triggers" : [ ],
+  "dataStream" : null
 }

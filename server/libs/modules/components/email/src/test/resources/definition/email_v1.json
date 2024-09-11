@@ -8,8 +8,6 @@
   } ],
   "customAction" : null,
   "customActionHelp" : null,
-  "dataStreamItemReader" : null,
-  "dataStreamItemWriter" : null,
   "description" : "The Email connector sends emails using an SMTP email server.",
   "icon" : "path:assets/email.svg",
   "tags" : null,
@@ -504,5 +502,6 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "dataStream" : null,
   "triggers" : null
 }

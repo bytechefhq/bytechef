@@ -5,8 +5,6 @@
   } ],
   "customAction" : null,
   "customActionHelp" : null,
-  "dataStreamItemReader" : null,
-  "dataStreamItemWriter" : null,
   "description" : "Sets a value which can then be referenced in other tasks.",
   "icon" : "path:assets/delay.svg",
   "tags" : null,
@@ -41,13 +39,14 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     } ],
     "title" : "Sleep",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
+  "dataStream" : null,
   "triggers" : null
 }

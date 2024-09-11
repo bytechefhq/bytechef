@@ -5,8 +5,6 @@
   } ],
   "customAction" : null,
   "customActionHelp" : null,
-  "dataStreamItemReader" : null,
-  "dataStreamItemWriter" : null,
   "description" : "Allows multiple operations over files on the filesystem.",
   "icon" : "path:assets/filesystem.svg",
   "tags" : null,
@@ -293,11 +291,11 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : {
           "bytes" : 1024
@@ -337,11 +335,11 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "INTEGER"
+          "controlType" : "INTEGER",
+          "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : {
         "bytes" : 1024
@@ -708,18 +706,18 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "INTEGER"
+              "controlType" : "INTEGER",
+              "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "ARRAY_BUILDER"
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
@@ -811,18 +809,18 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "ARRAY_BUILDER"
+        "controlType" : "ARRAY_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -1046,5 +1044,6 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "dataStream" : null,
   "triggers" : null
 }

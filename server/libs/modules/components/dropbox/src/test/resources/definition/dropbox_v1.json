@@ -5,8 +5,6 @@
   } ],
   "customAction" : null,
   "customActionHelp" : null,
-  "dataStreamItemReader" : null,
-  "dataStreamItemWriter" : null,
   "description" : "Dropbox is a file hosting service that offers cloud storage, file synchronization, personal cloud, and client software.",
   "icon" : "path:assets/dropbox.svg",
   "tags" : null,
@@ -65,6 +63,8 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationUrl" : { },
       "clientSecret" : null,
       "refreshToken" : null,
@@ -74,9 +74,7 @@
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
-      "tokenUrl" : { },
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "tokenUrl" : { }
     } ],
     "properties" : null,
     "version" : 1,
@@ -442,9 +440,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Copy",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -723,9 +721,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create new folder",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -982,9 +980,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create a new paper file",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1323,9 +1321,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Delete",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1664,9 +1662,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Get file link",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2067,9 +2065,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "List folder",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2428,9 +2426,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Move",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2911,9 +2909,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Search",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -4350,9 +4348,10 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Upload file",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "triggers" : null
+  "triggers" : null,
+  "dataStream" : null
 }

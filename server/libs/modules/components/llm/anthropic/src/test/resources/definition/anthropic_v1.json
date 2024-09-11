@@ -5,8 +5,6 @@
   } ],
   "customAction" : null,
   "customActionHelp" : null,
-  "dataStreamItemReader" : null,
-  "dataStreamItemWriter" : null,
   "description" : "Anthropic is an AI safety and research company that's working to build reliable, interpretable, and steerable AI systems.",
   "icon" : "path:assets/anthropic.svg",
   "tags" : null,
@@ -45,8 +43,6 @@
       "title" : "Bearer Token",
       "type" : "BEARER_TOKEN",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
       "refreshToken" : null,
@@ -56,7 +52,9 @@
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
-      "tokenUrl" : null
+      "tokenUrl" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -419,9 +417,10 @@
       "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "Ask",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
+  "dataStream" : null,
   "triggers" : null
 }

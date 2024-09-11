@@ -8,8 +8,6 @@
   } ],
   "customAction" : null,
   "customActionHelp" : null,
-  "dataStreamItemReader" : null,
-  "dataStreamItemWriter" : null,
   "description" : "Accelo is a cloud-based platform designed to streamline operations for service businesses by integrating project management, CRM, and billing functionalities into one unified system.",
   "icon" : "path:assets/accelo.svg",
   "tags" : null,
@@ -88,8 +86,8 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "authorizationCallback" : null,
       "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null,
       "authorizationUrl" : { },
       "clientSecret" : null,
       "refreshToken" : null,
@@ -1502,5 +1500,6 @@
     "workflowNodeDescription" : null,
     "perform" : { }
   } ],
+  "dataStream" : null,
   "triggers" : null
 }

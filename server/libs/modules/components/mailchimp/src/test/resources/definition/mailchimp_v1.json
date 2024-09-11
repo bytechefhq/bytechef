@@ -5,8 +5,6 @@
   } ],
   "customAction" : true,
   "customActionHelp" : null,
-  "dataStreamItemReader" : null,
-  "dataStreamItemWriter" : null,
   "description" : "Mailchimp is a marketing automation and email marketing platform.",
   "icon" : "path:assets/mailchimp.svg",
   "tags" : null,
@@ -65,9 +63,8 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "authorizationUrl" : { },
-      "clientSecret" : null,
-      "refreshToken" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -75,8 +72,9 @@
       "refreshUrl" : null,
       "scopes" : null,
       "tokenUrl" : { },
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null
+      "authorizationUrl" : { },
+      "clientSecret" : null,
+      "refreshToken" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -380,8 +378,8 @@
             "multipleValues" : null,
             "options" : null,
             "properties" : null,
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : "The key of this object's properties is the ID of the interest in question.",
@@ -420,8 +418,8 @@
             "multipleValues" : null,
             "options" : null,
             "properties" : null,
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : "Open and click rates for this subscriber.",
@@ -459,8 +457,8 @@
               "minValue" : null,
               "numberPrecision" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "NUMBER"
+              "controlType" : "NUMBER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : "A subscriber's average clickthrough rate.",
@@ -481,8 +479,8 @@
               "minValue" : null,
               "numberPrecision" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "NUMBER"
+              "controlType" : "NUMBER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : "Ecommerce stats for the list member if the list is attached to a store.",
@@ -520,8 +518,8 @@
                 "minValue" : null,
                 "numberPrecision" : null,
                 "options" : null,
-                "optionsDataSource" : null,
-                "controlType" : "NUMBER"
+                "controlType" : "NUMBER",
+                "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
                 "description" : "The total number of orders placed by the list member.",
@@ -542,8 +540,8 @@
                 "minValue" : null,
                 "numberPrecision" : null,
                 "options" : null,
-                "optionsDataSource" : null,
-                "controlType" : "NUMBER"
+                "controlType" : "NUMBER",
+                "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
                 "description" : "The three-letter ISO 4217 code for the currency that the store accepts.",
@@ -565,11 +563,11 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "optionsDataSource" : null,
-              "controlType" : "OBJECT_BUILDER"
+              "controlType" : "OBJECT_BUILDER",
+              "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : "IP address the subscriber signed up from.",
@@ -667,8 +665,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : "The date and time the member's info was last changed in ISO 8601 format.",
@@ -790,8 +788,8 @@
               "minValue" : null,
               "numberPrecision" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "NUMBER"
+              "controlType" : "NUMBER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : "The location longitude.",
@@ -812,8 +810,8 @@
               "minValue" : null,
               "numberPrecision" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "NUMBER"
+              "controlType" : "NUMBER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : "The time difference in hours from GMT.",
@@ -831,8 +829,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "INTEGER"
+              "controlType" : "INTEGER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : "The offset for timezones where daylight saving time is observed.",
@@ -850,8 +848,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "INTEGER"
+              "controlType" : "INTEGER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : "The unique code for the location country.",
@@ -913,8 +911,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : "The marketing permissions for the subscriber.",
@@ -1011,15 +1009,15 @@
                 } ],
                 "controlType" : "SELECT"
               } ],
-              "optionsDataSource" : null,
-              "controlType" : "OBJECT_BUILDER"
+              "controlType" : "OBJECT_BUILDER",
+              "optionsDataSource" : null
             } ],
             "maxItems" : null,
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "ARRAY_BUILDER"
+            "controlType" : "ARRAY_BUILDER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : "The most recent Note added about this member.",
@@ -1054,8 +1052,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "INTEGER"
+              "controlType" : "INTEGER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : "The date and time the note was created in ISO 8601 format.",
@@ -1117,8 +1115,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : "The source from which the subscriber was added to this list.",
@@ -1156,8 +1154,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : "Returns up to 50 tags applied to this member.",
@@ -1192,8 +1190,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "INTEGER"
+              "controlType" : "INTEGER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : "The name of the tag.",
@@ -1215,8 +1213,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : "The list id.",
@@ -1369,90 +1367,90 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "optionsDataSource" : null,
-              "controlType" : "OBJECT_BUILDER"
+              "controlType" : "OBJECT_BUILDER",
+              "optionsDataSource" : null
             } ],
             "maxItems" : null,
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "ARRAY_BUILDER"
+            "controlType" : "ARRAY_BUILDER",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : {
-          "source" : "string",
-          "consents_to_one_to_one_messaging" : true,
-          "email_client" : "string",
-          "unique_email_id" : "string",
-          "tags_count" : 0,
-          "list_id" : "string",
-          "full_name" : "string",
-          "merge_fields" : {
-            "property2" : "",
-            "property1" : ""
-          },
-          "stats" : {
-            "avg_click_rate" : 0,
-            "avg_open_rate" : 0,
-            "ecommerce_data" : {
-              "total_revenue" : 0,
-              "number_of_orders" : 0,
-              "currency_code" : "USD"
-            }
-          },
-          "contact_id" : "string",
-          "last_note" : {
-            "created_at" : "2019-08-24T14:15:22",
-            "note" : "string",
-            "created_by" : "string",
-            "note_id" : 0
-          },
-          "email_address" : "string",
-          "status" : "subscribed",
-          "unsubscribe_reason" : "string",
-          "timestamp_opt" : "2019-08-24T14:15:22",
-          "ip_opt" : "string",
-          "location" : {
-            "timezone" : "string",
-            "country_code" : "string",
-            "gmtoff" : 0,
-            "longitude" : 0,
-            "region" : "string",
-            "latitude" : 0,
-            "dstoff" : 0
-          },
-          "ip_signup" : "string",
-          "tags" : [ {
-            "id" : 0,
-            "name" : "string"
+          "last_changed" : "2019-08-24T14:15:22",
+          "vip" : true,
+          "member_rating" : 0,
+          "web_id" : 0,
+          "_links" : [ {
+            "schema" : "string",
+            "targetSchema" : "string",
+            "method" : "GET",
+            "rel" : "string",
+            "href" : "string"
           } ],
-          "marketing_permissions" : [ {
-            "text" : "string",
-            "marketing_permission_id" : "string",
-            "enabled" : true
-          } ],
-          "email_type" : "string",
-          "language" : "string",
+          "id" : "string",
+          "timestamp_signup" : "2019-08-24T14:15:22",
           "interests" : {
             "property2" : true,
             "property1" : true
           },
-          "timestamp_signup" : "2019-08-24T14:15:22",
-          "id" : "string",
-          "_links" : [ {
-            "rel" : "string",
-            "method" : "GET",
-            "targetSchema" : "string",
-            "schema" : "string",
-            "href" : "string"
+          "language" : "string",
+          "email_type" : "string",
+          "marketing_permissions" : [ {
+            "enabled" : true,
+            "marketing_permission_id" : "string",
+            "text" : "string"
           } ],
-          "web_id" : 0,
-          "member_rating" : 0,
-          "vip" : true,
-          "last_changed" : "2019-08-24T14:15:22"
+          "tags" : [ {
+            "id" : 0,
+            "name" : "string"
+          } ],
+          "ip_signup" : "string",
+          "location" : {
+            "dstoff" : 0,
+            "latitude" : 0,
+            "region" : "string",
+            "longitude" : 0,
+            "gmtoff" : 0,
+            "country_code" : "string",
+            "timezone" : "string"
+          },
+          "ip_opt" : "string",
+          "timestamp_opt" : "2019-08-24T14:15:22",
+          "unsubscribe_reason" : "string",
+          "status" : "subscribed",
+          "email_address" : "string",
+          "last_note" : {
+            "note_id" : 0,
+            "created_by" : "string",
+            "note" : "string",
+            "created_at" : "2019-08-24T14:15:22"
+          },
+          "contact_id" : "string",
+          "stats" : {
+            "avg_click_rate" : 0,
+            "ecommerce_data" : {
+              "number_of_orders" : 0,
+              "total_revenue" : 0,
+              "currency_code" : "USD"
+            },
+            "avg_open_rate" : 0
+          },
+          "merge_fields" : {
+            "property2" : "",
+            "property1" : ""
+          },
+          "full_name" : "string",
+          "list_id" : "string",
+          "tags_count" : 0,
+          "unique_email_id" : "string",
+          "email_client" : "string",
+          "consents_to_one_to_one_messaging" : true,
+          "source" : "string"
         }
       },
       "outputSchema" : {
@@ -1736,8 +1734,8 @@
           "multipleValues" : null,
           "options" : null,
           "properties" : null,
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : "The key of this object's properties is the ID of the interest in question.",
@@ -1776,8 +1774,8 @@
           "multipleValues" : null,
           "options" : null,
           "properties" : null,
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : "Open and click rates for this subscriber.",
@@ -1815,8 +1813,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "NUMBER"
+            "controlType" : "NUMBER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : "A subscriber's average clickthrough rate.",
@@ -1837,8 +1835,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "NUMBER"
+            "controlType" : "NUMBER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : "Ecommerce stats for the list member if the list is attached to a store.",
@@ -1876,8 +1874,8 @@
               "minValue" : null,
               "numberPrecision" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "NUMBER"
+              "controlType" : "NUMBER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : "The total number of orders placed by the list member.",
@@ -1898,8 +1896,8 @@
               "minValue" : null,
               "numberPrecision" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "NUMBER"
+              "controlType" : "NUMBER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : "The three-letter ISO 4217 code for the currency that the store accepts.",
@@ -1921,11 +1919,11 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : "IP address the subscriber signed up from.",
@@ -2023,8 +2021,8 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "INTEGER"
+          "controlType" : "INTEGER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : "The date and time the member's info was last changed in ISO 8601 format.",
@@ -2146,8 +2144,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "NUMBER"
+            "controlType" : "NUMBER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : "The location longitude.",
@@ -2168,8 +2166,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "NUMBER"
+            "controlType" : "NUMBER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : "The time difference in hours from GMT.",
@@ -2187,8 +2185,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : "The offset for timezones where daylight saving time is observed.",
@@ -2206,8 +2204,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : "The unique code for the location country.",
@@ -2269,8 +2267,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : "The marketing permissions for the subscriber.",
@@ -2367,15 +2365,15 @@
               } ],
               "controlType" : "SELECT"
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "ARRAY_BUILDER"
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : "The most recent Note added about this member.",
@@ -2410,8 +2408,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : "The date and time the note was created in ISO 8601 format.",
@@ -2473,8 +2471,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : "The source from which the subscriber was added to this list.",
@@ -2512,8 +2510,8 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "INTEGER"
+          "controlType" : "INTEGER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : "Returns up to 50 tags applied to this member.",
@@ -2548,8 +2546,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : "The name of the tag.",
@@ -2571,8 +2569,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : "The list id.",
@@ -2725,90 +2723,90 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "ARRAY_BUILDER"
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : {
-        "source" : "string",
-        "consents_to_one_to_one_messaging" : true,
-        "email_client" : "string",
-        "unique_email_id" : "string",
-        "tags_count" : 0,
-        "list_id" : "string",
-        "full_name" : "string",
-        "merge_fields" : {
-          "property2" : "",
-          "property1" : ""
-        },
-        "stats" : {
-          "avg_click_rate" : 0,
-          "avg_open_rate" : 0,
-          "ecommerce_data" : {
-            "total_revenue" : 0,
-            "number_of_orders" : 0,
-            "currency_code" : "USD"
-          }
-        },
-        "contact_id" : "string",
-        "last_note" : {
-          "created_at" : "2019-08-24T14:15:22",
-          "note" : "string",
-          "created_by" : "string",
-          "note_id" : 0
-        },
-        "email_address" : "string",
-        "status" : "subscribed",
-        "unsubscribe_reason" : "string",
-        "timestamp_opt" : "2019-08-24T14:15:22",
-        "ip_opt" : "string",
-        "location" : {
-          "timezone" : "string",
-          "country_code" : "string",
-          "gmtoff" : 0,
-          "longitude" : 0,
-          "region" : "string",
-          "latitude" : 0,
-          "dstoff" : 0
-        },
-        "ip_signup" : "string",
-        "tags" : [ {
-          "id" : 0,
-          "name" : "string"
+        "last_changed" : "2019-08-24T14:15:22",
+        "vip" : true,
+        "member_rating" : 0,
+        "web_id" : 0,
+        "_links" : [ {
+          "schema" : "string",
+          "targetSchema" : "string",
+          "method" : "GET",
+          "rel" : "string",
+          "href" : "string"
         } ],
-        "marketing_permissions" : [ {
-          "text" : "string",
-          "marketing_permission_id" : "string",
-          "enabled" : true
-        } ],
-        "email_type" : "string",
-        "language" : "string",
+        "id" : "string",
+        "timestamp_signup" : "2019-08-24T14:15:22",
         "interests" : {
           "property2" : true,
           "property1" : true
         },
-        "timestamp_signup" : "2019-08-24T14:15:22",
-        "id" : "string",
-        "_links" : [ {
-          "rel" : "string",
-          "method" : "GET",
-          "targetSchema" : "string",
-          "schema" : "string",
-          "href" : "string"
+        "language" : "string",
+        "email_type" : "string",
+        "marketing_permissions" : [ {
+          "enabled" : true,
+          "marketing_permission_id" : "string",
+          "text" : "string"
         } ],
-        "web_id" : 0,
-        "member_rating" : 0,
-        "vip" : true,
-        "last_changed" : "2019-08-24T14:15:22"
+        "tags" : [ {
+          "id" : 0,
+          "name" : "string"
+        } ],
+        "ip_signup" : "string",
+        "location" : {
+          "dstoff" : 0,
+          "latitude" : 0,
+          "region" : "string",
+          "longitude" : 0,
+          "gmtoff" : 0,
+          "country_code" : "string",
+          "timezone" : "string"
+        },
+        "ip_opt" : "string",
+        "timestamp_opt" : "2019-08-24T14:15:22",
+        "unsubscribe_reason" : "string",
+        "status" : "subscribed",
+        "email_address" : "string",
+        "last_note" : {
+          "note_id" : 0,
+          "created_by" : "string",
+          "note" : "string",
+          "created_at" : "2019-08-24T14:15:22"
+        },
+        "contact_id" : "string",
+        "stats" : {
+          "avg_click_rate" : 0,
+          "ecommerce_data" : {
+            "number_of_orders" : 0,
+            "total_revenue" : 0,
+            "currency_code" : "USD"
+          },
+          "avg_open_rate" : 0
+        },
+        "merge_fields" : {
+          "property2" : "",
+          "property1" : ""
+        },
+        "full_name" : "string",
+        "list_id" : "string",
+        "tags_count" : 0,
+        "unique_email_id" : "string",
+        "email_client" : "string",
+        "consents_to_one_to_one_messaging" : true,
+        "source" : "string"
       }
     },
     "properties" : [ {
@@ -3007,8 +3005,8 @@
         "multipleValues" : null,
         "options" : null,
         "properties" : null,
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : "The key of this object's properties is the ID of the interest in question.",
@@ -3047,8 +3045,8 @@
         "multipleValues" : null,
         "options" : null,
         "properties" : null,
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : "If set/detected, the subscriber's language.",
@@ -3130,8 +3128,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "NUMBER"
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : "The location longitude.",
@@ -3152,11 +3150,11 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "NUMBER"
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : "The marketing permissions for the subscriber.",
@@ -3233,15 +3231,15 @@
             } ],
             "controlType" : "SELECT"
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "ARRAY_BUILDER"
+        "controlType" : "ARRAY_BUILDER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : "IP address the subscriber signed up from.",
@@ -3361,17 +3359,18 @@
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "ARRAY_BUILDER"
+        "controlType" : "ARRAY_BUILDER",
+        "optionsDataSource" : null
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     } ],
     "title" : "Add a new member to the list",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   } ],
+  "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -3633,11 +3632,11 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "optionsDataSource" : null,
-              "controlType" : "OBJECT_BUILDER"
+              "controlType" : "OBJECT_BUILDER",
+              "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -3653,8 +3652,8 @@
             "label" : null,
             "placeholder" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "DATE_TIME"
+            "controlType" : "DATE_TIME",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -3676,8 +3675,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
@@ -3933,11 +3932,11 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -3953,8 +3952,8 @@
           "label" : null,
           "placeholder" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "DATE_TIME"
+          "controlType" : "DATE_TIME",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -3976,8 +3975,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -4011,17 +4010,17 @@
     "workflowSyncExecution" : null,
     "workflowSyncValidation" : null,
     "workflowSyncOnEnableValidation" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null,
+    "deduplicate" : null,
+    "poll" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
     "dwebhookRequest" : { },
-    "webhookValidate" : null,
-    "deduplicate" : null,
-    "poll" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null
+    "webhookValidate" : null
   } ]
 }

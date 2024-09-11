@@ -5,8 +5,6 @@
   } ],
   "customAction" : null,
   "customActionHelp" : null,
-  "dataStreamItemReader" : null,
-  "dataStreamItemWriter" : null,
   "description" : "Google Drive is a cloud storage service by Google that enables users to store, sync, share files, and collaborate online.",
   "icon" : "path:assets/google-drive.svg",
   "tags" : null,
@@ -176,9 +174,9 @@
           "optionsDataSource" : null
         },
         "sampleOutput" : {
-          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
           "mimeType" : "plain/text",
-          "name" : "new-file.txt"
+          "name" : "new-file.txt",
+          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
         }
       },
       "outputSchema" : {
@@ -263,9 +261,9 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : {
-        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
         "mimeType" : "plain/text",
-        "name" : "new-file.txt"
+        "name" : "new-file.txt",
+        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
     },
     "properties" : [ {
@@ -720,9 +718,9 @@
           "optionsDataSource" : null
         },
         "sampleOutput" : {
-          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
           "mimeType" : "plain/text",
-          "name" : "new-file.txt"
+          "name" : "new-file.txt",
+          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
         }
       },
       "outputSchema" : {
@@ -807,9 +805,9 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : {
-        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
         "mimeType" : "plain/text",
-        "name" : "new-file.txt"
+        "name" : "new-file.txt",
+        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
     },
     "properties" : [ {
@@ -952,9 +950,9 @@
           "optionsDataSource" : null
         },
         "sampleOutput" : {
-          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
           "mimeType" : "plain/text",
-          "name" : "new-file.txt"
+          "name" : "new-file.txt",
+          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
         }
       },
       "outputSchema" : {
@@ -1039,9 +1037,9 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : {
-        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
         "mimeType" : "plain/text",
-        "name" : "new-file.txt"
+        "name" : "new-file.txt",
+        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
     },
     "properties" : [ {
@@ -1145,5 +1143,6 @@
     "workflowNodeDescription" : null,
     "perform" : { }
   } ],
+  "dataStream" : null,
   "triggers" : null
 }

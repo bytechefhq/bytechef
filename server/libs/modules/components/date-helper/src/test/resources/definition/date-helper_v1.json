@@ -5,8 +5,6 @@
   } ],
   "customAction" : null,
   "customActionHelp" : null,
-  "dataStreamItemReader" : null,
-  "dataStreamItemWriter" : null,
   "description" : "Helper component for converting technical date values to human friendly formatted expressions.",
   "icon" : "path:assets/date-helper.svg",
   "tags" : null,
@@ -128,5 +126,6 @@
     "workflowNodeDescription" : null,
     "perform" : { }
   } ],
+  "dataStream" : null,
   "triggers" : null
 }

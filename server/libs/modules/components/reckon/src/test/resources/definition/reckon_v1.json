@@ -5,8 +5,6 @@
   } ],
   "customAction" : true,
   "customActionHelp" : null,
-  "dataStreamItemReader" : null,
-  "dataStreamItemWriter" : null,
   "description" : "Reckon is an accounting software used for financial management and bookkeeping tasks.",
   "icon" : "path:assets/reckon.svg",
   "tags" : null,
@@ -65,6 +63,8 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationUrl" : { },
       "clientSecret" : null,
       "refreshToken" : null,
@@ -74,9 +74,7 @@
       "refresh" : null,
       "refreshUrl" : { },
       "scopes" : null,
-      "tokenUrl" : { },
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "tokenUrl" : { }
     } ],
     "properties" : null,
     "version" : 1,
@@ -298,9 +296,9 @@
       "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Create Contact",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -627,9 +625,9 @@
       "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Create Invoice",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -886,9 +884,9 @@
       "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Create Payment",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   } ],
   "triggers" : [ {
     "batch" : null,
@@ -1411,6 +1409,10 @@
     "workflowSyncExecution" : null,
     "workflowSyncValidation" : null,
     "workflowSyncOnEnableValidation" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "listenerDisable" : null,
@@ -1418,11 +1420,7 @@
     "dwebhookRequest" : null,
     "webhookValidate" : null,
     "deduplicate" : null,
-    "poll" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null
+    "poll" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1828,6 +1826,10 @@
     "workflowSyncExecution" : null,
     "workflowSyncValidation" : null,
     "workflowSyncOnEnableValidation" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "listenerDisable" : null,
@@ -1835,10 +1837,7 @@
     "dwebhookRequest" : null,
     "webhookValidate" : null,
     "deduplicate" : null,
-    "poll" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null
-  } ]
+    "poll" : { }
+  } ],
+  "dataStream" : null
 }

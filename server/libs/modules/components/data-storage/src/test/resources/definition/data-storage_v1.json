@@ -5,8 +5,6 @@
   } ],
   "customAction" : null,
   "customActionHelp" : null,
-  "dataStreamItemReader" : null,
-  "dataStreamItemWriter" : null,
   "description" : "Using the Data Storage component, you can easily manage and operate on lists and objects by setting or retrieving any desired data. This process employs a key-value store mechanism, where the key represents the field's name and the value corresponds to the particular data's actual value.",
   "icon" : "path:assets/data-storage.svg",
   "tags" : null,
@@ -494,7 +492,7 @@
     "metadata" : null,
     "name" : "awaitGetValue",
     "outputDefinition" : {
-      "output" : { },
+      "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
@@ -1118,7 +1116,7 @@
     "metadata" : null,
     "name" : "getValue",
     "outputDefinition" : {
-      "output" : { },
+      "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
@@ -2083,5 +2081,6 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "dataStream" : null,
   "triggers" : null
 }

@@ -5,8 +5,6 @@
   } ],
   "customAction" : null,
   "customActionHelp" : null,
-  "dataStreamItemReader" : null,
-  "dataStreamItemWriter" : null,
   "description" : "Webhook is a method utilized by applications to supply real-time information to other apps. Such a process usually delivers data immediately as and when it occurs. Webhook Trigger enables users to receive callouts whenever a service provides the option of distributing signals to a user-defined URL.",
   "icon" : "path:assets/webhook.svg",
   "tags" : null,
@@ -24,7 +22,7 @@
     "help" : null,
     "name" : "autoRespondWithHTTP200",
     "outputDefinition" : {
-      "output" : { },
+      "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
@@ -55,7 +53,7 @@
     "help" : null,
     "name" : "validateAndRespond",
     "outputDefinition" : {
-      "output" : { },
+      "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
@@ -106,7 +104,7 @@
     "help" : null,
     "name" : "awaitWorkflowAndRespond",
     "outputDefinition" : {
-      "output" : { },
+      "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
@@ -169,5 +167,6 @@
     "processErrorResponse" : null,
     "webhookValidateOnEnable" : null,
     "workflowNodeDescription" : null
-  } ]
+  } ],
+  "dataStream" : null
 }
