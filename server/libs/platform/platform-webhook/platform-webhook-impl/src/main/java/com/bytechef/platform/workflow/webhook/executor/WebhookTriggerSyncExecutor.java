@@ -201,7 +201,7 @@ public class WebhookTriggerSyncExecutor {
         TriggerDispatcherPreSendProcessor triggerDispatcherPreSendProcessor = null;
 
         for (TriggerDispatcherPreSendProcessor curTriggerDispatcherPreSendProcessor : triggerDispatcherPreSendProcessors) {
-            if (triggerDispatcherPreSendProcessor.canProcess(triggerExecution)) {
+            if (curTriggerDispatcherPreSendProcessor.canProcess(triggerExecution)) {
                 triggerDispatcherPreSendProcessor = curTriggerDispatcherPreSendProcessor;
 
                 break;
