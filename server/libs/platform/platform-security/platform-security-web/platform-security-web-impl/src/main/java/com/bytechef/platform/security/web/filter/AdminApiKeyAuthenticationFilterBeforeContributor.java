@@ -14,31 +14,28 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.security.web.authentication;
+package com.bytechef.platform.security.web.filter;
 
-import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.security.core.userdetails.User;
+import jakarta.servlet.Filter;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-public class ApiKeyAuthenticationToken extends AbstractPublicApiAuthenticationToken {
+@Component
+public class AdminApiKeyAuthenticationFilterBeforeContributor implements FilterBeforeContributor {
 
-    private String secretKey;
-
-    public ApiKeyAuthenticationToken(Environment environment, int version, String secretKey, String tenantId) {
-        super(environment, version, tenantId);
-
-        this.secretKey = secretKey;
-    }
-
+    @Override
     @SuppressFBWarnings("EI")
-    public ApiKeyAuthenticationToken(User user) {
-        super(user);
+    public Filter getFilter(AuthenticationManager authenticationManager) {
+        return new AdminApiKeyAuthenticationFilter(authenticationManager);
     }
 
-    public String getSecretKey() {
-        return secretKey;
+    @Override
+    public Class<? extends Filter> getBeforeFilter() {
+        return BasicAuthenticationFilter.class;
     }
 }
