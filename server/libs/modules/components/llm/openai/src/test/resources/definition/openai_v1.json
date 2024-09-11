@@ -5,8 +5,6 @@
   } ],
   "customAction" : null,
   "customActionHelp" : null,
-  "dataStreamItemReader" : null,
-  "dataStreamItemWriter" : null,
   "description" : "OpenAI is a research organization that aims to develop and direct artificial intelligence (AI) in ways that benefit humanity as a whole.",
   "icon" : "path:assets/openai.svg",
   "tags" : null,
@@ -1955,5 +1953,6 @@
     "workflowNodeDescription" : null,
     "perform" : { }
   } ],
-  "triggers" : null
+  "triggers" : null,
+  "dataStream" : null
 }

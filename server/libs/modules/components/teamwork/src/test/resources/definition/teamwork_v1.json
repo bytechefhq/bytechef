@@ -8,8 +8,6 @@
   } ],
   "customAction" : true,
   "customActionHelp" : null,
-  "dataStreamItemReader" : null,
-  "dataStreamItemWriter" : null,
   "description" : "Teamwork is a project management software that helps teams collaborate, organize tasks, and track progress efficiently.",
   "icon" : "path:assets/teamwork.svg",
   "tags" : null,
@@ -227,7 +225,6 @@
         },
         "sampleOutput" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -350,7 +347,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -599,7 +597,6 @@
         },
         "sampleOutput" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -702,7 +699,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -833,5 +831,6 @@
     "workflowNodeDescription" : null,
     "perform" : null
   } ],
-  "triggers" : [ ]
+  "triggers" : [ ],
+  "dataStream" : null
 }

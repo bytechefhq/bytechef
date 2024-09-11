@@ -5,8 +5,6 @@
   } ],
   "customAction" : null,
   "customActionHelp" : null,
-  "dataStreamItemReader" : null,
-  "dataStreamItemWriter" : null,
   "description" : "Google Docs is a cloud-based collaborative word processing platform that allows multiple users to create, edit, and share documents in real-time.",
   "icon" : "path:assets/google-docs.svg",
   "tags" : null,
@@ -284,5 +282,6 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "dataStream" : null,
   "triggers" : null
 }

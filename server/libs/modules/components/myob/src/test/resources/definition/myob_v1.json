@@ -5,8 +5,6 @@
   } ],
   "customAction" : true,
   "customActionHelp" : null,
-  "dataStreamItemReader" : null,
-  "dataStreamItemWriter" : null,
   "description" : "MYOB is an accounting software that helps businesses manage their finances, invoicing, and payroll.",
   "icon" : "path:assets/myob.svg",
   "tags" : null,
@@ -85,8 +83,6 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "apply" : { },
       "clientId" : null,
       "pkce" : null,
@@ -96,7 +92,9 @@
       "tokenUrl" : { },
       "authorizationUrl" : { },
       "clientSecret" : null,
-      "refreshToken" : null
+      "refreshToken" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -446,9 +444,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Customer",
-    "workflowNodeDescription" : null,
+    "perform" : { },
     "processErrorResponse" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -553,9 +551,9 @@
       }
     } ],
     "title" : "Create Customer Payment",
-    "workflowNodeDescription" : null,
+    "perform" : { },
     "processErrorResponse" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -898,9 +896,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Supplier",
-    "workflowNodeDescription" : null,
+    "perform" : { },
     "processErrorResponse" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1005,9 +1003,10 @@
       }
     } ],
     "title" : "Create Supplier Payment",
-    "workflowNodeDescription" : null,
+    "perform" : { },
     "processErrorResponse" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
-  "triggers" : null
+  "triggers" : null,
+  "dataStream" : null
 }

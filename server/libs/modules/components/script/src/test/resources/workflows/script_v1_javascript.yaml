@@ -19,5 +19,5 @@ tasks:
     input:
       factor: "${factor}"
       var: "${var1}"
-    script: "function perform(input) {\n  print('Factor: ' + input.factor);\n  print('Var:\
-      \ ' + input.var);\n\n  return 2 * input.var * input.factor;\n}"
+    script: "function perform(input, context) {\n  print('Factor: ' + input.factor);\n\
+      \  print('Var: ' + input.var);\n\n  return 2 * input.var * input.factor;\n}"

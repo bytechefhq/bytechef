@@ -19,4 +19,5 @@ tasks:
     input:
       factor: "${factor}"
       var: "${var1}"
-    script: "def perform(input)\n  return 2 * input.var * input.factor;\nend"
+    script: "def perform(input, context)\n  return 2 * input.var * input.factor;\n\
+      end"

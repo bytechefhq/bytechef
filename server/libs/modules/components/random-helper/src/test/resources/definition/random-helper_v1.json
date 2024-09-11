@@ -5,8 +5,6 @@
   } ],
   "customAction" : null,
   "customActionHelp" : null,
-  "dataStreamItemReader" : null,
-  "dataStreamItemWriter" : null,
   "description" : "The Random Helper allows you to generate random values.",
   "icon" : "path:assets/random-helper.svg",
   "tags" : null,
@@ -110,9 +108,9 @@
       "controlType" : "INTEGER"
     } ],
     "title" : "Int",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -213,9 +211,10 @@
       "controlType" : "INTEGER"
     } ],
     "title" : "Float",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
+  "dataStream" : null,
   "triggers" : null
 }

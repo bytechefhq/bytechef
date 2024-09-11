@@ -8,8 +8,6 @@
   } ],
   "customAction" : null,
   "customActionHelp" : null,
-  "dataStreamItemReader" : null,
-  "dataStreamItemWriter" : null,
   "description" : "AWS S3 is a simple object storage service provided by Amazon Web Services.",
   "icon" : "path:assets/aws-s3.svg",
   "tags" : null,
@@ -1147,5 +1145,6 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "triggers" : null
+  "triggers" : null,
+  "dataStream" : null
 }

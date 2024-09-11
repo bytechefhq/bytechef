@@ -5,8 +5,6 @@
   } ],
   "customAction" : true,
   "customActionHelp" : null,
-  "dataStreamItemReader" : null,
-  "dataStreamItemWriter" : null,
   "description" : "HubSpot is a CRM platform with all the software, integrations, and resources you need to connect marketing, sales, content management, and customer service.",
   "icon" : "path:assets/hubspot.svg",
   "tags" : null,
@@ -65,15 +63,15 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "authorizationCallback" : null,
       "oauth2AuthorizationExtraQueryParameters" : null,
-      "apply" : null,
-      "clientId" : null,
+      "authorizationCallback" : null,
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : { },
       "scopes" : { },
       "tokenUrl" : { },
+      "apply" : null,
+      "clientId" : null,
       "authorizationUrl" : { },
       "clientSecret" : null,
       "refreshToken" : null
@@ -3258,10 +3256,10 @@
     "workflowSyncExecution" : null,
     "workflowSyncValidation" : null,
     "workflowSyncOnEnableValidation" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null,
     "deduplicate" : null,
     "poll" : null,
     "webhookDisable" : { },
@@ -3270,5 +3268,6 @@
     "listenerEnable" : null,
     "dwebhookRequest" : { },
     "webhookValidate" : null
-  } ]
+  } ],
+  "dataStream" : null
 }

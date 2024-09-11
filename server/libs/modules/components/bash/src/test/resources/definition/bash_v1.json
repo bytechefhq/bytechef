@@ -2,8 +2,6 @@
   "categories" : null,
   "customAction" : null,
   "customActionHelp" : null,
-  "dataStreamItemReader" : null,
-  "dataStreamItemWriter" : null,
   "description" : "Allows you to run arbitrary Bash scripts.",
   "icon" : "path:assets/bash.svg",
   "tags" : null,
@@ -46,6 +44,7 @@
         },
         "sampleOutput" : "Sample result"
       },
+      "sampleOutput" : "Sample result",
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -66,8 +65,7 @@
         "minLength" : null,
         "options" : null,
         "optionsDataSource" : null
-      },
-      "sampleOutput" : "Sample result"
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -91,9 +89,10 @@
       "optionsDataSource" : null
     } ],
     "title" : "Execute",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
+  "dataStream" : null,
   "triggers" : null
 }

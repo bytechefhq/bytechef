@@ -5,8 +5,6 @@
   } ],
   "customAction" : null,
   "customActionHelp" : null,
-  "dataStreamItemReader" : null,
-  "dataStreamItemWriter" : null,
   "description" : "Reads and writes data from a JSON file.",
   "icon" : "path:assets/jsonfile.svg",
   "tags" : null,
@@ -237,9 +235,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Read from file",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -566,9 +564,10 @@
       "optionsDataSource" : null
     } ],
     "title" : "Write to file",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
+  "dataStream" : null,
   "triggers" : null
 }

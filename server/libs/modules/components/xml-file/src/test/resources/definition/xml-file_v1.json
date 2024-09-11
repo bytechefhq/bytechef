@@ -5,8 +5,6 @@
   } ],
   "customAction" : null,
   "customActionHelp" : null,
-  "dataStreamItemReader" : null,
-  "dataStreamItemWriter" : null,
   "description" : "Reads and writes data from a XML file.",
   "icon" : "path:assets/xml-file.svg",
   "tags" : null,
@@ -209,9 +207,9 @@
       "controlType" : "INTEGER"
     } ],
     "title" : "Read from file",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -510,9 +508,10 @@
       "optionsDataSource" : null
     } ],
     "title" : "Write to file",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
+  "dataStream" : null,
   "triggers" : null
 }

@@ -5,8 +5,6 @@
   } ],
   "customAction" : null,
   "customActionHelp" : null,
-  "dataStreamItemReader" : null,
-  "dataStreamItemWriter" : null,
   "description" : "Microsoft Teams is a collaboration platform that combines workplace chat, video meetings, file storage, and application integration.",
   "icon" : "path:assets/microsoft-teams.svg",
   "tags" : null,
@@ -1116,5 +1114,6 @@
     "workflowNodeDescription" : null,
     "perform" : { }
   } ],
+  "dataStream" : null,
   "triggers" : null
 }

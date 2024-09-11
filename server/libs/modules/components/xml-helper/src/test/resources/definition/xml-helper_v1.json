@@ -5,8 +5,6 @@
   } ],
   "customAction" : null,
   "customActionHelp" : null,
-  "dataStreamItemReader" : null,
-  "dataStreamItemWriter" : null,
   "description" : "Converts between XML string and object/array.",
   "icon" : "path:assets/xml-helper.svg",
   "tags" : null,
@@ -94,9 +92,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Convert from XML string",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -223,9 +221,10 @@
       "optionsDataSource" : null
     } ],
     "title" : "Convert to XML string",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
+  "dataStream" : null,
   "triggers" : null
 }

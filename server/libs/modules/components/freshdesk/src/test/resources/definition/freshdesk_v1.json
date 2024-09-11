@@ -5,8 +5,6 @@
   } ],
   "customAction" : true,
   "customActionHelp" : null,
-  "dataStreamItemReader" : null,
-  "dataStreamItemWriter" : null,
   "description" : "Freshdesk is a cloud-based customer support software that helps businesses manage customer queries and tickets efficiently.",
   "icon" : "path:assets/freshdesk.svg",
   "tags" : null,
@@ -1315,5 +1313,6 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "triggers" : [ ]
+  "triggers" : [ ],
+  "dataStream" : null
 }
