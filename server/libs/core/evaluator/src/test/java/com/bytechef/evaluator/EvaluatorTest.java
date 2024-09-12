@@ -21,6 +21,7 @@ package com.bytechef.evaluator;
 import com.bytechef.commons.util.MapUtils;
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -389,6 +390,21 @@ public class EvaluatorTest {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 
         Assertions.assertEquals(sdf.format(new Date()), MapUtils.getString(map, "date"));
+    }
+
+    @Test
+    public void test41() {
+        LocalDateTime localDateTime = LocalDateTime.now();
+
+        Map<String, Object> map = Evaluator.evaluate(
+            Map.of("date", "${localDateTime}"), Map.of("localDateTime", localDateTime));
+
+        Assertions.assertEquals(localDateTime, MapUtils.getLocalDateTime(map, "date"));
+
+        map = Evaluator.evaluate(
+            Map.of("date", "${localDateTime.minusDays(1)}"), Map.of("localDateTime", localDateTime));
+
+        Assertions.assertEquals(localDateTime.minusDays(1), MapUtils.getLocalDateTime(map, "date"));
     }
 
 //    @Test
