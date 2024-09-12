@@ -134,19 +134,34 @@ $outputSchema
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
+    class OutputDefinition {
+        var outputResponse: OutputResponse? = null
+//        var output: Any? = null
+
+        private fun getOutputString(): String {
+            return if(outputResponse!=null) "$outputResponse"
+            else return ""
+        }
+
+        override fun toString(): String {
+            return getOutputString();
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
     class Action {
         var description: String? = null
         var name: String? = null
-        var outputResponse: OutputResponse? = null
+        var outputDefinition: OutputDefinition? = null
         var properties: Array<Properties>? = null
         var title: String? = null
 
-        private fun getOutputResponseString(): String {
-            if (outputResponse == null) {
+        private fun getOutputDefinitionString(): String {
+            if (outputDefinition == null) {
                 return ""
             }
 
-            return "$outputResponse"
+            return "$outputDefinition"
         }
 
         override fun toString(): String {
@@ -160,7 +175,7 @@ $description
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 ${properties?.joinToString("\n")}
 
-${getOutputResponseString()}
+${getOutputDefinitionString()}
 """
         }
     }
@@ -169,17 +184,17 @@ ${getOutputResponseString()}
     class Trigger {
         var description: String? = null
         var name: String? = null
-        var outputResponse: OutputResponse? = null
+        var outputDefinition: OutputDefinition? = null
         var properties: Array<Properties>? = null
         var title: String? = null
         var type: String? = null
 
         private fun getOutputResponseString(): String {
-            if (outputResponse == null) {
+            if (outputDefinition == null) {
                 return ""
             }
 
-            return "$outputResponse"
+            return "$outputDefinition"
         }
 
         override fun toString(): String {
