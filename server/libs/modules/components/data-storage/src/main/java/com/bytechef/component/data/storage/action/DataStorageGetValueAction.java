@@ -128,10 +128,11 @@ public class DataStorageGetValueAction {
             Scope.valueOf(inputParameters.getRequiredString(SCOPE)), inputParameters.getRequiredString(KEY)));
 
         if (optional.isEmpty()) {
-            if (ConvertUtils.canConvert(inputParameters.getRequiredString(DEFAULT_VALUE), type))
-                return ConvertUtils.convertValue(inputParameters.getRequiredString(DEFAULT_VALUE), type);
+            if (ConvertUtils.canConvert(inputParameters.getRequired(DEFAULT_VALUE), type)) {
+                return ConvertUtils.convertValue(inputParameters.getRequired(DEFAULT_VALUE), type);
+            }
 
-            return inputParameters.getRequiredString(DEFAULT_VALUE);
+            return inputParameters.getRequired(DEFAULT_VALUE);
         }
 
         if (ConvertUtils.canConvert(optional.get(), type)) {
