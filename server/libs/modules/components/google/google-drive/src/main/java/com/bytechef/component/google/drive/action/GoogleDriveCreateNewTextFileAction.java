@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.CREATE_NEW_TEXT_FILE;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_NAME;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_FILE_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_FILE_SAMPLE_OUTPUT;
@@ -34,7 +33,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
-import com.bytechef.component.google.drive.util.GoogleDriveOptionUtils;
+import com.bytechef.component.google.drive.util.GoogleDriveUtils;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.client.http.FileContent;
 import com.google.api.services.drive.Drive;
@@ -48,11 +47,11 @@ import java.util.List;
 
 /**
  * @author Mario Cvjetojevic
- * @author Monika Domiter
+ * @author Monika Kušter
  */
-public final class GoogleDriveCreateNewTextFileAction {
+public class GoogleDriveCreateNewTextFileAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_NEW_TEXT_FILE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createNewTextFile")
         .title("Create new text file")
         .description("Creates a new text file in Google Drive.")
         .properties(
@@ -79,7 +78,7 @@ public final class GoogleDriveCreateNewTextFileAction {
                 .description(
                     "Folder where the file should be created; if no folder is selected, the file will be created " +
                         "in the root folder.")
-                .options((ActionOptionsFunction<String>) GoogleDriveOptionUtils::getFolderOptions)
+                .options((ActionOptionsFunction<String>) GoogleDriveUtils::getFolderOptions)
                 .required(false))
         .output(outputSchema(GOOGLE_FILE_OUTPUT_PROPERTY), sampleOutput(GOOGLE_FILE_SAMPLE_OUTPUT))
         .perform(GoogleDriveCreateNewTextFileAction::perform);

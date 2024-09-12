@@ -23,14 +23,14 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_FILE_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PARENT_FOLDER;
-import static com.bytechef.component.google.drive.util.GoogleDriveOptionUtils.getPollOutput;
+import static com.bytechef.component.google.drive.util.GoogleDriveUtils.getPollOutput;
 
 import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.component.google.drive.util.GoogleDriveOptionUtils;
+import com.bytechef.component.google.drive.util.GoogleDriveUtils;
 
 /**
  * @author Monika Kušter
@@ -44,7 +44,7 @@ public class GoogleDriveNewFileTrigger {
         .properties(
             string(PARENT_FOLDER)
                 .label("Parent folder")
-                .options((TriggerOptionsFunction<String>) GoogleDriveOptionUtils::getFolderOptions)
+                .options((TriggerOptionsFunction<String>) GoogleDriveUtils::getFolderOptions)
                 .required(true))
         .output(
             outputSchema(

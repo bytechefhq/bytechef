@@ -17,6 +17,7 @@
 package com.bytechef.component.google.drive.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.APPLICATION_VND_GOOGLE_APPS_FOLDER;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PARENT_FOLDER;
 
 import com.bytechef.component.definition.Context;
@@ -35,13 +36,13 @@ import java.util.Map;
 
 /**
  * @author Ivica Cardic
- * @author Monika Domiter
+ * @author Monika Kušter
  */
-public class GoogleDriveOptionUtils {
+public class GoogleDriveUtils {
 
     protected static final String LAST_TIME_CHECKED = "lastTimeChecked";
 
-    private GoogleDriveOptionUtils() {
+    private GoogleDriveUtils() {
     }
 
     public static List<Option<String>> getFileOptions(
@@ -52,7 +53,7 @@ public class GoogleDriveOptionUtils {
 
         return drive.files()
             .list()
-            .setQ("mimeType != 'application/vnd.google-apps.folder'")
+            .setQ("mimeType != '" + APPLICATION_VND_GOOGLE_APPS_FOLDER + "' and trashed = false")
             .execute()
             .getFiles()
             .stream()
@@ -68,7 +69,7 @@ public class GoogleDriveOptionUtils {
 
         return drive.files()
             .list()
-            .setQ("mimeType = 'application/vnd.google-apps.folder'")
+            .setQ("mimeType = '" + APPLICATION_VND_GOOGLE_APPS_FOLDER + "' and trashed = false")
             .execute()
             .getFiles()
             .stream()
@@ -79,24 +80,17 @@ public class GoogleDriveOptionUtils {
     public static PollOutput getPollOutput(
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters, boolean newFile) {
 
-        LocalDateTime startDate =
-            closureParameters.getLocalDateTime(LAST_TIME_CHECKED, LocalDateTime.now(ZoneId.of("GMT")));
-        LocalDateTime endDate = LocalDateTime.now(ZoneId.of("GMT"));
-
+        ZoneId gmt = ZoneId.of("GMT");
+        LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, LocalDateTime.now(gmt));
+        String startDateString = startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
+        LocalDateTime endDate = LocalDateTime.now(gmt);
         Drive drive = GoogleServices.getDrive(connectionParameters);
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-
-        String startDateString = startDate.format(formatter);
-
         try {
+            String mimeType = newFile ? "mimeType != '" + APPLICATION_VND_GOOGLE_APPS_FOLDER + "'"
+                : "mimeType = '" + APPLICATION_VND_GOOGLE_APPS_FOLDER + "'";
 
-            String mimeType = "mimeType = 'application/vnd.google-apps.folder'";
-            if (newFile) {
-                mimeType = "mimeType = 'application/vnd.google-apps.folder'";
-            }
-
-            FileList execute = drive
+            FileList fileList = drive
                 .files()
                 .list()
                 .setQ(mimeType + " and '" + inputParameters.getRequiredString(PARENT_FOLDER) + "' in parents and " +
@@ -105,7 +99,7 @@ public class GoogleDriveOptionUtils {
                 .setOrderBy("createdTime asc")
                 .execute();
 
-            return new PollOutput(execute.getFiles(), Map.of(LAST_TIME_CHECKED, endDate), false);
+            return new PollOutput(fileList.getFiles(), Map.of(LAST_TIME_CHECKED, endDate), false);
 
         } catch (IOException e) {
             throw new RuntimeException(e);

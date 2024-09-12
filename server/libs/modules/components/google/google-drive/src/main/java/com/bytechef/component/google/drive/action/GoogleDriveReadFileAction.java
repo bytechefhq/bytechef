@@ -20,15 +20,15 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.APPLICATION_VND_GOOGLE_APPS_FOLDER;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ID;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.READ_FILE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.google.drive.util.GoogleDriveOptionUtils;
+import com.bytechef.component.google.drive.util.GoogleDriveUtils;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
@@ -37,18 +37,18 @@ import java.io.InputStream;
 
 /**
  * @author Mario Cvjetojevic
- * @author Monika Domiter
+ * @author Monika Kušter
  */
-public final class GoogleDriveReadFileAction {
+public class GoogleDriveReadFileAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(READ_FILE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("readFile")
         .title("Read file")
         .description("Read a selected file from Google Drive file.")
         .properties(
             string(FILE_ID)
                 .label("File")
                 .description("The id of a file to read.")
-                .options((ActionOptionsFunction<String>) GoogleDriveOptionUtils::getFileOptions)
+                .options((ActionOptionsFunction<String>) GoogleDriveUtils::getFileOptions)
                 .required(true))
         .output(outputSchema(fileEntry()))
         .perform(GoogleDriveReadFileAction::perform);
@@ -76,7 +76,7 @@ public final class GoogleDriveReadFileAction {
 
     private static String getFileName(Drive.Files files, String fileId) throws IOException {
         return files.list()
-            .setQ("mimeType != 'application/vnd.google-apps.folder'")
+            .setQ("mimeType != '" + APPLICATION_VND_GOOGLE_APPS_FOLDER + "'")
             .execute()
             .getFiles()
             .stream()
