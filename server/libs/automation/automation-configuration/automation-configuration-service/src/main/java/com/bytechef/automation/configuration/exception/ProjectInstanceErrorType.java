@@ -24,7 +24,7 @@ import com.bytechef.platform.exception.ErrorType;
  */
 public enum ProjectInstanceErrorType implements ErrorType {
 
-    CREATE_PROJECT_INSTANCE(100), DELETE_PROJECT_INSTANCE(101);
+    CREATE_PROJECT_INSTANCE(100), DELETE_PROJECT_INSTANCE(101), REQUIRED_WORKFLOW_CONNECTIONS(102);
 
     private final int errorKey;
 
