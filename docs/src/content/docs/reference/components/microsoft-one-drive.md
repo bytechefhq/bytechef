@@ -40,6 +40,41 @@ Version: 1
 
 
 
+## Triggers
+
+
+### New File
+Triggers when file is uploaded to folder.
+
+#### Type: POLLING
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Parent folder | STRING | SELECT  |  If no folder is specified, the root folder will be used.  |
+
+
+### Output
+
+
+
+Type: ARRAY
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| {STRING\(id), STRING\(name)} | OBJECT_BUILDER  |
+
+
+
+
+
+
+
+<hr />
+
 
 
 ## Actions

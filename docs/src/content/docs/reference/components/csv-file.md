@@ -68,7 +68,7 @@ Writes the data to a csv file.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Rows | [{}] | ARRAY_BUILDER  |  The array of objects to write to the file.  |
-| File | FILE_ENTRY | FILE_ENTRY  |  File you want to write to.  |
+| Filename | STRING | TEXT  |  Filename to set for binary data. By default, "file.csv" will be used.  |
 
 
 ### Output

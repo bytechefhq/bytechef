@@ -42,8 +42,8 @@ Version: 1
 ## Triggers
 
 
-### OnRowAdded
-Triggers when you add a row in google sheets. Refresh the page when you're done putting input.
+### New Row
+Triggers when a new row is added.
 
 #### Type: DYNAMIC_WEBHOOK
 #### Properties
@@ -96,6 +96,63 @@ Clear a sheet of all values while preserving formats.
 
 
 
+### Create column
+Append a new column to the end of the sheet.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Spreadsheet | STRING | SELECT  |  The spreadsheet to apply the updates to.  |
+| Include sheets from all drives | BOOLEAN | SELECT  |  Whether both My Drive and shared drive sheets should be included in results.  |
+| Sheet | STRING | SELECT  |  The name of the sheet  |
+| Column name | STRING | TEXT  |  Name of the new column.  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| STRING | TEXT  |
+| STRING | TEXT  |
+| [BOOLEAN, NUMBER, STRING] | ARRAY_BUILDER  |
+
+
+
+
+
+
+### Create sheet
+Create a blank sheet with title. Optionally, provide headers.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Spreadsheet | STRING | SELECT  |  The spreadsheet to apply the updates to.  |
+| Sheet name | STRING | TEXT  |  The name of the new sheet.  |
+| Headers | [BOOLEAN, NUMBER, STRING] | ARRAY_BUILDER  |  The headers of the new sheet.  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+
+
+
+
+
 ### Delete row
 Delete row on an existing sheet
 
@@ -131,6 +188,39 @@ Get a row in a Google Sheet by row number
 
 Type: OBJECT
 
+
+
+
+
+
+
+### Insert multiple rows
+Append rows to the end of the spreadsheet.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Spreadsheet | STRING | SELECT  |  The spreadsheet to apply the updates to.  |
+| Include sheets from all drives | BOOLEAN | SELECT  |  Whether both My Drive and shared drive sheets should be included in results.  |
+| Sheet | STRING | SELECT  |  The name of the sheet  |
+| Value input option | STRING | SELECT  |  How the input data should be interpreted.  |
+| Is the first row headers? | BOOLEAN | SELECT  |  If the first row is header  |
+| DYNAMIC_PROPERTIES | null  |
+
+
+### Output
+
+
+
+Type: ARRAY
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| {} | OBJECT_BUILDER  |
 
 
 

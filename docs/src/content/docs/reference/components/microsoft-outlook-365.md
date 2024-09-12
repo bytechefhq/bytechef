@@ -40,6 +40,41 @@ Version: 1
 
 
 
+## Triggers
+
+
+### New Email
+Triggers when new mail is received.
+
+#### Type: POLLING
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+null
+
+
+### Output
+
+
+
+Type: ARRAY
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| {STRING\(id), STRING\(subject), STRING\(bodyPreview), {STRING\(contentType), STRING\(content)}\(body), {{STRING\(name), STRING\(address)}\(emailAddress)}\(from)} | OBJECT_BUILDER  |
+
+
+
+
+
+
+
+<hr />
+
 
 
 ## Actions
@@ -61,6 +96,16 @@ Get a specific message
 
 Type: OBJECT
 
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| {STRING\(contentType), STRING\(content)} | OBJECT_BUILDER  |
+| {{STRING\(name), STRING\(address)}\(emailAddress)} | OBJECT_BUILDER  |
 
 
 
@@ -84,8 +129,14 @@ Get the messages in the signed-in user's mailbox
 
 
 
-Type: OBJECT
+Type: ARRAY
 
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| {STRING\(id), STRING\(subject), STRING\(bodyPreview), {STRING\(contentType), STRING\(content)}\(body), {{STRING\(name), STRING\(address)}\(emailAddress)}\(from)} | OBJECT_BUILDER  |
 
 
 

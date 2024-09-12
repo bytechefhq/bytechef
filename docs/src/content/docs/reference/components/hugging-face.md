@@ -52,16 +52,7 @@ Ask anything you want.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | URL | STRING | TEXT  |  Url of the inference endpoint  |
 | Messages | [{STRING\(content), STRING\(role)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |
-
-
-### Output
-
-
-
-Type: STRING
-
-
-
+| Response format | INTEGER | SELECT  |  In which format do you want the response to be in?  |
 
 
 
