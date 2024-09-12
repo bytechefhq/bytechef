@@ -285,6 +285,30 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
                 integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId());
 
+        if (enable) {
+            Workflow workflow = workflowService.getWorkflow(workflowId);
+
+            List<WorkflowConnection> requiredWorkflowConnections = CollectionUtils.concat(
+                WorkflowTrigger.of(workflow)
+                    .stream()
+                    .flatMap(workflowTrigger -> CollectionUtils.stream(
+                        workflowConnectionFacade.getWorkflowConnections(workflowTrigger)))
+                    .filter(WorkflowConnection::required)
+                    .toList(),
+                workflow.getAllTasks()
+                    .stream()
+                    .flatMap(workflowTask -> CollectionUtils.stream(
+                        workflowConnectionFacade.getWorkflowConnections(workflowTask)))
+                    .filter(WorkflowConnection::required)
+                    .toList());
+
+            if (requiredWorkflowConnections.size() != integrationInstanceConfigurationWorkflow.getConnectionsCount()) {
+                throw new PlatformException(
+                    "Not all required connections are set for a workflow with id=%s".formatted(workflow.getId()),
+                    IntegrationInstanceConfigurationErrorType.REQUIRED_WORKFLOW_CONNECTIONS);
+            }
+        }
+
         if (integrationInstanceConfiguration.isEnabled()) {
             if (enable) {
                 enableWorkflowTriggers(integrationInstanceConfigurationWorkflow);

@@ -71,8 +71,7 @@ public class IntegrationInstanceConfigurationWorkflow implements Comparable<Inte
     private AggregateReference<IntegrationInstanceConfiguration, Long> integrationInstanceConfigurationId;
 
     @MappedCollection(idColumn = "integration_instance_configuration_workflow_id")
-    private Set<IntegrationInstanceConfigurationWorkflowConnection> integrationInstanceWorkflowConnections =
-        Collections.emptySet();
+    private Set<IntegrationInstanceConfigurationWorkflowConnection> connections = Collections.emptySet();
 
     @Version
     private int version;
@@ -87,7 +86,7 @@ public class IntegrationInstanceConfigurationWorkflow implements Comparable<Inte
         List<IntegrationInstanceConfigurationWorkflowConnection> connections, Map<String, Object> inputs,
         String workflowId) {
 
-        this.integrationInstanceWorkflowConnections = new HashSet<>(connections);
+        this.connections = new HashSet<>(connections);
         this.inputs = new MapWrapper(inputs);
         this.workflowId = workflowId;
     }
@@ -117,7 +116,11 @@ public class IntegrationInstanceConfigurationWorkflow implements Comparable<Inte
     }
 
     public List<IntegrationInstanceConfigurationWorkflowConnection> getConnections() {
-        return List.copyOf(integrationInstanceWorkflowConnections);
+        return List.copyOf(connections);
+    }
+
+    public int getConnectionsCount() {
+        return connections.size();
     }
 
     public String getCreatedBy() {
@@ -163,7 +166,7 @@ public class IntegrationInstanceConfigurationWorkflow implements Comparable<Inte
     public void setConnections(
         List<IntegrationInstanceConfigurationWorkflowConnection> integrationInstanceWorkflowConnections) {
         if (integrationInstanceWorkflowConnections != null) {
-            this.integrationInstanceWorkflowConnections = new HashSet<>(integrationInstanceWorkflowConnections);
+            this.connections = new HashSet<>(integrationInstanceWorkflowConnections);
         }
     }
 
@@ -206,7 +209,7 @@ public class IntegrationInstanceConfigurationWorkflow implements Comparable<Inte
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
             ", lastModifiedDate=" + lastModifiedDate +
             ", integrationInstanceConfigurationId=" + integrationInstanceConfigurationId +
-            ", integrationInstanceWorkflowConnections=" + integrationInstanceWorkflowConnections +
+            ", connections=" + connections +
             ", version=" + version +
             ", workflowId='" + workflowId + '\'' +
             '}';
