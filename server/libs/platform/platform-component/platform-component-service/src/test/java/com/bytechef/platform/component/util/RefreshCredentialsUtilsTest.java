@@ -34,11 +34,15 @@ public class RefreshCredentialsUtilsTest {
     @Test
     public void testGetByExceptionMessage() {
         Assertions.assertTrue(RefreshCredentialsUtils.matches(List.of(401), new ProviderException(401)));
+
+        String pattern = "^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$";
+
+        Assertions.assertTrue(RefreshCredentialsUtils.matches(List.of(pattern), new Exception("401 Unauthorized")));
+        Assertions.assertTrue(RefreshCredentialsUtils.matches(List.of(pattern), new Exception(multilineMessage)));
+        Assertions.assertTrue(
+            RefreshCredentialsUtils.matches(List.of(pattern), new ProviderException(new Exception(multilineMessage))));
         Assertions.assertTrue(
             RefreshCredentialsUtils.matches(
-                List.of("^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$"), new Exception("401 Unauthorized")));
-        Assertions.assertTrue(
-            RefreshCredentialsUtils.matches(
-                List.of("^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$"), new Exception(multilineMessage)));
+                List.of(pattern), new ProviderException("Refresh token is expired", new Exception(multilineMessage))));
     }
 }
