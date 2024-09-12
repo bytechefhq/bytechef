@@ -48,12 +48,21 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
         try {
             workflowNodeTestOutput = workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(
                 workflowId, workflowNodeName);
-        } catch (Exception e) {
+        } catch (Exception exception) {
             if (logger.isDebugEnabled()) {
-                logger.debug(e.getMessage(), e);
+                logger.debug(exception.getMessage(), exception);
             }
 
-            executionError = new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e)));
+            Throwable curException = exception;
+            String message = null;
+
+            while (curException.getCause() != null) {
+                curException = curException.getCause();
+
+                message = curException.getMessage();
+            }
+
+            executionError = new ExecutionError(message, Arrays.asList(ExceptionUtils.getStackFrames(exception)));
         }
 
         OutputResponse outputResponse = null;
