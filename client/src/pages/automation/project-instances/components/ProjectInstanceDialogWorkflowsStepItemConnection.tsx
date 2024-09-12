@@ -67,7 +67,7 @@ const ProjectInstanceDialogWorkflowsStepItemConnection = ({
                             </span>
                         </FormLabel>
 
-                        <Select onValueChange={field.onChange} value={field.value ? field.value.toString() : ''}>
+                        <Select onValueChange={field.onChange} value={field.value ? field.value.toString() : undefined}>
                             <FormControl>
                                 <div className="flex space-x-2">
                                     <SelectTrigger>

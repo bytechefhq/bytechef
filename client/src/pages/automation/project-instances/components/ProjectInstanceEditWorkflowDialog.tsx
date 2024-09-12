@@ -84,7 +84,8 @@ const ProjectInstanceEditWorkflowDialog = ({
 
             if (!projectInstanceWorkflowConnection) {
                 projectInstanceWorkflowConnection = {
-                    connectionId: -1,
+                    /* eslint-disable @typescript-eslint/no-explicit-any */
+                    connectionId: undefined as any,
                     key: workflowConnection.key,
                     workflowNodeName: workflowConnection.workflowNodeName,
                 };
