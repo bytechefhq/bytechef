@@ -40,9 +40,20 @@ public class RefreshCredentialsUtils {
         }
 
         if (!matches) {
-            matches = matches(
-                exception.getMessage(), CollectionUtils.map(
-                    CollectionUtils.filter(refreshOn, item -> item instanceof String), item -> (String) item));
+            Throwable curException = exception;
+
+            do {
+                matches = matches(
+                    curException.getMessage(),
+                    CollectionUtils.map(
+                        CollectionUtils.filter(refreshOn, item -> item instanceof String), item -> (String) item));
+
+                if (matches) {
+                    break;
+                }
+
+                curException = curException.getCause();
+            } while (curException != null);
         }
 
         return matches;
