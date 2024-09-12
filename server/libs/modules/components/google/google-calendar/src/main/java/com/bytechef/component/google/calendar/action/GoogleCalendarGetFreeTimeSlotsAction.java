@@ -105,7 +105,12 @@ public class GoogleCalendarGetFreeTimeSlotsAction {
 
                 previousEndTime = previousEndTime.isAfter(endTime) ? previousEndTime : endTime;
             }
+
+            if (previousEndTime.isBefore(to)) {
+                intervals.add(new Interval(previousEndTime, to));
+            }
         }
+
         return intervals;
     }
 
