@@ -242,6 +242,30 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         ProjectInstance projectInstance = projectInstanceService.getProjectInstance(
             projectInstanceWorkflow.getProjectInstanceId());
 
+        if (enable) {
+            Workflow workflow = workflowService.getWorkflow(workflowId);
+
+            List<WorkflowConnection> requiredWorkflowConnections = CollectionUtils.concat(
+                WorkflowTrigger.of(workflow)
+                    .stream()
+                    .flatMap(workflowTrigger -> CollectionUtils.stream(
+                        workflowConnectionFacade.getWorkflowConnections(workflowTrigger)))
+                    .filter(WorkflowConnection::required)
+                    .toList(),
+                workflow.getAllTasks()
+                    .stream()
+                    .flatMap(workflowTask -> CollectionUtils.stream(
+                        workflowConnectionFacade.getWorkflowConnections(workflowTask)))
+                    .filter(WorkflowConnection::required)
+                    .toList());
+
+            if (requiredWorkflowConnections.size() != projectInstanceWorkflow.getConnectionsCount()) {
+                throw new PlatformException(
+                    "Not all required connections are set for a workflow with id=%s".formatted(workflow.getId()),
+                    ProjectInstanceErrorType.REQUIRED_WORKFLOW_CONNECTIONS);
+            }
+        }
+
         if (projectInstance.isEnabled()) {
             if (enable) {
                 enableWorkflowTriggers(projectInstanceWorkflow);

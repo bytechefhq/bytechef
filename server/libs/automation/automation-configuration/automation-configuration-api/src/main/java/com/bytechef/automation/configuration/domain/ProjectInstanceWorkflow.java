@@ -118,6 +118,10 @@ public class ProjectInstanceWorkflow implements Comparable<ProjectInstanceWorkfl
         return List.copyOf(connections);
     }
 
+    public int getConnectionsCount() {
+        return connections.size();
+    }
+
     public String getCreatedBy() {
         return createdBy;
     }
