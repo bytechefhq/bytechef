@@ -144,24 +144,10 @@ const PropertyCodeEditorSheet = ({
                                             ) : scriptTestExecution.error ? (
                                                 <div className="space-y-4 text-sm">
                                                     <div className="space-y-2">
-                                                        <div className="font-semibold">Error</div>
+                                                        <div className="font-semibold text-destructive">Error</div>
 
                                                         <div>{scriptTestExecution.error.message}</div>
                                                     </div>
-
-                                                    {scriptTestExecution.error.stackTrace && (
-                                                        <div className="space-y-2">
-                                                            <div className="font-semibold">Stack Trace</div>
-
-                                                            <div>
-                                                                {scriptTestExecution.error.stackTrace.map(
-                                                                    (stackTrace, index) => (
-                                                                        <div key={index}>{stackTrace}</div>
-                                                                    )
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    )}
                                                 </div>
                                             ) : (
                                                 <span className="text-muted-foreground">No defined output.</span>
