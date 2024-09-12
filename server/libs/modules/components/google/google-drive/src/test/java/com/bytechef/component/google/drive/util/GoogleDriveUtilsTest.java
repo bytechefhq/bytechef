@@ -45,7 +45,7 @@ import org.mockito.MockedStatic;
  * @author Ivica Cardic
  * @author Monika Domiter
  */
-class GoogleDriveOptionUtilsTest {
+class GoogleDriveUtilsTest {
 
     private final List<Option<String>> expectedOptions = List.of(option("name", "id"));
     private final List<File> files = new ArrayList<>();
@@ -91,7 +91,7 @@ class GoogleDriveOptionUtilsTest {
     @Test
     void testGetFileOptions() throws IOException {
         assertEquals(expectedOptions,
-            GoogleDriveOptionUtils.getFileOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+            GoogleDriveUtils.getFileOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
 
         assertEquals("mimeType != 'application/vnd.google-apps.folder'", qArgumentCaptor.getValue());
     }
@@ -99,7 +99,7 @@ class GoogleDriveOptionUtilsTest {
     @Test
     void testGetFolderOptions() throws IOException {
         assertEquals(expectedOptions,
-            GoogleDriveOptionUtils.getFolderOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+            GoogleDriveUtils.getFolderOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
 
         assertEquals("mimeType = 'application/vnd.google-apps.folder'", qArgumentCaptor.getValue());
     }

@@ -18,7 +18,6 @@ package com.bytechef.component.google.drive;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.google.drive.connection.GoogleDriveConnection.CONNECTION_DEFINITION;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_DRIVE;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -33,12 +32,12 @@ import com.google.auto.service.AutoService;
 
 /**
  * @author Mario Cvjetojevic
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 @AutoService(ComponentHandler.class)
 public class GoogleDriveComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(GOOGLE_DRIVE)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("googleDrive")
         .title("Google Drive")
         .description(
             "Google Drive is a cloud storage service by Google that enables users to store, sync, share files, and " +

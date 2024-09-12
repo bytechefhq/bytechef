@@ -24,24 +24,20 @@ import java.util.Map;
 
 /**
  * @author Mario Cvjetojevic
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public final class GoogleDriveConstants {
 
-    public static final String CREATE_NEW_FOLDER = "createNewFolder";
-    public static final String CREATE_NEW_TEXT_FILE = "createNewTextFile";
+    public static final String APPLICATION_VND_GOOGLE_APPS_FOLDER = "application/vnd.google-apps.folder";
     public static final String FILE_ENTRY = "fileEntry";
     public static final String FILE_ID = "fileId";
     public static final String FILE_NAME = "fileName";
     public static final String FOLDER_NAME = "folderName";
-    public static final String GOOGLE_DRIVE = "googleDrive";
     public static final String ID = "id";
     public static final String MIME_TYPE = "mimeType";
     public static final String NAME = "name";
     public static final String PARENT_FOLDER = "parentFolder";
-    public static final String READ_FILE = "readFile";
     public static final String TEXT = "text";
-    public static final String UPLOAD_FILE = "uploadFile";
 
     public static final ModifiableObjectProperty GOOGLE_FILE_OUTPUT_PROPERTY = object()
         .properties(
