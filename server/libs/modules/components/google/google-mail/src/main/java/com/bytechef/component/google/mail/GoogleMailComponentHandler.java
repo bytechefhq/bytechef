@@ -38,11 +38,10 @@ import com.google.auto.service.AutoService;
 public class GoogleMailComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("googleMail")
-        .title("Google Mail")
+        .title("Gmail")
         .description(
-            "Google Mail, commonly known as Gmail, is a widely used email service by Google, offering free and " +
-                "feature-rich communication, organization, and storage capabilities accessible through web browsers " +
-                "and mobile apps.")
+            "Gmail is a widely used email service by Google, offering free and feature-rich communication, " +
+                "organization, and storage capabilities accessible through web browsers and mobile apps.")
         .icon("path:assets/google-mail.svg")
         .categories(ComponentCategory.COMMUNICATION)
         .connection(CONNECTION_DEFINITION)
