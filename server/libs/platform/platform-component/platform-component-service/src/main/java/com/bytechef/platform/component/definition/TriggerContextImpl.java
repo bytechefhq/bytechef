@@ -35,13 +35,13 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext {
 
     @SuppressFBWarnings("EI")
     public TriggerContextImpl(
-        String componentName, int componentVersion, String triggerName, AppType type,
-        String workflowReferenceCode, ComponentConnection connection, DataStorage dataStorage,
-        FilesFileStorage filesFileStorage, HttpClientExecutor httpClientExecutor) {
+        String componentName, int componentVersion, String triggerName, AppType type, String workflowReferenceCode,
+        ComponentConnection connection, DataStorage dataStorage, FilesFileStorage filesFileStorage,
+        HttpClientExecutor httpClientExecutor) {
 
         super(componentName, componentVersion, triggerName, filesFileStorage, connection, httpClientExecutor);
 
-        this.data = type == null ? new NoOpDataImpl() : new DataImpl(
+        this.data = new DataImpl(
             componentName, componentVersion, triggerName, type, workflowReferenceCode, dataStorage);
     }
 
@@ -99,28 +99,6 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext {
                     case WORKFLOW -> workflowReferenceCode;
                     case ACCOUNT -> null;
                 }, "scope");
-        }
-    }
-
-    private record NoOpDataImpl() implements Data {
-
-        @Override
-        public <T> Optional<T> fetch(Data.Scope scope, String key) {
-            return Optional.empty();
-        }
-
-        @Override
-        public <T> T get(Data.Scope scope, String key) {
-            return null;
-        }
-
-        @Override
-        public Void put(Data.Scope scope, String key, Object data) {
-            return null;
-        }
-
-        public Void remove(Data.Scope scope, String key) {
-            return null;
         }
     }
 }

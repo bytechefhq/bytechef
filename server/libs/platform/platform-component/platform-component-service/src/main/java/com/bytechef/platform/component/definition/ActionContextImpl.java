@@ -35,38 +35,35 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 class ActionContextImpl extends ContextImpl implements ActionContext, ActionContextAware {
 
+    private final String actionName;
     private final Data data;
     private final Event event;
-    private final String actionName;
-    private final AppType type;
     private final Long instanceId;
     private final Long instanceWorkflowId;
     private final Long jobId;
+    private final boolean testEnvironment;
+    private final AppType type;
+    private final String workflowId;
 
     @SuppressFBWarnings("EI")
     public ActionContextImpl(
-        String componentName, int componentVersion, String actionName, AppType type,
-        Long instanceId, Long instanceWorkflowId, Long jobId, ComponentConnection connection,
-        DataStorage dataStorage, ApplicationEventPublisher eventPublisher,
-        FilesFileStorage filesFileStorage, HttpClientExecutor httpClientExecutor) {
+        String componentName, int componentVersion, String actionName, AppType type, Long instanceId,
+        Long instanceWorkflowId, String workflowId, Long jobId, ComponentConnection connection, boolean testEnvironment,
+        DataStorage dataStorage, ApplicationEventPublisher eventPublisher, FilesFileStorage filesFileStorage,
+        HttpClientExecutor httpClientExecutor) {
 
         super(componentName, componentVersion, actionName, filesFileStorage, connection, httpClientExecutor);
 
         this.actionName = actionName;
-        this.type = type;
+        this.data = new DataImpl(
+            componentName, componentVersion, actionName, type, instanceId, instanceWorkflowId, jobId, dataStorage);
+        this.event = jobId == null ? progress -> {} : new EventImpl(eventPublisher, jobId);
         this.instanceId = instanceId;
         this.instanceWorkflowId = instanceWorkflowId;
         this.jobId = jobId;
-
-        if (type == null || instanceId == null || instanceWorkflowId == null || jobId == null) {
-            this.data = new NoOpDataImpl();
-        } else {
-            this.data = new DataImpl(
-                componentName, componentVersion, actionName, type, instanceId, instanceWorkflowId, jobId,
-                dataStorage);
-        }
-
-        this.event = jobId == null ? progress -> {} : new EventImpl(eventPublisher, jobId);
+        this.testEnvironment = testEnvironment;
+        this.type = type;
+        this.workflowId = workflowId;
     }
 
     @Override
@@ -108,9 +105,19 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         return jobId;
     }
 
+    @Override
+    public boolean isTestEnvironment() {
+        return testEnvironment;
+    }
+
+    @Override
+    public String getWorkflowId() {
+        return workflowId;
+    }
+
     private record DataImpl(
-        String componentName, Integer componentVersion, String actionName, AppType type, long instanceId,
-        long instanceWorkflowId, long jobId, DataStorage dataStorage) implements Data {
+        String componentName, Integer componentVersion, String actionName, AppType type, Long instanceId,
+        Long instanceWorkflowId, Long jobId, DataStorage dataStorage) implements Data {
 
         @Override
         public <T> Optional<T> fetch(Scope scope, String key) {
@@ -167,34 +174,5 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         public void publishActionProgressEvent(int progress) {
             eventPublisher.publishEvent(new TaskProgressedApplicationEvent(taskExecutionId, progress));
         }
-    }
-
-    private record NoOpDataImpl() implements Data {
-
-        @Override
-        public <T> Optional<T> fetch(Scope scope, String key) {
-            return Optional.empty();
-        }
-
-        @Override
-        public <T> T get(Scope scope, String key) {
-            return null;
-        }
-
-        @Override
-        public <T> Map<String, T> getAll(Scope scope) {
-            return null;
-        }
-
-        @Override
-        public Void put(Scope scope, String key, Object data) {
-            return null;
-        }
-
-        @Override
-        public Void remove(Scope scope, String key) {
-            return null;
-        }
-
     }
 }

@@ -118,7 +118,7 @@ public abstract class AbstractDataStreamItemDelegate {
         context = new DataStreamContextImpl(
             contextFactory.createActionContext(
                 componentName, componentVersion, DataStreamConstants.STREAM, type, instanceId, instanceWorkflowId,
-                jobId, null));
+                null, jobId, null, false));
 
         doBeforeStep(stepExecution);
     }

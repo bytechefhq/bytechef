@@ -95,9 +95,9 @@ public class RemoteActionDefinitionFacadeController {
         return ResponseEntity.ok(
             actionDefinitionFacade.executePerform(
                 performRequest.componentName, performRequest.componentVersion, performRequest.actionName,
-                performRequest.type, performRequest.instanceId, Long.getLong(performRequest.workflowId),
-                performRequest.jobId, performRequest.inputParameters, performRequest.connectionIds,
-                performRequest.extensions));
+                performRequest.type, performRequest.instanceId, performRequest.instanceWorkflowId,
+                performRequest.jobId, performRequest.workflowId, performRequest.inputParameters,
+                performRequest.connectionIds, performRequest.extensions, false));
     }
 
     @RequestMapping(
@@ -143,7 +143,8 @@ public class RemoteActionDefinitionFacadeController {
     @SuppressFBWarnings("EI")
     public record PerformRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName, AppType type,
-        Long instanceId, @NonNull String workflowId, long jobId, @NotNull Map<String, ?> inputParameters,
-        @NotNull Map<String, Long> connectionIds, @NotNull Map<String, Long> extensions) {
+        Long instanceId, Long instanceWorkflowId, long jobId, @NonNull String workflowId,
+        @NotNull Map<String, ?> inputParameters, @NotNull Map<String, Long> connectionIds,
+        @NotNull Map<String, Long> extensions) {
     }
 }
