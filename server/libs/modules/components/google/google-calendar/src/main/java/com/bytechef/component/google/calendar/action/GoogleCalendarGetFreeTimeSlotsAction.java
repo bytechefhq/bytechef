@@ -55,12 +55,12 @@ public class GoogleCalendarGetFreeTimeSlotsAction {
                     dateTime(FROM)
                         .label("From")
                         .description("Start of the time range.")
-                        .required(false),
+                        .required(true),
                     dateTime(TO)
                         .label("To")
                         .description("End of the time range.")
-                        .required(false))
-                .required(false))
+                        .required(true))
+                .required(true))
         .output(
             outputSchema(
                 array()
