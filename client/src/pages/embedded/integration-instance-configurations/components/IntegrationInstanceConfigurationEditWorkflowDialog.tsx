@@ -5,12 +5,14 @@ import IntegrationInstanceConfigurationDialogWorkflowsStepItem from '@/pages/emb
 import {
     IntegrationInstanceConfiguration,
     IntegrationInstanceConfigurationWorkflow,
+    IntegrationInstanceConfigurationWorkflowConnection,
+    WorkflowConnection,
 } from '@/shared/middleware/embedded/configuration';
 import {Workflow} from '@/shared/middleware/platform/configuration';
 import {useUpdateIntegrationInstanceConfigurationWorkflowMutation} from '@/shared/mutations/embedded/integrationInstanceConfigurations.mutations';
 import {IntegrationInstanceConfigurationKeys} from '@/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
 interface IntegrationInstanceConfigurationEditWorkflowDialogProps {
@@ -56,7 +58,7 @@ const IntegrationInstanceConfigurationEditWorkflowDialog = ({
         }
     }
 
-    function updateProjectInstanceWorkflow() {
+    function updateIntegrationInstanceConfigurationWorkflow() {
         const formData = getValues();
 
         if (!formData) {
@@ -65,6 +67,52 @@ const IntegrationInstanceConfigurationEditWorkflowDialog = ({
 
         updateProjectInstanceWorkflowMutation.mutate(formData.integrationInstanceConfigurationWorkflows![0]);
     }
+
+    useEffect(() => {
+        let newIntegrationInstanceConfigurationWorkflowConnections: IntegrationInstanceConfigurationWorkflowConnection[] =
+            [];
+
+        const workflowConnections: WorkflowConnection[] = (workflow?.tasks ?? [])
+            .flatMap((task) => task.connections ?? [])
+            .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []));
+
+        for (const workflowConnection of workflowConnections) {
+            let integrationInstanceConfigurationWorkflowConnection =
+                integrationInstanceConfigurationWorkflow?.connections?.find(
+                    (integrationInstanceConfigurationWorkflowConnection) =>
+                        integrationInstanceConfigurationWorkflowConnection.workflowNodeName ===
+                            workflowConnection.workflowNodeName &&
+                        integrationInstanceConfigurationWorkflowConnection.key === workflowConnection.key
+                );
+
+            if (!integrationInstanceConfigurationWorkflowConnection) {
+                integrationInstanceConfigurationWorkflowConnection = {
+                    /* eslint-disable @typescript-eslint/no-explicit-any */
+                    connectionId: undefined as any,
+                    key: workflowConnection.key,
+                    workflowNodeName: workflowConnection.workflowNodeName,
+                };
+            }
+
+            newIntegrationInstanceConfigurationWorkflowConnections = [
+                ...newIntegrationInstanceConfigurationWorkflowConnections,
+                integrationInstanceConfigurationWorkflowConnection!,
+            ];
+        }
+
+        setValue(
+            'integrationInstanceConfigurationWorkflows',
+            [
+                {
+                    ...integrationInstanceConfigurationWorkflow,
+                    connections: newIntegrationInstanceConfigurationWorkflowConnections,
+                },
+            ],
+            {shouldValidate: true}
+        );
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <Dialog
@@ -101,7 +149,7 @@ const IntegrationInstanceConfigurationEditWorkflowDialog = ({
 
                         <Button
                             disabled={integrationInstanceConfigurationEnabled}
-                            onClick={handleSubmit(updateProjectInstanceWorkflow)}
+                            onClick={handleSubmit(updateIntegrationInstanceConfigurationWorkflow)}
                         >
                             Save
                         </Button>
