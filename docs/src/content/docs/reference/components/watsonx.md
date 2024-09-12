@@ -28,7 +28,7 @@ Version: 1
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Url | STRING | TEXT  |  URL to connect to.  |
+| Region | STRING | SELECT  |  URL to connect to.  |
 | Stream Endpoint | STRING | TEXT  |  The streaming endpoint.  |
 | Text Endpoint | STRING | TEXT  |  The text endpoint.  |
 | Project ID | STRING | TEXT  |  The project ID.  |
@@ -56,6 +56,7 @@ Ask anything you want.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Model | STRING | TEXT  |  Model is the identifier of the LLM Model to be used.  |
 | Messages | [{STRING\(content), STRING\(role)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |
+| Response format | INTEGER | SELECT  |  In which format do you want the response to be in?  |
 | Decoding method | STRING | TEXT  |  Decoding is the process that a model uses to choose the tokens in the generated output.  |
 | Repetition penalty | NUMBER | NUMBER  |  Sets how strongly to penalize repetitions. A higher value (e.g., 1.8) will penalize repetitions more strongly, while a lower value (e.g., 1.1) will be more lenient.  |
 | Min tokens | INTEGER | INTEGER  |  Sets how many tokens must the LLM generate.  |
@@ -65,16 +66,6 @@ Ask anything you want.
 | Top K | INTEGER | INTEGER  |  Specify the number of token choices the generative uses to generate the next token.  |
 | Stop | [STRING] | ARRAY_BUILDER  |  Up to 4 sequences where the API will stop generating further tokens.  |
 | Seed | INTEGER | INTEGER  |  Keeping the same seed would output the same response.  |
-
-
-### Output
-
-
-
-Type: STRING
-
-
-
 
 
 

@@ -55,20 +55,11 @@ Ask anything you want.
 | Model | STRING | SELECT  |  ID of the model to use.  |
 | Messages | [{STRING\(content), STRING\(role)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |
 | Max tokens | INTEGER | INTEGER  |  The maximum number of tokens to generate in the chat completion.  |
+| Response format | INTEGER | SELECT  |  In which format do you want the response to be in?  |
 | Temperature | NUMBER | NUMBER  |  Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.  |
 | Top P | NUMBER | NUMBER  |  An alternative to sampling with temperature, called nucleus sampling,  where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.  |
 | Top K | INTEGER | INTEGER  |  Specify the number of token choices the generative uses to generate the next token.  |
 | Stop | [STRING] | ARRAY_BUILDER  |  Up to 4 sequences where the API will stop generating further tokens.  |
-
-
-### Output
-
-
-
-Type: STRING
-
-
-
 
 
 
@@ -83,20 +74,11 @@ Ask anything you want.
 | Model | STRING | SELECT  |  ID of the model to use.  |
 | Messages | [{STRING\(content), STRING\(role)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |
 | Max tokens | INTEGER | INTEGER  |  The maximum number of tokens to generate in the chat completion.  |
+| Response format | INTEGER | SELECT  |  In which format do you want the response to be in?  |
 | Temperature | NUMBER | NUMBER  |  Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.  |
 | Top P | NUMBER | NUMBER  |  An alternative to sampling with temperature, called nucleus sampling,  where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.  |
 | Top K | INTEGER | INTEGER  |  Specify the number of token choices the generative uses to generate the next token.  |
 | Stop | [STRING] | ARRAY_BUILDER  |  Up to 4 sequences where the API will stop generating further tokens.  |
-
-
-### Output
-
-
-
-Type: STRING
-
-
-
 
 
 
@@ -110,6 +92,7 @@ Ask anything you want.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Model | STRING | SELECT  |  ID of the model to use.  |
 | Messages | [{STRING\(content), STRING\(role)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |
+| Response format | INTEGER | SELECT  |  In which format do you want the response to be in?  |
 | Max tokens | INTEGER | INTEGER  |  The maximum number of tokens to generate in the chat completion.  |
 | Number of chat completion choices | INTEGER | INTEGER  |  How many chat completion choices to generate for each input message.  |
 | Temperature | NUMBER | NUMBER  |  Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.  |
@@ -119,16 +102,6 @@ Ask anything you want.
 | Logit Bias | {STRING\(biasToken), NUMBER\(biasValue)} | OBJECT_BUILDER  |  Modify the likelihood of a specified token appearing in the completion.  |
 | Return Likelihoods | {} | SELECT  |  The token likelihoods are returned with the response.  |
 | Truncate | {} | SELECT  |  Specifies how the API handles inputs longer than the maximum token length  |
-
-
-### Output
-
-
-
-Type: STRING
-
-
-
 
 
 
@@ -142,6 +115,7 @@ Ask anything you want.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Model | STRING | SELECT  |  ID of the model to use.  |
 | Messages | [{STRING\(content), STRING\(role)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |
+| Response format | INTEGER | SELECT  |  In which format do you want the response to be in?  |
 | Min tokens | INTEGER | INTEGER  |  The minimum number of tokens to generate in the chat completion.  |
 | Max tokens | INTEGER | INTEGER  |  The maximum number of tokens to generate in the chat completion.  |
 | Prompt | STRING | TEXT  |  The text which the model is requested to continue.  |
@@ -155,16 +129,6 @@ Ask anything you want.
 | Count penalty | NUMBER | NUMBER  |  Penalty object for count.  |
 
 
-### Output
-
-
-
-Type: STRING
-
-
-
-
-
 
 
 ### Ask Llama
@@ -176,19 +140,10 @@ Ask anything you want.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Model | STRING | SELECT  |  ID of the model to use.  |
 | Messages | [{STRING\(content), STRING\(role)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |
+| Response format | INTEGER | SELECT  |  In which format do you want the response to be in?  |
 | Max tokens | INTEGER | INTEGER  |  The maximum number of tokens to generate in the chat completion.  |
 | Temperature | NUMBER | NUMBER  |  Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.  |
 | Top P | NUMBER | NUMBER  |  An alternative to sampling with temperature, called nucleus sampling,  where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.  |
-
-
-### Output
-
-
-
-Type: STRING
-
-
-
 
 
 
@@ -202,20 +157,11 @@ Ask anything you want.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Model | STRING | SELECT  |  ID of the model to use.  |
 | Messages | [{STRING\(content), STRING\(role)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |
+| Response format | INTEGER | SELECT  |  In which format do you want the response to be in?  |
 | Max tokens | INTEGER | INTEGER  |  The maximum number of tokens to generate in the chat completion.  |
 | Temperature | NUMBER | NUMBER  |  Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.  |
 | Top P | NUMBER | NUMBER  |  An alternative to sampling with temperature, called nucleus sampling,  where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.  |
 | Stop | [STRING] | ARRAY_BUILDER  |  Up to 4 sequences where the API will stop generating further tokens.  |
-
-
-### Output
-
-
-
-Type: STRING
-
-
-
 
 
 

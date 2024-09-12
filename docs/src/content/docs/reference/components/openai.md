@@ -52,6 +52,7 @@ Ask anything you want.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Model | STRING | SELECT  |  ID of the model to use.  |
 | Messages | [{STRING\(content), STRING\(role)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |
+| Response format | INTEGER | SELECT  |  In which format do you want the response to be in?  |
 | Max tokens | INTEGER | INTEGER  |  The maximum number of tokens to generate in the chat completion.  |
 | Number of chat completion choices | INTEGER | INTEGER  |  How many chat completion choices to generate for each input message.  |
 | Temperature | NUMBER | NUMBER  |  Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.  |
@@ -60,17 +61,8 @@ Ask anything you want.
 | Presence penalty | NUMBER | NUMBER  |  Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics.  |
 | Logit bias | {} | OBJECT_BUILDER  |  Modify the likelihood of specified tokens appearing in the completion.  |
 | Stop | [STRING] | ARRAY_BUILDER  |  Up to 4 sequences where the API will stop generating further tokens.  |
+| Functions | [STRING] | ARRAY_BUILDER  |  Enter the names of functions you want to use.  |
 | User | STRING | TEXT  |  A unique identifier representing your end-user, which can help admins to monitor and detect abuse.  |
-
-
-### Output
-
-
-
-Type: STRING
-
-
-
 
 
 
@@ -159,16 +151,6 @@ Transcribes audio into the input language.
 | Prompt | STRING | TEXT  |  An optional text to guide the model's style or continue a previous audio segment. The prompt should match the audio language.  |
 | Response format | {} | SELECT  |  The format of the transcript output  |
 | Temperature | NUMBER | NUMBER  |  The sampling temperature, between 0 and 1. Higher values like will make the output more random, while lower values will make it more focused and deterministic.   |
-
-
-### Output
-
-
-
-Type: STRING
-
-
-
 
 
 

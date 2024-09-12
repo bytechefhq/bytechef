@@ -1,5 +1,5 @@
 ---
-title: "Gitlab"
+title: "GitLab"
 description: "GitLab is a web-based DevOps lifecycle tool that provides a Git repository manager, CI/CD pipelines, issue tracking, and more in a single application."
 ---
 ## Reference

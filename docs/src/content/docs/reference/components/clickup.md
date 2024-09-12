@@ -1,5 +1,5 @@
 ---
-title: "Clickup"
+title: "ClickUp"
 description: "ClickUp is a cloud-based collaboration tool that offers task management, document sharing, goal tracking, and other productivity features for teams."
 ---
 ## Reference
