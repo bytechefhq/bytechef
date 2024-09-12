@@ -19,7 +19,6 @@ package com.bytechef.platform.configuration.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
@@ -77,15 +76,11 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
                 .orElseGet(() -> {
                     WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
 
-                    Map<String, ?> outputs = workflowNodeOutputFacade.getWorkflowNodeSampleOutputs(
-                        workflowId, workflowTask.getName());
                     WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
                     return actionDefinitionFacade.executeWorkflowNodeDescription(
                         workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                        workflowNodeType.componentOperationName(),
-                        workflowTask.evaluateParameters(
-                            MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs)));
+                        workflowNodeType.componentOperationName(), workflowTask.evaluateParameters(inputs));
                 });
         }
 
