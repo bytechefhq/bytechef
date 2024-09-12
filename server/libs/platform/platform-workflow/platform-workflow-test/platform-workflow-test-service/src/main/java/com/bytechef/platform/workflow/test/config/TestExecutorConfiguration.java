@@ -84,8 +84,7 @@ public class TestExecutorConfiguration {
 
         InMemoryTaskExecutionRepository taskExecutionRepository = new InMemoryTaskExecutionRepository();
 
-        JobService jobService = new JobServiceImpl(
-            new InMemoryJobRepository(taskExecutionRepository, objectMapper));
+        JobService jobService = new JobServiceImpl(new InMemoryJobRepository(taskExecutionRepository, objectMapper));
         TaskExecutionService taskExecutionService = new TaskExecutionServiceImpl(taskExecutionRepository);
 
         TaskFileStorage taskFileStorage = new TaskFileStorageImpl(new Base64FileStorageService());
@@ -96,12 +95,10 @@ public class TestExecutorConfiguration {
                 contextService, jobService, syncMessageBroker,
                 getTaskCompletionHandlerFactories(
                     contextService, counterService, taskExecutionService, taskFileStorage),
-                getTaskDispatcherAdapterFactories(),
-                List.of(new TestTaskDispatcherPreSendProcessor(jobService)),
+                getTaskDispatcherAdapterFactories(), List.of(new TestTaskDispatcherPreSendProcessor(jobService)),
                 getTaskDispatcherResolverFactories(
                     syncMessageBroker, contextService, counterService, taskExecutionService, taskFileStorage),
-                taskExecutionService, taskHandlerRegistry, taskFileStorage,
-                workflowService),
+                taskExecutionService, taskHandlerRegistry, taskFileStorage, workflowService),
             taskExecutionService, taskFileStorage);
     }
 

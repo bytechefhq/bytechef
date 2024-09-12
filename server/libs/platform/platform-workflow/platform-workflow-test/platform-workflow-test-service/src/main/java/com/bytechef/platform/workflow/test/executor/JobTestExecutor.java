@@ -49,8 +49,7 @@ public class JobTestExecutor {
     @SuppressFBWarnings("EI")
     public JobTestExecutor(
         ComponentDefinitionService componentDefinitionService, ContextService contextService,
-        JobSyncExecutor jobSyncExecutor, TaskExecutionService taskExecutionService,
-        TaskFileStorage taskFileStorage) {
+        JobSyncExecutor jobSyncExecutor, TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
         this.componentDefinitionService = componentDefinitionService;
         this.contextService = contextService;
@@ -92,8 +91,6 @@ public class JobTestExecutor {
                 workflowNodeType.componentName(), workflowNodeType.componentVersion());
         }
 
-        return componentDefinitionService.getComponentDefinition(
-            "missing", 1);
-
+        return componentDefinitionService.getComponentDefinition("missing", 1);
     }
 }
