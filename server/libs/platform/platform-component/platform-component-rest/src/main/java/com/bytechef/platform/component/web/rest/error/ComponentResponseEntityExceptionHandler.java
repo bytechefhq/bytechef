@@ -38,8 +38,6 @@ public class ComponentResponseEntityExceptionHandler extends AbstractResponseEnt
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(AbstractComponentException.class)
     public ResponseEntity<Object> handleComponentException(AbstractComponentException exception, WebRequest request) {
-        logger.error(exception.getMessage(), exception);
-
         return ResponseEntity
             .of(
                 createProblemDetail(

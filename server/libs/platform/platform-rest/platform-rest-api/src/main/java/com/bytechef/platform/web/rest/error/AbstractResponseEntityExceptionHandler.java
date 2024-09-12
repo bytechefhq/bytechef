@@ -37,8 +37,6 @@ public abstract class AbstractResponseEntityExceptionHandler extends ResponseEnt
     protected ProblemDetail createProblemDetail(
         AbstractException exception, HttpStatus status, Map<String, ?> properties, WebRequest request) {
 
-        logger.error(exception.getMessage(), exception);
-
         return createProblemDetail(
             exception, status, exception.getEntityClass(), exception.getErrorKey(),
             exception.getErrorMessageCode(), exception.getErrorMessageArguments(), properties, request);
@@ -47,6 +45,8 @@ public abstract class AbstractResponseEntityExceptionHandler extends ResponseEnt
     protected ProblemDetail createProblemDetail(
         Exception exception, HttpStatus status, Class<?> entityClass, int errorKey, String errorMessageCode,
         List<?> errorMessageArguments, Map<String, ?> properties, WebRequest request) {
+
+        logger.error(exception.getMessage(), exception);
 
         String detailMessage = exception.getMessage();
         Throwable curException = exception;
