@@ -59,6 +59,7 @@ class ContextFactoryImpl implements ContextFactory {
         return new ActionContextImpl(
             componentName, componentVersion, actionName, type, instanceId, instanceWorkflowId, workflowId, jobId,
             connection, testEnvironment, getDataStorage(workflowId, testEnvironment), eventPublisher,
+            getFilesFileStorage(testEnvironment), httpClientExecutor);
     }
 
     @Override
@@ -73,6 +74,7 @@ class ContextFactoryImpl implements ContextFactory {
 
         return new TriggerContextImpl(
             componentName, componentVersion, triggerName, type, workflowReferenceCode, connection,
+            getDataStorage(workflowReferenceCode, testEnvironment), getFilesFileStorage(testEnvironment),
             httpClientExecutor);
     }
 
@@ -83,5 +85,12 @@ class ContextFactoryImpl implements ContextFactory {
 
         return dataStorage;
     }
+
+    private FilesFileStorage getFilesFileStorage(boolean testEnvironment) {
+        if (testEnvironment) {
+            return new InMemoryFilesFileStorage();
+        }
+
+        return filesFileStorage;
     }
 }
