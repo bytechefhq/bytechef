@@ -247,7 +247,9 @@ public class PolyglotEngine {
                         entry = getComponentConnectionEntry(arguments[1].asString());
                     }
 
-                    componentConnection = entry.getValue();
+                    if (entry != null) {
+                        componentConnection = entry.getValue();
+                    }
                 }
 
                 ActionDefinitionFacade actionDefinitionFacade = applicationContext.getBean(
@@ -289,7 +291,8 @@ public class PolyglotEngine {
                 .filter(entry -> Objects.equals(entry.getKey(), connectionName))
                 .findFirst()
                 .map(entry -> Map.entry(entry.getKey(), toComponentConnection(entry.getValue())))
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(() -> new IllegalArgumentException(
+                    "Connection with name %s does not exist".formatted(connectionName)));
         }
 
         private Map.Entry<String, ComponentConnection> getFirstComponentConnectionEntry() {
@@ -302,7 +305,7 @@ public class PolyglotEngine {
                 })
                 .findFirst()
                 .map(entry -> Map.entry(entry.getKey(), toComponentConnection(entry.getValue())))
-                .orElseThrow(IllegalStateException::new);
+                .orElse(null);
         }
 
         private ComponentConnection toComponentConnection(ParameterConnection parameterConnection) {
