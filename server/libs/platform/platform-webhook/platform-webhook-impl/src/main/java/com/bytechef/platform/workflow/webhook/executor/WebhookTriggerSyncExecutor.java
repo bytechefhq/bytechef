@@ -100,7 +100,7 @@ public class WebhookTriggerSyncExecutor {
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode(),
             triggerExecution.getParameters(), triggerExecution.getState(),
             MapUtils.get(triggerExecution.getMetadata(), WebhookRequest.WEBHOOK_REQUEST, WebhookRequest.class),
-            OptionalUtils.orElse(CollectionUtils.findFirst(connectIdMap.values()), null));
+            OptionalUtils.orElse(CollectionUtils.findFirst(connectIdMap.values()), null), false);
 
         triggerExecution.setBatch(triggerOutput.batch());
         triggerExecution.setOutput(

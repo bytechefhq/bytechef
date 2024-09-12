@@ -53,27 +53,35 @@ class ContextFactoryImpl implements ContextFactory {
     @Override
     public ActionContext createActionContext(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, AppType type,
-        Long instanceId, Long instanceWorkflowId, Long jobId, ComponentConnection connection) {
+        Long instanceId, Long instanceWorkflowId, String workflowId, Long jobId, ComponentConnection connection,
+        boolean testEnvironment) {
 
         return new ActionContextImpl(
-            componentName, componentVersion, actionName, type, instanceId, instanceWorkflowId, jobId,
-            connection, dataStorage, eventPublisher, filesFileStorage, httpClientExecutor);
+            componentName, componentVersion, actionName, type, instanceId, instanceWorkflowId, workflowId, jobId,
+            connection, testEnvironment, getDataStorage(workflowId, testEnvironment), eventPublisher,
     }
 
     @Override
-    public Context createContext(
-        @NonNull String componentName, ComponentConnection connection) {
-
+    public Context createContext(@NonNull String componentName, ComponentConnection connection) {
         return new ContextImpl(componentName, -1, null, filesFileStorage, connection, httpClientExecutor);
     }
 
     @Override
     public TriggerContext createTriggerContext(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, AppType type,
-        String workflowReferenceCode, ComponentConnection connection) {
+        String workflowReferenceCode, ComponentConnection connection, boolean testEnvironment) {
 
         return new TriggerContextImpl(
-            componentName, componentVersion, triggerName, type, workflowReferenceCode, connection, dataStorage,
-            filesFileStorage, httpClientExecutor);
+            componentName, componentVersion, triggerName, type, workflowReferenceCode, connection,
+            httpClientExecutor);
+    }
+
+    private DataStorage getDataStorage(String workflowReference, boolean testEnvironment) {
+        if (testEnvironment) {
+            return new InMemoryDataStorage(workflowReference);
+        }
+
+        return dataStorage;
+    }
     }
 }

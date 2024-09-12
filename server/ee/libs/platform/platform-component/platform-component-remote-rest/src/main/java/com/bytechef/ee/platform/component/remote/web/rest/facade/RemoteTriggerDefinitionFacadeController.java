@@ -175,7 +175,7 @@ public class RemoteTriggerDefinitionFacadeController {
                 triggerRequest.componentName, triggerRequest.componentVersion, triggerRequest.triggerName,
                 triggerRequest.type, triggerRequest.instanceId, triggerRequest.workflowReferenceCode,
                 triggerRequest.inputParameters, triggerRequest.state, triggerRequest.webhookRequest,
-                triggerRequest.connectionId));
+                triggerRequest.connectionId, false));
     }
 
     @RequestMapping(
