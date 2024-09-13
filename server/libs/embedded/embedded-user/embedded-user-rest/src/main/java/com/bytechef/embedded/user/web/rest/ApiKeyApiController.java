@@ -72,7 +72,7 @@ public class ApiKeyApiController extends AbstractApiKeyApiController implements 
 
     @Override
     public ResponseEntity<List<ApiKeyModel>> getApiKeys() {
-        return super.doGetApiKeys();
+        return super.doGetApiKeys(AppType.EMBEDDED);
     }
 
     @Override

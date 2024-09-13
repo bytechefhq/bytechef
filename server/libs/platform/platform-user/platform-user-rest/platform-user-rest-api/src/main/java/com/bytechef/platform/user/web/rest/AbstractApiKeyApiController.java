@@ -55,10 +55,10 @@ public abstract class AbstractApiKeyApiController {
         return ResponseEntity.ok(apiKeyModel.secretKey(obfuscate(apiKeyModel.getSecretKey())));
     }
 
-    protected ResponseEntity<List<ApiKeyModel>> doGetApiKeys() {
+    protected ResponseEntity<List<ApiKeyModel>> doGetApiKeys(AppType type) {
         return ResponseEntity.ok(
             CollectionUtils.map(
-                apiKeyService.getApiKeys(AppType.EMBEDDED),
+                apiKeyService.getApiKeys(type),
                 apiKey -> conversionService.convert(apiKey, ApiKeyModel.class)
                     .secretKey(obfuscate(apiKey.getSecretKey()))));
     }
