@@ -31,7 +31,7 @@ public class ApiKeyAuthenticationFilter extends AbstractApiKeyAuthenticationFilt
     @SuppressFBWarnings("EI")
     public ApiKeyAuthenticationFilter(AuthenticationManager authenticationManager) {
         super(
-            "^/api/(automation|embedded)/v([0-9]+)/(.+)/.+", authenticationManager,
+            "^/api/(automation|embedded)/v([0-9]+)/(test|production)/.+", authenticationManager,
             ApiKeyAuthenticationFilter::getUrlItems);
     }
 
