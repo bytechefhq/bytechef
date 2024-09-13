@@ -186,8 +186,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         ProjectInstance projectInstance = projectInstanceService.getProjectInstance(id);
 
         if (projectInstance.isEnabled()) {
-            throw new PlatformException(
-                "Project instance id=%s is enabled".formatted(id), ProjectInstanceErrorType.DELETE_PROJECT_INSTANCE);
+            enableProjectInstance(projectInstance.getId(), false);
         }
 
         List<ProjectInstanceWorkflow> projectInstanceWorkflows =
@@ -334,7 +333,15 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     @Override
     public ProjectInstanceDTO updateProjectInstance(ProjectInstanceDTO projectInstanceDTO) {
-        ProjectInstance projectInstance = projectInstanceService.update(projectInstanceDTO.toProjectInstance());
+        ProjectInstance projectInstance = projectInstanceDTO.toProjectInstance();
+
+        List<Tag> tags = checkTags(projectInstanceDTO.tags());
+
+        if (!tags.isEmpty()) {
+            projectInstance.setTags(tags);
+        }
+
+        projectInstance = projectInstanceService.update(projectInstance);
 
         projectInstanceWorkflowService.deleteProjectInstanceWorkflows(projectInstance.getId());
 
@@ -345,7 +352,6 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
         List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
             projectInstanceDTO.projectId(), projectInstanceDTO.projectVersion());
-        List<Tag> tags = checkTags(projectInstanceDTO.tags());
 
         return new ProjectInstanceDTO(
             projectInstance,
