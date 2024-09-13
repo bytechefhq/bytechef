@@ -221,9 +221,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             .getIntegrationInstanceConfiguration(id);
 
         if (integrationInstanceConfiguration.isEnabled()) {
-            throw new PlatformException(
-                "Integration instance configuration id=%s is enabled".formatted(id),
-                IntegrationInstanceConfigurationErrorType.DELETE_INTEGRATION_INSTANCE_CONFIGURATION);
+            enableIntegrationInstanceConfiguration(integrationInstanceConfiguration.getId(), false);
         }
 
         List<IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflows =
@@ -449,8 +447,17 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     public IntegrationInstanceConfigurationDTO updateIntegrationInstanceConfiguration(
         IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO) {
 
-        IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
-            .update(integrationInstanceConfigurationDTO.toIntegrationInstanceConfiguration());
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationDTO
+            .toIntegrationInstanceConfiguration();
+
+        List<Tag> tags = checkTags(integrationInstanceConfigurationDTO.tags());
+
+        if (!tags.isEmpty()) {
+            integrationInstanceConfiguration.setTags(tags);
+        }
+
+        integrationInstanceConfiguration = integrationInstanceConfigurationService.update(
+            integrationInstanceConfiguration);
 
         integrationInstanceConfigurationWorkflowService.deleteIntegrationInstanceConfigurationWorkflows(
             integrationInstanceConfiguration.getId());
@@ -462,7 +469,6 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                     IntegrationInstanceConfigurationWorkflowDTO::toIntegrationInstanceConfigurationWorkflow));
 
         List<IntegrationWorkflow> integrationWorkflows = getIntegrationWorkflows(integrationInstanceConfigurationDTO);
-        List<Tag> tags = checkTags(integrationInstanceConfigurationDTO.tags());
 
         return toIntegrationInstanceConfigurationDTO(
             integrationService.getIntegration(integrationInstanceConfigurationDTO.integrationId()),
