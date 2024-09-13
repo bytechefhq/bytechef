@@ -47,7 +47,6 @@ public class XeroNewBillTrigger {
         .type(TriggerType.STATIC_WEBHOOK)
         .properties(WEBHOOK_KEY_PROPERTY)
         .output(outputSchema(INVOICE_OUTPUT_PROPERTY))
-        .workflowSyncValidation(true)
         .webhookValidate(XeroUtils::webhookValidate)
         .webhookRequest(XeroNewBillTrigger::webhookRequest);
 

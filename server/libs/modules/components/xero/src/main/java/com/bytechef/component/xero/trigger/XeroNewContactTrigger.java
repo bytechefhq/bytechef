@@ -45,7 +45,6 @@ public class XeroNewContactTrigger {
         .type(TriggerType.STATIC_WEBHOOK)
         .properties(WEBHOOK_KEY_PROPERTY)
         .output(outputSchema(CONTACT_OUTPUT_PROPERTY))
-        .workflowSyncValidation(true)
         .webhookValidate(XeroUtils::webhookValidate)
         .webhookRequest(XeroNewContactTrigger::webhookRequest);
 
