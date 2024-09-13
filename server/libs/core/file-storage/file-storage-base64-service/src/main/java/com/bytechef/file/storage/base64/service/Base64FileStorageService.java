@@ -50,12 +50,14 @@ public class Base64FileStorageService implements FileStorageService {
     @Override
     public boolean fileExists(@NonNull String directoryPath, @NonNull String nonRandomFilename)
         throws FileStorageException {
+
         throw new UnsupportedOperationException();
     }
 
     @Override
     public FileEntry getFileEntry(@NonNull String directoryPath, @NonNull String nonRandomFilename)
         throws FileStorageException {
+
         throw new UnsupportedOperationException();
     }
 
@@ -79,6 +81,7 @@ public class Base64FileStorageService implements FileStorageService {
     @Override
     public byte[] readFileToBytes(@NonNull String directoryPath, @NonNull FileEntry fileEntry)
         throws FileStorageException {
+
         String url = fileEntry.getUrl();
 
         return EncodingUtils.base64Decode(url.replace(URL_PREFIX, ""));
@@ -87,6 +90,7 @@ public class Base64FileStorageService implements FileStorageService {
     @Override
     public String readFileToString(@NonNull String directoryPath, @NonNull FileEntry fileEntry)
         throws FileStorageException {
+
         String url = fileEntry.getUrl();
 
         return EncodingUtils.base64DecodeToString(url.replace(URL_PREFIX, ""));
@@ -95,6 +99,7 @@ public class Base64FileStorageService implements FileStorageService {
     @Override
     public FileEntry storeFileContent(@NonNull String directoryPath, @NonNull String filename, byte[] data)
         throws FileStorageException {
+
         return new FileEntry(filename, URL_PREFIX + EncodingUtils.base64EncodeToString(data));
     }
 
@@ -109,6 +114,7 @@ public class Base64FileStorageService implements FileStorageService {
     @Override
     public FileEntry storeFileContent(@NonNull String directoryPath, @NonNull String filename, @NonNull String data)
         throws FileStorageException {
+
         return new FileEntry(filename, URL_PREFIX + EncodingUtils.base64EncodeToString(data));
     }
 
@@ -121,8 +127,9 @@ public class Base64FileStorageService implements FileStorageService {
     }
 
     @Override
-    public FileEntry
-        storeFileContent(@NonNull String directoryPath, @NonNull String filename, @NonNull InputStream inputStream) {
+    public FileEntry storeFileContent(
+        @NonNull String directoryPath, @NonNull String filename, @NonNull InputStream inputStream) {
+
         try {
             return new FileEntry(filename, URL_PREFIX + EncodingUtils.base64EncodeToString(toByteArray(inputStream)));
         } catch (IOException ioe) {

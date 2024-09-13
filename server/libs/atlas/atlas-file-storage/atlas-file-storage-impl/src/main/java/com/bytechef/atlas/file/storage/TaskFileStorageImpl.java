@@ -77,8 +77,7 @@ public class TaskFileStorageImpl implements TaskFileStorage {
         Validate.notNull(value, "'value' must not be null");
 
         return fileStorageService.storeFileContent(
-            CONTEXT_FILES_DIR, classname + "_" + stackId + ".json",
-            CompressionUtils.compress(JsonUtils.write(value)));
+            CONTEXT_FILES_DIR, classname + "_" + stackId + ".json", CompressionUtils.compress(JsonUtils.write(value)));
     }
 
     @Override
