@@ -7,7 +7,7 @@ module.exports = {
     plugins: [require('@tailwindcss/forms'), require('tailwindcss-animate')],
     theme: {
         container: {
-            center: true,
+            center: 'true',
             padding: '2rem',
         },
         extend: {
@@ -65,15 +65,30 @@ module.exports = {
                     DEFAULT: 'hsl(var(--success))',
                     foreground: 'hsl(var(--success-foreground))',
                 },
+                chart: {
+                    1: 'hsl(var(--chart-1))',
+                    2: 'hsl(var(--chart-2))',
+                    3: 'hsl(var(--chart-3))',
+                    4: 'hsl(var(--chart-4))',
+                    5: 'hsl(var(--chart-5))',
+                },
             },
             keyframes: {
                 'accordion-down': {
-                    from: {height: 0},
-                    to: {height: 'var(--radix-accordion-content-height)'},
+                    from: {
+                        height: '0',
+                    },
+                    to: {
+                        height: 'var(--radix-accordion-content-height)',
+                    },
                 },
                 'accordion-up': {
-                    from: {height: 'var(--radix-accordion-content-height)'},
-                    to: {height: 0},
+                    from: {
+                        height: 'var(--radix-accordion-content-height)',
+                    },
+                    to: {
+                        height: '0',
+                    },
                 },
             },
             maxHeight: {
