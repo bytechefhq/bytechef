@@ -103,7 +103,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             return CollectionUtils.map(
                 propertiesFunction.apply(
                     ParametersFactory.createParameters(inputParameters),
-                    connection == null ? null : ParametersFactory.createParameters(connection.parameters()),
+                    ParametersFactory.createParameters(connection == null ? Map.of() : connection.parameters()),
                     MapUtils.toMap(
                         lookupDependsOnPaths,
                         item -> item.substring(item.lastIndexOf(".") + 1),
@@ -125,7 +125,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             componentName, componentVersion, triggerName);
 
         return dynamicWebhookRefreshFunction.apply(
-            connection == null ? null : ParametersFactory.createParameters(connection.parameters()),
+            ParametersFactory.createParameters(connection == null ? Map.of() : connection.parameters()),
             ParametersFactory.createParameters(outputParameters), context);
     }
 
@@ -141,7 +141,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         try {
             listenerDisableConsumer.accept(
                 ParametersFactory.createParameters(inputParameters),
-                connection == null ? null : ParametersFactory.createParameters(connection.parameters()),
+                ParametersFactory.createParameters(connection == null ? Map.of() : connection.parameters()),
                 workflowExecutionId,
                 context);
         } catch (Exception e) {
@@ -162,7 +162,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         try {
             listenerEnableConsumer.accept(
                 ParametersFactory.createParameters(inputParameters),
-                connection == null ? null : ParametersFactory.createParameters(connection.parameters()),
+                ParametersFactory.createParameters(connection == null ? Map.of() : connection.parameters()),
                 workflowExecutionId,
                 output -> eventPublisher.publishEvent(
                     new TriggerListenerEvent(
@@ -189,7 +189,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             return CollectionUtils.map(
                 optionsFunction.apply(
                     ParametersFactory.createParameters(inputParameters),
-                    connection == null ? null : ParametersFactory.createParameters(connection.parameters()),
+                    ParametersFactory.createParameters(connection == null ? Map.of() : connection.parameters()),
                     MapUtils.toMap(
                         lookupDependsOnPaths,
                         item -> item.substring(item.lastIndexOf(".") + 1),
@@ -268,7 +268,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         try {
             webhookDisableConsumer.accept(
                 ParametersFactory.createParameters(inputParameters),
-                connection == null ? null : ParametersFactory.createParameters(connection.parameters()),
+                ParametersFactory.createParameters(connection == null ? Map.of() : connection.parameters()),
                 ParametersFactory.createParameters(outputParameters), workflowExecutionId, context);
         } catch (Exception e) {
             throw new ComponentExecutionException(
@@ -292,7 +292,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         try {
             return webhookEnableFunction.apply(
                 ParametersFactory.createParameters(inputParameters),
-                connection == null ? null : ParametersFactory.createParameters(connection.parameters()),
+                ParametersFactory.createParameters(connection == null ? Map.of() : connection.parameters()),
                 webhookUrl, workflowExecutionId, context);
         } catch (Exception e) {
             throw new ComponentExecutionException(
@@ -401,7 +401,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         PollOutput pollOutput;
 
         Parameters connectionParameters =
-            connection == null ? null : ParametersFactory.createParameters(connection.getConnectionParameters());
+            ParametersFactory.createParameters(connection == null ? Map.of() : connection.getConnectionParameters());
 
         try {
             pollOutput = pollFunction.apply(
@@ -443,7 +443,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         try {
             webhookOutput = webhookRequestFunction.apply(
                 ParametersFactory.createParameters(inputParameters),
-                connection == null ? null : ParametersFactory.createParameters(connection.parameters()),
+                ParametersFactory.createParameters(connection == null ? Map.of() : connection.parameters()),
                 new HttpHeadersImpl(webhookRequest.headers()),
                 new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(), webhookRequest.method(),
                 output, triggerContext);

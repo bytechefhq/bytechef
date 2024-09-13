@@ -208,7 +208,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         try {
             BaseOutputDefinition.OutputResponse outputResponse = singleConnectionOutputFunction.apply(
                 ParametersFactory.createParameters(inputParameters),
-                connection == null ? null : ParametersFactory.createParameters(connection.getConnectionParameters()),
+                ParametersFactory
+                    .createParameters(connection == null ? Map.of() : connection.getConnectionParameters()),
                 context);
 
             if (outputResponse == null) {
