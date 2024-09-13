@@ -50,12 +50,12 @@ public abstract class AbstractApiKeyAuthenticationFilter extends OncePerRequestF
 
     @SuppressFBWarnings("EI")
     public AbstractApiKeyAuthenticationFilter(
-        String pathRegex, AuthenticationManager authenticationManager,
+        String pathPatternRegex, AuthenticationManager authenticationManager,
         UrlItemsExtractFunction urlItemsExtractFunction) {
 
         this.authenticationManager = authenticationManager;
-        this.pathPattern = Pattern.compile(pathRegex);
-        this.requestMatcher = new NegatedRequestMatcher(RegexRequestMatcher.regexMatcher(pathRegex));
+        this.pathPattern = Pattern.compile(pathPatternRegex);
+        this.requestMatcher = new NegatedRequestMatcher(RegexRequestMatcher.regexMatcher(pathPatternRegex));
         this.urlItemsExtractFunction = urlItemsExtractFunction;
     }
 
