@@ -1407,19 +1407,18 @@ public final class ComponentDSL {
                 return false;
             }
 
-            return Objects.equals(actionDefinitions, that.actionDefinitions)
-                && Objects.equals(additionalConnections, that.additionalConnections)
-                && Objects.equals(categories, that.categories)
-                && Objects.equals(connectionDefinition, that.connectionDefinition)
-                && Objects.equals(connectionRequired, that.connectionRequired)
-                && Objects.equals(customAction, that.customAction)
-                && Objects.equals(customActionHelp, that.customActionHelp)
-                && Objects.equals(dataStreamDefinition, that.dataStreamDefinition)
-                && Objects.equals(description, that.description) && Objects.equals(icon, that.icon)
-                && Objects.equals(tags, that.tags)
-                && Objects.equals(metadata, that.metadata) && Objects.equals(name, that.name)
-                && Objects.equals(resources, that.resources) && Objects.equals(title, that.title)
-                && Objects.equals(triggerDefinitions, that.triggerDefinitions);
+            return Objects.equals(actionDefinitions, that.actionDefinitions) &&
+                Objects.equals(additionalConnections, that.additionalConnections) &&
+                Objects.equals(categories, that.categories) &&
+                Objects.equals(connectionDefinition, that.connectionDefinition) &&
+                Objects.equals(connectionRequired, that.connectionRequired) &&
+                Objects.equals(customAction, that.customAction) &&
+                Objects.equals(customActionHelp, that.customActionHelp) &&
+                Objects.equals(dataStreamDefinition, that.dataStreamDefinition) &&
+                Objects.equals(description, that.description) && Objects.equals(icon, that.icon) &&
+                Objects.equals(tags, that.tags) && Objects.equals(metadata, that.metadata) &&
+                Objects.equals(name, that.name) && Objects.equals(resources, that.resources) &&
+                Objects.equals(title, that.title) && Objects.equals(triggerDefinitions, that.triggerDefinitions);
         }
 
         @Override
