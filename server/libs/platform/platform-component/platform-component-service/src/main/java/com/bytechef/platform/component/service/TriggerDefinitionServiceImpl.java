@@ -261,6 +261,10 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         WebhookDisableConsumer webhookDisableConsumer = getWebhookDisableConsumer(
             componentName, componentVersion, triggerName);
 
+        if (webhookDisableConsumer == null) {
+            return;
+        }
+
         try {
             webhookDisableConsumer.accept(
                 ParametersFactory.createParameters(inputParameters),
@@ -280,6 +284,10 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         WebhookEnableFunction webhookEnableFunction = getWebhookEnableFunction(
             componentName, componentVersion, triggerName);
+
+        if (webhookEnableFunction == null) {
+            return null;
+        }
 
         try {
             return webhookEnableFunction.apply(
@@ -515,7 +523,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         com.bytechef.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
-        return OptionalUtils.get(triggerDefinition.getWebhookDisable());
+        return triggerDefinition.getWebhookDisable()
+            .orElse(null);
     }
 
     private WebhookEnableFunction getWebhookEnableFunction(
@@ -524,7 +533,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         com.bytechef.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
-        return OptionalUtils.get(triggerDefinition.getWebhookEnable());
+        return triggerDefinition.getWebhookEnable()
+            .orElse(null);
     }
 
     private TriggerWorkflowNodeDescriptionFunction getWorkflowNodeDescriptionFunction(
