@@ -16,7 +16,7 @@
 
 package com.bytechef.task.dispatcher.loop;
 
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.taskDispatcher;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LOOP_BREAK;
 
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFactory;

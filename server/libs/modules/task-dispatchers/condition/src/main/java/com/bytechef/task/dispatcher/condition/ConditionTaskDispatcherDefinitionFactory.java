@@ -16,15 +16,15 @@
 
 package com.bytechef.task.dispatcher.condition;
 
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.array;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.bool;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.dateTime;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.number;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.object;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.option;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.string;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.task;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.array;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.bool;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.dateTime;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.number;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.object;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.option;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.string;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.task;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.taskDispatcher;
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.BOOLEAN;
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.CASE_FALSE;
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.CASE_TRUE;

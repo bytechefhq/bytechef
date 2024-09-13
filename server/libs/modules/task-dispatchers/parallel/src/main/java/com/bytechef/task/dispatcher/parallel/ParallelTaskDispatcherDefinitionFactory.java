@@ -16,9 +16,9 @@
 
 package com.bytechef.task.dispatcher.parallel;
 
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.array;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.task;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.array;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.task;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.taskDispatcher;
 import static com.bytechef.task.dispatcher.parallel.constants.ParallelTaskDispatcherConstants.PARALLEL;
 import static com.bytechef.task.dispatcher.parallel.constants.ParallelTaskDispatcherConstants.TASKS;
 

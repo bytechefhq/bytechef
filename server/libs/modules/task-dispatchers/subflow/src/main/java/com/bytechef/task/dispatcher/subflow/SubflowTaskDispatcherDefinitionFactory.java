@@ -16,15 +16,15 @@
 
 package com.bytechef.task.dispatcher.subflow;
 
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.bool;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.date;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.dateTime;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.integer;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.number;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.object;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.string;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.time;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.bool;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.date;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.dateTime;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.integer;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.number;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.object;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.string;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.taskDispatcher;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.time;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFactory;

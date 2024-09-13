@@ -16,11 +16,11 @@
 
 package com.bytechef.component.map;
 
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.array;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.integer;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.object;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.task;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.array;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.integer;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.object;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.task;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.taskDispatcher;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.INDEX;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.ITEM;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.ITERATEE;
@@ -33,8 +33,8 @@ import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFa
 import com.bytechef.platform.workflow.task.dispatcher.definition.OutputFunction;
 import com.bytechef.platform.workflow.task.dispatcher.definition.Property.ObjectProperty;
 import com.bytechef.platform.workflow.task.dispatcher.definition.PropertyFactory;
-import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.ModifiableValueProperty;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition;
+import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.ModifiableValueProperty;
 import java.util.List;
 import java.util.Map;
 
