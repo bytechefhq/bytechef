@@ -32,9 +32,7 @@ const ProjectInstanceListItemDropdownMenu = ({
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-                <DropdownMenuItem disabled={projectInstanceEnabled} onClick={onEditClick}>
-                    Edit
-                </DropdownMenuItem>
+                <DropdownMenuItem onClick={onEditClick}>Edit</DropdownMenuItem>
 
                 <DropdownMenuItem disabled={projectInstanceEnabled} onClick={onUpdateProjectVersionClick}>
                     Update Project Version
@@ -46,11 +44,7 @@ const ProjectInstanceListItemDropdownMenu = ({
 
                 <DropdownMenuSeparator />
 
-                <DropdownMenuItem
-                    className="text-destructive"
-                    disabled={projectInstanceEnabled}
-                    onClick={onDeleteClick}
-                >
+                <DropdownMenuItem className="text-destructive" onClick={onDeleteClick}>
                     Delete
                 </DropdownMenuItem>
             </DropdownMenuContent>
