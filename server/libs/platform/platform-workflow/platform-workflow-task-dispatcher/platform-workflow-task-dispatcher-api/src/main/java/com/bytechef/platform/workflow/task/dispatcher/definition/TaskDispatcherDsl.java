@@ -35,7 +35,7 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public final class TaskDispatcherDSL {
+public final class TaskDispatcherDsl {
 
     public static ModifiableArrayProperty array() {
         return new ModifiableArrayProperty();
