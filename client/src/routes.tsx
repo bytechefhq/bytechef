@@ -24,8 +24,9 @@ import {WorkflowExecutions as EmbeddedIntegrationWorkflowExecutions} from '@/pag
 import Home from '@/pages/home/Home';
 import OAuthPopup from '@/pages/platform/connection/components/oauth2/OAuthPopup';
 import AdminApiKeys from '@/pages/platform/settings/admin-api-keys/AdminApiKeys';
+import {ApiKeys as AutomationApiKeys} from '@/pages/settings/automation/api-keys/ApiKeys';
 import Workspaces from '@/pages/settings/automation/workspaces/Workspaces';
-import ApiKeys from '@/pages/settings/embedded/api-keys/ApiKeys';
+import {ApiKeys as EmbeddedApiKeys} from '@/pages/settings/embedded/api-keys/ApiKeys';
 import SigningKeys from '@/pages/settings/embedded/signing-keys/SigningKeys';
 import PrivateRoute from '@/shared/auth/PrivateRoute';
 import {AUTHORITIES} from '@/shared/constants';
@@ -212,6 +213,14 @@ export const getRouter = (queryClient: QueryClient) =>
                                     ),
                                     path: 'workspaces',
                                 },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                                            <AutomationApiKeys />
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'api-keys',
+                                },
                                 ...platformSettingsRoutes.children,
                             ],
                             element: (
@@ -220,6 +229,10 @@ export const getRouter = (queryClient: QueryClient) =>
                                         {
                                             href: '/automation/settings/workspaces',
                                             title: 'Workspaces',
+                                        },
+                                        {
+                                            href: '/automation/settings/api-keys',
+                                            title: 'API Keys',
                                         },
                                         ...platformSettingsRoutes.navItems,
                                     ]}
@@ -321,7 +334,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
-                                            <ApiKeys />
+                                            <EmbeddedApiKeys />
                                         </PrivateRoute>
                                     ),
                                     path: 'api-keys',

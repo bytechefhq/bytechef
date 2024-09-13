@@ -1,11 +1,11 @@
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
-import ApiKeyDialog from '@/pages/settings/embedded/api-keys/components/ApiKeyDialog';
-import ApiKeyTable from '@/pages/settings/embedded/api-keys/components/ApiKeyTable';
+import ApiKeyDialog from '@/pages/settings/automation/api-keys/components/ApiKeyDialog';
+import ApiKeyTable from '@/pages/settings/automation/api-keys/components/ApiKeyTable';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {useGeApiKeysQuery} from '@/shared/queries/embedded/apiKeys.queries';
+import {useGeApiKeysQuery} from '@/shared/queries/automation/apiKeys.queries';
 import {KeyIcon} from 'lucide-react';
 import {useState} from 'react';
 
