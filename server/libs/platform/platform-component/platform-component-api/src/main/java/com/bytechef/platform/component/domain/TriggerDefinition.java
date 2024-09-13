@@ -58,9 +58,9 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
         this.workflowNodeDescriptionDefined = OptionalUtils.mapOrElse(
             triggerDefinition.getWorkflowNodeDescription(), nodeDescriptionFunction -> true, false);
         this.workflowSyncExecution = OptionalUtils.orElse(triggerDefinition.getWorkflowSyncExecution(), false);
-        this.workflowSyncValidation = OptionalUtils.orElse(triggerDefinition.getWorkflowSyncValidation(), false);
-        this.workflowSyncOnEnableValidation = OptionalUtils.orElse(
-            triggerDefinition.getWorkflowSyncOnEnableValidation(), false);
+        this.workflowSyncValidation = OptionalUtils.mapOrElse(triggerDefinition.getWebhookValidate(), v -> true, false);
+        this.workflowSyncOnEnableValidation = OptionalUtils.mapOrElse(
+            triggerDefinition.getWebhookValidateOnEnable(), v -> true, false);
     }
 
     @Override

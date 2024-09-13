@@ -1595,8 +1595,8 @@ public final class ComponentDSL {
 
     public static final class ModifiableDataStreamDefinition implements DataStreamDefinition {
 
-        private DataStreamReaderDefinition dataStreamReaderDefinition;
-        private DataStreamWriterDefinition dataStreamWriterDefinition;
+        private final DataStreamReaderDefinition dataStreamReaderDefinition;
+        private final DataStreamWriterDefinition dataStreamWriterDefinition;
 
         public ModifiableDataStreamDefinition(
             DataStreamReaderDefinition dataStreamReaderDefinition,
@@ -3216,8 +3216,6 @@ public final class ComponentDSL {
         private WebhookValidateOnEnableFunction webhookValidateOnEnableFunction;
         private TriggerWorkflowNodeDescriptionFunction workflowNodeDescriptionFunction;
         private Boolean workflowSyncExecution;
-        private Boolean workflowSyncValidation;
-        private Boolean workflowSyncOnEnableValidation;
 
         public ModifiableTriggerDefinition() {
         }
@@ -3385,7 +3383,6 @@ public final class ComponentDSL {
 
         public ModifiableTriggerDefinition webhookValidate(WebhookValidateFunction webhookValidate) {
             this.webhookValidateFunction = webhookValidate;
-            this.workflowSyncValidation = true;
 
             return this;
         }
@@ -3394,7 +3391,6 @@ public final class ComponentDSL {
             WebhookValidateOnEnableFunction webhookValidateEnable) {
 
             this.webhookValidateOnEnableFunction = webhookValidateEnable;
-            this.workflowSyncOnEnableValidation = true;
 
             return this;
         }
@@ -3409,12 +3405,6 @@ public final class ComponentDSL {
 
         public ModifiableTriggerDefinition workflowSyncExecution(boolean workflowSyncExecution) {
             this.workflowSyncExecution = workflowSyncExecution;
-
-            return this;
-        }
-
-        public ModifiableTriggerDefinition workflowSyncValidation(boolean workflowSyncValidation) {
-            this.workflowSyncValidation = workflowSyncValidation;
 
             return this;
         }
@@ -3446,9 +3436,7 @@ public final class ComponentDSL {
                 Objects.equals(webhookValidateFunction, that.webhookValidateFunction) &&
                 Objects.equals(webhookValidateOnEnableFunction, that.webhookValidateOnEnableFunction) &&
                 Objects.equals(workflowNodeDescriptionFunction, that.workflowNodeDescriptionFunction) &&
-                Objects.equals(workflowSyncExecution, that.workflowSyncExecution) &&
-                Objects.equals(workflowSyncOnEnableValidation, that.workflowSyncOnEnableValidation) &&
-                Objects.equals(workflowSyncValidation, that.workflowSyncValidation);
+                Objects.equals(workflowSyncExecution, that.workflowSyncExecution);
         }
 
         @Override
@@ -3457,8 +3445,7 @@ public final class ComponentDSL {
                 webhookEnableFunction, dynamicWebhookRefreshFunction, webhookRequestFunction, help,
                 listenerDisableConsumer, listenerEnableConsumer, name, outputDefinition, pollFunction, properties,
                 title, type, webhookRawBody, webhookValidateFunction, webhookValidateOnEnableFunction,
-                workflowNodeDescriptionFunction, workflowSyncExecution, workflowSyncOnEnableValidation,
-                workflowSyncValidation);
+                workflowNodeDescriptionFunction, workflowSyncExecution);
         }
 
         @Override
@@ -3577,16 +3564,6 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<Boolean> getWorkflowSyncValidation() {
-            return Optional.ofNullable(workflowSyncValidation);
-        }
-
-        @Override
-        public Optional<Boolean> getWorkflowSyncOnEnableValidation() {
-            return Optional.ofNullable(workflowSyncOnEnableValidation);
-        }
-
-        @Override
         public String toString() {
             return "ModifiableTriggerDefinition{" +
                 "name='" + name + '\'' +
@@ -3600,8 +3577,6 @@ public final class ComponentDSL {
                 ", outputDefinition=" + outputDefinition +
                 ", webhookRawBody=" + webhookRawBody +
                 ", workflowSyncExecution=" + workflowSyncExecution +
-                ", workflowSyncValidation=" + workflowSyncValidation +
-                ", workflowSyncEnableValidation=" + workflowSyncOnEnableValidation +
                 '}';
         }
     }

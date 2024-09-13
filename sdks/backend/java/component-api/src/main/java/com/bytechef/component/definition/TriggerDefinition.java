@@ -242,17 +242,6 @@ public interface TriggerDefinition {
     Optional<Boolean> getWorkflowSyncExecution();
 
     /**
-     * @return
-     */
-    Optional<Boolean> getWorkflowSyncValidation();
-
-    /**
-     *
-     * @return
-     */
-    Optional<Boolean> getWorkflowSyncOnEnableValidation();
-
-    /**
      *
      */
     interface DeduplicateFunction {
