@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.definition;
+package com.bytechef.platform.component.definition;
 
+import com.bytechef.component.definition.Resources;
 import java.util.Optional;
 
 /**

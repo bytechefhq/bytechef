@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.definition;
+package com.bytechef.platform.component;
 
-import com.bytechef.component.definition.JdbcComponentDefinition;
+import com.bytechef.platform.component.definition.JdbcComponentDefinition;
 
 /**
  * The component definition factory used for JDBC based components.
