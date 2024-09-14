@@ -16,11 +16,11 @@
 
 package com.bytechef.component.postgresql;
 
-import static com.bytechef.component.definition.ComponentDsl.jdbcComponent;
 import static com.bytechef.component.postgresql.constant.PostgreSQLConstants.POSTGRESQL;
+import static com.bytechef.platform.component.definition.JdbcComponentDsl.jdbcComponent;
 
-import com.bytechef.component.definition.JdbcComponentDefinition;
-import com.bytechef.platform.component.definition.JdbcComponentHandler;
+import com.bytechef.platform.component.JdbcComponentHandler;
+import com.bytechef.platform.component.definition.JdbcComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**
