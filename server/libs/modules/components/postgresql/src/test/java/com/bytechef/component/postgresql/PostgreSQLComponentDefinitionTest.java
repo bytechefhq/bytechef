@@ -16,7 +16,7 @@
 
 package com.bytechef.component.postgresql;
 
-import com.bytechef.platform.component.jdbc.handler.JdbcComponentHandler;
+import com.bytechef.platform.component.jdbc.handler.JdbcComponentHandlerImpl;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +27,7 @@ public class PostgreSQLComponentDefinitionTest {
 
     @Test
     public void testGetComponentDefinition() {
-        JdbcComponentHandler jdbcComponentHandler = new JdbcComponentHandler(
+        JdbcComponentHandlerImpl jdbcComponentHandler = new JdbcComponentHandlerImpl(
             new PostgreSQLJdbcComponentHandler().getJdbcComponentDefinition());
 
         JsonFileAssert.assertEquals("definition/postgresql_v1.json", jdbcComponentHandler.getDefinition());
