@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.jdbc.handler;
+package com.bytechef.platform.component.jdbc.handler.loader;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -22,11 +22,11 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class JdbcComponentHandlerLoaderTest {
+public class JdbcComponentHandlerImplLoaderTest {
 
     @Disabled
     @Test
-    public void testGetDefinition() {
+    public void testLoadComponentHandlers() {
         // TODO
     }
 }

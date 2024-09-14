@@ -18,6 +18,7 @@ package com.bytechef.platform.component.jdbc.handler.loader;
 
 import com.bytechef.platform.component.JdbcComponentHandler;
 import com.bytechef.platform.component.handler.loader.ComponentHandlerLoader;
+import com.bytechef.platform.component.jdbc.handler.JdbcComponentHandlerImpl;
 import com.bytechef.platform.component.task.handler.ComponentTaskHandler;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,16 +33,15 @@ public class JdbcComponentHandlerLoader implements ComponentHandlerLoader {
     public List<ComponentHandlerEntry> loadComponentHandlers() {
         List<ComponentHandlerEntry> componentHandlerEntries = new ArrayList<>();
 
-        for (JdbcComponentHandler jdbcComponentDefinitionFactory : ServiceLoader.load(JdbcComponentHandler.class)) {
-            com.bytechef.platform.component.jdbc.handler.JdbcComponentHandler jdbcComponentHandler =
-                new com.bytechef.platform.component.jdbc.handler.JdbcComponentHandler(
-                    jdbcComponentDefinitionFactory.getJdbcComponentDefinition());
+        for (JdbcComponentHandler jdbcComponentHandler : ServiceLoader.load(JdbcComponentHandler.class)) {
+            JdbcComponentHandlerImpl jdbcComponentHandlerImpl = new JdbcComponentHandlerImpl(
+                jdbcComponentHandler.getJdbcComponentDefinition());
 
             componentHandlerEntries.add(
                 new ComponentHandlerEntry(
-                    jdbcComponentHandler,
+                    jdbcComponentHandlerImpl,
                     (actionName, actionDefinitionFacade) -> new ComponentTaskHandler(
-                        jdbcComponentHandler.getName(), jdbcComponentHandler.getVersion(), actionName,
+                        jdbcComponentHandlerImpl.getName(), jdbcComponentHandlerImpl.getVersion(), actionName,
                         actionDefinitionFacade)));
         }
 

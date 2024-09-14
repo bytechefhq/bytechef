@@ -56,7 +56,7 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
  * @author Ivica Cardic
  * @author Igor Beslic
  */
-public class JdbcComponentHandler implements ComponentHandler {
+public class JdbcComponentHandlerImpl implements ComponentHandler {
 
     private static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .properties(
@@ -212,7 +212,7 @@ public class JdbcComponentHandler implements ComponentHandler {
     private final QueryJdbcOperation queryJdbcOperation;
     private final UpdateJdbcOperation updateJdbcOperation;
 
-    public JdbcComponentHandler(JdbcComponentDefinition jdbcComponentDefinition) {
+    public JdbcComponentHandlerImpl(JdbcComponentDefinition jdbcComponentDefinition) {
         this.databaseJdbcName = jdbcComponentDefinition.getDatabaseJdbcName();
         this.jdbcDriverClassName = jdbcComponentDefinition.getJdbcDriverClassName();
 
