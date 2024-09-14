@@ -99,7 +99,7 @@ public class ComponentInitOpenApiGenerator {
     public static final ClassName CONNECTION_DEFINITION_CLASS_NAME = ClassName
         .get(COM_BYTECHEF_COMPONENT_PACKAGE + ".definition", "ConnectionDefinition");
     public static final ClassName COMPONENT_DSL_CLASS_NAME = ClassName
-        .get(COM_BYTECHEF_COMPONENT_PACKAGE + ".definition", "ComponentDSL");
+        .get(COM_BYTECHEF_COMPONENT_PACKAGE + ".definition", "ComponentDsl");
     private static final ClassName CONTEXT_HTTP_CLASS = ClassName
         .get("com.bytechef.component.definition", "Context", "Http");
     private static final ClassName OPEN_API_COMPONENT_HANDLER_CLASS = ClassName
@@ -1889,7 +1889,7 @@ public class ComponentInitOpenApiGenerator {
                 .addField(FieldSpec.builder(
                     ClassName.get(
                         "com.bytechef.component.definition",
-                        "ComponentDSL",
+                        "ComponentDsl",
                         "ModifiableActionDefinition"),
                     "ACTION_DEFINITION")
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
@@ -1921,7 +1921,7 @@ public class ComponentInitOpenApiGenerator {
                     .addField(FieldSpec.builder(
                         ClassName.get(
                             "com.bytechef.component.definition",
-                            "ComponentDSL",
+                            "ComponentDsl",
                             "ModifiableConnectionDefinition"),
                         "CONNECTION_DEFINITION")
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
@@ -2030,7 +2030,7 @@ public class ComponentInitOpenApiGenerator {
                             ClassName.get("java.util", "List"),
                             ParameterizedTypeName.get(
                                 ClassName.get(
-                                    "com.bytechef.component.definition", "ComponentDSL", "ModifiableValueProperty"),
+                                    "com.bytechef.component.definition", "ComponentDsl", "ModifiableValueProperty"),
                                 WildcardTypeName.subtypeOf(Object.class), WildcardTypeName.subtypeOf(Object.class))),
                         "PROPERTIES")
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)

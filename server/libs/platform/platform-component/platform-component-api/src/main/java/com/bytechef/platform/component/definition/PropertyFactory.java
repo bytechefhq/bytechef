@@ -16,13 +16,13 @@
 
 package com.bytechef.platform.component.definition;
 
-import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDsl.object;
 
 import com.bytechef.commons.util.ConvertUtils;
-import com.bytechef.component.definition.ComponentDSL;
-import com.bytechef.component.definition.ComponentDSL.ModifiableArrayProperty;
-import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
-import com.bytechef.component.definition.ComponentDSL.ModifiableValueProperty;
+import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.definition.BaseProperty;
 import com.bytechef.definition.BaseProperty.BaseValueProperty;
 import com.bytechef.platform.registry.util.SchemaUtils;
@@ -41,25 +41,25 @@ public record PropertyFactory(Object value) implements SchemaPropertyFactory {
         if (baseValueProperty == BaseProperty.BaseArrayProperty.class) {
             return getArrayProperty(name);
         } else if (baseValueProperty == BaseProperty.BaseBooleanProperty.class) {
-            return ComponentDSL.bool(name);
+            return ComponentDsl.bool(name);
         } else if (baseValueProperty == BaseProperty.BaseDateProperty.class) {
-            return ComponentDSL.date(name);
+            return ComponentDsl.date(name);
         } else if (baseValueProperty == BaseProperty.BaseDateTimeProperty.class) {
-            return ComponentDSL.dateTime(name);
+            return ComponentDsl.dateTime(name);
         } else if (baseValueProperty == BaseProperty.BaseFileEntryProperty.class) {
-            return ComponentDSL.fileEntry(name);
+            return ComponentDsl.fileEntry(name);
         } else if (baseValueProperty == BaseProperty.BaseIntegerProperty.class) {
-            return ComponentDSL.integer(name);
+            return ComponentDsl.integer(name);
         } else if (baseValueProperty == BaseProperty.BaseNullProperty.class) {
-            return ComponentDSL.nullable(name);
+            return ComponentDsl.nullable(name);
         } else if (baseValueProperty == BaseProperty.BaseNumberProperty.class) {
-            return ComponentDSL.number(name);
+            return ComponentDsl.number(name);
         } else if (baseValueProperty == BaseProperty.BaseObjectProperty.class) {
             return getObjectProperty(name);
         } else if (baseValueProperty == BaseProperty.BaseStringProperty.class) {
-            return ComponentDSL.string(name);
+            return ComponentDsl.string(name);
         } else if (baseValueProperty == BaseProperty.BaseTimeProperty.class) {
-            return ComponentDSL.time(name);
+            return ComponentDsl.time(name);
         } else {
             return object(name);
         }
@@ -70,9 +70,9 @@ public record PropertyFactory(Object value) implements SchemaPropertyFactory {
         Class<?> valueClass = value.getClass();
 
         if (valueClass.isArray()) {
-            arrayProperty = ComponentDSL.array(name);
+            arrayProperty = ComponentDsl.array(name);
         } else {
-            arrayProperty = ComponentDSL.array(name);
+            arrayProperty = ComponentDsl.array(name);
 
             List<?> list = (List<?>) value;
 

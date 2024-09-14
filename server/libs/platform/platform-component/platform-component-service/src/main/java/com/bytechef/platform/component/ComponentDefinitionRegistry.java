@@ -16,16 +16,16 @@
 
 package com.bytechef.platform.component;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
-import static com.bytechef.component.definition.ComponentDSL.trigger;
+import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.trigger;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization;
-import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ConnectionDefinition;
 import com.bytechef.component.definition.OutputDefinition;
 import com.bytechef.component.definition.Property;
@@ -67,7 +67,7 @@ public class ComponentDefinitionRegistry {
         .title("Missing Component")
         .icon("path:assets/missing.svg")
         .version(1)
-        .actions(ComponentDSL.action("missing")
+        .actions(ComponentDsl.action("missing")
             .title("Missing Action"));
 
     private final List<ComponentDefinition> componentDefinitions;

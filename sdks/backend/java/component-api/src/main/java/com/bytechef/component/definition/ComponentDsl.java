@@ -42,7 +42,7 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public final class ComponentDSL {
+public final class ComponentDsl {
 
     private static final int VERSION_1 = 1;
 

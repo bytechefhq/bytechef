@@ -22,8 +22,8 @@ import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.component.ComponentHandler;
-import com.bytechef.component.definition.ComponentDSL;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.petstore.PetstoreComponentHandler;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.encryption.Encryption;
@@ -69,8 +69,8 @@ public class ComponentRegistryConfiguration {
     public static final PetstoreComponentHandler PETSTORE_COMPONENT_HANDLER = new PetstoreComponentHandler() {
 
         @Override
-        public ComponentDSL.ModifiableConnectionDefinition modifyConnection(
-            ComponentDSL.ModifiableConnectionDefinition modifiableConnectionDefinition) {
+        public ComponentDsl.ModifiableConnectionDefinition modifyConnection(
+            ComponentDsl.ModifiableConnectionDefinition modifiableConnectionDefinition) {
 
             modifiableConnectionDefinition.baseUri((connectionParameters, context) -> "http://localhost:9999");
 

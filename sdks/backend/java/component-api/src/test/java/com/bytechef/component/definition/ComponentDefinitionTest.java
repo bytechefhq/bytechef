@@ -44,7 +44,7 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testActionDefinition() throws JSONException, JsonProcessingException {
-        ActionDefinition action = ComponentDSL.action("name")
+        ActionDefinition action = ComponentDsl.action("name")
             .title("title")
             .description("description")
             .perform((inputParameters, connectionParameters, context) -> null);
@@ -58,13 +58,13 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testArrayProperty() throws JSONException, JsonProcessingException {
-        Property property = ComponentDSL.array("name")
+        Property property = ComponentDsl.array("name")
             .defaultValue(1, 2)
             .description("description")
             .label("label")
             .placeholder("placeholder")
             .required(true)
-            .items(ComponentDSL.integer());
+            .items(ComponentDsl.integer());
 
         jsonAssertEquals(
             """
@@ -75,7 +75,7 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testBooleanProperty() throws JSONException, JsonProcessingException {
-        Property property = ComponentDSL.bool("name")
+        Property property = ComponentDsl.bool("name")
             .defaultValue(true)
             .description("description")
             .label("label")
@@ -91,7 +91,7 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testComponentDefinition() throws JSONException, JsonProcessingException {
-        ComponentDefinition componentDefinition = ComponentDSL.component("name")
+        ComponentDefinition componentDefinition = ComponentDsl.component("name")
             .title("title")
             .description("description")
             .icon("icon")
@@ -106,7 +106,7 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testDateProperty() throws JSONException, JsonProcessingException {
-        Property property = ComponentDSL.date("name")
+        Property property = ComponentDsl.date("name")
             .defaultValue(LocalDate.MIN)
             .description("description")
             .label("label")
@@ -122,7 +122,7 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testDateTimeProperty() throws JSONException, JsonProcessingException {
-        Property property = ComponentDSL.dateTime("name")
+        Property property = ComponentDsl.dateTime("name")
             .defaultValue(LocalDateTime.MIN)
             .description("description")
             .label("label")
@@ -138,7 +138,7 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testIntegerProperty() throws JSONException, JsonProcessingException {
-        Property property = ComponentDSL.integer("name")
+        Property property = ComponentDsl.integer("name")
             .defaultValue(2)
             .description("description")
             .label("label")
@@ -154,11 +154,11 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testNumberProperty() throws JSONException, JsonProcessingException {
-        Property property = ComponentDSL.number("name")
+        Property property = ComponentDsl.number("name")
             .defaultValue(2)
             .description("description")
             .label("label")
-            .options(ComponentDSL.option("option1", 1.0), ComponentDSL.option("option2", 2.0))
+            .options(ComponentDsl.option("option1", 1.0), ComponentDsl.option("option2", 2.0))
             .placeholder("placeholder")
             .required(true);
 
@@ -171,7 +171,7 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testObjectProperty() throws JSONException, JsonProcessingException {
-        Property property = ComponentDSL.object("name")
+        Property property = ComponentDsl.object("name")
             .defaultValue(Map.of("key", Map.of("key1", "value1")))
             .description("description")
             .label("label")
@@ -187,7 +187,7 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testStringProperty() throws JSONException, JsonProcessingException {
-        Property property = ComponentDSL.string("name")
+        Property property = ComponentDsl.string("name")
             .defaultValue("defaultValue")
             .description("description")
             .label("label")
@@ -203,7 +203,7 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testPropertyOption() throws JSONException, JsonProcessingException {
-        Option option = ComponentDSL.option("label", 1);
+        Option option = ComponentDsl.option("label", 1);
 
         jsonAssertEquals(
             """
@@ -211,7 +211,7 @@ public class ComponentDefinitionTest {
                 """,
             option);
 
-        option = ComponentDSL.option("label", "value");
+        option = ComponentDsl.option("label", "value");
 
         jsonAssertEquals(
             """
@@ -219,7 +219,7 @@ public class ComponentDefinitionTest {
                 """,
             option);
 
-        option = ComponentDSL.option("label", 1, "description");
+        option = ComponentDsl.option("label", 1, "description");
 
         jsonAssertEquals(
             """
@@ -227,7 +227,7 @@ public class ComponentDefinitionTest {
                 """,
             option);
 
-        option = ComponentDSL.option("label", "value", "description");
+        option = ComponentDsl.option("label", "value", "description");
 
         jsonAssertEquals(
             """
