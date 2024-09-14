@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinition", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-06T05:56:21.708890+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-14T19:06:43.949922+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class ComponentDefinitionModel {
 
   @Valid
@@ -41,6 +41,8 @@ public class ComponentDefinitionModel {
   private ConnectionDefinitionBasicModel connection;
 
   private Boolean connectionRequired;
+
+  private Boolean dataStreamSupported;
 
   private String description;
 
@@ -167,6 +169,26 @@ public class ComponentDefinitionModel {
 
   public void setConnectionRequired(Boolean connectionRequired) {
     this.connectionRequired = connectionRequired;
+  }
+
+  public ComponentDefinitionModel dataStreamSupported(Boolean dataStreamSupported) {
+    this.dataStreamSupported = dataStreamSupported;
+    return this;
+  }
+
+  /**
+   * If the component supports data stream.
+   * @return dataStreamSupported
+   */
+  
+  @Schema(name = "dataStreamSupported", description = "If the component supports data stream.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("dataStreamSupported")
+  public Boolean getDataStreamSupported() {
+    return dataStreamSupported;
+  }
+
+  public void setDataStreamSupported(Boolean dataStreamSupported) {
+    this.dataStreamSupported = dataStreamSupported;
   }
 
   public ComponentDefinitionModel description(String description) {
@@ -358,6 +380,7 @@ public class ComponentDefinitionModel {
         Objects.equals(this.categories, componentDefinition.categories) &&
         Objects.equals(this.connection, componentDefinition.connection) &&
         Objects.equals(this.connectionRequired, componentDefinition.connectionRequired) &&
+        Objects.equals(this.dataStreamSupported, componentDefinition.dataStreamSupported) &&
         Objects.equals(this.description, componentDefinition.description) &&
         Objects.equals(this.icon, componentDefinition.icon) &&
         Objects.equals(this.name, componentDefinition.name) &&
@@ -370,7 +393,7 @@ public class ComponentDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(actions, categories, connection, connectionRequired, description, icon, name, resources, tags, title, triggers, version);
+    return Objects.hash(actions, categories, connection, connectionRequired, dataStreamSupported, description, icon, name, resources, tags, title, triggers, version);
   }
 
   @Override
@@ -381,6 +404,7 @@ public class ComponentDefinitionModel {
     sb.append("    categories: ").append(toIndentedString(categories)).append("\n");
     sb.append("    connection: ").append(toIndentedString(connection)).append("\n");
     sb.append("    connectionRequired: ").append(toIndentedString(connectionRequired)).append("\n");
+    sb.append("    dataStreamSupported: ").append(toIndentedString(dataStreamSupported)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");

@@ -17,53 +17,31 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * A type of the control to show in UI.
+ * A category of unified API.
  */
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-14T19:06:43.949922+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
-public enum ControlTypeModel {
+public enum UnifiedApiCategoryModel {
   
-  ARRAY_BUILDER("ARRAY_BUILDER"),
+  ACCOUNTING("ACCOUNTING"),
   
-  CODE_EDITOR("CODE_EDITOR"),
+  ATS("ATS"),
   
-  DATE("DATE"),
+  CRM("CRM"),
   
-  DATE_TIME("DATE_TIME"),
+  E_COMMERCE("E_COMMERCE"),
   
-  EMAIL("EMAIL"),
+  HRIS("HRIS"),
   
-  INTEGER("INTEGER"),
+  FILE_STORAGE("FILE_STORAGE"),
   
-  FILE_ENTRY("FILE_ENTRY"),
+  MARKETING_AUTOMATION("MARKETING_AUTOMATION"),
   
-  OBJECT_BUILDER("OBJECT_BUILDER"),
-  
-  MULTI_SELECT("MULTI_SELECT"),
-  
-  NUMBER("NUMBER"),
-  
-  NULL("NULL"),
-  
-  PASSWORD("PASSWORD"),
-  
-  PHONE("PHONE"),
-  
-  RICH_TEXT("RICH_TEXT"),
-  
-  SELECT("SELECT"),
-  
-  TEXT("TEXT"),
-  
-  TEXT_AREA("TEXT_AREA"),
-  
-  TIME("TIME"),
-  
-  URL("URL");
+  TICKETING("TICKETING");
 
   private String value;
 
-  ControlTypeModel(String value) {
+  UnifiedApiCategoryModel(String value) {
     this.value = value;
   }
 
@@ -78,8 +56,8 @@ public enum ControlTypeModel {
   }
 
   @JsonCreator
-  public static ControlTypeModel fromValue(String value) {
-    for (ControlTypeModel b : ControlTypeModel.values()) {
+  public static UnifiedApiCategoryModel fromValue(String value) {
+    for (UnifiedApiCategoryModel b : UnifiedApiCategoryModel.values()) {
       if (b.value.equals(value)) {
         return b;
       }
