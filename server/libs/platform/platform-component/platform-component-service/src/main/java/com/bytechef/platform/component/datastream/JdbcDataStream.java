@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.component.datastream;
 
-import static com.bytechef.component.definition.ComponentDSL.writer;
+import static com.bytechef.component.definition.ComponentDSL.dataStreamWriter;
 
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.DataStreamDefinition;
@@ -28,6 +28,6 @@ public class JdbcDataStream {
 
     public static DataStreamDefinition dataStream(String databaseJdbcName, String jdbcDriverClassName) {
         return ComponentDSL.dataStream(
-            writer(() -> new JdbcDataStreamItemWriter(databaseJdbcName, jdbcDriverClassName)));
+            dataStreamWriter(() -> new JdbcDataStreamItemWriter(databaseJdbcName, jdbcDriverClassName)));
     }
 }

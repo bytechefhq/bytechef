@@ -17,8 +17,8 @@
 package com.bytechef.component.csv.file.datastream;
 
 import static com.bytechef.component.definition.ComponentDSL.dataStream;
-import static com.bytechef.component.definition.ComponentDSL.reader;
-import static com.bytechef.component.definition.ComponentDSL.writer;
+import static com.bytechef.component.definition.ComponentDSL.dataStreamReader;
+import static com.bytechef.component.definition.ComponentDSL.dataStreamWriter;
 
 import com.bytechef.component.definition.DataStreamDefinition;
 
@@ -28,5 +28,5 @@ import com.bytechef.component.definition.DataStreamDefinition;
 public class CsvFileDataStream {
 
     public static final DataStreamDefinition DATA_STREAM_DEFINITION = dataStream(
-        reader(CsvFileDataStreamItemReader.class), writer(CsvFileDataStreamItemWriter.class));
+        dataStreamReader(CsvFileDataStreamItemReader.class), dataStreamWriter(CsvFileDataStreamItemWriter.class));
 }

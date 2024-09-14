@@ -92,6 +92,43 @@ public final class ComponentDSL {
         return new ModifiableDataStreamDefinition(null, writer);
     }
 
+    public static ModifiableDataStreamReaderDefinition dataStreamReader(
+        Class<? extends DataStreamItemReader> dataStreamItemReader) {
+
+        return new ModifiableDataStreamReaderDefinition(() -> {
+            try {
+                return dataStreamItemReader.getDeclaredConstructor()
+                    .newInstance();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    public static ModifiableDataStreamReaderDefinition dataStreamReader(
+        DataStreamItemReaderSupplier dataStreamItemReaderClass) {
+
+        return new ModifiableDataStreamReaderDefinition(dataStreamItemReaderClass);
+    }
+
+    public static ModifiableDataStreamWriterDefinition dataStreamWriter(
+        Class<? extends DataStreamItemWriter> dataStreamItemReaderClass) {
+
+        return new ModifiableDataStreamWriterDefinition(() -> {
+            try {
+                return dataStreamItemReaderClass.getDeclaredConstructor()
+                    .newInstance();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    public static ModifiableDataStreamWriterDefinition
+        dataStreamWriter(DataStreamItemWriterSupplier dataStreamItemWriter) {
+        return new ModifiableDataStreamWriterDefinition(dataStreamItemWriter);
+    }
+
     public static ModifiableDateProperty date() {
         return new ModifiableDateProperty();
     }
@@ -246,42 +283,6 @@ public final class ComponentDSL {
 
     public static ModifiableTriggerDefinition trigger(String name) {
         return new ModifiableTriggerDefinition(name);
-    }
-
-    public static ModifiableDataStreamReaderDefinition reader(
-        Class<? extends DataStreamItemReader> dataStreamItemReader) {
-
-        return new ModifiableDataStreamReaderDefinition(() -> {
-            try {
-                return dataStreamItemReader.getDeclaredConstructor()
-                    .newInstance();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-    }
-
-    public static ModifiableDataStreamReaderDefinition reader(
-        DataStreamItemReaderSupplier dataStreamItemReaderClass) {
-
-        return new ModifiableDataStreamReaderDefinition(dataStreamItemReaderClass);
-    }
-
-    public static ModifiableDataStreamWriterDefinition writer(
-        Class<? extends DataStreamItemWriter> dataStreamItemReaderClass) {
-
-        return new ModifiableDataStreamWriterDefinition(() -> {
-            try {
-                return dataStreamItemReaderClass.getDeclaredConstructor()
-                    .newInstance();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-    }
-
-    public static ModifiableDataStreamWriterDefinition writer(DataStreamItemWriterSupplier dataStreamItemWriter) {
-        return new ModifiableDataStreamWriterDefinition(dataStreamItemWriter);
     }
 
     public static final class ModifiableActionDefinition implements ActionDefinition {

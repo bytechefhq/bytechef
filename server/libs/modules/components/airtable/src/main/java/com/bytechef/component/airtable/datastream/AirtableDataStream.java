@@ -17,8 +17,8 @@
 package com.bytechef.component.airtable.datastream;
 
 import static com.bytechef.component.definition.ComponentDSL.dataStream;
-import static com.bytechef.component.definition.ComponentDSL.reader;
-import static com.bytechef.component.definition.ComponentDSL.writer;
+import static com.bytechef.component.definition.ComponentDSL.dataStreamReader;
+import static com.bytechef.component.definition.ComponentDSL.dataStreamWriter;
 
 import com.bytechef.component.definition.DataStreamDefinition;
 
@@ -28,6 +28,5 @@ import com.bytechef.component.definition.DataStreamDefinition;
 public class AirtableDataStream {
 
     public static final DataStreamDefinition DATA_STREAM_DEFINITION = dataStream(
-        reader(AirtableDataStreamItemReader.class), writer(AirtableDataStreamItemWriter.class));
-
+        dataStreamReader(AirtableDataStreamItemReader.class), dataStreamWriter(AirtableDataStreamItemWriter.class));
 }
