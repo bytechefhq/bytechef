@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.component.jdbc.handler.loader;
 
-import com.bytechef.platform.component.definition.JdbcComponentHandler;
+import com.bytechef.component.JdbcComponentHandler;
 import com.bytechef.platform.component.handler.loader.ComponentHandlerLoader;
 import com.bytechef.platform.component.task.handler.ComponentTaskHandler;
 import java.util.ArrayList;

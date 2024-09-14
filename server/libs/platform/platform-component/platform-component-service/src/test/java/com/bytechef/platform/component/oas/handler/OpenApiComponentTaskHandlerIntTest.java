@@ -72,7 +72,7 @@ import wiremock.com.fasterxml.jackson.databind.node.JsonNodeFactory;
     JacksonConfiguration.class, PostgreSQLContainerConfiguration.class
 })
 @WireMockTest(httpPort = 9999)
-public class OpenAPIComponentTaskHandlerIntTest {
+public class OpenApiComponentTaskHandlerIntTest {
 
     @Autowired
     private ConnectionRepository connectionRepository;
@@ -99,7 +99,7 @@ public class OpenAPIComponentTaskHandlerIntTest {
     public void testHandleDELETE() throws Exception {
         stubFor(delete("/pet/1").willReturn(ok()));
 
-        OpenAPIComponentTaskHandler openApiComponentTaskHandler = createOpenApiComponentHandler(
+        OpenApiComponentTaskHandler openApiComponentTaskHandler = createOpenApiComponentHandler(
             "deletePet");
 
         TaskExecution taskExecution = getTaskExecution(Map.of("petId", 1));
@@ -195,7 +195,7 @@ public class OpenAPIComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        OpenAPIComponentTaskHandler openApiComponentTaskHandler = createOpenApiComponentHandler(
+        OpenApiComponentTaskHandler openApiComponentTaskHandler = createOpenApiComponentHandler(
             "findPetsByStatus");
 
         TaskExecution taskExecution = getTaskExecution(Map.of("status", "available"));
@@ -388,7 +388,7 @@ public class OpenAPIComponentTaskHandlerIntTest {
 
     @Test
     public void testHandleGETStatus400() {
-        OpenAPIComponentTaskHandler openApiComponentTaskHandler;
+        OpenApiComponentTaskHandler openApiComponentTaskHandler;
         TaskExecution taskExecution;
 
         //
@@ -443,7 +443,7 @@ public class OpenAPIComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        OpenAPIComponentTaskHandler openApiComponentTaskHandler = createOpenApiComponentHandler("addPet");
+        OpenApiComponentTaskHandler openApiComponentTaskHandler = createOpenApiComponentHandler("addPet");
 
         TaskExecution taskExecution = getTaskExecution(
             Map.of(
@@ -690,7 +690,7 @@ public class OpenAPIComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        OpenAPIComponentTaskHandler openApiComponentTaskHandler = createOpenApiComponentHandler(
+        OpenApiComponentTaskHandler openApiComponentTaskHandler = createOpenApiComponentHandler(
             "updatePet");
 
         TaskExecution taskExecution = getTaskExecution(
@@ -758,8 +758,8 @@ public class OpenAPIComponentTaskHandlerIntTest {
         JSONAssert.assertEquals(json, new JSONObject(response.getBody(new TypeReference<Map<?, ?>>() {})), true);
     }
 
-    private OpenAPIComponentTaskHandler createOpenApiComponentHandler(String actionName) {
-        return new OpenAPIComponentTaskHandler(
+    private OpenApiComponentTaskHandler createOpenApiComponentHandler(String actionName) {
+        return new OpenApiComponentTaskHandler(
             actionName, actionDefinitionFacade,
             ComponentRegistryConfiguration.PETSTORE_COMPONENT_HANDLER);
     }

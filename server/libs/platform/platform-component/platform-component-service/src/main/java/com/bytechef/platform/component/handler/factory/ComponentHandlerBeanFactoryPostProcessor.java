@@ -21,7 +21,7 @@ import com.bytechef.platform.component.handler.ComponentHandlerServiceLoaderFact
 import com.bytechef.platform.component.handler.loader.ComponentHandlerLoader;
 import com.bytechef.platform.component.handler.loader.DefaultComponentHandlerLoader;
 import com.bytechef.platform.component.jdbc.handler.loader.JdbcComponentHandlerLoader;
-import com.bytechef.platform.component.oas.handler.loader.OpenAPIComponentHandlerLoader;
+import com.bytechef.platform.component.oas.handler.loader.OpenApiComponentHandlerLoader;
 import com.bytechef.platform.component.task.handler.ComponentTaskHandlerFactory;
 import com.bytechef.platform.component.trigger.handler.ComponentTriggerHandlerFactory;
 import java.util.List;
@@ -43,7 +43,7 @@ public class ComponentHandlerBeanFactoryPostProcessor implements BeanFactoryPost
 
     private static final List<ComponentHandlerLoader> COMPONENT_HANDLER_LOADERS =
         List.of(
-            new DefaultComponentHandlerLoader(), new JdbcComponentHandlerLoader(), new OpenAPIComponentHandlerLoader());
+            new DefaultComponentHandlerLoader(), new JdbcComponentHandlerLoader(), new OpenApiComponentHandlerLoader());
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {

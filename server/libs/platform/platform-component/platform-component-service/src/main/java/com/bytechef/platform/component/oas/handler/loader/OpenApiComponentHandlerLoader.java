@@ -17,13 +17,13 @@
 package com.bytechef.platform.component.oas.handler.loader;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.component.OpenAPIComponentHandler;
+import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
 import com.bytechef.platform.component.definition.ActionDefinitionWrapper;
 import com.bytechef.platform.component.handler.loader.AbstractComponentHandlerLoader;
-import com.bytechef.platform.component.oas.handler.OpenAPIComponentTaskHandler;
-import com.bytechef.platform.component.util.OpenAPIClientUtils;
+import com.bytechef.platform.component.oas.handler.OpenApiComponentTaskHandler;
+import com.bytechef.platform.component.util.OpenApiClientUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -31,16 +31,16 @@ import java.util.function.Function;
 /**
  * @author Ivica Cardic
  */
-public class OpenAPIComponentHandlerLoader extends AbstractComponentHandlerLoader<OpenAPIComponentHandler> {
+public class OpenApiComponentHandlerLoader extends AbstractComponentHandlerLoader<OpenApiComponentHandler> {
 
     public static final Function<ActionDefinition, SingleConnectionPerformFunction> PERFORM_FUNCTION_FUNCTION =
-        actionDefinition -> (inputParameters, connectionParameters, context) -> OpenAPIClientUtils.execute(
+        actionDefinition -> (inputParameters, connectionParameters, context) -> OpenApiClientUtils.execute(
             inputParameters, OptionalUtils.orElse(actionDefinition.getProperties(), List.of()),
             OptionalUtils.orElse(actionDefinition.getOutputDefinition(), null),
             OptionalUtils.orElse(actionDefinition.getMetadata(), Map.of()),
             OptionalUtils.orElse(actionDefinition.getProcessErrorResponse(), null), context);
 
-    public OpenAPIComponentHandlerLoader() {
+    public OpenApiComponentHandlerLoader() {
         super(
             (componentHandler, actionDefinition) -> {
                 if (OptionalUtils.isPresent(actionDefinition.getPerform())) {
@@ -50,12 +50,12 @@ public class OpenAPIComponentHandlerLoader extends AbstractComponentHandlerLoade
                         actionDefinition, PERFORM_FUNCTION_FUNCTION.apply(actionDefinition));
                 }
             },
-            OpenAPIComponentHandler.class);
+            OpenApiComponentHandler.class);
     }
 
     @Override
-    protected ComponentTaskHandlerFunction getComponentTaskHandlerFunction(OpenAPIComponentHandler componentHandler) {
-        return (actionName, actionDefinitionFacade) -> new OpenAPIComponentTaskHandler(
+    protected ComponentTaskHandlerFunction getComponentTaskHandlerFunction(OpenApiComponentHandler componentHandler) {
+        return (actionName, actionDefinitionFacade) -> new OpenApiComponentTaskHandler(
             actionName, actionDefinitionFacade, componentHandler);
     }
 }

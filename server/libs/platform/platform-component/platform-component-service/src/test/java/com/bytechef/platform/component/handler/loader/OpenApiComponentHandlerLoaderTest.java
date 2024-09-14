@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class OpenAPIComponentHandlerLoaderTest {
+public class OpenApiComponentHandlerLoaderTest {
 
     @Disabled
     @Test
