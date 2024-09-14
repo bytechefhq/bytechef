@@ -43,18 +43,18 @@
       "title" : "Bearer Token",
       "type" : "BEARER_TOKEN",
       "acquire" : null,
-      "apply" : null,
-      "clientId" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null,
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
       "tokenUrl" : null,
+      "apply" : null,
+      "clientId" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
-      "refreshToken" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "refreshToken" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -654,10 +654,21 @@
       }
     } ],
     "title" : "Creates a record",
-    "perform" : null,
     "processErrorResponse" : { },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   } ],
+  "dataStream" : {
+    "reader" : {
+      "properties" : null,
+      "dataStreamItemReader" : { }
+    },
+    "writer" : {
+      "properties" : null,
+      "streamTypes" : null,
+      "dataStreamItemWriter" : { }
+    }
+  },
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -741,8 +752,10 @@
     "type" : "POLLING",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "workflowSyncValidation" : null,
-    "workflowSyncOnEnableValidation" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "deduplicate" : null,
     "poll" : { },
     "webhookDisable" : null,
@@ -750,21 +763,6 @@
     "listenerDisable" : null,
     "listenerEnable" : null,
     "dwebhookRequest" : null,
-    "webhookValidate" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null
-  } ],
-  "dataStream" : {
-    "reader" : {
-      "properties" : null,
-      "dataStreamItemReader" : { }
-    },
-    "writer" : {
-      "properties" : null,
-      "streamTypes" : null,
-      "dataStreamItemWriter" : { }
-    }
-  }
+    "webhookValidate" : null
+  } ]
 }

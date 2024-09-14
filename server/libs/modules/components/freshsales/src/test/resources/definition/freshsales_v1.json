@@ -63,8 +63,8 @@
       "title" : "API Key",
       "type" : "API_KEY",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "apply" : { },
       "clientId" : null,
       "pkce" : null,
@@ -1658,6 +1658,6 @@
     "workflowNodeDescription" : null,
     "perform" : { }
   } ],
-  "dataStream" : null,
-  "triggers" : null
+  "triggers" : null,
+  "dataStream" : null
 }

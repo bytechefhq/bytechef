@@ -235,9 +235,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Read from file",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -564,9 +564,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Write to file",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
   "dataStream" : null,
   "triggers" : null

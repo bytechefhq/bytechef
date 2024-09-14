@@ -49,8 +49,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : null,
@@ -143,13 +143,13 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     } ],
     "title" : "Send Message",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
   "dataStream" : null,
   "triggers" : [ {
@@ -189,19 +189,17 @@
     "type" : "LISTENER",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "workflowSyncValidation" : null,
-    "workflowSyncOnEnableValidation" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null,
+    "deduplicate" : null,
+    "poll" : null,
+    "webhookDisable" : null,
+    "webhookEnable" : null,
     "dwebhookRequest" : null,
     "listenerDisable" : { },
     "listenerEnable" : { },
-    "webhookValidate" : null,
-    "webhookDisable" : null,
-    "webhookEnable" : null,
-    "poll" : null,
-    "deduplicate" : null,
-    "webhookValidateOnEnable" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null
+    "webhookValidate" : null
   } ]
 }

@@ -4352,6 +4352,6 @@
     "workflowNodeDescription" : null,
     "perform" : { }
   } ],
-  "triggers" : null,
-  "dataStream" : null
+  "dataStream" : null,
+  "triggers" : null
 }

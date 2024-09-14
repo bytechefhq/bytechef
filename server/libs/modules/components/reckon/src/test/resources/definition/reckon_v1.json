@@ -63,8 +63,6 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationUrl" : { },
       "clientSecret" : null,
       "refreshToken" : null,
@@ -74,7 +72,9 @@
       "refresh" : null,
       "refreshUrl" : { },
       "scopes" : null,
-      "tokenUrl" : { }
+      "tokenUrl" : { },
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -296,9 +296,9 @@
       "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Create Contact",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -625,9 +625,9 @@
       "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Create Invoice",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -884,9 +884,9 @@
       "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Create Payment",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   } ],
   "triggers" : [ {
     "batch" : null,
@@ -1407,12 +1407,6 @@
     "type" : "POLLING",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "workflowSyncValidation" : null,
-    "workflowSyncOnEnableValidation" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "listenerDisable" : null,
@@ -1420,7 +1414,11 @@
     "dwebhookRequest" : null,
     "webhookValidate" : null,
     "deduplicate" : null,
-    "poll" : { }
+    "poll" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1824,12 +1822,6 @@
     "type" : "POLLING",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "workflowSyncValidation" : null,
-    "workflowSyncOnEnableValidation" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "listenerDisable" : null,
@@ -1837,7 +1829,11 @@
     "dwebhookRequest" : null,
     "webhookValidate" : null,
     "deduplicate" : null,
-    "poll" : { }
+    "poll" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null
   } ],
   "dataStream" : null
 }

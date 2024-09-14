@@ -73,8 +73,8 @@
       "authorizationUrl" : { },
       "clientSecret" : null,
       "refreshToken" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : { }
+      "oauth2AuthorizationExtraQueryParameters" : { },
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -2762,8 +2762,6 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "workflowSyncValidation" : null,
-    "workflowSyncOnEnableValidation" : null,
     "deduplicate" : null,
     "poll" : null,
     "webhookDisable" : { },

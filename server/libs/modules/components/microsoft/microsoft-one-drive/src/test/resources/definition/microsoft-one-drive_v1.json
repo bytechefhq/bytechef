@@ -1239,8 +1239,6 @@
     "type" : "POLLING",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "workflowSyncValidation" : null,
-    "workflowSyncOnEnableValidation" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
     "dynamicWebhookRefresh" : null,

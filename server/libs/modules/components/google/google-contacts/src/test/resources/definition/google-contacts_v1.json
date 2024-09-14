@@ -73,8 +73,8 @@
       "authorizationUrl" : { },
       "clientSecret" : null,
       "refreshToken" : null,
-      "oauth2AuthorizationExtraQueryParameters" : { },
-      "authorizationCallback" : null
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : { }
     } ],
     "properties" : null,
     "version" : 1,

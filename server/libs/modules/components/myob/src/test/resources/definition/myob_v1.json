@@ -93,8 +93,8 @@
       "authorizationUrl" : { },
       "clientSecret" : null,
       "refreshToken" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -1007,6 +1007,6 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "triggers" : null,
-  "dataStream" : null
+  "dataStream" : null,
+  "triggers" : null
 }
