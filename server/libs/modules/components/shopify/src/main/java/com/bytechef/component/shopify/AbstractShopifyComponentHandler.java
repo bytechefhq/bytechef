@@ -18,7 +18,7 @@ package com.bytechef.component.shopify;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
 
-import com.bytechef.component.OpenAPIComponentHandler;
+import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.shopify.action.ShopifyCancelOrderAction;
 import com.bytechef.component.shopify.action.ShopifyCloseOrderAction;
@@ -32,7 +32,7 @@ import com.bytechef.component.shopify.connection.ShopifyConnection;
  *
  * @generated
  */
-public abstract class AbstractShopifyComponentHandler implements OpenAPIComponentHandler {
+public abstract class AbstractShopifyComponentHandler implements OpenApiComponentHandler {
     private final ComponentDefinition componentDefinition = modifyComponent(
         component("shopify")
             .title("Shopify")

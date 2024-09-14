@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.pipeliner.constant.PipelinerConstants.SERVER_URL;
 import static com.bytechef.component.pipeliner.constant.PipelinerConstants.SPACE_ID;
 
-import com.bytechef.component.OpenAPIComponentHandler;
+import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentCategory;
@@ -42,7 +42,7 @@ import java.util.Objects;
 /**
  * @author Monika Domiter
  */
-@AutoService(OpenAPIComponentHandler.class)
+@AutoService(OpenApiComponentHandler.class)
 public class PipelinerComponentHandler extends AbstractPipelinerComponentHandler {
 
     @Override

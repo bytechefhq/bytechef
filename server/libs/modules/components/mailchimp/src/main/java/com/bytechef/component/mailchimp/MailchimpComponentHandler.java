@@ -18,7 +18,7 @@ package com.bytechef.component.mailchimp;
 
 import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 
-import com.bytechef.component.OpenAPIComponentHandler;
+import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
@@ -36,7 +36,7 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
-@AutoService(OpenAPIComponentHandler.class)
+@AutoService(OpenApiComponentHandler.class)
 public class MailchimpComponentHandler extends AbstractMailchimpComponentHandler {
 
     @Override

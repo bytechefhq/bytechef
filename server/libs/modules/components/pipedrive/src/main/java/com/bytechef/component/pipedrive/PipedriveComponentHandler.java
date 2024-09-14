@@ -19,7 +19,7 @@ package com.bytechef.component.pipedrive;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.pipedrive.constant.PipedriveConstants.ID;
 
-import com.bytechef.component.OpenAPIComponentHandler;
+import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDSL.ModifiableArrayProperty;
@@ -49,7 +49,7 @@ import java.util.Optional;
  * @author Monika Kušter
  * @generated
  */
-@AutoService(OpenAPIComponentHandler.class)
+@AutoService(OpenApiComponentHandler.class)
 public class PipedriveComponentHandler extends AbstractPipedriveComponentHandler {
 
     @Override

@@ -16,7 +16,7 @@
 
 package com.bytechef.component.salesflare;
 
-import com.bytechef.component.OpenAPIComponentHandler;
+import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.google.auto.service.AutoService;
@@ -24,7 +24,7 @@ import com.google.auto.service.AutoService;
 /**
  * @author Monika Domiter
  */
-@AutoService(OpenAPIComponentHandler.class)
+@AutoService(OpenApiComponentHandler.class)
 public class SalesflareComponentHandler extends AbstractSalesflareComponentHandler {
 
     @Override

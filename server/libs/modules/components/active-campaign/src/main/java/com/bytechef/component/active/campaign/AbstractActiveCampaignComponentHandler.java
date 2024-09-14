@@ -18,7 +18,7 @@ package com.bytechef.component.active.campaign;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
 
-import com.bytechef.component.OpenAPIComponentHandler;
+import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.active.campaign.action.ActiveCampaignCreateAccountAction;
 import com.bytechef.component.active.campaign.action.ActiveCampaignCreateContactAction;
 import com.bytechef.component.active.campaign.action.ActiveCampaignCreateTaskAction;
@@ -30,7 +30,7 @@ import com.bytechef.component.definition.ComponentDefinition;
  *
  * @generated
  */
-public abstract class AbstractActiveCampaignComponentHandler implements OpenAPIComponentHandler {
+public abstract class AbstractActiveCampaignComponentHandler implements OpenApiComponentHandler {
     private final ComponentDefinition componentDefinition = modifyComponent(
         component("active-campaign")
             .title("ActiveCampaign")

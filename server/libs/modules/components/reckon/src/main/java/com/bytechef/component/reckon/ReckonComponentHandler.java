@@ -18,7 +18,7 @@ package com.bytechef.component.reckon;
 
 import static com.bytechef.component.reckon.constant.ReckonConstants.BOOK_ID;
 
-import com.bytechef.component.OpenAPIComponentHandler;
+import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
@@ -40,7 +40,7 @@ import java.util.Optional;
 /**
  * @author Monika Kušter
  */
-@AutoService(OpenAPIComponentHandler.class)
+@AutoService(OpenApiComponentHandler.class)
 public class ReckonComponentHandler extends AbstractReckonComponentHandler {
 
     @Override

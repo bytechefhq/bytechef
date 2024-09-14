@@ -23,7 +23,7 @@ import static com.bytechef.component.asana.constant.AsanaConstants.TEAM;
 import static com.bytechef.component.asana.constant.AsanaConstants.WORKSPACE;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
-import com.bytechef.component.OpenAPIComponentHandler;
+import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.asana.util.AsanaUtils;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
@@ -43,7 +43,7 @@ import java.util.Optional;
 /**
  * @author Monika Domiter
  */
-@AutoService(OpenAPIComponentHandler.class)
+@AutoService(OpenApiComponentHandler.class)
 public class AsanaComponentHandler extends AbstractAsanaComponentHandler {
 
     @Override

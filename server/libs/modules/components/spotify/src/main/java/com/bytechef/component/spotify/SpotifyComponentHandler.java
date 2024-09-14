@@ -16,7 +16,7 @@
 
 package com.bytechef.component.spotify;
 
-import com.bytechef.component.OpenAPIComponentHandler;
+import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
@@ -32,7 +32,7 @@ import java.util.Objects;
 /**
  * @author Monika Kušter
  */
-@AutoService(OpenAPIComponentHandler.class)
+@AutoService(OpenApiComponentHandler.class)
 public class SpotifyComponentHandler extends AbstractSpotifyComponentHandler {
 
     @Override

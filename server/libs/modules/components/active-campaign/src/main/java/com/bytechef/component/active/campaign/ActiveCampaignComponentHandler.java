@@ -22,7 +22,7 @@ import static com.bytechef.component.definition.Authorization.VALUE;
 import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
-import com.bytechef.component.OpenAPIComponentHandler;
+import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.active.campaign.util.ActiveCampaignUtils;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
@@ -43,7 +43,7 @@ import java.util.Optional;
 /**
  * @author Monika Domiter
  */
-@AutoService(OpenAPIComponentHandler.class)
+@AutoService(OpenApiComponentHandler.class)
 public class ActiveCampaignComponentHandler extends AbstractActiveCampaignComponentHandler {
 
     @Override

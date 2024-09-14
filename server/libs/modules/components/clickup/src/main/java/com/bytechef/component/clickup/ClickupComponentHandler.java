@@ -23,7 +23,7 @@ import static com.bytechef.component.clickup.constant.ClickupConstants.SPACE_ID_
 import static com.bytechef.component.clickup.constant.ClickupConstants.WORKSPACE_ID;
 import static com.bytechef.component.clickup.constant.ClickupConstants.WORKSPACE_ID_PROPERTY;
 
-import com.bytechef.component.OpenAPIComponentHandler;
+import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.clickup.trigger.ClickupNewListTrigger;
 import com.bytechef.component.clickup.trigger.ClickupNewTaskTrigger;
 import com.bytechef.component.clickup.util.ClickupUtils;
@@ -46,7 +46,7 @@ import java.util.Optional;
 /**
  * @author Monika Kušter
  */
-@AutoService(OpenAPIComponentHandler.class)
+@AutoService(OpenApiComponentHandler.class)
 public class ClickupComponentHandler extends AbstractClickupComponentHandler {
 
     @Override

@@ -18,7 +18,7 @@ package com.bytechef.component.keap;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
 
-import com.bytechef.component.OpenAPIComponentHandler;
+import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.keap.action.KeapCreateCompanyAction;
 import com.bytechef.component.keap.action.KeapCreateContactAction;
@@ -30,7 +30,7 @@ import com.bytechef.component.keap.connection.KeapConnection;
  *
  * @generated
  */
-public abstract class AbstractKeapComponentHandler implements OpenAPIComponentHandler {
+public abstract class AbstractKeapComponentHandler implements OpenApiComponentHandler {
     private final ComponentDefinition componentDefinition = modifyComponent(
         component("keap")
             .title("Keap")

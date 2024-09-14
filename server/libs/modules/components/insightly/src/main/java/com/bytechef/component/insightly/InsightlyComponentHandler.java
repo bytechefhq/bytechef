@@ -21,7 +21,7 @@ import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.insightly.constant.InsightlyConstants.POD;
 
-import com.bytechef.component.OpenAPIComponentHandler;
+import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
@@ -32,7 +32,7 @@ import java.util.List;
 /**
  * @author Monika Domiter
  */
-@AutoService(OpenAPIComponentHandler.class)
+@AutoService(OpenApiComponentHandler.class)
 public class InsightlyComponentHandler extends AbstractInsightlyComponentHandler {
 
     @Override

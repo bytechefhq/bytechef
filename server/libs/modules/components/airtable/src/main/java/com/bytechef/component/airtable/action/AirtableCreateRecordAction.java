@@ -16,7 +16,7 @@
 
 package com.bytechef.component.airtable.action;
 
-import static com.bytechef.component.OpenAPIComponentHandler.PropertyType;
+import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;

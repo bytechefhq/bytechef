@@ -18,7 +18,7 @@ package com.bytechef.component.encharge;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
 
-import com.bytechef.component.OpenAPIComponentHandler;
+import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.encharge.action.EnchargeAddTagAction;
 import com.bytechef.component.encharge.action.EnchargeCreateEmailAction;
@@ -30,7 +30,7 @@ import com.bytechef.component.encharge.connection.EnchargeConnection;
  *
  * @generated
  */
-public abstract class AbstractEnchargeComponentHandler implements OpenAPIComponentHandler {
+public abstract class AbstractEnchargeComponentHandler implements OpenApiComponentHandler {
     private final ComponentDefinition componentDefinition = modifyComponent(
         component("encharge")
             .title("Encharge")

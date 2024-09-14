@@ -21,7 +21,7 @@ import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.teamwork.constant.TeamworkConstants.SITE_NAME;
 
-import com.bytechef.component.OpenAPIComponentHandler;
+import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentCategory;
@@ -37,7 +37,7 @@ import java.util.Objects;
 /**
  * @author Monika Domiter
  */
-@AutoService(OpenAPIComponentHandler.class)
+@AutoService(OpenApiComponentHandler.class)
 public class TeamworkComponentHandler extends AbstractTeamworkComponentHandler {
 
     @Override

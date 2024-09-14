@@ -18,7 +18,7 @@ package com.bytechef.component.teamwork;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
 
-import com.bytechef.component.OpenAPIComponentHandler;
+import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.teamwork.action.TeamworkCreateCompanyAction;
 import com.bytechef.component.teamwork.action.TeamworkCreateTaskAction;
@@ -29,7 +29,7 @@ import com.bytechef.component.teamwork.connection.TeamworkConnection;
  *
  * @generated
  */
-public abstract class AbstractTeamworkComponentHandler implements OpenAPIComponentHandler {
+public abstract class AbstractTeamworkComponentHandler implements OpenApiComponentHandler {
     private final ComponentDefinition componentDefinition = modifyComponent(
         component("teamwork")
             .title("Teamwork")

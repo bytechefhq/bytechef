@@ -18,7 +18,7 @@ package com.bytechef.component.spotify;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
 
-import com.bytechef.component.OpenAPIComponentHandler;
+import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.spotify.action.SpotifyAddItemsToPlaylistAction;
 import com.bytechef.component.spotify.action.SpotifyStartResumePlaybackAction;
@@ -29,7 +29,7 @@ import com.bytechef.component.spotify.connection.SpotifyConnection;
  *
  * @generated
  */
-public abstract class AbstractSpotifyComponentHandler implements OpenAPIComponentHandler {
+public abstract class AbstractSpotifyComponentHandler implements OpenApiComponentHandler {
     private final ComponentDefinition componentDefinition = modifyComponent(
         component("spotify")
             .title("Spotify")

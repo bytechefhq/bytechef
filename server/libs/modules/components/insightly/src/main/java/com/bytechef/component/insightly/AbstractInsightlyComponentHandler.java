@@ -18,7 +18,7 @@ package com.bytechef.component.insightly;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
 
-import com.bytechef.component.OpenAPIComponentHandler;
+import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.insightly.action.InsightlyCreateContactAction;
 import com.bytechef.component.insightly.action.InsightlyCreateOrganizationAction;
@@ -30,7 +30,7 @@ import com.bytechef.component.insightly.connection.InsightlyConnection;
  *
  * @generated
  */
-public abstract class AbstractInsightlyComponentHandler implements OpenAPIComponentHandler {
+public abstract class AbstractInsightlyComponentHandler implements OpenApiComponentHandler {
     private final ComponentDefinition componentDefinition = modifyComponent(
         component("insightly")
             .title("Insightly")

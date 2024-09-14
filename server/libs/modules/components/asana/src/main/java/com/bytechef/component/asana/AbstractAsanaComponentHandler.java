@@ -18,7 +18,7 @@ package com.bytechef.component.asana;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
 
-import com.bytechef.component.OpenAPIComponentHandler;
+import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.asana.action.AsanaCreateProjectAction;
 import com.bytechef.component.asana.action.AsanaCreateTaskAction;
 import com.bytechef.component.asana.connection.AsanaConnection;
@@ -29,7 +29,7 @@ import com.bytechef.component.definition.ComponentDefinition;
  *
  * @generated
  */
-public abstract class AbstractAsanaComponentHandler implements OpenAPIComponentHandler {
+public abstract class AbstractAsanaComponentHandler implements OpenApiComponentHandler {
     private final ComponentDefinition componentDefinition = modifyComponent(
         component("asana")
             .title("Asana")
