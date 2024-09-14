@@ -17,13 +17,13 @@
 package com.bytechef.component.mailchimp.trigger;
 
 import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
-import static com.bytechef.component.definition.ComponentDSL.dateTime;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.dateTime;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.ComponentDSL;
-import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
+import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.OptionsDataSource;
@@ -48,7 +48,7 @@ public class MailchimpSubscribeTrigger {
     private static final String LIST_ID = "listId";
     private static final String SUBSCRIBE = "subscribe";
 
-    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = ComponentDSL.trigger(SUBSCRIBE)
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = ComponentDsl.trigger(SUBSCRIBE)
         .title("Subscribe")
         .description("Triggers when an Audience subscriber is added to the list.")
         .type(TriggerType.DYNAMIC_WEBHOOK)

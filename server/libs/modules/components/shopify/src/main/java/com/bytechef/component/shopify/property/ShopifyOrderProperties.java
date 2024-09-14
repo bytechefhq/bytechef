@@ -16,13 +16,13 @@
 
 package com.bytechef.component.shopify.property;
 
-import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.number;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.number;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDsl;
 import java.util.List;
 
 /**
@@ -31,7 +31,7 @@ import java.util.List;
  * @generated
  */
 public class ShopifyOrderProperties {
-    public static final List<ComponentDSL.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(integer("id").label("Id")
+    public static final List<ComponentDsl.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(integer("id").label("Id")
         .required(false),
         string("currency").label("Currency")
             .required(false),

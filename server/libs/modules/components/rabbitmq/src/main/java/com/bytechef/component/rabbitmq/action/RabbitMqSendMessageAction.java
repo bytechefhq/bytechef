@@ -16,9 +16,9 @@
 
 package com.bytechef.component.rabbitmq.action;
 
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.HOSTNAME;
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.MESSAGE;
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.PASSWORD;
@@ -27,7 +27,7 @@ import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.QUEUE;
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.USERNAME;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.rabbitmq.util.RabbitMqUtils;
 import com.rabbitmq.client.Channel;

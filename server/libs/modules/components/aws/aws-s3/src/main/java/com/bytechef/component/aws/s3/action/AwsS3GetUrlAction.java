@@ -19,12 +19,12 @@ package com.bytechef.component.aws.s3.action;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.BUCKET_NAME;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.GET_URL;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.KEY;
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.aws.s3.util.AwsS3Utils;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import software.amazon.awssdk.services.s3.S3Client;

@@ -16,7 +16,7 @@
 
 package com.bytechef.component.infobip;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.infobip.constant.InfobipConstants.INFOBIP;
 
 import com.bytechef.component.ComponentHandler;

@@ -17,7 +17,7 @@
 package com.bytechef.component.data.mapper;
 
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.DATA_MAPPER;
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.data.mapper.action.DataMapperMapObjectsToArrayAction;

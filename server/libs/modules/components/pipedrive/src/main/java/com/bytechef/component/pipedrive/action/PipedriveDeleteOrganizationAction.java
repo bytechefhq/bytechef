@@ -17,13 +17,13 @@
 package com.bytechef.component.pipedrive.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDsl;
 import java.util.Map;
 
 /**
@@ -32,7 +32,7 @@ import java.util.Map;
  * @generated
  */
 public class PipedriveDeleteOrganizationAction {
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("deleteOrganization")
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("deleteOrganization")
         .title("Delete an organization")
         .description("Marks an organization as deleted. After 30 days, the organization will be permanently deleted.")
         .metadata(

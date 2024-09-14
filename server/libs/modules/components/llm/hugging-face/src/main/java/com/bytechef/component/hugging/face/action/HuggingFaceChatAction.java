@@ -17,15 +17,15 @@
 package com.bytechef.component.hugging.face.action;
 
 import static com.bytechef.component.definition.Authorization.TOKEN;
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.hugging.face.constant.HuggingFaceConstants.URL;
 import static com.bytechef.component.llm.constant.LLMConstants.ASK;
 import static com.bytechef.component.llm.constant.LLMConstants.MESSAGE_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.llm.Chat;
 import org.springframework.ai.chat.model.ChatModel;

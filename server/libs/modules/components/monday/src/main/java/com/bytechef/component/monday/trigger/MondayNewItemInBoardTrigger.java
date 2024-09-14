@@ -16,16 +16,16 @@
 
 package com.bytechef.component.monday.trigger;
 
-import static com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
-import static com.bytechef.component.definition.ComponentDSL.bool;
-import static com.bytechef.component.definition.ComponentDSL.date;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.number;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.ComponentDSL.time;
-import static com.bytechef.component.definition.ComponentDSL.trigger;
+import static com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.date;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.number;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.ComponentDsl.time;
+import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.monday.constant.MondayColumnType.getColumnTypeByName;
 import static com.bytechef.component.monday.constant.MondayConstants.BOARDS;
 import static com.bytechef.component.monday.constant.MondayConstants.BOARD_ID;

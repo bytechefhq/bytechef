@@ -16,7 +16,7 @@
 
 package com.bytechef.component.google.docs;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.google.docs.connection.GoogleDocsConnection.CONNECTION_DEFINITION;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.GOOGLE_DOCS;
 

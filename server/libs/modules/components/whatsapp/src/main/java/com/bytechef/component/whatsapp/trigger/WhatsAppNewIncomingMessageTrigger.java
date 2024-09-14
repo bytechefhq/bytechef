@@ -17,9 +17,9 @@
 package com.bytechef.component.whatsapp.trigger;
 
 import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import static com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import static com.bytechef.component.definition.TriggerDefinition.TriggerType;
@@ -30,7 +30,7 @@ import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.MESSAGE
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.RECEIVE_USER;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.SENDER_NUMBER;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
@@ -45,8 +45,8 @@ import java.util.Map;
  */
 public class WhatsAppNewIncomingMessageTrigger {
 
-    public static final ComponentDSL.ModifiableTriggerDefinition TRIGGER_DEFINITION =
-        ComponentDSL.trigger(MESSAGE_RECEIVED)
+    public static final ComponentDsl.ModifiableTriggerDefinition TRIGGER_DEFINITION =
+        ComponentDsl.trigger(MESSAGE_RECEIVED)
             .title("Message received")
             .description("Triggers when you get a new message from certain number.")
             .type(TriggerType.DYNAMIC_WEBHOOK)

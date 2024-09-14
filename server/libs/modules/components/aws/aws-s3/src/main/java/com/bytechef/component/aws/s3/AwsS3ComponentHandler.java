@@ -17,7 +17,7 @@
 package com.bytechef.component.aws.s3;
 
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.AWS_S3;
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.aws.s3.action.AwsS3GetObjectAction;

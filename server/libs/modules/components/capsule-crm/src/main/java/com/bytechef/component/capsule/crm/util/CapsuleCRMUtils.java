@@ -17,7 +17,7 @@
 package com.bytechef.component.capsule.crm.util;
 
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.NAME;
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.ContextFunction;

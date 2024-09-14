@@ -16,7 +16,7 @@
 
 package com.bytechef.component.microsoft.excel.util;
 
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.ID;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.IS_THE_FIRST_ROW_HEADER;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.NAME;
@@ -30,8 +30,8 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableArrayProperty;
-import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;

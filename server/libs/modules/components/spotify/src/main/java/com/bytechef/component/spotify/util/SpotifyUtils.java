@@ -16,7 +16,7 @@
 
 package com.bytechef.component.spotify.util;
 
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.spotify.constant.SpotifyConstants.ID;
 import static com.bytechef.component.spotify.constant.SpotifyConstants.NAME;
 

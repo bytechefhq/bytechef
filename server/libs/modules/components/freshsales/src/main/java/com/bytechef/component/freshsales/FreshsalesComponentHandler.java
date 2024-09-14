@@ -16,7 +16,7 @@
 
 package com.bytechef.component.freshsales;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.freshsales.connection.FreshsalesConnection.CONNECTION_DEFINITION;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.FRESHSALES;
 

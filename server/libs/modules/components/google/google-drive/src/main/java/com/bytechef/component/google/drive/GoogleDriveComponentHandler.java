@@ -16,7 +16,7 @@
 
 package com.bytechef.component.google.drive;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.google.drive.connection.GoogleDriveConnection.CONNECTION_DEFINITION;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_DRIVE;
 

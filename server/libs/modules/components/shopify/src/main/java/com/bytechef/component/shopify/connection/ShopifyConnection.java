@@ -19,11 +19,11 @@ package com.bytechef.component.shopify.connection;
 import static com.bytechef.component.definition.Authorization.AuthorizationType;
 import static com.bytechef.component.definition.Authorization.KEY;
 import static com.bytechef.component.definition.Authorization.VALUE;
-import static com.bytechef.component.definition.ComponentDSL.authorization;
-import static com.bytechef.component.definition.ComponentDSL.connection;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.authorization;
+import static com.bytechef.component.definition.ComponentDsl.connection;
+import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDsl;
 
 /**
  * Provides the component connection definition.
@@ -31,7 +31,7 @@ import com.bytechef.component.definition.ComponentDSL;
  * @generated
  */
 public class ShopifyConnection {
-    public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+    public static final ComponentDsl.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://${shopName}.myshopify.com/admin/api/2024-04")
         .authorizations(authorization(AuthorizationType.API_KEY)
             .title("API Key")

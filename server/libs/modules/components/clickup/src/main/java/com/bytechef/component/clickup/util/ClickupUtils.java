@@ -21,7 +21,7 @@ import static com.bytechef.component.clickup.constant.ClickupConstants.ID;
 import static com.bytechef.component.clickup.constant.ClickupConstants.NAME;
 import static com.bytechef.component.clickup.constant.ClickupConstants.SPACE_ID;
 import static com.bytechef.component.clickup.constant.ClickupConstants.WORKSPACE_ID;
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;

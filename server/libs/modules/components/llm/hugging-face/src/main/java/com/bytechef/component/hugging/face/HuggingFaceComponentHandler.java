@@ -16,7 +16,7 @@
 
 package com.bytechef.component.hugging.face;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.hugging.face.constant.HuggingFaceConstants.HUGGING_FACE;
 
 import com.bytechef.component.ComponentHandler;

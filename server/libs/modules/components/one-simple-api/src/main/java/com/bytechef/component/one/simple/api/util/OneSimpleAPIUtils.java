@@ -16,7 +16,7 @@
 
 package com.bytechef.component.one.simple.api.util;
 
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Option;

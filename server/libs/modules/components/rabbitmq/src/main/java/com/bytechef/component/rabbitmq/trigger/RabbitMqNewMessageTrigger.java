@@ -16,15 +16,15 @@
 
 package com.bytechef.component.rabbitmq.trigger;
 
-import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.ComponentDSL.trigger;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.HOSTNAME;
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.PASSWORD;
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.PORT;
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.QUEUE;
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.USERNAME;
 
-import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.ListenerEmitter;

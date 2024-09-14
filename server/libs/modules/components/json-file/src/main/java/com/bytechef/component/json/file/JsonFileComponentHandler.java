@@ -16,7 +16,7 @@
 
 package com.bytechef.component.json.file;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.json.file.constant.JsonFileConstants.JSON_FILE;
 
 import com.bytechef.component.ComponentHandler;

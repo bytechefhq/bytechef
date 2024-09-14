@@ -18,13 +18,13 @@ package com.bytechef.component.bash.action;
 
 import static com.bytechef.component.bash.constant.BashConstants.EXECUTE;
 import static com.bytechef.component.bash.constant.BashConstants.SCRIPT;
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.sampleOutput;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
+import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import java.io.BufferedWriter;
 import java.io.File;

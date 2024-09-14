@@ -16,7 +16,7 @@
 
 package com.bytechef.component.google.mail.connection;
 
-import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.google.commons.GoogleConnection;
 import java.util.List;
 

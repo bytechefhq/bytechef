@@ -16,16 +16,16 @@
 
 package com.bytechef.component.pipedrive.trigger;
 
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.ComponentDSL.trigger;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.pipedrive.constant.PipedriveConstants.ADDED;
 import static com.bytechef.component.pipedrive.constant.PipedriveConstants.CURRENT;
 import static com.bytechef.component.pipedrive.constant.PipedriveConstants.ID;
 
-import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;

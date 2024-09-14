@@ -17,15 +17,15 @@
 package com.bytechef.component.insightly;
 
 import static com.bytechef.component.definition.Authorization.USERNAME;
-import static com.bytechef.component.definition.ComponentDSL.authorization;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.authorization;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.insightly.constant.InsightlyConstants.POD;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentCategory;
-import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
-import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.google.auto.service.AutoService;
 import java.util.List;
 

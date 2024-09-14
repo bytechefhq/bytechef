@@ -16,7 +16,7 @@
 
 package com.bytechef.component.microsoft.one.drive;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.MICROSOFT_ONEDRIVE;
 
 import com.bytechef.component.ComponentHandler;

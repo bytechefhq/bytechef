@@ -16,9 +16,9 @@
 
 package com.bytechef.component.myob.action;
 
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.bool;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.myob.constant.MyobConstants.ADDRESSES;
 import static com.bytechef.component.myob.constant.MyobConstants.ADDRESSES_PROPERTY;
 import static com.bytechef.component.myob.constant.MyobConstants.COMPANY_FILE;
@@ -32,7 +32,7 @@ import static com.bytechef.component.myob.constant.MyobConstants.LAST_NAME;
 import static com.bytechef.component.myob.constant.MyobConstants.LAST_NAME_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 

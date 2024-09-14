@@ -16,7 +16,7 @@
 
 package com.bytechef.component.stability;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.stability.constant.StabilityConstants.STABILITY;
 
 import com.bytechef.component.ComponentHandler;

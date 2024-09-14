@@ -17,7 +17,7 @@
 package com.bytechef.component.petstore;
 
 import com.bytechef.component.OpenApiComponentHandler;
-import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**

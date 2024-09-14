@@ -16,7 +16,7 @@
 
 package com.bytechef.component.todoist;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;

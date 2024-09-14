@@ -17,10 +17,10 @@
 package com.bytechef.component.petstore.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.integer;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDsl;
 import java.util.Map;
 
 /**
@@ -29,7 +29,7 @@ import java.util.Map;
  * @generated
  */
 public class PetstoreDeleteOrderAction {
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("deleteOrder")
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("deleteOrder")
         .title("Delete purchase order by ID")
         .description(
             "For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors")

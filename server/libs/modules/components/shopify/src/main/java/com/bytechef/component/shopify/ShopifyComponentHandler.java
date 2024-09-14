@@ -18,8 +18,8 @@ package com.bytechef.component.shopify;
 
 import static com.bytechef.component.definition.Authorization.KEY;
 import static com.bytechef.component.definition.Authorization.VALUE;
-import static com.bytechef.component.definition.ComponentDSL.authorization;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.authorization;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.PRODUCT_ID;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.SHOP_NAME;
 
@@ -27,13 +27,13 @@ import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentCategory;
-import com.bytechef.component.definition.ComponentDSL;
-import com.bytechef.component.definition.ComponentDSL.ModifiableArrayProperty;
-import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
-import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
-import com.bytechef.component.definition.ComponentDSL.ModifiableIntegerProperty;
-import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
-import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
+import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.shopify.trigger.ShopifyNewCancelledOrderTrigger;
@@ -53,7 +53,7 @@ import java.util.Optional;
 public class ShopifyComponentHandler extends AbstractShopifyComponentHandler {
 
     @Override
-    public List<ComponentDSL.ModifiableTriggerDefinition> getTriggers() {
+    public List<ComponentDsl.ModifiableTriggerDefinition> getTriggers() {
         return List.of(
             ShopifyNewCancelledOrderTrigger.TRIGGER_DEFINITION,
             ShopifyNewOrderTrigger.TRIGGER_DEFINITION,

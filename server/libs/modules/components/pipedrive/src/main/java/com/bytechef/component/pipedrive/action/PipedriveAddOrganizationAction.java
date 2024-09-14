@@ -17,15 +17,15 @@
 package com.bytechef.component.pipedrive.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDsl;
 import java.util.Map;
 
 /**
@@ -34,7 +34,7 @@ import java.util.Map;
  * @generated
  */
 public class PipedriveAddOrganizationAction {
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("addOrganization")
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("addOrganization")
         .title("Add an organization")
         .description("Adds a new organization.")
         .metadata(

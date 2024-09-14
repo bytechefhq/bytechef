@@ -16,11 +16,11 @@
 
 package com.bytechef.component.xero.action;
 
-import static com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.date;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.date;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.xero.constant.XeroConstants.ACCREC;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACT_ID;
 import static com.bytechef.component.xero.constant.XeroConstants.CREATE_SALES_INVOICE;

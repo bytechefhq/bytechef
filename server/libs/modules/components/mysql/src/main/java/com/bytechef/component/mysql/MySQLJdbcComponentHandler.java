@@ -16,7 +16,7 @@
 
 package com.bytechef.component.mysql;
 
-import static com.bytechef.component.definition.ComponentDSL.jdbcComponent;
+import static com.bytechef.component.definition.ComponentDsl.jdbcComponent;
 import static com.bytechef.component.mysql.constant.MySQLConstants.MYSQL;
 
 import com.bytechef.component.definition.JdbcComponentDefinition;

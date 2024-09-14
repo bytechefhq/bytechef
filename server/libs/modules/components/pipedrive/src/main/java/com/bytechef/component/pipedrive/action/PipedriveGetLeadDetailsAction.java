@@ -17,15 +17,15 @@
 package com.bytechef.component.pipedrive.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.date;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.date;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDsl;
 import java.util.Map;
 
 /**
@@ -34,7 +34,7 @@ import java.util.Map;
  * @generated
  */
 public class PipedriveGetLeadDetailsAction {
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("getLeadDetails")
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("getLeadDetails")
         .title("Get lead details")
         .description("Returns details of a specific lead. ")
         .metadata(

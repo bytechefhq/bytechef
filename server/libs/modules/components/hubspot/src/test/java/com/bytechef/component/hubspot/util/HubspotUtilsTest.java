@@ -16,7 +16,7 @@
 
 package com.bytechef.component.hubspot.util;
 
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.hubspot.constant.HubspotConstants.ID;
 import static com.bytechef.component.hubspot.constant.HubspotConstants.LABEL;
 import static com.bytechef.component.hubspot.constant.HubspotConstants.RESULTS;

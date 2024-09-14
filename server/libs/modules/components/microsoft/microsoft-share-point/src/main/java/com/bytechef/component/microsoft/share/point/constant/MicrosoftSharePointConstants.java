@@ -16,9 +16,9 @@
 
 package com.bytechef.component.microsoft.share.point.constant;
 
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.microsoft.share.point.util.MicrosoftSharePointUtils;
 

@@ -17,7 +17,7 @@
 package com.bytechef.component.data.mapper.util;
 
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.TYPE;
-import static com.bytechef.component.definition.ComponentDSL.nullable;
+import static com.bytechef.component.definition.ComponentDsl.nullable;
 
 import com.bytechef.component.definition.Parameters;
 import java.time.LocalDate;

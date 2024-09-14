@@ -16,7 +16,7 @@
 
 package com.bytechef.component.intercom;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.intercom.constant.IntercomConstants.INTERCOM;
 
 import com.bytechef.component.ComponentHandler;

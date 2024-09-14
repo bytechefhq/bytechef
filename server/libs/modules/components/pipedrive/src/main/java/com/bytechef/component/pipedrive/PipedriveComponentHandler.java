@@ -16,19 +16,19 @@
 
 package com.bytechef.component.pipedrive;
 
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.pipedrive.constant.PipedriveConstants.ID;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
-import com.bytechef.component.definition.ComponentDSL.ModifiableArrayProperty;
-import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
-import com.bytechef.component.definition.ComponentDSL.ModifiableIntegerProperty;
-import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
-import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
-import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
-import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.pipedrive.trigger.PipedriveNewActivityTrigger;
 import com.bytechef.component.pipedrive.trigger.PipedriveNewDealTrigger;

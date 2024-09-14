@@ -16,16 +16,16 @@
 
 package com.bytechef.component.trello.trigger;
 
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.ComponentDSL.trigger;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.trello.constant.TrelloConstants.CARD_OUTPUT_PROPERTY;
 import static com.bytechef.component.trello.constant.TrelloConstants.ID;
 import static com.bytechef.component.trello.constant.TrelloConstants.ID_BOARD;
 import static com.bytechef.component.trello.constant.TrelloConstants.ID_LIST;
 
-import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;

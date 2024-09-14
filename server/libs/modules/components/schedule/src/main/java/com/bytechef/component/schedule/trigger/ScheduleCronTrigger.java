@@ -16,15 +16,15 @@
 
 package com.bytechef.component.schedule.trigger;
 
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.ComponentDSL.trigger;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.DATETIME;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.EXPRESSION;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.TIMEZONE;
 
-import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.ListenerEmitter;

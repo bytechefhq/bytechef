@@ -16,7 +16,7 @@
 
 package com.bytechef.component.filesystem;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILESYSTEM;
 
 import com.bytechef.component.ComponentHandler;

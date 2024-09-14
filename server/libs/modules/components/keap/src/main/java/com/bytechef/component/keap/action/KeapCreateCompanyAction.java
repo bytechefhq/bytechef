@@ -17,18 +17,18 @@
 package com.bytechef.component.keap.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.bool;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDsl;
 import java.util.Map;
 
 /**
@@ -37,7 +37,7 @@ import java.util.Map;
  * @generated
  */
 public class KeapCreateCompanyAction {
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("createCompany")
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createCompany")
         .title("Create a Company")
         .description("Creates a new company")
         .metadata(

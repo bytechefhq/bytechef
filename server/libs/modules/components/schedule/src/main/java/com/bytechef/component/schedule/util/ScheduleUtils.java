@@ -16,7 +16,7 @@
 
 package com.bytechef.component.schedule.util;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Option;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -44,7 +44,7 @@ public class ScheduleUtils {
 
                 String zoneOffsetId = zoneOffset.getId();
 
-                options.add(ComponentDSL.option("GMT" + zoneOffsetId.replace("Z", "+00:00"), zoneId));
+                options.add(ComponentDsl.option("GMT" + zoneOffsetId.replace("Z", "+00:00"), zoneId));
             }
         }
 

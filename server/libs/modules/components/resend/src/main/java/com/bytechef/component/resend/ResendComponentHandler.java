@@ -16,7 +16,7 @@
 
 package com.bytechef.component.resend;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.resend.constant.ResendConstants.RESEND;
 
 import com.bytechef.component.ComponentHandler;

@@ -16,11 +16,11 @@
 
 package com.bytechef.component.vtiger.action;
 
-import static com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.vtiger.constant.VTigerConstants.CREATE_CONTACT;
 import static com.bytechef.component.vtiger.constant.VTigerConstants.EMAIL;

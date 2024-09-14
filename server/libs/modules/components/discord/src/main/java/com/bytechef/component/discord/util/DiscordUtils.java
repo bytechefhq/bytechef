@@ -16,7 +16,7 @@
 
 package com.bytechef.component.discord.util;
 
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.discord.constant.DiscordConstants.GUILD_ID;
 import static com.bytechef.component.discord.constant.DiscordConstants.RECIPIENT_ID;
 

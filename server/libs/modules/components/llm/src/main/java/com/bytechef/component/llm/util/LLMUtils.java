@@ -16,7 +16,7 @@
 
 package com.bytechef.component.llm.util;
 
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.definition.Option;
 import java.util.ArrayList;

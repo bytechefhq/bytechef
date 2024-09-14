@@ -17,11 +17,11 @@
 package com.bytechef.component.petstore.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDsl;
 import java.util.Map;
 
 /**
@@ -30,7 +30,7 @@ import java.util.Map;
  * @generated
  */
 public class PetstoreDeletePetAction {
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("deletePet")
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("deletePet")
         .title("Deletes a pet")
         .description("delete a pet")
         .metadata(

@@ -16,10 +16,10 @@
 
 package com.bytechef.component.slack.action;
 
-import static com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.slack.constant.SlackConstants.CHANNEL;
 import static com.bytechef.component.slack.constant.SlackConstants.CHAT_POST_MESSAGE_RESPONSE_PROPERTY;
 import static com.bytechef.component.slack.constant.SlackConstants.SEND_DIRECT_MESSAGE;

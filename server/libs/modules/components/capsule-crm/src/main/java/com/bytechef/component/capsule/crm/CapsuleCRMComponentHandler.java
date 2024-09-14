@@ -18,7 +18,7 @@ package com.bytechef.component.capsule.crm;
 
 import static com.bytechef.component.capsule.crm.connection.CapsuleCRMConnection.CONNECTION_DEFINITION;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.CAPSULE_CRM;
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.capsule.crm.action.CapsuleCRMCreateContactAction;

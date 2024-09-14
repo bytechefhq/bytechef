@@ -18,11 +18,11 @@ package com.bytechef.component.discord.connection;
 
 import static com.bytechef.component.definition.Authorization.AuthorizationType;
 import static com.bytechef.component.definition.Authorization.TOKEN;
-import static com.bytechef.component.definition.ComponentDSL.authorization;
-import static com.bytechef.component.definition.ComponentDSL.connection;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.authorization;
+import static com.bytechef.component.definition.ComponentDsl.connection;
+import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDsl;
 
 /**
  * Provides the component connection definition.
@@ -30,7 +30,7 @@ import com.bytechef.component.definition.ComponentDSL;
  * @generated
  */
 public class DiscordConnection {
-    public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+    public static final ComponentDsl.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://discord.com/api/v10")
         .authorizations(authorization(AuthorizationType.BEARER_TOKEN)
             .title("Bearer Token")

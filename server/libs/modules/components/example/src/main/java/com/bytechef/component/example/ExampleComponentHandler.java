@@ -16,7 +16,7 @@
 
 package com.bytechef.component.example;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.example.constant.ExampleConstants.EXAMPLE;
 
 import com.bytechef.component.ComponentHandler;

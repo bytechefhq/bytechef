@@ -16,11 +16,11 @@
 
 package com.bytechef.component.jira.constant;
 
-import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 
 /**
  * @author Monika Kušter

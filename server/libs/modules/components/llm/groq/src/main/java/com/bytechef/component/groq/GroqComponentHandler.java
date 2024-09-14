@@ -16,7 +16,7 @@
 
 package com.bytechef.component.groq;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.groq.constant.GroqConstants.GROQ;
 
 import com.bytechef.component.ComponentHandler;

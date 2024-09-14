@@ -16,10 +16,10 @@
 
 package com.bytechef.component.intercom.action;
 
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http;
 import static com.bytechef.component.intercom.constant.IntercomConstants.CONTACT_NAME;
 import static com.bytechef.component.intercom.constant.IntercomConstants.EMAIL;
@@ -30,7 +30,7 @@ import static com.bytechef.component.intercom.constant.IntercomConstants.ROLE;
 import static com.bytechef.component.intercom.constant.IntercomConstants.TYPE;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -42,7 +42,7 @@ import com.bytechef.component.intercom.util.IntercomUtils;
  */
 public class IntercomGetContactAction {
 
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action(GET_CONTACT)
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action(GET_CONTACT)
         .title("Get Contact")
         .description("Get a single Contact")
         .properties(

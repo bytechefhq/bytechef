@@ -16,12 +16,12 @@
 
 package com.bytechef.component.microsoft.share.point.util;
 
-import static com.bytechef.component.definition.ComponentDSL.bool;
-import static com.bytechef.component.definition.ComponentDSL.date;
-import static com.bytechef.component.definition.ComponentDSL.dateTime;
-import static com.bytechef.component.definition.ComponentDSL.number;
-import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.date;
+import static com.bytechef.component.definition.ComponentDsl.dateTime;
+import static com.bytechef.component.definition.ComponentDsl.number;
+import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.share.point.constant.ColumnType.BOOLEAN;
 import static com.bytechef.component.microsoft.share.point.constant.ColumnType.CHOICE;
 import static com.bytechef.component.microsoft.share.point.constant.ColumnType.DATE_TIME;

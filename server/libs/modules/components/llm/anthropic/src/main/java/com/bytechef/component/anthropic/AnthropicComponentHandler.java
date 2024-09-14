@@ -17,7 +17,7 @@
 package com.bytechef.component.anthropic;
 
 import static com.bytechef.component.anthropic.constant.AnthropicConstants.ANTHROPIC;
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.anthropic.action.AnthropicChatAction;

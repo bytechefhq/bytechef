@@ -16,13 +16,13 @@
 
 package com.bytechef.component.delay.action;
 
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.delay.constant.DelayConstants.MILLIS;
 import static com.bytechef.component.delay.constant.DelayConstants.SLEEP;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;

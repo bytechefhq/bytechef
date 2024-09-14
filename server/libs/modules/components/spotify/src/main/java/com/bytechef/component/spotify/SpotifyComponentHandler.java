@@ -18,10 +18,10 @@ package com.bytechef.component.spotify;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
-import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
-import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.spotify.action.SpotifyCreatePlaylistAction;
 import com.bytechef.component.spotify.util.SpotifyUtils;

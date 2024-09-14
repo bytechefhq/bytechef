@@ -16,7 +16,7 @@
 
 package com.bytechef.component.google.contacts;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.google.contacts.connection.GoogleContactsConnection.CONNECTION_DEFINITION;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.GOOGLE_CONTACTS;
 

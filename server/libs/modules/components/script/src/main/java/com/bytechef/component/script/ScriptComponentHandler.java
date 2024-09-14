@@ -16,7 +16,7 @@
 
 package com.bytechef.component.script;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.platform.component.definition.ScriptComponentDefinition.SCRIPT;
 
 import com.bytechef.component.ComponentHandler;

@@ -16,7 +16,7 @@
 
 package com.bytechef.component.text.helper;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT_HELPER;
 
 import com.bytechef.component.ComponentHandler;

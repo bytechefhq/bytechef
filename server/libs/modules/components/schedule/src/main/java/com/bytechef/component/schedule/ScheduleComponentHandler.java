@@ -16,7 +16,7 @@
 
 package com.bytechef.component.schedule;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.SCHEDULE;
 
 import com.bytechef.component.ComponentHandler;

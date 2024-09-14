@@ -17,7 +17,7 @@
 package com.bytechef.component.twilio.util;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import java.time.LocalDateTime;
@@ -53,7 +53,7 @@ public class TwilioUtils {
 
                 String zoneOffsetId = zoneOffset.getId();
 
-                options.add(ComponentDSL.option("GMT" + zoneOffsetId.replace("Z", "+00:00"), zoneId));
+                options.add(ComponentDsl.option("GMT" + zoneOffsetId.replace("Z", "+00:00"), zoneId));
             }
         }
 

@@ -17,14 +17,14 @@
 package com.bytechef.component.vertex.gemini.connection;
 
 import static com.bytechef.component.definition.Authorization.AuthorizationType.BEARER_TOKEN;
-import static com.bytechef.component.definition.ComponentDSL.authorization;
-import static com.bytechef.component.definition.ComponentDSL.connection;
-import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.authorization;
+import static com.bytechef.component.definition.ComponentDsl.connection;
+import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.vertex.gemini.constant.VertexGeminiConstants.LOCATION;
 import static com.bytechef.component.vertex.gemini.constant.VertexGeminiConstants.PROJECT_ID;
 
-import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 
 /**
  * @author Monika Domiter

@@ -18,16 +18,16 @@ package com.bytechef.component.email.connection;
 
 import static com.bytechef.component.definition.Authorization.PASSWORD;
 import static com.bytechef.component.definition.Authorization.USERNAME;
-import static com.bytechef.component.definition.ComponentDSL.authorization;
-import static com.bytechef.component.definition.ComponentDSL.bool;
-import static com.bytechef.component.definition.ComponentDSL.connection;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.authorization;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.connection;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.email.constant.EmailConstants.HOST;
 import static com.bytechef.component.email.constant.EmailConstants.PORT;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
-import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.email.constant.EmailConstants;
 
 public class EmailConnection {

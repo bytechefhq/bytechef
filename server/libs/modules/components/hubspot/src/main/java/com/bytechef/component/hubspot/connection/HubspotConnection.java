@@ -19,11 +19,11 @@ package com.bytechef.component.hubspot.connection;
 import static com.bytechef.component.definition.Authorization.AuthorizationType;
 import static com.bytechef.component.definition.Authorization.CLIENT_ID;
 import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
-import static com.bytechef.component.definition.ComponentDSL.authorization;
-import static com.bytechef.component.definition.ComponentDSL.connection;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.authorization;
+import static com.bytechef.component.definition.ComponentDsl.connection;
+import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDsl;
 import java.util.List;
 
 /**
@@ -32,7 +32,7 @@ import java.util.List;
  * @generated
  */
 public class HubspotConnection {
-    public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+    public static final ComponentDsl.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://api.hubapi.com")
         .authorizations(authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
             .title("OAuth2 Authorization Code")

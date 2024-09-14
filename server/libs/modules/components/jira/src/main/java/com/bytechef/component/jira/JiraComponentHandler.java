@@ -16,7 +16,7 @@
 
 package com.bytechef.component.jira;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.jira.constant.JiraConstants.JIRA;
 
 import com.bytechef.component.ComponentHandler;

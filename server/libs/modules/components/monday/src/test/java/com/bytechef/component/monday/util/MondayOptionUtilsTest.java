@@ -16,7 +16,7 @@
 
 package com.bytechef.component.monday.util;
 
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.monday.constant.MondayConstants.BOARDS;
 import static com.bytechef.component.monday.constant.MondayConstants.BOARD_ID;
 import static com.bytechef.component.monday.constant.MondayConstants.DATA;

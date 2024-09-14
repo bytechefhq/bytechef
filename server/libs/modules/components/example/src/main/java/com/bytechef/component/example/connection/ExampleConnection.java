@@ -16,9 +16,9 @@
 
 package com.bytechef.component.example.connection;
 
-import static com.bytechef.component.definition.ComponentDSL.connection;
+import static com.bytechef.component.definition.ComponentDsl.connection;
 
-import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 
 public class ExampleConnection {
 

@@ -16,7 +16,7 @@
 
 package com.bytechef.component.pipedrive.util;
 
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.pipedrive.constant.PipedriveConstants.ID;
 
 import com.bytechef.component.definition.Context.Http;

@@ -16,7 +16,7 @@
 
 package com.bytechef.component.encharge.util;
 
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.encharge.util.EnchargeUtils.GET_PEOPLE_CONTEXT_FUNCTION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;

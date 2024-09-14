@@ -16,7 +16,7 @@
 
 package com.bytechef.component.intercom.util;
 
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.intercom.constant.IntercomConstants.ID;
 import static com.bytechef.component.intercom.constant.IntercomConstants.TYPE;
 import static com.bytechef.component.intercom.util.IntercomUtils.GET_CONTACTS_CONTEXT_FUNCTION;

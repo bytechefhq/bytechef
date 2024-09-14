@@ -17,10 +17,10 @@
 package com.bytechef.component.todoist.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDsl;
 import java.util.Map;
 
 /**
@@ -29,7 +29,7 @@ import java.util.Map;
  * @generated
  */
 public class TodoistMarkTaskCompletedAction {
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("markTaskCompleted")
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("markTaskCompleted")
         .title("Mark Task as Completed")
         .description("Mark a tas as being completed.")
         .metadata(

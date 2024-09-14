@@ -25,9 +25,9 @@ import static com.bytechef.component.datastream.constant.DataStreamConstants.JOB
 import static com.bytechef.component.datastream.constant.DataStreamConstants.SOURCE;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.TENANT_ID;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.TYPE;
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.datastream.constant.DataStreamConstants;
 import com.bytechef.component.definition.ActionContext;

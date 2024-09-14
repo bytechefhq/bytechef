@@ -16,12 +16,12 @@
 
 package com.bytechef.component.text.helper.action;
 
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.text.helper.constant.TextHelperConstants;
@@ -34,7 +34,7 @@ import java.util.Objects;
  */
 public class TextHelperBase64DecodeAction {
 
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION =
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION =
         action(TextHelperConstants.BASE_64_DECODE)
             .title("Base64 Decode")
             .description("Decodes base64 encoded text into human readable plain text.")

@@ -16,14 +16,14 @@
 
 package com.bytechef.component.xero.action;
 
-import static com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.date;
-import static com.bytechef.component.definition.ComponentDSL.number;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.date;
+import static com.bytechef.component.definition.ComponentDsl.number;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.xero.action.XeroCreateInvoiceAction.POST_INVOICES_CONTEXT_FUNCTION;
 import static com.bytechef.component.xero.constant.XeroConstants.ACCOUNT_CODE;
 import static com.bytechef.component.xero.constant.XeroConstants.ACCPAY;

@@ -16,7 +16,7 @@
 
 package com.bytechef.component.microsoft.share.point;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.MICROSOFT_SHARE_POINT;
 
 import com.bytechef.component.ComponentHandler;

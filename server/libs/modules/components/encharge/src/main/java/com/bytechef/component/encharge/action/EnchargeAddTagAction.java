@@ -17,12 +17,12 @@
 package com.bytechef.component.encharge.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDsl;
 import java.util.Map;
 
 /**
@@ -31,7 +31,7 @@ import java.util.Map;
  * @generated
  */
 public class EnchargeAddTagAction {
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("addTag")
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("addTag")
         .title("Add tag")
         .description("Add tag(s) to an existing user.")
         .metadata(

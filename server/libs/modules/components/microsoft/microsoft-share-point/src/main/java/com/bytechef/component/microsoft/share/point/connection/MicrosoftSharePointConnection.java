@@ -16,7 +16,7 @@
 
 package com.bytechef.component.microsoft.share.point.connection;
 
-import static com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
+import static com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 
 import com.bytechef.microsoft.commons.MicrosoftConnection;
 import java.util.List;

@@ -16,15 +16,15 @@
 
 package com.bytechef.component.todoist;
 
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
-import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
-import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
-import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
-import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.todoist.util.TodoistUtils;
 import com.bytechef.definition.BaseProperty;

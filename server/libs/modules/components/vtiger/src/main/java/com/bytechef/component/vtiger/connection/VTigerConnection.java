@@ -17,14 +17,14 @@
 package com.bytechef.component.vtiger.connection;
 
 import static com.bytechef.component.definition.Authorization.PASSWORD;
-import static com.bytechef.component.definition.ComponentDSL.authorization;
-import static com.bytechef.component.definition.ComponentDSL.connection;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.authorization;
+import static com.bytechef.component.definition.ComponentDsl.connection;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.vtiger.constant.VTigerConstants.INSTANCE_URL;
 
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
-import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 
 /**
  * @author Luka Ljubić

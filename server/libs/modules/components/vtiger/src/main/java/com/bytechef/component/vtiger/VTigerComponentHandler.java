@@ -16,7 +16,7 @@
 
 package com.bytechef.component.vtiger;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.vtiger.constant.VTigerConstants.VTIGER;
 
 import com.bytechef.component.ComponentHandler;

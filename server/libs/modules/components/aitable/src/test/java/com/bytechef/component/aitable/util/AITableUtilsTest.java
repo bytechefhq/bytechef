@@ -22,7 +22,7 @@ import static com.bytechef.component.aitable.constant.AITableConstants.MAX_RECOR
 import static com.bytechef.component.aitable.constant.AITableConstants.RECORD_IDS;
 import static com.bytechef.component.aitable.constant.AITableConstants.SPACE_ID;
 import static com.bytechef.component.aitable.constant.FieldType.EMAIL;
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;

@@ -16,14 +16,14 @@
 
 package com.bytechef.component.llm.constant;
 
-import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.number;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.number;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDsl;
 import java.util.List;
 
 /**
@@ -65,7 +65,7 @@ public class LLMConstants {
     public static final String WEIGHT = "weight";
     public static final String FUNCTIONS = "functions";
 
-    public static final ComponentDSL.ModifiableNumberProperty FREQUENCY_PENALTY_PROPERTY = number(FREQUENCY_PENALTY)
+    public static final ComponentDsl.ModifiableNumberProperty FREQUENCY_PENALTY_PROPERTY = number(FREQUENCY_PENALTY)
         .label("Frequency penalty")
         .description(
             "Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in " +
@@ -75,13 +75,13 @@ public class LLMConstants {
         .maxValue(2)
         .advancedOption(true);
 
-    public static final ComponentDSL.ModifiableArrayProperty FUNCTIONS_PROPERTY = array(FUNCTIONS)
+    public static final ComponentDsl.ModifiableArrayProperty FUNCTIONS_PROPERTY = array(FUNCTIONS)
         .label("Functions")
         .description("Enter the names of functions you want to use.")
         .items(string())
         .advancedOption(true);
 
-    public static final ComponentDSL.ModifiableIntegerProperty RESPONSE_FORMAT_PROPERTY = integer(RESPONSE_FORMAT)
+    public static final ComponentDsl.ModifiableIntegerProperty RESPONSE_FORMAT_PROPERTY = integer(RESPONSE_FORMAT)
         .label("Response format")
         .description("In which format do you want the response to be in?")
         .options(option("Text", 0),
@@ -90,30 +90,30 @@ public class LLMConstants {
         .defaultValue(0)
         .required(false);
 
-    public static final ComponentDSL.ModifiableObjectProperty LOGIT_BIAS_PROPERTY = object(LOGIT_BIAS)
+    public static final ComponentDsl.ModifiableObjectProperty LOGIT_BIAS_PROPERTY = object(LOGIT_BIAS)
         .label("Logit bias")
         .description("Modify the likelihood of specified tokens appearing in the completion.")
         .additionalProperties(number())
         .advancedOption(true);
 
-    public static final ComponentDSL.ModifiableIntegerProperty MAX_TOKENS_PROPERTY = integer(MAX_TOKENS)
+    public static final ComponentDsl.ModifiableIntegerProperty MAX_TOKENS_PROPERTY = integer(MAX_TOKENS)
         .label("Max tokens")
         .description("The maximum number of tokens to generate in the chat completion.")
         .advancedOption(true);
 
-    public static final ComponentDSL.ModifiableIntegerProperty N_PROPERTY = integer(N)
+    public static final ComponentDsl.ModifiableIntegerProperty N_PROPERTY = integer(N)
         .label("Number of chat completion choices")
         .description("How many chat completion choices to generate for each input message.")
         .defaultValue(1)
         .advancedOption(true);
 
-    public static final ComponentDSL.ModifiableIntegerProperty TOP_K_PROPERTY = integer(TOP_K)
+    public static final ComponentDsl.ModifiableIntegerProperty TOP_K_PROPERTY = integer(TOP_K)
         .label("Top K")
         .description("Specify the number of token choices the generative uses to generate the next token.")
         .defaultValue(1)
         .advancedOption(true);
 
-    public static final ComponentDSL.ModifiableNumberProperty PRESENCE_PENALTY_PROPERTY = number(PRESENCE_PENALTY)
+    public static final ComponentDsl.ModifiableNumberProperty PRESENCE_PENALTY_PROPERTY = number(PRESENCE_PENALTY)
         .label("Presence penalty")
         .description(
             "Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the " +
@@ -123,13 +123,13 @@ public class LLMConstants {
         .maxValue(2)
         .advancedOption(true);
 
-    public static final ComponentDSL.ModifiableArrayProperty STOP_PROPERTY = array(STOP)
+    public static final ComponentDsl.ModifiableArrayProperty STOP_PROPERTY = array(STOP)
         .label("Stop")
         .description("Up to 4 sequences where the API will stop generating further tokens.")
         .items(string())
         .advancedOption(true);
 
-    public static final ComponentDSL.ModifiableNumberProperty TEMPERATURE_PROPERTY = number(TEMPERATURE)
+    public static final ComponentDsl.ModifiableNumberProperty TEMPERATURE_PROPERTY = number(TEMPERATURE)
         .label("Temperature")
         .description(
             "Controls randomness:  Higher values will make the output more random, while lower values like will make " +
@@ -139,7 +139,7 @@ public class LLMConstants {
         .maxValue(2)
         .advancedOption(true);
 
-    public static final ComponentDSL.ModifiableNumberProperty TOP_P_PROPERTY = number(TOP_P)
+    public static final ComponentDsl.ModifiableNumberProperty TOP_P_PROPERTY = number(TOP_P)
         .label("Top P")
         .description(
             "An alternative to sampling with temperature, called nucleus sampling,  where the model considers the " +
@@ -148,19 +148,19 @@ public class LLMConstants {
         .defaultValue(1)
         .advancedOption(true);
 
-    public static final ComponentDSL.ModifiableStringProperty USER_PROPERTY = string(USER)
+    public static final ComponentDsl.ModifiableStringProperty USER_PROPERTY = string(USER)
         .label("User")
         .description(
             "A unique identifier representing your end-user, which can help admins to monitor and detect abuse.")
         .required(false)
         .advancedOption(true);
 
-    public static final ComponentDSL.ModifiableIntegerProperty SEED_PROPERTY = integer(SEED)
+    public static final ComponentDsl.ModifiableIntegerProperty SEED_PROPERTY = integer(SEED)
         .label("Seed")
         .description("Keeping the same seed would output the same response.")
         .advancedOption(true);
 
-    public static final ComponentDSL.ModifiableArrayProperty MESSAGE_PROPERTY = array(MESSAGES)
+    public static final ComponentDsl.ModifiableArrayProperty MESSAGE_PROPERTY = array(MESSAGES)
         .label("Messages")
         .description("A list of messages comprising the conversation so far.")
         .items(
@@ -180,7 +180,7 @@ public class LLMConstants {
                     .required(true)))
         .required(true);
 
-    public static final ComponentDSL.ModifiableArrayProperty IMAGE_MESSAGE_PROPERTY = array(IMAGE_MESSAGES)
+    public static final ComponentDsl.ModifiableArrayProperty IMAGE_MESSAGE_PROPERTY = array(IMAGE_MESSAGES)
         .label("Messages")
         .description("A list of messages comprising the conversation so far.")
         .items(
@@ -195,7 +195,7 @@ public class LLMConstants {
                     .required(false)))
         .required(true);
 
-    public static final ComponentDSL.ModifiableStringProperty LANGUAGE_PROPERTY = string(LANGUAGE)
+    public static final ComponentDsl.ModifiableStringProperty LANGUAGE_PROPERTY = string(LANGUAGE)
         .label("Language")
         .description("The language of the input audio.")
         .options(

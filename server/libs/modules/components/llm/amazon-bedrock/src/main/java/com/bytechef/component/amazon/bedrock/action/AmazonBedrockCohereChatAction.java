@@ -20,10 +20,10 @@ import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConsta
 import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.BIAS_TOKEN;
 import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.BIAS_VALUE;
 import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.SECRET_ACCESS_KEY;
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.number;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.number;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.llm.constant.LLMConstants.LOGIT_BIAS;
 import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
@@ -43,7 +43,7 @@ import static com.bytechef.component.llm.constant.LLMConstants.TOP_P_PROPERTY;
 
 import com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants;
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.llm.Chat;

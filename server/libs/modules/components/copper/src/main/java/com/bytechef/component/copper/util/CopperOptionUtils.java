@@ -22,7 +22,7 @@ import static com.bytechef.component.copper.constant.CopperConstants.LEAD;
 import static com.bytechef.component.copper.constant.CopperConstants.NAME;
 import static com.bytechef.component.copper.constant.CopperConstants.PERSON;
 import static com.bytechef.component.copper.constant.CopperConstants.TYPE;
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;

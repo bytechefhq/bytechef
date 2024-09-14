@@ -16,12 +16,12 @@
 
 package com.bytechef.component.microsoft.excel.action;
 
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.bool;
-import static com.bytechef.component.definition.ComponentDSL.number;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.number;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.APPEND_ROW;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.ROW_DYNAMIC_PROPERTY;
@@ -32,7 +32,7 @@ import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils.ge
 import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils.getRowInputValues;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 
 /**

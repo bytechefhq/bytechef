@@ -17,11 +17,11 @@
 package com.bytechef.component.openai.action;
 
 import static com.bytechef.component.definition.Authorization.TOKEN;
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.fileEntry;
-import static com.bytechef.component.definition.ComponentDSL.number;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.fileEntry;
+import static com.bytechef.component.definition.ComponentDsl.number;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.llm.constant.LLMConstants.CREATE_TRANSCRIPTION;
 import static com.bytechef.component.llm.constant.LLMConstants.FILE;
 import static com.bytechef.component.llm.constant.LLMConstants.LANGUAGE;
@@ -32,7 +32,7 @@ import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.llm.constant.LLMConstants.TEMPERATURE;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.llm.Transcript;
 import com.bytechef.component.llm.util.LLMUtils;

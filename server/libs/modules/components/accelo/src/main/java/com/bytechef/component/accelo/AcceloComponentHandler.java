@@ -17,7 +17,7 @@
 package com.bytechef.component.accelo;
 
 import static com.bytechef.component.accelo.constant.AcceloConstants.ACCELO;
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.accelo.action.AcceloCreateCompanyAction;

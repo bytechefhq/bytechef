@@ -16,12 +16,12 @@
 
 package com.bytechef.component.github.constant;
 
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.number;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.number;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 
 /**
  * @author Luka Ljubić

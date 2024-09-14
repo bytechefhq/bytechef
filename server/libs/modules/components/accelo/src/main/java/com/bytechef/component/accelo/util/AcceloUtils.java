@@ -17,7 +17,7 @@
 package com.bytechef.component.accelo.util;
 
 import static com.bytechef.component.accelo.constant.AcceloConstants.AGAINST_TYPE;
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;

@@ -16,12 +16,12 @@
 
 package com.bytechef.component.microsoft.excel.util;
 
-import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.bool;
-import static com.bytechef.component.definition.ComponentDSL.number;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.number;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.ID;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.IS_THE_FIRST_ROW_HEADER;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.NAME;
@@ -33,9 +33,9 @@ import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelCons
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKSHEET_NAME;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableArrayProperty;
-import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
-import com.bytechef.component.definition.ComponentDSL.ModifiableValueProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;

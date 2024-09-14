@@ -16,7 +16,7 @@
 
 package com.bytechef.component.xero.util;
 
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.xero.constant.XeroConstants.ACCPAY;
 import static com.bytechef.component.xero.constant.XeroConstants.ACCREC;
 import static com.bytechef.component.xero.constant.XeroConstants.CODE;

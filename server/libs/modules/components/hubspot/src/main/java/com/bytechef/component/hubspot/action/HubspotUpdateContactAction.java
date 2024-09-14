@@ -17,14 +17,14 @@
 package com.bytechef.component.hubspot.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDsl;
 import java.util.Map;
 
 /**
@@ -33,7 +33,7 @@ import java.util.Map;
  * @generated
  */
 public class HubspotUpdateContactAction {
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("updateContact")
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("updateContact")
         .title("Update Contact")
         .description("Update Contact properties.")
         .metadata(

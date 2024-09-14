@@ -16,7 +16,7 @@
 
 package com.bytechef.component.openai;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.openai.constant.OpenAIConstants.OPENAI;
 
 import com.bytechef.component.ComponentHandler;

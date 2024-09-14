@@ -16,7 +16,7 @@
 
 package com.bytechef.component.typeform.util;
 
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.typeform.constant.TypeformConstants.ID;
 import static com.bytechef.component.typeform.constant.TypeformConstants.TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;

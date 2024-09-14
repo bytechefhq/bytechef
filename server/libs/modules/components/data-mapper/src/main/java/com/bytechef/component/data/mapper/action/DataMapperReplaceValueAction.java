@@ -33,25 +33,25 @@ import static com.bytechef.component.data.mapper.util.DataMapperUtils.TO_DESCRIP
 import static com.bytechef.component.data.mapper.util.DataMapperUtils.VALUE_DESCRIPTION;
 import static com.bytechef.component.data.mapper.util.DataMapperUtils.VALUE_LABEL;
 import static com.bytechef.component.data.mapper.util.DataMapperUtils.getDisplayCondition;
-import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.bool;
-import static com.bytechef.component.definition.ComponentDSL.date;
-import static com.bytechef.component.definition.ComponentDSL.dateTime;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.nullable;
-import static com.bytechef.component.definition.ComponentDSL.number;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.ComponentDSL.time;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.date;
+import static com.bytechef.component.definition.ComponentDsl.dateTime;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.nullable;
+import static com.bytechef.component.definition.ComponentDsl.number;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.ComponentDsl.time;
 
 import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.component.data.mapper.model.Mapping;
 import com.bytechef.component.data.mapper.model.ObjectMapping;
 import com.bytechef.component.data.mapper.util.DataMapperUtils;
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import java.util.List;
 
@@ -61,7 +61,7 @@ import java.util.List;
  */
 public class DataMapperReplaceValueAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL.action("replaceValue")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDsl.action("replaceValue")
         .title("Replace value")
         .description(
             "Replaces a given value with the specified value defined in mappings. In case there is no mapping specified for the value, it returns the default value, and if there is no default defined, it returns null. You can also change a string value with regex.")

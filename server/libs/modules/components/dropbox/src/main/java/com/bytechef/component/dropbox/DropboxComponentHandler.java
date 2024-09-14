@@ -16,7 +16,7 @@
 
 package com.bytechef.component.dropbox;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.DROPBOX;
 
 import com.bytechef.component.ComponentHandler;

@@ -16,15 +16,15 @@
 
 package com.bytechef.component.hubspot.trigger;
 
-import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.sampleOutput;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
+import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
@@ -50,7 +50,7 @@ public class HubspotSubscribeTrigger {
     private static final String PROPERTY_NAME = "propertyName";
     private static final String SUBSCRIBE = "subscribe";
 
-    public static final ComponentDSL.ModifiableTriggerDefinition TRIGGER_DEFINITION = ComponentDSL.trigger(SUBSCRIBE)
+    public static final ComponentDsl.ModifiableTriggerDefinition TRIGGER_DEFINITION = ComponentDsl.trigger(SUBSCRIBE)
         .title("Subscribe")
         .description("Triggers when an event of the subscribed type happens inside HubSpot.")
         .type(TriggerDefinition.TriggerType.DYNAMIC_WEBHOOK)

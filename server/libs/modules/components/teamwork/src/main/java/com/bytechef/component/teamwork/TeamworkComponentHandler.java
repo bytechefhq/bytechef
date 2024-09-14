@@ -17,18 +17,18 @@
 package com.bytechef.component.teamwork;
 
 import static com.bytechef.component.definition.Authorization.USERNAME;
-import static com.bytechef.component.definition.ComponentDSL.authorization;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.authorization;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.teamwork.constant.TeamworkConstants.SITE_NAME;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentCategory;
-import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
-import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
-import com.bytechef.component.definition.ComponentDSL.ModifiableIntegerProperty;
-import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.teamwork.util.TeamworkUtils;
 import com.google.auto.service.AutoService;

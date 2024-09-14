@@ -21,11 +21,11 @@ import static com.bytechef.component.definition.Authorization.CLIENT_ID;
 import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
 import static com.bytechef.component.definition.Authorization.KEY;
 import static com.bytechef.component.definition.Authorization.VALUE;
-import static com.bytechef.component.definition.ComponentDSL.authorization;
-import static com.bytechef.component.definition.ComponentDSL.connection;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.authorization;
+import static com.bytechef.component.definition.ComponentDsl.connection;
+import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDsl;
 import java.util.List;
 
 /**
@@ -34,7 +34,7 @@ import java.util.List;
  * @generated
  */
 public class PetstoreConnection {
-    public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+    public static final ComponentDsl.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://petstore3.swagger.io/api/v3")
         .authorizations(authorization(AuthorizationType.OAUTH2_IMPLICIT_CODE)
             .title("OAuth2 Implicit")

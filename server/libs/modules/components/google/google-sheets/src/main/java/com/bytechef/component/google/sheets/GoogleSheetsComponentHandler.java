@@ -16,7 +16,7 @@
 
 package com.bytechef.component.google.sheets;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.google.sheets.connection.GoogleSheetsConnection.CONNECTION_DEFINITION;
 
 import com.bytechef.component.ComponentHandler;

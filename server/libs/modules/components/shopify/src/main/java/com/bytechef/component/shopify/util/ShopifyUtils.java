@@ -16,7 +16,7 @@
 
 package com.bytechef.component.shopify.util;
 
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.ID;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.PRODUCT_ID;
 

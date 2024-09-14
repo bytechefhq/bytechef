@@ -16,11 +16,11 @@
 
 package com.bytechef.component.google.mail.trigger;
 
-import static com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
-import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.ComponentDSL.trigger;
+import static com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.definition.TriggerContext.Data.Scope.WORKFLOW;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FULL_MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.HISTORY_ID;

@@ -16,7 +16,7 @@
 
 package com.bytechef.component.sendgrid;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.SENDGRID;
 
 import com.bytechef.component.ComponentHandler;

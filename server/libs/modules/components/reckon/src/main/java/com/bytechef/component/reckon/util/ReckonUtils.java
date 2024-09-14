@@ -16,7 +16,7 @@
 
 package com.bytechef.component.reckon.util;
 
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.reckon.constant.ReckonConstants.BOOK_ID;
 import static com.bytechef.component.reckon.constant.ReckonConstants.ID;
 import static com.bytechef.component.reckon.constant.ReckonConstants.LAST_TIME_CHECKED;

@@ -16,9 +16,9 @@
 
 package com.bytechef.component.trello.action;
 
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.trello.constant.TrelloConstants.CARD_OUTPUT_PROPERTY;
 import static com.bytechef.component.trello.constant.TrelloConstants.DESC;
 import static com.bytechef.component.trello.constant.TrelloConstants.ID_BOARD;
@@ -26,7 +26,7 @@ import static com.bytechef.component.trello.constant.TrelloConstants.ID_LIST;
 import static com.bytechef.component.trello.constant.TrelloConstants.NAME;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;

@@ -20,7 +20,7 @@ import static com.bytechef.component.copper.constant.CopperConstants.ID;
 import static com.bytechef.component.copper.constant.CopperConstants.LEAD;
 import static com.bytechef.component.copper.constant.CopperConstants.NAME;
 import static com.bytechef.component.copper.constant.CopperConstants.TYPE;
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;

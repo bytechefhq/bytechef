@@ -16,9 +16,9 @@
 
 package com.bytechef.component.jira.action;
 
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.jira.constant.JiraConstants.ASSIGNEE;
 import static com.bytechef.component.jira.constant.JiraConstants.CONTENT;
 import static com.bytechef.component.jira.constant.JiraConstants.CREATE_ISSUE;
@@ -35,7 +35,7 @@ import static com.bytechef.component.jira.constant.JiraConstants.TEXT;
 import static com.bytechef.component.jira.constant.JiraConstants.TYPE;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;

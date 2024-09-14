@@ -16,7 +16,7 @@
 
 package com.bytechef.component.keap.util;
 
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;

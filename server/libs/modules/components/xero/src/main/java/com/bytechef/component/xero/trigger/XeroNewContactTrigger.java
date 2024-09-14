@@ -16,9 +16,9 @@
 
 package com.bytechef.component.xero.trigger;
 
-import static com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.trigger;
+import static com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACT_OUTPUT_PROPERTY;
 import static com.bytechef.component.xero.constant.XeroConstants.NEW_CONTACT;
 import static com.bytechef.component.xero.constant.XeroConstants.WEBHOOK_KEY_PROPERTY;

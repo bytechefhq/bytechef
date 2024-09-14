@@ -16,7 +16,7 @@
 
 package com.bytechef.component.monday;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.monday.constant.MondayConstants.MONDAY;
 
 import com.bytechef.component.ComponentHandler;

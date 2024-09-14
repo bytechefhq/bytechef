@@ -16,7 +16,7 @@
 
 package com.bytechef.component.microsoft.teams;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.MICROSOFT_TEAMS;
 
 import com.bytechef.component.ComponentHandler;

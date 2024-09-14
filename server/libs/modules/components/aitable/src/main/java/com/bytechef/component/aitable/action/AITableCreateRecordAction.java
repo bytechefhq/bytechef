@@ -24,11 +24,11 @@ import static com.bytechef.component.aitable.constant.AITableConstants.FIELDS_DY
 import static com.bytechef.component.aitable.constant.AITableConstants.OUTPUT_PROPERTY;
 import static com.bytechef.component.aitable.constant.AITableConstants.RECORDS;
 import static com.bytechef.component.aitable.constant.AITableConstants.SPACE_ID_PROPERTY;
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;

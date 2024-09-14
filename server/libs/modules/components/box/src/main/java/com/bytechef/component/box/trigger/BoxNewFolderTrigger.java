@@ -21,10 +21,10 @@ import static com.bytechef.component.box.constant.BoxConstants.FOLDER;
 import static com.bytechef.component.box.constant.BoxConstants.FOLDER_ID;
 import static com.bytechef.component.box.constant.BoxConstants.ID;
 import static com.bytechef.component.box.constant.BoxConstants.NEW_FOLDER;
-import static com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.ComponentDSL.trigger;
+import static com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.ComponentDsl.trigger;
 
 import com.bytechef.component.box.util.BoxUtils;
 import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;

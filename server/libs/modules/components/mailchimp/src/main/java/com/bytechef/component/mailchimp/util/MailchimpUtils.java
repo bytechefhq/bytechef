@@ -18,7 +18,7 @@ package com.bytechef.component.mailchimp.util;
 
 import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.Authorization.AUTHORIZATION;
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;

@@ -19,14 +19,14 @@ package com.bytechef.component.whatsapp.connection;
 import static com.bytechef.component.definition.Authorization.AUTHORIZATION;
 import static com.bytechef.component.definition.Authorization.ApplyResponse.ofHeaders;
 import static com.bytechef.component.definition.Authorization.BEARER;
-import static com.bytechef.component.definition.ComponentDSL.authorization;
-import static com.bytechef.component.definition.ComponentDSL.connection;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.authorization;
+import static com.bytechef.component.definition.ComponentDsl.connection;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.PHONE_NUMBER_ID;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.SYSTEM_USER_ACCESS_TOKEN;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
-import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import java.util.List;
 import java.util.Map;
 

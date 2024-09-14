@@ -20,7 +20,7 @@ import static com.bytechef.component.clickup.constant.ClickupConstants.FOLDER_ID
 import static com.bytechef.component.clickup.constant.ClickupConstants.ID;
 import static com.bytechef.component.clickup.constant.ClickupConstants.NAME;
 import static com.bytechef.component.clickup.constant.ClickupConstants.SPACE_ID;
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;

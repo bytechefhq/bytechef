@@ -16,7 +16,7 @@
 
 package com.bytechef.component.slack.util;
 
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.slack.constant.SlackConstants.CHANNEL;
 import static com.bytechef.component.slack.constant.SlackConstants.ID;
 import static com.bytechef.component.slack.constant.SlackConstants.NAME;

@@ -16,9 +16,9 @@
 
 package com.bytechef.component.csv.file.datastream;
 
-import static com.bytechef.component.definition.ComponentDSL.dataStream;
-import static com.bytechef.component.definition.ComponentDSL.dataStreamReader;
-import static com.bytechef.component.definition.ComponentDSL.dataStreamWriter;
+import static com.bytechef.component.definition.ComponentDsl.dataStream;
+import static com.bytechef.component.definition.ComponentDsl.dataStreamReader;
+import static com.bytechef.component.definition.ComponentDsl.dataStreamWriter;
 
 import com.bytechef.component.definition.DataStreamDefinition;
 

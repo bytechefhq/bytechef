@@ -16,7 +16,7 @@
 
 package com.bytechef.component.nifty.util;
 
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.nifty.constant.NiftyConstants.NAME;
 import static com.bytechef.component.nifty.constant.NiftyConstants.PROJECT;
 

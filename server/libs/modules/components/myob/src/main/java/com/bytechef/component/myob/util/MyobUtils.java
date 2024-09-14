@@ -16,7 +16,7 @@
 
 package com.bytechef.component.myob.util;
 
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.myob.constant.MyobConstants.COMPANY_FILE;

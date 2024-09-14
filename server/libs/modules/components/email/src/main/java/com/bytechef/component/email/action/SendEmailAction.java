@@ -18,18 +18,18 @@ package com.bytechef.component.email.action;
 
 import static com.bytechef.component.definition.Authorization.PASSWORD;
 import static com.bytechef.component.definition.Authorization.USERNAME;
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.fileEntry;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.fileEntry;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.email.constant.EmailConstants.HOST;
 import static com.bytechef.component.email.constant.EmailConstants.PORT;
 import static com.bytechef.component.email.constant.EmailConstants.SEND;
 import static com.bytechef.component.email.constant.EmailConstants.TLS;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import jakarta.activation.DataHandler;
@@ -66,7 +66,7 @@ public class SendEmailAction {
     private static final String CONTENT = "content";
     private static final String ATTACHMENTS = "attachments";
 
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action(SEND)
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action(SEND)
         .title("Send")
         .description("Send an email to any address.")
         .properties(

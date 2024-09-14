@@ -17,13 +17,13 @@
 package com.bytechef.component.petstore.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.petstore.property.PetstoreUserProperties;
 import java.util.Map;
 
@@ -33,7 +33,7 @@ import java.util.Map;
  * @generated
  */
 public class PetstoreCreateUserAction {
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("createUser")
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createUser")
         .title("Create user")
         .description("This can only be done by the logged in user.")
         .metadata(

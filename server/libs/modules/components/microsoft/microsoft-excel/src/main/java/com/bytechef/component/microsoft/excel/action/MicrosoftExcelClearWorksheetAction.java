@@ -16,7 +16,7 @@
 
 package com.bytechef.component.microsoft.excel.action;
 
-import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.CLEAR_WORKSHEET;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.IS_THE_FIRST_ROW_HEADER;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
@@ -29,7 +29,7 @@ import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils.ge
 import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils.getLastUsedRowIndex;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import java.util.List;

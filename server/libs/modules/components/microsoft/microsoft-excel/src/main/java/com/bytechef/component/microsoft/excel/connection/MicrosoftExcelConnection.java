@@ -16,7 +16,7 @@
 
 package com.bytechef.component.microsoft.excel.connection;
 
-import static com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
+import static com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 
 import com.bytechef.microsoft.commons.MicrosoftConnection;
 import java.util.List;

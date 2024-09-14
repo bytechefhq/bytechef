@@ -16,11 +16,11 @@
 
 package com.bytechef.component.xml.file.action;
 
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.bool;
-import static com.bytechef.component.definition.ComponentDSL.fileEntry;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.fileEntry;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.xml.file.constant.XmlFileConstants.FILE_ENTRY;
 import static com.bytechef.component.xml.file.constant.XmlFileConstants.IS_ARRAY;
 import static com.bytechef.component.xml.file.constant.XmlFileConstants.PAGE_NUMBER;
@@ -29,7 +29,7 @@ import static com.bytechef.component.xml.file.constant.XmlFileConstants.PATH;
 import static com.bytechef.component.xml.file.constant.XmlFileConstants.READ;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;

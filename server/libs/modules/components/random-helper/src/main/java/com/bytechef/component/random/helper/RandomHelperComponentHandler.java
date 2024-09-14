@@ -16,7 +16,7 @@
 
 package com.bytechef.component.random.helper;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.random.helper.constant.RandomHelperConstants.RANDOM_HELPER;
 
 import com.bytechef.component.ComponentHandler;

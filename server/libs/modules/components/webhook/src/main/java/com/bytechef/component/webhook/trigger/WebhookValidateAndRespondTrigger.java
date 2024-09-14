@@ -16,11 +16,11 @@
 
 package com.bytechef.component.webhook.trigger;
 
-import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.ComponentDSL.trigger;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.webhook.constant.WebhookConstants.CSRF_TOKEN;
 
-import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.webhook.util.WebhookUtils;
 

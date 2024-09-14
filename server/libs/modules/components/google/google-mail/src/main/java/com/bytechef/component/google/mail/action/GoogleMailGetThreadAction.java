@@ -16,10 +16,10 @@
 
 package com.bytechef.component.google.mail.action;
 
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FULL;
@@ -35,7 +35,7 @@ import static com.bytechef.component.google.mail.util.GoogleMailUtils.getMessage
 import static com.bytechef.component.google.mail.util.GoogleMailUtils.getSimpleMessage;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;

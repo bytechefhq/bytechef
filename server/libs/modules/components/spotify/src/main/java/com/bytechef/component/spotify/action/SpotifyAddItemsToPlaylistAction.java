@@ -17,16 +17,16 @@
 package com.bytechef.component.spotify.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDsl;
 import java.util.Map;
 
 /**
@@ -35,7 +35,7 @@ import java.util.Map;
  * @generated
  */
 public class SpotifyAddItemsToPlaylistAction {
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("addItemsToPlaylist")
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("addItemsToPlaylist")
         .title("Add Items to a Playlist")
         .description("Adds one or more items to your playlist.")
         .metadata(

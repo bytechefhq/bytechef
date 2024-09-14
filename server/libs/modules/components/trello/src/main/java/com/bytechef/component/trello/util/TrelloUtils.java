@@ -16,7 +16,7 @@
 
 package com.bytechef.component.trello.util;
 
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.trello.constant.TrelloConstants.ID;
 import static com.bytechef.component.trello.constant.TrelloConstants.ID_BOARD;

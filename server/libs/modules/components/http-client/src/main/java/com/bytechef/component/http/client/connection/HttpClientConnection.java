@@ -28,14 +28,14 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.Authorization.TOKEN_URL;
 import static com.bytechef.component.definition.Authorization.USERNAME;
 import static com.bytechef.component.definition.Authorization.VALUE;
-import static com.bytechef.component.definition.ComponentDSL.authorization;
-import static com.bytechef.component.definition.ComponentDSL.connection;
-import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.authorization;
+import static com.bytechef.component.definition.ComponentDsl.connection;
+import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ConnectionDefinition.BASE_URI;
 
 import com.bytechef.component.definition.Authorization;
-import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.Property;
 
 public class HttpClientConnection {

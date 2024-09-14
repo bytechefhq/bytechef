@@ -18,7 +18,7 @@ package com.bytechef.component.affinity;
 
 import static com.bytechef.component.affinity.connection.AffinityConnection.CONNECTION_DEFINITION;
 import static com.bytechef.component.affinity.constant.AffinityConstants.AFFINITY;
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.affinity.action.AffinityCreateOpportunityAction;

@@ -17,7 +17,7 @@
 package com.bytechef.component.accelo.util;
 
 import static com.bytechef.component.accelo.constant.AcceloConstants.AGAINST_TYPE;
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;

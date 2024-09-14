@@ -16,11 +16,11 @@
 
 package com.bytechef.component.infobip.action;
 
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.infobip.constant.InfobipConstants.CONTENT;
 import static com.bytechef.component.infobip.constant.InfobipConstants.DESCRIPTION;
 import static com.bytechef.component.infobip.constant.InfobipConstants.FROM;
@@ -36,7 +36,7 @@ import static com.bytechef.component.infobip.constant.InfobipConstants.TEXT;
 import static com.bytechef.component.infobip.constant.InfobipConstants.TO;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;

@@ -16,10 +16,10 @@
 
 package com.bytechef.component.one.simple.api.action;
 
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.ACCESS_TOKEN;
@@ -27,7 +27,7 @@ import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConsta
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.URL_SHORTENER;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -37,7 +37,7 @@ import com.bytechef.component.definition.TypeReference;
  */
 public class OneSimpleAPIUrlShortenerAction {
 
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action(URL_SHORTENER)
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action(URL_SHORTENER)
         .title("URL Shortener")
         .description("Shorten your desired URL")
         .properties(

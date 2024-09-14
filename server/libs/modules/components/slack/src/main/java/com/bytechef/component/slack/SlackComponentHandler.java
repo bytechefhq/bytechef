@@ -16,7 +16,7 @@
 
 package com.bytechef.component.slack;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.slack.constant.SlackConstants.SLACK;
 
 import com.bytechef.component.ComponentHandler;

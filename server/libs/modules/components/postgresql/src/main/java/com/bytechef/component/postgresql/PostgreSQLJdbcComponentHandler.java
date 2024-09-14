@@ -16,7 +16,7 @@
 
 package com.bytechef.component.postgresql;
 
-import static com.bytechef.component.definition.ComponentDSL.jdbcComponent;
+import static com.bytechef.component.definition.ComponentDsl.jdbcComponent;
 import static com.bytechef.component.postgresql.constant.PostgreSQLConstants.POSTGRESQL;
 
 import com.bytechef.component.definition.JdbcComponentDefinition;

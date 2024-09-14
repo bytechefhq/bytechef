@@ -16,11 +16,11 @@
 
 package com.bytechef.component.discord.action;
 
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.bool;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.discord.constant.DiscordConstants.CONTENT;
 import static com.bytechef.component.discord.constant.DiscordConstants.GUILD_ID;
 import static com.bytechef.component.discord.constant.DiscordConstants.GUILD_ID_PROPERTY;
@@ -30,7 +30,7 @@ import static com.bytechef.component.discord.constant.DiscordConstants.TTS;
 import static com.bytechef.component.discord.util.DiscordUtils.getDMChannel;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;

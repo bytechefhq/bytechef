@@ -17,10 +17,10 @@
 package com.bytechef.component.petstore.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDsl;
 import java.util.Map;
 
 /**
@@ -29,7 +29,7 @@ import java.util.Map;
  * @generated
  */
 public class PetstoreDeleteUserAction {
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("deleteUser")
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("deleteUser")
         .title("Delete user")
         .description("This can only be done by the logged in user.")
         .metadata(

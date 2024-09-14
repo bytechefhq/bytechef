@@ -17,13 +17,13 @@
 package com.bytechef.component.shopify.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.shopify.property.ShopifyOrderProperties;
 import java.util.Map;
 
@@ -33,7 +33,7 @@ import java.util.Map;
  * @generated
  */
 public class ShopifyCancelOrderAction {
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("cancelOrder")
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("cancelOrder")
         .title("Cancel an order")
         .description("Cancels an order. Orders that are paid and have fulfillments can't be canceled.")
         .metadata(

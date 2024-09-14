@@ -16,7 +16,7 @@
 
 package com.bytechef.component.microsoft.teams.util;
 
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.DISPLAY_NAME;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.ID;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.VALUE;

@@ -16,10 +16,10 @@
 
 package com.bytechef.component.monday.action;
 
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.monday.constant.MondayConstants.BOARD_ID;
 import static com.bytechef.component.monday.constant.MondayConstants.CREATE_GROUP;
 import static com.bytechef.component.monday.constant.MondayConstants.DATA;
@@ -30,7 +30,7 @@ import static com.bytechef.component.monday.constant.MondayConstants.WORKSPACE_I
 import static com.bytechef.component.monday.util.MondayUtils.executeGraphQLQuery;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.monday.util.MondayOptionUtils;

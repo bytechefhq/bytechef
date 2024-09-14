@@ -17,7 +17,7 @@
 package com.bytechef.component.aitable;
 
 import static com.bytechef.component.aitable.constant.AITableConstants.AI_TABLE;
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.aitable.action.AITableCreateRecordAction;

@@ -17,14 +17,14 @@
 package com.bytechef.component.petstore.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.petstore.property.PetstorePetProperties;
 import java.util.Map;
 
@@ -34,7 +34,7 @@ import java.util.Map;
  * @generated
  */
 public class PetstoreFindPetsByTagsAction {
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("findPetsByTags")
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("findPetsByTags")
         .title("Finds Pets by tags")
         .description("Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.")
         .metadata(

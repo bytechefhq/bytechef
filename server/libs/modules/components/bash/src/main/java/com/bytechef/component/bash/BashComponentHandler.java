@@ -17,7 +17,7 @@
 package com.bytechef.component.bash;
 
 import static com.bytechef.component.bash.constant.BashConstants.BASH;
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.bash.action.BashExecuteAction;

@@ -16,7 +16,7 @@
 
 package com.bytechef.component.xero;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.xero.constant.XeroConstants.XERO;
 
 import com.bytechef.component.ComponentHandler;

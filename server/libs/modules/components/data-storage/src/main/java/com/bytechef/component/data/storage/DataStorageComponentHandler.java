@@ -17,7 +17,7 @@
 package com.bytechef.component.data.storage;
 
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.DATA_STORAGE;
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.data.storage.action.DataStorageAppendValueToListAction;

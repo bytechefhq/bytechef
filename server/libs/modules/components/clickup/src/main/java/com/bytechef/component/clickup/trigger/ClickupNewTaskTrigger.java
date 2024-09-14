@@ -22,11 +22,11 @@ import static com.bytechef.component.clickup.constant.ClickupConstants.WORKSPACE
 import static com.bytechef.component.clickup.util.ClickupUtils.getCreatedObject;
 import static com.bytechef.component.clickup.util.ClickupUtils.subscribeWebhook;
 import static com.bytechef.component.clickup.util.ClickupUtils.unsubscribeWebhook;
-import static com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.ComponentDSL.trigger;
+import static com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.ComponentDsl.trigger;
 
 import com.bytechef.component.clickup.util.ClickupUtils;
 import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;

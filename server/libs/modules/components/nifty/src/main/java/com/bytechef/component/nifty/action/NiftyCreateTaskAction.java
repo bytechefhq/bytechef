@@ -16,11 +16,11 @@
 
 package com.bytechef.component.nifty.action;
 
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.dateTime;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.outputSchema;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.dateTime;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.nifty.constant.NiftyConstants.CREATE_TASK;
 import static com.bytechef.component.nifty.constant.NiftyConstants.DESCRIPTION;
 import static com.bytechef.component.nifty.constant.NiftyConstants.DUE_DATE;
@@ -29,7 +29,7 @@ import static com.bytechef.component.nifty.constant.NiftyConstants.PROJECT;
 import static com.bytechef.component.nifty.constant.NiftyConstants.TASK_GROUP_ID;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;

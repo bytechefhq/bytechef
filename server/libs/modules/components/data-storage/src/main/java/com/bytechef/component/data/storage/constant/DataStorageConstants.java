@@ -16,7 +16,7 @@
 
 package com.bytechef.component.data.storage.constant;
 
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.definition.Option;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

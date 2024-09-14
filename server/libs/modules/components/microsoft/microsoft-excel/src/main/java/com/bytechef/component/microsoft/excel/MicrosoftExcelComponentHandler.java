@@ -16,7 +16,7 @@
 
 package com.bytechef.component.microsoft.excel;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.MICROSOFT_EXCEL;
 
 import com.bytechef.component.ComponentHandler;

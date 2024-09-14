@@ -18,16 +18,16 @@ package com.bytechef.component.watsonx.connection;
 
 import static com.bytechef.component.definition.Authorization.AuthorizationType.BEARER_TOKEN;
 import static com.bytechef.component.definition.Authorization.TOKEN;
-import static com.bytechef.component.definition.ComponentDSL.authorization;
-import static com.bytechef.component.definition.ComponentDSL.connection;
-import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.authorization;
+import static com.bytechef.component.definition.ComponentDsl.connection;
+import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.llm.constant.LLMConstants.URL;
 import static com.bytechef.component.watsonx.constant.WatsonxConstants.PROJECT_ID;
 import static com.bytechef.component.watsonx.constant.WatsonxConstants.STREAM_ENDPOINT;
 import static com.bytechef.component.watsonx.constant.WatsonxConstants.TEXT_ENDPOINT;
 
-import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 
 /**
  * @author Monika Domiter

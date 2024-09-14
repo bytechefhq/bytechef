@@ -16,7 +16,7 @@
 
 package com.bytechef.component.microsoft.outlook;
 
-import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.MICROSOFT_OUTLOOK_365;
 
 import com.bytechef.component.ComponentHandler;

@@ -16,13 +16,13 @@
 
 package com.bytechef.component.google.docs.action;
 
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.DOCUMENT_ID;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.READ_DOCUMENT;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.docs.v1.Docs;

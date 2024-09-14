@@ -16,10 +16,10 @@
 
 package com.bytechef.component.clickup.constant;
 
-import static com.bytechef.component.definition.ComponentDSL.number;
+import static com.bytechef.component.definition.ComponentDsl.number;
 
 import com.bytechef.component.clickup.util.ClickupUtils;
-import com.bytechef.component.definition.ComponentDSL.ModifiableNumberProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableNumberProperty;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 
 /**

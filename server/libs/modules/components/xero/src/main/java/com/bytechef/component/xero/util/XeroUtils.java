@@ -16,7 +16,7 @@
 
 package com.bytechef.component.xero.util;
 
-import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.xero.constant.XeroConstants.CODE;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACT;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACTS;
