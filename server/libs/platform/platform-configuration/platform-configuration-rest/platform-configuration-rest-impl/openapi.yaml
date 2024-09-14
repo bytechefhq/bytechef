@@ -1200,6 +1200,9 @@ components:
         connectionRequired:
           description: "If connection is required or not if it is defined."
           type: "boolean"
+        dataStreamSupported:
+          description: "If the component supports data stream."
+          type: "boolean"
         description:
           description: "The description."
           type: "string"
