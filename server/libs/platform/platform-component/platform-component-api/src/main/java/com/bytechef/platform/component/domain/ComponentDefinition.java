@@ -37,6 +37,7 @@ public class ComponentDefinition {
     private List<ComponentCategory> categories;
     private ConnectionDefinitionBasic connection;
     private boolean connectionRequired;
+    private boolean dataStreamSupported;
     private String description;
     private String icon;
     private String name;
@@ -67,6 +68,8 @@ public class ComponentDefinition {
                 property -> OptionalUtils.orElse(property.getRequired(), false)) ||
                 OptionalUtils.orElse(connectionDefinition.getAuthorizationRequired(), true))
             .orElse(false);
+        this.dataStreamSupported = OptionalUtils.mapOrElse(
+            componentDefinition.getDataStream(), dataStreamDefinition -> true, false);
         this.description = OptionalUtils.orElse(componentDefinition.getDescription(), null);
         this.icon = OptionalUtils.mapOrElse(componentDefinition.getIcon(), IconUtils::readIcon, null);
         this.name = componentDefinition.getName();
@@ -97,6 +100,10 @@ public class ComponentDefinition {
     @Nullable
     public ConnectionDefinitionBasic getConnection() {
         return connection;
+    }
+
+    public boolean isDataStreamSupported() {
+        return dataStreamSupported;
     }
 
     @Nullable
@@ -151,34 +158,36 @@ public class ComponentDefinition {
 
         return Objects.equals(actions, that.actions) && Objects.equals(categories, that.categories) &&
             Objects.equals(connection, that.connection) && connectionRequired == that.connectionRequired &&
-            Objects.equals(description, that.description) && Objects.equals(icon, that.icon) &&
-            Objects.equals(name, that.name) && Objects.equals(resources, that.resources) &&
-            Objects.equals(tags, that.tags) && Objects.equals(triggers, that.triggers) &&
-            Objects.equals(title, that.title) && version == that.version;
+            dataStreamSupported == that.dataStreamSupported && Objects.equals(description, that.description) &&
+            Objects.equals(icon, that.icon) && Objects.equals(name, that.name) &&
+            Objects.equals(resources, that.resources) && Objects.equals(tags, that.tags) &&
+            Objects.equals(triggers, that.triggers) && Objects.equals(title, that.title) && version == that.version;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-            actions, categories, connection, connectionRequired, description, icon, name, resources, tags, triggers,
-            title, version);
+            actions, categories, connection, connectionRequired, dataStreamSupported, description, icon, name,
+            resources, tags, triggers, title, version);
     }
 
     @Override
     public String toString() {
         return "ComponentDefinition{" +
-            "actions=" + actions +
-            ", categories='" + categories + '\'' +
+            "name='" + name + '\'' +
+            ", version=" + version +
+            ", title='" + title + '\'' +
             ", connection=" + connection +
             ", connectionRequired=" + connectionRequired +
+            ", connectionRequired=" + connectionRequired +
+            ", dataStreamSupported=" + dataStreamSupported +
             ", description='" + description + '\'' +
             ", icon='" + icon + '\'' +
-            ", name='" + name + '\'' +
+            ", actions=" + actions +
+            ", triggers=" + triggers +
+            ", categories='" + categories + '\'' +
             ", resources=" + resources +
             ", tags=" + tags +
-            ", triggers=" + triggers +
-            ", title='" + title + '\'' +
-            ", version=" + version +
             '}';
     }
 
