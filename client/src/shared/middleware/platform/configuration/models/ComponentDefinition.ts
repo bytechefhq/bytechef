@@ -75,6 +75,12 @@ export interface ComponentDefinition {
      */
     connectionRequired: boolean;
     /**
+     * If the component supports data stream.
+     * @type {boolean}
+     * @memberof ComponentDefinition
+     */
+    dataStreamSupported?: boolean;
+    /**
      * The description.
      * @type {string}
      * @memberof ComponentDefinition
@@ -148,6 +154,7 @@ export function ComponentDefinitionFromJSONTyped(json: any, ignoreDiscriminator:
         'categories': json['categories'] == null ? undefined : ((json['categories'] as Array<any>).map(ComponentCategoryFromJSON)),
         'connection': json['connection'] == null ? undefined : ConnectionDefinitionBasicFromJSON(json['connection']),
         'connectionRequired': json['connectionRequired'],
+        'dataStreamSupported': json['dataStreamSupported'] == null ? undefined : json['dataStreamSupported'],
         'description': json['description'] == null ? undefined : json['description'],
         'icon': json['icon'] == null ? undefined : json['icon'],
         'name': json['name'],
@@ -169,6 +176,7 @@ export function ComponentDefinitionToJSON(value?: ComponentDefinition | null): a
         'categories': value['categories'] == null ? undefined : ((value['categories'] as Array<any>).map(ComponentCategoryToJSON)),
         'connection': ConnectionDefinitionBasicToJSON(value['connection']),
         'connectionRequired': value['connectionRequired'],
+        'dataStreamSupported': value['dataStreamSupported'],
         'description': value['description'],
         'icon': value['icon'],
         'name': value['name'],
