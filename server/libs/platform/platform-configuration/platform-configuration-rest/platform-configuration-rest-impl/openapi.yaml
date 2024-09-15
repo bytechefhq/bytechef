@@ -191,7 +191,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ActionDefinition"
-  /component-definitions/{componentName}/versions/{componentVersion}/connection-definition:
+  /component-definitions/{componentName}/versions/connection-definition:
     get:
       description: "Get connection definition for a component."
       summary: "Get connection definition for a component"
@@ -207,8 +207,8 @@ paths:
           type: "string"
       - name: "componentVersion"
         description: "The version of a component."
-        required: true
-        in: "path"
+        required: false
+        in: "query"
         schema:
           type: "integer"
       responses:
@@ -218,7 +218,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConnectionDefinition"
-  /component-definitions/{componentName}/versions/{componentVersion}/connection-definitions:
+  /component-definitions/{componentName}/versions/connection-definitions:
     get:
       description: "Get all compatible connection definitions for a component."
       summary: "Get all compatible connection definitions for a component"
@@ -234,8 +234,8 @@ paths:
           type: "string"
       - name: "componentVersion"
         description: "The version of a component."
-        required: true
-        in: "path"
+        required: false
+        in: "query"
         schema:
           type: "integer"
       responses:
