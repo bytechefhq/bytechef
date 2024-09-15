@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-14T19:06:43.949922+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-15T19:25:20.309288+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 @Validated
 @Tag(name = "connection-definition", description = "The Platform Connection Definition Internal API")
 public interface ConnectionDefinitionApi {
@@ -43,11 +43,11 @@ public interface ConnectionDefinitionApi {
     }
 
     /**
-     * GET /component-definitions/{componentName}/versions/{componentVersion}/connection-definition : Get connection definition for a component
+     * GET /component-definitions/{componentName}/versions/connection-definition : Get connection definition for a component
      * Get connection definition for a component.
      *
      * @param componentName The name of a component. (required)
-     * @param componentVersion The version of a component. (required)
+     * @param componentVersion The version of a component. (optional)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -63,13 +63,13 @@ public interface ConnectionDefinitionApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/component-definitions/{componentName}/versions/{componentVersion}/connection-definition",
+        value = "/component-definitions/{componentName}/versions/connection-definition",
         produces = { "application/json" }
     )
     
     default ResponseEntity<ConnectionDefinitionModel> getComponentConnectionDefinition(
         @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
-        @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion
+        @Parameter(name = "componentVersion", description = "The version of a component.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "componentVersion", required = false) Integer componentVersion
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
@@ -86,11 +86,11 @@ public interface ConnectionDefinitionApi {
 
 
     /**
-     * GET /component-definitions/{componentName}/versions/{componentVersion}/connection-definitions : Get all compatible connection definitions for a component
+     * GET /component-definitions/{componentName}/versions/connection-definitions : Get all compatible connection definitions for a component
      * Get all compatible connection definitions for a component.
      *
      * @param componentName The name of a component. (required)
-     * @param componentVersion The version of a component. (required)
+     * @param componentVersion The version of a component. (optional)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -106,13 +106,13 @@ public interface ConnectionDefinitionApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/component-definitions/{componentName}/versions/{componentVersion}/connection-definitions",
+        value = "/component-definitions/{componentName}/versions/connection-definitions",
         produces = { "application/json" }
     )
     
     default ResponseEntity<List<ConnectionDefinitionBasicModel>> getComponentConnectionDefinitions(
         @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
-        @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion
+        @Parameter(name = "componentVersion", description = "The version of a component.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "componentVersion", required = false) Integer componentVersion
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
