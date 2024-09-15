@@ -51,12 +51,6 @@ export interface Integration {
      */
     componentName: string;
     /**
-     * The version of the integration's component.
-     * @type {number}
-     * @memberof Integration
-     */
-    componentVersion: number;
-    /**
      * The created by.
      * @type {string}
      * @memberof Integration
@@ -150,7 +144,6 @@ export interface Integration {
 export function instanceOfIntegration(value: object): value is Integration {
     if (!('allowMultipleInstances' in value) || value['allowMultipleInstances'] === undefined) return false;
     if (!('componentName' in value) || value['componentName'] === undefined) return false;
-    if (!('componentVersion' in value) || value['componentVersion'] === undefined) return false;
     return true;
 }
 
@@ -166,7 +159,6 @@ export function IntegrationFromJSONTyped(json: any, ignoreDiscriminator: boolean
         
         'allowMultipleInstances': json['allowMultipleInstances'],
         'componentName': json['componentName'],
-        'componentVersion': json['componentVersion'],
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'description': json['description'] == null ? undefined : json['description'],
@@ -192,7 +184,6 @@ export function IntegrationToJSON(value?: Omit<Integration, 'createdBy'|'created
         
         'allowMultipleInstances': value['allowMultipleInstances'],
         'componentName': value['componentName'],
-        'componentVersion': value['componentVersion'],
         'description': value['description'],
         'lastStatus': IntegrationStatusToJSON(value['lastStatus']),
         'name': value['name'],
