@@ -275,7 +275,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
-    public ConnectionDefinition getConnectionDefinition(@NonNull String componentName, int componentVersion) {
+    public ConnectionDefinition getConnectionDefinition(@NonNull String componentName, Integer componentVersion) {
         return toConnectionDefinition(
             componentDefinitionRegistry.getComponentDefinition(componentName, componentVersion));
     }

@@ -68,7 +68,7 @@ public interface ConnectionDefinitionService {
 
     ConnectionDefinition getConnectionConnectionDefinition(@NonNull String componentName, int connectionVersion);
 
-    ConnectionDefinition getConnectionDefinition(@NonNull String componentName, int componentVersion);
+    ConnectionDefinition getConnectionDefinition(@NonNull String componentName, Integer componentVersion);
 
     List<ConnectionDefinition> getConnectionDefinitions();
 
