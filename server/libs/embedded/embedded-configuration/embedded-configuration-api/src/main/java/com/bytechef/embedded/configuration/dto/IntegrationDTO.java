@@ -32,7 +32,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 @SuppressFBWarnings("EI")
 public record IntegrationDTO(
-    boolean allowMultipleInstances, Category category, String componentName, int componentVersion, String createdBy,
+    boolean allowMultipleInstances, Category category, String componentName, String createdBy,
     LocalDateTime createdDate, String description, String icon, Long id, List<IntegrationVersion> integrationVersions,
     List<Long> integrationWorkflowIds, String lastModifiedBy, LocalDateTime lastModifiedDate,
     LocalDateTime lastPublishedDate, Status lastStatus, Integer lastIntegrationVersion, String name, List<Tag> tags,
@@ -45,12 +45,11 @@ public record IntegrationDTO(
 
         this(
             integration.isAllowMultipleInstances(), category, integration.getComponentName(),
-            integration.getComponentVersion(), integration.getCreatedBy(), integration.getCreatedDate(),
-            getDescription(componentDefinition, integration), componentDefinition.getIcon(),
-            integration.getId(), integration.getIntegrationVersions(), integrationWorkflowIds,
-            integration.getLastModifiedBy(), integration.getLastModifiedDate(), lastPublishedDate,
-            lastStatus, lastIntegrationVersion, integration.getName(), List.of(), componentDefinition.getTitle(),
-            integration.getVersion());
+            integration.getCreatedBy(), integration.getCreatedDate(), getDescription(componentDefinition, integration),
+            componentDefinition.getIcon(), integration.getId(), integration.getIntegrationVersions(),
+            integrationWorkflowIds, integration.getLastModifiedBy(), integration.getLastModifiedDate(),
+            lastPublishedDate, lastStatus, lastIntegrationVersion, integration.getName(), List.of(),
+            componentDefinition.getTitle(), integration.getVersion());
     }
 
     public IntegrationDTO(
@@ -58,11 +57,11 @@ public record IntegrationDTO(
 
         this(
             integration.isAllowMultipleInstances(), category, integration.getComponentName(),
-            integration.getComponentVersion(), integration.getCreatedBy(), integration.getCreatedDate(),
-            integration.getDescription(), null, integration.getId(), integration.getIntegrationVersions(),
-            integrationWorkflowIds, integration.getLastModifiedBy(), integration.getLastModifiedDate(),
-            integration.getLastPublishedDate(), integration.getLastStatus(), integration.getLastIntegrationVersion(),
-            integration.getName(), tags, null, integration.getVersion());
+            integration.getCreatedBy(), integration.getCreatedDate(), integration.getDescription(), null,
+            integration.getId(), integration.getIntegrationVersions(), integrationWorkflowIds,
+            integration.getLastModifiedBy(), integration.getLastModifiedDate(), integration.getLastPublishedDate(),
+            integration.getLastStatus(), integration.getLastIntegrationVersion(), integration.getName(), tags, null,
+            integration.getVersion());
     }
 
     public static Builder builder() {
@@ -90,7 +89,6 @@ public record IntegrationDTO(
         private boolean allowMultipleInstances;
         private Category category;
         private String componentName;
-        private int componentVersion;
         private String createdBy;
         private LocalDateTime createdDate;
         private String description;
@@ -123,12 +121,6 @@ public record IntegrationDTO(
 
         public Builder componentName(String componentName) {
             this.componentName = componentName;
-
-            return this;
-        }
-
-        public Builder componentVersion(int componentVersion) {
-            this.componentVersion = componentVersion;
 
             return this;
         }
@@ -219,9 +211,9 @@ public record IntegrationDTO(
 
         public IntegrationDTO build() {
             return new IntegrationDTO(
-                allowMultipleInstances, category, componentName, componentVersion, createdBy, createdDate,
-                description, null, id, integrationVersions, integrationWorkflowIds, lastModifiedBy, lastModifiedDate,
-                lastPublishedDate, lastStatus, lastIntegrationVersion, name, tags, null, version);
+                allowMultipleInstances, category, componentName, createdBy, createdDate, description, null, id,
+                integrationVersions, integrationWorkflowIds, lastModifiedBy, lastModifiedDate, lastPublishedDate,
+                lastStatus, lastIntegrationVersion, name, tags, null, version);
         }
     }
 

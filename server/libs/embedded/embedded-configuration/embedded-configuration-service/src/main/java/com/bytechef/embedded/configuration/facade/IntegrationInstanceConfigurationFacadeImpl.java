@@ -179,8 +179,10 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         }
 
         if (MapUtils.isEmpty(integrationInstanceConfiguration.getConnectionParameters())) {
+            // TODO define scenarios when there are multiple component versions and workflows
+
             ConnectionDefinition connectionDefinition = connectionDefinitionService.getConnectionDefinition(
-                integration.getComponentName(), integration.getComponentVersion());
+                integration.getComponentName(), null);
 
             if (connectionDefinition.hasOAuth2Authorization()) {
                 integrationInstanceConfiguration.setConnectionParameters(
@@ -337,60 +339,6 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 integrationInstanceConfigurationWorkflow -> workflowIds
                     .contains(integrationInstanceConfigurationWorkflow.getWorkflowId())),
             integrationWorkflows);
-    }
-
-    private IntegrationInstanceConfigurationDTO toIntegrationInstanceConfigurationDTO(
-        IntegrationInstanceConfiguration integrationInstanceConfiguration,
-        List<IntegrationInstanceConfigurationWorkflow> integrationInstanceWorkflows,
-        List<IntegrationWorkflow> integrationWorkflows) {
-
-        return toIntegrationInstanceConfigurationDTO(
-            integrationService.getIntegration(integrationInstanceConfiguration.getIntegrationId()),
-            integrationInstanceConfiguration, integrationInstanceWorkflows, integrationWorkflows,
-            tagService.getTags(integrationInstanceConfiguration.getTagIds()));
-    }
-
-    private IntegrationInstanceConfigurationDTO toIntegrationInstanceConfigurationDTO(
-        Integration integration, IntegrationInstanceConfiguration integrationInstanceConfiguration,
-        List<IntegrationInstanceConfigurationWorkflow> integrationInstanceWorkflows,
-        List<IntegrationWorkflow> integrationWorkflows, List<Tag> tags) {
-
-        ConnectionDefinition connectionDefinition =
-            connectionDefinitionService.getConnectionDefinition(
-                integration.getComponentName(), integration.getComponentVersion());
-
-        List<String> authorizationPropertyNames = connectionDefinition.getAuthorizations()
-            .stream()
-            .flatMap(authorization -> CollectionUtils.stream(authorization.getProperties()))
-            .map(BaseProperty::getName)
-            .toList();
-
-        List<String> connectionPropertyNames = connectionDefinition.getProperties()
-            .stream()
-            .map(BaseProperty::getName)
-            .toList();
-
-        return new IntegrationInstanceConfigurationDTO(
-            getConnectionAuthorizationParameters(
-                integrationInstanceConfiguration.getConnectionParameters(), authorizationPropertyNames),
-            getConnectionConnectionParameters(
-                integrationInstanceConfiguration.getConnectionParameters(), connectionPropertyNames),
-            integrationInstanceConfiguration,
-            CollectionUtils.map(
-                integrationInstanceWorkflows,
-                integrationInstanceConfigurationWorkflow -> new IntegrationInstanceConfigurationWorkflowDTO(
-                    integrationInstanceConfigurationWorkflow,
-                    getWorkflowLastExecutionDate(integrationInstanceConfigurationWorkflow.getWorkflowId()),
-                    getStaticWebhookUrl(
-                        integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId(),
-                        integrationInstanceConfigurationWorkflow.getWorkflowId()),
-                    getWorkflowReferenceCode(
-                        integrationInstanceConfigurationWorkflow.getWorkflowId(),
-                        integrationInstanceConfiguration.getIntegrationVersion(), integrationWorkflows))),
-            integration,
-            getIntegrationInstanceConfigurationLastExecutionDate(
-                Validate.notNull(integrationInstanceConfiguration.getId(), "id")),
-            tags);
     }
 
     @Override
@@ -738,6 +686,61 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             .findFirst()
             .map(IntegrationWorkflow::getWorkflowReferenceCode)
             .orElseThrow();
+    }
+
+    private IntegrationInstanceConfigurationDTO toIntegrationInstanceConfigurationDTO(
+        IntegrationInstanceConfiguration integrationInstanceConfiguration,
+        List<IntegrationInstanceConfigurationWorkflow> integrationInstanceWorkflows,
+        List<IntegrationWorkflow> integrationWorkflows) {
+
+        return toIntegrationInstanceConfigurationDTO(
+            integrationService.getIntegration(integrationInstanceConfiguration.getIntegrationId()),
+            integrationInstanceConfiguration, integrationInstanceWorkflows, integrationWorkflows,
+            tagService.getTags(integrationInstanceConfiguration.getTagIds()));
+    }
+
+    private IntegrationInstanceConfigurationDTO toIntegrationInstanceConfigurationDTO(
+        Integration integration, IntegrationInstanceConfiguration integrationInstanceConfiguration,
+        List<IntegrationInstanceConfigurationWorkflow> integrationInstanceWorkflows,
+        List<IntegrationWorkflow> integrationWorkflows, List<Tag> tags) {
+
+        // TODO define scenarios when there are multiple component versions and workflows
+
+        ConnectionDefinition connectionDefinition = connectionDefinitionService.getConnectionDefinition(
+            integration.getComponentName(), null);
+
+        List<String> authorizationPropertyNames = connectionDefinition.getAuthorizations()
+            .stream()
+            .flatMap(authorization -> CollectionUtils.stream(authorization.getProperties()))
+            .map(BaseProperty::getName)
+            .toList();
+
+        List<String> connectionPropertyNames = connectionDefinition.getProperties()
+            .stream()
+            .map(BaseProperty::getName)
+            .toList();
+
+        return new IntegrationInstanceConfigurationDTO(
+            getConnectionAuthorizationParameters(
+                integrationInstanceConfiguration.getConnectionParameters(), authorizationPropertyNames),
+            getConnectionConnectionParameters(
+                integrationInstanceConfiguration.getConnectionParameters(), connectionPropertyNames),
+            integrationInstanceConfiguration,
+            CollectionUtils.map(
+                integrationInstanceWorkflows,
+                integrationInstanceConfigurationWorkflow -> new IntegrationInstanceConfigurationWorkflowDTO(
+                    integrationInstanceConfigurationWorkflow,
+                    getWorkflowLastExecutionDate(integrationInstanceConfigurationWorkflow.getWorkflowId()),
+                    getStaticWebhookUrl(
+                        integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId(),
+                        integrationInstanceConfigurationWorkflow.getWorkflowId()),
+                    getWorkflowReferenceCode(
+                        integrationInstanceConfigurationWorkflow.getWorkflowId(),
+                        integrationInstanceConfiguration.getIntegrationVersion(), integrationWorkflows))),
+            integration,
+            getIntegrationInstanceConfigurationLastExecutionDate(
+                Validate.notNull(integrationInstanceConfiguration.getId(), "id")),
+            tags);
     }
 
     private void validateConnections(

@@ -225,8 +225,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
                     return new IntegrationDTO(
                         integration.getCategoryId() == null
                             ? null : categoryService.getCategory(integration.getCategoryId()),
-                        componentDefinitionService.getComponentDefinition(
-                            integration.getComponentName(), integration.getComponentVersion()),
+                        componentDefinitionService.getComponentDefinition(integration.getComponentName(), null),
                         integration, getIntegrationWorkflowIds(integration), lastIntegrationVersion.getPublishedDate(),
                         lastIntegrationVersion.getStatus(), lastIntegrationVersion.getVersion());
                 })

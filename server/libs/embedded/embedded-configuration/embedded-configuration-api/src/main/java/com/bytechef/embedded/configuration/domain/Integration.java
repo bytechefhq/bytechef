@@ -57,9 +57,6 @@ public final class Integration {
     @Column("component_name")
     private String componentName;
 
-    @Column("component_version")
-    private int componentVersion = 1;
-
     @CreatedBy
     @Column("created_by")
     private String createdBy;
@@ -141,10 +138,6 @@ public final class Integration {
 
     public String getComponentName() {
         return componentName;
-    }
-
-    public int getComponentVersion() {
-        return componentVersion;
     }
 
     public String getCreatedBy() {
@@ -248,10 +241,6 @@ public final class Integration {
         this.componentName = componentName;
     }
 
-    public void setComponentVersion(int componentVersion) {
-        this.componentVersion = componentVersion;
-    }
-
     public void setDescription(String description) {
         this.description = description;
     }
@@ -295,7 +284,6 @@ public final class Integration {
         return "Integration{" +
             "id=" + id +
             ", componentName='" + componentName + '\'' +
-            ", componentVersion=" + componentVersion +
             ", name='" + name + '\'' +
             ", description='" + description + '\'' +
             ", categoryId=" + getCategoryId() +
