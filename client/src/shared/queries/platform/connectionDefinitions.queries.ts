@@ -8,7 +8,7 @@ import {useQuery} from '@tanstack/react-query';
 
 export interface GetComponentConnectionDefinitionRequestI {
     componentName: string | undefined;
-    componentVersion: number | undefined;
+    componentVersion?: number | undefined;
 }
 
 export const ConnectDefinitionKeys = {

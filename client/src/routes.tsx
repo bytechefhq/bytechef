@@ -18,7 +18,6 @@ import ConnectedUsers from '@/pages/embedded/connected-users/ConnectedUsers';
 import {Connections as EmbeddedConnections} from '@/pages/embedded/connections/Connections';
 import IntegrationInstanceConfigurations from '@/pages/embedded/integration-instance-configurations/IntegrationInstanceConfigurations';
 import Integration from '@/pages/embedded/integration/Integration';
-import EmbeddedIPaaSIntegrations from '@/pages/embedded/integrations/EmbeddedIPaaSIntegrations';
 import Integrations from '@/pages/embedded/integrations/Integrations';
 import {WorkflowExecutions as EmbeddedIntegrationWorkflowExecutions} from '@/pages/embedded/workflow-executions/WorkflowExecutions';
 import Home from '@/pages/home/Home';
@@ -254,16 +253,6 @@ export const getRouter = (queryClient: QueryClient) =>
                         },
                         getAccountRoutes('/embedded'),
                         {
-                            children: [
-                                {
-                                    element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <EmbeddedIPaaSIntegrations />
-                                        </PrivateRoute>
-                                    ),
-                                    index: true,
-                                },
-                            ],
                             element: <Integrations />,
                             path: 'integrations',
                         },
