@@ -21,26 +21,27 @@ import com.bytechef.component.definition.DataStreamItemWriter;
 import com.bytechef.platform.component.definition.DataStreamComponentDefinition.ComponentType;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import java.util.List;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
  */
 public interface ComponentDefinitionService {
 
-    ComponentDefinition getComponentDefinition(String name, Integer version);
+    ComponentDefinition getComponentDefinition(@NonNull String name, Integer version);
 
     List<ComponentDefinition> getComponentDefinitions();
 
     List<ComponentDefinition> getComponentDefinitions(
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions, List<String> include);
 
-    List<ComponentDefinition> getComponentDefinitionVersions(String name);
+    List<ComponentDefinition> getComponentDefinitionVersions(@NonNull String name);
 
-    List<ComponentDefinition> getDataStreamComponentDefinitions(ComponentType componentType);
+    List<ComponentDefinition> getDataStreamComponentDefinitions(@NonNull ComponentType componentType);
 
-    DataStreamItemReader getDataStreamItemReader(String componentName, int componentVersion);
+    DataStreamItemReader getDataStreamItemReader(@NonNull String componentName, int componentVersion);
 
-    DataStreamItemWriter getDataStreamItemWriter(String componentName, int componentVersion);
+    DataStreamItemWriter getDataStreamItemWriter(@NonNull String componentName, int componentVersion);
 
-    boolean hasComponentDefinition(String name, Integer version);
+    boolean hasComponentDefinition(@NonNull String name, Integer version);
 }

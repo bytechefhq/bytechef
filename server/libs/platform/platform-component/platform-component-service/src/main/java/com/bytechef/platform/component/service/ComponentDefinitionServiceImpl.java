@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 /**
@@ -44,7 +45,7 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     @Override
-    public ComponentDefinition getComponentDefinition(String name, Integer version) {
+    public ComponentDefinition getComponentDefinition(@NonNull String name, Integer version) {
         com.bytechef.component.definition.ComponentDefinition componentDefinition =
             componentDefinitionRegistry.getComponentDefinition(name, version);
 
@@ -79,7 +80,7 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     @Override
-    public List<ComponentDefinition> getComponentDefinitionVersions(String name) {
+    public List<ComponentDefinition> getComponentDefinitionVersions(@NonNull String name) {
         return componentDefinitionRegistry.getComponentDefinitions(name)
             .stream()
             .map(ComponentDefinition::new)
@@ -87,7 +88,7 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     @Override
-    public List<ComponentDefinition> getDataStreamComponentDefinitions(ComponentType componentType) {
+    public List<ComponentDefinition> getDataStreamComponentDefinitions(@NonNull ComponentType componentType) {
         return componentDefinitionRegistry.getComponentDefinitions()
             .stream()
             .filter(componentDefinition -> {
@@ -106,7 +107,7 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     @Override
-    public DataStreamItemReader getDataStreamItemReader(String componentName, int componentVersion) {
+    public DataStreamItemReader getDataStreamItemReader(@NonNull String componentName, int componentVersion) {
         com.bytechef.component.definition.ComponentDefinition componentDefinition =
             componentDefinitionRegistry.getComponentDefinition(componentName, componentVersion);
 
@@ -120,7 +121,7 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     @Override
-    public DataStreamItemWriter getDataStreamItemWriter(String componentName, int componentVersion) {
+    public DataStreamItemWriter getDataStreamItemWriter(@NonNull String componentName, int componentVersion) {
         com.bytechef.component.definition.ComponentDefinition componentDefinition =
             componentDefinitionRegistry.getComponentDefinition(componentName, componentVersion);
 
@@ -134,7 +135,7 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     @Override
-    public boolean hasComponentDefinition(String name, Integer version) {
+    public boolean hasComponentDefinition(@NonNull String name, Integer version) {
         return componentDefinitionRegistry.hasComponentDefinition(name, version);
     }
 
