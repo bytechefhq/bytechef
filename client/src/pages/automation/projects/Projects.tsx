@@ -60,6 +60,10 @@ const Projects = () => {
         pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
     }
 
+    pageTitle = !pageTitle
+        ? 'All Projects'
+        : `Filter by ${searchParams.get('tagId') ? 'tag' : 'category'}: ${pageTitle}`;
+
     return (
         <LayoutContainer
             header={
@@ -81,11 +85,7 @@ const Projects = () => {
                                 triggerNode={<Button>New Project</Button>}
                             />
                         }
-                        title={
-                            !pageTitle
-                                ? 'All Projects'
-                                : `Filter by ${searchParams.get('tagId') ? 'tag' : 'category'}: ${pageTitle}`
-                        }
+                        title={pageTitle}
                     />
                 )
             }

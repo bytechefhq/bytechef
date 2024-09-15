@@ -94,6 +94,10 @@ const IntegrationInstanceConfigurations = () => {
         pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
     }
 
+    pageTitle = !pageTitle
+        ? 'All Instance Configurations'
+        : `Filter by ${searchParams.get('tagId') ? 'tag' : 'integration'}: ${pageTitle}`;
+
     function getEnvironment() {
         return searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : 1;
     }
@@ -137,11 +141,7 @@ const IntegrationInstanceConfigurations = () => {
                                 />
                             )
                         }
-                        title={
-                            !pageTitle
-                                ? 'All Instance Configurations'
-                                : `Filter by ${searchParams.get('tagId') ? 'tag' : 'integration'}: ${pageTitle}`
-                        }
+                        title={pageTitle}
                     />
                 )
             }

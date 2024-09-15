@@ -71,6 +71,10 @@ export const Connections = () => {
         pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
     }
 
+    pageTitle = !pageTitle
+        ? 'All Connections'
+        : `Filter by ${searchParams.get('tagId') ? 'tag' : 'component'}: ${pageTitle}`;
+
     function getEnvironment() {
         return searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : 1;
     }
@@ -120,11 +124,7 @@ export const Connections = () => {
                                 useGetConnectionTagsQuery={useGetConnectionTagsQuery}
                             />
                         }
-                        title={
-                            !pageTitle
-                                ? 'All Connections'
-                                : `Filter by ${searchParams.get('tagId') ? 'tag' : 'component'}: ${pageTitle}`
-                        }
+                        title={pageTitle}
                     />
                 )
             }

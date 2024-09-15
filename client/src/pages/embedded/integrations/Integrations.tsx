@@ -55,6 +55,10 @@ const Integrations = () => {
         pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
     }
 
+    pageTitle = !pageTitle
+        ? 'All Integrations'
+        : `Filter by ${searchParams.get('tagId') ? 'tag' : 'category'}: ${pageTitle}`;
+
     return (
         <LayoutContainer
             leftSidebarBody={
@@ -158,11 +162,7 @@ const Integrations = () => {
                                     />
                                 )
                             }
-                            title={
-                                !pageTitle
-                                    ? 'All Integrations'
-                                    : `Filter by ${searchParams.get('tagId') ? 'tag' : 'category'}: ${pageTitle}`
-                            }
+                            title={pageTitle}
                         />
 
                         <div className="flex-1 overflow-y-auto">

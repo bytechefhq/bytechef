@@ -83,6 +83,10 @@ const ProjectInstances = () => {
         pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
     }
 
+    pageTitle = !pageTitle
+        ? 'All Instances'
+        : `Filter by ${searchParams.get('tagId') ? 'tag' : 'project'}: ${pageTitle}`;
+
     function getEnvironment() {
         return searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : 1;
     }
@@ -123,11 +127,7 @@ const ProjectInstances = () => {
                                 triggerNode={<Button>New Instance</Button>}
                             />
                         }
-                        title={
-                            !pageTitle
-                                ? 'All Instances'
-                                : `Filter by ${searchParams.get('tagId') ? 'tag' : 'project'}: ${pageTitle}`
-                        }
+                        title={pageTitle}
                     />
                 )
             }
