@@ -50,8 +50,7 @@ public interface TriggerDefinitionService {
 
     String executeWorkflowNodeDescription(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> triggerParameters,
-        @NonNull TriggerContext context);
+        @NonNull Map<String, ?> triggerParameters, @NonNull TriggerContext context);
 
     void executeListenerDisable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
