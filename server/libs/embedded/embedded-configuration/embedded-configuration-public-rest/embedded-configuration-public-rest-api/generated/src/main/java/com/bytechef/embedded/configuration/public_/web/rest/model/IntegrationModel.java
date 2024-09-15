@@ -21,14 +21,12 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T10:08:03.806897+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-15T12:35:05.382973+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class IntegrationModel {
 
   private Boolean allowMultipleInstances = false;
 
   private String componentName;
-
-  private Integer componentVersion;
 
   private String description;
 
@@ -47,10 +45,9 @@ public class IntegrationModel {
   /**
    * Constructor with only required parameters
    */
-  public IntegrationModel(Boolean allowMultipleInstances, String componentName, Integer componentVersion, String icon) {
+  public IntegrationModel(Boolean allowMultipleInstances, String componentName, String icon) {
     this.allowMultipleInstances = allowMultipleInstances;
     this.componentName = componentName;
-    this.componentVersion = componentVersion;
     this.icon = icon;
   }
 
@@ -92,26 +89,6 @@ public class IntegrationModel {
 
   public void setComponentName(String componentName) {
     this.componentName = componentName;
-  }
-
-  public IntegrationModel componentVersion(Integer componentVersion) {
-    this.componentVersion = componentVersion;
-    return this;
-  }
-
-  /**
-   * The version of the integration's component.
-   * @return componentVersion
-   */
-  @NotNull 
-  @Schema(name = "componentVersion", description = "The version of the integration's component.", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("componentVersion")
-  public Integer getComponentVersion() {
-    return componentVersion;
-  }
-
-  public void setComponentVersion(Integer componentVersion) {
-    this.componentVersion = componentVersion;
   }
 
   public IntegrationModel description(String description) {
@@ -225,7 +202,6 @@ public class IntegrationModel {
     IntegrationModel integration = (IntegrationModel) o;
     return Objects.equals(this.allowMultipleInstances, integration.allowMultipleInstances) &&
         Objects.equals(this.componentName, integration.componentName) &&
-        Objects.equals(this.componentVersion, integration.componentVersion) &&
         Objects.equals(this.description, integration.description) &&
         Objects.equals(this.icon, integration.icon) &&
         Objects.equals(this.id, integration.id) &&
@@ -235,7 +211,7 @@ public class IntegrationModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(allowMultipleInstances, componentName, componentVersion, description, icon, id, integrationVersion, title);
+    return Objects.hash(allowMultipleInstances, componentName, description, icon, id, integrationVersion, title);
   }
 
   @Override
@@ -244,7 +220,6 @@ public class IntegrationModel {
     sb.append("class IntegrationModel {\n");
     sb.append("    allowMultipleInstances: ").append(toIndentedString(allowMultipleInstances)).append("\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
-    sb.append("    componentVersion: ").append(toIndentedString(componentVersion)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
