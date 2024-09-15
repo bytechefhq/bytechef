@@ -45,7 +45,6 @@ components:
         - "allowMultipleInstances"
         - "icon"
         - "componentName"
-        - "componentVersion"
       properties:
         allowMultipleInstances:
           description: "If multiple instances of an integration are allowed or not."
@@ -54,9 +53,6 @@ components:
         componentName:
           description: "The name of the integration's component."
           type: "string"
-        componentVersion:
-          description: "The version of the integration's component."
-          type: "integer"
         description:
           description: "The description of a project."
           type: "string"

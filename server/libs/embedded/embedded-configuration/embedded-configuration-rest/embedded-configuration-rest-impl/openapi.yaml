@@ -980,10 +980,6 @@ components:
       allOf:
         - $ref: "#/components/schemas/IntegrationBasic"
         - type: "object"
-          required:
-            - "allowMultipleInstances"
-            - "componentName"
-            - "componentVersion"
           properties:
             category:
               $ref: "#/components/schemas/Category"
@@ -1005,7 +1001,6 @@ components:
       required:
         - "allowMultipleInstances"
         - "componentName"
-        - "componentVersion"
       properties:
         allowMultipleInstances:
           description: "If multiple instances of an integration are allowed or not."
@@ -1014,9 +1009,6 @@ components:
         componentName:
           description: "The name of the integration's component."
           type: "string"
-        componentVersion:
-          description: "The version of the integration's component."
-          type: "integer"
         createdBy:
           description: "The created by."
           type: "string"
