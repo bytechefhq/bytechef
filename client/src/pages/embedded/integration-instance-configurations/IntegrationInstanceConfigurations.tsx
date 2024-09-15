@@ -20,13 +20,14 @@ import {useSearchParams} from 'react-router-dom';
 export enum Type {
     Integration,
     Tag,
+    UnifiedAPI,
 }
 
 const IntegrationInstanceConfigurations = () => {
     const [searchParams] = useSearchParams();
 
     const [environment, setEnvironment] = useState<number>(getEnvironment());
-    const [filterData, setFilterData] = useState<{id?: number; type: Type}>(getFilterData());
+    const [filterData, setFilterData] = useState<{id?: number | string; type: Type}>(getFilterData());
 
     const {
         data: componentDefinitions,
@@ -246,6 +247,58 @@ const IntegrationInstanceConfigurations = () => {
                             </>
                         }
                         title="Tags"
+                    />
+
+                    <LeftSidebarNav
+                        body={
+                            <>
+                                <LeftSidebarNavItem
+                                    item={{
+                                        current: filterData?.id === 'accounting' && filterData.type === Type.UnifiedAPI,
+                                        id: 'accounting',
+                                        name: 'Accounting',
+                                        onItemClick: (id?: number | string) => {
+                                            setFilterData({
+                                                id: id as number,
+                                                type: Type.UnifiedAPI,
+                                            });
+                                        },
+                                    }}
+                                    toLink="?unifiedApiCategory=accounting"
+                                />
+
+                                <LeftSidebarNavItem
+                                    item={{
+                                        current: filterData?.id === 'commerce' && filterData.type === Type.UnifiedAPI,
+                                        id: 'commerce',
+                                        name: 'Commerce',
+                                        onItemClick: (id?: number | string) => {
+                                            setFilterData({
+                                                id: id as number,
+                                                type: Type.UnifiedAPI,
+                                            });
+                                        },
+                                    }}
+                                    toLink="?unifiedApiCategory=commerce"
+                                />
+
+                                <LeftSidebarNavItem
+                                    item={{
+                                        current: filterData?.id === 'crm' && filterData.type === Type.UnifiedAPI,
+                                        id: 'crm',
+                                        name: 'CRM',
+                                        onItemClick: (id?: number | string) => {
+                                            setFilterData({
+                                                id: id as string,
+                                                type: Type.UnifiedAPI,
+                                            });
+                                        },
+                                    }}
+                                    toLink="?unifiedApiCategory=crm"
+                                />
+                            </>
+                        }
+                        title="Unified API"
                     />
                 </>
             }

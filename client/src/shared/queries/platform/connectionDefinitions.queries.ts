@@ -2,17 +2,13 @@
 import {
     ConnectionDefinition,
     ConnectionDefinitionApi,
+    GetComponentConnectionDefinitionRequest,
     GetComponentConnectionDefinitionsRequest,
 } from '@/shared/middleware/platform/configuration';
 import {useQuery} from '@tanstack/react-query';
 
-export interface GetComponentConnectionDefinitionRequestI {
-    componentName: string | undefined;
-    componentVersion?: number | undefined;
-}
-
 export const ConnectDefinitionKeys = {
-    connectionDefinition: (request?: GetComponentConnectionDefinitionRequestI) => [
+    connectionDefinition: (request?: GetComponentConnectionDefinitionRequest) => [
         ...ConnectDefinitionKeys.connectionDefinitions,
         request?.componentName,
         request?.componentVersion,
@@ -24,14 +20,10 @@ export const ConnectDefinitionKeys = {
     ],
 };
 
-export const useGetConnectionDefinitionQuery = (request?: GetComponentConnectionDefinitionRequestI) =>
+export const useGetConnectionDefinitionQuery = (request: GetComponentConnectionDefinitionRequest) =>
     useQuery<ConnectionDefinition, Error>({
         queryKey: ConnectDefinitionKeys.connectionDefinition(request),
-        queryFn: () =>
-            new ConnectionDefinitionApi().getComponentConnectionDefinition({
-                componentName: request?.componentName ?? '',
-                componentVersion: request?.componentVersion ?? -1,
-            }),
+        queryFn: () => new ConnectionDefinitionApi().getComponentConnectionDefinition(request),
         enabled: !!request?.componentName,
     });
 
