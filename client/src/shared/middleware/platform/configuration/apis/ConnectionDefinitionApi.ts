@@ -27,12 +27,12 @@ import {
 
 export interface GetComponentConnectionDefinitionRequest {
     componentName: string;
-    componentVersion: number;
+    componentVersion?: number;
 }
 
 export interface GetComponentConnectionDefinitionsRequest {
     componentName: string;
-    componentVersion: number;
+    componentVersion?: number;
 }
 
 /**
@@ -52,19 +52,16 @@ export class ConnectionDefinitionApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['componentVersion'] == null) {
-            throw new runtime.RequiredError(
-                'componentVersion',
-                'Required parameter "componentVersion" was null or undefined when calling getComponentConnectionDefinition().'
-            );
-        }
-
         const queryParameters: any = {};
+
+        if (requestParameters['componentVersion'] != null) {
+            queryParameters['componentVersion'] = requestParameters['componentVersion'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/component-definitions/{componentName}/versions/{componentVersion}/connection-definition`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion']))),
+            path: `/component-definitions/{componentName}/versions/connection-definition`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -94,19 +91,16 @@ export class ConnectionDefinitionApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['componentVersion'] == null) {
-            throw new runtime.RequiredError(
-                'componentVersion',
-                'Required parameter "componentVersion" was null or undefined when calling getComponentConnectionDefinitions().'
-            );
-        }
-
         const queryParameters: any = {};
+
+        if (requestParameters['componentVersion'] != null) {
+            queryParameters['componentVersion'] = requestParameters['componentVersion'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/component-definitions/{componentName}/versions/{componentVersion}/connection-definitions`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion']))),
+            path: `/component-definitions/{componentName}/versions/connection-definitions`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
