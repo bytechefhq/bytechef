@@ -55,9 +55,6 @@ public class OAuth2ServiceImpl implements OAuth2Service {
                     Map.of(
                         Authorization.CLIENT_ID, oAuth2App.getClientId(),
                         Authorization.CLIENT_SECRET, oAuth2App.getClientSecret()));
-            } else {
-                throw new IllegalArgumentException(
-                    "Predefined OAuth2 app for componentName=%s does not exist".formatted(componentName));
             }
         }
 

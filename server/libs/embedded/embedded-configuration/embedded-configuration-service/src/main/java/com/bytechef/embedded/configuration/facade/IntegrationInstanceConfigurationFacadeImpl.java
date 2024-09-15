@@ -179,16 +179,9 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         }
 
         if (MapUtils.isEmpty(integrationInstanceConfiguration.getConnectionParameters())) {
-            // TODO define scenarios when there are multiple component versions and workflows
-
-            ConnectionDefinition connectionDefinition = connectionDefinitionService.getConnectionDefinition(
-                integration.getComponentName(), null);
-
-            if (connectionDefinition.hasOAuth2Authorization()) {
-                integrationInstanceConfiguration.setConnectionParameters(
-                    oAuth2Service.checkPredefinedParameters(
-                        integration.getComponentName(), integrationInstanceConfiguration.getConnectionParameters()));
-            }
+            integrationInstanceConfiguration.setConnectionParameters(
+                oAuth2Service.checkPredefinedParameters(
+                    integration.getComponentName(), integrationInstanceConfiguration.getConnectionParameters()));
         }
 
         integrationInstanceConfiguration = integrationInstanceConfigurationService.create(
