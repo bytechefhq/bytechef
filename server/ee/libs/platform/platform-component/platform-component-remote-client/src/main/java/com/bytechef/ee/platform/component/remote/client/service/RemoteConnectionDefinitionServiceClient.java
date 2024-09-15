@@ -141,7 +141,7 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
 
     @Override
     public List<ConnectionDefinition> getConnectionDefinitions(
-        @NonNull String componentName, @NonNull Integer componentVersion) {
+        @NonNull String componentName, Integer componentVersion) {
 
         List<CompletableFuture<List<ConnectionDefinition>>> completableFutures = CollectionUtils.map(
             WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP)),

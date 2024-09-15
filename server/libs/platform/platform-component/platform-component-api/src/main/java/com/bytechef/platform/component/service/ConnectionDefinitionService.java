@@ -72,6 +72,5 @@ public interface ConnectionDefinitionService {
 
     List<ConnectionDefinition> getConnectionDefinitions();
 
-    List<ConnectionDefinition> getConnectionDefinitions(
-        @NonNull String componentName, @NonNull Integer componentVersion);
+    List<ConnectionDefinition> getConnectionDefinitions(@NonNull String componentName, Integer componentVersion);
 }

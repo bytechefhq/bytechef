@@ -290,6 +290,16 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
+    public List<ConnectionDefinition> getConnectionDefinitions(
+        @NonNull String componentName, Integer componentVersion) {
+
+        return getConnectableComponentDefinitions(componentName, componentVersion)
+            .stream()
+            .map(ConnectionDefinitionServiceImpl::toConnectionDefinition)
+            .toList();
+    }
+
+    @Override
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
         @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
         @NonNull Map<String, ?> authorizationParams, @NonNull Context context) {
@@ -326,18 +336,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         }
     }
 
-    @Override
-    public List<ConnectionDefinition> getConnectionDefinitions(
-        @NonNull String componentName, @NonNull Integer componentVersion) {
-
-        return getConnectableComponentDefinitions(componentName, componentVersion)
-            .stream()
-            .map(ConnectionDefinitionServiceImpl::toConnectionDefinition)
-            .toList();
-    }
-
     private List<ComponentDefinition> getConnectableComponentDefinitions(
-        String componentName, int componentVersion) {
+        String componentName, Integer componentVersion) {
 
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
             componentName, componentVersion);
@@ -345,9 +345,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         if (componentDefinition instanceof ScriptComponentDefinition) {
             return componentDefinitionRegistry.getComponentDefinitions()
                 .stream()
-                .filter(curComponentDefinition -> curComponentDefinition
-                    .getConnection()
-                    .isPresent())
+                .filter(curComponentDefinition -> OptionalUtils.isPresent(curComponentDefinition.getConnection()))
                 .toList();
         } else {
             return List.of(componentDefinition);

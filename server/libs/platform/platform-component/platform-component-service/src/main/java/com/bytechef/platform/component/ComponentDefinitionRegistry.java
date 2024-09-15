@@ -36,6 +36,7 @@ import com.bytechef.config.ApplicationProperties.Component.Registry;
 import com.bytechef.platform.component.handler.ComponentHandlerFactory;
 import com.bytechef.platform.component.handler.DynamicComponentHandlerFactory;
 import com.bytechef.platform.registry.util.PropertyUtils;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
@@ -153,7 +154,7 @@ public class ComponentDefinitionRegistry {
             .orElseThrow(IllegalArgumentException::new);
     }
 
-    public ComponentDefinition getComponentDefinition(String name, Integer version) {
+    public ComponentDefinition getComponentDefinition(@NonNull String name, Integer version) {
         ComponentDefinition componentDefinition;
 
         if (version == null) {
