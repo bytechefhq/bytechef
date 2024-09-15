@@ -50,7 +50,6 @@ const IntegrationDialog = ({integration, onClose, triggerNode}: IntegrationDialo
                   }
                 : undefined,
             componentName: integration?.componentName || '',
-            componentVersion: 1,
             description: integration?.description || '',
             name: integration?.name || '',
             tags:

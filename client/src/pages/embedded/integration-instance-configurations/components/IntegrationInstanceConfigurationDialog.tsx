@@ -83,8 +83,8 @@ const IntegrationInstanceConfigurationDialog = ({
     const {data: integration} = useGetIntegrationQuery(curIntegrationId!, undefined, !!curIntegrationId);
 
     const {data: connectionDefinition} = useGetConnectionDefinitionQuery({
-        componentName: integration?.componentName,
-        componentVersion: integration?.componentVersion,
+        componentName: integration?.componentName as string,
+        componentVersion: 1,
     });
 
     const oAuth2Authorization = connectionDefinition?.authorizations?.find(
