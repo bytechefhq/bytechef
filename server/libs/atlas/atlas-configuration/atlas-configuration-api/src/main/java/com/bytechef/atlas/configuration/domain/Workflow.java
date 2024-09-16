@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.annotation.CreatedBy;
@@ -387,7 +388,13 @@ public final class Workflow implements Persistable<String>, Serializable {
         List<WorkflowTask> allWorkflowTasks = new ArrayList<>();
 
         for (WorkflowTask workflowTask : workflowTasks) {
-            allWorkflowTasks.add(workflowTask);
+            String type = workflowTask.getType();
+
+            // TODO - This is a temporary solution to filter out the task dispatchers. Long term solution is to
+            // inject this check so this platform related logic is not hardcoded inside the atlas module
+            if (StringUtils.countMatches(type, "/") == 2) {
+                allWorkflowTasks.add(workflowTask);
+            }
 
             Map<String, ?> parameters = workflowTask.getParameters();
 
