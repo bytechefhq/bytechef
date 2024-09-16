@@ -17,7 +17,10 @@
 package com.bytechef.component.google.drive.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PARENT_FOLDER;
+import static com.bytechef.component.google.drive.util.GoogleDriveUtils.LAST_TIME_CHECKED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -26,11 +29,14 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TriggerDefinition.PollOutput;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +49,7 @@ import org.mockito.MockedStatic;
 /**
  * @author Mario Cvjetojevic
  * @author Ivica Cardic
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 class GoogleDriveUtilsTest {
 
@@ -51,12 +57,16 @@ class GoogleDriveUtilsTest {
     private final List<File> files = new ArrayList<>();
     private MockedStatic<GoogleServices> googleServicesMockedStatic;
     private final ActionContext mockedContext = mock(ActionContext.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
     private final Drive mockedDrive = mock(Drive.class);
     private final FileList mockedFileList = mock(FileList.class);
     private final Drive.Files mockedFiles = mock(Drive.Files.class);
     private final Drive.Files.List mockedList = mock(Drive.Files.List.class);
+    private final Parameters mockedParameters =
+        MockParametersFactory
+            .create(Map.of(PARENT_FOLDER, "parent", LAST_TIME_CHECKED, LocalDateTime.of(2000, 1, 1, 1, 1, 1)));
     private final ArgumentCaptor<String> qArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> fieldsArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> orderByArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @BeforeEach
     void beforeEach() throws IOException {
@@ -93,7 +103,8 @@ class GoogleDriveUtilsTest {
         assertEquals(expectedOptions,
             GoogleDriveUtils.getFileOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
 
-        assertEquals("mimeType != 'application/vnd.google-apps.folder'", qArgumentCaptor.getValue());
+        assertEquals("mimeType != 'application/vnd.google-apps.folder' and trashed = false",
+            qArgumentCaptor.getValue());
     }
 
     @Test
@@ -101,6 +112,25 @@ class GoogleDriveUtilsTest {
         assertEquals(expectedOptions,
             GoogleDriveUtils.getFolderOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
 
-        assertEquals("mimeType = 'application/vnd.google-apps.folder'", qArgumentCaptor.getValue());
+        assertEquals("mimeType = 'application/vnd.google-apps.folder' and trashed = false", qArgumentCaptor.getValue());
+    }
+
+    @Test
+    void testGetPollOutput() throws IOException {
+            when(mockedList.setFields(fieldsArgumentCaptor.capture()))
+                .thenReturn(mockedList);
+            when(mockedList.setOrderBy(orderByArgumentCaptor.capture()))
+                .thenReturn(mockedList);
+
+            PollOutput pollOutput = GoogleDriveUtils.getPollOutput(mockedParameters, mockedParameters, mockedParameters, false);
+
+            assertEquals(files, pollOutput.getRecords());
+            assertFalse(pollOutput.pollImmediately());
+
+            assertEquals(
+                "mimeType = 'application/vnd.google-apps.folder' and 'parent' in parents and trashed = false and createdTime > '2000-01-01T01:01:01'",
+                qArgumentCaptor.getValue());
+            assertEquals("files(id, name, mimeType, webViewLink, kind)", fieldsArgumentCaptor.getValue());
+            assertEquals("createdTime asc", orderByArgumentCaptor.getValue());
     }
 }

@@ -24,6 +24,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.FileEntry;
+import com.bytechef.component.definition.Parameters;
 import com.google.api.services.drive.model.File;
 import java.io.IOException;
 import java.util.List;
@@ -31,12 +32,13 @@ import org.junit.jupiter.api.Test;
 
 /**
  * @author Mario Cvjetojevic
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 class GoogleDriveUploadFileActionTest extends AbstractGoogleDriveActionTest {
 
     private final java.io.File mockedFile = mock(java.io.File.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
 
     @Test
     void testPerform() throws IOException {

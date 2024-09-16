@@ -49,7 +49,6 @@ public abstract class AbstractGoogleDriveActionTest {
     protected Drive.Files.Get mockedGet = mock(Drive.Files.Get.class);
     protected File mockedGoogleFile = mock(File.class);
     protected Drive.Files mockedFiles = mock(Drive.Files.class);
-    protected Parameters mockedParameters = mock(Parameters.class);
 
     @BeforeEach
     public void beforeEach() {

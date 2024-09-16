@@ -23,6 +23,8 @@ import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import com.google.api.client.http.AbstractInputStreamContent;
 import com.google.api.services.drive.model.File;
 import java.io.BufferedReader;
@@ -30,27 +32,22 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Mario Cvjetojevic
- * @author Monika Domiter
+ * @author Monika KUšter
  */
 class GoogleDriveCreateNewTextFileActionTest extends AbstractGoogleDriveActionTest {
 
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(FILE_NAME, "fileName", PARENT_FOLDER, "parentFolder", TEXT, "text", MIME_TYPE, "mimeType"));
+
     @Test
     void testPerform() throws IOException {
-        when(mockedParameters.getRequiredString(FILE_NAME))
-            .thenReturn("fileName");
-        when(mockedParameters.getString(PARENT_FOLDER))
-            .thenReturn("parentFolder");
-        when(mockedParameters.getRequiredString(TEXT))
-            .thenReturn("text");
-        when(mockedParameters.getRequiredString(MIME_TYPE))
-            .thenReturn("mimeType");
-
         when(mockedFiles.create(fileArgumentCaptor.capture(), abstractInputStreamContentArgumentCaptor.capture()))
             .thenReturn(mockedCreate);
         when(mockedCreate.execute())
@@ -72,7 +69,7 @@ class GoogleDriveCreateNewTextFileActionTest extends AbstractGoogleDriveActionTe
         try (InputStreamReader inputStreamReader = new InputStreamReader(
             abstractInputStreamContent.getInputStream(), StandardCharsets.UTF_8);
 
-             BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
 
             Stream<String> lines = bufferedReader.lines();
 

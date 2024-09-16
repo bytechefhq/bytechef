@@ -16,29 +16,31 @@
 
 package com.bytechef.component.google.drive.action;
 
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.APPLICATION_VND_GOOGLE_APPS_FOLDER;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FOLDER_NAME;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PARENT_FOLDER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import com.google.api.services.drive.model.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Mario Cvjetojevic
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 class GoogleDriveCreateNewFolderActionTest extends AbstractGoogleDriveActionTest {
 
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(FOLDER_NAME, "folderName", PARENT_FOLDER, "parentFolder"));
+
     @Test
     void testPerform() throws IOException {
-        when(mockedParameters.getRequiredString(FOLDER_NAME))
-            .thenReturn("folderName");
-        when(mockedParameters.getString(PARENT_FOLDER))
-            .thenReturn("parentFolder");
-
         when(mockedFiles.create(fileArgumentCaptor.capture()))
             .thenReturn(mockedCreate);
         when(mockedCreate.execute())
@@ -51,7 +53,7 @@ class GoogleDriveCreateNewFolderActionTest extends AbstractGoogleDriveActionTest
         File file = fileArgumentCaptor.getValue();
 
         assertEquals("folderName", file.getName());
-        assertEquals("application/vnd.google-apps.folder", file.getMimeType());
+        assertEquals(APPLICATION_VND_GOOGLE_APPS_FOLDER, file.getMimeType());
         assertEquals(List.of("parentFolder"), file.getParents());
     }
 }
