@@ -177,6 +177,16 @@ const Property = ({
         });
     }
 
+    const getComponentIcon = (mentionValue: string) => {
+        let componentName = mentionValue.split('_')[0].replace('${', '');
+
+        if (componentName === 'trigger') {
+            componentName = workflow.workflowTriggerComponentNames?.[0] || '';
+        }
+
+        return componentDefinitions.find((component) => component.name === componentName)?.icon || '📄';
+    };
+
     const saveInputValue = useDebouncedCallback(() => {
         if (!currentComponent || !workflow || !name || !path || !updateWorkflowNodeParameterMutation) {
             return;
@@ -583,17 +593,12 @@ const Property = ({
             if (typeof propertyParameterValue === 'string' && propertyParameterValue.includes('${')) {
                 const mentionInputNodes = mentionValues.map((value) => {
                     if (value.startsWith('${')) {
-                        const componentName = value.split('_')[0].replace('${', '');
-
-                        const componentIcon =
-                            componentDefinitions.find((component) => component.name === componentName)?.icon || '📄';
-
                         const node = document.createElement('div');
 
                         node.className = 'property-mention';
 
                         node.dataset.value = value.replace(/\$\{|\}/g, '');
-                        node.dataset.componentIcon = componentIcon;
+                        node.dataset.componentIcon = getComponentIcon(value);
 
                         return node.outerHTML;
                     } else {
@@ -735,17 +740,12 @@ const Property = ({
 
         const mentionInputNodes = mentionValues.map((value) => {
             if (value.startsWith('${')) {
-                const componentName = value.split('_')[0].replace('${', '');
-
-                const componentIcon =
-                    componentDefinitions.find((component) => component.name === componentName)?.icon || '📄';
-
                 const node = document.createElement('div');
 
                 node.className = 'property-mention';
 
                 node.dataset.value = value.replace(/\$\{|\}/g, '');
-                node.dataset.componentIcon = componentIcon;
+                node.dataset.componentIcon = getComponentIcon(value);
 
                 return node.outerHTML;
             } else {
