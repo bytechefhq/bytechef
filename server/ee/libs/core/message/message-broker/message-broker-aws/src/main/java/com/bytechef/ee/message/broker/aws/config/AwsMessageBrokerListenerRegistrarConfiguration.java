@@ -41,7 +41,7 @@ import software.amazon.awssdk.services.sqs.SqsAsyncClient;
  */
 @Configuration
 @ConditionalOnMessageBrokerAws
-public class AwsMessageBrokerListenerRegistrarConfiguration
+class AwsMessageBrokerListenerRegistrarConfiguration
     implements SqsListenerConfigurer, MessageBrokerListenerRegistrar<EndpointRegistrar> {
 
     private static final Logger logger = LoggerFactory.getLogger(AwsMessageBrokerListenerRegistrarConfiguration.class);
@@ -49,14 +49,14 @@ public class AwsMessageBrokerListenerRegistrarConfiguration
     private final BeanFactory beanFactory;
     private final List<MessageBrokerConfigurer<EndpointRegistrar>> messageBrokerConfigurers;
     private final MessageHandlerMethodFactory messageHandlerMethodFactory;
-    private final SqsMessageListenerContainerFactory sqsMessageListenerContainerFactory;
+    private final SqsMessageListenerContainerFactory<?> sqsMessageListenerContainerFactory;
 
     @SuppressFBWarnings("EI")
     public AwsMessageBrokerListenerRegistrarConfiguration(
         BeanFactory beanFactory,
         @Autowired(required = false) List<MessageBrokerConfigurer<EndpointRegistrar>> messageBrokerConfigurers,
         MessageHandlerMethodFactory messageHandlerMethodFactory,
-        SqsMessageListenerContainerFactory sqsMessageListenerContainerFactory) {
+        SqsMessageListenerContainerFactory<?> sqsMessageListenerContainerFactory) {
 
         this.beanFactory = beanFactory;
         this.messageBrokerConfigurers = messageBrokerConfigurers == null ? List.of() : messageBrokerConfigurers;
@@ -91,60 +91,56 @@ public class AwsMessageBrokerListenerRegistrarConfiguration
         listenerEndpointRegistrar.registerEndpoint(endpoint);
     }
 
-    private SqsEndpoint createListenerEndpoint(MessageRoute messageRoute, Method listenerMethod) {
-        SqsEndpoint endpoint = new SqsEndpoint.SqsEndpointBuilder()
-            .id(messageRoute.getName())
-            .queueNames(List.of(messageRoute.getName()))
-            .factoryBeanName(SqsBeanNames.ENDPOINT_REGISTRY_BEAN_NAME)
-            .acknowledgementMode(AcknowledgementMode.ON_SUCCESS) // change if needed
-//            .maxConcurrentMessages()
-//            .maxMessagesPerPoll()
-//            .pollTimeoutSeconds()
-//            .messageVisibility()
-            .build();
-
-        endpoint.setMethod(listenerMethod);
-        endpoint.setBean(beanFactory);
-        endpoint.setHandlerMethodFactory(messageHandlerMethodFactory);
-        endpoint.setupContainer(sqsMessageListenerContainerFactory.createContainer(endpoint));
-        return endpoint;
-    }
-
-    // the reason why the code is so messy is that it's in the testing phase
-
     @Bean
     MessageHandlerMethodFactory messageHandlerMethodFactory(MessageConverter messageConverter) {
         DefaultMessageHandlerMethodFactory messageHandlerMethodFactory = new DefaultMessageHandlerMethodFactory();
+
         messageHandlerMethodFactory.setMessageConverter(messageConverter);
 
         return messageHandlerMethodFactory;
     }
 
     @Bean
-    protected MessageConverter messageConverter() {
+    MessageConverter messageConverter() {
         var converter = new MappingJackson2MessageConverter();
+
         converter.setSerializedPayloadClass(String.class);
         converter.setStrictContentTypeMatch(false);
+
         return converter;
     }
 
     @Bean
-    public SqsMessageListenerContainerFactory<Object> sqsListenerContainerFactory() {
-        return SqsMessageListenerContainerFactory
-            .builder()
+    SqsMessageListenerContainerFactory<Object> sqsListenerContainerFactory() {
+        return SqsMessageListenerContainerFactory.builder()
             .sqsAsyncClient(sqsAsyncClient())
             .build();
     }
 
     @Bean
-    public SqsAsyncClient sqsAsyncClient() {
+    SqsAsyncClient sqsAsyncClient() {
         return SqsAsyncClient.builder()
             .build();
     }
 
     @Bean
-    public SqsProperties.Listener listener() {
+    SqsProperties.Listener listener() {
         return new SqsProperties.Listener();
     }
 
+    private SqsEndpoint createListenerEndpoint(MessageRoute messageRoute, Method listenerMethod) {
+        SqsEndpoint endpoint = new SqsEndpoint.SqsEndpointBuilder()
+            .id(messageRoute.getName())
+            .queueNames(List.of(messageRoute.getName()))
+            .factoryBeanName(SqsBeanNames.ENDPOINT_REGISTRY_BEAN_NAME)
+            .acknowledgementMode(AcknowledgementMode.ON_SUCCESS) // change if needed
+            .build();
+
+        endpoint.setMethod(listenerMethod);
+        endpoint.setBean(beanFactory);
+        endpoint.setHandlerMethodFactory(messageHandlerMethodFactory);
+        endpoint.setupContainer(sqsMessageListenerContainerFactory.createContainer(endpoint));
+
+        return endpoint;
+    }
 }

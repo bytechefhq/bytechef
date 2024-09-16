@@ -1,17 +1,8 @@
 /*
  * Copyright 2023-present ByteChef Inc.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
  */
 
 package com.bytechef.ee.message.broker.aws;
@@ -20,16 +11,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.testcontainers.containers.localstack.LocalStackContainer.Service.SQS;
 
-import com.bytechef.ee.message.broker.aws.config.AwsMessageBrokerListenerRegistrarConfiguration;
 import com.bytechef.message.route.MessageRoute;
-import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
+import io.awspring.cloud.sqs.config.EndpointRegistrar;
 import io.awspring.cloud.sqs.operations.SqsTemplate;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -48,34 +38,36 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+/**
+ * @version ee
+ *
+ * @author Marko Krikovic
+ */
 @SpringBootTest
 @Testcontainers
 class AwsMessageBrokerIntTest {
 
-    @Container
-    static LocalStackContainer localStack = new LocalStackContainer(
-        DockerImageName.parse("localstack/localstack:3.0"));
+    private static final String QUEUE_NAME = "awsTest";
+    private static final String MESSAGE = "Hello World";
 
-    static final String QUEUE_NAME = "awsTest";
-    static final String MESSAGE = "Hello World";
+    @Container
+    private static final LocalStackContainer localStack = new LocalStackContainer(
+        DockerImageName.parse("localstack/localstack:3.0"));
 
     private static MessageRoute route;
 
+    @Autowired
+    private AwsMessageBroker awsMessageBroker;
+
+    @Autowired
+    private SqsTemplate sqsTemplate;
+
     @DynamicPropertySource
     static void overrideProperties(DynamicPropertyRegistry registry) {
-        registry.add(
-            "spring.cloud.aws.region.static",
-            () -> localStack.getRegion());
-        registry.add(
-            "spring.cloud.aws.credentials.access-key",
-            () -> localStack.getAccessKey());
-        registry.add(
-            "spring.cloud.aws.credentials.secret-key",
-            () -> localStack.getSecretKey());
-        registry.add(
-            "spring.cloud.aws.sqs.endpoint",
-            () -> localStack.getEndpointOverride(SQS)
-                .toString());
+        registry.add("spring.cloud.aws.region.static", localStack::getRegion);
+        registry.add("spring.cloud.aws.credentials.access-key", localStack::getAccessKey);
+        registry.add("spring.cloud.aws.credentials.secret-key", localStack::getSecretKey);
+        registry.add("spring.cloud.aws.sqs.endpoint", () -> String.valueOf(localStack.getEndpointOverride(SQS)));
     }
 
     @BeforeAll
@@ -112,52 +104,41 @@ class AwsMessageBrokerIntTest {
             });
     }
 
-//    @Test
-//    void canRegisterListenerEndpoints() {
-//        EndpointRegistrar listenerEndpointRegistrar = new EndpointRegistrar();
-//        int concurrency = 1;
-//        TestClass testClass = new TestClass();
-//        String methodName = "testMethod";
-//
-//        awsMessageBrokerListenerRegistrarConfiguration.registerListenerEndpoint(listenerEndpointRegistrar, route,
-//            concurrency, testClass, methodName);
-//
-//        await()
-//            .pollInterval(Duration.ofSeconds(2))
-//            .atMost(Duration.ofSeconds(10))
-//            .ignoreExceptions()
-//            .untilAsserted(() -> {
-//                awsMessageBroker.send(route, MESSAGE);
-//
-//                sqsTemplate.receiveAsync(from -> from.queue(QUEUE_NAME));
-//
-//                assertThat(TestClass.message).isEqualTo(MESSAGE);
-////                assertThat(stringMessage.get().getPayload()).isEqualTo(MESSAGE);
-//            });
-//    }
+    @Disabled
+    @Test
+    void canRegisterListenerEndpoints() {
+        EndpointRegistrar listenerEndpointRegistrar = new EndpointRegistrar();
+        int concurrency = 1;
+        TestClass testClass = new TestClass();
+        String methodName = "testMethod";
 
-    private class TestClass {
-        public static String message;
+//        awsMessageBrokerListenerRegistrarConfiguration.registerListenerEndpoint(
+//            listenerEndpointRegistrar, route, concurrency, testClass, methodName);
 
-        public void testMethod() {
-            message = MESSAGE;
-//            awsMessageBroker.send(route, MESSAGE);
-        }
+        await()
+            .pollInterval(Duration.ofSeconds(2))
+            .atMost(Duration.ofSeconds(10))
+            .ignoreExceptions()
+            .untilAsserted(() -> {
+                awsMessageBroker.send(route, MESSAGE);
+
+                sqsTemplate.receiveAsync(from -> from.queue(QUEUE_NAME));
+
+                assertThat(TestClass.message).isEqualTo(MESSAGE);
+//                assertThat(stringMessage.get().getPayload()).isEqualTo(MESSAGE);
+            });
     }
 
-    @Autowired
-    AwsMessageBroker awsMessageBroker;
+    private static class TestClass {
 
-    @Autowired
-    AwsMessageBrokerListenerRegistrarConfiguration awsMessageBrokerListenerRegistrarConfiguration;
-
-    @Autowired
-    SqsTemplate sqsTemplate;
+        public static String message;
+    }
 
     @Configuration
     @ComponentScan("io.awspring.cloud")
     @EnableAutoConfiguration
     static class AwsMessageBrokerIntTestConfiguration {
+
         @Bean
         AwsMessageBroker awsMessageBroker(SqsTemplate sqsTemplate) {
             return new AwsMessageBroker(sqsTemplate);
@@ -178,14 +159,5 @@ class AwsMessageBrokerIntTest {
             converter.setStrictContentTypeMatch(false);
             return converter;
         }
-
-        @Bean
-        AwsMessageBrokerListenerRegistrarConfiguration awsMessageBrokerListenerRegistrarConfiguration(
-            BeanFactory beanFactory, MessageHandlerMethodFactory messageHandlerMethodFactory,
-            SqsMessageListenerContainerFactory sqsMessageListenerContainerFactory) {
-            return new AwsMessageBrokerListenerRegistrarConfiguration(beanFactory, null, messageHandlerMethodFactory,
-                sqsMessageListenerContainerFactory);
-        }
-
     }
 }
