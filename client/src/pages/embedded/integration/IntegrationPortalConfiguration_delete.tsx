@@ -49,7 +49,7 @@ const IntegrationPortalConfiguration_delete = () => {
             rightSidebarWidth="460"
         >
             <div className="flex w-full items-center justify-center">
-                <div className="flex w-[600px] flex-col gap-4 rounded-lg border bg-background p-6 shadow-lg">
+                <div className="flex w-workflow-nodes-popover-menu-width flex-col gap-4 rounded-lg border bg-background p-6 shadow-lg">
                     <div className="flex flex-col space-y-1.5 text-center sm:text-left">
                         <div className="flex justify-between">
                             <div>
