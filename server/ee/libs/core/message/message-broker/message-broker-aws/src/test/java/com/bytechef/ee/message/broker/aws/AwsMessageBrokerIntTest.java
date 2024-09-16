@@ -12,7 +12,6 @@ import static org.awaitility.Awaitility.await;
 import static org.testcontainers.containers.localstack.LocalStackContainer.Service.SQS;
 
 import com.bytechef.message.route.MessageRoute;
-import io.awspring.cloud.sqs.config.EndpointRegistrar;
 import io.awspring.cloud.sqs.operations.SqsTemplate;
 import java.io.IOException;
 import java.time.Duration;
@@ -107,32 +106,32 @@ class AwsMessageBrokerIntTest {
     @Disabled
     @Test
     void canRegisterListenerEndpoints() {
-        EndpointRegistrar listenerEndpointRegistrar = new EndpointRegistrar();
-        int concurrency = 1;
-        TestClass testClass = new TestClass();
-        String methodName = "testMethod";
-
+//        EndpointRegistrar listenerEndpointRegistrar = new EndpointRegistrar();
+//        int concurrency = 1;
+//        TestClass testClass = new TestClass();
+//        String methodName = "testMethod";
+//
 //        awsMessageBrokerListenerRegistrarConfiguration.registerListenerEndpoint(
 //            listenerEndpointRegistrar, route, concurrency, testClass, methodName);
-
-        await()
-            .pollInterval(Duration.ofSeconds(2))
-            .atMost(Duration.ofSeconds(10))
-            .ignoreExceptions()
-            .untilAsserted(() -> {
-                awsMessageBroker.send(route, MESSAGE);
-
-                sqsTemplate.receiveAsync(from -> from.queue(QUEUE_NAME));
-
-                assertThat(TestClass.message).isEqualTo(MESSAGE);
+//
+//        await()
+//            .pollInterval(Duration.ofSeconds(2))
+//            .atMost(Duration.ofSeconds(10))
+//            .ignoreExceptions()
+//            .untilAsserted(() -> {
+//                awsMessageBroker.send(route, MESSAGE);
+//
+//                sqsTemplate.receiveAsync(from -> from.queue(QUEUE_NAME));
+//
+//                assertThat(TestClass.message).isEqualTo(MESSAGE);
 //                assertThat(stringMessage.get().getPayload()).isEqualTo(MESSAGE);
-            });
+//            });
     }
 
-    private static class TestClass {
-
-        public static String message;
-    }
+//    private static class TestClass {
+//
+//        public static String message;
+//    }
 
     @Configuration
     @ComponentScan("io.awspring.cloud")

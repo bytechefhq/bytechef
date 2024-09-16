@@ -10,6 +10,7 @@ package com.bytechef.ee.file.storage.aws.service;
 import com.bytechef.ee.file.storage.aws.AwsFileStorageService;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.exception.FileStorageException;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.awspring.cloud.s3.S3Resource;
 import io.awspring.cloud.s3.S3Template;
 import java.io.ByteArrayInputStream;
@@ -35,6 +36,7 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     private final S3Template s3Template;
     private final String bucketName;
 
+    @SuppressFBWarnings("EI")
     public AwsFileStorageServiceImpl(S3Template s3Template, String bucketName) {
         this.s3Template = s3Template;
         this.bucketName = bucketName;

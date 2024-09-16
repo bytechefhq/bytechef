@@ -137,6 +137,10 @@ bytechef:
   cache:
     # Cache provider (redis | simple) default: simple
     provider: simple
+  cloud:
+    provider: aws
+    aws:
+      region: us-east-1
   component:
     registry:
       # The list of component names to exclude from runtime
@@ -157,7 +161,7 @@ bytechef:
     filesystem:
       basedir: ${user.home}/bytechef/data/file-storage
     aws:
-      bucket: myBucket
+      bucket: ded47d6b-65e2-4052-92d4-bc015e00871e
   mail:
     base-url: ${bytechef.public-url}
     from: noreply@bytechef.io
