@@ -32,8 +32,8 @@ import org.junit.jupiter.api.Test;
  */
 class MathHelperSubtractionActionTest {
 
-    private final Parameters mockedParameters =
-        MockParametersFactory.create(Map.of(FIRST_NUMBER, 10, SECOND_NUMBER, 3.2));
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(FIRST_NUMBER, 10, SECOND_NUMBER, 3.2));
 
     @Test
     void testPerform() {

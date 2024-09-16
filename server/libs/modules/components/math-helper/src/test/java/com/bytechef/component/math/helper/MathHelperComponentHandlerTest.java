@@ -28,5 +28,4 @@ class MathHelperComponentHandlerTest {
     void testGetComponentDefinition() {
         JsonFileAssert.assertEquals("definition/math-helper_v1.json", new MathHelperComponentHandler().getDefinition());
     }
-
 }
