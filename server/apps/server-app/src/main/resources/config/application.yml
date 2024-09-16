@@ -156,6 +156,8 @@ bytechef:
     provider: filesystem
     filesystem:
       basedir: ${user.home}/bytechef/data/file-storage
+    aws:
+      bucket: myBucket
   mail:
     base-url: ${bytechef.public-url}
     from: noreply@bytechef.io
