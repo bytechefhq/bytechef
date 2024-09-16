@@ -56,7 +56,8 @@ public class MathHelperModuloAction {
         BigDecimal firstNumber = BigDecimal.valueOf(inputParameters.getRequiredDouble(FIRST_NUMBER));
         BigDecimal secondNumber = BigDecimal.valueOf(inputParameters.getRequiredDouble(SECOND_NUMBER));
 
-        return firstNumber.remainder(secondNumber)
-            .doubleValue();
+        BigDecimal remainder = firstNumber.remainder(secondNumber);
+
+        return remainder.doubleValue();
     }
 }
