@@ -76,10 +76,4 @@ public class TaskFileStorageConfiguration {
             .getBasedir();
     }
 
-    private String getBucket() {
-        return applicationProperties.getFileStorage()
-            .getAws()
-            .getBucket();
-    }
-
 }

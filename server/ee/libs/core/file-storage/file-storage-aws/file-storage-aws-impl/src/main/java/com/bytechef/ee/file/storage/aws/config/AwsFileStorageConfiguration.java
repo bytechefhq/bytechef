@@ -11,7 +11,6 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.FileStorage.Aws;
 import com.bytechef.ee.file.storage.aws.AwsFileStorageService;
 import com.bytechef.ee.file.storage.aws.service.AwsFileStorageServiceImpl;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.awspring.cloud.s3.S3ObjectConverter;
 import io.awspring.cloud.s3.S3OutputStreamProvider;
 import io.awspring.cloud.s3.S3Template;
@@ -20,10 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.regions.providers.AwsRegionProvider;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
@@ -57,11 +52,6 @@ class AwsFileStorageConfiguration {
     }
 
     @Bean
-    ObjectMapper objectMapper() {
-        return new ObjectMapper();
-    }
-
-    @Bean
     S3Template s3Template(
         S3Client s3Client, S3OutputStreamProvider s3OutputStreamProvider, S3ObjectConverter s3ObjectConverter,
         S3Presigner s3Presigner) {
@@ -69,13 +59,4 @@ class AwsFileStorageConfiguration {
         return new S3Template(s3Client, s3OutputStreamProvider, s3ObjectConverter, s3Presigner);
     }
 
-    @Bean
-    AwsCredentialsProvider awsCredentialsProvider() {
-        return () -> AwsBasicCredentials.create("noop", "noop");
-    }
-
-    @Bean
-    AwsRegionProvider awsRegionProvider() {
-        return () -> Region.US_EAST_1;
-    }
 }
