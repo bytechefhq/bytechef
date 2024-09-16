@@ -17,7 +17,7 @@
 package com.bytechef.platform.data.storage.file.storage.config;
 
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.ee.file.storage.aws.service.AwsFileStorageService;
+import com.bytechef.ee.file.storage.aws.api.AwsFileStorageService;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.data.storage.DataStorage;
@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.NonNull;
@@ -44,10 +45,13 @@ public class DataFileStorageConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(DataFileStorageConfiguration.class);
 
     private final ApplicationProperties applicationProperties;
+    private final AwsFileStorageService awsFileStorageService;
 
     @SuppressFBWarnings("EI")
-    public DataFileStorageConfiguration(ApplicationProperties applicationProperties) {
+    public DataFileStorageConfiguration(ApplicationProperties applicationProperties,
+        @Autowired(required = false) AwsFileStorageService awsFileStorageService) {
         this.applicationProperties = applicationProperties;
+        this.awsFileStorageService = awsFileStorageService;
     }
 
     @Bean
@@ -57,7 +61,7 @@ public class DataFileStorageConfiguration {
             logger.info("Data storage provider type enabled: aws");
         }
 
-        return new DataStorageImpl(new DataFileStorageServiceImpl(new AwsFileStorageService()));
+        return new DataStorageImpl(new DataFileStorageServiceImpl(awsFileStorageService));
     }
 
     @Bean

@@ -567,8 +567,14 @@ public class ApplicationProperties {
             AWS, FILESYSTEM, JDBC
         }
 
+        private Aws aws;
+
         private Filesystem filesystem;
         private Provider provider;
+
+        public Aws getAws() {
+            return aws;
+        }
 
         public Filesystem getFilesystem() {
             return filesystem;
@@ -578,12 +584,29 @@ public class ApplicationProperties {
             return provider;
         }
 
+        public void setAws(Aws aws) {
+            this.aws = aws;
+        }
+
         public void setFilesystem(Filesystem filesystem) {
             this.filesystem = filesystem;
         }
 
         public void setProvider(Provider provider) {
             this.provider = provider;
+        }
+
+        public static class Aws {
+
+            private String bucket;
+
+            public String getBucket() {
+                return bucket;
+            }
+
+            public void setBucket(String bucket) {
+                this.bucket = bucket;
+            }
         }
 
         public static class Filesystem {

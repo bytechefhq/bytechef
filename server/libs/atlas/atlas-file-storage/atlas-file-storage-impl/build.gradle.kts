@@ -8,5 +8,5 @@ dependencies {
     implementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
     implementation(project(":server:libs:core:commons:commons-util"))
 
-    implementation(project(":server:ee:libs:core:file-storage:file-storage-aws"))
+    implementation(project(":server:ee:libs:core:file-storage:file-storage-aws:file-storage-aws-api"))
 }
