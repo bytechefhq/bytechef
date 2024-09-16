@@ -71,7 +71,6 @@ const WorkflowNodesSidebar = ({
                 <WorkflowNodesTabs
                     actionComponentDefinitions={filteredActionComponentDefinitions}
                     itemsDraggable
-                    popover={false}
                     taskDispatcherDefinitions={filteredTaskDispatcherDefinitions}
                     triggerComponentDefinitions={filteredTriggerComponentDefinitions}
                 />

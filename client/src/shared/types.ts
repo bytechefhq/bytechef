@@ -18,6 +18,7 @@ import {
     TaskDispatcherDefinition,
     TaskProperty,
     TimeProperty,
+    TriggerDefinition,
     ValueProperty,
     Workflow,
     WorkflowConnection,
@@ -78,11 +79,21 @@ export type ComponentType = {
     workflowNodeName: string;
 };
 
-export type ClickedItemType = {
-    componentName?: string;
-    trigger?: boolean;
+export type ClickedDefinitionType = {
     taskDispatcher?: boolean;
-} & (ComponentDefinitionBasic | TaskDispatcherDefinition);
+    trigger?: boolean;
+} & (ComponentDefinition & TriggerDefinition & TaskDispatcherDefinition);
+
+export type ClickedOperationType = {
+    componentLabel?: string;
+    componentName: string;
+    icon?: string;
+    operationName: string;
+    taskDispatcher?: boolean;
+    trigger?: boolean;
+    type: string;
+    version: number;
+};
 
 export type NodeDataType = {
     componentName: string;
