@@ -1,20 +1,11 @@
 /*
  * Copyright 2023-present ByteChef Inc.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.file.storage.aws.impl.service;
+package com.bytechef.ee.file.storage.aws.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -23,7 +14,6 @@ import static org.testcontainers.containers.localstack.LocalStackContainer.Servi
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.awspring.cloud.autoconfigure.dynamodb.DynamoDbAutoConfiguration;
 import io.awspring.cloud.s3.S3ObjectConverter;
 import io.awspring.cloud.s3.S3OutputStreamProvider;
 import io.awspring.cloud.s3.S3Template;
@@ -50,56 +40,47 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.AwsCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.regions.providers.AwsRegionProvider;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
+/**
+ * @version ee
+ *
+ * @author Marko Krikovic
+ */
 @SpringBootTest
-@EnableAutoConfiguration(exclude = DynamoDbAutoConfiguration.class)
 @Testcontainers
 class AwsFileStorageIntTest {
 
+    private static final String BUCKET_NAME = String.valueOf(UUID.randomUUID());
+    private static final String DATA = "Hello World";
+    private static final String DIR_PATH = "RandomDirectory/Test";
+    private static final String KEY = "key";
+    private static final String FILE_PATH = "s3://" + BUCKET_NAME + "/" + DIR_PATH + "/" + KEY;
+
     @Container
-    static LocalStackContainer localStack = new LocalStackContainer(
+    private static final LocalStackContainer localStack = new LocalStackContainer(
         DockerImageName.parse("localstack/localstack:3.0"));
 
-    static final String BUCKET_NAME = UUID.randomUUID()
-        .toString();
-    static final String DATA = "Hello World";
-    static final String DIR_PATH = "RandomDirectory/Test";
-    static final String KEY = "key";
-    static final String FILE_PATH = "s3://" + BUCKET_NAME + "/" + DIR_PATH + "/" + KEY;
+    @Autowired
+    private AwsFileStorageServiceImpl storageService;
 
     @DynamicPropertySource
     static void overrideProperties(DynamicPropertyRegistry registry) {
-        registry.add(
-            "spring.cloud.aws.region.static",
-            () -> localStack.getRegion());
-        registry.add(
-            "spring.cloud.aws.credentials.access-key",
-            () -> localStack.getAccessKey());
-        registry.add(
-            "spring.cloud.aws.credentials.secret-key",
-            () -> localStack.getSecretKey());
-        registry.add(
-            "spring.cloud.aws.s3.endpoint",
-            () -> localStack.getEndpointOverride(S3)
-                .toString());
-        registry.add(
-            "bytechef.file-storage.aws.bucket",
-            () -> BUCKET_NAME);
+        registry.add("spring.cloud.aws.region.static", localStack::getRegion);
+        registry.add("spring.cloud.aws.credentials.access-key", localStack::getAccessKey);
+        registry.add("spring.cloud.aws.credentials.secret-key", localStack::getSecretKey);
+        registry.add("spring.cloud.aws.s3.endpoint", () -> String.valueOf(localStack.getEndpointOverride(S3)));
+        registry.add("bytechef.file-storage.aws.bucket", () -> BUCKET_NAME);
     }
 
     @BeforeAll
     static void beforeAll() throws IOException, InterruptedException {
         localStack.execInContainer("awslocal", "s3", "mb", "s3://" + BUCKET_NAME);
     }
-
-    @Autowired
-    AwsFileStorageServiceImpl storageService;
 
     @Test
     void canStoreFileContent() {
@@ -133,8 +114,9 @@ class AwsFileStorageIntTest {
 
     @Test
     void canGetFileEntryUrl() {
-        FileEntry msg = storageService.storeFileContent(DIR_PATH, KEY, DATA);
-        URL url = storageService.getFileEntryURL(DIR_PATH, msg);
+        FileEntry fileEntry = storageService.storeFileContent(DIR_PATH, KEY, DATA);
+
+        URL url = storageService.getFileEntryURL(DIR_PATH, fileEntry);
 
         await()
             .pollInterval(Duration.ofSeconds(2))
@@ -148,8 +130,10 @@ class AwsFileStorageIntTest {
 
     @Test
     void canReadFileToBytes() {
-        FileEntry msg = storageService.storeFileContent(DIR_PATH, KEY, DATA);
-        byte[] bytes = storageService.readFileToBytes(DIR_PATH, msg);
+        FileEntry fileEntry = storageService.storeFileContent(DIR_PATH, KEY, DATA);
+
+        byte[] bytes = storageService.readFileToBytes(DIR_PATH, fileEntry);
+
         String result = new String(bytes, StandardCharsets.UTF_8);
 
         await()
@@ -163,8 +147,9 @@ class AwsFileStorageIntTest {
 
     @Test
     void canReadFileToString() {
-        FileEntry msg = storageService.storeFileContent(DIR_PATH, KEY, DATA);
-        String result = storageService.readFileToString(DIR_PATH, msg);
+        FileEntry fileEntry = storageService.storeFileContent(DIR_PATH, KEY, DATA);
+
+        String result = storageService.readFileToString(DIR_PATH, fileEntry);
 
         await()
             .pollInterval(Duration.ofSeconds(2))
@@ -177,8 +162,9 @@ class AwsFileStorageIntTest {
 
     @Test
     void canGetFileStream() {
-        FileEntry msg = storageService.storeFileContent(DIR_PATH, KEY, DATA);
-        InputStream fileStream = storageService.getFileStream(DIR_PATH, msg);
+        FileEntry fileEntry = storageService.storeFileContent(DIR_PATH, KEY, DATA);
+
+        InputStream fileStream = storageService.getFileStream(DIR_PATH, fileEntry);
 
         await()
             .pollInterval(Duration.ofSeconds(2))
@@ -194,6 +180,7 @@ class AwsFileStorageIntTest {
     @Test
     void canGetFileEntry() {
         storageService.storeFileContent(DIR_PATH, KEY, DATA);
+
         FileEntry result = storageService.getFileEntry(DIR_PATH, KEY);
 
         await()
@@ -208,8 +195,8 @@ class AwsFileStorageIntTest {
 
     @Test
     void canGetFileEntries() {
-        FileEntry msg1 = storageService.storeFileContent(DIR_PATH, KEY, DATA);
-        FileEntry msg2 = storageService.storeFileContent(DIR_PATH, "key2", DATA);
+        FileEntry fileEntry1 = storageService.storeFileContent(DIR_PATH, KEY, DATA);
+        FileEntry fileEntry2 = storageService.storeFileContent(DIR_PATH, "key2", DATA);
         Set<FileEntry> fileEntries = storageService.getFileEntries(DIR_PATH);
 
         await()
@@ -217,15 +204,16 @@ class AwsFileStorageIntTest {
             .atMost(Duration.ofSeconds(10))
             .ignoreExceptions()
             .untilAsserted(() -> {
-                assertThat(fileEntries).contains(msg1);
-                assertThat(fileEntries).contains(msg2);
+                assertThat(fileEntries).contains(fileEntry1);
+                assertThat(fileEntries).contains(fileEntry2);
             });
     }
 
     @Test
     void canDeleteFile() {
-        FileEntry msg = storageService.storeFileContent(DIR_PATH, KEY, DATA);
-        storageService.deleteFile(DIR_PATH, msg);
+        FileEntry fileEntry = storageService.storeFileContent(DIR_PATH, KEY, DATA);
+
+        storageService.deleteFile(DIR_PATH, fileEntry);
 
         await()
             .pollInterval(Duration.ofSeconds(2))
@@ -243,9 +231,11 @@ class AwsFileStorageIntTest {
     @EnableConfigurationProperties(ApplicationProperties.class)
     @EnableAutoConfiguration
     static class AwsFileStorageIntTestConfiguration {
+
         @Bean
-        AwsFileStorageServiceImpl
-            awsFileStorageService(S3Template s3Template, ApplicationProperties applicationProperties) {
+        AwsFileStorageServiceImpl awsFileStorageService(
+            S3Template s3Template, ApplicationProperties applicationProperties) {
+
             return new AwsFileStorageServiceImpl(s3Template, applicationProperties.getFileStorage()
                 .getAws()
                 .getBucket());
@@ -265,23 +255,12 @@ class AwsFileStorageIntTest {
 
         @Bean
         AwsCredentialsProvider awsCredentialsProvider() {
-            return new AwsCredentialsProvider() {
-
-                @Override
-                public AwsCredentials resolveCredentials() {
-                    return AwsBasicCredentials.create("noop", "noop");
-                }
-            };
+            return () -> AwsBasicCredentials.create("noop", "noop");
         }
 
         @Bean
         AwsRegionProvider awsRegionProvider() {
-            return new AwsRegionProvider() {
-                @Override
-                public Region getRegion() {
-                    return Region.US_EAST_1;
-                }
-            };
+            return () -> Region.US_EAST_1;
         }
     }
 }

@@ -17,7 +17,7 @@
 package com.bytechef.platform.data.storage.file.storage.config;
 
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.ee.file.storage.aws.api.AwsFileStorageService;
+import com.bytechef.ee.file.storage.aws.AwsFileStorageService;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.data.storage.DataStorage;
