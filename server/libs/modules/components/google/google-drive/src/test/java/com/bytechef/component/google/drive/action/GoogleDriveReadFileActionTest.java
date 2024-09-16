@@ -23,18 +23,21 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.FileEntry;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Mario Cvjetojevic
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 class GoogleDriveReadFileActionTest extends AbstractGoogleDriveActionTest {
 
@@ -42,13 +45,11 @@ class GoogleDriveReadFileActionTest extends AbstractGoogleDriveActionTest {
     private final Drive.Files.List mockedList = mock(Drive.Files.List.class);
     private final FileList mockedFileList = mock(FileList.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(FILE_ID, "fileId"));
     private final ArgumentCaptor<String> qArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void testPerform() throws IOException {
-        when(mockedParameters.getRequiredString(FILE_ID))
-            .thenReturn("fileId");
-
         when(mockedFiles.get(fileIdArgumentCaptor.capture()))
             .thenReturn(mockedGet);
         when(mockedGet.executeMediaAsInputStream())
@@ -61,7 +62,8 @@ class GoogleDriveReadFileActionTest extends AbstractGoogleDriveActionTest {
         when(mockedList.execute())
             .thenReturn(mockedFileList);
         when(mockedFileList.getFiles())
-            .thenReturn(List.of(new File().setId("fileId").setName("fileName")));
+            .thenReturn(List.of(new File().setId("fileId")
+                .setName("fileName")));
 
         when(mockedContext.file(any()))
             .thenReturn(mockedFileEntry);
@@ -70,12 +72,7 @@ class GoogleDriveReadFileActionTest extends AbstractGoogleDriveActionTest {
 
         assertEquals(mockedFileEntry, result);
 
-        String fileId = fileIdArgumentCaptor.getValue();
-
-        assertEquals("fileId", fileId);
-
-        String q = qArgumentCaptor.getValue();
-
-        assertEquals("mimeType != 'application/vnd.google-apps.folder'", q);
+        assertEquals("fileId", fileIdArgumentCaptor.getValue());
+        assertEquals("mimeType != 'application/vnd.google-apps.folder'", qArgumentCaptor.getValue());
     }
 }
