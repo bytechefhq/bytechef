@@ -9,6 +9,7 @@ package com.bytechef.ee.message.broker.aws;
 
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.route.MessageRoute;
+import io.awspring.cloud.sqs.operations.SqsSendOptions;
 import io.awspring.cloud.sqs.operations.SqsTemplate;
 
 /**
@@ -17,6 +18,7 @@ import io.awspring.cloud.sqs.operations.SqsTemplate;
  * @author Ivica Cardic
  */
 public class AwsMessageBroker implements MessageBroker {
+
     private final SqsTemplate sqsTemplate;
 
     public AwsMessageBroker(SqsTemplate sqsTemplate) {
@@ -25,7 +27,10 @@ public class AwsMessageBroker implements MessageBroker {
 
     @Override
     public void send(MessageRoute route, Object message) {
-        sqsTemplate.sendAsync(to -> to.queue(route.getName())
-            .payload(message));
+        sqsTemplate.sendAsync(to -> {
+            SqsSendOptions<Object> queue = to.queue(route.getName());
+
+            queue.payload(message);
+        });
     }
 }

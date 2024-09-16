@@ -58,8 +58,8 @@ class AwsFileStorageIntTest {
     private static final String BUCKET_NAME = String.valueOf(UUID.randomUUID());
     private static final String DATA = "Hello World";
     private static final String DIR_PATH = "RandomDirectory/Test";
-    private static final String KEY = "key";
     private static final String FILE_PATH = "s3://" + BUCKET_NAME + "/" + DIR_PATH + "/" + KEY;
+    private static final String KEY = "key";
 
     @Container
     private static final LocalStackContainer localStack = new LocalStackContainer(
