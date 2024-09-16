@@ -54,6 +54,8 @@ import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Ivica Cardic
@@ -327,7 +329,10 @@ public class DataMapperReplaceValueAction {
                 if (type.equals(String.class)) {
                     String value = inputParameters.getString(VALUE);
 
-                    return value.replace(mappingFrom.toString(), mappingTo.toString());
+                    Pattern pattern = Pattern.compile(mappingFrom.toString());
+                    Matcher matcher = pattern.matcher(value);
+
+                    return matcher.replaceAll(mappingTo.toString());
                 } else {
                     Object from = ConvertUtils.convertValue(mappingFrom, type);
 

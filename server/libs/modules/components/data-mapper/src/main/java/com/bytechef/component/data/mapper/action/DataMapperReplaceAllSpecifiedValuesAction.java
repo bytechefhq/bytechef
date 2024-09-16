@@ -50,6 +50,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Ivica Cardic
@@ -270,9 +272,10 @@ public class DataMapperReplaceAllSpecifiedValuesAction {
                     Object key = entry.getKey();
                     Object value = entry.getValue();
 
-                    String inputValueString = inputValue.toString();
+                    Pattern pattern = Pattern.compile(key.toString());
+                    Matcher matcher = pattern.matcher(inputValue.toString());
 
-                    outputEntry.setValue(inputValueString.replace(key.toString(), value.toString()));
+                    outputEntry.setValue(matcher.replaceAll(value.toString()));
                 }
             }
         } else {
