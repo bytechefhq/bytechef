@@ -19,7 +19,7 @@ package com.bytechef.platform.file.storage.config;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.FileStorage;
 import com.bytechef.config.ApplicationProperties.Workflow.OutputStorage;
-import com.bytechef.ee.file.storage.aws.api.AwsFileStorageService;
+import com.bytechef.ee.file.storage.aws.AwsFileStorageService;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
