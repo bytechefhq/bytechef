@@ -2,6 +2,7 @@ import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middl
 import {Component1Icon} from '@radix-ui/react-icons';
 import {HTMLAttributes, MouseEvent} from 'react';
 import InlineSVG from 'react-inlinesvg';
+import {twMerge} from 'tailwind-merge';
 
 interface DragEventI<T = Element> extends MouseEvent<T, DragEventInit> {
     dataTransfer: DataTransfer;
@@ -10,9 +11,10 @@ interface DragEventI<T = Element> extends MouseEvent<T, DragEventInit> {
 interface WorkflowNodesTabsItemProps extends HTMLAttributes<HTMLLIElement> {
     handleClick?: () => void;
     node: (ComponentDefinitionBasic | TaskDispatcherDefinition) & {taskDispatcher: boolean; trigger: boolean};
+    selected?: boolean;
 }
 
-const WorkflowNodesTabsItem = ({draggable, handleClick, node}: WorkflowNodesTabsItemProps) => {
+const WorkflowNodesTabsItem = ({draggable, handleClick, node, selected}: WorkflowNodesTabsItemProps) => {
     let nodeName = node.name;
 
     if (node.trigger) {
@@ -30,7 +32,10 @@ const WorkflowNodesTabsItem = ({draggable, handleClick, node}: WorkflowNodesTabs
 
     return (
         <li
-            className="flex h-[72px] cursor-pointer items-center rounded-md bg-white p-2 hover:bg-gray-50"
+            className={twMerge(
+                'flex h-16 cursor-pointer items-center border-2 border-transparent rounded-md bg-white px-2 py-1 hover:border-blue-200',
+                selected && 'border-blue-500 hover:bg-white'
+            )}
             draggable={draggable}
             id={node?.title}
             onClick={handleClick}
@@ -50,7 +55,7 @@ const WorkflowNodesTabsItem = ({draggable, handleClick, node}: WorkflowNodesTabs
             <div className="flex flex-col">
                 <p className="text-sm font-medium">{node?.title}</p>
 
-                <p className="line-clamp-2 text-left text-xs text-gray-500">{node?.description}</p>
+                <p className="line-clamp-2 text-left text-xs text-muted-foreground">{node?.description}</p>
             </div>
         </li>
     );

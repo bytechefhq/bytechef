@@ -1,7 +1,7 @@
 import {TaskDispatcherDefinitionApi, Workflow} from '@/shared/middleware/platform/configuration';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
-import {ClickedItemType, NodeType, PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
+import {ClickedDefinitionType, NodeType, PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
 import {getRandomId} from '@/shared/util/random-utils';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {QueryClient} from '@tanstack/react-query';
@@ -14,7 +14,7 @@ import getParametersWithDefaultValues from './getParametersWithDefaultValues';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
 
 interface HandleTaskDispatcherClickProps {
-    clickedItem: ClickedItemType;
+    clickedItem: ClickedDefinitionType;
     currentNode?: NodeType;
     edge?: boolean;
     getNode: (id: string) => Node | undefined;

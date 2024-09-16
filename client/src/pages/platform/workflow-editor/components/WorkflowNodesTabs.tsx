@@ -1,19 +1,19 @@
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
-import {ClickedItemType} from '@/shared/types';
+import {ClickedDefinitionType} from '@/shared/types';
 import {twMerge} from 'tailwind-merge';
 
 import WorkflowNodesTabsItem from './WorkflowNodesTabsItem';
 
 interface WorkflowNodesTabsProps {
     actionComponentDefinitions: Array<ComponentDefinitionBasic>;
-    taskDispatcherDefinitions: Array<TaskDispatcherDefinition>;
     hideActionComponents?: boolean;
-    hideTriggerComponents?: boolean;
     hideTaskDispatchers?: boolean;
+    hideTriggerComponents?: boolean;
     itemsDraggable?: boolean;
-    onItemClick?: (clickedItem: ClickedItemType) => void;
-    popover: boolean;
+    onItemClick?: (clickedItem: ClickedDefinitionType) => void;
+    selectedComponentName?: string;
+    taskDispatcherDefinitions: Array<TaskDispatcherDefinition>;
     triggerComponentDefinitions: Array<ComponentDefinitionBasic>;
 }
 
@@ -24,7 +24,7 @@ const WorkflowNodesTabs = ({
     hideTriggerComponents = false,
     itemsDraggable = false,
     onItemClick,
-    popover,
+    selectedComponentName,
     taskDispatcherDefinitions,
     triggerComponentDefinitions,
 }: WorkflowNodesTabsProps) => (
@@ -53,41 +53,40 @@ const WorkflowNodesTabs = ({
                 )}
             </TabsList>
 
-            <div className="relative mb-4 flex flex-1">
-                <div
-                    className={twMerge('overflow-y-auto flex absolute w-full', popover && 'h-80', !popover && 'h-full')}
-                >
+            <div className="relative flex flex-1">
+                <div className={twMerge('overflow-y-auto flex absolute w-full h-full')}>
                     {!hideTriggerComponents && (
                         <TabsContent className="mt-0 w-full" value="triggers">
                             <ul className="space-y-2" role="list">
-                                {triggerComponentDefinitions.length ? (
-                                    triggerComponentDefinitions.map(
-                                        (componentDefinition: ComponentDefinitionBasic & {trigger?: boolean}) => {
-                                            componentDefinition = {
-                                                ...componentDefinition,
-                                                trigger: true,
-                                            };
-
-                                            return (
-                                                <WorkflowNodesTabsItem
-                                                    draggable={itemsDraggable}
-                                                    handleClick={() => onItemClick && onItemClick(componentDefinition)}
-                                                    key={componentDefinition.name}
-                                                    node={
-                                                        componentDefinition as (
-                                                            | ComponentDefinitionBasic
-                                                            | TaskDispatcherDefinition
-                                                        ) & {taskDispatcher: boolean; trigger: boolean}
-                                                    }
-                                                />
-                                            );
-                                        }
-                                    )
-                                ) : (
+                                {!triggerComponentDefinitions.length && (
                                     <span className="block px-3 py-2 text-xs text-gray-500">
                                         No trigger components found.
                                     </span>
                                 )}
+
+                                {triggerComponentDefinitions?.map((triggerDefinition) => {
+                                    const clickedTriggerDefinition = {
+                                        ...triggerDefinition,
+                                        trigger: true,
+                                    };
+
+                                    return (
+                                        <WorkflowNodesTabsItem
+                                            draggable={itemsDraggable}
+                                            handleClick={() =>
+                                                onItemClick &&
+                                                onItemClick(clickedTriggerDefinition as ClickedDefinitionType)
+                                            }
+                                            key={triggerDefinition.name}
+                                            node={
+                                                triggerDefinition as (
+                                                    | ComponentDefinitionBasic
+                                                    | TaskDispatcherDefinition
+                                                ) & {taskDispatcher: boolean; trigger: boolean}
+                                            }
+                                        />
+                                    );
+                                })}
                             </ul>
                         </TabsContent>
                     )}
@@ -95,25 +94,28 @@ const WorkflowNodesTabs = ({
                     {!hideActionComponents && (
                         <TabsContent className="mt-0 w-full" value="components">
                             <ul className="space-y-2" role="list">
-                                {actionComponentDefinitions.length ? (
-                                    actionComponentDefinitions.map((componentDefinition: ComponentDefinitionBasic) => (
-                                        <WorkflowNodesTabsItem
-                                            draggable={itemsDraggable}
-                                            handleClick={() => onItemClick && onItemClick(componentDefinition)}
-                                            key={componentDefinition.name}
-                                            node={
-                                                componentDefinition as (
-                                                    | ComponentDefinitionBasic
-                                                    | TaskDispatcherDefinition
-                                                ) & {taskDispatcher: boolean; trigger: boolean}
-                                            }
-                                        />
-                                    ))
-                                ) : (
+                                {!actionComponentDefinitions.length && (
                                     <span className="block px-3 py-2 text-xs text-gray-500">
                                         No action components found.
                                     </span>
                                 )}
+
+                                {actionComponentDefinitions?.map((componentDefinition) => (
+                                    <WorkflowNodesTabsItem
+                                        draggable={itemsDraggable}
+                                        handleClick={() =>
+                                            onItemClick && onItemClick(componentDefinition as ClickedDefinitionType)
+                                        }
+                                        key={componentDefinition.name}
+                                        node={
+                                            componentDefinition as (
+                                                | ComponentDefinitionBasic
+                                                | TaskDispatcherDefinition
+                                            ) & {taskDispatcher: boolean; trigger: boolean}
+                                        }
+                                        selected={selectedComponentName === componentDefinition.name}
+                                    />
+                                ))}
                             </ul>
                         </TabsContent>
                     )}
@@ -127,28 +129,25 @@ const WorkflowNodesTabs = ({
                                             taskDispatcherDefinition: TaskDispatcherDefinition & {
                                                 taskDispatcher?: boolean;
                                             }
-                                        ) => {
-                                            taskDispatcherDefinition = {
-                                                ...taskDispatcherDefinition,
-                                                taskDispatcher: true,
-                                            };
-
-                                            return (
-                                                <WorkflowNodesTabsItem
-                                                    draggable={itemsDraggable}
-                                                    handleClick={() =>
-                                                        onItemClick && onItemClick(taskDispatcherDefinition)
-                                                    }
-                                                    key={taskDispatcherDefinition.name}
-                                                    node={
-                                                        taskDispatcherDefinition as (
-                                                            | ComponentDefinitionBasic
-                                                            | TaskDispatcherDefinition
-                                                        ) & {taskDispatcher: boolean; trigger: boolean}
-                                                    }
-                                                />
-                                            );
-                                        }
+                                        ) => (
+                                            <WorkflowNodesTabsItem
+                                                draggable={itemsDraggable}
+                                                handleClick={() =>
+                                                    onItemClick &&
+                                                    onItemClick({
+                                                        ...taskDispatcherDefinition,
+                                                        taskDispatcher: true,
+                                                    } as ClickedDefinitionType)
+                                                }
+                                                key={taskDispatcherDefinition.name}
+                                                node={
+                                                    taskDispatcherDefinition as (
+                                                        | ComponentDefinitionBasic
+                                                        | TaskDispatcherDefinition
+                                                    ) & {taskDispatcher: boolean; trigger: boolean}
+                                                }
+                                            />
+                                        )
                                     )
                                 ) : (
                                     <span className="block px-3 py-2 text-xs text-gray-500">

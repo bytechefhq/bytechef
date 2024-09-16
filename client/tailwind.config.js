@@ -106,7 +106,8 @@ module.exports = {
                 '3xl': '1792px',
             },
             width: {
-                'workflow-nodes-popover-menu-width': '500px',
+                'workflow-nodes-popover-menu-width': '600px',
+                'workflow-nodes-popover-menu-width-half': '300px',
             },
         },
     },
