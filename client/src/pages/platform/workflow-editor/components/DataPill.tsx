@@ -34,7 +34,7 @@ const DataPill = ({
         property.name = '[index]';
     }
 
-    const addDataPillToInput = (
+    const handleDataPillClick = (
         workflowNodeName: string,
         propertyName?: string,
         parentPropertyName?: string,
@@ -49,7 +49,7 @@ const DataPill = ({
             : `${propertyName || workflowNodeName}`;
 
         const value = propertyName
-            ? `${workflowNodeName}.${(path || dataPillName).replaceAll('/', '.')}`
+            ? `${workflowNodeName}.${(path || dataPillName).replaceAll('/', '.').replaceAll('.[index]', '[index]')}`
             : workflowNodeName;
 
         mentionInput.insertItem(
@@ -76,7 +76,7 @@ const DataPill = ({
                         !mentionInput && 'cursor-not-allowed'
                     )}
                     draggable
-                    onClick={() => addDataPillToInput(workflowNodeName)}
+                    onClick={() => handleDataPillClick(workflowNodeName)}
                 >
                     <span className="mr-2" title={property?.type}>
                         {TYPE_ICONS[property?.type as keyof typeof TYPE_ICONS]}
@@ -108,7 +108,7 @@ const DataPill = ({
                 data-name={property?.name || workflowNodeName}
                 draggable
                 onClick={() =>
-                    addDataPillToInput(workflowNodeName, property?.name || '[index]', parentProperty?.name, path)
+                    handleDataPillClick(workflowNodeName, property?.name || '[index]', parentProperty?.name, path)
                 }
                 onDragStart={(event) => event.dataTransfer.setData('name', property?.name || workflowNodeName)}
             >
