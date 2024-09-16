@@ -54,7 +54,6 @@ const WorkflowNodesPopoverMenu = ({
 
     const handleComponentClick = async (clickedItem: ClickedDefinitionType) => {
         if (clickedItem.taskDispatcher) {
-            console.log('clickedItem', clickedItem);
             await handleTaskDispatcherClick({
                 clickedItem,
                 currentNode,
