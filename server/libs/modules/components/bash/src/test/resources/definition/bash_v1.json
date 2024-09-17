@@ -89,9 +89,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Execute",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
   "dataStream" : null,
   "triggers" : null

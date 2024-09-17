@@ -1246,6 +1246,6 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
-  "triggers" : [ ]
+  "triggers" : [ ],
+  "dataStream" : null
 }

@@ -1649,6 +1649,7 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "triggers" : null,
   "dataStream" : {
     "reader" : null,
     "writer" : {
@@ -1656,6 +1657,5 @@
       "streamTypes" : null,
       "dataStreamItemWriter" : { }
     }
-  },
-  "triggers" : null
+  }
 }

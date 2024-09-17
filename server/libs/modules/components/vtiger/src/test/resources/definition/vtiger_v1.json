@@ -83,8 +83,8 @@
       "title" : "Basic Auth",
       "type" : "BASIC_AUTH",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
       "refreshToken" : null,
@@ -420,8 +420,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create a contact",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
     "perform" : { }
   }, {
     "batch" : null,
@@ -809,8 +809,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create a Product",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
     "perform" : { }
   }, {
     "batch" : null,
@@ -1590,8 +1590,8 @@
     },
     "properties" : null,
     "title" : "Get Me",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
     "perform" : { }
   } ],
   "dataStream" : null,

@@ -93,8 +93,8 @@
       "refreshUrl" : null,
       "scopes" : null,
       "tokenUrl" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -3449,7 +3449,6 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -5580,5 +5579,6 @@
     "webhookValidateOnEnable" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
-  } ]
+  } ],
+  "dataStream" : null
 }

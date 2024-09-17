@@ -43,15 +43,15 @@
       "title" : "Bearer Token",
       "type" : "BEARER_TOKEN",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "apply" : null,
+      "clientId" : null,
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
       "tokenUrl" : null,
-      "apply" : null,
-      "clientId" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
       "refreshToken" : null
@@ -658,17 +658,6 @@
     "workflowNodeDescription" : null,
     "perform" : null
   } ],
-  "dataStream" : {
-    "reader" : {
-      "properties" : null,
-      "dataStreamItemReader" : { }
-    },
-    "writer" : {
-      "properties" : null,
-      "streamTypes" : null,
-      "dataStreamItemWriter" : { }
-    }
-  },
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -752,10 +741,10 @@
     "type" : "POLLING",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null,
     "deduplicate" : null,
     "poll" : { },
     "webhookDisable" : null,
@@ -764,5 +753,16 @@
     "listenerEnable" : null,
     "dwebhookRequest" : null,
     "webhookValidate" : null
-  } ]
+  } ],
+  "dataStream" : {
+    "reader" : {
+      "properties" : null,
+      "dataStreamItemReader" : { }
+    },
+    "writer" : {
+      "properties" : null,
+      "streamTypes" : null,
+      "dataStreamItemWriter" : { }
+    }
+  }
 }

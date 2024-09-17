@@ -721,7 +721,6 @@
     "workflowNodeDescription" : null,
     "perform" : { }
   } ],
-  "triggers" : null,
   "dataStream" : {
     "reader" : {
       "properties" : null,
@@ -732,5 +731,6 @@
       "streamTypes" : null,
       "dataStreamItemWriter" : { }
     }
-  }
+  },
+  "triggers" : null
 }
