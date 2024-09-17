@@ -31,7 +31,6 @@ public class ConditionTaskDispatcherConstants {
     public static final String VALUE_2 = "value2";
     public static final String DATE_TIME = "dateTime";
     public static final String STRING = "string";
-    public static final String COMBINE_OPERATION = "combineOperation";
     public static final String NUMBER = "number";
     public static final String CASE_TRUE = "caseTrue";
     public static final String CASE_FALSE = "caseFalse";
@@ -51,10 +50,5 @@ public class ConditionTaskDispatcherConstants {
         ENDS_WITH,
         REGEX,
         EMPTY,
-    }
-
-    public enum CombineOperation {
-        ALL,
-        ANY,
     }
 }

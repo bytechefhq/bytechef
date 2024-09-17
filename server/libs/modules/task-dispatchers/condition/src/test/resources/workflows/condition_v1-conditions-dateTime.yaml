@@ -12,11 +12,10 @@ tasks:
   type: "condition/v1"
   parameters:
     conditions:
-    - dateTime:
-        value1: "${value1}"
-        operation: "AFTER"
-        value2: "${value2}"
-    combineOperation: "ANY"
+    - - dateTime:
+          value1: "${value1}"
+          operation: "AFTER"
+          value2: "${value2}"
     caseTrue:
     - name: "afterResult"
       type: "var"
@@ -31,11 +30,10 @@ tasks:
   type: "condition/v1"
   parameters:
     conditions:
-    - dateTime:
-        value1: "${value1}"
-        operation: "BEFORE"
-        value2: "${value2}"
-    combineOperation: "ANY"
+    - - dateTime:
+          value1: "${value1}"
+          operation: "BEFORE"
+          value2: "${value2}"
     caseTrue:
     - name: "beforeResult"
       type: "var"
