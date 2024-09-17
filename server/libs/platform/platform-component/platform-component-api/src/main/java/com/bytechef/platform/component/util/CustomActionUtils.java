@@ -117,7 +117,7 @@ public class CustomActionUtils {
                     .label("Body Content Type")
                     .description("Content-Type to use when sending body parameters.")
                     .displayCondition(
-                        "['%s','%s','%s'].includes('%s')".formatted(
+                        "{'%s','%s','%s'}.contains(%s)".formatted(
                             Http.RequestMethod.PATCH.name(), Http.RequestMethod.POST.name(),
                             Http.RequestMethod.PUT.name(), METHOD))
                     .options(
