@@ -1,24 +1,38 @@
-import {PropertyAllType} from '@/shared/types';
+import {DataPillType, PropertyAllType} from '@/shared/types';
 
 export default function getSubProperties(
     componentIcon: string,
     nodeName: string,
-    properties: Array<PropertyAllType>,
-    propertyName?: string
+    subProperties: Array<PropertyAllType>,
+    value: string
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): any {
-    return properties.map((subProperty) => {
-        if (subProperty.properties?.length) {
-            return getSubProperties(componentIcon, nodeName, subProperty.properties, propertyName);
-        } else if (subProperty.items?.length) {
-            return getSubProperties(componentIcon, nodeName, subProperty.items, propertyName);
-        }
+): Array<DataPillType> | any {
+    const parentProperty = {
+        componentIcon,
+        id: value,
+        nodeName,
+        value,
+    };
 
-        return {
-            componentIcon,
-            id: subProperty.name,
-            nodeName,
-            value: propertyName ? `${nodeName}.${propertyName}.${subProperty.name}` : `${nodeName}.${subProperty.name}`,
-        };
-    });
+    return [
+        parentProperty,
+        subProperties.map((subProperty) => {
+            const {items, name, properties} = subProperty;
+
+            const nestedSubProperties = properties?.length ? properties : items;
+
+            const subValue = name ? `${value}.${name}` : `${value}[index]`;
+
+            if (nestedSubProperties?.length) {
+                return getSubProperties(componentIcon, nodeName, nestedSubProperties, subValue);
+            }
+
+            return {
+                componentIcon,
+                id: name,
+                nodeName,
+                value: subValue,
+            } as DataPillType;
+        }),
+    ];
 }

@@ -39,18 +39,22 @@ export default function getDataPillsFromProperties(
             value: nodeName,
         });
 
-        const formattedProperties: DataPillType[] = existingProperties.map((property) => {
-            if (property.properties) {
-                return getSubProperties(componentDefinition.icon!, nodeName, property.properties, property.name);
-            } else if (property.items) {
-                return getSubProperties(componentDefinition.icon!, nodeName, property.items, property.name);
+        const formattedProperties: Array<DataPillType> = existingProperties.map((property) => {
+            const {items, name, properties} = property;
+
+            const subProperties = properties?.length ? properties : items;
+
+            const value = `${nodeName}.${name}`;
+
+            if (subProperties?.length) {
+                return getSubProperties(componentDefinition.icon!, nodeName, subProperties, value);
             }
 
             return {
                 componentIcon: componentDefinition.icon,
-                id: property.name,
+                id: name,
                 nodeName,
-                value: `${nodeName}.${property.name}`,
+                value,
             };
         });
 
