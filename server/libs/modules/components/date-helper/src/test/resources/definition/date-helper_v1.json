@@ -5,7 +5,7 @@
   } ],
   "customAction" : null,
   "customActionHelp" : null,
-  "description" : "Helper component for converting technical date values to human friendly formatted expressions.",
+  "description" : "Helper component for date and time manipulation.",
   "icon" : "path:assets/date-helper.svg",
   "tags" : null,
   "metadata" : null,
@@ -13,7 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Date Helper",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -90,8 +89,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Formatting that should be applied the text representation of date.",
@@ -102,7 +101,7 @@
       "required" : true,
       "name" : "dateFormat",
       "type" : "STRING",
-      "defaultValue" : "ISO8601DATETIME",
+      "defaultValue" : "yyyy-MM-dd'T'HH:mm:ss.SSSZ",
       "exampleValue" : null,
       "label" : "Date Format",
       "placeholder" : null,
@@ -113,11 +112,11 @@
       "options" : [ {
         "description" : "Get date in yyyy-MM-ddTHH:mm:ssZ",
         "label" : "ISO8601 Date Time",
-        "value" : "ISO8601DATETIME"
+        "value" : "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
       }, {
         "description" : "Get date in yyyy-MM-dd",
         "label" : "ISO8601 Date",
-        "value" : "ISO8601DATE"
+        "value" : "yyyy-MM-dd"
       } ],
       "optionsDataSource" : null
     } ],
@@ -126,6 +125,7 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "dataStream" : null,
   "triggers" : null,
-  "dataStream" : null
+  "connection" : null
 }
