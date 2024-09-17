@@ -16,9 +16,9 @@
 
 package com.bytechef.component.date.helper.action;
 
+import static com.bytechef.component.date.helper.action.DateHelperConvertAction.ISO8601_DATE_FORMAT;
+import static com.bytechef.component.date.helper.action.DateHelperConvertAction.ISO8601_DATE_TIME_FORMAT;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_FORMAT;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_FORMAT_OPTION_ISO8601_DATE_TIME_VALUE;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_FORMAT_OPTION_ISO8601_DATE_VALUE;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_TIMESTAMP;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -40,25 +40,25 @@ class DateHelperConvertActionTest {
     @Disabled
     @Test
     void testActionPerform() {
-        mockParameters(1716572102L, DATE_FORMAT_OPTION_ISO8601_DATE_VALUE);
+        mockParameters(1716572102L, ISO8601_DATE_FORMAT);
 
         assertEquals(
             "2024-05-24",
             DateHelperConvertAction.perform(mockedParameters, mockedParameters, mockedContext));
 
-        mockParameters(1716572102000L, DATE_FORMAT_OPTION_ISO8601_DATE_VALUE);
+        mockParameters(1716572102000L, ISO8601_DATE_FORMAT);
 
         assertEquals(
             "2024-05-24",
             DateHelperConvertAction.perform(mockedParameters, mockedParameters, mockedContext));
 
-        mockParameters(1716572102L, DATE_FORMAT_OPTION_ISO8601_DATE_TIME_VALUE);
+        mockParameters(1716572102L, ISO8601_DATE_TIME_FORMAT);
 
         assertEquals(
             "2024-05-24T19:35:02.000+0200",
             DateHelperConvertAction.perform(mockedParameters, mockedParameters, mockedContext));
 
-        mockParameters(1716572102977L, DATE_FORMAT_OPTION_ISO8601_DATE_TIME_VALUE);
+        mockParameters(1716572102977L, ISO8601_DATE_TIME_FORMAT);
 
         assertEquals(
             "2024-05-24T19:35:02.977+0200",
