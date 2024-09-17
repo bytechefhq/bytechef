@@ -1,0 +1,84 @@
+---
+label: "If Task String Operands"
+inputs:
+- name: "value1"
+  type: "string"
+  required: true
+- name: "value2"
+  type: "string"
+  required: true
+tasks:
+- name: "condition_1"
+  type: "condition/v1"
+  parameters:
+    conditions:
+    - - string:
+          value1: "${value1}"
+          operation: "EQUALS"
+          value2: "${value2}"
+    - - string:
+          value1: "aaa"
+          operation: "EQUALS"
+          value2: "aaa"
+    caseTrue:
+    - name: "equalsResult"
+      type: "var"
+      parameters:
+        value: "true branch"
+    caseFalse:
+    - name: "equalsResult"
+      type: "var"
+      parameters:
+        value: "false branch"
+- name: "condition_2"
+  type: "condition/v1"
+  parameters:
+    conditions:
+    - - string:
+          value1: "${value1}"
+          operation: "EQUALS"
+          value2: "${value2}"
+      - string:
+          value1: "aaa"
+          operation: "EQUALS"
+          value2: "bbb"
+    - - string:
+          value1: "aaa"
+          operation: "EQUALS"
+          value2: "aaa"
+    caseTrue:
+    - name: "equalsResult"
+      type: "var"
+      parameters:
+        value: "true branch"
+    caseFalse:
+    - name: "equalsResult"
+      type: "var"
+      parameters:
+        value: "false branch"
+- name: "condition_3"
+  type: "condition/v1"
+  parameters:
+    conditions:
+    - - string:
+          value1: "${value1}"
+          operation: "EQUALS"
+          value2: "${value2}"
+      - string:
+          value1: "aaa"
+          operation: "EQUALS"
+          value2: "bbb"
+    - - string:
+          value1: "aaa"
+          operation: "EQUALS"
+          value2: "ccc"
+    caseTrue:
+    - name: "notEqualsResult"
+      type: "var"
+      parameters:
+        value: "true branch"
+    caseFalse:
+    - name: "notEqualsResult"
+      type: "var"
+      parameters:
+        value: "false branch"

@@ -16,7 +16,6 @@
 
 package com.bytechef.task.dispatcher.condition.util;
 
-import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.COMBINE_OPERATION;
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.EXPRESSION;
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.RAW_EXPRESSION;
 
@@ -47,14 +46,18 @@ public class ConditionTaskUtils {
                 .parseExpression(MapUtils.getString(conditionTaskExecution.getParameters(), EXPRESSION))
                 .getValue(Boolean.class);
         } else {
-            List<Map<String, Map<String, ?>>> conditions = MapUtils.getList(
+            List<List<Map<String, Map<String, ?>>>> conditions = MapUtils.getList(
                 conditionTaskExecution.getParameters(), ConditionTaskDispatcherConstants.CONDITIONS,
                 new TypeReference<>() {}, Collections.emptyList());
-            String combineOperation = MapUtils.getRequiredString(
-                conditionTaskExecution.getParameters(), COMBINE_OPERATION);
+
+            List<String> conditionExpressions = new ArrayList<>();
+
+            for (List<Map<String, Map<String, ?>>> andConditions : conditions) {
+                conditionExpressions.add(String.join(" && ", getConditionExpressions(andConditions)));
+            }
 
             result = expressionParser
-                .parseExpression(String.join(getBooleanOperator(combineOperation), getConditionExpressions(conditions)))
+                .parseExpression(String.join(" || ", conditionExpressions))
                 .getValue(Boolean.class);
         }
 
@@ -84,16 +87,6 @@ public class ConditionTaskUtils {
         }
 
         return conditionExpressions;
-    }
-
-    private static String getBooleanOperator(String combineOperation) {
-        if (combineOperation.equalsIgnoreCase(ConditionTaskDispatcherConstants.CombineOperation.ANY.name())) {
-            return "||";
-        } else if (combineOperation.equalsIgnoreCase(ConditionTaskDispatcherConstants.CombineOperation.ALL.name())) {
-            return "&&";
-        }
-
-        throw new IllegalArgumentException("Invalid combine operation: " + combineOperation);
     }
 
     private static final Map<String, Map<String, String>> conditionTemplates = new HashMap<>();

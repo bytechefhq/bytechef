@@ -30,7 +30,447 @@
     "controlType" : "SELECT"
   }, {
     "advancedOption" : null,
-    "displayCondition" : "rawExpression == true",
+    "displayCondition" : "rawExpression == false",
+    "expressionEnabled" : null,
+    "hidden" : null,
+    "metadata" : { },
+    "required" : null,
+    "name" : "conditions",
+    "type" : "ARRAY",
+    "defaultValue" : null,
+    "description" : "The type of values to compare.",
+    "exampleValue" : null,
+    "label" : "Conditions",
+    "placeholder" : "Or Condition",
+    "items" : [ {
+      "advancedOption" : null,
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : null,
+      "type" : "ARRAY",
+      "defaultValue" : null,
+      "description" : null,
+      "exampleValue" : null,
+      "label" : null,
+      "placeholder" : null,
+      "items" : [ {
+        "advancedOption" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : "boolean",
+        "type" : "OBJECT",
+        "defaultValue" : null,
+        "description" : null,
+        "exampleValue" : null,
+        "label" : "Boolean",
+        "placeholder" : null,
+        "options" : null,
+        "additionalProperties" : null,
+        "multipleValues" : null,
+        "properties" : [ {
+          "advancedOption" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : "value1",
+          "type" : "BOOLEAN",
+          "defaultValue" : false,
+          "description" : "The boolean value to compare with the second one.",
+          "exampleValue" : null,
+          "label" : "Value 1",
+          "placeholder" : null,
+          "options" : [ {
+            "description" : null,
+            "label" : "True",
+            "value" : true
+          }, {
+            "description" : null,
+            "label" : "False",
+            "value" : true
+          } ],
+          "controlType" : "SELECT"
+        }, {
+          "advancedOption" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : "operation",
+          "type" : "STRING",
+          "defaultValue" : "EQUALS",
+          "description" : "Compare operation to decide where to map data.",
+          "exampleValue" : null,
+          "label" : "Operation",
+          "placeholder" : null,
+          "options" : [ {
+            "description" : null,
+            "label" : "Equals",
+            "value" : "EQUALS"
+          }, {
+            "description" : null,
+            "label" : "Not Equals",
+            "value" : "NOT_EQUALS"
+          } ],
+          "controlType" : "SELECT",
+          "maxLength" : null,
+          "minLength" : null
+        }, {
+          "advancedOption" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : "value2",
+          "type" : "BOOLEAN",
+          "defaultValue" : false,
+          "description" : "The boolean value to compare with the first one.",
+          "exampleValue" : null,
+          "label" : "Value 2",
+          "placeholder" : null,
+          "options" : [ {
+            "description" : null,
+            "label" : "True",
+            "value" : true
+          }, {
+            "description" : null,
+            "label" : "False",
+            "value" : true
+          } ],
+          "controlType" : "SELECT"
+        } ],
+        "controlType" : "SELECT"
+      }, {
+        "advancedOption" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : "dateTime",
+        "type" : "OBJECT",
+        "defaultValue" : null,
+        "description" : null,
+        "exampleValue" : null,
+        "label" : "Date & Time",
+        "placeholder" : null,
+        "options" : null,
+        "additionalProperties" : null,
+        "multipleValues" : null,
+        "properties" : [ {
+          "advancedOption" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : "value1",
+          "type" : "DATE_TIME",
+          "defaultValue" : null,
+          "description" : "The date & time value to compare with the second one.",
+          "exampleValue" : null,
+          "label" : "Value 1",
+          "placeholder" : null,
+          "options" : null,
+          "controlType" : "DATE_TIME"
+        }, {
+          "advancedOption" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : "operation",
+          "type" : "STRING",
+          "defaultValue" : "AFTER",
+          "description" : "Compare operation to decide where to map data.",
+          "exampleValue" : null,
+          "label" : "Operation",
+          "placeholder" : null,
+          "options" : [ {
+            "description" : null,
+            "label" : "After",
+            "value" : "AFTER"
+          }, {
+            "description" : null,
+            "label" : "Before",
+            "value" : "BEFORE"
+          } ],
+          "controlType" : "SELECT",
+          "maxLength" : null,
+          "minLength" : null
+        }, {
+          "advancedOption" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : "value2",
+          "type" : "DATE_TIME",
+          "defaultValue" : null,
+          "description" : "The date & time value to compare with the first one.",
+          "exampleValue" : null,
+          "label" : "Value 2",
+          "placeholder" : null,
+          "options" : null,
+          "controlType" : "DATE_TIME"
+        } ],
+        "controlType" : "SELECT"
+      }, {
+        "advancedOption" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : "number",
+        "type" : "OBJECT",
+        "defaultValue" : null,
+        "description" : null,
+        "exampleValue" : null,
+        "label" : "Number",
+        "placeholder" : null,
+        "options" : null,
+        "additionalProperties" : null,
+        "multipleValues" : null,
+        "properties" : [ {
+          "advancedOption" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : "value1",
+          "type" : "NUMBER",
+          "defaultValue" : 0.0,
+          "description" : "The number value to compare with the second one.",
+          "exampleValue" : null,
+          "label" : "Value 1",
+          "placeholder" : null,
+          "options" : null,
+          "maxNumberPrecision" : null,
+          "maxValue" : null,
+          "minNumberPrecision" : null,
+          "minValue" : null,
+          "numberPrecision" : null,
+          "controlType" : "NUMBER"
+        }, {
+          "advancedOption" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : "operation",
+          "type" : "STRING",
+          "defaultValue" : "LESS",
+          "description" : "Compare operation to decide where to map data.",
+          "exampleValue" : null,
+          "label" : "Operation",
+          "placeholder" : null,
+          "options" : [ {
+            "description" : null,
+            "label" : "Less",
+            "value" : "LESS"
+          }, {
+            "description" : null,
+            "label" : "Less or Equals",
+            "value" : "LESS_EQUALS"
+          }, {
+            "description" : null,
+            "label" : "Equals",
+            "value" : "EQUALS"
+          }, {
+            "description" : null,
+            "label" : "Not Equals",
+            "value" : "NOT_EQUALS"
+          }, {
+            "description" : null,
+            "label" : "Greater",
+            "value" : "GREATER"
+          }, {
+            "description" : null,
+            "label" : "Greater or Equals",
+            "value" : "GREATER_EQUALS"
+          }, {
+            "description" : null,
+            "label" : "Empty",
+            "value" : "EMPTY"
+          } ],
+          "controlType" : "SELECT",
+          "maxLength" : null,
+          "minLength" : null
+        }, {
+          "advancedOption" : null,
+          "displayCondition" : "operation != 'EMPTY'",
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : "value2",
+          "type" : "NUMBER",
+          "defaultValue" : 0.0,
+          "description" : "The number value to compare with the first one.",
+          "exampleValue" : null,
+          "label" : "Value 2",
+          "placeholder" : null,
+          "options" : null,
+          "maxNumberPrecision" : null,
+          "maxValue" : null,
+          "minNumberPrecision" : null,
+          "minValue" : null,
+          "numberPrecision" : null,
+          "controlType" : "NUMBER"
+        } ],
+        "controlType" : "SELECT"
+      }, {
+        "advancedOption" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : "string",
+        "type" : "OBJECT",
+        "defaultValue" : null,
+        "description" : null,
+        "exampleValue" : null,
+        "label" : "String",
+        "placeholder" : "And conditions",
+        "options" : null,
+        "additionalProperties" : null,
+        "multipleValues" : null,
+        "properties" : [ {
+          "advancedOption" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : "value1",
+          "type" : "STRING",
+          "defaultValue" : "",
+          "description" : "The string value to compare with the second one.",
+          "exampleValue" : null,
+          "label" : "Value 1",
+          "placeholder" : null,
+          "options" : null,
+          "controlType" : "TEXT",
+          "maxLength" : null,
+          "minLength" : null
+        }, {
+          "advancedOption" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : "operation",
+          "type" : "STRING",
+          "defaultValue" : "EQUALS",
+          "description" : "Compare operation to decide where to map data.",
+          "exampleValue" : null,
+          "label" : "Operation",
+          "placeholder" : null,
+          "options" : [ {
+            "description" : null,
+            "label" : "Equals",
+            "value" : "EQUALS"
+          }, {
+            "description" : null,
+            "label" : "Not Equals",
+            "value" : "NOT_EQUALS"
+          }, {
+            "description" : null,
+            "label" : "Contains",
+            "value" : "CONTAINS"
+          }, {
+            "description" : null,
+            "label" : "Not Contains",
+            "value" : "NOT_CONTAINS"
+          }, {
+            "description" : null,
+            "label" : "Starts With",
+            "value" : "STARTS_WITH"
+          }, {
+            "description" : null,
+            "label" : "Ends With",
+            "value" : "ENDS_WITH"
+          }, {
+            "description" : null,
+            "label" : "Regex",
+            "value" : "REGEX"
+          }, {
+            "description" : null,
+            "label" : "Empty",
+            "value" : "EMPTY"
+          } ],
+          "controlType" : "SELECT",
+          "maxLength" : null,
+          "minLength" : null
+        }, {
+          "advancedOption" : null,
+          "displayCondition" : "!{'EMPTY','REGEX'}.contains('operation')",
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : "value2",
+          "type" : "STRING",
+          "defaultValue" : "",
+          "description" : "The string value to compare with the first one.",
+          "exampleValue" : null,
+          "label" : "Value 2",
+          "placeholder" : null,
+          "options" : null,
+          "controlType" : "TEXT",
+          "maxLength" : null,
+          "minLength" : null
+        }, {
+          "advancedOption" : null,
+          "displayCondition" : "operation == 'REGEX'",
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : "value2",
+          "type" : "STRING",
+          "defaultValue" : "",
+          "description" : "The regex value to compare with the first one.",
+          "exampleValue" : null,
+          "label" : "Regex",
+          "placeholder" : "/text/i",
+          "options" : null,
+          "controlType" : "TEXT",
+          "maxLength" : null,
+          "minLength" : null
+        } ],
+        "controlType" : "SELECT"
+      } ],
+      "maxItems" : null,
+      "minItems" : null,
+      "multipleValues" : null,
+      "options" : null,
+      "controlType" : "MULTI_SELECT"
+    } ],
+    "maxItems" : null,
+    "minItems" : null,
+    "multipleValues" : null,
+    "options" : null,
+    "controlType" : "MULTI_SELECT"
+  }, {
+    "advancedOption" : null,
+    "displayCondition" : "rawExpression == false",
     "expressionEnabled" : null,
     "hidden" : null,
     "metadata" : { },
@@ -448,32 +888,6 @@
     "multipleValues" : null,
     "options" : null,
     "controlType" : "MULTI_SELECT"
-  }, {
-    "advancedOption" : null,
-    "displayCondition" : "rawExpression == false",
-    "expressionEnabled" : null,
-    "hidden" : null,
-    "metadata" : { },
-    "required" : null,
-    "name" : "combineOperation",
-    "type" : "STRING",
-    "defaultValue" : "ALL",
-    "description" : "If multiple conditions are set, this setting decides if it is true as soon as ANY condition\n matches or only if ALL are met.\n",
-    "exampleValue" : null,
-    "label" : "Combine",
-    "placeholder" : null,
-    "options" : [ {
-      "description" : "Only if all conditions are met, the workflow goes into \"true\" branch.",
-      "label" : "All",
-      "value" : "ALL"
-    }, {
-      "description" : "If any condition is met, the workflow goes into \"true\" branch.",
-      "label" : "Any",
-      "value" : "ANY"
-    } ],
-    "controlType" : "SELECT",
-    "maxLength" : null,
-    "minLength" : null
   }, {
     "advancedOption" : null,
     "displayCondition" : null,

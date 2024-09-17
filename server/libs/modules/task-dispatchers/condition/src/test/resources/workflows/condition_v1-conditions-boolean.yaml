@@ -12,11 +12,10 @@ tasks:
   type: "condition/v1"
   parameters:
     conditions:
-    - number:
-        value1: "${value1}"
-        operation: "EQUALS"
-        value2: "${value2}"
-    combineOperation: "ANY"
+    - - number:
+          value1: "${value1}"
+          operation: "EQUALS"
+          value2: "${value2}"
     caseTrue:
     - name: "equalsResult"
       type: "var"
@@ -31,11 +30,10 @@ tasks:
   type: "condition/v1"
   parameters:
     conditions:
-    - number:
-        value1: "${value1}"
-        operation: "NOT_EQUALS"
-        value2: "${value2}"
-    combineOperation: "ANY"
+    - - number:
+          value1: "${value1}"
+          operation: "NOT_EQUALS"
+          value2: "${value2}"
     caseTrue:
     - name: "notEqualsResult"
       type: "var"

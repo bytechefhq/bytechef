@@ -101,6 +101,21 @@ public class ConditionTaskDispatcherIntTest {
     }
 
     @Test
+    public void testDispatchMultipleConditions() {
+        taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString(
+                "condition_v1-conditions-multiple-conditions".getBytes(StandardCharsets.UTF_8)),
+            Map.of("value1", "Hello World", "value2", "Hello"),
+            this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories,
+            this::getTaskHandlerMap);
+
+        Assertions.assertEquals("true branch", testVarTaskHandler.get("equalsResult"));
+        Assertions.assertEquals("true branch", testVarTaskHandler.get("equalsResult"));
+        Assertions.assertEquals("false branch", testVarTaskHandler.get("notEqualsResult"));
+    }
+
+    @Test
     public void testDispatchNumber() {
         taskDispatcherJobTestExecutor.execute(
             EncodingUtils.base64EncodeToString("condition_v1-conditions-number".getBytes(StandardCharsets.UTF_8)),

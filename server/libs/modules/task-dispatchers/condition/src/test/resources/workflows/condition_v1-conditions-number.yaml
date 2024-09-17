@@ -12,11 +12,10 @@ tasks:
   type: "condition/v1"
   parameters:
     conditions:
-    - number:
-        value1: "${value1}"
-        operation: "EQUALS"
-        value2: "${value2}"
-    combineOperation: "any"
+    - - number:
+          value1: "${value1}"
+          operation: "EQUALS"
+          value2: "${value2}"
     caseTrue:
     - name: "equalsResult"
       type: "var"
@@ -31,11 +30,10 @@ tasks:
   type: "condition/v1"
   parameters:
     conditions:
-    - number:
-        value1: "${value1}"
-        operation: "NOT_EQUALS"
-        value2: "${value2}"
-    combineOperation: "any"
+    - - number:
+          value1: "${value1}"
+          operation: "NOT_EQUALS"
+          value2: "${value2}"
     caseTrue:
     - name: "notEqualsResult"
       type: "var"
@@ -50,11 +48,10 @@ tasks:
   type: "condition/v1"
   parameters:
     conditions:
-    - number:
-        value1: "${value1}"
-        operation: "GREATER"
-        value2: "${value2}"
-    combineOperation: "any"
+    - - number:
+          value1: "${value1}"
+          operation: "GREATER"
+          value2: "${value2}"
     caseTrue:
     - name: "greaterResult"
       type: "var"
@@ -69,11 +66,10 @@ tasks:
   type: "condition/v1"
   parameters:
     conditions:
-    - number:
-        value1: "${value1}"
-        operation: "LESS"
-        value2: "${value2}"
-    combineOperation: "any"
+    - - number:
+          value1: "${value1}"
+          operation: "LESS"
+          value2: "${value2}"
     caseTrue:
     - name: "lessResult"
       type: "var"
@@ -88,11 +84,10 @@ tasks:
   type: "condition/v1"
   parameters:
     conditions:
-    - number:
-        value1: "${value1}"
-        operation: "GREATER_EQUALS"
-        value2: "${value2}"
-    combineOperation: "ANY"
+    - - number:
+          value1: "${value1}"
+          operation: "GREATER_EQUALS"
+          value2: "${value2}"
     caseTrue:
     - name: "greaterEqualsResult"
       type: "var"
@@ -107,11 +102,10 @@ tasks:
   type: "condition/v1"
   parameters:
     conditions:
-    - number:
-        value1: "${value1}"
-        operation: "LESS_EQUALS"
-        value2: "${value2}"
-    combineOperation: "ANY"
+    - - number:
+          value1: "${value1}"
+          operation: "LESS_EQUALS"
+          value2: "${value2}"
     caseTrue:
     - name: "lessEqualsResult"
       type: "var"
