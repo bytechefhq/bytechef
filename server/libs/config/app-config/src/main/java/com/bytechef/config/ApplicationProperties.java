@@ -43,6 +43,7 @@ public class ApplicationProperties {
     private Edition edition;
     private Email email;
     private Encryption encryption;
+    private List<String> featureFlags;
     private FileStorage fileStorage;
     private Mail mail;
     private MessageBroker messageBroker;
@@ -93,6 +94,10 @@ public class ApplicationProperties {
 
     public Encryption getEncryption() {
         return encryption;
+    }
+
+    public List<String> getFeatureFlags() {
+        return featureFlags;
     }
 
     public FileStorage getFileStorage() {
@@ -177,6 +182,10 @@ public class ApplicationProperties {
 
     public void setEncryption(Encryption encryption) {
         this.encryption = encryption;
+    }
+
+    public void setFeatureFlags(List<String> featureFlags) {
+        this.featureFlags = featureFlags;
     }
 
     public void setFileStorage(FileStorage fileStorage) {
