@@ -145,9 +145,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Extract Content from HTML",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -211,10 +211,10 @@
       "optionsDataSource" : null
     } ],
     "title" : "Base64 Decode",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
-  "triggers" : null
+  "triggers" : null,
+  "dataStream" : null
 }

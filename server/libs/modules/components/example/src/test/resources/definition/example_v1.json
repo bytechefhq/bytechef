@@ -79,9 +79,9 @@
     },
     "properties" : [ ],
     "title" : "Title",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
   "dataStream" : null,
   "triggers" : null

@@ -44,9 +44,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Debug",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -77,9 +77,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Error",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -110,9 +110,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Info",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -143,10 +143,10 @@
       "optionsDataSource" : null
     } ],
     "title" : "Warn",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
-  "triggers" : null
+  "triggers" : null,
+  "dataStream" : null
 }
