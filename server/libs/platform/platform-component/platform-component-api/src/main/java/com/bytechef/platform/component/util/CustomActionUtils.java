@@ -50,7 +50,7 @@ import java.util.Map;
  */
 public class CustomActionUtils {
 
-    private static final String CUSTOM = "custom";
+    private static final String CUSTOM_ACTION = "customAction";
 
     private static final String BODY_CONTENT = "bodyContent";
     private static final String BODY_CONTENT_MIME_TYPE = "bodyContentMimeType";
@@ -61,7 +61,7 @@ public class CustomActionUtils {
     private static final String PATH = "path";
 
     public static ActionDefinition getCustomActionDefinition(ComponentDefinition componentDefinition) {
-        ModifiableActionDefinition customActionDefinition = ComponentDsl.action(CUSTOM)
+        ModifiableActionDefinition customActionDefinition = ComponentDsl.action(CUSTOM_ACTION)
             .title("Custom Action")
             .description(
                 "By using custom actions, you can take advantage of the existing connector platform to create new actions.")
