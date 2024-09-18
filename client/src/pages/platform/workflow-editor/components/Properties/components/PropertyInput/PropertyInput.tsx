@@ -103,7 +103,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                         placeholder={placeholder}
                         ref={ref}
                         required={required}
-                        step={type === 'time' || type === 'date-time' ? 1 : undefined}
+                        step={1}
                         type={type}
                         value={value}
                         {...props}
