@@ -43,6 +43,7 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-connection:platform-connection-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-data-storage:platform-data-storage-jdbc:platform-data-storage-jdbc-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-client"))
+    implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-aws"))
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-remote-rest"))
 
     implementation(project(":server:libs:modules:components:accelo"))
