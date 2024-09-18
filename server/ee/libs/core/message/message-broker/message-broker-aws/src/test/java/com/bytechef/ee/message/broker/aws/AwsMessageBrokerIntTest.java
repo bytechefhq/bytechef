@@ -108,11 +108,11 @@ class AwsMessageBrokerIntTest {
     void canRegisterListenerEndpoints() {
 //        EndpointRegistrar listenerEndpointRegistrar = new EndpointRegistrar();
 //        int concurrency = 1;
-//        TestClass testClass = new TestClass();
+//        TestClass testDelagte = new TestClass();
 //        String methodName = "testMethod";
 //
 //        awsMessageBrokerListenerRegistrarConfiguration.registerListenerEndpoint(
-//            listenerEndpointRegistrar, route, concurrency, testClass, methodName);
+//            listenerEndpointRegistrar, route, concurrency, testDelagte, methodName);
 //
 //        await()
 //            .pollInterval(Duration.ofSeconds(2))
@@ -131,6 +131,10 @@ class AwsMessageBrokerIntTest {
 //    private static class TestClass {
 //
 //        public static String message;
+//
+//    public void testMathod(){
+//        message = MESSAGE;
+//    }
 //    }
 
     @Configuration
