@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T10:08:02.879137+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-18T05:52:25.821517+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 @Validated
 @Tag(name = "api-key", description = "The Embedded User API Key Internal API")
 public interface ApiKeyApi {

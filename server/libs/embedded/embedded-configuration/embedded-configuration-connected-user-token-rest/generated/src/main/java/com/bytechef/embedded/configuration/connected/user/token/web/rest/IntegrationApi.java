@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-11T19:04:35.387622+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-18T05:52:25.411979+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 @Validated
 @Tag(name = "integration", description = "The Embedded Integration by Connected User Token accessible API")
 public interface IntegrationApi {
@@ -70,7 +70,7 @@ public interface IntegrationApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"allowMultipleInstances\" : false, \"icon\" : \"icon\", \"integrationVersion\" : 1, \"description\" : \"description\", \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"id\" : 6, \"title\" : \"title\" }, { \"allowMultipleInstances\" : false, \"icon\" : \"icon\", \"integrationVersion\" : 1, \"description\" : \"description\", \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"id\" : 6, \"title\" : \"title\" } ]";
+                    String exampleString = "[ { \"allowMultipleInstances\" : false, \"icon\" : \"icon\", \"integrationVersion\" : 6, \"description\" : \"description\", \"componentName\" : \"componentName\", \"id\" : 0, \"title\" : \"title\" }, { \"allowMultipleInstances\" : false, \"icon\" : \"icon\", \"integrationVersion\" : 6, \"description\" : \"description\", \"componentName\" : \"componentName\", \"id\" : 0, \"title\" : \"title\" } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

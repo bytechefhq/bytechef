@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-05T10:08:02.973336+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-18T05:52:25.929720+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 @Validated
 @Tag(name = "workspace", description = "The Automation Workspace Internal API")
 public interface WorkspaceApi {
