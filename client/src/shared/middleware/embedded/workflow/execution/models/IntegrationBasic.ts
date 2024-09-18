@@ -39,12 +39,6 @@ export interface IntegrationBasic {
      */
     componentName: string;
     /**
-     * The version of the integration's component.
-     * @type {number}
-     * @memberof IntegrationBasic
-     */
-    componentVersion: number;
-    /**
      * The created by.
      * @type {string}
      * @memberof IntegrationBasic
@@ -114,7 +108,6 @@ export interface IntegrationBasic {
 export function instanceOfIntegrationBasic(value: object): value is IntegrationBasic {
     if (!('allowMultipleInstances' in value) || value['allowMultipleInstances'] === undefined) return false;
     if (!('componentName' in value) || value['componentName'] === undefined) return false;
-    if (!('componentVersion' in value) || value['componentVersion'] === undefined) return false;
     return true;
 }
 
@@ -130,7 +123,6 @@ export function IntegrationBasicFromJSONTyped(json: any, ignoreDiscriminator: bo
         
         'allowMultipleInstances': json['allowMultipleInstances'],
         'componentName': json['componentName'],
-        'componentVersion': json['componentVersion'],
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'description': json['description'] == null ? undefined : json['description'],
@@ -152,7 +144,6 @@ export function IntegrationBasicToJSON(value?: Omit<IntegrationBasic, 'createdBy
         
         'allowMultipleInstances': value['allowMultipleInstances'],
         'componentName': value['componentName'],
-        'componentVersion': value['componentVersion'],
         'description': value['description'],
         'lastStatus': IntegrationStatusToJSON(value['lastStatus']),
         'name': value['name'],
