@@ -255,7 +255,7 @@ class AwsFileStorageIntTest {
 
         @Bean
         AwsCredentialsProvider awsCredentialsProvider() {
-            return () -> AwsBasicCredentials.create("noop", "noop");
+            return () -> AwsBasicCredentials.create(localStack.getAccessKey(), localStack.getSecretKey());
         }
 
         @Bean
