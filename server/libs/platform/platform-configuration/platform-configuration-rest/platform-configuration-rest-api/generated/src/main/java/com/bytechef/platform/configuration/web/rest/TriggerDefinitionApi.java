@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-15T19:25:20.309288+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-18T05:52:28.072330+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 @Validated
 @Tag(name = "trigger-definition", description = "The Platform Trigger Definition Internal API")
 public interface TriggerDefinitionApi {

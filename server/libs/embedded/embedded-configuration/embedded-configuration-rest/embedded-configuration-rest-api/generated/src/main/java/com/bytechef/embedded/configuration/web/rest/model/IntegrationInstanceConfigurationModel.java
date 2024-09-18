@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceConfiguration", description = "Contains configurations and connections required for the execution of integration workflows.")
 @JsonTypeName("IntegrationInstanceConfiguration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-15T12:33:44.441238+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-18T05:52:27.018517+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 public class IntegrationInstanceConfigurationModel {
 
   private String createdBy;
