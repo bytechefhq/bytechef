@@ -76,7 +76,12 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         }, [componentDefinitions, filter]);
 
         return (
-            <div className={twMerge('rounded-lg', actionPanelOpen ? 'w-1/2' : 'w-full')}>
+            <div
+                className={twMerge(
+                    'rounded-lg',
+                    actionPanelOpen ? 'w-workflow-nodes-popover-component-menu-width' : 'w-full'
+                )}
+            >
                 <header className="rounded-tl-lg bg-white p-3 text-center">
                     <Input
                         name="workflowNodeFilter"
