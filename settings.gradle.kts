@@ -400,6 +400,7 @@ include("server:ee:libs:platform:platform-api-connector:platform-api-connector-f
 include("server:ee:libs:platform:platform-api-connector:platform-api-connector-file-storage:platform-api-connector-file-storage-impl")
 include("server:ee:libs:platform:platform-api-connector:platform-api-connector-handler")
 include("server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-client")
+include("server:ee:libs:platform:platform-scheduler:platform-scheduler-aws")
 include("server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-rest")
 include("server:ee:libs:platform:platform-tenant:platform-tenant-multi-service")
 include("server:ee:libs:platform:platform-user:platform-user-remote-client")

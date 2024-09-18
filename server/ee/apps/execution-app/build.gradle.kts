@@ -62,6 +62,7 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-data-storage:platform-data-storage-jdbc:platform-data-storage-jdbc-remote-rest"))
     implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-client"))
+    implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-aws"))
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-rest"))
 
     runtimeOnly("org.postgresql:postgresql")
