@@ -408,14 +408,6 @@ public final class Workflow implements Persistable<String>, Serializable {
                             map.containsKey(WorkflowConstants.TYPE)) {
 
                             for (Object item : curList) {
-                                // TODO exclude task dispatchers as we don't need them in 'allWorkflowTasks' list by
-                                // checking if any item of 'parameters' map is again a map or list which contains
-                                // map/s with 'parameters' and 'type' keys.
-                                // If true then drill-down further until extracting WorkflowTasks, if false, the 'item'
-                                // is a WorkflowTask
-
-                                // new WorkflowTask((Map<String, ?>) item) should be added to allWorkflowTasks only
-                                // if it is a real workflow task and not a task dispatcher
                                 allWorkflowTasks.addAll(getAllTasks(List.of(new WorkflowTask((Map<String, ?>) item))));
                             }
                         }
