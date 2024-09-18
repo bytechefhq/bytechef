@@ -16,6 +16,278 @@
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
+    "description" : "Add time to the date.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "addTime",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        },
+        "sampleOutput" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      },
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : null,
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "inputDate",
+      "type" : "DATE_TIME",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Date",
+      "placeholder" : null,
+      "options" : null,
+      "controlType" : "DATE_TIME",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits).",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "dateFormat",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Date format",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : [ {
+        "description" : "Sun Sep 17 2023 11:23:58",
+        "label" : "EEE MMM dd yyyy HH:mm:ss",
+        "value" : "EEE MMM dd yyyy HH:mm:ss"
+      }, {
+        "description" : "Sun Sep 17 11:23:58 2023",
+        "label" : "EEE MMM dd HH:mm:ss yyyy",
+        "value" : "EEE MMM dd HH:mm:ss yyyy"
+      }, {
+        "description" : "September 17 2023 11:23:58",
+        "label" : "MMMM dd yyyy HH:mm:ss",
+        "value" : "MMMM dd yyyy HH:mm:ss"
+      }, {
+        "description" : "September 17 2023",
+        "label" : "MMMM dd yyyy",
+        "value" : "MMMM dd yyyy"
+      }, {
+        "description" : "Sep 17 2023",
+        "label" : "MMM dd yyyy",
+        "value" : "MMM dd yyyy"
+      }, {
+        "description" : "2023-09-17T11:23:58",
+        "label" : "yyyy-MM-ddTHH:mm:ss",
+        "value" : "yyyy-MM-dd'T'HH:mm:ss"
+      }, {
+        "description" : "2023-09-17 11:23:58",
+        "label" : "yyyy-MM-dd HH:mm:ss",
+        "value" : "yyyy-MM-dd HH:mm:ss"
+      }, {
+        "description" : "2023-09-17",
+        "label" : "yyyy-MM-dd",
+        "value" : "yyyy-MM-dd"
+      }, {
+        "description" : "09-17-2023",
+        "label" : "MM-dd-yyyy",
+        "value" : "MM-dd-yyyy"
+      }, {
+        "description" : "09/17/2023",
+        "label" : "MM/dd/yyyy",
+        "value" : "MM/dd/yyyy"
+      }, {
+        "description" : "09/17/23",
+        "label" : "MM/dd/yy",
+        "value" : "MM/dd/yy"
+      }, {
+        "description" : "17-09-2023",
+        "label" : "dd-MM-yyyy",
+        "value" : "dd-MM-yyyy"
+      }, {
+        "description" : "17/09/2023",
+        "label" : "dd/MM/yyyy",
+        "value" : "dd/MM/yyyy"
+      }, {
+        "description" : "17/09/23",
+        "label" : "dd/MM/yy",
+        "value" : "dd/MM/yy"
+      }, {
+        "description" : "1694949838",
+        "label" : "Time in unix format",
+        "value" : "UnixTimestamp"
+      } ],
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Years to add.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "year",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Year",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Months to add.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "month",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Month",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Days to add.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "day",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Day",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Hours to add.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "hour",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Hour",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Minutes to add.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "minute",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Minute",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Seconds to add.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "second",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Second",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    } ],
+    "title" : "Add Time",
+    "perform" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
+  }, {
+    "batch" : null,
+    "deprecated" : null,
     "description" : "Converts UNIX timestamp to ISO8601 format.",
     "help" : null,
     "metadata" : null,
@@ -124,8 +396,711 @@
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
+  }, {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Get the difference between two dates.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "dateDifference",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "NUMBER",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "maxNumberPrecision" : null,
+          "maxValue" : null,
+          "minNumberPrecision" : null,
+          "minValue" : null,
+          "numberPrecision" : null,
+          "options" : null,
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
+        },
+        "sampleOutput" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "NUMBER",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "maxNumberPrecision" : null,
+        "maxValue" : null,
+        "minNumberPrecision" : null,
+        "minValue" : null,
+        "numberPrecision" : null,
+        "options" : null,
+        "controlType" : "NUMBER",
+        "optionsDataSource" : null
+      },
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : null,
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "startDate",
+      "type" : "DATE_TIME",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Start date",
+      "placeholder" : null,
+      "options" : null,
+      "controlType" : "DATE_TIME",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : null,
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "endDate",
+      "type" : "DATE_TIME",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "End date",
+      "placeholder" : null,
+      "options" : null,
+      "controlType" : "DATE_TIME",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "The unit of difference between the two dates.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "unit",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Unit",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "Year",
+        "value" : "year"
+      }, {
+        "description" : null,
+        "label" : "Month",
+        "value" : "month"
+      }, {
+        "description" : null,
+        "label" : "Day",
+        "value" : "day"
+      }, {
+        "description" : null,
+        "label" : "Hour",
+        "value" : "hour"
+      }, {
+        "description" : null,
+        "label" : "Minute",
+        "value" : "minute"
+      }, {
+        "description" : null,
+        "label" : "Second",
+        "value" : "second"
+      } ],
+      "optionsDataSource" : null
+    } ],
+    "title" : "Date Difference",
+    "perform" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
+  }, {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Extract date units (year/month/day/hour/minute/second/day of week/month name) from a date.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "extractDateUnits",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        },
+        "sampleOutput" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      },
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : null,
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "inputDate",
+      "type" : "DATE_TIME",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Date",
+      "placeholder" : null,
+      "options" : null,
+      "controlType" : "DATE_TIME",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Unit to extract from date.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "unit",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Unit to extract",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "Year",
+        "value" : "year"
+      }, {
+        "description" : null,
+        "label" : "Month",
+        "value" : "month"
+      }, {
+        "description" : null,
+        "label" : "Day",
+        "value" : "day"
+      }, {
+        "description" : null,
+        "label" : "Hour",
+        "value" : "hour"
+      }, {
+        "description" : null,
+        "label" : "Minute",
+        "value" : "minute"
+      }, {
+        "description" : null,
+        "label" : "Second",
+        "value" : "second"
+      }, {
+        "description" : null,
+        "label" : "Day of Week",
+        "value" : "dayOfWeek"
+      }, {
+        "description" : null,
+        "label" : "Month name",
+        "value" : "monthName"
+      } ],
+      "optionsDataSource" : null
+    } ],
+    "title" : "Extract Date units",
+    "perform" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
+  }, {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Get current date in the specified format.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "getCurrentDate",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        },
+        "sampleOutput" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      },
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "Time zone to use when formatting date.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "timeZone",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Time zone",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
+    }, {
+      "advancedOption" : null,
+      "description" : "Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits).",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "dateFormat",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Date format",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : [ {
+        "description" : "Sun Sep 17 2023 11:23:58",
+        "label" : "EEE MMM dd yyyy HH:mm:ss",
+        "value" : "EEE MMM dd yyyy HH:mm:ss"
+      }, {
+        "description" : "Sun Sep 17 11:23:58 2023",
+        "label" : "EEE MMM dd HH:mm:ss yyyy",
+        "value" : "EEE MMM dd HH:mm:ss yyyy"
+      }, {
+        "description" : "September 17 2023 11:23:58",
+        "label" : "MMMM dd yyyy HH:mm:ss",
+        "value" : "MMMM dd yyyy HH:mm:ss"
+      }, {
+        "description" : "September 17 2023",
+        "label" : "MMMM dd yyyy",
+        "value" : "MMMM dd yyyy"
+      }, {
+        "description" : "Sep 17 2023",
+        "label" : "MMM dd yyyy",
+        "value" : "MMM dd yyyy"
+      }, {
+        "description" : "2023-09-17T11:23:58",
+        "label" : "yyyy-MM-ddTHH:mm:ss",
+        "value" : "yyyy-MM-dd'T'HH:mm:ss"
+      }, {
+        "description" : "2023-09-17 11:23:58",
+        "label" : "yyyy-MM-dd HH:mm:ss",
+        "value" : "yyyy-MM-dd HH:mm:ss"
+      }, {
+        "description" : "2023-09-17",
+        "label" : "yyyy-MM-dd",
+        "value" : "yyyy-MM-dd"
+      }, {
+        "description" : "09-17-2023",
+        "label" : "MM-dd-yyyy",
+        "value" : "MM-dd-yyyy"
+      }, {
+        "description" : "09/17/2023",
+        "label" : "MM/dd/yyyy",
+        "value" : "MM/dd/yyyy"
+      }, {
+        "description" : "09/17/23",
+        "label" : "MM/dd/yy",
+        "value" : "MM/dd/yy"
+      }, {
+        "description" : "17-09-2023",
+        "label" : "dd-MM-yyyy",
+        "value" : "dd-MM-yyyy"
+      }, {
+        "description" : "17/09/2023",
+        "label" : "dd/MM/yyyy",
+        "value" : "dd/MM/yyyy"
+      }, {
+        "description" : "17/09/23",
+        "label" : "dd/MM/yy",
+        "value" : "dd/MM/yy"
+      }, {
+        "description" : "1694949838",
+        "label" : "Time in unix format",
+        "value" : "UnixTimestamp"
+      } ],
+      "optionsDataSource" : null
+    } ],
+    "title" : "Get Current Date",
+    "perform" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
+  }, {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Subtract time from date",
+    "help" : null,
+    "metadata" : null,
+    "name" : "subtractTime",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "DATE_TIME",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "options" : null,
+          "controlType" : "DATE_TIME",
+          "optionsDataSource" : null
+        },
+        "sampleOutput" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "DATE_TIME",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "options" : null,
+        "controlType" : "DATE_TIME",
+        "optionsDataSource" : null
+      },
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : null,
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "inputDate",
+      "type" : "DATE_TIME",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Date",
+      "placeholder" : null,
+      "options" : null,
+      "controlType" : "DATE_TIME",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits).",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "dateFormat",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Date format",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : [ {
+        "description" : "Sun Sep 17 2023 11:23:58",
+        "label" : "EEE MMM dd yyyy HH:mm:ss",
+        "value" : "EEE MMM dd yyyy HH:mm:ss"
+      }, {
+        "description" : "Sun Sep 17 11:23:58 2023",
+        "label" : "EEE MMM dd HH:mm:ss yyyy",
+        "value" : "EEE MMM dd HH:mm:ss yyyy"
+      }, {
+        "description" : "September 17 2023 11:23:58",
+        "label" : "MMMM dd yyyy HH:mm:ss",
+        "value" : "MMMM dd yyyy HH:mm:ss"
+      }, {
+        "description" : "September 17 2023",
+        "label" : "MMMM dd yyyy",
+        "value" : "MMMM dd yyyy"
+      }, {
+        "description" : "Sep 17 2023",
+        "label" : "MMM dd yyyy",
+        "value" : "MMM dd yyyy"
+      }, {
+        "description" : "2023-09-17T11:23:58",
+        "label" : "yyyy-MM-ddTHH:mm:ss",
+        "value" : "yyyy-MM-dd'T'HH:mm:ss"
+      }, {
+        "description" : "2023-09-17 11:23:58",
+        "label" : "yyyy-MM-dd HH:mm:ss",
+        "value" : "yyyy-MM-dd HH:mm:ss"
+      }, {
+        "description" : "2023-09-17",
+        "label" : "yyyy-MM-dd",
+        "value" : "yyyy-MM-dd"
+      }, {
+        "description" : "09-17-2023",
+        "label" : "MM-dd-yyyy",
+        "value" : "MM-dd-yyyy"
+      }, {
+        "description" : "09/17/2023",
+        "label" : "MM/dd/yyyy",
+        "value" : "MM/dd/yyyy"
+      }, {
+        "description" : "09/17/23",
+        "label" : "MM/dd/yy",
+        "value" : "MM/dd/yy"
+      }, {
+        "description" : "17-09-2023",
+        "label" : "dd-MM-yyyy",
+        "value" : "dd-MM-yyyy"
+      }, {
+        "description" : "17/09/2023",
+        "label" : "dd/MM/yyyy",
+        "value" : "dd/MM/yyyy"
+      }, {
+        "description" : "17/09/23",
+        "label" : "dd/MM/yy",
+        "value" : "dd/MM/yy"
+      }, {
+        "description" : "1694949838",
+        "label" : "Time in unix format",
+        "value" : "UnixTimestamp"
+      } ],
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Years to subtract.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "year",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Year",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Months to subtract.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "month",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Month",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Days to subtract.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "day",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Day",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Hours to subtract.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "hour",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Hour",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Minutes to subtract.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "minute",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Minute",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Seconds to subtract.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "second",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Second",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    } ],
+    "title" : "Subtract Time",
+    "perform" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
+  "connection" : null,
   "dataStream" : null,
-  "triggers" : null,
-  "connection" : null
+  "triggers" : null
 }
