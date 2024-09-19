@@ -23,7 +23,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -33,11 +35,10 @@ import org.junit.jupiter.api.Test;
  */
 class DropboxSearchActionTest extends AbstractDropboxActionTest {
 
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(QUERY, "query"));
+
     @Test
     void testPerform() {
-        when(mockedParameters.getRequired(QUERY))
-            .thenReturn("query");
-
         when(mockedContext.http(POST_SEARCH_CONTEXT_FUNCTION))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
