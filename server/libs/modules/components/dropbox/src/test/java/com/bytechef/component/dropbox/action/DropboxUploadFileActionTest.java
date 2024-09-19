@@ -68,7 +68,7 @@ class DropboxUploadFileActionTest extends AbstractDropboxActionTest {
 
         assertEquals(mockedFileEntry, body.getContent());
 
-        Map<String, List<String>> expectedHeaders = Map.of("Dropbox-API-Arg", List.of("jsonString"), "Content-Type", List.of("application/octet-stream"));
+        Map<String, List<String>> expectedHeaders = Map.of("Dropbox-API-Arg", List.of("jsonString"));
 
         assertEquals(expectedHeaders, headersArgumentCapture.getValue());
     }
