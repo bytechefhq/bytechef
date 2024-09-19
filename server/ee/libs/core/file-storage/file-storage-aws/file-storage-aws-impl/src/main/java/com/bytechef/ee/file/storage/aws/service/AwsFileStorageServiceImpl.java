@@ -10,6 +10,7 @@ package com.bytechef.ee.file.storage.aws.service;
 import com.bytechef.ee.file.storage.aws.AwsFileStorageService;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.exception.FileStorageException;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.awspring.cloud.s3.S3Resource;
 import io.awspring.cloud.s3.S3Template;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -52,7 +54,9 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
             throw new FileStorageException("File %s doesn't exist".formatted(fileEntry.getName()));
         }
 
-        s3Template.deleteObject(bucketName, directoryPath + "/" + fileEntry.getName());
+        S3Resource file = getObject(directoryPath, fileEntry.getName());
+
+        s3Template.deleteObject(bucketName, file.getFilename());
     }
 
     @Override
@@ -66,22 +70,24 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
             throw new FileStorageException("Bucket %s doesn't exist.".formatted(bucketName));
         }
 
-        return s3Template.objectExists(bucketName, directoryPath + "/" + key);
+        List<S3Resource> items = listAllObjects();
+
+        return items.stream()
+            .map(S3Resource::getFilename)
+            .filter(Objects::nonNull)
+            .anyMatch((filename) -> filename.substring(filename.indexOf('/')+1)
+                .equals(directoryPath + "/" + key));
     }
 
     @Override
     public FileEntry getFileEntry(@NonNull String directoryPath, @NonNull String key) {
-        if (!bucketExists()) {
-            throw new FileStorageException("Bucket %s doesn't exist.".formatted(bucketName));
-        }
-
         if (!fileExists(directoryPath, key)) {
             throw new FileStorageException("File %s doesn't exist".formatted(key));
         }
 
-        directoryPath = combinePaths(directoryPath, key);
+        S3Resource file = getObject(directoryPath, key);
 
-        return new FileEntry(key, URL_PREFIX + bucketName + "/" + directoryPath);
+        return new FileEntry(key, URL_PREFIX + bucketName + "/" + file.getFilename());
     }
 
     @Override
@@ -90,9 +96,9 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
             throw new FileStorageException("Bucket %s doesn't exist.".formatted(bucketName));
         }
 
-        List<S3Resource> s3Resources = s3Template.listObjects(bucketName, directoryPath);
+        List<S3Resource> items = listAllObjects();
 
-        return s3Resources.stream()
+        return items.stream()
             .map(S3Resource::getFilename)
             .filter(Objects::nonNull)
             .map(filename -> new FileEntry(
@@ -102,10 +108,6 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
 
     @Override
     public InputStream getFileStream(@NonNull String directoryPath, @NonNull FileEntry fileEntry) {
-        if (!bucketExists()) {
-            throw new FileStorageException("Bucket %s doesn't exist.".formatted(bucketName));
-        }
-
         if (!fileExists(directoryPath, fileEntry.getName())) {
             throw new FileStorageException("File %s doesn't exist".formatted(fileEntry.getName()));
         }
@@ -115,18 +117,14 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
 
     @Override
     public URL getFileEntryURL(@NonNull String directoryPath, @NonNull FileEntry fileEntry) {
-        if (!bucketExists()) {
-            throw new FileStorageException("Bucket %s doesn't exist.".formatted(bucketName));
-        }
-
         if (!fileExists(directoryPath, fileEntry.getName())) {
             throw new FileStorageException("File %s doesn't exist".formatted(fileEntry.getName()));
         }
 
-        S3Resource download = s3Template.download(bucketName, directoryPath + "/" + fileEntry.getName());
+        S3Resource file = getObject(directoryPath, fileEntry.getName());
 
         try {
-            return download.getURL();
+            return file.getURL();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -134,22 +132,26 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
 
     @Override
     public byte[] readFileToBytes(@NonNull String directoryPath, @NonNull FileEntry fileEntry)
-        throws FileStorageException {
-        if (!bucketExists()) {
-            throw new FileStorageException("Bucket %s doesn't exist.".formatted(bucketName));
-        }
-
+        throws FileStorageException{
         if (!fileExists(directoryPath, fileEntry.getName())) {
             throw new FileStorageException("File %s doesn't exist".formatted(fileEntry.getName()));
         }
 
-        return s3Template.read(bucketName, directoryPath + "/" + fileEntry.getName(), byte[].class);
+        S3Resource file = getObject(directoryPath, fileEntry.getName());
+
+        byte[] bytes = null;
+        try {
+            bytes = file.getInputStream().readAllBytes();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return Base64.getMimeDecoder().decode(bytes);
     }
 
     @Override
     public String readFileToString(@NonNull String directoryPath, @NonNull FileEntry fileEntry)
         throws FileStorageException {
-
         byte[] bytes = readFileToBytes(directoryPath, fileEntry);
 
         return new String(bytes, StandardCharsets.UTF_8);
@@ -193,11 +195,10 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
 
     @Override
     public FileEntry
-        storeFileContent(@NonNull String directoryPath, @NonNull String filename, @NonNull InputStream inputStream)
+        storeFileContent(@NonNull String directoryPath, @NonNull String key, @NonNull InputStream inputStream)
             throws FileStorageException {
-
         try {
-            return storeFileContent(directoryPath, filename, inputStream.readAllBytes());
+            return storeFileContent(directoryPath, key, inputStream.readAllBytes());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -215,10 +216,24 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
         return s3Template.bucketExists(bucketName);
     }
 
+    private List<S3Resource> listAllObjects(){
+        return s3Template.listObjects(bucketName, "");
+    }
+
+    private S3Resource getObject(String directoryPath, String key){
+        List<S3Resource> items = s3Template.listObjects(bucketName, "");
+
+        return items.stream()
+            .filter((file) -> file.getFilename().contains(directoryPath + "/" + key))
+            .findFirst()
+            .get();
+    }
+
     private static String combinePaths(String directoryPath, String key) {
         directoryPath = StringUtils.replace(directoryPath.replaceAll("[^0-9a-zA-Z/_!\\-.*'()]", ""), " ", "");
 
-        directoryPath += "/" + key;
+        directoryPath = TenantContext.getCurrentTenantId() + "/" + directoryPath;
+        if(key!=null) directoryPath += "/" + key;
 
         return directoryPath;
     }
