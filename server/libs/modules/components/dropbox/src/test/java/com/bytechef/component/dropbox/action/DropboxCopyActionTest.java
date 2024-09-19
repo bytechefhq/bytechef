@@ -26,8 +26,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.dropbox.util.DropboxUtils;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -37,16 +39,12 @@ import org.junit.jupiter.api.Test;
  */
 class DropboxCopyActionTest extends AbstractDropboxActionTest {
 
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(FILENAME, "filename.txt", FROM_PATH, "from", TO_PATH, "to"));
+
     @Test
     void testPerform() {
         String fullPath = "fullPath";
-
-        when(mockedParameters.getRequiredString(FILENAME))
-            .thenReturn("filename.txt");
-        when(mockedParameters.getRequiredString(FROM_PATH))
-            .thenReturn("from");
-        when(mockedParameters.getRequiredString(TO_PATH))
-            .thenReturn("to");
 
         dropboxUtilsMockedStatic.when(() -> DropboxUtils.getFullPath(anyString(), fileNameArgumentCaptor.capture()))
             .thenReturn(fullPath);

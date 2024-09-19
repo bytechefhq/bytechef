@@ -21,7 +21,6 @@ import static org.mockito.Mockito.mockStatic;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.dropbox.util.DropboxUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +39,6 @@ public abstract class AbstractDropboxActionTest {
     protected ActionContext mockedContext = mock(ActionContext.class);
     protected Http.Executor mockedExecutor = mock(Http.Executor.class);
     protected Object mockedObject = mock(Object.class);
-    protected Parameters mockedParameters = mock(Parameters.class);
     protected Http.Response mockedResponse = mock(Http.Response.class);
     protected ArgumentCaptor<String> pathArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
