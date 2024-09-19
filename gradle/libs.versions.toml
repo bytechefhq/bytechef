@@ -12,7 +12,7 @@ org-springdoc = "2.6.0"
 org-springframework-cloud-dependencies = "2023.0.3"
 pmd = "7.4.0"
 spotbugs = "4.8.6"
-spring-boot = "3.3.3"
+spring-boot = "3.3.4"
 spring-cloud-aws = "3.1.1"
 spring-shell = "3.3.1"
 
