@@ -18,6 +18,7 @@ package com.bytechef.platform.component.definition;
 
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MimeTypeUtils;
 import com.bytechef.commons.util.OptionalUtils;
@@ -39,7 +40,6 @@ import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.util.RefreshCredentialsUtils;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.MediaType;
 import com.github.mizosoft.methanol.Methanol;
@@ -76,33 +76,28 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-@Component
-class HttpClientExecutor implements ApplicationContextAware {
+class HttpClientExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpClientExecutor.class);
 
-    private ApplicationContext applicationContext;
+    private final ApplicationContext applicationContext;
     private final ConnectionDefinitionService connectionDefinitionService;
     private final FilesFileStorage filesFileStorage;
-    private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI")
     public HttpClientExecutor(
-        ConnectionDefinitionService connectionDefinitionService, FilesFileStorage filesFileStorage,
-        ObjectMapper objectMapper) {
+        ApplicationContext applicationContext, ConnectionDefinitionService connectionDefinitionService,
+        FilesFileStorage filesFileStorage) {
 
+        this.applicationContext = applicationContext;
         this.connectionDefinitionService = connectionDefinitionService;
         this.filesFileStorage = filesFileStorage;
-        this.objectMapper = objectMapper;
     }
 
     public Response execute(
@@ -130,11 +125,6 @@ class HttpClientExecutor implements ApplicationContextAware {
         }
 
         return handleResponse(httpResponse, configuration);
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
     }
 
     HttpResponse.BodyHandler<?> createBodyHandler(Configuration configuration) {
@@ -522,17 +512,17 @@ class HttpClientExecutor implements ApplicationContextAware {
 
         @Override
         public Object getBody() {
-            return objectMapper.convertValue(body, new TypeReference<>() {});
+            return ConvertUtils.convertValue(body, new TypeReference<>() {});
         }
 
         @Override
         public <T> T getBody(Class<T> valueType) {
-            return objectMapper.convertValue(body, valueType);
+            return ConvertUtils.convertValue(body, valueType);
         }
 
         @Override
         public <T> T getBody(com.bytechef.component.definition.TypeReference<T> valueTypeRef) {
-            return objectMapper.convertValue(body, new TypeReference<>() {
+            return ConvertUtils.convertValue(body, new TypeReference<>() {
 
                 @Override
                 public Type getType() {
