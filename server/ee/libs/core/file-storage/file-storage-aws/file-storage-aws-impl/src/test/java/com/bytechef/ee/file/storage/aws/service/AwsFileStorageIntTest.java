@@ -58,8 +58,9 @@ class AwsFileStorageIntTest {
     private static final String BUCKET_NAME = String.valueOf(UUID.randomUUID());
     private static final String DATA = "Hello World";
     private static final String DIR_PATH = "RandomDirectory/Test";
+    private static final String TENANT_ID = "public";
     private static final String KEY = "key";
-    private static final String FILE_PATH = "s3://" + BUCKET_NAME + "/" + DIR_PATH + "/" + KEY;
+    private static final String FILE_PATH = "s3://" + BUCKET_NAME + "/" + TENANT_ID + "/" + DIR_PATH + "/" + KEY;
 
     @Container
     private static final LocalStackContainer localStack = new LocalStackContainer(
@@ -97,7 +98,7 @@ class AwsFileStorageIntTest {
     }
 
     @Test
-    void canDeterminteIfFileExists() {
+    void canDeterminateIfFileExists() {
         FileEntry msg = storageService.storeFileContent(DIR_PATH, KEY, DATA);
         boolean existsFileEntry = storageService.fileExists(DIR_PATH, msg);
         boolean existsString = storageService.fileExists(DIR_PATH, KEY);
@@ -124,7 +125,7 @@ class AwsFileStorageIntTest {
             .ignoreExceptions()
             .untilAsserted(() -> {
                 assertThat(url.toString())
-                    .matches("http://127\\.0\\.0\\.1:\\d+/" + BUCKET_NAME + "/" + DIR_PATH + "/" + KEY);
+                    .matches("http://127\\.0\\.0\\.1:\\d+/" + BUCKET_NAME + "/" + TENANT_ID + "/" + DIR_PATH + "/" + KEY);
             });
     }
 
@@ -197,7 +198,7 @@ class AwsFileStorageIntTest {
     void canGetFileEntries() {
         FileEntry fileEntry1 = storageService.storeFileContent(DIR_PATH, KEY, DATA);
         FileEntry fileEntry2 = storageService.storeFileContent(DIR_PATH, "key2", DATA);
-        Set<FileEntry> fileEntries = storageService.getFileEntries(DIR_PATH);
+        Set<FileEntry> fileEntries = storageService.getFileEntries(TENANT_ID +  "/" + DIR_PATH);
 
         await()
             .pollInterval(Duration.ofSeconds(2))
