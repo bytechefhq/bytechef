@@ -181,9 +181,11 @@ class HttpClientExecutor {
             try {
                 SSLContext sslContext = SSLContext.getInstance("TLS");
 
-                sslContext.init(null, new TrustManager[] {
-                    new UnauthorizedCertsX509ExtendedTrustManager()
-                }, null);
+                sslContext.init(
+                    null, new TrustManager[] {
+                        new UnauthorizedCertsX509ExtendedTrustManager()
+                    },
+                    null);
 
                 builder.sslContext(sslContext);
             } catch (Exception e) {
@@ -236,8 +238,7 @@ class HttpClientExecutor {
         Map<String, List<String>> queryParameters, Body body, String componentName,
         ComponentConnection componentConnection, Context context) {
 
-        HttpRequest.Builder httpRequestBuilder = HttpRequest
-            .newBuilder()
+        HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder()
             .method(requestMethod.name(), createBodyPublisher(body));
 
         for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
@@ -449,8 +450,7 @@ class HttpClientExecutor {
         Object content = body.getContent();
 
         return MoreBodyPublishers.ofMediaType(
-            BodyPublishers.ofString(content.toString()),
-            MediaType.parse(body.getMimeType()));
+            BodyPublishers.ofString(content.toString()), MediaType.parse(body.getMimeType()));
     }
 
     private BodyPublisher getXmlBodyPublisher(Body body) {
@@ -493,7 +493,7 @@ class HttpClientExecutor {
         return new FileEntryImpl(filesFileStorage.storeFileContent(filename, httpResponseBody));
     }
 
-    private class ResponseImpl implements Response {
+    private static class ResponseImpl implements Response {
 
         private final Map<String, List<String>> headers;
         private final Object body;
@@ -550,6 +550,7 @@ class HttpClientExecutor {
     }
 
     private static class UnauthorizedCertsX509ExtendedTrustManager extends X509ExtendedTrustManager {
+
         public X509Certificate[] getAcceptedIssuers() {
             return null;
         }

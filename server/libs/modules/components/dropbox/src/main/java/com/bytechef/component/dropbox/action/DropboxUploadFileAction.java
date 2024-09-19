@@ -137,16 +137,12 @@ public class DropboxUploadFileAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        String destination = inputParameters.getRequiredString(PATH);
-
         String headerJson = actionContext.json(json -> {
             Map<String, Object> ime = Map.of(
                 AUTORENAME, inputParameters.getBoolean(AUTORENAME),
                 "mode", "add",
                 MUTE, inputParameters.getBoolean(MUTE),
-                PATH,
-                (destination.endsWith("/") ? destination : destination + "/")
-                    + inputParameters.getRequiredString(FILENAME),
+                PATH, getPath(inputParameters, inputParameters.getRequiredString(PATH)),
                 STRICT_CONFLICT, inputParameters.getBoolean(STRICT_CONFLICT));
             return json.write(ime);
         });
@@ -157,5 +153,10 @@ public class DropboxUploadFileAction {
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
+    }
+
+    private static String getPath(Parameters inputParameters, String destination) {
+        return (destination.endsWith("/")
+            ? destination : destination + "/") + inputParameters.getRequiredString(FILENAME);
     }
 }
