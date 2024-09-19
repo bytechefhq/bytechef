@@ -28,6 +28,7 @@ import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
 import com.bytechef.definition.BaseOutputDefinition.SampleOutput;
 import com.bytechef.definition.BaseOutputFunction;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.lang.reflect.Constructor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -106,9 +107,9 @@ public final class ComponentDsl {
     }
 
     public static ModifiableDataStreamReaderDefinition dataStreamReader(
-        DataStreamItemReaderSupplier dataStreamItemReaderClass) {
+        DataStreamItemReaderSupplier dataStreamItemReader) {
 
-        return new ModifiableDataStreamReaderDefinition(dataStreamItemReaderClass);
+        return new ModifiableDataStreamReaderDefinition(dataStreamItemReader);
     }
 
     public static ModifiableDataStreamWriterDefinition dataStreamWriter(
@@ -116,16 +117,19 @@ public final class ComponentDsl {
 
         return new ModifiableDataStreamWriterDefinition(() -> {
             try {
-                return dataStreamItemReaderClass.getDeclaredConstructor()
-                    .newInstance();
+                Constructor<? extends DataStreamItemWriter> declaredConstructor = dataStreamItemReaderClass
+                    .getDeclaredConstructor();
+
+                return declaredConstructor.newInstance();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
     }
 
-    public static ModifiableDataStreamWriterDefinition
-        dataStreamWriter(DataStreamItemWriterSupplier dataStreamItemWriter) {
+    public static ModifiableDataStreamWriterDefinition dataStreamWriter(
+        DataStreamItemWriterSupplier dataStreamItemWriter) {
+
         return new ModifiableDataStreamWriterDefinition(dataStreamItemWriter);
     }
 
