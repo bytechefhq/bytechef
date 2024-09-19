@@ -152,11 +152,8 @@ public class DropboxUploadFileAction {
         });
 
         return actionContext.http(http -> http.post("https://content.dropboxapi.com/2/files/upload"))
-            .headers(
-                Map.of(
-                    "Dropbox-API-Arg", List.of(headerJson.replace("\"", "\\\"")),
-                    "Content-Type", List.of("application/octet-stream")))
-            .body(Http.Body.of(inputParameters.getRequiredFileEntry(FILE_ENTRY)))
+            .headers(Map.of("Dropbox-API-Arg", List.of(headerJson.replace("\"", "\\\""))))
+            .body(Http.Body.of(inputParameters.getRequiredFileEntry(FILE_ENTRY), "application/octet-stream"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

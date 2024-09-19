@@ -18,6 +18,7 @@ package com.bytechef.commons.util;
 
 import static com.bytechef.commons.util.constant.ObjectMapperConstants.OBJECT_MAPPER;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import java.lang.reflect.Type;
 
@@ -45,5 +46,9 @@ public class ConvertUtils {
         TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
 
         return OBJECT_MAPPER.convertValue(fromValue, typeFactory.constructType(type));
+    }
+
+    public static <T> T convertValue(Object fromValue, TypeReference<T> toValueTypeRef) {
+        return OBJECT_MAPPER.convertValue(fromValue, toValueTypeRef);
     }
 }

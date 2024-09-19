@@ -20,10 +20,12 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.platform.component.domain.ComponentConnection;
+import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -34,20 +36,22 @@ import org.springframework.stereotype.Component;
 @Component
 class ContextFactoryImpl implements ContextFactory {
 
+    private final ApplicationContext applicationContext;
+    private final ConnectionDefinitionService connectionDefinitionService;
     private final DataStorage dataStorage;
     private final ApplicationEventPublisher eventPublisher;
     private final FilesFileStorage filesFileStorage;
-    private final HttpClientExecutor httpClientExecutor;
 
     @SuppressFBWarnings("EI")
     public ContextFactoryImpl(
-        DataStorage dataStorage, ApplicationEventPublisher eventPublisher, FilesFileStorage filesFileStorage,
-        HttpClientExecutor httpClientExecutor) {
+        ApplicationContext applicationContext, ConnectionDefinitionService connectionDefinitionService,
+        DataStorage dataStorage, ApplicationEventPublisher eventPublisher, FilesFileStorage filesFileStorage) {
 
+        this.applicationContext = applicationContext;
+        this.connectionDefinitionService = connectionDefinitionService;
         this.dataStorage = dataStorage;
         this.eventPublisher = eventPublisher;
         this.filesFileStorage = filesFileStorage;
-        this.httpClientExecutor = httpClientExecutor;
     }
 
     @Override
@@ -59,12 +63,13 @@ class ContextFactoryImpl implements ContextFactory {
         return new ActionContextImpl(
             componentName, componentVersion, actionName, type, instanceId, instanceWorkflowId, workflowId, jobId,
             connection, testEnvironment, getDataStorage(workflowId, testEnvironment), eventPublisher,
-            getFilesFileStorage(testEnvironment), httpClientExecutor);
+            getFilesFileStorage(testEnvironment), getHttpClientExecutor(testEnvironment));
     }
 
     @Override
     public Context createContext(@NonNull String componentName, ComponentConnection connection) {
-        return new ContextImpl(componentName, -1, null, filesFileStorage, connection, httpClientExecutor);
+        return new ContextImpl(
+            componentName, -1, null, filesFileStorage, connection, getHttpClientExecutor(false));
     }
 
     @Override
@@ -75,7 +80,7 @@ class ContextFactoryImpl implements ContextFactory {
         return new TriggerContextImpl(
             componentName, componentVersion, triggerName, type, workflowReferenceCode, connection,
             getDataStorage(workflowReferenceCode, testEnvironment), getFilesFileStorage(testEnvironment),
-            httpClientExecutor);
+            getHttpClientExecutor(testEnvironment));
     }
 
     private DataStorage getDataStorage(String workflowReference, boolean testEnvironment) {
@@ -92,5 +97,10 @@ class ContextFactoryImpl implements ContextFactory {
         }
 
         return filesFileStorage;
+    }
+
+    private HttpClientExecutor getHttpClientExecutor(boolean testEnvironment) {
+        return new HttpClientExecutor(
+            applicationContext, connectionDefinitionService, getFilesFileStorage(testEnvironment));
     }
 }

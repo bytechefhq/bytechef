@@ -51,6 +51,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.context.ApplicationContext;
 
 /**
  * @author Ivica Cardic
@@ -65,7 +66,8 @@ public class HttpClientExecutorTest {
     private final Base64.Encoder encoder = Base64.getEncoder();
     private final HttpClientExecutor httpClientExecutor =
         new HttpClientExecutor(
-            Mockito.mock(ConnectionDefinitionService.class), Mockito.mock(FilesFileStorage.class), objectMapper);
+            Mockito.mock(ApplicationContext.class), Mockito.mock(ConnectionDefinitionService.class),
+            Mockito.mock(FilesFileStorage.class));
 
     @Test
     public void testCreateBodyHandler() {
