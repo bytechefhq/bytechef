@@ -38,7 +38,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -138,8 +137,6 @@ public class DropboxUploadFileAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        // TODO
-
         String destination = inputParameters.getRequiredString(PATH);
 
         String headerJson = actionContext.json(json -> {
@@ -154,15 +151,12 @@ public class DropboxUploadFileAction {
             return json.write(ime);
         });
 
-        String fileContent = actionContext.file(file -> Base64.getEncoder()
-            .encodeToString(file.readAllBytes(inputParameters.getRequiredFileEntry(FILE_ENTRY))));
-
         return actionContext.http(http -> http.post("https://content.dropboxapi.com/2/files/upload"))
             .headers(
                 Map.of(
-                    "Dropbox-API-Arg", List.of(headerJson),
+                    "Dropbox-API-Arg", List.of(headerJson.replace("\"", "\\\"")),
                     "Content-Type", List.of("application/octet-stream")))
-            .body(Http.Body.of(fileContent))
+            .body(Http.Body.of(inputParameters.getRequiredFileEntry(FILE_ENTRY)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
