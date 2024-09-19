@@ -343,8 +343,8 @@ class HttpClientExecutor implements ApplicationContextAware {
 
     private BodyPublisher getBinaryBodyPublisher(Body body, FileEntry fileEntry) {
         return MoreBodyPublishers.ofMediaType(
-            BodyPublishers
-                .ofInputStream(() -> filesFileStorage.getFileStream(((FileEntryImpl) fileEntry).getFileEntry())),
+            BodyPublishers.ofInputStream(
+                () -> filesFileStorage.getFileStream(((FileEntryImpl) fileEntry).getFileEntry())),
             MediaType.parse(body.getMimeType() == null ? fileEntry.getMimeType() : body.getMimeType()));
     }
 
