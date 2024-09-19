@@ -175,9 +175,9 @@ class DataMapperReplaceValueActionTest {
         try (MockedStatic<ConvertUtils> convertUtilsMockedStatic = mockStatic(ConvertUtils.class)) {
             convertUtilsMockedStatic.when(() -> ConvertUtils.canConvert(eq(inputMapping), any())).thenReturn(true);
             convertUtilsMockedStatic.when(
-                () -> ConvertUtils.convertValue(eq(inputMapping), any())).thenReturn(inputMapping);
+                () -> ConvertUtils.convertValue(eq(inputMapping), any(Class.class))).thenReturn(inputMapping);
             convertUtilsMockedStatic.when(
-                () -> ConvertUtils.convertValue(eq(outputMapping), any())).thenReturn(outputMapping);
+                () -> ConvertUtils.convertValue(eq(outputMapping), any(Class.class))).thenReturn(outputMapping);
 
             Object result = DataMapperReplaceValueAction.perform(inputParameters, connectionParameters, context);
 
