@@ -2,7 +2,7 @@
 awssdk = "2.27.6"
 checkstyle = "10.17.0"
 com-google-auto-service = "1.1.1"
-graalvm = "24.0.2"
+graalvm = "24.1.0"
 jacoco = "0.8.12"
 jackson = "2.17.1"
 java = "21"
