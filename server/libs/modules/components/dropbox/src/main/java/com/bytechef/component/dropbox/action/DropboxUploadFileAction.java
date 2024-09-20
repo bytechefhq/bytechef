@@ -32,6 +32,7 @@ import static com.bytechef.component.dropbox.constant.DropboxConstants.MUTE;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.PATH;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.STRICT_CONFLICT;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.UPLOAD_FILE;
+import static com.bytechef.component.dropbox.util.DropboxUtils.getFullPath;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -142,7 +143,7 @@ public class DropboxUploadFileAction {
                 AUTORENAME, inputParameters.getBoolean(AUTORENAME),
                 "mode", "add",
                 MUTE, inputParameters.getBoolean(MUTE),
-                PATH, getPath(inputParameters, inputParameters.getRequiredString(PATH)),
+                PATH, getFullPath(inputParameters.getRequiredString(PATH), inputParameters.getRequiredString(FILENAME)),
                 STRICT_CONFLICT, inputParameters.getBoolean(STRICT_CONFLICT));
             return json.write(ime);
         });
@@ -153,10 +154,5 @@ public class DropboxUploadFileAction {
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
-    }
-
-    private static String getPath(Parameters inputParameters, String destination) {
-        return (destination.endsWith("/")
-            ? destination : destination + "/") + inputParameters.getRequiredString(FILENAME);
     }
 }
