@@ -11,7 +11,7 @@ tags:
 - name: "workflow"
   description: "The Embedded Workflow Public API"
 paths:
-  /{environment}/integrations:
+  /integrations:
     get:
       description: "Get active integrations."
       summary: "Get active configurations"
@@ -21,8 +21,8 @@ paths:
       parameters:
         - name: "environment"
           description: "The environment."
-          in: "path"
-          required: true
+          in: "query"
+          required: false
           schema:
             $ref: '#/components/schemas/Environment'
       responses:
