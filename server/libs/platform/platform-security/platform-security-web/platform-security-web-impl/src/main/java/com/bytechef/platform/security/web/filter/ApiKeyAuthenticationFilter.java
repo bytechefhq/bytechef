@@ -16,11 +16,7 @@
 
 package com.bytechef.platform.security.web.filter;
 
-import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import jakarta.servlet.http.HttpServletRequest;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.springframework.security.authentication.AuthenticationManager;
 
 /**
@@ -30,27 +26,6 @@ public class ApiKeyAuthenticationFilter extends AbstractApiKeyAuthenticationFilt
 
     @SuppressFBWarnings("EI")
     public ApiKeyAuthenticationFilter(AuthenticationManager authenticationManager) {
-        super(
-            "^/api/(automation|embedded)/v([0-9]+)/(test|production)/.+", authenticationManager,
-            ApiKeyAuthenticationFilter::getUrlItems);
-    }
-
-    private static UrlItems getUrlItems(Pattern pathPattern, HttpServletRequest request) {
-        Matcher matcher = pathPattern.matcher(request.getRequestURI());
-
-        Environment environment = null;
-        int version = 0;
-
-        if (matcher.find()) {
-            String group = matcher.group(2);
-
-            version = Integer.parseInt(group);
-
-            group = matcher.group(3);
-
-            environment = Environment.valueOf(group.toUpperCase());
-        }
-
-        return new UrlItems(environment, version);
+        super("^/api/(automation|embedded|platform)/v([0-9]+)/.+", authenticationManager);
     }
 }
