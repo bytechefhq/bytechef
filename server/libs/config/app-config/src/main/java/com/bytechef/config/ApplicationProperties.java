@@ -270,6 +270,15 @@ public class ApplicationProperties {
             private String accessKeyId;
             private String region;
             private String secretAccessKey;
+            private String accountId;
+
+            public String getAccountId() {
+                return accountId;
+            }
+
+            public void setAccountId(String accountId) {
+                this.accountId = accountId;
+            }
 
             public String getAccessKeyId() {
                 return accessKeyId;
