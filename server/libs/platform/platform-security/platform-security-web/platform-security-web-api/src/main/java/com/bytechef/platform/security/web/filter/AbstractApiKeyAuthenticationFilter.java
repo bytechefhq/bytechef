@@ -25,7 +25,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -44,26 +44,19 @@ public abstract class AbstractApiKeyAuthenticationFilter extends OncePerRequestF
     private static final String AUTH_TOKEN_HEADER_NAME = "Authorization";
 
     private final AuthenticationManager authenticationManager;
-    private final Pattern pathPattern;
     private final RequestMatcher requestMatcher;
-    private final UrlItemsExtractFunction urlItemsExtractFunction;
 
     @SuppressFBWarnings("EI")
-    public AbstractApiKeyAuthenticationFilter(
-        String pathPatternRegex, AuthenticationManager authenticationManager,
-        UrlItemsExtractFunction urlItemsExtractFunction) {
-
+    public AbstractApiKeyAuthenticationFilter(String pathPatternRegex, AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
-        this.pathPattern = Pattern.compile(pathPatternRegex);
         this.requestMatcher = new NegatedRequestMatcher(RegexRequestMatcher.regexMatcher(pathPatternRegex));
-        this.urlItemsExtractFunction = urlItemsExtractFunction;
     }
 
     @Override
     protected void doFilterInternal(
         HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) {
 
-        Authentication authentication = getAuthentication(pathPattern, urlItemsExtractFunction, httpServletRequest);
+        Authentication authentication = getAuthentication(httpServletRequest);
 
         String tenantId = ((AbstractPublicApiAuthenticationToken) authentication).getTenantId();
 
@@ -80,24 +73,15 @@ public abstract class AbstractApiKeyAuthenticationFilter extends OncePerRequestF
             });
     }
 
-    protected Authentication getAuthentication(
-        Pattern pathPattern, UrlItemsExtractFunction urlItemsExtractFunction, HttpServletRequest request) {
-
+    protected Authentication getAuthentication(HttpServletRequest request) {
         String token = getAuthToken(request);
 
         TenantKey tenantKey = TenantKey.parse(token);
 
-        UrlItems urlItems = urlItemsExtractFunction.apply(pathPattern, request);
-
-        return new ApiKeyAuthenticationToken(urlItems.environment(), urlItems.version, token, tenantKey.getTenantId());
+        return new ApiKeyAuthenticationToken(getEnvironment(request), token, tenantKey.getTenantId());
     }
 
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        return requestMatcher.matches(request);
-    }
-
-    protected static String getAuthToken(HttpServletRequest request) {
+    protected String getAuthToken(HttpServletRequest request) {
         String token = request.getHeader(AUTH_TOKEN_HEADER_NAME);
 
         if (token == null) {
@@ -107,11 +91,18 @@ public abstract class AbstractApiKeyAuthenticationFilter extends OncePerRequestF
         return token.replace("Bearer ", "");
     }
 
-    public record UrlItems(Environment environment, int version) {
+    protected Environment getEnvironment(HttpServletRequest request) {
+        String environment = request.getParameter("environment");
+
+        if (StringUtils.isNotBlank(environment)) {
+            return Environment.valueOf(environment.toUpperCase());
+        }
+
+        return Environment.PRODUCTION;
     }
 
-    public interface UrlItemsExtractFunction {
-
-        UrlItems apply(Pattern pathPattern, HttpServletRequest request);
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return requestMatcher.matches(request);
     }
 }

@@ -28,10 +28,8 @@ public class ConnectedUserAuthenticationToken extends AbstractPublicApiAuthentic
 
     private String externalUserId;
 
-    public ConnectedUserAuthenticationToken(
-        Environment environment, int version, String externalUserId, String tenantId) {
-
-        super(environment, version, tenantId);
+    public ConnectedUserAuthenticationToken(Environment environment, String externalUserId, String tenantId) {
+        super(environment, tenantId);
 
         this.externalUserId = externalUserId;
     }

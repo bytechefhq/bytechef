@@ -31,8 +31,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Locator;
 import jakarta.servlet.http.HttpServletRequest;
 import java.security.Key;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 
@@ -47,21 +45,18 @@ public class ConnectedUserAuthenticationFilter extends AbstractApiKeyAuthenticat
     public ConnectedUserAuthenticationFilter(
         AuthenticationManager authenticationManager, SigningKeyService signingKeyService) {
 
-        super(
-            "/api/embedded/by-connected-user-token/v([0-9]+)/(test|production)/.+", authenticationManager,
-            ConnectedUserAuthenticationFilter::getUrlItems);
+        super("/api/embedded/v([0-9]+)/by-connected-user-token/.+", authenticationManager);
 
         this.signingKeyService = signingKeyService;
     }
 
-    protected Authentication getAuthentication(
-        Pattern pathPattern, UrlItemsExtractFunction urlItemsExtractFunction, HttpServletRequest request) {
-
+    @Override
+    protected Authentication getAuthentication(HttpServletRequest request) {
         String token = getAuthToken(request);
 
-        UrlItems urlItems = urlItemsExtractFunction.apply(pathPattern, request);
+        Environment environment = getEnvironment(request);
 
-        Jws<Claims> jws = getJws(urlItems.environment(), token);
+        Jws<Claims> jws = getJws(environment, token);
 
         Claims payload = jws.getPayload();
 
@@ -71,8 +66,7 @@ public class ConnectedUserAuthenticationFilter extends AbstractApiKeyAuthenticat
 
         TenantKey tenantKey = TenantKey.parse(header.getKeyId());
 
-        return new ConnectedUserAuthenticationToken(
-            urlItems.environment(), urlItems.version(), externalUserId, tenantKey.getTenantId());
+        return new ConnectedUserAuthenticationToken(environment, externalUserId, tenantKey.getTenantId());
     }
 
     private Jws<Claims> getJws(Environment environment, String secretKey) {
@@ -80,25 +74,6 @@ public class ConnectedUserAuthenticationFilter extends AbstractApiKeyAuthenticat
             .keyLocator(new SigningKeyLocator(environment))
             .build()
             .parseSignedClaims(secretKey);
-    }
-
-    private static UrlItems getUrlItems(Pattern pathPattern, HttpServletRequest request) {
-        Matcher matcher = pathPattern.matcher(request.getRequestURI());
-
-        Environment environment = null;
-        int version = 0;
-
-        if (matcher.find()) {
-            String group = matcher.group(1);
-
-            version = Integer.parseInt(group);
-
-            group = matcher.group(2);
-
-            environment = Environment.valueOf(group.toUpperCase());
-        }
-
-        return new UrlItems(environment, version);
     }
 
     private class SigningKeyLocator implements Locator<Key> {

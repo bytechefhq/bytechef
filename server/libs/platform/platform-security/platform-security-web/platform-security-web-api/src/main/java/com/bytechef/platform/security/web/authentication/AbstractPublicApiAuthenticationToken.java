@@ -30,14 +30,12 @@ public abstract class AbstractPublicApiAuthenticationToken extends AbstractAuthe
     private Environment environment;
     private String tenantId;
     private User user;
-    private int version;
 
-    public AbstractPublicApiAuthenticationToken(Environment environment, int version, String tenantId) {
+    public AbstractPublicApiAuthenticationToken(Environment environment, String tenantId) {
         super(List.of());
 
         this.environment = environment;
         this.tenantId = tenantId;
-        this.version = version;
     }
 
     @SuppressFBWarnings("EI")
@@ -67,9 +65,5 @@ public abstract class AbstractPublicApiAuthenticationToken extends AbstractAuthe
 
     public String getTenantId() {
         return tenantId;
-    }
-
-    public int getVersion() {
-        return version;
     }
 }
