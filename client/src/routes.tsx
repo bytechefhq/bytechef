@@ -89,10 +89,6 @@ const platformSettingsRoutes = {
             title: 'Organization',
         },
         {
-            href: `api-connectors`,
-            title: 'API Connectors',
-        },
-        {
             href: `admin-api-keys`,
             title: 'Admin API Keys',
         },
