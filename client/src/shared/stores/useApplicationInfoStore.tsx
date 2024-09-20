@@ -9,6 +9,7 @@ export interface ApplicationInfoI {
     application: {
         edition: EditionType;
     } | null;
+    featureFlags: Record<string, boolean> | null;
 
     getApplicationInfo: () => void;
 }
@@ -24,6 +25,7 @@ export const useApplicationInfoStore = create<ApplicationInfoI>()(
         (set) => {
             return {
                 application: null,
+                featureFlags: null,
 
                 getApplicationInfo: async () => {
                     const response = await fetchGetApplicationInfo();
@@ -34,13 +36,14 @@ export const useApplicationInfoStore = create<ApplicationInfoI>()(
                         set((state) => ({
                             ...state,
                             application: json.application,
+                            featureFlags: json.featureFlags,
                         }));
                     }
                 },
             };
         },
         {
-            name: 'application-profile',
+            name: 'application-info',
         }
     )
 );
