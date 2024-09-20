@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-15T12:35:05.382973+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-20T12:48:11.486346+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 @Validated
 @Tag(name = "integration", description = "The Embedded Integration Public API")
 public interface IntegrationApi {
@@ -43,10 +43,10 @@ public interface IntegrationApi {
     }
 
     /**
-     * GET /{environment}/integrations : Get active configurations
+     * GET /integrations : Get active configurations
      * Get active integrations.
      *
-     * @param environment The environment. (required)
+     * @param environment The environment. (optional)
      * @return The list of active integrations. (status code 200)
      */
     @Operation(
@@ -62,12 +62,12 @@ public interface IntegrationApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/{environment}/integrations",
+        value = "/integrations",
         produces = { "application/json" }
     )
     
     default ResponseEntity<List<IntegrationModel>> getIntegrations(
-        @Parameter(name = "environment", description = "The environment.", required = true, in = ParameterIn.PATH) @PathVariable("environment") EnvironmentModel environment
+        @Parameter(name = "environment", description = "The environment.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "environment", required = false) EnvironmentModel environment
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
