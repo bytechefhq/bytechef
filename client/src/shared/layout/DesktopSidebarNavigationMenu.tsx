@@ -8,6 +8,7 @@ import {
     NavigationMenuViewport,
 } from '@/components/ui/navigation-menu';
 import {AppType, useAppTypeStore} from '@/pages/home/stores/useAppTypeStore';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {cn} from '@/shared/util/cn-utils';
 import React, {ComponentPropsWithoutRef, ElementRef, forwardRef} from 'react';
 import {Link} from 'react-router-dom';
@@ -16,6 +17,7 @@ import reactLogo from '../../assets/logo.svg';
 
 const DesktopSidebarNavigationMenu = () => {
     const {setCurrentType} = useAppTypeStore();
+    const {featureFlags} = useApplicationInfoStore();
 
     const handleClick = (appType: AppType) => {
         setCurrentType(appType);
@@ -43,9 +45,11 @@ const DesktopSidebarNavigationMenu = () => {
                                 </div>
                             </li>
 
-                            <ListItem onClick={() => handleClick(AppType.EMBEDDED)} title="Embedded">
-                                Build integrations for your product.
-                            </ListItem>
+                            {featureFlags && featureFlags['ff-520'] && (
+                                <ListItem onClick={() => handleClick(AppType.EMBEDDED)} title="Embedded">
+                                    Build integrations for your product.
+                                </ListItem>
+                            )}
 
                             <ListItem onClick={() => handleClick(AppType.AUTOMATION)} title="Automation">
                                 Automate your daily work.
