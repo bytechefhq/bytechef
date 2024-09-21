@@ -10,11 +10,6 @@ spring:
   devtools:
     restart:
       enabled: true
-  mail:
-    host: localhost
-    port: 1025
-    username:
-    password:
   messages:
     cache-duration: PT1S # 1 second, see the ISO 8601 standard
   thymeleaf:
@@ -32,6 +27,9 @@ bytechef:
 #    url: jdbc:h2:file:~/.bytechef/bytechef;DB_CLOSE_ON_EXIT=FALSE;CASE_INSENSITIVE_IDENTIFIERS=TRUE
 #    username: sa
 #    password:
+#  mail:
+#    host: localhost
+#    port: 1025
   security:
     remember-me:
       key: e48612ba1fd46fa7089fe9f5085d8d164b53ffb2

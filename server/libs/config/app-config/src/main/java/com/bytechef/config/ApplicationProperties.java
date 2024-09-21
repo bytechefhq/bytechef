@@ -424,7 +424,7 @@ public class ApplicationProperties {
             }
         }
 
-        public class Trigger {
+        public static class Trigger {
 
             private Subscriptions subscriptions = new Subscriptions();
 
@@ -642,10 +642,13 @@ public class ApplicationProperties {
 
     public static class Mail {
 
-        private boolean enabled;
         private String from;
+        private String host;
         private String baseUrl;
+        private String password;
+        private int port;
         private String tempDomainListUrl;
+        private String username;
 
         public String getBaseUrl() {
             return baseUrl;
@@ -653,14 +656,6 @@ public class ApplicationProperties {
 
         public void setBaseUrl(String baseUrl) {
             this.baseUrl = baseUrl;
-        }
-
-        public boolean isEnabled() {
-            return enabled;
-        }
-
-        public void setEnabled(boolean enabled) {
-            this.enabled = enabled;
         }
 
         public String getFrom() {
@@ -671,12 +666,44 @@ public class ApplicationProperties {
             this.from = from;
         }
 
+        public String getHost() {
+            return host;
+        }
+
+        public void setHost(String host) {
+            this.host = host;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
+        public int getPort() {
+            return port;
+        }
+
+        public void setPort(int port) {
+            this.port = port;
+        }
+
         public String getTempDomainListUrl() {
             return tempDomainListUrl;
         }
 
         public void setTempDomainListUrl(String tempDomainListUrl) {
             this.tempDomainListUrl = tempDomainListUrl;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public void setUsername(String username) {
+            this.username = username;
         }
     }
 
