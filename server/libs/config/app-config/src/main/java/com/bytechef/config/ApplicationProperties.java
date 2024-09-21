@@ -41,7 +41,6 @@ public class ApplicationProperties {
     private DataStorage dataStorage;
     private DiscoveryService discoveryService;
     private Edition edition;
-    private Email email;
     private Encryption encryption;
     private List<String> featureFlags;
     private FileStorage fileStorage;
@@ -86,10 +85,6 @@ public class ApplicationProperties {
 
     public Edition getEdition() {
         return edition;
-    }
-
-    public Email getEmail() {
-        return email;
     }
 
     public Encryption getEncryption() {
@@ -174,10 +169,6 @@ public class ApplicationProperties {
 
     public void setEdition(Edition edition) {
         this.edition = edition;
-    }
-
-    public void setEmail(Email email) {
-        this.email = email;
     }
 
     public void setEncryption(Encryption encryption) {
@@ -632,19 +623,6 @@ public class ApplicationProperties {
         }
     }
 
-    public static class Email {
-
-        private String tempDomainListUrl;
-
-        public String getTempDomainListUrl() {
-            return tempDomainListUrl;
-        }
-
-        public void setTempDomainListUrl(String tempDomainListUrl) {
-            this.tempDomainListUrl = tempDomainListUrl;
-        }
-    }
-
     public static class Encryption {
 
         public enum Provider {
@@ -667,6 +645,15 @@ public class ApplicationProperties {
         private boolean enabled;
         private String from;
         private String baseUrl;
+        private String tempDomainListUrl;
+
+        public String getBaseUrl() {
+            return baseUrl;
+        }
+
+        public void setBaseUrl(String baseUrl) {
+            this.baseUrl = baseUrl;
+        }
 
         public boolean isEnabled() {
             return enabled;
@@ -684,12 +671,12 @@ public class ApplicationProperties {
             this.from = from;
         }
 
-        public String getBaseUrl() {
-            return baseUrl;
+        public String getTempDomainListUrl() {
+            return tempDomainListUrl;
         }
 
-        public void setBaseUrl(String baseUrl) {
-            this.baseUrl = baseUrl;
+        public void setTempDomainListUrl(String tempDomainListUrl) {
+            this.tempDomainListUrl = tempDomainListUrl;
         }
     }
 
