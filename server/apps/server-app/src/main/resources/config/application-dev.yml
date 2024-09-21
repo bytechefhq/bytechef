@@ -10,8 +10,6 @@ spring:
   devtools:
     restart:
       enabled: true
-  liquibase:
-    contexts: mono
   mail:
     host: localhost
     port: 1025
