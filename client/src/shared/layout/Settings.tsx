@@ -14,9 +14,19 @@ interface SettingsProps {
 }
 
 const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
-    const {getApplicationInfo} = useApplicationInfoStore();
+    const {featureFlags, getApplicationInfo} = useApplicationInfoStore();
 
     const location = useLocation();
+    console.log(sidebarNavItems);
+    sidebarNavItems = sidebarNavItems.filter((navItem) => {
+        if (featureFlags) {
+            if (navItem.href?.includes('/account/appearance')) {
+                return featureFlags['ff-445'];
+            }
+        }
+
+        return true;
+    });
 
     useEffect(() => {
         getApplicationInfo();
