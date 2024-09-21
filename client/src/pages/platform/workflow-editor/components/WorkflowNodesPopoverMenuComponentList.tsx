@@ -2,6 +2,7 @@ import {Input} from '@/components/ui/input';
 import WorkflowNodesTabs from '@/pages/platform/workflow-editor/components/WorkflowNodesTabs';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {ClickedDefinitionType} from '@/shared/types';
 import {memo, useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -26,6 +27,8 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         selectedComponentName,
     }: WorkflowNodesListProps) => {
         const [filter, setFilter] = useState('');
+
+        const ff_797 = useApplicationInfoStore((state) => state.featureFlags?.['ff-797'] ?? false);
 
         const [filteredActionComponentDefinitions, setFilteredActionComponentDefinitions] = useState<
             Array<ComponentDefinitionBasic>
@@ -56,12 +59,14 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         useEffect(() => {
             if (componentDefinitions) {
                 setFilteredActionComponentDefinitions(
-                    componentDefinitions.filter(
-                        ({actionsCount, name, title}) =>
-                            actionsCount &&
-                            (name?.toLowerCase().includes(filter.toLowerCase()) ||
-                                title?.toLowerCase().includes(filter.toLowerCase()))
-                    )
+                    componentDefinitions
+                        .filter(
+                            ({actionsCount, name, title}) =>
+                                actionsCount &&
+                                (name?.toLowerCase().includes(filter.toLowerCase()) ||
+                                    title?.toLowerCase().includes(filter.toLowerCase()))
+                        )
+                        .filter(({name}) => (!ff_797 && name !== 'dataStream') || ff_797)
                 );
 
                 setFilteredTriggerComponentDefinitions(
@@ -73,7 +78,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                     )
                 );
             }
-        }, [componentDefinitions, filter]);
+        }, [componentDefinitions, filter, ff_797]);
 
         return (
             <div
