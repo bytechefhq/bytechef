@@ -23,6 +23,10 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
             if (navItem.href?.includes('/account/appearance')) {
                 return featureFlags['ff-445'];
             }
+
+            if (navItem.href === '/automation/settings/api-keys' && location.pathname.includes('automation/settings')) {
+                return featureFlags['ff-1023'];
+            }
         }
 
         return true;
