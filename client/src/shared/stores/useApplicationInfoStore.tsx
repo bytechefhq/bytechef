@@ -10,6 +10,9 @@ export interface ApplicationInfoI {
         edition: EditionType;
     } | null;
     featureFlags: Record<string, boolean> | null;
+    mail: {
+        enabled: boolean;
+    };
 
     getApplicationInfo: () => void;
 }
@@ -26,6 +29,9 @@ export const useApplicationInfoStore = create<ApplicationInfoI>()(
             return {
                 application: null,
                 featureFlags: null,
+                mail: {
+                    enabled: false,
+                },
 
                 getApplicationInfo: async () => {
                     const response = await fetchGetApplicationInfo();
@@ -37,6 +43,7 @@ export const useApplicationInfoStore = create<ApplicationInfoI>()(
                             ...state,
                             application: json.application,
                             featureFlags: json.featureFlags,
+                            mail: json.mail,
                         }));
                     }
                 },

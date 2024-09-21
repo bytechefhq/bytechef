@@ -5,6 +5,7 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Input} from '@/components/ui/input';
 import {useRegisterStore} from '@/pages/account/public/stores/useRegisterStore';
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {zodResolver} from '@hookform/resolvers/zod';
 import React, {useEffect} from 'react';
 import {useForm} from 'react-hook-form';
@@ -19,7 +20,8 @@ const formSchema = z.object({
 });
 
 export const Register = () => {
-    const {register, registerErrorMessage, registerSuccess} = useRegisterStore();
+    const {register, registerErrorMessage, registerSuccess, reset} = useRegisterStore();
+    const {getApplicationInfo, mail} = useApplicationInfoStore();
 
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
@@ -34,16 +36,24 @@ export const Register = () => {
     const navigate = useNavigate();
 
     function handleSubmit({email, password}: z.infer<typeof formSchema>) {
+        reset();
+
         register(email, password);
     }
 
     useEffect(() => {
         if (registerSuccess) {
-            navigate('/verify-email');
+            if (mail.enabled) {
+                navigate('/verify-email');
+            }
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [registerSuccess]);
+
+    useEffect(() => {
+        getApplicationInfo();
+    }, [getApplicationInfo]);
 
     return (
         <PublicLayoutContainer>
@@ -60,6 +70,20 @@ export const Register = () => {
                             <AlertTitle>Error</AlertTitle>
 
                             <AlertDescription>{registerErrorMessage}</AlertDescription>
+                        </Alert>
+                    )}
+
+                    {registerSuccess && !mail.enabled && (
+                        <Alert className="mb-4" variant="success">
+                            <AlertTitle>Success</AlertTitle>
+
+                            <AlertDescription className="space-x-1">
+                                <span>Your account is created. Please go to</span>
+
+                                <Link className="underline" to="/login">
+                                    Sign in
+                                </Link>
+                            </AlertDescription>
                         </Alert>
                     )}
 
