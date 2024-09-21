@@ -3,7 +3,7 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
-    <changeSet id="20240604153042" author="Ivica Cardic" contextFilter="mono">
+    <changeSet id="20240604153042" author="Ivica Cardic" contextFilter="mono and !multitenant and dev">
         <loadData file="config/liquibase/data/user.csv" separator=";" tableName="user" usePreparedStatements="true">
             <column name="id" type="numeric"/>
             <column name="activated" type="boolean"/>

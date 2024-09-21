@@ -84,7 +84,7 @@ spring:
   jmx:
     enabled: false
   liquibase:
-    contexts: mono
+    contexts: mono, #spring.profiles.active#
   output:
     ansi:
       console-available: true
