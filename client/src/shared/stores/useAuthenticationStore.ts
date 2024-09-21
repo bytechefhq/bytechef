@@ -18,6 +18,7 @@ export interface AuthenticationI {
     getAccount: () => void;
     login: (email: string, password: string, rememberMe: boolean) => void;
     logout: () => void;
+    reset: () => void;
 }
 
 const initialState = {
@@ -149,6 +150,12 @@ export const useAuthenticationStore = create<AuthenticationI>()(
 
                 // fetch new csrf token
                 // getAccount();
+            },
+
+            reset: () => {
+                set(() => ({
+                    ...initialState,
+                }));
             },
         }),
         {

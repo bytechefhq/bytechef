@@ -20,7 +20,7 @@ const formSchema = z.object({
 });
 
 const Login = () => {
-    const {authenticated, getAccount, login, loginError, sessionHasBeenFetched} = useAuthenticationStore();
+    const {authenticated, getAccount, login, loginError, reset, sessionHasBeenFetched} = useAuthenticationStore();
 
     const pageLocation = useLocation();
 
@@ -40,6 +40,10 @@ const Login = () => {
     const handleSubmit = ({email, password, rememberMe}: z.infer<typeof formSchema>) => {
         login(email, password, rememberMe);
     };
+
+    useEffect(() => {
+        reset();
+    }, [reset]);
 
     useEffect(() => {
         if (!sessionHasBeenFetched) {

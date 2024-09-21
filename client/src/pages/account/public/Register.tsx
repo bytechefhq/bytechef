@@ -42,6 +42,8 @@ export const Register = () => {
     }
 
     useEffect(() => {
+        form.reset({});
+
         if (registerSuccess) {
             if (mail.enabled) {
                 navigate('/verify-email');
@@ -50,6 +52,10 @@ export const Register = () => {
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [registerSuccess]);
+
+    useEffect(() => {
+        reset();
+    }, [reset]);
 
     useEffect(() => {
         getApplicationInfo();
