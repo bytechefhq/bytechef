@@ -10,6 +10,7 @@ export interface RegisterI {
     registerSuccess: boolean;
 
     register: (email: string, password: string) => void;
+    reset: () => void;
 }
 
 const fetchRegister = async (data: string): Promise<Response> => {
@@ -43,6 +44,13 @@ export const useRegisterStore = create<RegisterI>()(
                         registerErrorMessage: detail,
                     }));
                 }
+            },
+
+            reset: () => {
+                set(() => ({
+                    registerErrorMessage: '',
+                    registerSuccess: false,
+                }));
             },
         }),
         {
