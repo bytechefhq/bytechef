@@ -87,7 +87,6 @@ include("server:libs:config:static-resources-config")
 include("server:libs:config:security-config")
 include("server:libs:config:tenant-single-security-config")
 
-include("server:libs:core:annotation-api")
 include("server:libs:core:commons:commons-data")
 include("server:libs:core:commons:commons-util")
 include("server:libs:core:error-api")

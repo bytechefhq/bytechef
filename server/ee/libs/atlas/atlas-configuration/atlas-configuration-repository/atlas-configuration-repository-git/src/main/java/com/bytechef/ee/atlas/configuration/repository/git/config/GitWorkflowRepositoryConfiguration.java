@@ -7,9 +7,9 @@
 
 package com.bytechef.ee.atlas.configuration.repository.git.config;
 
+import com.bytechef.annotation.ConditionalOnEeVersion;
 import com.bytechef.atlas.configuration.repository.annotation.ConditionalOnWorkflowRepositoryGit;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.edition.annotation.ConditionalOnEEVersion;
 import com.bytechef.ee.atlas.configuration.repository.git.GitWorkflowRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +23,7 @@ import org.springframework.core.annotation.Order;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnEEVersion
+@ConditionalOnEeVersion
 @ConditionalOnWorkflowRepositoryGit
 public class GitWorkflowRepositoryConfiguration {
 

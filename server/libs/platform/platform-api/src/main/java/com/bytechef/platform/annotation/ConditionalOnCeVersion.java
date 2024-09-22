@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.edition.annotation;
+package com.bytechef.platform.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -32,5 +32,5 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
     ElementType.TYPE, ElementType.METHOD
 })
 @ConditionalOnProperty(prefix = "bytechef", name = "edition", havingValue = "ce", matchIfMissing = true)
-public @interface ConditionalOnCEVersion {
+public @interface ConditionalOnCeVersion {
 }
