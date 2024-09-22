@@ -18,7 +18,7 @@ package com.bytechef.platform.workflow.execution;
 
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.platform.constant.AppType;
-import com.bytechef.tenant.TenantContext;
+import com.bytechef.platform.tenant.TenantContext;
 import java.io.Serializable;
 import org.apache.commons.lang3.Validate;
 

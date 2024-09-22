@@ -5,7 +5,7 @@ dependencies {
     api(project(":server:libs:platform:platform-user:platform-user-api"))
 
     implementation("org.apache.commons:commons-lang3")
-    implementation(project(":server:libs:core:tenant:tenant-api"))
+    implementation(project(":server:libs:platform:platform-tenant:platform-tenant-api"))
 
     compileOnly("jakarta.servlet:jakarta.servlet-api")
 }

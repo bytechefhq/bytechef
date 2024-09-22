@@ -39,7 +39,8 @@ import org.springframework.security.web.authentication.RememberMeServices;
  * @author Ivica Cardic
  */
 @ComponentScan(basePackages = {
-    "com.bytechef.platform.user", "com.bytechef.platform.web.rest", "com.bytechef.tenant", "com.bytechef.ee.tenant"
+    "com.bytechef.platform.user", "com.bytechef.platform.web.rest", "com.bytechef.platform.tenant",
+    "com.bytechef.ee.platform.tenant"
 })
 @EnableAutoConfiguration
 @EnableConfigurationProperties(ApplicationProperties.class)
