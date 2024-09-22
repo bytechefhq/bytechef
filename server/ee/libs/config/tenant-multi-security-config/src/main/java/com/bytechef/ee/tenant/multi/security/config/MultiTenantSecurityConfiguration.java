@@ -7,11 +7,11 @@
 
 package com.bytechef.ee.tenant.multi.security.config;
 
-import com.bytechef.edition.annotation.ConditionalOnEEVersion;
 import com.bytechef.ee.tenant.multi.security.MultiTenantUserDetailsService;
 import com.bytechef.ee.tenant.multi.security.web.authentication.MultiTenantAuthenticationFailureHandler;
 import com.bytechef.ee.tenant.multi.security.web.authentication.MultiTenantAuthenticationSuccessHandler;
 import com.bytechef.ee.tenant.multi.security.web.filter.MultiTenantFilterAfterContributor;
+import com.bytechef.platform.annotation.ConditionalOnEeVersion;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
 import com.bytechef.tenant.service.TenantService;
@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnEEVersion
+@ConditionalOnEeVersion
 @ConditionalOnMultiTenant
 public class MultiTenantSecurityConfiguration {
 

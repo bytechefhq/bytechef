@@ -19,7 +19,7 @@ package com.bytechef.automation.configuration.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.web.rest.model.WorkspaceModel;
-import com.bytechef.edition.annotation.ConditionalOnCEVersion;
+import com.bytechef.platform.annotation.ConditionalOnCeVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}/internal")
-@ConditionalOnCEVersion
+@ConditionalOnCeVersion
 @ConditionalOnCoordinator
 public class WorkspaceApiController implements WorkspaceApi {
 

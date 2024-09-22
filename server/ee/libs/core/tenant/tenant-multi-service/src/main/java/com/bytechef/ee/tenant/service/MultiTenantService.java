@@ -16,8 +16,8 @@
 
 package com.bytechef.ee.tenant.service;
 
-import com.bytechef.edition.annotation.ConditionalOnEEVersion;
 import com.bytechef.ee.tenant.repository.TenantRepository;
+import com.bytechef.platform.annotation.ConditionalOnEeVersion;
 import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
 import com.bytechef.tenant.domain.Tenant;
 import com.bytechef.tenant.service.TenantService;
@@ -39,7 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Ivica Cardic
  */
 @Service
-@ConditionalOnEEVersion
+@ConditionalOnEeVersion
 @ConditionalOnMultiTenant
 public class MultiTenantService implements TenantService, ResourceLoaderAware {
 
