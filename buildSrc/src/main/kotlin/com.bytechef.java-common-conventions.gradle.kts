@@ -214,7 +214,6 @@ val check by tasks.existing {//mozda ovdje dodati task delete
                 !project.name.contains("atlas-configuration") &&
                 !project.name.contains("atlas-coordinator-api") &&
                 !project.name.contains("atlas-coordinator-impl") && // ovo korisiti CSV integracijski test
-                !project.name.contains("atlas-sync-executor") &&
                 !project.name.contains("atlas-execution") &&
                 !project.name.contains("atlas-worker-api") &&
                 !project.name.contains("atlas-worker-impl") && // ovo korisiti CSV integracijski test
@@ -227,6 +226,7 @@ val check by tasks.existing {//mozda ovdje dodati task delete
                 !project.name.contains("llm") && // REFINE: this includes all, probably it can be reduced
                 !project.name.contains("microsoft-commons") &&
                 !project.name.contains("platform-") && // HARD: many uses this
+                !project.name.contains("platform-coordinator") &&
                 !project.name.contains("platform-user-api") &&
                 !project.name.contains("platform-workflow-execution-api") &&
                 !project.name.contains("test-int-support") &&
