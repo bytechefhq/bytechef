@@ -16,7 +16,7 @@
 
 package com.bytechef.async.config;
 
-import com.bytechef.tenant.concurrent.TenantThreadPoolTaskExecutor;
+import com.bytechef.platform.tenant.concurrent.TenantThreadPoolTaskExecutor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.concurrent.Executor;
 import org.slf4j.Logger;

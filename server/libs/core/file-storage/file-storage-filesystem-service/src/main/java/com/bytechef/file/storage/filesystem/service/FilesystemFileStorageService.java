@@ -19,7 +19,7 @@ package com.bytechef.file.storage.filesystem.service;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.exception.FileStorageException;
 import com.bytechef.file.storage.service.FileStorageService;
-import com.bytechef.tenant.TenantContext;
+import com.bytechef.platform.tenant.TenantContext;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;

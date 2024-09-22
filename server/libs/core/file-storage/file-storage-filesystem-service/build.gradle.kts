@@ -4,5 +4,5 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:file-storage:file-storage-api"))
-    implementation(project(":server:libs:core:tenant:tenant-api"))
+    implementation(project(":server:libs:platform:platform-tenant:platform-tenant-api"))
 }

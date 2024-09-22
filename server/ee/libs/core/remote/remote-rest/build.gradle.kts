@@ -3,5 +3,5 @@ dependencies {
 
     implementation("org.springframework:spring-webmvc")
     implementation("org.springframework.security:spring-security-web")
-    implementation(project(":server:libs:core:tenant:tenant-api"))
+    implementation(project(":server:libs:platform:platform-tenant:platform-tenant-api"))
 }

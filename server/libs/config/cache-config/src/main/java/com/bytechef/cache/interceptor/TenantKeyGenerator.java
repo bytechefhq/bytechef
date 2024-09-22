@@ -16,7 +16,7 @@
 
 package com.bytechef.cache.interceptor;
 
-import com.bytechef.tenant.cache.TenantCacheKeyGenerator;
+import com.bytechef.platform.tenant.cache.TenantCacheKeyGenerator;
 import java.lang.reflect.Method;
 import org.springframework.cache.interceptor.KeyGenerator;
 

@@ -56,7 +56,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
-import com.bytechef.tenant.TenantContext;
+import com.bytechef.platform.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;

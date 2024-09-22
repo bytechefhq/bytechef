@@ -7,8 +7,8 @@
 
 package com.bytechef.ee.remote.web.filter;
 
-import com.bytechef.tenant.TenantContext;
-import com.bytechef.tenant.constant.TenantConstants;
+import com.bytechef.platform.tenant.TenantContext;
+import com.bytechef.platform.tenant.constant.TenantConstants;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

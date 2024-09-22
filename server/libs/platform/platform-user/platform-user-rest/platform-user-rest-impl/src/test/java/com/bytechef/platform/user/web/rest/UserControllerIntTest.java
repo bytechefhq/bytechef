@@ -28,13 +28,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.tenant.cache.TenantCacheKeyGenerator;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
 import com.bytechef.platform.user.mapper.UserMapper;
 import com.bytechef.platform.user.repository.UserRepository;
 import com.bytechef.platform.user.web.rest.config.UserIntTestConfiguration;
-import com.bytechef.tenant.cache.TenantCacheKeyGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
