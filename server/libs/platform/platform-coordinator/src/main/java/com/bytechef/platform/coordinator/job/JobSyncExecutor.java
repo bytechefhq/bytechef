@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.sync.executor;
+package com.bytechef.platform.coordinator.job;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
