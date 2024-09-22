@@ -90,7 +90,7 @@ include("server:libs:config:tenant-single-security-config")
 
 include("server:libs:core:commons:commons-data")
 include("server:libs:core:commons:commons-util")
-include("server:libs:core:error-api")
+include("server:libs:core:error:error-api")
 include("server:libs:core:encryption:encryption-api")
 include("server:libs:core:encryption:encryption-filesystem")
 include("server:libs:core:encryption:encryption-impl")
