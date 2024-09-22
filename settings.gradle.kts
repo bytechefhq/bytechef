@@ -31,6 +31,7 @@ rootProject.name = "bytechef"
 
 include("cli:cli-app")
 include("cli:commands:component")
+include("cli:commands:component:init:openapi")
 
 include("server:apps:server-app")
 
@@ -314,10 +315,6 @@ include("server:libs:test:test-int-support")
 include("sdks:backend:java:component-api")
 include("sdks:backend:java:component-test")
 include("sdks:backend:java:definition-api")
-
-// EE
-
-include("cli:ee:commands:component:init:openapi")
 
 include("server:ee:apps:api-gateway-app")
 include("server:ee:apps:config-server-app")
