@@ -111,7 +111,13 @@ public class AccountController {
             throw new EmailAlreadyUsedException();
         }
 
+        ApplicationProperties.Mail mail = applicationProperties.getMail();
+
         if (tenantService.isMultiTenantEnabled()) {
+            if (StringUtils.isBlank(mail.getHost())) {
+                throw new IllegalStateException("Mail server not enabled. Please contact your administrator.");
+            }
+
             if (tenantService.tenantIdsByUserLoginExist(managedUserVM.getLogin())) {
                 throw new LoginAlreadyUsedException();
             }
@@ -131,8 +137,6 @@ public class AccountController {
         }
 
         User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
-
-        ApplicationProperties.Mail mail = applicationProperties.getMail();
 
         if (StringUtils.isBlank(mail.getHost())) {
             userService.activateRegistration(user.getActivationKey());
