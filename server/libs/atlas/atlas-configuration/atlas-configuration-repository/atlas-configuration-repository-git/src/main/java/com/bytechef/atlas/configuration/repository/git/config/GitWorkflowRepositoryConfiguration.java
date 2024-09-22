@@ -1,16 +1,24 @@
 /*
  * Copyright 2023-present ByteChef Inc.
  *
- * Licensed under the ByteChef Enterprise license (the "Enterprise License");
- * you may not use this file except in compliance with the Enterprise License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
-package com.bytechef.ee.atlas.configuration.repository.git.config;
+package com.bytechef.atlas.configuration.repository.git.config;
 
-import com.bytechef.annotation.ConditionalOnEeVersion;
 import com.bytechef.atlas.configuration.repository.annotation.ConditionalOnWorkflowRepositoryGit;
+import com.bytechef.atlas.configuration.repository.git.GitWorkflowRepository;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.ee.atlas.configuration.repository.git.GitWorkflowRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -18,12 +26,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 
 /**
- * @version ee
- *
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnEeVersion
 @ConditionalOnWorkflowRepositoryGit
 public class GitWorkflowRepositoryConfiguration {
 

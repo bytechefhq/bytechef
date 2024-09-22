@@ -18,6 +18,7 @@ dependencies {
     implementation("org.springframework.retry:spring-retry")
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-config"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-converter"))
+    implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-git"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
     implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-impl"))
@@ -58,7 +59,6 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-api"))
 
-    implementation(project(":server:ee:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-git"))
     implementation(project(":server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-remote-rest"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
