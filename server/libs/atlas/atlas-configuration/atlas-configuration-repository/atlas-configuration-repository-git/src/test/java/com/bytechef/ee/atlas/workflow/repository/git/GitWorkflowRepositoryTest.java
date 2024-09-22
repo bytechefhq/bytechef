@@ -9,9 +9,9 @@ package com.bytechef.ee.atlas.workflow.repository.git;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.Format;
+import com.bytechef.atlas.configuration.repository.git.GitWorkflowRepository;
+import com.bytechef.atlas.configuration.repository.git.operations.GitWorkflowOperations;
 import com.bytechef.atlas.configuration.workflow.mapper.WorkflowResource;
-import com.bytechef.ee.atlas.configuration.repository.git.GitWorkflowRepository;
-import com.bytechef.ee.atlas.configuration.repository.git.operations.GitWorkflowOperations;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
