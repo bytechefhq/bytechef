@@ -18,6 +18,7 @@ package com.bytechef.platform.user.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.PersistentToken;
@@ -72,6 +73,7 @@ public class AccountController {
 
     private static final Logger log = LoggerFactory.getLogger(AccountController.class);
 
+    private final ApplicationProperties applicationProperties;
     private final AuthorityService authorityService;
     private final MailService mailService;
     private final PersistentTokenService persistentTokenService;
@@ -81,9 +83,11 @@ public class AccountController {
 
     @SuppressFBWarnings("EI")
     public AccountController(
-        AuthorityService authorityService, MailService mailService, PersistentTokenService persistentTokenService,
-        TenantService tenantService, UserService userService, TempEmailService tempEmailService) {
+        ApplicationProperties applicationProperties, AuthorityService authorityService, MailService mailService,
+        PersistentTokenService persistentTokenService, TenantService tenantService, UserService userService,
+        TempEmailService tempEmailService) {
 
+        this.applicationProperties = applicationProperties;
         this.authorityService = authorityService;
         this.persistentTokenService = persistentTokenService;
         this.tenantService = tenantService;
@@ -128,7 +132,13 @@ public class AccountController {
 
         User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
 
-        mailService.sendActivationEmail(user);
+        ApplicationProperties.Mail mail = applicationProperties.getMail();
+
+        if (StringUtils.isBlank(mail.getHost())) {
+            userService.activateRegistration(user.getActivationKey());
+        } else {
+            mailService.sendActivationEmail(user);
+        }
     }
 
     /**
