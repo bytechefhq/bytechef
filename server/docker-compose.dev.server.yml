@@ -4,7 +4,7 @@ services:
   postgres:
     image: postgres:14-alpine
     ports:
-      - 5432:5432
+      - "5432:5432"
     volumes:
       - db:/var/lib/postgresql/data
     environment:
@@ -22,7 +22,7 @@ services:
     image: redis:7-alpine
     restart: always
     ports:
-      - '6379:6379'
+      - "6379:6379"
     command: redis-server --save 20 1 --loglevel warning
     volumes:
       - cache:/data
@@ -45,7 +45,7 @@ services:
       - SPRING_DATA_REDIS_HOST=redis
 #      - WORKFLOW_MESSAGE_BROKER_PROVIDER=amqp
     ports:
-      - '9555:9555'
+      - "9555:9555"
 volumes:
   cache:
     driver: local
