@@ -70,8 +70,7 @@ public final class SecurityUtils {
 
         Authentication authentication = context.getAuthentication();
 
-        return authentication != null
-            && getAuthorities(authentication).noneMatch(AuthorityConstants.ANONYMOUS::equals);
+        return authentication != null && getAuthorities(authentication).noneMatch(AuthorityConstants.ANONYMOUS::equals);
     }
 
     /**
