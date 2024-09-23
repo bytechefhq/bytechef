@@ -44,6 +44,8 @@ services:
 #      - SPRING_RABBITMQ_PORT=5672
       - SPRING_DATA_REDIS_HOST=redis
 #      - WORKFLOW_MESSAGE_BROKER_PROVIDER=amqp
+    env_file:
+      - local.env
     ports:
       - "9555:9555"
 volumes:
