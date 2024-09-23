@@ -38,6 +38,7 @@ dependencies {
 
     compileOnly("jakarta.servlet:jakarta.servlet-api:6.0.0")
 
+    implementation("org.apache.commons:commons-lang3")
     implementation(libs.io.swagger.core.v3.swagger.annotations)
     implementation(libs.org.openapitools.jackson.databind.nullable)
     implementation("jakarta.annotation:jakarta.annotation-api")
