@@ -70,6 +70,7 @@ const WorkflowNodesSidebar = ({
             <main className="size-full pt-1">
                 <WorkflowNodesTabs
                     actionComponentDefinitions={filteredActionComponentDefinitions}
+                    hideTriggerComponents
                     itemsDraggable
                     taskDispatcherDefinitions={filteredTaskDispatcherDefinitions}
                     triggerComponentDefinitions={filteredTriggerComponentDefinitions}
