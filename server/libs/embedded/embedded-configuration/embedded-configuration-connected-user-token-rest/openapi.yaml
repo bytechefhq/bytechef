@@ -19,9 +19,9 @@ paths:
         - "integration"
       operationId: "getIntegrations"
       parameters:
-        - name: "environment"
+        - name: "x-environment"
           description: "The environment."
-          in: "query"
+          in: "header"
           required: false
           schema:
             $ref: '../embedded-configuration-public-rest/embedded-configuration-public-rest-impl/openapi.yaml#/components/schemas/Environment'
