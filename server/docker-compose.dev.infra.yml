@@ -3,12 +3,12 @@ version: "3.9"
 services:
   mailhog:
     image: mailhog/mailhog
-    container_name: 'mailhog'
+    container_name: mailhog
     ports:
       - "1025:1025"
       - "8025:8025"
   postgres:
-    image: "postgres:14-alpine"
+    image: postgres:14-alpine
     ports:
     - "5432:5432"
     volumes:
@@ -20,8 +20,8 @@ services:
     - "5672:5672"
     - "15672:15672"
   redis:
-    image: "redis:7-alpine"
-    restart: "always"
+    image: redis:7-alpine
+    restart: always
     ports:
     - "6379:6379"
     command: "redis-server --save 20 1 --loglevel warning"
