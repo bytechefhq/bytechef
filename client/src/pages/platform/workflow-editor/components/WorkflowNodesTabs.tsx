@@ -42,7 +42,7 @@ const WorkflowNodesTabs = ({
 
                 {!hideActionComponents && (
                     <TabsTrigger className="w-full" value="components">
-                        Components
+                        Actions
                     </TabsTrigger>
                 )}
 
