@@ -105,21 +105,17 @@ const WorkflowNodeDetailsPanel = ({
         !!workflow.id && !!currentNode
     );
 
-    const getActionName = (): string => {
-        const currentComponentActionNames = currentComponentDefinition?.actions?.map((action) => action.name);
-
-        return currentComponentActionNames?.includes(currentOperationName)
-            ? currentOperationName
-            : (currentComponentDefinition?.actions?.[0]?.name as string);
-    };
+    const matchingOperation = currentComponentDefinition?.actions?.find(
+        (action) => action.name === currentOperationName
+    );
 
     const {data: currentActionDefinition, isFetched: currentActionFetched} = useGetComponentActionDefinitionQuery(
         {
-            actionName: getActionName(),
+            actionName: currentOperationName,
             componentName: currentComponentDefinition?.name as string,
             componentVersion: currentComponentDefinition?.version as number,
         },
-        !!currentComponentDefinition?.actions && !currentNode?.trigger && !!getActionName()
+        !!currentComponentDefinition?.actions && !currentNode?.trigger && !!matchingOperation
     );
 
     const getTriggerName = (): string => {
@@ -195,12 +191,12 @@ const WorkflowNodeDetailsPanel = ({
     const currentWorkflowTrigger = workflow.triggers?.find((trigger) => trigger.name === currentNode?.name);
     const currentWorkflowTask = workflow.tasks?.find((task) => task.name === currentNode?.name);
 
-    const workflowConnections: WorkflowConnection[] =
+    const componentConnections: WorkflowConnection[] =
         currentWorkflowTask?.connections || currentWorkflowTrigger?.connections || [];
 
     const nodeTabs = TABS.filter(({name}) => {
         if (name === 'connection') {
-            return workflowConnections.length > 0;
+            return componentConnections.length > 0;
         }
 
         if (name === 'dataStreamComponents') {
@@ -293,7 +289,7 @@ const WorkflowNodeDetailsPanel = ({
         if (currentNodeDefinition?.properties) {
             setCurrentOperationProperties(currentNodeDefinition?.properties);
         }
-    }, [currentNodeDefinition?.properties, currentNode?.trigger, currentTriggerDefinition?.properties]);
+    }, [currentNodeDefinition?.properties]);
 
     // Set availableDataPills depending on previousComponentProperties
     useEffect(() => {
@@ -317,7 +313,7 @@ const WorkflowNodeDetailsPanel = ({
 
     // Tab switching logic
     useEffect(() => {
-        if (activeTab === 'connection' && workflowConnections.length === 0) {
+        if (activeTab === 'connection' && componentConnections.length === 0) {
             setActiveTab('description');
         }
 
@@ -423,9 +419,22 @@ const WorkflowNodeDetailsPanel = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [componentActions, currentNode?.name]);
 
+    useEffect(() => {
+        if (!currentOperationName || !matchingOperation?.name) {
+            setCurrentOperationName(currentNode?.operationName || currentComponentDefinition?.actions?.[0]?.name || '');
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentNode?.name, matchingOperation?.name]);
+
     const data = currentComponentDefinition || currentTaskDispatcherDefinition;
 
-    if (!workflowNodeDetailsPanelOpen || !currentNode?.name || !data) {
+    if (
+        !workflowNodeDetailsPanelOpen ||
+        !currentNode?.name ||
+        !data ||
+        !matchingOperation?.name ||
+        !currentActionFetched
+    ) {
         return <></>;
     }
 
@@ -523,13 +532,13 @@ const WorkflowNodeDetailsPanel = ({
                                 {activeTab === 'dataStreamComponents' && <DataStreamComponentsTab />}
 
                                 {activeTab === 'connection' &&
-                                    workflowConnections.length > 0 &&
+                                    componentConnections.length > 0 &&
                                     currentNode &&
                                     currentComponentDefinition && (
                                         <ConnectionTab
                                             componentDefinition={currentComponentDefinition}
                                             key={`${currentNode?.name}_connection`}
-                                            workflowConnections={workflowConnections}
+                                            workflowConnections={componentConnections}
                                             workflowId={workflow.id!}
                                             workflowNodeName={currentNode?.name}
                                             workflowTestConfigurationConnections={workflowTestConfigurationConnections}
