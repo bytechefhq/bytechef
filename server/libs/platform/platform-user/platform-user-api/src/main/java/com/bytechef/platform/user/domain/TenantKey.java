@@ -14,21 +14,28 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.tenant;
+package com.bytechef.platform.user.domain;
 
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.RandomUtils;
+import com.bytechef.platform.tenant.TenantContext;
 
 public class TenantKey {
 
+    private final String secretKey;
     private final String tenantId;
 
-    private TenantKey(String tenantId) {
+    private TenantKey(String secretKey, String tenantId) {
+        this.secretKey = secretKey;
         this.tenantId = tenantId;
     }
 
     public static TenantKey of() {
-        return new TenantKey(TenantContext.getCurrentTenantId());
+        String tenantId = TenantContext.getCurrentTenantId();
+        return new TenantKey(
+            EncodingUtils.base64EncodeToString(
+                tenantId + ":" + EncodingUtils.base64EncodeToString(RandomUtils.nextBytes(24))),
+            tenantId);
     }
 
     public static TenantKey parse(String secretKey) {
@@ -36,7 +43,11 @@ public class TenantKey {
 
         String[] items = secretKey.split(":");
 
-        return new TenantKey(items[0]);
+        return new TenantKey(secretKey, items[0]);
+    }
+
+    public String getSecretKey() {
+        return secretKey;
     }
 
     public String getTenantId() {
@@ -45,7 +56,6 @@ public class TenantKey {
 
     @Override
     public String toString() {
-        return EncodingUtils.base64EncodeToString(
-            tenantId + ":" + EncodingUtils.base64EncodeToString(RandomUtils.nextBytes(24)));
+        return secretKey;
     }
 }

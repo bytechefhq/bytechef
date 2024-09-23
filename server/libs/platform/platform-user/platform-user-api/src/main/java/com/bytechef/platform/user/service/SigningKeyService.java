@@ -32,13 +32,11 @@ public interface SigningKeyService {
 
     void delete(long id);
 
-    PublicKey getPublicKey(long id);
-
-    PublicKey getPublicKey(String keyId, Environment environment);
+    PublicKey getPublicKey(@NonNull String keyId, @NonNull Environment environment);
 
     SigningKey getSigningKey(long id);
 
-    List<SigningKey> getSigningKeys(AppType type);
+    List<SigningKey> getSigningKeys(@NonNull AppType type);
 
     SigningKey update(@NonNull SigningKey signingKey);
 }

@@ -19,8 +19,8 @@ package com.bytechef.platform.user.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.constant.Environment;
-import com.bytechef.platform.tenant.TenantKey;
 import com.bytechef.platform.user.domain.SigningKey;
+import com.bytechef.platform.user.domain.TenantKey;
 import com.bytechef.platform.user.repository.SigningKeyRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.security.KeyFactory;
@@ -75,7 +75,7 @@ public class SigningKeyServiceImpl implements SigningKeyService {
 
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
 
-        signingKey.setKeyId(String.valueOf(TenantKey.of()));
+        signingKey.setKeyId(TenantKey.of());
 
         PublicKey publicKey = keyPair.getPublic();
 
@@ -95,14 +95,7 @@ public class SigningKeyServiceImpl implements SigningKeyService {
 
     @Override
     @Transactional(readOnly = true)
-    public PublicKey getPublicKey(long id) {
-        SigningKey signingKey = OptionalUtils.get(signingKeyRepository.findById(id));
-
-        return stringToPublicKey(signingKey.getPublicKey());
-    }
-
-    @Override
-    public PublicKey getPublicKey(String keyId, Environment environment) {
+    public PublicKey getPublicKey(@NonNull String keyId, @NonNull Environment environment) {
         SigningKey signingKey = OptionalUtils.get(
             signingKeyRepository.findByKeyIdAndEnvironment(keyId, environment.ordinal()), "Signing key not found");
 
@@ -117,7 +110,7 @@ public class SigningKeyServiceImpl implements SigningKeyService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<SigningKey> getSigningKeys(AppType type) {
+    public List<SigningKey> getSigningKeys(@NonNull AppType type) {
         return signingKeyRepository.findAllByType(type.ordinal());
     }
 

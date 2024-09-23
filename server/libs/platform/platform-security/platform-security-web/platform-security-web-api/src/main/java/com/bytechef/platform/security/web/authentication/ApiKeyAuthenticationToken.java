@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.security.web.authentication;
 
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.security.core.userdetails.User;
@@ -27,8 +28,8 @@ public class ApiKeyAuthenticationToken extends AbstractPublicApiAuthenticationTo
 
     private String secretKey;
 
-    public ApiKeyAuthenticationToken(Environment environment, String secretKey, String tenantId) {
-        super(environment, tenantId);
+    public ApiKeyAuthenticationToken(String secretKey, Environment environment, String tenantId, AppType type) {
+        super(environment, tenantId, type);
 
         this.secretKey = secretKey;
     }
