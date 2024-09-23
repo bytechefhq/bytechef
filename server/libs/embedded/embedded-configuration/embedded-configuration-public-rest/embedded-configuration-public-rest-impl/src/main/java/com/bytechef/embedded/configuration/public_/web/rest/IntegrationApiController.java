@@ -24,6 +24,7 @@ import com.bytechef.embedded.configuration.public_.web.rest.model.IntegrationMod
 import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
@@ -49,12 +50,13 @@ public class IntegrationApiController implements IntegrationApi {
     }
 
     @Override
-    public ResponseEntity<List<IntegrationModel>> getIntegrations(EnvironmentModel environment) {
-        String name = environment.name();
+    public ResponseEntity<List<IntegrationModel>> getIntegrations(EnvironmentModel xEnvironment) {
+        Environment environment = xEnvironment == null
+            ? Environment.PRODUCTION : Environment.valueOf(StringUtils.upperCase(xEnvironment.name()));
 
         return ResponseEntity.ok(
             integrationFacade
-                .getEnabledIntegrationInstanceConfigurationIntegrations(Environment.valueOf(name.toUpperCase()))
+                .getEnabledIntegrationInstanceConfigurationIntegrations(environment)
                 .stream()
                 .map(integrationDTO -> conversionService.convert(integrationDTO, IntegrationModel.class))
                 .toList());
