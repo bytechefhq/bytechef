@@ -107,8 +107,8 @@ module.exports = {
             },
             width: {
                 'workflow-nodes-popover-actions-menu-width': '400px',
-                'workflow-nodes-popover-component-menu-width': '300px',
-                'workflow-nodes-popover-menu-width': '700px',
+                'workflow-nodes-popover-component-menu-width': '330px',
+                'workflow-nodes-popover-menu-width': '730px',
             },
         },
     },
