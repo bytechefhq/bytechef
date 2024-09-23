@@ -32,7 +32,7 @@ public interface ApiKeyRepository extends ListCrudRepository<ApiKey, Long> {
 
     List<ApiKey> findAllByTypeIsNull();
 
-    Optional<ApiKey> findByEnvironmentAndSecretKey(int environment, String apiKey);
+    Optional<ApiKey> findBySecretKeyAndEnvironmentAndType(String secretKey, int environment, int type);
 
     Optional<ApiKey> findBySecretKeyAndEnvironmentIsNull(String secretKey);
 }

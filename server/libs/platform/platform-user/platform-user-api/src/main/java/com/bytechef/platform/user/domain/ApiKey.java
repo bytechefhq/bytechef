@@ -175,6 +175,10 @@ public class ApiKey {
         this.secretKey = secretKey;
     }
 
+    public void setSecretKey(TenantKey tenantKey) {
+        this.secretKey = tenantKey.toString();
+    }
+
     public void setType(AppType type) {
         if (type != null) {
             this.type = type.ordinal();
@@ -199,5 +203,4 @@ public class ApiKey {
             ", lastUsedDate=" + lastUsedDate +
             '}';
     }
-
 }

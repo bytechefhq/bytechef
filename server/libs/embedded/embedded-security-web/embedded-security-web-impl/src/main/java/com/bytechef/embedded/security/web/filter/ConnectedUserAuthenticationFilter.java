@@ -18,9 +18,9 @@ package com.bytechef.embedded.security.web.filter;
 
 import com.bytechef.embedded.security.web.authentication.ConnectedUserAuthenticationToken;
 import com.bytechef.platform.constant.Environment;
-import com.bytechef.platform.security.web.filter.AbstractApiKeyAuthenticationFilter;
-import com.bytechef.platform.tenant.TenantKey;
+import com.bytechef.platform.security.web.filter.AbstractPublicApiAuthenticationFilter;
 import com.bytechef.platform.tenant.util.TenantUtils;
+import com.bytechef.platform.user.domain.TenantKey;
 import com.bytechef.platform.user.service.SigningKeyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jsonwebtoken.Claims;
@@ -37,7 +37,7 @@ import org.springframework.security.core.Authentication;
 /**
  * @author Ivica Cardic
  */
-public class ConnectedUserAuthenticationFilter extends AbstractApiKeyAuthenticationFilter {
+public class ConnectedUserAuthenticationFilter extends AbstractPublicApiAuthenticationFilter {
 
     private final SigningKeyService signingKeyService;
 
@@ -45,7 +45,7 @@ public class ConnectedUserAuthenticationFilter extends AbstractApiKeyAuthenticat
     public ConnectedUserAuthenticationFilter(
         AuthenticationManager authenticationManager, SigningKeyService signingKeyService) {
 
-        super("/api/embedded/v([0-9]+)/by-connected-user-token/.+", authenticationManager);
+        super("/api/embedded/by-connected-user-token/v([0-9]+)/.+", authenticationManager);
 
         this.signingKeyService = signingKeyService;
     }
@@ -56,7 +56,7 @@ public class ConnectedUserAuthenticationFilter extends AbstractApiKeyAuthenticat
 
         Environment environment = getEnvironment(request);
 
-        Jws<Claims> jws = getJws(environment, token);
+        Jws<Claims> jws = getJws(token, environment);
 
         Claims payload = jws.getPayload();
 
@@ -66,10 +66,10 @@ public class ConnectedUserAuthenticationFilter extends AbstractApiKeyAuthenticat
 
         TenantKey tenantKey = TenantKey.parse(header.getKeyId());
 
-        return new ConnectedUserAuthenticationToken(environment, externalUserId, tenantKey.getTenantId());
+        return new ConnectedUserAuthenticationToken(externalUserId, environment, tenantKey.getTenantId());
     }
 
-    private Jws<Claims> getJws(Environment environment, String secretKey) {
+    private Jws<Claims> getJws(String secretKey, Environment environment) {
         return Jwts.parser()
             .keyLocator(new SigningKeyLocator(environment))
             .build()

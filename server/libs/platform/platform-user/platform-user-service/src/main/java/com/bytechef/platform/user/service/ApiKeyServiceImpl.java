@@ -19,8 +19,8 @@ package com.bytechef.platform.user.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.constant.Environment;
-import com.bytechef.platform.tenant.TenantKey;
 import com.bytechef.platform.user.domain.ApiKey;
+import com.bytechef.platform.user.domain.TenantKey;
 import com.bytechef.platform.user.repository.ApiKeyRepository;
 import java.util.List;
 import java.util.Optional;
@@ -48,7 +48,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
         Validate.isTrue(apiKey.getId() == null, "'id' must be null");
         Validate.notNull(apiKey.getName(), "'name' must not be null");
 
-        apiKey.setSecretKey(String.valueOf(TenantKey.of()));
+        apiKey.setSecretKey(TenantKey.of());
 
         apiKey = apiKeyRepository.save(apiKey);
 
@@ -61,11 +61,13 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     }
 
     @Override
-    public Optional<ApiKey> fetchApiKey(@NonNull String secretKey, Environment environment) {
+    @Transactional(readOnly = true)
+    public Optional<ApiKey> fetchApiKey(@NonNull String secretKey, Environment environment, AppType type) {
         if (environment == null) {
             return apiKeyRepository.findBySecretKeyAndEnvironmentIsNull(secretKey);
         } else {
-            return apiKeyRepository.findByEnvironmentAndSecretKey(environment.ordinal(), secretKey);
+            return apiKeyRepository.findBySecretKeyAndEnvironmentAndType(
+                secretKey, environment.ordinal(), type.ordinal());
         }
     }
 

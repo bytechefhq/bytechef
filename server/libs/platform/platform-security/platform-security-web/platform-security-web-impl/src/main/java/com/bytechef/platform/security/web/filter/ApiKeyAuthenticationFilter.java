@@ -22,7 +22,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 /**
  * @author Ivica Cardic
  */
-public class ApiKeyAuthenticationFilter extends AbstractApiKeyAuthenticationFilter {
+public class ApiKeyAuthenticationFilter extends AbstractPublicApiAuthenticationFilter {
 
     @SuppressFBWarnings("EI")
     public ApiKeyAuthenticationFilter(AuthenticationManager authenticationManager) {

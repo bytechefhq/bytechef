@@ -16,11 +16,12 @@
 
 package com.bytechef.platform.security.web.filter;
 
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.security.web.authentication.AbstractPublicApiAuthenticationToken;
 import com.bytechef.platform.security.web.authentication.ApiKeyAuthenticationToken;
-import com.bytechef.platform.tenant.TenantKey;
 import com.bytechef.platform.tenant.util.TenantUtils;
+import com.bytechef.platform.user.domain.TenantKey;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,7 +40,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 /**
  * @author Ivica Cardic
  */
-public abstract class AbstractApiKeyAuthenticationFilter extends OncePerRequestFilter {
+public abstract class AbstractPublicApiAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String AUTH_TOKEN_HEADER_NAME = "Authorization";
 
@@ -47,7 +48,7 @@ public abstract class AbstractApiKeyAuthenticationFilter extends OncePerRequestF
     private final RequestMatcher requestMatcher;
 
     @SuppressFBWarnings("EI")
-    public AbstractApiKeyAuthenticationFilter(String pathPatternRegex, AuthenticationManager authenticationManager) {
+    public AbstractPublicApiAuthenticationFilter(String pathPatternRegex, AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
         this.requestMatcher = new NegatedRequestMatcher(RegexRequestMatcher.regexMatcher(pathPatternRegex));
     }
@@ -56,12 +57,11 @@ public abstract class AbstractApiKeyAuthenticationFilter extends OncePerRequestF
     protected void doFilterInternal(
         HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) {
 
-        Authentication authentication = getAuthentication(httpServletRequest);
-
-        String tenantId = ((AbstractPublicApiAuthenticationToken) authentication).getTenantId();
+        AbstractPublicApiAuthenticationToken authentication =
+            (AbstractPublicApiAuthenticationToken) getAuthentication(httpServletRequest);
 
         TenantUtils.runWithTenantId(
-            tenantId,
+            authentication.getTenantId(),
             () -> {
                 Authentication authenticatedAuthentication = authenticationManager.authenticate(authentication);
 
@@ -78,7 +78,17 @@ public abstract class AbstractApiKeyAuthenticationFilter extends OncePerRequestF
 
         TenantKey tenantKey = TenantKey.parse(token);
 
-        return new ApiKeyAuthenticationToken(getEnvironment(request), token, tenantKey.getTenantId());
+        String requestURI = request.getRequestURI();
+
+        AppType type = null;
+
+        if (requestURI.contains("/automation/")) {
+            type = AppType.AUTOMATION;
+        } else if (requestURI.contains("/embedded/")) {
+            type = AppType.EMBEDDED;
+        }
+
+        return new ApiKeyAuthenticationToken(token, getEnvironment(request), tenantKey.getTenantId(), type);
     }
 
     protected String getAuthToken(HttpServletRequest request) {
@@ -92,13 +102,13 @@ public abstract class AbstractApiKeyAuthenticationFilter extends OncePerRequestF
     }
 
     protected Environment getEnvironment(HttpServletRequest request) {
-        String environment = request.getParameter("environment");
+        String environment = request.getHeader("x-environment");
 
         if (StringUtils.isNotBlank(environment)) {
             return Environment.valueOf(environment.toUpperCase());
         }
 
-        return Environment.PRODUCTION;
+        return null;
     }
 
     @Override

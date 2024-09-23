@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.security.web.authentication;
 
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -29,13 +30,15 @@ public abstract class AbstractPublicApiAuthenticationToken extends AbstractAuthe
 
     private Environment environment;
     private String tenantId;
+    private AppType type;
     private User user;
 
-    public AbstractPublicApiAuthenticationToken(Environment environment, String tenantId) {
+    public AbstractPublicApiAuthenticationToken(Environment environment, String tenantId, AppType type) {
         super(List.of());
 
         this.environment = environment;
         this.tenantId = tenantId;
+        this.type = type;
     }
 
     @SuppressFBWarnings("EI")
@@ -65,5 +68,9 @@ public abstract class AbstractPublicApiAuthenticationToken extends AbstractAuthe
 
     public String getTenantId() {
         return tenantId;
+    }
+
+    public AppType getType() {
+        return type;
     }
 }

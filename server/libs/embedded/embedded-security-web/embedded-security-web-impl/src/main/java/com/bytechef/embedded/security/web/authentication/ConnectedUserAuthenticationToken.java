@@ -16,6 +16,7 @@
 
 package com.bytechef.embedded.security.web.authentication;
 
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.security.web.authentication.AbstractPublicApiAuthenticationToken;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -28,8 +29,8 @@ public class ConnectedUserAuthenticationToken extends AbstractPublicApiAuthentic
 
     private String externalUserId;
 
-    public ConnectedUserAuthenticationToken(Environment environment, String externalUserId, String tenantId) {
-        super(environment, tenantId);
+    public ConnectedUserAuthenticationToken(String externalUserId, Environment environment, String tenantId) {
+        super(environment, tenantId, AppType.EMBEDDED);
 
         this.externalUserId = externalUserId;
     }
