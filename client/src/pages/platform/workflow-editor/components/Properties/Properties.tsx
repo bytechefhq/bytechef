@@ -36,7 +36,10 @@ const Properties = ({
 
     return (
         <>
-            <ul className={twMerge('space-y-4', customClassName)} key={`${currentComponent?.operationName}_properties`}>
+            <ul
+                className={twMerge('space-y-4', customClassName)}
+                key={`${currentComponent?.workflowNodeName}_${currentComponent?.operationName}_properties`}
+            >
                 {simpleProperties.map((property, index) => {
                     const {displayCondition, name} = property;
 
@@ -49,7 +52,7 @@ const Properties = ({
                             control={control}
                             controlPath={controlPath}
                             formState={formState}
-                            key={`${name}_${currentComponent?.operationName}_${index}`}
+                            key={`${currentComponent?.workflowNodeName}_${currentComponent?.operationName}_${name}_${index}`}
                             operationName={operationName}
                             path={path}
                             property={property}
