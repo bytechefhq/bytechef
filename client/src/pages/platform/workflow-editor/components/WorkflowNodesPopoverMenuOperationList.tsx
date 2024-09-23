@@ -384,7 +384,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 <div className="flex w-full flex-col">
                     <h2 className="text-lg font-semibold">{title}</h2>
 
-                    <h3 className="text-sm text-muted-foreground">Actions</h3>
+                    <h3 className="text-sm text-muted-foreground">{trigger ? 'Triggers' : 'Actions'}</h3>
                 </div>
             </header>
 
