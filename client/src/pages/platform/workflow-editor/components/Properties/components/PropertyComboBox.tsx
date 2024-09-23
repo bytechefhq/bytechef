@@ -79,7 +79,11 @@ const PropertyComboBox = ({
         if (path.endsWith(`_${arrayIndex}`)) {
             path = path.substring(0, path.lastIndexOf('.')) + `[${arrayIndex}]`;
         }
+    } else {
+        path = name;
     }
+
+    const connectionRequirementMet = currentNode?.connections?.length ? !!currentNode.connectionId : true;
 
     const {
         data: optionsData,
@@ -99,7 +103,7 @@ const PropertyComboBox = ({
             (lookupDependsOnValues
                 ? lookupDependsOnValues.every((loadDependencyValue) => !!loadDependencyValue)
                 : false) &&
-            !!currentNode?.connectionId
+            !!connectionRequirementMet
     );
 
     if (optionsData) {
