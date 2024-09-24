@@ -51,7 +51,6 @@ class QuickbooksCreateItemActionTest extends AbstractQuickbooksActionTest {
         when(mockedParameters.getString(QUANTITY))
             .thenReturn((String) propertyStubsMap.get(QUANTITY));
 
-
         Object result = QuickbooksCreateItemAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(responeseMap, result);

@@ -264,7 +264,8 @@ class XeroUtilsTest {
             .thenReturn("mockedWebhookKey");
 
         WebhookValidateResponse webhookValidateResponse = XeroUtils.webhookValidate(
-            mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody, mockedWebhookMethod, mockedTriggerContext);
+            mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody, mockedWebhookMethod,
+            mockedTriggerContext);
 
         assertEquals(200, webhookValidateResponse.status());
 

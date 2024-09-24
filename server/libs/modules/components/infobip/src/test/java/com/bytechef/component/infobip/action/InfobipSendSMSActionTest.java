@@ -50,6 +50,7 @@ class InfobipSendSMSActionTest extends AbstractInfobipActionTest {
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
-        assertEquals(Map.of(MESSAGES, List.of(Map.of(SENDER, "123", DESTINATIONS, List.of(Map.of(TO, "abc"), Map.of(TO, "def")), CONTENT, Map.of(TEXT, "text")))), body.getContent());
+        assertEquals(Map.of(MESSAGES, List.of(Map.of(SENDER, "123", DESTINATIONS,
+            List.of(Map.of(TO, "abc"), Map.of(TO, "def")), CONTENT, Map.of(TEXT, "text")))), body.getContent());
     }
 }

@@ -52,7 +52,7 @@ class TwilioSendSMSActionTest {
 
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.headers(anyMap()))  // Make sure this returns mockedExecutor
+        when(mockedExecutor.headers(anyMap())) // Make sure this returns mockedExecutor
             .thenReturn(mockedExecutor);
         when(mockedExecutor.header(anyString(), anyString()))
             .thenReturn(mockedExecutor);
@@ -78,8 +78,10 @@ class TwilioSendSMSActionTest {
         when(mockedParameters.getString(AUTH_TOKEN))
             .thenReturn((String) propertyStubsMap.get(AUTH_TOKEN));
 
-        when(mockedConnectionParameters.getRequiredString(ACCOUNT_SID)).thenReturn((String) propertyStubsMap.get(ACCOUNT_SID));
-        when(mockedConnectionParameters.getRequiredString(AUTH_TOKEN)).thenReturn((String) propertyStubsMap.get(AUTH_TOKEN));
+        when(mockedConnectionParameters.getRequiredString(ACCOUNT_SID))
+            .thenReturn((String) propertyStubsMap.get(ACCOUNT_SID));
+        when(mockedConnectionParameters.getRequiredString(AUTH_TOKEN))
+            .thenReturn((String) propertyStubsMap.get(AUTH_TOKEN));
 
         Object result = TwilioSendSMSAction.perform(mockedParameters, mockedConnectionParameters, mockedContext);
 

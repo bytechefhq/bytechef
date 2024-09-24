@@ -117,20 +117,21 @@ class GoogleDriveUtilsTest {
 
     @Test
     void testGetPollOutput() throws IOException {
-            when(mockedList.setFields(fieldsArgumentCaptor.capture()))
-                .thenReturn(mockedList);
-            when(mockedList.setOrderBy(orderByArgumentCaptor.capture()))
-                .thenReturn(mockedList);
+        when(mockedList.setFields(fieldsArgumentCaptor.capture()))
+            .thenReturn(mockedList);
+        when(mockedList.setOrderBy(orderByArgumentCaptor.capture()))
+            .thenReturn(mockedList);
 
-            PollOutput pollOutput = GoogleDriveUtils.getPollOutput(mockedParameters, mockedParameters, mockedParameters, false);
+        PollOutput pollOutput =
+            GoogleDriveUtils.getPollOutput(mockedParameters, mockedParameters, mockedParameters, false);
 
-            assertEquals(files, pollOutput.getRecords());
-            assertFalse(pollOutput.pollImmediately());
+        assertEquals(files, pollOutput.getRecords());
+        assertFalse(pollOutput.pollImmediately());
 
-            assertEquals(
-                "mimeType = 'application/vnd.google-apps.folder' and 'parent' in parents and trashed = false and createdTime > '2000-01-01T01:01:01'",
-                qArgumentCaptor.getValue());
-            assertEquals("files(id, name, mimeType, webViewLink, kind)", fieldsArgumentCaptor.getValue());
-            assertEquals("createdTime asc", orderByArgumentCaptor.getValue());
+        assertEquals(
+            "mimeType = 'application/vnd.google-apps.folder' and 'parent' in parents and trashed = false and createdTime > '2000-01-01T01:01:01'",
+            qArgumentCaptor.getValue());
+        assertEquals("files(id, name, mimeType, webViewLink, kind)", fieldsArgumentCaptor.getValue());
+        assertEquals("createdTime asc", orderByArgumentCaptor.getValue());
     }
 }

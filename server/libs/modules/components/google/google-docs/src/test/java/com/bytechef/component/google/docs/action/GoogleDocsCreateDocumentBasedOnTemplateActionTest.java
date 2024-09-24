@@ -59,13 +59,14 @@ class GoogleDocsCreateDocumentBasedOnTemplateActionTest extends AbstractGoogleDo
         when(mockedParameters.getRequiredString(DESTINATION_FILE))
             .thenReturn("destinationFile");
 
-
         try (MockedStatic<GoogleDocsUtils> googleDocsUtilsMockedStatic = mockStatic(GoogleDocsUtils.class)) {
             googleDocsUtilsMockedStatic
-                .when(() -> GoogleDocsUtils.writeToDocument(any(Docs.class), destinationFileArgumentCaptor.capture(), requestsArgumentCaptor.capture()))
+                .when(() -> GoogleDocsUtils.writeToDocument(any(Docs.class), destinationFileArgumentCaptor.capture(),
+                    requestsArgumentCaptor.capture()))
                 .thenAnswer(Answers.RETURNS_DEFAULTS);
 
-            Object result = GoogleDocsCreateDocumentBasedOnTemplateAction.perform(mockedParameters, mockedParameters, mockedContext);
+            Object result = GoogleDocsCreateDocumentBasedOnTemplateAction.perform(mockedParameters, mockedParameters,
+                mockedContext);
 
             assertNull(result);
 
@@ -75,7 +76,8 @@ class GoogleDocsCreateDocumentBasedOnTemplateActionTest extends AbstractGoogleDo
 
             assertEquals(2, requests.size());
 
-            ReplaceAllTextRequest replaceAllText = requests.getFirst().getReplaceAllText();
+            ReplaceAllTextRequest replaceAllText = requests.getFirst()
+                .getReplaceAllText();
 
             assertEquals("textValue1", replaceAllText.getReplaceText());
 
@@ -84,7 +86,8 @@ class GoogleDocsCreateDocumentBasedOnTemplateActionTest extends AbstractGoogleDo
             assertEquals("[[textKey1]]", substringMatchCriteria.getText());
             assertTrue(substringMatchCriteria.getMatchCase());
 
-            ReplaceImageRequest replaceImageRequest = requests.get(1).getReplaceImage();
+            ReplaceImageRequest replaceImageRequest = requests.get(1)
+                .getReplaceImage();
 
             assertEquals("imageId1", replaceImageRequest.getImageObjectId());
             assertEquals("url1", replaceImageRequest.getUri());

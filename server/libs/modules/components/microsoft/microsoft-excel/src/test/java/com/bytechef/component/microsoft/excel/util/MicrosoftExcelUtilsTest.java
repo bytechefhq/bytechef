@@ -116,11 +116,15 @@ class MicrosoftExcelUtilsTest {
 
         Property.ValueProperty<?> array = result.getFirst();
 
-        assertEquals(3, ((ModifiableArrayProperty) array).getItems().get().size());
+        assertEquals(3, ((ModifiableArrayProperty) array).getItems()
+            .get()
+            .size());
 
         assertEquals(VALUES, array.getName());
-        assertEquals("Values", array.getLabel().get());
-        assertEquals(true, array.getRequired().get());
+        assertEquals("Values", array.getLabel()
+            .get());
+        assertEquals(true, array.getRequired()
+            .get());
     }
 
     @Test

@@ -55,7 +55,8 @@ class TodoistUtilsTest {
 
         List<Option<String>> expectedOptions = List.of(option("ime", "123"));
 
-        List<? extends Option<String>> result = TodoistUtils.getOptions(anyString(), "label").apply(mockedParameters, mockedParameters, null, "", mockedActionContext);
+        List<? extends Option<String>> result = TodoistUtils.getOptions(anyString(), "label")
+            .apply(mockedParameters, mockedParameters, null, "", mockedActionContext);
 
         assertEquals(expectedOptions, result);
     }

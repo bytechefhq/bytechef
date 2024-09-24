@@ -117,7 +117,7 @@ class GoogleCalendarCreateEventActionTest {
                 .thenReturn(eventDateTime);
             googleCalendarUtilsMockedStatic
                 .when(() -> GoogleCalendarUtils.createCustomEvent(mockedEvent))
-                    .thenReturn(mockedCustomEvent);
+                .thenReturn(mockedCustomEvent);
 
             CustomEvent result = GoogleCalendarCreateEventAction.perform(
                 mockedParameters, mockedParameters, mock(ActionContext.class));

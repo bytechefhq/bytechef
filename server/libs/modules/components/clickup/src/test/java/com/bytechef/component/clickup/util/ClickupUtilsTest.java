@@ -115,7 +115,7 @@ class ClickupUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(ID, "123"));
 
-       String id = ClickupUtils.subscribeWebhook("webhookUrl", mockedTriggerContext, "id", "eventType");
+        String id = ClickupUtils.subscribeWebhook("webhookUrl", mockedTriggerContext, "id", "eventType");
 
         assertEquals("123", id);
 
@@ -138,6 +138,7 @@ class ClickupUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(ID, "123"));
 
-        assertEquals(Map.of(ID, "123"), ClickupUtils.getCreatedObject(mockedWebhookBody, mockedTriggerContext, "id", "path"));
+        assertEquals(Map.of(ID, "123"),
+            ClickupUtils.getCreatedObject(mockedWebhookBody, mockedTriggerContext, "id", "path"));
     }
 }

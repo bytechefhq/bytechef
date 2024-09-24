@@ -66,7 +66,6 @@ class SendgridSendEmailActionTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responeseMap);
 
-
         List<FileEntry> fileList = new ArrayList<>();
         List<String> toList = new ArrayList<>();
         List<String> ccList = new ArrayList<>();

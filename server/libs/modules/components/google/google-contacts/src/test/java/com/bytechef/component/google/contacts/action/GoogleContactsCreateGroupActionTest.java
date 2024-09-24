@@ -52,13 +52,15 @@ class GoogleContactsCreateGroupActionTest extends AbstractGoogleContactsActionTe
         when(mockedCreate.execute())
             .thenReturn(mockedContactGroup);
 
-        ContactGroup result = GoogleContactsCreateGroupAction.perform(mockedParameters, mockedParameters, mockedContext);
+        ContactGroup result =
+            GoogleContactsCreateGroupAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(mockedContactGroup, result);
 
         CreateContactGroupRequest createContactGroupRequest = createContactGroupRequestArgumentCaptor.getValue();
 
-        assertEquals("Name", createContactGroupRequest.getContactGroup().getName());
+        assertEquals("Name", createContactGroupRequest.getContactGroup()
+            .getName());
 
     }
 }

@@ -63,7 +63,6 @@ class QuickbooksCreateCustomerActionTest extends AbstractQuickbooksActionTest {
         when(mockedParameters.getString(GIVEN_NAME))
             .thenReturn((String) propertyStubsMap.get(GIVEN_NAME));
 
-
         Object result = QuickbooksCreateCustomerAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(responeseMap, result);
