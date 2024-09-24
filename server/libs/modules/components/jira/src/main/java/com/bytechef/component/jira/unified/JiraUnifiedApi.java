@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.jira.unifiedapi;
+package com.bytechef.component.jira.unified;
 
 import static com.bytechef.component.definition.ComponentDsl.unifiedApi;
 import static com.bytechef.component.definition.UnifiedApiDefinition.Category.TICKETING;

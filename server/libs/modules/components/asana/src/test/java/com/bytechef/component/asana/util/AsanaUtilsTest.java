@@ -63,16 +63,16 @@ class AsanaUtilsTest {
     }
 
     @BeforeEach
-     void beforeEach() {
-         when(mockedContext.http(any()))
-             .thenReturn(mockedExecutor);
-         when(mockedExecutor.configuration(any()))
-             .thenReturn(mockedExecutor);
-         when(mockedExecutor.execute())
-             .thenReturn(mockedResponse);
-         when(mockedResponse.getBody(any(TypeReference.class)))
-             .thenReturn(map);
-     }
+    void beforeEach() {
+        when(mockedContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(map);
+    }
 
     @Test
     void testGetAssigneeOptions() {

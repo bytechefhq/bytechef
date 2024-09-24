@@ -58,7 +58,7 @@ public abstract class ImageActionTest extends AbstractLLMActionTest {
         }
     }
 
-    protected void getResponseTest(ImageModel mockedImageModel){
+    protected void getResponseTest(ImageModel mockedImageModel) {
         when(mockedParameters.getList(eq(MESSAGES), any(TypeReference.class)))
             .thenReturn(List.of(new ImageMessage("PROMPT", 1f)));
 

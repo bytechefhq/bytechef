@@ -131,8 +131,8 @@
       "title" : null,
       "type" : "CUSTOM",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -140,8 +140,8 @@
       "refreshUrl" : null,
       "scopes" : null,
       "tokenUrl" : null,
-      "authorizationUrl" : null,
       "clientSecret" : null,
+      "authorizationUrl" : null,
       "refreshToken" : null
     } ],
     "properties" : null,
@@ -2159,6 +2159,7 @@
     "workflowNodeDescription" : null,
     "perform" : { }
   } ],
+  "triggers" : null,
   "dataStream" : null,
-  "triggers" : null
+  "unifiedApi" : null
 }

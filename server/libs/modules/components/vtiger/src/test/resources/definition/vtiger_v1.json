@@ -83,8 +83,6 @@
       "title" : "Basic Auth",
       "type" : "BASIC_AUTH",
       "acquire" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
       "refreshToken" : null,
@@ -94,7 +92,9 @@
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
-      "tokenUrl" : null
+      "tokenUrl" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -420,9 +420,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create a contact",
-    "workflowNodeDescription" : null,
+    "perform" : { },
     "processErrorResponse" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -809,9 +809,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create a Product",
-    "workflowNodeDescription" : null,
+    "perform" : { },
     "processErrorResponse" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1590,10 +1590,11 @@
     },
     "properties" : null,
     "title" : "Get Me",
-    "workflowNodeDescription" : null,
+    "perform" : { },
     "processErrorResponse" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
   "dataStream" : null,
-  "triggers" : null
+  "triggers" : null,
+  "unifiedApi" : null
 }

@@ -972,6 +972,7 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "triggers" : [ ],
   "dataStream" : null,
-  "triggers" : [ ]
+  "unifiedApi" : null
 }
