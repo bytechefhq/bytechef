@@ -43,7 +43,8 @@ public final class DropboxConnection {
                         .label("Client Secret")
                         .required(true))
                 .authorizationUrl((connection, context) -> "https://www.dropbox.com/oauth2/authorize")
-                .tokenUrl((connection, context) -> "https://api.dropboxapi.com/oauth2/token"));
+                .tokenUrl((connection, context) -> "https://api.dropboxapi.com/oauth2/token")
+                .refreshUrl((connection, context) -> "https://api.dropboxapi.com/oauth2/token"));
 
     private DropboxConnection() {
     }
