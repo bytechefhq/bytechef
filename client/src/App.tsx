@@ -13,6 +13,7 @@ import {
     LucideIcon,
     Settings2Icon,
     SquareIcon,
+    UnplugIcon,
     UsersIcon,
     ZapIcon,
 } from 'lucide-react';
@@ -80,6 +81,14 @@ const embeddedNavigation: {
     },
 ];
 
+const platformNavigation = [
+    {
+        href: '/platform/connectors',
+        icon: UnplugIcon,
+        name: 'Connectors',
+    },
+];
+
 function App() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -94,8 +103,9 @@ function App() {
 
     useEffect(() => {
         document.title =
-            [...automationNavigation, ...embeddedNavigation].find((navItem) => navItem.href === location.pathname)
-                ?.name ?? 'ByteChef';
+            [...automationNavigation, ...embeddedNavigation, ...platformNavigation].find(
+                (navItem) => navItem.href === location.pathname
+            )?.name ?? 'ByteChef';
     }, [location]);
 
     useEffect(() => {

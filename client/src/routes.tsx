@@ -1,4 +1,5 @@
 import App from '@/App';
+import ApiConnectors from '@/ee/pages/settings/platform/api-connectors/ApiConnectors';
 import Activate from '@/pages/account/public/Activate';
 import Login from '@/pages/account/public/Login';
 import PasswordResetFinish from '@/pages/account/public/PasswordResetFinish';
@@ -80,6 +81,16 @@ const getAccountRoutes = (path: string) => ({
 const platformSettingsRoutes = {
     children: [
         {
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                    <EEVersion>
+                        <ApiConnectors />
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'api-connectors',
+        },
+        {
             element: <AdminApiKeys />,
             path: 'admin-api-keys',
         },
@@ -89,7 +100,11 @@ const platformSettingsRoutes = {
             title: 'Organization',
         },
         {
-            href: `admin-api-keys`,
+            href: 'api-connectors',
+            title: 'API Connectors',
+        },
+        {
+            href: 'admin-api-keys',
             title: 'Admin API Keys',
         },
     ],
