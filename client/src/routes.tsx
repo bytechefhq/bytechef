@@ -1,4 +1,5 @@
 import App from '@/App';
+import ApiCollections from '@/ee/pages/automation/api-platform/api-collections/ApiCollections';
 import ApiConnectors from '@/ee/pages/settings/platform/api-connectors/ApiConnectors';
 import Activate from '@/pages/account/public/Activate';
 import Login from '@/pages/account/public/Login';
@@ -196,6 +197,21 @@ export const getRouter = (queryClient: QueryClient) =>
                                 </PrivateRoute>
                             ),
                             path: 'connections',
+                        },
+                        {
+                            children: [
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <EEVersion>
+                                                <ApiCollections />
+                                            </EEVersion>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'api-collections',
+                                },
+                            ],
+                            path: 'api-platform',
                         },
                         {
                             element: (
