@@ -7,9 +7,11 @@ import com.bytechef.platform.configuration.web.rest.model.ComponentCategoryModel
 import com.bytechef.platform.configuration.web.rest.model.ConnectionDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.ResourcesModel;
 import com.bytechef.platform.configuration.web.rest.model.TriggerDefinitionBasicModel;
+import com.bytechef.platform.configuration.web.rest.model.UnifiedApiCategoryModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -59,6 +61,8 @@ public class ComponentDefinitionModel {
 
   @Valid
   private List<@Valid TriggerDefinitionBasicModel> triggers = new ArrayList<>();
+
+  private UnifiedApiCategoryModel unifiedApiCategory;
 
   private Integer version;
 
@@ -347,6 +351,26 @@ public class ComponentDefinitionModel {
     this.triggers = triggers;
   }
 
+  public ComponentDefinitionModel unifiedApiCategory(UnifiedApiCategoryModel unifiedApiCategory) {
+    this.unifiedApiCategory = unifiedApiCategory;
+    return this;
+  }
+
+  /**
+   * Get unifiedApiCategory
+   * @return unifiedApiCategory
+   */
+  @Valid 
+  @Schema(name = "unifiedApiCategory", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("unifiedApiCategory")
+  public UnifiedApiCategoryModel getUnifiedApiCategory() {
+    return unifiedApiCategory;
+  }
+
+  public void setUnifiedApiCategory(UnifiedApiCategoryModel unifiedApiCategory) {
+    this.unifiedApiCategory = unifiedApiCategory;
+  }
+
   public ComponentDefinitionModel version(Integer version) {
     this.version = version;
     return this;
@@ -388,12 +412,13 @@ public class ComponentDefinitionModel {
         Objects.equals(this.tags, componentDefinition.tags) &&
         Objects.equals(this.title, componentDefinition.title) &&
         Objects.equals(this.triggers, componentDefinition.triggers) &&
+        Objects.equals(this.unifiedApiCategory, componentDefinition.unifiedApiCategory) &&
         Objects.equals(this.version, componentDefinition.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(actions, categories, connection, connectionRequired, dataStreamSupported, description, icon, name, resources, tags, title, triggers, version);
+    return Objects.hash(actions, categories, connection, connectionRequired, dataStreamSupported, description, icon, name, resources, tags, title, triggers, unifiedApiCategory, version);
   }
 
   @Override
@@ -412,6 +437,7 @@ public class ComponentDefinitionModel {
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    triggers: ").append(toIndentedString(triggers)).append("\n");
+    sb.append("    unifiedApiCategory: ").append(toIndentedString(unifiedApiCategory)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();
