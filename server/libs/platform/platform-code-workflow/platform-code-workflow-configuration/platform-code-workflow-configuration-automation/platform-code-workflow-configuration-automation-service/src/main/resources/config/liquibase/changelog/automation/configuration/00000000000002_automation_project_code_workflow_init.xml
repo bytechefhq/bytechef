@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="00000000000002" author="Ivica Cardic">
+        <createTable tableName="project_code_workflow">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="code_workflow_container_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="project_code_workflow" columnNames="project_id, project_version"/>
+
+        <addForeignKeyConstraint
+            baseTableName="project_code_workflow"
+            baseColumnNames="code_workflow_container_id"
+            constraintName="fk_project_code_workflow_code_workflow_container"
+            referencedTableName="code_workflow_container"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="project_code_workflow"
+            baseColumnNames="project_id"
+            constraintName="fk_project_code_workflow_project"
+            referencedTableName="project"
+            referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>

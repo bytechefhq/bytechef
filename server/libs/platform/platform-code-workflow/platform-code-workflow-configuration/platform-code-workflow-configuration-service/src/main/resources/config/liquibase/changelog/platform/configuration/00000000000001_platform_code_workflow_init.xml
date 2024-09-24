@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="00000000000001" author="Ivica Cardic">
+        <createTable tableName="code_workflow_container">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code_workflow_container_reference" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="external_version" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="language" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workflows_file" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="code_workflow">
+            <column name="workflow_id" type="VARCHAR(256)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="code_workflow_container_id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="label" type="VARCHAR(256)" />
+            <column name="description" type="TEXT" />
+            <column name="definition" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableName="code_workflow"
+            baseColumnNames="code_workflow_container_id"
+            constraintName="fk_code_workflow_code_workflow_container"
+            referencedTableName="code_workflow_container"
+            referencedColumnNames="id"/>
+
+<!--        <createTable tableName="code_workflow_tag">-->
+<!--            <column name="code_workflow_id" type="BIGINT">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="tag_id" type="BIGINT">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--        </createTable>-->
+
+<!--        <addPrimaryKey tableName="code_workflow_tag" columnNames="code_workflow_id,tag_id"/>-->
+
+<!--        <addForeignKeyConstraint-->
+<!--            baseTableName="code_workflow_tag"-->
+<!--            baseColumnNames="code_workflow_id"-->
+<!--            constraintName="fk_code_workflow_tag_code_workflow"-->
+<!--            referencedTableName="code_workflow"-->
+<!--            referencedColumnNames="id"/>-->
+
+<!--        <addForeignKeyConstraint-->
+<!--            baseTableName="code_workflow_tag"-->
+<!--            baseColumnNames="tag_id"-->
+<!--            constraintName="fk_code_workflow_tag_tag"-->
+<!--            referencedTableName="tag"-->
+<!--            referencedColumnNames="id"/>-->
+    </changeSet>
+</databaseChangeLog>

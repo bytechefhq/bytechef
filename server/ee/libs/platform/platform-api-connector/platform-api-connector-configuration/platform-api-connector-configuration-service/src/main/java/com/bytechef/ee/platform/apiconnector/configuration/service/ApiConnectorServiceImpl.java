@@ -63,7 +63,7 @@ public class ApiConnectorServiceImpl implements ApiConnectorService {
     @Override
     @Transactional(readOnly = true)
     public List<ApiConnector> getApiConnectors() {
-        return apiConnectorRepository.findAll(Sort.by("title", "componentName", "componentVersion"));
+        return apiConnectorRepository.findAll(Sort.by("title", "name", "version"));
     }
 
     @Override
