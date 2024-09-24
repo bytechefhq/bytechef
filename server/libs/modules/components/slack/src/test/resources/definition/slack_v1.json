@@ -66,8 +66,8 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "authorizationCallback" : null,
       "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null,
       "authorizationUrl" : { },
       "clientSecret" : null,
       "refreshToken" : null,
@@ -1434,6 +1434,7 @@
     "workflowNodeDescription" : null,
     "perform" : { }
   } ],
+  "triggers" : null,
   "dataStream" : null,
-  "triggers" : null
+  "unifiedApi" : null
 }

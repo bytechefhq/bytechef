@@ -43,18 +43,18 @@
       "title" : "Bearer Token",
       "type" : "BEARER_TOKEN",
       "acquire" : null,
-      "authorizationCallback" : null,
       "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
       "refreshToken" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "tokenUrl" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "tokenUrl" : null
+      "refresh" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -442,5 +442,6 @@
     "perform" : { }
   } ],
   "dataStream" : null,
-  "triggers" : null
+  "triggers" : null,
+  "unifiedApi" : null
 }

@@ -39,8 +39,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     } ],
     "title" : "Sleep",
     "perform" : { },
@@ -48,5 +48,6 @@
     "workflowNodeDescription" : null
   } ],
   "dataStream" : null,
-  "triggers" : null
+  "triggers" : null,
+  "unifiedApi" : null
 }

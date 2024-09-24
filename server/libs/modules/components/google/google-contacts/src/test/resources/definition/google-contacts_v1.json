@@ -73,8 +73,8 @@
       "refreshUrl" : { },
       "scopes" : { },
       "tokenUrl" : { },
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : { }
+      "oauth2AuthorizationExtraQueryParameters" : { },
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -1014,5 +1014,6 @@
     "workflowNodeDescription" : null
   } ],
   "dataStream" : null,
-  "triggers" : null
+  "triggers" : null,
+  "unifiedApi" : null
 }

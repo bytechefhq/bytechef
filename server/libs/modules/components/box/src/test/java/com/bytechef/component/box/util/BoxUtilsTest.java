@@ -141,7 +141,8 @@ class BoxUtilsTest {
             "triggers", List.of("triggerEvent"),
             "target", Map.of(
                 ID, "id",
-                TYPE, "type")), content);
+                TYPE, "type")),
+            content);
     }
 
     @Test

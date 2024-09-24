@@ -28,7 +28,7 @@ import com.bytechef.component.jira.action.JiraSearchForIssuesUsingJqlAction;
 import com.bytechef.component.jira.connection.JiraConnection;
 import com.bytechef.component.jira.trigger.JiraNewIssueTrigger;
 import com.bytechef.component.jira.trigger.JiraUpdatedIssueTrigger;
-import com.bytechef.component.jira.unifiedapi.JiraUnifiedApi;
+import com.bytechef.component.jira.unified.JiraUnifiedApi;
 import com.google.auto.service.AutoService;
 
 /**

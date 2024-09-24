@@ -56,7 +56,7 @@ public abstract class ChatActionTest extends AbstractLLMActionTest {
         }
     }
 
-    protected void getResponseTest(ChatModel mockedChatModel){
+    protected void getResponseTest(ChatModel mockedChatModel) {
         when(mockedParameters.getList(eq(MESSAGES), any(TypeReference.class)))
             .thenReturn(List.of(new Chat.Message("QUESTION", "user")));
 

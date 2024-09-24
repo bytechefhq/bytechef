@@ -15,7 +15,6 @@
   "title" : "Webhook",
   "connection" : null,
   "actions" : null,
-  "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -162,5 +161,7 @@
     "webhookValidate" : { },
     "deduplicate" : null,
     "poll" : null
-  } ]
+  } ],
+  "dataStream" : null,
+  "unifiedApi" : null
 }

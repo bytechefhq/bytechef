@@ -63,8 +63,8 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "authorizationCallback" : null,
       "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null,
       "authorizationUrl" : { },
       "clientSecret" : null,
       "refreshToken" : null,
@@ -1381,42 +1381,19 @@
           "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : {
-          "tags_count" : 0,
-          "list_id" : "string",
-          "full_name" : "string",
-          "merge_fields" : {
-            "property1" : "",
-            "property2" : ""
-          },
-          "stats" : {
-            "avg_click_rate" : 0,
-            "avg_open_rate" : 0,
-            "ecommerce_data" : {
-              "total_revenue" : 0,
-              "number_of_orders" : 0,
-              "currency_code" : "USD"
-            }
-          },
-          "contact_id" : "string",
-          "last_note" : {
-            "note" : "string",
-            "created_by" : "string",
-            "note_id" : 0,
-            "created_at" : "2019-08-24T14:15:22"
-          },
           "email_address" : "string",
           "status" : "subscribed",
           "unsubscribe_reason" : "string",
           "timestamp_opt" : "2019-08-24T14:15:22",
           "ip_opt" : "string",
           "location" : {
-            "country_code" : "string",
-            "gmtoff" : 0,
             "longitude" : 0,
             "region" : "string",
             "latitude" : 0,
             "dstoff" : 0,
-            "timezone" : "string"
+            "timezone" : "string",
+            "country_code" : "string",
+            "gmtoff" : 0
           },
           "ip_signup" : "string",
           "tags" : [ {
@@ -1437,11 +1414,11 @@
           "timestamp_signup" : "2019-08-24T14:15:22",
           "id" : "string",
           "_links" : [ {
-            "rel" : "string",
             "method" : "GET",
             "targetSchema" : "string",
             "schema" : "string",
-            "href" : "string"
+            "href" : "string",
+            "rel" : "string"
           } ],
           "web_id" : 0,
           "member_rating" : 0,
@@ -1450,7 +1427,30 @@
           "source" : "string",
           "consents_to_one_to_one_messaging" : true,
           "email_client" : "string",
-          "unique_email_id" : "string"
+          "unique_email_id" : "string",
+          "tags_count" : 0,
+          "list_id" : "string",
+          "full_name" : "string",
+          "merge_fields" : {
+            "property1" : "",
+            "property2" : ""
+          },
+          "stats" : {
+            "avg_click_rate" : 0,
+            "avg_open_rate" : 0,
+            "ecommerce_data" : {
+              "total_revenue" : 0,
+              "number_of_orders" : 0,
+              "currency_code" : "USD"
+            }
+          },
+          "contact_id" : "string",
+          "last_note" : {
+            "created_by" : "string",
+            "note_id" : 0,
+            "created_at" : "2019-08-24T14:15:22",
+            "note" : "string"
+          }
         }
       },
       "outputSchema" : {
@@ -2737,42 +2737,19 @@
         "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : {
-        "tags_count" : 0,
-        "list_id" : "string",
-        "full_name" : "string",
-        "merge_fields" : {
-          "property1" : "",
-          "property2" : ""
-        },
-        "stats" : {
-          "avg_click_rate" : 0,
-          "avg_open_rate" : 0,
-          "ecommerce_data" : {
-            "total_revenue" : 0,
-            "number_of_orders" : 0,
-            "currency_code" : "USD"
-          }
-        },
-        "contact_id" : "string",
-        "last_note" : {
-          "note" : "string",
-          "created_by" : "string",
-          "note_id" : 0,
-          "created_at" : "2019-08-24T14:15:22"
-        },
         "email_address" : "string",
         "status" : "subscribed",
         "unsubscribe_reason" : "string",
         "timestamp_opt" : "2019-08-24T14:15:22",
         "ip_opt" : "string",
         "location" : {
-          "country_code" : "string",
-          "gmtoff" : 0,
           "longitude" : 0,
           "region" : "string",
           "latitude" : 0,
           "dstoff" : 0,
-          "timezone" : "string"
+          "timezone" : "string",
+          "country_code" : "string",
+          "gmtoff" : 0
         },
         "ip_signup" : "string",
         "tags" : [ {
@@ -2793,11 +2770,11 @@
         "timestamp_signup" : "2019-08-24T14:15:22",
         "id" : "string",
         "_links" : [ {
-          "rel" : "string",
           "method" : "GET",
           "targetSchema" : "string",
           "schema" : "string",
-          "href" : "string"
+          "href" : "string",
+          "rel" : "string"
         } ],
         "web_id" : 0,
         "member_rating" : 0,
@@ -2806,7 +2783,30 @@
         "source" : "string",
         "consents_to_one_to_one_messaging" : true,
         "email_client" : "string",
-        "unique_email_id" : "string"
+        "unique_email_id" : "string",
+        "tags_count" : 0,
+        "list_id" : "string",
+        "full_name" : "string",
+        "merge_fields" : {
+          "property1" : "",
+          "property2" : ""
+        },
+        "stats" : {
+          "avg_click_rate" : 0,
+          "avg_open_rate" : 0,
+          "ecommerce_data" : {
+            "total_revenue" : 0,
+            "number_of_orders" : 0,
+            "currency_code" : "USD"
+          }
+        },
+        "contact_id" : "string",
+        "last_note" : {
+          "created_by" : "string",
+          "note_id" : 0,
+          "created_at" : "2019-08-24T14:15:22",
+          "note" : "string"
+        }
       }
     },
     "properties" : [ {
@@ -4020,5 +4020,6 @@
     "deduplicate" : null,
     "poll" : null
   } ],
-  "dataStream" : null
+  "dataStream" : null,
+  "unifiedApi" : null
 }

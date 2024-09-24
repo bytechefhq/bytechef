@@ -44,7 +44,6 @@
         },
         "sampleOutput" : "Sample result"
       },
-      "sampleOutput" : "Sample result",
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -65,7 +64,8 @@
         "minLength" : null,
         "options" : null,
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : "Sample result"
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -94,5 +94,6 @@
     "perform" : { }
   } ],
   "dataStream" : null,
-  "triggers" : null
+  "triggers" : null,
+  "unifiedApi" : null
 }
