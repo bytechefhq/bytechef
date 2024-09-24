@@ -1,0 +1,11 @@
+apis/ApiConnectorApi.ts
+apis/index.ts
+index.ts
+models/ApiConnector.ts
+models/ApiConnectorEndpoint.ts
+models/HttpMethod.ts
+models/ImportOpenApiSpecificationRequest.ts
+models/Tag.ts
+models/UpdateTagsRequest.ts
+models/index.ts
+runtime.ts
