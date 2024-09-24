@@ -1,4 +1,4 @@
-package com.bytechef.platform.configuration.web.rest.model;
+package com.bytechef.embedded.unified.web.rest.crm.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -17,31 +17,31 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * A category of unified API.
+ * Gets or Sets lifecycle_stage
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-14T19:13:02.481585+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
-public enum UnifiedApiCategoryModel {
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-25T10:48:36.540830+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
+public enum LifecycleStageModel {
   
-  ACCOUNTING("ACCOUNTING"),
+  SUBSCRIBER("SUBSCRIBER"),
   
-  ATS("ATS"),
+  LEAD("LEAD"),
   
-  CRM("CRM"),
+  MARKETING_QUALIFIED_LEAD("MARKETING_QUALIFIED_LEAD"),
   
-  E_COMMERCE("E_COMMERCE"),
+  SALES_QUALIFIED_LEAD("SALES_QUALIFIED_LEAD"),
   
-  HRIS("HRIS"),
+  OPPORTUNITY("OPPORTUNITY"),
   
-  FILE_STORAGE("FILE_STORAGE"),
+  CUSTOMER("CUSTOMER"),
   
-  MARKETING_AUTOMATION("MARKETING_AUTOMATION"),
+  EVANGELIST("EVANGELIST"),
   
-  TICKETING("TICKETING");
+  OTHER("OTHER");
 
   private String value;
 
-  UnifiedApiCategoryModel(String value) {
+  LifecycleStageModel(String value) {
     this.value = value;
   }
 
@@ -56,13 +56,13 @@ public enum UnifiedApiCategoryModel {
   }
 
   @JsonCreator
-  public static UnifiedApiCategoryModel fromValue(String value) {
-    for (UnifiedApiCategoryModel b : UnifiedApiCategoryModel.values()) {
+  public static LifecycleStageModel fromValue(String value) {
+    for (LifecycleStageModel b : LifecycleStageModel.values()) {
       if (b.value.equals(value)) {
         return b;
       }
     }
-    throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    return null;
   }
 }
 

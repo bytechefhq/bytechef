@@ -7,6 +7,7 @@ package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionModel;
+import com.bytechef.platform.configuration.web.rest.model.UnifiedApiCategoryModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -74,7 +75,7 @@ public interface ComponentDefinitionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"icon\" : \"icon\", \"description\" : \"description\", \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"title\" : \"title\", \"triggers\" : [ { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"name\" : \"name\", \"description\" : \"description\", \"title\" : \"title\", \"type\" : \"STATIC_WEBHOOK\" }, { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"name\" : \"name\", \"description\" : \"description\", \"title\" : \"title\", \"type\" : \"STATIC_WEBHOOK\" } ], \"version\" : 6, \"tags\" : [ \"tags\", \"tags\" ], \"dataStreamSupported\" : true, \"connectionRequired\" : true, \"name\" : \"name\", \"connection\" : { \"componentTitle\" : \"componentTitle\", \"componentDescription\" : \"componentDescription\", \"componentName\" : \"componentName\", \"version\" : 0 }, \"categories\" : [ { \"label\" : \"label\", \"key\" : \"key\" }, { \"label\" : \"label\", \"key\" : \"key\" } ], \"actions\" : [ { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"name\" : \"name\", \"description\" : \"description\", \"title\" : \"title\" }, { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"name\" : \"name\", \"description\" : \"description\", \"title\" : \"title\" } ] }";
+                    String exampleString = "{ \"icon\" : \"icon\", \"description\" : \"description\", \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"title\" : \"title\", \"triggers\" : [ { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"name\" : \"name\", \"description\" : \"description\", \"title\" : \"title\", \"type\" : \"STATIC_WEBHOOK\" }, { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"name\" : \"name\", \"description\" : \"description\", \"title\" : \"title\", \"type\" : \"STATIC_WEBHOOK\" } ], \"version\" : 6, \"tags\" : [ \"tags\", \"tags\" ], \"dataStreamSupported\" : true, \"connectionRequired\" : true, \"name\" : \"name\", \"connection\" : { \"componentTitle\" : \"componentTitle\", \"componentDescription\" : \"componentDescription\", \"componentName\" : \"componentName\", \"version\" : 0 }, \"categories\" : [ { \"label\" : \"label\", \"key\" : \"key\" }, { \"label\" : \"label\", \"key\" : \"key\" } ], \"actions\" : [ { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"name\" : \"name\", \"description\" : \"description\", \"title\" : \"title\" }, { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"name\" : \"name\", \"description\" : \"description\", \"title\" : \"title\" } ], \"unifiedApiCategory\" : \"ACCOUNTING\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -199,6 +200,47 @@ public interface ComponentDefinitionApi {
     
     default ResponseEntity<List<ComponentDefinitionBasicModel>> getDataStreamComponentDefinitions(
         @Parameter(name = "componentType", description = "The name of a component type.", required = true, in = ParameterIn.PATH) @PathVariable("componentType") String componentType
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "[ { \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"title\" : \"title\", \"version\" : 1, \"triggersCount\" : 6 }, { \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"title\" : \"title\", \"version\" : 1, \"triggersCount\" : 6 } ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * GET /unified-api/{category}/component-definitions : Get all compatible component definitions for a unified API category
+     * Get all compatible component definitions for a unified API category.
+     *
+     * @param category The name of a unified API category. (required)
+     * @return Successful operation. (status code 200)
+     */
+    @Operation(
+        operationId = "getUnifiedApiComponentDefinitions",
+        summary = "Get all compatible component definitions for a unified API category",
+        description = "Get all compatible component definitions for a unified API category.",
+        tags = { "component-definition" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ComponentDefinitionBasicModel.class)))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/unified-api/{category}/component-definitions",
+        produces = { "application/json" }
+    )
+    
+    default ResponseEntity<List<ComponentDefinitionBasicModel>> getUnifiedApiComponentDefinitions(
+        @Parameter(name = "category", description = "The name of a unified API category.", required = true, in = ParameterIn.PATH) @PathVariable("category") UnifiedApiCategoryModel category
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
