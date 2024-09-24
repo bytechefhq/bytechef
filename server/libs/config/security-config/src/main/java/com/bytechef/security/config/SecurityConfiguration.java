@@ -113,6 +113,7 @@ public class SecurityConfiguration {
                 .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
                 .ignoringRequestMatchers(
                     RegexRequestMatcher.regexMatcher("^/api/(automation|embedded|platform)/v[0-9]+/.+"))
+                .ignoringRequestMatchers("/api/automation/o/**")
                 .ignoringRequestMatchers("/webhooks/**"));
 
         for (AuthenticationProviderContributor authenticationProviderContributor : authenticationProviderContributors) {

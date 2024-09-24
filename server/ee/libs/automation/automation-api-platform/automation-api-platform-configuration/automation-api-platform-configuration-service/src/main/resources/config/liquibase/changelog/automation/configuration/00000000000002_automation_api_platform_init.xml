@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="00000000000002" author="Ivica Cardic">
+        <createTable tableName="api_collection">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="project_instance_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="collection_version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="api_collection_endpoint">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="api_collection_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="path" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="http_method" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workflow_reference_code" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_instance_workflow_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="api_collection_tag">
+            <column name="api_collection_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tag_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="api_collection_tag" columnNames="api_collection_id,tag_id"/>
+
+        <addUniqueConstraint constraintName="uk_api_collection_name" tableName="api_collection" columnNames="name" />
+
+        <addForeignKeyConstraint
+            baseTableName="api_collection"
+            baseColumnNames="project_instance_id"
+            constraintName="fk_api_collection_project"
+            referencedTableName="project_instance"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="api_collection_tag"
+            baseColumnNames="api_collection_id"
+            constraintName="fk_api_collection_tag_api_collection"
+            referencedTableName="api_collection"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="api_collection_tag"
+            baseColumnNames="tag_id"
+            constraintName="fk_api_collection_tag_tag"
+            referencedTableName="tag"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="api_collection_endpoint"
+            baseColumnNames="api_collection_id"
+            constraintName="fk_api_collection_endpoint_api_collection"
+            referencedTableName="api_collection"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="api_collection_endpoint"
+            baseColumnNames="project_instance_workflow_id"
+            constraintName="fk_api_collection_endpoint_project_instance_workflow"
+            referencedTableName="project_instance_workflow"
+            referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>

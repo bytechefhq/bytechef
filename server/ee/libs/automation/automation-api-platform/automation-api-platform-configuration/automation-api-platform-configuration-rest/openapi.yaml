@@ -1,0 +1,425 @@
+---
+openapi: "3.0.1"
+info:
+  title: "The Automation API Platform Internal API"
+  version: "1"
+servers:
+  - url: "/api/automation/internal"
+tags:
+  - name: "api-collection"
+    description: "The Automation API Platform Collection Internal API"
+  - name: "api-collection-tag"
+    description: "The Automation API Platform Collection Tag Internal API"
+  - name: "api-collection-endpoint"
+    description: "The Automation API Platform Collection Endpoint Internal API"
+paths:
+  /api-collections:
+    post:
+      description: "Create a new API collection."
+      summary: "Create a new API collection"
+      tags:
+        - "api-collection"
+      operationId: "createApiCollection"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiCollection"
+        required: true
+      responses:
+        "200":
+          description: "The API collection object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiCollection"
+  /api-collections/tags:
+    get:
+      description: "Get API collection tags."
+      summary: "Get API collection tags"
+      tags:
+        - "api-collection-tag"
+      operationId: "getApiCollectionTags"
+      responses:
+        "200":
+          description: "The list of API collection tags."
+          content:
+            application/json:
+              schema:
+                description: "The response object that contains the array of tags."
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Tag"
+  /api-collections/{id}:
+    delete:
+      description: "Delete an API collection."
+      summary: "Delete an API collection"
+      tags:
+        - "api-collection"
+      operationId: "deleteApiCollection"
+      parameters:
+        - name: "id"
+          description: "The id of an API collection."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "Successful operation."
+    get:
+      description: "Get an API collection by id."
+      summary: "Get an API collection by id"
+      tags:
+        - "api-collection"
+      operationId: "getApiCollection"
+      parameters:
+        - name: "id"
+          description: "The id of an API collection."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The API collection object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiCollection"
+    put:
+      description: "Update an existing API collection."
+      summary: "Update an existing API collection"
+      tags:
+        - "api-collection"
+      operationId: "updateApiCollection"
+      parameters:
+        - name: "id"
+          description: "The id of an API collection."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiCollection"
+        required: true
+      responses:
+        "200":
+          description: "The updated API collection object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiCollection"
+  /api-collections/{id}/tags:
+    put:
+      description: "Updates tags of an existing API collection."
+      summary: "Updates tags of an existing API collection"
+      tags:
+        - "api-collection-tag"
+      operationId: "updateApiCollectionTags"
+      parameters:
+        - name: "id"
+          description: "The id of an API collection."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTagsRequest"
+        required: true
+      responses:
+        "200":
+          description: "Successful operation."
+  /api-collection-endpoints:
+    post:
+      description: "Create a new API collection endpoint."
+      summary: "Create a new API collection endpoint"
+      tags:
+        - "api-collection-endpoint"
+      operationId: "createApiCollectionEndpoint"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiCollectionEndpoint"
+        required: true
+      responses:
+        "200":
+          description: "The API collection endpoint object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiCollectionEndpoint"
+  /api-collection-endpoints/{id}:
+    delete:
+      description: "Delete an API collection endpoint."
+      summary: "Delete an API collection endpoint"
+      tags:
+        - "api-collection-endpoint"
+      operationId: "deleteApiCollectionEndpoint"
+      parameters:
+        - name: "id"
+          description: "The id of an API collection endpoint."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "Successful operation."
+    get:
+      description: "Get an API collection endpoint by id."
+      summary: "Get an API collection endpoint by id"
+      tags:
+        - "api-collection-endpoint"
+      operationId: "getApiCollectionEndpoint"
+      parameters:
+        - name: "id"
+          description: "The id of an API collection endpoint."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The API collection endpoint object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiCollectionEndpoint"
+    put:
+      description: "Update an existing API collection endpoint."
+      summary: "Update an existing API collection endpoint"
+      tags:
+        - "api-collection-endpoint"
+      operationId: "updateApiCollectionEndpoint"
+      parameters:
+        - name: "id"
+          description: "The id of an API collection endpoint."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiCollectionEndpoint"
+        required: true
+      responses:
+        "200":
+          description: "The updated API collection endpoint object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiCollectionEndpoint"
+  /workspaces/{id}/api-collections:
+    get:
+      description: "Get all workspaceAPI collections."
+      summary: "Get all workspaceAPI collections"
+      tags:
+        - "api-collection"
+      operationId: "getWorkspaceApiCollections"
+      parameters:
+        - name: "id"
+          description: "The id of a workspace."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "environment"
+          description: "The environment."
+          in: "query"
+          required: false
+          schema:
+            $ref: "#/components/schemas/Environment"
+        - name: "projectId"
+          description: "The project ids used for filtering project instances."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "tagId"
+          description: "The tag id of used for filtering project instances."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "A list of API collections."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ApiCollection"
+components:
+  schemas:
+    ApiCollection:
+      description: "An API collection."
+      required:
+        - "enabled"
+        - "name"
+        - "projectId"
+        - "projectVersion"
+        - "workspaceId"
+      properties:
+        collectionVersion:
+          description: "The version of an API collection."
+          type: "integer"
+          format: "int32"
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        description:
+          description: "The description of an API collection."
+          type: "string"
+        enabled:
+          description: "If an API collection is enabled or not."
+          type: "boolean"
+          default: false
+        endpoints:
+          type: array
+          items:
+            $ref: "#/components/schemas/ApiCollectionEndpoint"
+        id:
+          description: "The id of an API collection."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        name:
+          description: "The name of an API collection."
+          type: "string"
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        projectId:
+          description: "The id of a project the API collection is connected to."
+          type: "integer"
+          format: "int64"
+        projectInstanceId:
+          description: "The id of an project instance the API collection is connected to."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        projectVersion:
+          description: "The version of a project the API collection is connected to."
+          type: "integer"
+        tags:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Tag"
+        workspaceId:
+          description: "The workspace id."
+          type: "integer"
+          format: "int64"
+        __version:
+          type: "integer"
+          format: "int32"
+    ApiCollectionEndpoint:
+      description: "An API collection endpoint."
+      required:
+        - "enabled"
+        - "httpMethod"
+        - "path"
+        - "workflowReferenceCode"
+      properties:
+        apiCollectionId:
+          description: "The id of an API collection."
+          type: "integer"
+          format: "int64"
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        enabled:
+          description: "If an API collection is enabled or not."
+          type: "boolean"
+          default: false
+        httpMethod:
+          $ref: "#/components/schemas/HttpMethod"
+        id:
+          description: "The id of an API collection."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        name:
+          description: "The name of an API collection."
+          type: "string"
+        lastExecutionDate:
+          description: "The last execution date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        path:
+          description: "The endpoint path."
+          type: "string"
+        projectInstanceWorkflowId:
+          description: "The project instance workflow id."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        workflowReferenceCode:
+          description: "The workflow reference code."
+          type: "string"
+        __version:
+          type: "integer"
+          format: "int32"
+    Environment:
+      $ref: "../../../../../../libs/platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
+    HttpMethod:
+      description: "The endpoint HTTP method."
+      type: "string"
+      enum:
+        - "DELETE"
+        - "GET"
+        - "PATCH"
+        - "POST"
+        - "PUT"
+    Tag:
+      $ref: "../../../../../../libs/platform/platform-tag/platform-tag-rest/platform-tag-rest-api/openapi.yaml#/components/schemas/Tag"
+    UpdateTagsRequest:
+      $ref: "../../../../../../libs/platform/platform-tag/platform-tag-rest/platform-tag-rest-api/openapi.yaml#/components/schemas/UpdateTagsRequest"
