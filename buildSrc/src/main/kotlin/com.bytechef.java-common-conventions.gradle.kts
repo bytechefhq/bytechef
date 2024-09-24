@@ -317,6 +317,7 @@ val testIntegration by tasks.registering(Test::class) {
 }
 
 check {
+    dependsOn(test)
     dependsOn(testIntegration)
 }
 
