@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="00000000000002" author="Ivica Cardic">
+        <createTable tableName="api_connector">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="connector_version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="icon" type="TEXT" />
+            <column name="specification" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="definition" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+<!--        <createTable tableName="api_connector_tag">-->
+<!--            <column name="api_connector_id" type="BIGINT">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="tag_id" type="BIGINT">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--        </createTable>-->
+
+<!--        <addPrimaryKey tableName="api_connector_tag" columnNames="api_connector_id,tag_id"/>-->
+
+        <addUniqueConstraint constraintName="uk_api_connector_component_name_component_version" tableName="api_connector" columnNames="name, connector_version" />
+
+<!--        <addForeignKeyConstraint-->
+<!--            baseTableName="api_connector_tag"-->
+<!--            baseColumnNames="api_connector_id"-->
+<!--            constraintName="fk_api_connector_tag_api_connector"-->
+<!--            referencedTableName="api_connector"-->
+<!--            referencedColumnNames="id"/>-->
+
+<!--        <addForeignKeyConstraint-->
+<!--            baseTableName="api_connector_tag"-->
+<!--            baseColumnNames="tag_id"-->
+<!--            constraintName="fk_api_connector_tag_tag"-->
+<!--            referencedTableName="tag"-->
+<!--            referencedColumnNames="id"/>-->
+    </changeSet>
+</databaseChangeLog>

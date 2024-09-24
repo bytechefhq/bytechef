@@ -21,6 +21,12 @@ subprojects {
 
         testImplementation("org.springframework.boot:spring-boot-starter-test")
     }
+
+    configure<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension> {
+        imports {
+            mavenBom("org.springframework.shell:spring-shell-dependencies:${rootProject.libs.versions.spring.shell.get()}")
+        }
+    }
 }
 
 reporting {
