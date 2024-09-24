@@ -39,6 +39,7 @@ public final class DropboxConstants {
     public static final String QUERY = "query";
     public static final String SEARCH = "search";
     public static final String STRICT_CONFLICT = "strict_conflict";
+    public static final String TEXT = "text";
     public static final String TO_PATH = "to_path";
     public static final String UPLOAD_FILE = "uploadFile";
 
