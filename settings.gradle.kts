@@ -336,6 +336,12 @@ include("server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client")
 include("server:ee:libs:automation:automation-configuration:automation-configuration-remote-client")
 include("server:ee:libs:automation:automation-configuration:automation-configuration-remote-rest")
 include("server:ee:libs:automation:automation-configuration:automation-configuration-rest")
+include("server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-api")
+include("server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-rest")
+include("server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-service")
+include("server:ee:libs:automation:automation-api-platform:automation-api-platform-handler:automation-api-platform-handler-api")
+include("server:ee:libs:automation:automation-api-platform:automation-api-platform-handler:automation-api-platform-handler-rest")
+include("server:ee:libs:automation:automation-api-platform:automation-api-platform-handler:automation-api-platform-handler-impl")
 
 include("server:ee:libs:config:tenant-multi-data-config")
 include("server:ee:libs:config:tenant-multi-message-event-config")
@@ -383,3 +389,5 @@ include("server:ee:libs:platform:platform-workflow:platform-workflow-worker:plat
 include("server:ee:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-remote-rest")
 include("server:ee:libs:core:file-storage:file-storage-aws:file-storage-aws-api")
 include("server:ee:libs:core:file-storage:file-storage-aws:file-storage-aws-impl")
+
+include("server:ee:libs:modules:components:api-platform")
