@@ -48,6 +48,7 @@ export * from './TimeProperty';
 export * from './TriggerDefinition';
 export * from './TriggerDefinitionBasic';
 export * from './TriggerType';
+export * from './UnifiedApiCategory';
 export * from './UpdateWorkflowNodeParameter200Response';
 export * from './UpdateWorkflowNodeParameterRequest';
 export * from './ValueProperty';

@@ -31,6 +31,12 @@ import {
     ResourcesFromJSONTyped,
     ResourcesToJSON,
 } from './Resources';
+import type { UnifiedApiCategory } from './UnifiedApiCategory';
+import {
+    UnifiedApiCategoryFromJSON,
+    UnifiedApiCategoryFromJSONTyped,
+    UnifiedApiCategoryToJSON,
+} from './UnifiedApiCategory';
 import type { ComponentCategory } from './ComponentCategory';
 import {
     ComponentCategoryFromJSON,
@@ -123,12 +129,20 @@ export interface ComponentDefinition {
      */
     triggers?: Array<TriggerDefinitionBasic>;
     /**
+     * 
+     * @type {UnifiedApiCategory}
+     * @memberof ComponentDefinition
+     */
+    unifiedApiCategory?: UnifiedApiCategory;
+    /**
      * The version of a component.
      * @type {number}
      * @memberof ComponentDefinition
      */
     version: number;
 }
+
+
 
 /**
  * Check if a given object implements the ComponentDefinition interface.
@@ -162,6 +176,7 @@ export function ComponentDefinitionFromJSONTyped(json: any, ignoreDiscriminator:
         'tags': json['tags'] == null ? undefined : json['tags'],
         'title': json['title'] == null ? undefined : json['title'],
         'triggers': json['triggers'] == null ? undefined : ((json['triggers'] as Array<any>).map(TriggerDefinitionBasicFromJSON)),
+        'unifiedApiCategory': json['unifiedApiCategory'] == null ? undefined : UnifiedApiCategoryFromJSON(json['unifiedApiCategory']),
         'version': json['version'],
     };
 }
@@ -184,6 +199,7 @@ export function ComponentDefinitionToJSON(value?: ComponentDefinition | null): a
         'tags': value['tags'],
         'title': value['title'],
         'triggers': value['triggers'] == null ? undefined : ((value['triggers'] as Array<any>).map(TriggerDefinitionBasicToJSON)),
+        'unifiedApiCategory': UnifiedApiCategoryToJSON(value['unifiedApiCategory']),
         'version': value['version'],
     };
 }
