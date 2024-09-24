@@ -17,12 +17,15 @@ import * as runtime from '../runtime';
 import type {
   ComponentDefinition,
   ComponentDefinitionBasic,
+  UnifiedApiCategory,
 } from '../models/index';
 import {
     ComponentDefinitionFromJSON,
     ComponentDefinitionToJSON,
     ComponentDefinitionBasicFromJSON,
     ComponentDefinitionBasicToJSON,
+    UnifiedApiCategoryFromJSON,
+    UnifiedApiCategoryToJSON,
 } from '../models/index';
 
 export interface GetComponentDefinitionRequest {
@@ -43,6 +46,10 @@ export interface GetComponentDefinitionsRequest {
 
 export interface GetDataStreamComponentDefinitionsRequest {
     componentType: GetDataStreamComponentDefinitionsComponentTypeEnum;
+}
+
+export interface GetUnifiedApiComponentDefinitionsRequest {
+    category: UnifiedApiCategory;
 }
 
 /**
@@ -200,6 +207,41 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
      */
     async getDataStreamComponentDefinitions(requestParameters: GetDataStreamComponentDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ComponentDefinitionBasic>> {
         const response = await this.getDataStreamComponentDefinitionsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get all compatible component definitions for a unified API category.
+     * Get all compatible component definitions for a unified API category
+     */
+    async getUnifiedApiComponentDefinitionsRaw(requestParameters: GetUnifiedApiComponentDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComponentDefinitionBasic>>> {
+        if (requestParameters['category'] == null) {
+            throw new runtime.RequiredError(
+                'category',
+                'Required parameter "category" was null or undefined when calling getUnifiedApiComponentDefinitions().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/unified-api/{category}/component-definitions`.replace(`{${"category"}}`, encodeURIComponent(String(requestParameters['category']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ComponentDefinitionBasicFromJSON));
+    }
+
+    /**
+     * Get all compatible component definitions for a unified API category.
+     * Get all compatible component definitions for a unified API category
+     */
+    async getUnifiedApiComponentDefinitions(requestParameters: GetUnifiedApiComponentDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ComponentDefinitionBasic>> {
+        const response = await this.getUnifiedApiComponentDefinitionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
