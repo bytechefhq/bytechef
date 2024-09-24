@@ -32,15 +32,11 @@ import static com.bytechef.component.dropbox.constant.DropboxConstants.MUTE;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.PATH;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.STRICT_CONFLICT;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.UPLOAD_FILE;
-import static com.bytechef.component.dropbox.util.DropboxUtils.getFullPath;
+import static com.bytechef.component.dropbox.util.DropboxUtils.uploadFile;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Mario Cvjetojevic
@@ -138,21 +134,6 @@ public class DropboxUploadFileAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        String headerJson = actionContext.json(json -> {
-            Map<String, Object> ime = Map.of(
-                AUTORENAME, inputParameters.getBoolean(AUTORENAME),
-                "mode", "add",
-                MUTE, inputParameters.getBoolean(MUTE),
-                PATH, getFullPath(inputParameters.getRequiredString(PATH), inputParameters.getRequiredString(FILENAME)),
-                STRICT_CONFLICT, inputParameters.getBoolean(STRICT_CONFLICT));
-            return json.write(ime);
-        });
-
-        return actionContext.http(http -> http.post("https://content.dropboxapi.com/2/files/upload"))
-            .headers(Map.of("Dropbox-API-Arg", List.of(headerJson)))
-            .body(Http.Body.of(inputParameters.getRequiredFileEntry(FILE_ENTRY), "application/octet-stream"))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        return uploadFile(inputParameters, actionContext, inputParameters.getRequiredFileEntry(FILE_ENTRY));
     }
 }
