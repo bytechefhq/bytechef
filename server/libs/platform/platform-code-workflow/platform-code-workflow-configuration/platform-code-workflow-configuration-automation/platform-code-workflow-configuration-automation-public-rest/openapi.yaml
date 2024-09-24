@@ -1,0 +1,36 @@
+---
+openapi: "3.0.1"
+info:
+  title: "The Platform Public API"
+  version: "1"
+servers:
+- url: "/api/platform/v1"
+tags:
+  - name: "project-code-workflow"
+    description: "The Platform Code-Based Project Public API"
+paths:
+  /projects/deploy:
+    post:
+      description: "Deploy a new code based project."
+      summary: "Deploy a new code based project"
+      tags:
+        - "project-code-workflow"
+      operationId: "deployProject"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: "object"
+              properties:
+                workspaceId:
+                  description: "The id of a workspace this project will belong."
+                  type: "integer"
+                  format: "int64"
+                projectFile:
+                  description: "The file of a code-native project."
+                  type: "string"
+                  format: "binary"
+        required: true
+      responses:
+        "204":
+          description: "Successful operation."
