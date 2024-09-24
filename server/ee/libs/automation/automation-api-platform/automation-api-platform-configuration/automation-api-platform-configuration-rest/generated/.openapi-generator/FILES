@@ -1,0 +1,9 @@
+README.md
+pom.xml
+src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/ApiCollectionApi.java
+src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/ApiCollectionEndpointApi.java
+src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/ApiCollectionTagApi.java
+src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/ApiUtil.java
+src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/model/ApiCollectionEndpointModel.java
+src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/model/ApiCollectionModel.java
+src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/model/HttpMethodModel.java
