@@ -105,9 +105,10 @@ const WorkflowNodeDetailsPanel = ({
         !!workflow.id && !!currentNode
     );
 
-    const matchingOperation = currentComponentDefinition?.actions?.find(
-        (action) => action.name === currentOperationName
-    );
+    const matchingOperation = [
+        ...(currentComponentDefinition?.actions || []),
+        ...(currentComponentDefinition?.triggers || []),
+    ].find((action) => action.name === currentOperationName);
 
     const {data: currentActionDefinition, isFetched: currentActionFetched} = useGetComponentActionDefinitionQuery(
         {
@@ -427,14 +428,9 @@ const WorkflowNodeDetailsPanel = ({
     }, [currentNode?.name, matchingOperation?.name]);
 
     const data = currentComponentDefinition || currentTaskDispatcherDefinition;
+    const dataFetched = currentActionFetched || currentTriggerFetched;
 
-    if (
-        !workflowNodeDetailsPanelOpen ||
-        !currentNode?.name ||
-        !data ||
-        !matchingOperation?.name ||
-        !currentActionFetched
-    ) {
+    if (!workflowNodeDetailsPanelOpen || !currentNode?.name || !data || !matchingOperation?.name || !dataFetched) {
         return <></>;
     }
 
