@@ -42,7 +42,7 @@ class GoogleDriveUploadFileActionTest extends AbstractGoogleDriveActionTest {
 
     @Test
     void testPerform() throws IOException {
-       when(mockedParameters.getRequiredFileEntry(FILE_ENTRY))
+        when(mockedParameters.getRequiredFileEntry(FILE_ENTRY))
             .thenReturn(mockedFileEntry);
         when(mockedParameters.getString(PARENT_FOLDER))
             .thenReturn("parentFolder");

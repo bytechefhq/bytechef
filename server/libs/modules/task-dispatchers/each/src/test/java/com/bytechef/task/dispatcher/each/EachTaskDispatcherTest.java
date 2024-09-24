@@ -76,20 +76,23 @@ public class EachTaskDispatcherTest {
         when(contextService.peek(anyLong(), any()))
             .thenReturn(taskFileStorage.storeContextValue(1, Context.Classname.TASK_EXECUTION, Map.of()));
         when(taskExecutionService.create(any()))
-            .thenReturn(TaskExecution.builder().id(1L).build());
+            .thenReturn(TaskExecution.builder()
+                .id(1L)
+                .build());
 
         EachTaskDispatcher dispatcher = new EachTaskDispatcher(
             eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
             taskFileStorage);
-        TaskExecution taskExecution = TaskExecution.builder().workflowTask(
-            new WorkflowTask(
-                Map.of(
-                    WorkflowConstants.NAME, "name",
-                    WorkflowConstants.TYPE, "type",
-                    WorkflowConstants.PARAMETERS,
+        TaskExecution taskExecution = TaskExecution.builder()
+            .workflowTask(
+                new WorkflowTask(
                     Map.of(
-                        "list", Arrays.asList(1, 2, 3),
-                        "iteratee", new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", "type", "print"))))))
+                        WorkflowConstants.NAME, "name",
+                        WorkflowConstants.TYPE, "type",
+                        WorkflowConstants.PARAMETERS,
+                        Map.of(
+                            "list", Arrays.asList(1, 2, 3),
+                            "iteratee", new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", "type", "print"))))))
             .build();
 
         taskExecution.setId(1L);

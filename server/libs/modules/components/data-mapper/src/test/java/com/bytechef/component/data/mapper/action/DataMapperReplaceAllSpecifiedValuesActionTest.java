@@ -315,7 +315,7 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
     }
 
     private void setupAndAssertTest(
-        Map<String, Object> inputValue,  List<ObjectMapping> mappings, Consumer<Object> consumer) {
+        Map<String, Object> inputValue, List<ObjectMapping> mappings, Consumer<Object> consumer) {
 
         when(inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of())).thenReturn(mappings);
         when(inputParameters.getMap(INPUT, Object.class, Map.of())).thenReturn(inputValue);

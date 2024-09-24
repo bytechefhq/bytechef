@@ -34,7 +34,8 @@ class GithubCreateCommentOnIssueActionTest extends AbstractGithubActionTest {
         when(mockedParameters.getRequiredString(BODY))
             .thenReturn("comment");
 
-        Map<String, Object> result = GithubCreateCommentOnIssueAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Map<String, Object> result =
+            GithubCreateCommentOnIssueAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(responseMap, result);
 

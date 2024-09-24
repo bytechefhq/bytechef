@@ -167,7 +167,8 @@ class ShopifyUtilsTest {
             "webhook", Map.of(
                 "topic", "topic",
                 "address", "webhookUrl",
-                "format", "json")), content);
+                "format", "json")),
+            content);
     }
 
     @Test

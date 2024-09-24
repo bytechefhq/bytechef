@@ -38,7 +38,8 @@ class MicrosoftTeamsSendChannelMessageActionTest extends AbstractMicrosoftTeamsA
         when(mockedParameters.getRequiredString(CONTENT))
             .thenReturn("message");
 
-        Object result = MicrosoftTeamsSendChannelMessageAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result =
+            MicrosoftTeamsSendChannelMessageAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(responseMap, result);
 

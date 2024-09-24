@@ -152,16 +152,23 @@ class GoogleSheetsUtilsTest {
                 ModifiableObjectProperty first = (ModifiableObjectProperty) result.getFirst();
 
                 assertEquals(VALUES, first.getName());
-                assertEquals("Values", first.getLabel().get());
+                assertEquals("Values", first.getLabel()
+                    .get());
 
-                List<? extends ValueProperty<?>> properties = first.getProperties().get();
+                List<? extends ValueProperty<?>> properties = first.getProperties()
+                    .get();
 
                 assertEquals(3, properties.size());
 
                 for (int i = 0; i < properties.size(); i++) {
-                    assertEquals("header" + (i + 1), properties.get(i).getName());
-                    assertEquals("header" + (i + 1), properties.get(i).getLabel().get());
-                    assertEquals("", properties.get(i).getDefaultValue().get());
+                    assertEquals("header" + (i + 1), properties.get(i)
+                        .getName());
+                    assertEquals("header" + (i + 1), properties.get(i)
+                        .getLabel()
+                        .get());
+                    assertEquals("", properties.get(i)
+                        .getDefaultValue()
+                        .get());
                 }
             }
         }
@@ -199,21 +206,30 @@ class GoogleSheetsUtilsTest {
                 ModifiableArrayProperty first = (ModifiableArrayProperty) result.getFirst();
 
                 assertEquals(VALUES, first.getName());
-                assertEquals("Rows", first.getLabel().get());
-                assertEquals(true, first.getRequired().get());
+                assertEquals("Rows", first.getLabel()
+                    .get());
+                assertEquals(true, first.getRequired()
+                    .get());
 
-                List<? extends ValueProperty<?>> items = first.getItems().get();
+                List<? extends ValueProperty<?>> items = first.getItems()
+                    .get();
 
                 assertEquals(1, items.size());
 
                 ModifiableObjectProperty first1 = (ModifiableObjectProperty) items.getFirst();
 
-                List<? extends ValueProperty<?>> valueProperties = first1.getProperties().get();
+                List<? extends ValueProperty<?>> valueProperties = first1.getProperties()
+                    .get();
 
                 for (int i = 0; i < valueProperties.size(); i++) {
-                    assertEquals("header" + (i + 1), valueProperties.get(i).getName());
-                    assertEquals("header" + (i + 1), valueProperties.get(i).getLabel().get());
-                    assertEquals("", valueProperties.get(i).getDefaultValue().get());
+                    assertEquals("header" + (i + 1), valueProperties.get(i)
+                        .getName());
+                    assertEquals("header" + (i + 1), valueProperties.get(i)
+                        .getLabel()
+                        .get());
+                    assertEquals("", valueProperties.get(i)
+                        .getDefaultValue()
+                        .get());
                 }
             }
         }
@@ -239,16 +255,20 @@ class GoogleSheetsUtilsTest {
         ModifiableArrayProperty first = (ModifiableArrayProperty) result.getFirst();
 
         assertEquals(VALUES, first.getName());
-        assertEquals("Rows", first.getLabel().get());
-        assertEquals(true, first.getRequired().get());
+        assertEquals("Rows", first.getLabel()
+            .get());
+        assertEquals(true, first.getRequired()
+            .get());
 
-        List<? extends ValueProperty<?>> items = first.getItems().get();
+        List<? extends ValueProperty<?>> items = first.getItems()
+            .get();
 
         assertEquals(1, items.size());
 
         ModifiableArrayProperty first1 = (ModifiableArrayProperty) items.getFirst();
 
-        List<? extends ValueProperty<?>> valueProperties = first1.getItems().get();
+        List<? extends ValueProperty<?>> valueProperties = first1.getItems()
+            .get();
 
         assertEquals(3, valueProperties.size());
 
@@ -274,11 +294,15 @@ class GoogleSheetsUtilsTest {
 
         ValueProperty<?> array = result.getFirst();
 
-        assertEquals(3, ((ModifiableArrayProperty) array).getItems().get().size());
+        assertEquals(3, ((ModifiableArrayProperty) array).getItems()
+            .get()
+            .size());
 
         assertEquals(VALUES, array.getName());
-        assertEquals("Values", array.getLabel().get());
-        assertEquals(true, array.getRequired().get());
+        assertEquals("Values", array.getLabel()
+            .get());
+        assertEquals(true, array.getRequired()
+            .get());
     }
 
     @Test

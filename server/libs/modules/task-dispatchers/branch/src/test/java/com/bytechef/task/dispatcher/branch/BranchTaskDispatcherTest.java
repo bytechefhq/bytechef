@@ -66,27 +66,29 @@ public class BranchTaskDispatcherTest {
         when(contextService.peek(anyLong(), any()))
             .thenReturn(base64FileStorageService.storeFileContent("", "", CompressionUtils.compress("{}")));
         when(taskExecutionService.create(any()))
-            .thenReturn(TaskExecution.builder().id(1L).build());
+            .thenReturn(TaskExecution.builder()
+                .id(1L)
+                .build());
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
             eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage);
-        TaskExecution taskExecution = TaskExecution.builder().workflowTask(
-            new WorkflowTask(
-                Map.of(
-                    WorkflowConstants.NAME, "name",
-                    WorkflowConstants.TYPE, "type",
-                    WorkflowConstants.PARAMETERS,
+        TaskExecution taskExecution = TaskExecution.builder()
+            .workflowTask(
+                new WorkflowTask(
                     Map.of(
-                        "cases",
-                        List.of(
-                            Map.of(
-                                "key", "k1",
-                                "tasks",
-                                List.of(new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", "type", "print"))))),
-                        "expression", "k1")
-                )
-            )
-        ).build();
+                        WorkflowConstants.NAME, "name",
+                        WorkflowConstants.TYPE, "type",
+                        WorkflowConstants.PARAMETERS,
+                        Map.of(
+                            "cases",
+                            List.of(
+                                Map.of(
+                                    "key", "k1",
+                                    "tasks",
+                                    List.of(
+                                        new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", "type", "print"))))),
+                            "expression", "k1"))))
+            .build();
 
         taskExecution.setId(1L);
         taskExecution.setJobId(2L);
@@ -134,7 +136,8 @@ public class BranchTaskDispatcherTest {
                                 Map.of(
                                     "key", "k1",
                                     "tasks",
-                                    List.of(new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", "type", "print"))))),
+                                    List.of(
+                                        new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", "type", "print"))))),
                             "expression", "k2"))))
             .build();
 
@@ -151,27 +154,31 @@ public class BranchTaskDispatcherTest {
         when(contextService.peek(anyLong(), any()))
             .thenReturn(taskFileStorage.storeContextValue(1, Context.Classname.TASK_EXECUTION, Map.of()));
         when(taskExecutionService.create(any()))
-            .thenReturn(TaskExecution.builder().id(1L).build());
+            .thenReturn(TaskExecution.builder()
+                .id(1L)
+                .build());
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
             eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage);
-        TaskExecution taskExecution = TaskExecution.builder().workflowTask(
-            new WorkflowTask(
-                Map.of(
-                    WorkflowConstants.NAME, "name",
-                    WorkflowConstants.TYPE, "type",
-                    WorkflowConstants.PARAMETERS,
+        TaskExecution taskExecution = TaskExecution.builder()
+            .workflowTask(
+                new WorkflowTask(
                     Map.of(
-                        "cases", Arrays.asList(
-                            Map.of(
-                                "key", "k1",
-                                "tasks", List.of(
-                                    new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", "type", "print")))),
-                            Map.of(
-                                "key", "k2",
-                                "tasks", List.of(
-                                    new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", "type", "sleep"))))),
-                        "expression", "k2")))).build();
+                        WorkflowConstants.NAME, "name",
+                        WorkflowConstants.TYPE, "type",
+                        WorkflowConstants.PARAMETERS,
+                        Map.of(
+                            "cases", Arrays.asList(
+                                Map.of(
+                                    "key", "k1",
+                                    "tasks", List.of(
+                                        new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", "type", "print")))),
+                                Map.of(
+                                    "key", "k2",
+                                    "tasks", List.of(
+                                        new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", "type", "sleep"))))),
+                            "expression", "k2"))))
+            .build();
 
         taskExecution.setId(1L);
         taskExecution.setJobId(2L);
@@ -183,7 +190,8 @@ public class BranchTaskDispatcherTest {
             .thenReturn(
                 TaskExecution.builder()
                     .id(2L)
-                    .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", "type", "sleep"))).build());
+                    .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", "type", "sleep")))
+                    .build());
 
         branchTaskDispatcher.dispatch(taskExecution);
 
@@ -200,7 +208,9 @@ public class BranchTaskDispatcherTest {
         when(contextService.peek(anyLong(), any()))
             .thenReturn(base64FileStorageService.storeFileContent("", "", "{}"));
         when(taskExecutionService.create(any()))
-            .thenReturn(TaskExecution.builder().id(1L).build());
+            .thenReturn(TaskExecution.builder()
+                .id(1L)
+                .build());
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
             eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage);

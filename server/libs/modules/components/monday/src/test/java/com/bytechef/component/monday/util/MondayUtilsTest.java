@@ -45,7 +45,7 @@ class MondayUtilsTest {
     private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @Test
-    void testGetBoardColumns(){
+    void testGetBoardColumns() {
         when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
@@ -60,7 +60,6 @@ class MondayUtilsTest {
         List<?> boardColumns = MondayUtils.getBoardColumns("board", mockedActionContext);
 
         assertEquals(List.of(Map.of(ID, "abc")), boardColumns);
-
 
         Http.Body body = bodyArgumentCaptor.getValue();
 

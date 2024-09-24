@@ -489,7 +489,7 @@ class DataMapperMapObjectsToObjectActionTest {
     }
 
     private void setupAndAssertTest(
-        Map<String, Object> inputValue,  List<RequiredStringMapping> mappings, Consumer<Map<String, Object>> consumer,
+        Map<String, Object> inputValue, List<RequiredStringMapping> mappings, Consumer<Map<String, Object>> consumer,
         Boolean includeUnmapped, Boolean includeNulls, Boolean includeEmptyStrings) {
 
         when(inputParameters.getBoolean(INCLUDE_UNMAPPED)).thenReturn(includeUnmapped);

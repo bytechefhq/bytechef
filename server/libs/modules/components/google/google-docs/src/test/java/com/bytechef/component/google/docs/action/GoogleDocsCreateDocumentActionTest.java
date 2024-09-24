@@ -62,7 +62,8 @@ class GoogleDocsCreateDocumentActionTest extends AbstractGoogleDocsActionTest {
                 .when(() -> GoogleDocsUtils.createDocument(titleArgumentCaptor.capture(), any(Docs.class)))
                 .thenReturn(document);
             googleDocsUtilsMockedStatic
-                .when(() -> GoogleDocsUtils.writeToDocument(any(Docs.class), documentIdArgumentCaptor.capture(), requestsArgumentCaptor.capture()))
+                .when(() -> GoogleDocsUtils.writeToDocument(any(Docs.class), documentIdArgumentCaptor.capture(),
+                    requestsArgumentCaptor.capture()))
                 .thenAnswer(Answers.RETURNS_DEFAULTS);
 
             Object result = GoogleDocsCreateDocumentAction.perform(mockedParameters, mockedParameters, mockedContext);
@@ -76,10 +77,12 @@ class GoogleDocsCreateDocumentActionTest extends AbstractGoogleDocsActionTest {
 
             assertEquals(1, requests.size());
 
-            InsertTextRequest insertTextRequest = requests.getFirst().getInsertText();
+            InsertTextRequest insertTextRequest = requests.getFirst()
+                .getInsertText();
 
             assertEquals("text", insertTextRequest.getText());
-            assertTrue(insertTextRequest.getEndOfSegmentLocation().isEmpty());
+            assertTrue(insertTextRequest.getEndOfSegmentLocation()
+                .isEmpty());
         }
     }
 }

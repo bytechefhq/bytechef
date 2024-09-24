@@ -64,7 +64,8 @@ class PipedriveUtilsTest {
 
         List<Option<String>> expectedOptions = List.of(option("ime", "123"));
 
-        List<? extends Option<String>> result = PipedriveUtils.getOptions("org", null).apply(mockedParameters, mockedParameters, null, "", mockedActionContext);
+        List<? extends Option<String>> result = PipedriveUtils.getOptions("org", null)
+            .apply(mockedParameters, mockedParameters, null, "", mockedActionContext);
 
         assertEquals(expectedOptions, result);
 

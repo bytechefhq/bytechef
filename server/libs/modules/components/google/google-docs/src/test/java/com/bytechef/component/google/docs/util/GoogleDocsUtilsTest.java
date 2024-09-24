@@ -58,7 +58,8 @@ class GoogleDocsUtilsTest {
         Document result = GoogleDocsUtils.createDocument("Title", mockedDocs);
 
         assertEquals(mockedDocument, result);
-        assertEquals("Title", documentArgumentCaptor.getValue().getTitle());
+        assertEquals("Title", documentArgumentCaptor.getValue()
+            .getTitle());
     }
 
     @Test
@@ -67,11 +68,12 @@ class GoogleDocsUtilsTest {
             .thenReturn(mockedDocuments);
         when(mockedDocuments.batchUpdate(
             documentIdArgumentCaptor.capture(), batchUpdateDocumentRequestArgumentCaptor.capture()))
-            .thenReturn(mockedBatchUpdate);
+                .thenReturn(mockedBatchUpdate);
 
         GoogleDocsUtils.writeToDocument(mockedDocs, "id", mockedList);
 
         assertEquals("id", documentIdArgumentCaptor.getValue());
-        assertEquals(mockedList, batchUpdateDocumentRequestArgumentCaptor.getValue().getRequests());
+        assertEquals(mockedList, batchUpdateDocumentRequestArgumentCaptor.getValue()
+            .getRequests());
     }
 }

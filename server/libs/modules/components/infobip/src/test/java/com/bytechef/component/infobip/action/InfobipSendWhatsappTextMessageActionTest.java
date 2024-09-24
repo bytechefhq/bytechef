@@ -41,7 +41,8 @@ class InfobipSendWhatsappTextMessageActionTest extends AbstractInfobipActionTest
         when(mockedParameters.getRequiredString(TEXT))
             .thenReturn("text");
 
-        Map<String, Object> result = InfobipSendWhatsappTextMesageAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Map<String, Object> result =
+            InfobipSendWhatsappTextMesageAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(responseMap, result);
 
