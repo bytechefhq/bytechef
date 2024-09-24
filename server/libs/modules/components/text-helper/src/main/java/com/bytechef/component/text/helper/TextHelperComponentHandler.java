@@ -23,7 +23,11 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.text.helper.action.TextHelperBase64DecodeAction;
+import com.bytechef.component.text.helper.action.TextHelperConcatenateAction;
 import com.bytechef.component.text.helper.action.TextHelperExtractContentFromHtmlAction;
+import com.bytechef.component.text.helper.action.TextHelperFindAction;
+import com.bytechef.component.text.helper.action.TextHelperReplaceAction;
+import com.bytechef.component.text.helper.action.TextHelperSplitAction;
 import com.google.auto.service.AutoService;
 
 /**
@@ -38,7 +42,12 @@ public class TextHelperComponentHandler implements ComponentHandler {
         .icon("path:assets/text-helper.svg")
         .categories(ComponentCategory.HELPERS)
         .actions(
-            TextHelperExtractContentFromHtmlAction.ACTION_DEFINITION, TextHelperBase64DecodeAction.ACTION_DEFINITION);
+            TextHelperBase64DecodeAction.ACTION_DEFINITION,
+            TextHelperConcatenateAction.ACTION_DEFINITION,
+            TextHelperExtractContentFromHtmlAction.ACTION_DEFINITION,
+            TextHelperFindAction.ACTION_DEFINITION,
+            TextHelperReplaceAction.ACTION_DEFINITION,
+            TextHelperSplitAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
