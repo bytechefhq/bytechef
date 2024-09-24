@@ -437,12 +437,38 @@ public class ApplicationProperties {
 
             private Subscriptions subscriptions = new Subscriptions();
 
+            private Scheduler scheduler = new Scheduler();
+
+            public Scheduler getScheduler() {
+                return scheduler;
+            }
+
+            public void setScheduler(Scheduler scheduler) {
+                this.scheduler = scheduler;
+            }
+
             public Subscriptions getSubscriptions() {
                 return subscriptions;
             }
 
             public void setSubscriptions(Subscriptions subscriptions) {
                 this.subscriptions = subscriptions;
+            }
+
+            public static class Scheduler {
+                public enum Provider {
+                    AWS, REMOTE
+                }
+
+                private Provider provider;
+
+                public Provider getProvider() {
+                    return provider;
+                }
+
+                public void setProvider(Provider provider) {
+                    this.provider = provider;
+                }
             }
 
             public static class Subscriptions {

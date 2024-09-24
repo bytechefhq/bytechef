@@ -20,6 +20,7 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.scheduler.aws.AwsTriggerScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
@@ -27,20 +28,23 @@ import software.amazon.awssdk.regions.providers.AwsRegionProvider;
 import software.amazon.awssdk.services.scheduler.SchedulerClient;
 
 @Configuration
+@ConditionalOnProperty(prefix = "bytechef", name = "coordinator.trigger.scheduler.provider", havingValue = "aws")
 public class AwsTriggerSchedulerConfiguration {
     private static final Logger log = LoggerFactory.getLogger(AwsTriggerSchedulerConfiguration.class);
 
     private final ApplicationProperties.Cloud.Aws aws;
 
     AwsTriggerSchedulerConfiguration(ApplicationProperties applicationProperties) {
-        log.info("Event Trigger Scheduler enabled");
+        if (log.isInfoEnabled()) {
+            log.info("Event Trigger Scheduler enabled");
+        }
 
         this.aws = applicationProperties.getCloud()
             .getAws();
     }
 
     @Bean
-    AwsTriggerScheduler
+    public AwsTriggerScheduler
         awsTriggerScheduler(AwsCredentialsProvider awsCredentialsProvider, AwsRegionProvider awsRegionProvider) {
         SchedulerClient client = SchedulerClient.builder()
             .credentialsProvider(awsCredentialsProvider)
