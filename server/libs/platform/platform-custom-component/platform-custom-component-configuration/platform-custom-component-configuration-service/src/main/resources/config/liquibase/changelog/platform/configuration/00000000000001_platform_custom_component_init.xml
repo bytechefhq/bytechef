@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="00000000000001" author="Ivica Cardic">
+        <createTable tableName="custom_component">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="component_version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="icon" type="TEXT" />
+            <column name="language" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="component_file" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+<!--        <createTable tableName="custom_component_tag">-->
+<!--            <column name="custom_component_id" type="BIGINT">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="tag_id" type="BIGINT">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--        </createTable>-->
+
+<!--        <addPrimaryKey tableName="custom_component_tag" columnNames="custom_component_id,tag_id"/>-->
+
+        <addUniqueConstraint constraintName="uk_custom_component_name" tableName="custom_component" columnNames="name, component_version" />
+
+<!--        <addForeignKeyConstraint-->
+<!--            baseTableName="custom_component_tag"-->
+<!--            baseColumnNames="custom_component_id"-->
+<!--            constraintName="fk_custom_component_tag_custom_component"-->
+<!--            referencedTableName="custom_component"-->
+<!--            referencedColumnNames="id"/>-->
+
+<!--        <addForeignKeyConstraint-->
+<!--            baseTableName="custom_component_tag"-->
+<!--            baseColumnNames="tag_id"-->
+<!--            constraintName="fk_custom_component_tag_tag"-->
+<!--            referencedTableName="tag"-->
+<!--            referencedColumnNames="id"/>-->
+    </changeSet>
+</databaseChangeLog>
