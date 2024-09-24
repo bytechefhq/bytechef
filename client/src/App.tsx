@@ -8,6 +8,7 @@ import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {
     ActivityIcon,
     FolderIcon,
+    LandmarkIcon,
     Layers3Icon,
     Link2Icon,
     LucideIcon,
@@ -45,6 +46,11 @@ const automationNavigation: {
         name: 'Project Instances',
     },
     {href: '/automation/connections', icon: Link2Icon, name: 'Connections'},
+    {
+        href: '/automation/api-platform/api-collections',
+        icon: LandmarkIcon,
+        name: 'API Collections',
+    },
     {
         href: '/automation/executions',
         icon: ActivityIcon,
