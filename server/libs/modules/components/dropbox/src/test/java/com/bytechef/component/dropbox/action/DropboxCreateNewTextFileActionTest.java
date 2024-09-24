@@ -16,15 +16,35 @@
 
 package com.bytechef.component.dropbox.action;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import com.bytechef.component.definition.FileEntry;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.dropbox.util.DropboxUtils;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Mario Cvjetojevic
+ * @author Monika Kušter
  */
 class DropboxCreateNewTextFileActionTest extends AbstractDropboxActionTest {
 
+    private final FileEntry mockedFileEntry = mock(FileEntry.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
+
     @Test
     void testPerform() {
-        // TODO
+        when(mockedContext.file(any()))
+            .thenReturn(mockedFileEntry);
+
+        dropboxUtilsMockedStatic.when(() -> DropboxUtils.uploadFile(mockedParameters, mockedContext, mockedFileEntry))
+            .thenReturn(mockedObject);
+
+        Object result = DropboxCreateNewTextFileAction.perform(mockedParameters, mockedParameters, mockedContext);
+
+        assertEquals(mockedObject, result);
     }
 }
