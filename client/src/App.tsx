@@ -98,7 +98,7 @@ const platformNavigation = [
 function App() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    const {getApplicationInfo} = useApplicationInfoStore();
+    const {featureFlags, getApplicationInfo} = useApplicationInfoStore();
     const {authenticated, getAccount, sessionHasBeenFetched, showLogin} = useAuthenticationStore();
 
     const location = useLocation();
@@ -143,7 +143,13 @@ function App() {
             <TooltipProvider>
                 <MobileSidebar
                     mobileMenuOpen={mobileMenuOpen}
-                    navigation={automationNavigation}
+                    navigation={automationNavigation.filter((navItem) => {
+                        if (navItem.href === '/automation/api-platform/api-collections') {
+                            return featureFlags && featureFlags['ff-1023'];
+                        }
+
+                        return true;
+                    })}
                     setMobileMenuOpen={setMobileMenuOpen}
                     user={user}
                 />
@@ -151,7 +157,13 @@ function App() {
                 <DesktopSidebar
                     navigation={
                         location.pathname.includes('automation')
-                            ? automationNavigation
+                            ? automationNavigation.filter((navItem) => {
+                                  if (navItem.href === '/automation/api-platform/api-collections') {
+                                      return featureFlags && featureFlags['ff-1023'];
+                                  }
+
+                                  return true;
+                              })
                             : location.pathname.includes('embedded')
                               ? embeddedNavigation
                               : []
