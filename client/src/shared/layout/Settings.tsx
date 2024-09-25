@@ -17,7 +17,7 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
     const {featureFlags, getApplicationInfo} = useApplicationInfoStore();
 
     const location = useLocation();
-    console.log(sidebarNavItems);
+
     sidebarNavItems = sidebarNavItems.filter((navItem) => {
         if (featureFlags) {
             if (navItem.href === 'api-connectors') {
