@@ -108,7 +108,7 @@ public abstract class AbstractPublicApiAuthenticationFilter extends OncePerReque
             return Environment.valueOf(environment.toUpperCase());
         }
 
-        return null;
+        return Environment.PRODUCTION;
     }
 
     @Override

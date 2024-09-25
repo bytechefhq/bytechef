@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 /**
  * @author Ivica Cardic
  */
-@Component
+@Component("com.bytechef.platform.security.web.filter.ApiKeyAuthenticationFilterBeforeContributor")
 public class ApiKeyAuthenticationFilterBeforeContributor implements FilterBeforeContributor {
 
     @Override

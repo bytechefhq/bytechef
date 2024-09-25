@@ -66,6 +66,7 @@ include("server:libs:automation:automation-configuration:automation-configuratio
 include("server:libs:automation:automation-configuration:automation-configuration-rest:automation-configuration-rest-api")
 include("server:libs:automation:automation-configuration:automation-configuration-rest:automation-configuration-rest-impl")
 include("server:libs:automation:automation-configuration:automation-configuration-service")
+include("server:libs:automation:automation-security-web:automation-security-web-impl")
 include("server:libs:automation:automation-swagger")
 include("server:libs:automation:automation-user:automation-user-rest")
 include("server:libs:automation:automation-workflow:automation-workflow-coordinator")

@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.security.web.filter;
+package com.bytechef.automation.security.web.filter;
 
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.security.web.filter.AbstractPublicApiAuthenticationFilter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 
 /**
@@ -28,11 +27,6 @@ public class ApiKeyAuthenticationFilter extends AbstractPublicApiAuthenticationF
 
     @SuppressFBWarnings("EI")
     public ApiKeyAuthenticationFilter(AuthenticationManager authenticationManager) {
-        super("^/api/platform/v[0-9]+/.+", authenticationManager);
-    }
-
-    @Override
-    protected Environment getEnvironment(HttpServletRequest request) {
-        return null;
+        super("^/api/automation/v[0-9]+/.+", authenticationManager);
     }
 }

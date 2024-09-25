@@ -14,25 +14,29 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.security.web.filter;
+package com.bytechef.embedded.security.web.filter;
 
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.security.web.filter.FilterBeforeContributor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.Filter;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-public class ApiKeyAuthenticationFilter extends AbstractPublicApiAuthenticationFilter {
+@Component("com.bytechef.embedded.security.web.filter.ApiKeyAuthenticationFilterBeforeContributor")
+public class ApiKeyAuthenticationFilterBeforeContributor implements FilterBeforeContributor {
 
+    @Override
     @SuppressFBWarnings("EI")
-    public ApiKeyAuthenticationFilter(AuthenticationManager authenticationManager) {
-        super("^/api/platform/v[0-9]+/.+", authenticationManager);
+    public Filter getFilter(AuthenticationManager authenticationManager) {
+        return new ApiKeyAuthenticationFilter(authenticationManager);
     }
 
     @Override
-    protected Environment getEnvironment(HttpServletRequest request) {
-        return null;
+    public Class<? extends Filter> getBeforeFilter() {
+        return BasicAuthenticationFilter.class;
     }
 }
