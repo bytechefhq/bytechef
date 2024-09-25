@@ -28,7 +28,7 @@ export const useApplicationInfoStore = create<ApplicationInfoI>()(
         (set) => {
             return {
                 application: null,
-                featureFlags: null,
+                featureFlags: {},
                 mail: {
                     enabled: false,
                 },
@@ -42,7 +42,7 @@ export const useApplicationInfoStore = create<ApplicationInfoI>()(
                         set((state) => ({
                             ...state,
                             application: json.application,
-                            featureFlags: json.featureFlags,
+                            featureFlags: json.featureFlags || {},
                             mail: json.mail,
                         }));
                     }
