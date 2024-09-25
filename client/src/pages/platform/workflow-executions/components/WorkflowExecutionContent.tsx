@@ -98,7 +98,7 @@ const WorkflowExecutionContent = ({
                                     </DialogHeader>
 
                                     <div className="max-h-[80vh] overflow-y-auto">
-                                        {output ? (
+                                        {output !== undefined ? (
                                             typeof output === 'object' ? (
                                                 <ReactJson
                                                     collapsed={false}
@@ -106,7 +106,8 @@ const WorkflowExecutionContent = ({
                                                     src={output as object}
                                                 />
                                             ) : (
-                                                output
+                                                /* eslint-disable @typescript-eslint/no-explicit-any */
+                                                (output as any).toString()
                                             )
                                         ) : (
                                             <span className="text-sm">No output data.</span>
@@ -120,11 +121,16 @@ const WorkflowExecutionContent = ({
                     </header>
 
                     <div className="overflow-x-auto text-nowrap">
-                        {output ? (
+                        {output !== undefined ? (
                             typeof output === 'object' ? (
                                 <ReactJson enableClipboard={false} src={output as object} />
                             ) : (
-                                <span className="text-sm">{output}</span>
+                                <span className="text-sm">
+                                    {
+                                        /* eslint-disable @typescript-eslint/no-explicit-any */
+                                        (output as any).toString()
+                                    }
+                                </span>
                             )
                         ) : (
                             <span className="text-sm">No output data.</span>
