@@ -32,6 +32,10 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
                 return featureFlags['ff-1023'];
             }
 
+            if (navItem.href === 'custom-components') {
+                return featureFlags['ff-1024'];
+            }
+
             if (navItem.href === 'admin-api-keys' || navItem.title === 'Organization') {
                 return featureFlags['ff-1024'] || featureFlags['ff-1025'];
             }
