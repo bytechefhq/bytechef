@@ -39,18 +39,16 @@ import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-@Component
-public class TriggerSchedulerImpl implements TriggerScheduler {
+public class QuartzTriggerScheduler implements TriggerScheduler {
 
     private final Scheduler scheduler;
 
     @SuppressFBWarnings("EI")
-    public TriggerSchedulerImpl(Scheduler scheduler) {
+    public QuartzTriggerScheduler(Scheduler scheduler) {
         this.scheduler = scheduler;
     }
 

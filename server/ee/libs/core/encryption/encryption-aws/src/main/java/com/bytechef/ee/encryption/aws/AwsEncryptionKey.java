@@ -30,20 +30,21 @@ public final class AwsEncryptionKey extends AbstractEncryptionKey {
     private static final Logger log = LoggerFactory.getLogger(AwsEncryptionKey.class);
     private final SecretsManagerClient secretsManagerClient;
 
-    private static final String BYTECHEF_KEY = "bytechef-key";
+    private static final String KEY = "bytechef-key";
 
     @SuppressFBWarnings("EI")
     public AwsEncryptionKey(SecretsManagerClient secretsManagerClient) {
         this.secretsManagerClient = secretsManagerClient;
 
-        CreateSecretRequest bytechefKey = CreateSecretRequest.builder()
-            .name(BYTECHEF_KEY)
+        CreateSecretRequest key = CreateSecretRequest.builder()
+            .name(KEY)
             .secretString(getRandomPassword())
             .build();
 
-        CreateSecretResponse secret = null;
+        CreateSecretResponse secret;
+
         try {
-            secret = secretsManagerClient.createSecret(bytechefKey);
+            secret = secretsManagerClient.createSecret(key);
 
             if (log.isInfoEnabled()) {
                 log.info("Secret created: Version Id: {}", secret.versionId());
@@ -58,7 +59,7 @@ public final class AwsEncryptionKey extends AbstractEncryptionKey {
     @Override
     protected String fetchKey() {
         GetSecretValueRequest request = GetSecretValueRequest.builder()
-            .secretId(BYTECHEF_KEY)
+            .secretId(KEY)
             .build();
 
         GetSecretValueResponse secretValue = secretsManagerClient.getSecretValue(request);
@@ -69,7 +70,6 @@ public final class AwsEncryptionKey extends AbstractEncryptionKey {
     private String getRandomPassword() {
         GetRandomPasswordRequest passwordRequest = GetRandomPasswordRequest.builder()
             .passwordLength(30L)
-//            .excludeCharacters()
             .excludeLowercase(false)
             .excludeUppercase(false)
             .excludeNumbers(false)

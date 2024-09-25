@@ -38,6 +38,7 @@ import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
 @SpringBootTest
 @Testcontainers
 class AwsEncryptionKeyIntTest {
+
     @Container
     private static final LocalStackContainer localStack = new LocalStackContainer(
         DockerImageName.parse("localstack/localstack:3.0"));
@@ -96,6 +97,7 @@ class AwsEncryptionKeyIntTest {
     @ComponentScan("io.awspring.cloud")
     @EnableAutoConfiguration
     static class AwsEncryptionKeyIntTestConfiguration {
+
         @Bean
         AwsEncryptionKey awsEncryptionKey() {
             SecretsManagerClient client = SecretsManagerClient.builder()

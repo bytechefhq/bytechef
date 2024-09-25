@@ -102,6 +102,11 @@ bytechef:
   cache:
     # Cache provider (redis | simple) default: simple
     provider: redis
+  coordinator:
+    trigger:
+      scheduler:
+        # Trigger scheduler provider (aws(ee) | quartz) default: quartz
+        provider: quartz
   data-storage:
     # Data storage provider for files (aws(ee) | filesystem | jdbc) default: jdbc
     provider: jdbc

@@ -456,8 +456,9 @@ public class ApplicationProperties {
             }
 
             public static class Scheduler {
+
                 public enum Provider {
-                    AWS, REMOTE
+                    AWS, QUARTZ
                 }
 
                 private Provider provider;
