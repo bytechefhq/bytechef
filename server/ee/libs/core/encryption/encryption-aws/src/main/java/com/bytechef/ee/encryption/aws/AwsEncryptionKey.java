@@ -8,6 +8,7 @@
 package com.bytechef.ee.encryption.aws;
 
 import com.bytechef.encryption.AbstractEncryptionKey;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
@@ -24,16 +25,19 @@ import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueRespon
  *
  * @author Ivica Caardic
  */
-public class AwsEncryptionKey extends AbstractEncryptionKey {
+public final class AwsEncryptionKey extends AbstractEncryptionKey {
 
     private static final Logger log = LoggerFactory.getLogger(AwsEncryptionKey.class);
     private final SecretsManagerClient secretsManagerClient;
 
+    private static final String BYTECHEF_KEY = "bytechef-key";
+
+    @SuppressFBWarnings("EI")
     public AwsEncryptionKey(SecretsManagerClient secretsManagerClient) {
         this.secretsManagerClient = secretsManagerClient;
 
         CreateSecretRequest bytechefKey = CreateSecretRequest.builder()
-            .name("bytechef-key")
+            .name(BYTECHEF_KEY)
             .secretString(getRandomPassword())
             .build();
 
@@ -54,7 +58,7 @@ public class AwsEncryptionKey extends AbstractEncryptionKey {
     @Override
     protected String fetchKey() {
         GetSecretValueRequest request = GetSecretValueRequest.builder()
-            .secretId("bytechef-key")
+            .secretId(BYTECHEF_KEY)
             .build();
 
         GetSecretValueResponse secretValue = secretsManagerClient.getSecretValue(request);
@@ -62,7 +66,7 @@ public class AwsEncryptionKey extends AbstractEncryptionKey {
         return secretValue.secretString();
     }
 
-    private String getRandomPassword(){
+    private String getRandomPassword() {
         GetRandomPasswordRequest passwordRequest = GetRandomPasswordRequest.builder()
             .passwordLength(30L)
 //            .excludeCharacters()

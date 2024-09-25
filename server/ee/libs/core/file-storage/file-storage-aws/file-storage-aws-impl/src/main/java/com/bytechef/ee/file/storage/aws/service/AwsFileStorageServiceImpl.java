@@ -56,7 +56,7 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
 
         S3Resource file = getObject(directoryPath, fileEntry.getName());
 
-        s3Template.deleteObject(bucketName, file.getFilename());
+        s3Template.deleteObject(bucketName, Objects.requireNonNull(file.getFilename()));
     }
 
     @Override
@@ -75,7 +75,7 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
         return items.stream()
             .map(S3Resource::getFilename)
             .filter(Objects::nonNull)
-            .anyMatch((filename) -> filename.substring(filename.indexOf('/')+1)
+            .anyMatch((filename) -> filename.substring(filename.indexOf('/') + 1)
                 .equals(directoryPath + "/" + key));
     }
 
@@ -132,7 +132,7 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
 
     @Override
     public byte[] readFileToBytes(@NonNull String directoryPath, @NonNull FileEntry fileEntry)
-        throws FileStorageException{
+        throws FileStorageException {
         if (!fileExists(directoryPath, fileEntry.getName())) {
             throw new FileStorageException("File %s doesn't exist".formatted(fileEntry.getName()));
         }
@@ -141,12 +141,14 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
 
         byte[] bytes = null;
         try {
-            bytes = file.getInputStream().readAllBytes();
+            bytes = file.getInputStream()
+                .readAllBytes();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        return Base64.getMimeDecoder().decode(bytes);
+        return Base64.getMimeDecoder()
+            .decode(bytes);
     }
 
     @Override
@@ -216,15 +218,16 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
         return s3Template.bucketExists(bucketName);
     }
 
-    private List<S3Resource> listAllObjects(){
+    private List<S3Resource> listAllObjects() {
         return s3Template.listObjects(bucketName, "");
     }
 
-    private S3Resource getObject(String directoryPath, String key){
+    private S3Resource getObject(String directoryPath, String key) {
         List<S3Resource> items = s3Template.listObjects(bucketName, "");
 
         return items.stream()
-            .filter((file) -> file.getFilename().contains(directoryPath + "/" + key))
+            .filter((file) -> file.getFilename()
+                .contains(directoryPath + "/" + key))
             .findFirst()
             .get();
     }
@@ -233,7 +236,8 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
         directoryPath = StringUtils.replace(directoryPath.replaceAll("[^0-9a-zA-Z/_!\\-.*'()]", ""), " ", "");
 
         directoryPath = TenantContext.getCurrentTenantId() + "/" + directoryPath;
-        if(key!=null) directoryPath += "/" + key;
+        if (key != null)
+            directoryPath += "/" + key;
 
         return directoryPath;
     }

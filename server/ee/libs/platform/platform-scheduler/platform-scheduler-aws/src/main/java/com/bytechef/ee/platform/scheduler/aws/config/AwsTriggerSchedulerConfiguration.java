@@ -32,14 +32,16 @@ public class AwsTriggerSchedulerConfiguration {
 
     private final ApplicationProperties.Cloud.Aws aws;
 
-    AwsTriggerSchedulerConfiguration(ApplicationProperties applicationProperties){
+    AwsTriggerSchedulerConfiguration(ApplicationProperties applicationProperties) {
         log.info("Event Trigger Scheduler enabled");
 
-        this.aws = applicationProperties.getCloud().getAws();
+        this.aws = applicationProperties.getCloud()
+            .getAws();
     }
 
     @Bean
-    AwsTriggerScheduler awsTriggerScheduler(AwsCredentialsProvider awsCredentialsProvider, AwsRegionProvider awsRegionProvider){
+    AwsTriggerScheduler
+        awsTriggerScheduler(AwsCredentialsProvider awsCredentialsProvider, AwsRegionProvider awsRegionProvider) {
         SchedulerClient client = SchedulerClient.builder()
             .credentialsProvider(awsCredentialsProvider)
             .region(awsRegionProvider.getRegion())

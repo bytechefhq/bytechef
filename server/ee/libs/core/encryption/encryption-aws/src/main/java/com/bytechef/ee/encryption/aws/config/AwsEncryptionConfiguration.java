@@ -35,7 +35,8 @@ public class AwsEncryptionConfiguration {
     }
 
     @Bean
-    AwsEncryptionKey awsEncryptionKey(AwsCredentialsProvider awsCredentialsProvider, AwsRegionProvider awsRegionProvider) {
+    AwsEncryptionKey
+        awsEncryptionKey(AwsCredentialsProvider awsCredentialsProvider, AwsRegionProvider awsRegionProvider) {
         SecretsManagerClient client = SecretsManagerClient.builder()
             .credentialsProvider(awsCredentialsProvider)
             .region(awsRegionProvider.getRegion())

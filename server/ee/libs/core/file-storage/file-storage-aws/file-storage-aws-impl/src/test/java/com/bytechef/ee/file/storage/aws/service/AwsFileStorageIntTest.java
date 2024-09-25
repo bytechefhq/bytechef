@@ -125,7 +125,8 @@ class AwsFileStorageIntTest {
             .ignoreExceptions()
             .untilAsserted(() -> {
                 assertThat(url.toString())
-                    .matches("http://127\\.0\\.0\\.1:\\d+/" + BUCKET_NAME + "/" + TENANT_ID + "/" + DIR_PATH + "/" + KEY);
+                    .matches(
+                        "http://127\\.0\\.0\\.1:\\d+/" + BUCKET_NAME + "/" + TENANT_ID + "/" + DIR_PATH + "/" + KEY);
             });
     }
 
@@ -198,7 +199,7 @@ class AwsFileStorageIntTest {
     void canGetFileEntries() {
         FileEntry fileEntry1 = storageService.storeFileContent(DIR_PATH, KEY, DATA);
         FileEntry fileEntry2 = storageService.storeFileContent(DIR_PATH, "key2", DATA);
-        Set<FileEntry> fileEntries = storageService.getFileEntries(TENANT_ID +  "/" + DIR_PATH);
+        Set<FileEntry> fileEntries = storageService.getFileEntries(TENANT_ID + "/" + DIR_PATH);
 
         await()
             .pollInterval(Duration.ofSeconds(2))
