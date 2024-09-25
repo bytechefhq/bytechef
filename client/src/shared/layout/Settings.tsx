@@ -20,6 +20,10 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
     console.log(sidebarNavItems);
     sidebarNavItems = sidebarNavItems.filter((navItem) => {
         if (featureFlags) {
+            if (navItem.href === 'api-connectors') {
+                return featureFlags['ff-207'];
+            }
+
             if (navItem.href?.includes('/account/appearance')) {
                 return featureFlags['ff-445'];
             }
