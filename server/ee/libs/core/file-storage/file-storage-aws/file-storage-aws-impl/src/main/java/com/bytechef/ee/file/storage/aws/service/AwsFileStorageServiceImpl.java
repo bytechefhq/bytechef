@@ -34,7 +34,9 @@ import org.springframework.lang.NonNull;
  */
 public class AwsFileStorageServiceImpl implements AwsFileStorageService {
 
+    private static final Base64.Decoder MIME_DECODER = Base64.getMimeDecoder();
     private static final String URL_PREFIX = "s3://";
+
     private final S3Template s3Template;
     private final String bucketName;
 
@@ -54,9 +56,9 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
             throw new FileStorageException("File %s doesn't exist".formatted(fileEntry.getName()));
         }
 
-        S3Resource file = getObject(directoryPath, fileEntry.getName());
+        S3Resource s3Resource = getObject(directoryPath, fileEntry.getName());
 
-        s3Template.deleteObject(bucketName, Objects.requireNonNull(file.getFilename()));
+        s3Template.deleteObject(bucketName, Objects.requireNonNull(s3Resource.getFilename()));
     }
 
     @Override
@@ -70,9 +72,9 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
             throw new FileStorageException("Bucket %s doesn't exist.".formatted(bucketName));
         }
 
-        List<S3Resource> items = listAllObjects();
+        List<S3Resource> s3Resources = listAllObjects();
 
-        return items.stream()
+        return s3Resources.stream()
             .map(S3Resource::getFilename)
             .filter(Objects::nonNull)
             .anyMatch((filename) -> filename.substring(filename.indexOf('/') + 1)
@@ -85,9 +87,9 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
             throw new FileStorageException("File %s doesn't exist".formatted(key));
         }
 
-        S3Resource file = getObject(directoryPath, key);
+        S3Resource s3Resource = getObject(directoryPath, key);
 
-        return new FileEntry(key, URL_PREFIX + bucketName + "/" + file.getFilename());
+        return new FileEntry(key, URL_PREFIX + bucketName + "/" + s3Resource.getFilename());
     }
 
     @Override
@@ -96,9 +98,9 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
             throw new FileStorageException("Bucket %s doesn't exist.".formatted(bucketName));
         }
 
-        List<S3Resource> items = listAllObjects();
+        List<S3Resource> s3Resources = listAllObjects();
 
-        return items.stream()
+        return s3Resources.stream()
             .map(S3Resource::getFilename)
             .filter(Objects::nonNull)
             .map(filename -> new FileEntry(
@@ -121,10 +123,10 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
             throw new FileStorageException("File %s doesn't exist".formatted(fileEntry.getName()));
         }
 
-        S3Resource file = getObject(directoryPath, fileEntry.getName());
+        S3Resource s3Resource = getObject(directoryPath, fileEntry.getName());
 
         try {
-            return file.getURL();
+            return s3Resource.getURL();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -133,27 +135,28 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     @Override
     public byte[] readFileToBytes(@NonNull String directoryPath, @NonNull FileEntry fileEntry)
         throws FileStorageException {
+
         if (!fileExists(directoryPath, fileEntry.getName())) {
             throw new FileStorageException("File %s doesn't exist".formatted(fileEntry.getName()));
         }
 
-        S3Resource file = getObject(directoryPath, fileEntry.getName());
+        S3Resource s3Resource = getObject(directoryPath, fileEntry.getName());
 
-        byte[] bytes = null;
-        try {
-            bytes = file.getInputStream()
-                .readAllBytes();
+        byte[] bytes;
+
+        try (InputStream inputStream = s3Resource.getInputStream()) {
+            bytes = inputStream.readAllBytes();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        return Base64.getMimeDecoder()
-            .decode(bytes);
+        return MIME_DECODER.decode(bytes);
     }
 
     @Override
     public String readFileToString(@NonNull String directoryPath, @NonNull FileEntry fileEntry)
         throws FileStorageException {
+
         byte[] bytes = readFileToBytes(directoryPath, fileEntry);
 
         return new String(bytes, StandardCharsets.UTF_8);
@@ -196,9 +199,10 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     }
 
     @Override
-    public FileEntry
-        storeFileContent(@NonNull String directoryPath, @NonNull String key, @NonNull InputStream inputStream)
-            throws FileStorageException {
+    public FileEntry storeFileContent(
+        @NonNull String directoryPath, @NonNull String key, @NonNull InputStream inputStream)
+        throws FileStorageException {
+
         try {
             return storeFileContent(directoryPath, key, inputStream.readAllBytes());
         } catch (IOException e) {
@@ -223,21 +227,22 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     }
 
     private S3Resource getObject(String directoryPath, String key) {
-        List<S3Resource> items = s3Template.listObjects(bucketName, "");
+        List<S3Resource> s3Resources = s3Template.listObjects(bucketName, "");
 
-        return items.stream()
-            .filter((file) -> file.getFilename()
-                .contains(directoryPath + "/" + key))
+        return s3Resources.stream()
+            .filter((file) -> StringUtils.contains(file.getFilename(), directoryPath + "/" + key))
             .findFirst()
-            .get();
+            .orElseThrow(() -> new FileStorageException("File %s doesn't exist".formatted(key)));
     }
 
     private static String combinePaths(String directoryPath, String key) {
         directoryPath = StringUtils.replace(directoryPath.replaceAll("[^0-9a-zA-Z/_!\\-.*'()]", ""), " ", "");
 
         directoryPath = TenantContext.getCurrentTenantId() + "/" + directoryPath;
-        if (key != null)
+
+        if (key != null) {
             directoryPath += "/" + key;
+        }
 
         return directoryPath;
     }

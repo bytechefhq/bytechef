@@ -44,8 +44,9 @@ public class AwsTriggerSchedulerConfiguration {
     }
 
     @Bean
-    public AwsTriggerScheduler
-        awsTriggerScheduler(AwsCredentialsProvider awsCredentialsProvider, AwsRegionProvider awsRegionProvider) {
+    public AwsTriggerScheduler awsTriggerScheduler(
+        AwsCredentialsProvider awsCredentialsProvider, AwsRegionProvider awsRegionProvider) {
+
         SchedulerClient client = SchedulerClient.builder()
             .credentialsProvider(awsCredentialsProvider)
             .region(awsRegionProvider.getRegion())

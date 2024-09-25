@@ -150,6 +150,11 @@ bytechef:
     registry:
       # The list of component names to exclude from runtime
       exclude:
+  coordinator:
+    trigger:
+      scheduler:
+        # Trigger scheduler provider (aws(ee) | quartz) default: quartz
+        provider: quartz
   data-storage:
     # Data storage provider for files (aws(ee) | filesystem | jdbc) default: jdbc
     provider: jdbc
@@ -210,7 +215,3 @@ bytechef:
     repository:
       jdbc:
         enabled: true
-  coordinator:
-    trigger:
-      scheduler:
-        provider: remote

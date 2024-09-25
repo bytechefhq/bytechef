@@ -16,6 +16,9 @@
 
 package com.bytechef.platform.scheduler.config;
 
+import com.bytechef.platform.scheduler.QuartzTriggerScheduler;
+import com.bytechef.platform.scheduler.TriggerScheduler;
+import org.quartz.Scheduler;
 import org.quartz.spi.JobFactory;
 import org.quartz.spi.TriggerFiredBundle;
 import org.springframework.beans.BeansException;
@@ -30,8 +33,9 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 
 @Configuration
-@ConditionalOnProperty(prefix = "bytechef", name = "coordinator.trigger.scheduler.provider", havingValue = "remote")
-public class TriggerSchedulerConfiguration implements SchedulerFactoryBeanCustomizer {
+@ConditionalOnProperty(
+    prefix = "bytechef", name = "coordinator.trigger.scheduler.provider", havingValue = "quartz", matchIfMissing = true)
+public class QuartzTriggerSchedulerConfiguration implements SchedulerFactoryBeanCustomizer {
 
     @Override
     public void customize(SchedulerFactoryBean schedulerFactoryBean) {
@@ -41,6 +45,11 @@ public class TriggerSchedulerConfiguration implements SchedulerFactoryBeanCustom
     @Bean
     JobFactory jobFactory() {
         return new AutowiringSpringBeanJobFactory();
+    }
+
+    @Bean
+    TriggerScheduler quartzTriggerScheduler(Scheduler scheduler) {
+        return new QuartzTriggerScheduler(scheduler);
     }
 
     private static class AutowiringSpringBeanJobFactory extends SpringBeanJobFactory
