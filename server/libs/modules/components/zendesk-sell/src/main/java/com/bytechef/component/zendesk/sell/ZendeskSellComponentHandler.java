@@ -25,6 +25,7 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.zendesk.sell.action.ZendeskSellCreateContactAction;
 import com.bytechef.component.zendesk.sell.action.ZendeskSellCreateTaskAction;
+import com.bytechef.component.zendesk.sell.unified.ZendeskUnifiedApi;
 import com.google.auto.service.AutoService;
 
 /**
@@ -42,7 +43,8 @@ public class ZendeskSellComponentHandler implements ComponentHandler {
         .connection(CONNECTION_DEFINITION)
         .actions(
             ZendeskSellCreateContactAction.ACTION_DEFINITION,
-            ZendeskSellCreateTaskAction.ACTION_DEFINITION);
+            ZendeskSellCreateTaskAction.ACTION_DEFINITION)
+        .unifiedApi(ZendeskUnifiedApi.UNIFIED_API_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

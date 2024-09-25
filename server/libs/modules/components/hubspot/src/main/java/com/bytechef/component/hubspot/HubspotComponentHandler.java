@@ -27,6 +27,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinitio
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.hubspot.trigger.HubspotSubscribeTrigger;
+import com.bytechef.component.hubspot.unified.HubspotUnifiedApi;
 import com.bytechef.component.hubspot.util.HubspotUtils;
 import com.bytechef.definition.BaseProperty;
 import com.google.auto.service.AutoService;
@@ -51,7 +52,8 @@ public class HubspotComponentHandler extends AbstractHubspotComponentHandler {
         return modifiableComponentDefinition
             .customAction(true)
             .icon("path:assets/hubspot.svg")
-            .categories(ComponentCategory.MARKETING_AUTOMATION);
+            .categories(ComponentCategory.MARKETING_AUTOMATION)
+            .unifiedApi(HubspotUnifiedApi.UNIFIED_API_DEFINITION);
     }
 
     @Override
