@@ -28,6 +28,7 @@ import com.bytechef.platform.file.storage.FilesFileStorageImpl;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.file.storage.TriggerFileStorageImpl;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,10 +59,9 @@ public class PlatformFileStorageConfiguration {
             .getProvider();
 
         if (logger.isInfoEnabled()) {
-            String providerName = provider.name();
-
             logger.info(
-                "Workflow trigger output storage provider type enabled: %s".formatted(providerName.toLowerCase()));
+                "Workflow trigger output storage provider type enabled: %s".formatted(
+                    StringUtils.lowerCase(provider.name())));
         }
 
         return new FilesFileStorageImpl(getFilesFileStorageService(provider));

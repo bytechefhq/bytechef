@@ -24,6 +24,7 @@ import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.apiconnector.file.storage.ApiConnectorFileStorage;
 import com.bytechef.platform.apiconnector.file.storage.ApiConnectorFileStorageImpl;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +61,9 @@ public class ApiConnectorFileStorageConfiguration {
         }
 
         if (logger.isInfoEnabled()) {
-            logger.info("Custom component file storage provider type enabled: %s".formatted(provider));
+            logger.info(
+                "API connector file storage provider type enabled: %s".formatted(
+                    StringUtils.lowerCase(provider.name())));
         }
 
         return new ApiConnectorFileStorageImpl(getFileStorageService(provider));

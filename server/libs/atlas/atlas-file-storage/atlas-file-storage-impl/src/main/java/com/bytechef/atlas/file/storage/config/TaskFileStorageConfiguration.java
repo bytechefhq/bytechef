@@ -25,6 +25,7 @@ import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +57,9 @@ public class TaskFileStorageConfiguration {
             .getProvider();
 
         if (logger.isInfoEnabled()) {
-            logger.info("Workflow task output storage provider type enabled: %s".formatted(provider));
+            logger.info(
+                "Workflow task output storage provider type enabled: %s".formatted(
+                    StringUtils.lowerCase(provider.name())));
         }
 
         return new TaskFileStorageImpl(getFileStorageService(provider));

@@ -25,6 +25,7 @@ import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.platform.codeworkflow.file.storage.CodeWorkflowFileStorageImpl;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +62,9 @@ public class CodeWorkflowFileStorageConfiguration {
         }
 
         if (logger.isInfoEnabled()) {
-            logger.info("Code workflow file storage provider type enabled: %s".formatted(provider));
+            logger.info(
+                "Code workflow file storage provider type enabled: %s".formatted(
+                    StringUtils.lowerCase(provider.name())));
         }
 
         return new CodeWorkflowFileStorageImpl(getFileStorageService(provider));

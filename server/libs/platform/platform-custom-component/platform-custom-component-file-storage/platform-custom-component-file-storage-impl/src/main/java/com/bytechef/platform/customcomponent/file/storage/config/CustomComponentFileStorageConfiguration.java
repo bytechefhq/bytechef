@@ -25,6 +25,7 @@ import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.customcomponent.file.storage.CustomComponentFileStorage;
 import com.bytechef.platform.customcomponent.file.storage.CustomComponentFileStorageImpl;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +62,9 @@ public class CustomComponentFileStorageConfiguration {
         }
 
         if (logger.isInfoEnabled()) {
-            logger.info("Custom component file storage provider type enabled: %s".formatted(provider));
+            logger.info(
+                "Custom component file storage provider type enabled: %s".formatted(
+                    StringUtils.lowerCase(provider.name())));
         }
 
         return new CustomComponentFileStorageImpl(getFileStorageService(provider));
