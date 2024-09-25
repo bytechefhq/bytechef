@@ -21,7 +21,7 @@ paths:
       parameters:
         - name: "x-environment"
           description: "The environment."
-          in: "query"
+          in: "header"
           required: false
           schema:
             $ref: '#/components/schemas/Environment'
