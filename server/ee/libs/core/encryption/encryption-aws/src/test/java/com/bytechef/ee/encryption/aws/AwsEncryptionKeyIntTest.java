@@ -1,5 +1,18 @@
+/*
+ * Copyright 2023-present ByteChef Inc.
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
 package com.bytechef.ee.encryption.aws;
 
+import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.testcontainers.containers.localstack.LocalStackContainer.Service.SECRETSMANAGER;
+
+import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -16,13 +29,6 @@ import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
-
-import java.time.Duration;
-
-import static org.awaitility.Awaitility.await;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.testcontainers.containers.localstack.LocalStackContainer.Service.SECRETSMANAGER;
 
 /**
  * @version ee
@@ -44,11 +50,12 @@ class AwsEncryptionKeyIntTest {
         registry.add("spring.cloud.aws.region.static", localStack::getRegion);
         registry.add("spring.cloud.aws.credentials.access-key", localStack::getAccessKey);
         registry.add("spring.cloud.aws.credentials.secret-key", localStack::getSecretKey);
-        registry.add("spring.cloud.aws.secretsmanager.endpoint", () -> String.valueOf(localStack.getEndpointOverride(SECRETSMANAGER)));
+        registry.add("spring.cloud.aws.secretsmanager.endpoint",
+            () -> String.valueOf(localStack.getEndpointOverride(SECRETSMANAGER)));
     }
 
     @Test
-    void canFetchKey(){
+    void canFetchKey() {
         await()
             .pollInterval(Duration.ofSeconds(2))
             .atMost(Duration.ofSeconds(10))
@@ -62,7 +69,7 @@ class AwsEncryptionKeyIntTest {
     }
 
     @Test
-    void canFetchKeyIfAlreadyExists(){
+    void canFetchKeyIfAlreadyExists() {
         SecretsManagerClient secretsManagerClient = SecretsManagerClient.builder()
             .credentialsProvider(() -> AwsBasicCredentials.create(localStack.getAccessKey(), localStack.getSecretKey()))
             .region(Region.US_EAST_1)
@@ -92,7 +99,8 @@ class AwsEncryptionKeyIntTest {
         @Bean
         AwsEncryptionKey awsEncryptionKey() {
             SecretsManagerClient client = SecretsManagerClient.builder()
-                .credentialsProvider(() -> AwsBasicCredentials.create(localStack.getAccessKey(), localStack.getSecretKey()))
+                .credentialsProvider(
+                    () -> AwsBasicCredentials.create(localStack.getAccessKey(), localStack.getSecretKey()))
                 .region(Region.US_EAST_1)
                 .endpointOverride(localStack.getEndpointOverride(SECRETSMANAGER))
                 .build();
