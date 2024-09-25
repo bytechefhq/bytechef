@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-23T07:57:32.661948+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-25T21:33:13.828661+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 @Validated
 @Tag(name = "integration", description = "The Embedded Integration Public API")
 public interface IntegrationApi {
@@ -67,7 +67,7 @@ public interface IntegrationApi {
     )
     
     default ResponseEntity<List<IntegrationModel>> getIntegrations(
-        @Parameter(name = "x-environment", description = "The environment.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "x-environment", required = false) EnvironmentModel xEnvironment
+        @Parameter(name = "x-environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "x-environment", required = false) EnvironmentModel xEnvironment
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
