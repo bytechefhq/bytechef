@@ -1,0 +1,10 @@
+name: x-environment
+in: header
+required: false
+schema:
+  type: "string"
+  enum:
+    - "TEST"
+    - "PRODUCTION"
+example: "TEST"
+description: "The environment of an integration."

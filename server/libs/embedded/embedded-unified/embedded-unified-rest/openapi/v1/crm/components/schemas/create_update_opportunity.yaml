@@ -1,0 +1,39 @@
+type: object
+properties:
+  amount:
+    type: integer
+    nullable: true
+    example: 100000
+  closeDate:
+    type: string
+    nullable: true
+    example: '2022-02-10T00:00:00Z'
+  description:
+    type: string
+    nullable: true
+    example: Wants to use open source unified API for third-party integrations
+  name:
+    type: string
+    nullable: true
+    example: Needs Integrations
+  stage:
+    type: string
+    example: Closed Won
+  lastActivityDate:
+    type: string
+    nullable: true
+    format: date-time
+    example: '2022-02-27T00:00:00Z'
+  accountId:
+    type: string
+    nullable: true
+    example: 64571bff-48ea-4469-9fa0-ee1a0bab38bd
+  ownerId:
+    type: string
+    nullable: true
+    example: 9f3e97fd-4d5d-4efc-959d-bbebfac079f5
+  pipeline:
+    type: string
+    nullable: true
+  customFields:
+    $ref: ./objects/custom_fields.yaml

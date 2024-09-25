@@ -1,0 +1,10 @@
+type: array
+items:
+  type: object
+  properties:
+    detail:
+      type: string
+    problem_type:
+      type: string
+    title:
+      type: string

@@ -1,0 +1,41 @@
+type: object
+properties:
+  description:
+    type: string
+    nullable: true
+    example: Integration API
+  industry:
+    type: string
+    nullable: true
+    example: API's
+  lastActivityDate:
+    type: string
+    nullable: true
+    format: date-time
+    example: '2022-02-27T00:00:00Z'
+  name:
+    type: string
+    nullable: true
+    example: Sample Customer
+  numberOfEmployees:
+    type: integer
+    nullable: true
+    example: 276000
+  website:
+    type: string
+    nullable: true
+    example: https://bytechef.io/
+  addresses:
+    $ref: './objects/addresses.yaml'
+  emails:
+    $ref: ./objects/emails.yaml
+  phones:
+    $ref: './objects/phones.yaml'
+  ownerId:
+    type: string
+    nullable: true
+    example: 9f3e97fd-4d5d-4efc-959d-bbebfac079f5
+  lifecycleStage:
+    $ref: './objects/lifecycle_stage.yaml'
+  customFields:
+    $ref: ./objects/custom_fields.yaml

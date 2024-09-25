@@ -1,0 +1,3 @@
+type: object
+additionalProperties: true
+description: Custom properties to be inserted that are not covered by the common object. Object keys must match exactly to the corresponding provider API.

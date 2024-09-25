@@ -1,0 +1,7 @@
+name: created_after
+in: query
+schema:
+  type: string
+  format: date-time
+example: 2023-02-23T00:00:00Z
+description: If provided, will only return objects created after this datetime. Datetime must be in ISO 8601 format and URI encoded.

@@ -457,6 +457,29 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TaskDispatcherDefinition"
+  /unified-api/{category}/component-definitions:
+    get:
+      description: "Get all compatible component definitions for a unified API category."
+      summary: "Get all compatible component definitions for a unified API category"
+      tags:
+        - "component-definition"
+      operationId: "getUnifiedApiComponentDefinitions"
+      parameters:
+        - name: "category"
+          description: "The name of a unified API category."
+          required: true
+          in: "path"
+          schema:
+            $ref: "#/components/schemas/UnifiedApiCategory"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ComponentDefinitionBasic"
   /workflow-test-configurations/{workflowId}:
     get:
       description: "Get a workflow test configuration."
@@ -1227,6 +1250,8 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/TriggerDefinitionBasic"
+        unifiedApiCategory:
+          $ref: "#/components/schemas/UnifiedApiCategory"
         version:
           description: "The version of a component."
           type: "integer"
@@ -1899,6 +1924,18 @@ components:
       - "LISTENER"
       - "POLLING"
       - "DYNAMIC_WEBHOOK"
+    UnifiedApiCategory:
+      description: "A category of unified API."
+      type: "string"
+      enum:
+        - "ACCOUNTING"
+        - "ATS"
+        - "CRM"
+        - "E_COMMERCE"
+        - "HRIS"
+        - "FILE_STORAGE"
+        - "MARKETING_AUTOMATION"
+        - "TICKETING"
     ValueProperty:
       description: "A base property for all value based properties."
       type: "object"

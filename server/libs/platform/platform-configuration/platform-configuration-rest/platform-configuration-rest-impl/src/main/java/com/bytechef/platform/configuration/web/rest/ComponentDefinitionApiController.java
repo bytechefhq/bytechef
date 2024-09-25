@@ -17,10 +17,12 @@
 package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.component.definition.UnifiedApiDefinition;
 import com.bytechef.platform.component.definition.DataStreamComponentDefinition.ComponentType;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionModel;
+import com.bytechef.platform.configuration.web.rest.model.UnifiedApiCategoryModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -87,6 +89,19 @@ public class ComponentDefinitionApiController implements ComponentDefinitionApi 
         return ResponseEntity.ok(
             componentDefinitionService
                 .getDataStreamComponentDefinitions(ComponentType.valueOf(componentType))
+                .stream()
+                .map(componentDefinition -> conversionService.convert(
+                    componentDefinition, ComponentDefinitionBasicModel.class))
+                .toList());
+    }
+
+    @Override
+    public ResponseEntity<List<ComponentDefinitionBasicModel>> getUnifiedApiComponentDefinitions(
+        UnifiedApiCategoryModel category) {
+
+        return ResponseEntity.ok(
+            componentDefinitionService
+                .getUnifiedApiComponentDefinitions(UnifiedApiDefinition.Category.valueOf(category.name()))
                 .stream()
                 .map(componentDefinition -> conversionService.convert(
                     componentDefinition, ComponentDefinitionBasicModel.class))

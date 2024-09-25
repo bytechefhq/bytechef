@@ -25,6 +25,7 @@ import com.bytechef.component.definition.DataStreamDefinition;
 import com.bytechef.component.definition.Help;
 import com.bytechef.component.definition.Resources;
 import com.bytechef.component.definition.TriggerDefinition;
+import com.bytechef.component.definition.UnifiedApiDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,9 +51,10 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
     protected final Map<String, Object> metadata;
     protected final String name;
     protected final Resources resources;
-    protected final int version;
     protected final String title;
     protected final List<? extends TriggerDefinition> triggers;
+    protected final UnifiedApiDefinition unifiedApi;
+    protected final int version;
 
     public AbstractComponentDefinitionWrapper(ComponentDefinition componentDefinition) {
         this.actions = OptionalUtils.orElse(componentDefinition.getActions(), List.of());
@@ -69,6 +71,7 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
         this.resources = OptionalUtils.orElse(componentDefinition.getResources(), null);
         this.title = OptionalUtils.orElse(componentDefinition.getTitle(), null);
         this.triggers = OptionalUtils.orElse(componentDefinition.getTriggers(), null);
+        this.unifiedApi = OptionalUtils.orElse(componentDefinition.getUnifiedApi(), null);
         this.version = componentDefinition.getVersion();
     }
 
@@ -141,6 +144,11 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
     @Override
     public Optional<List<? extends TriggerDefinition>> getTriggers() {
         return Optional.ofNullable(triggers == null ? null : new ArrayList<>(triggers));
+    }
+
+    @Override
+    public Optional<UnifiedApiDefinition> getUnifiedApi() {
+        return Optional.ofNullable(unifiedApi);
     }
 
     @Override

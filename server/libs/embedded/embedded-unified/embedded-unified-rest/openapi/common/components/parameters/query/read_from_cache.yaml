@@ -1,0 +1,10 @@
+name: read_from_cache
+in: query
+schema:
+  type: boolean
+example: true
+description: |
+  Whether to read from ByteChef's Managed Destination cache or to read directly from the provider.
+
+
+  **NOTE**: `read_from_cache=true` requires you to have the object synced to the ByteChef Managed Destination.

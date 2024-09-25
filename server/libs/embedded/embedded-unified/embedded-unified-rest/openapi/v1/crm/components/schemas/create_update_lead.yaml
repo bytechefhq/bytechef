@@ -1,0 +1,39 @@
+type: object
+properties:
+  company:
+    type: string
+    nullable: true
+    example: ByteChef
+  firstName:
+    type: string
+    nullable: true
+    example: George
+  lastName:
+    type: string
+    nullable: true
+    example: Xing
+  leadSource:
+    type: string
+    nullable: true
+    example: API Blogger
+  title:
+    type: string
+    example: Co-Founder
+  emails:
+    $ref: ./objects/emails.yaml
+  addresses:
+    $ref: ./objects/addresses.yaml
+  ownerId:
+    type: string
+    nullable: true
+    example: 9f3e97fd-4d5d-4efc-959d-bbebfac079f5
+  convertedContactId:
+    type: string
+    nullable: true
+    example: ad43955d-2b27-4ec3-b38a-0ca07a76d43b
+  convertedAccountId:
+    type: string
+    nullable: true
+    example: 2e1e6813-0459-47f5-ad4c-3d137c0e1fdd
+  customFields:
+    $ref: ./objects/custom_fields.yaml

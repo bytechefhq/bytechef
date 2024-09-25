@@ -1,0 +1,21 @@
+description: "A sublist of a list of objects. It allows gain information about the position of it in the containing entire list."
+type: object
+properties:
+  hasNext:
+    description: "The current page."
+    type: "boolean"
+  continuationToken:
+    description: "to access the next page slice. Can be null."
+    type: "string"
+  content:
+    description: "The list of elements."
+    type: "array"
+    items:
+      type: "object"
+  size:
+    description: "The size of the page."
+    type: "integer"
+required:
+  - content
+  - hasNext
+  - size

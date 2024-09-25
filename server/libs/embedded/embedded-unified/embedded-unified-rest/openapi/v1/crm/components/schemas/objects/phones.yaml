@@ -1,0 +1,21 @@
+type: array
+items:
+  type: object
+  properties:
+    phoneNumber:
+      type: string
+      nullable: true
+      example: '+14151234567'
+    phoneNumberType:
+      type: string
+      enum:
+        - PRIMARY
+        - MOBILE
+        - FAX
+        - OTHER
+  required:
+    - phoneNumber
+    - phoneNumberType
+example:
+  - phoneNumber: '+14151234567'
+    phoneNumberType: primary

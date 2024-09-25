@@ -1,0 +1,130 @@
+openapi: 3.0.3
+info:
+  version: v1
+  title: Unified CRM API
+  description: |
+    #### Introduction
+
+    Welcome to the Unified API (CRM) documentation. You can use this API to write to multiple third-party providers within the CRM category.
+
+    [View common schema for CRM](https://docs.bytechef.io/embedded/unified/common-schemas/crm)
+
+    #### Base API URL
+    ```
+    https://api.bytechef.io/embedded/unified/v1/crm
+    ```
+servers:
+  - url: "/api/embedded"
+tags:
+  - name: account
+    description: The `Account` Common Object represents a "company" in CRMs.
+  - name: contact
+    description: The `Contact` Common Object represents a "contact" in CRMs.
+  - name: lead
+    description: The `Lead` Common Object represents a "potential customer" in CRMs.
+  - name: opportunity
+    description: The `Opportunity` Common Object represents a "deal opportunity" in CRMs.
+paths:
+  '/accounts':
+    $ref: paths/accounts.yaml
+  '/accounts/{account_id}':
+    $ref: paths/accounts@account_id.yaml
+#  '/contacts':
+#    $ref: paths/contacts.yaml
+#  '/contacts/{contact_id}':
+#    $ref: paths/contacts@{contact_id}.yaml
+#  '/leads':
+#    $ref: paths/leads.yaml
+#  '/leads/{lead_id}':
+#    $ref: paths/leads@{lead_id}.yaml
+#  '/opportunities':
+#    $ref: paths/opportunities.yaml
+#  '/opportunities/{opportunity_id}':
+#    $ref: paths/opportunities@{opportunity_id}.yaml
+components:
+  securitySchemes:
+    bearer:
+      $ref: ../../common/components/securitySchemes/bearer.yaml
+  schemas:
+    account:
+      $ref: ./components/schemas/objects/account.yaml
+    create_update_account:
+      $ref: ./components/schemas/create_update_account.yaml
+    contact:
+      $ref: ./components/schemas/objects/contact.yaml
+    create_update_contact:
+      $ref: ./components/schemas/create_update_contact.yaml
+    lead:
+      $ref: ./components/schemas/objects/lead.yaml
+    create_update_lead:
+      $ref: ./components/schemas/create_update_lead.yaml
+    opportunity:
+      $ref: ./components/schemas/objects/opportunity.yaml
+    create_update_opportunity:
+      $ref: ./components/schemas/create_update_opportunity.yaml
+    errors:
+      $ref: ../../common/components/schemas/errors.yaml
+    warnings:
+      $ref: ../../common/components/schemas/warnings.yaml
+    created_record:
+      $ref: ../../common/components/schemas/created.yaml
+    addresses:
+      $ref: ./components/schemas/objects/addresses.yaml
+    emails:
+      $ref: ./components/schemas/objects/emails.yaml
+    phones:
+      $ref: ./components/schemas/objects/phones.yaml
+    page:
+      $ref: ../../common/components/schemas/page.yaml
+    custom_fields:
+      $ref: ./components/schemas/objects/custom_fields.yaml
+  parameters:
+    environment:
+      $ref: "../../common/components/parameters/query/environment.yaml"
+#    include_deleted_data:
+#      $ref: ../../common/components/parameters/query/include_deleted_data.yaml
+    include_raw_data:
+      $ref: ../../common/components/parameters/query/include_raw_data.yaml
+#    read_from_cache:
+#      $ref: ../../common/components/parameters/query/read_from_cache.yaml
+#    created_after:
+#      $ref: ../../common/components/parameters/query/created_after.yaml
+#    created_before:
+#      $ref: ../../common/components/parameters/query/created_before.yaml
+#    modified_after:
+#      $ref: ../../common/components/parameters/query/modified_after.yaml
+#    modified_before:
+#      $ref: ../../common/components/parameters/query/modified_before.yaml
+#    cursor:
+#      $ref: ../../common/components/parameters/query/cursor.yaml
+#    remote_provider_page_size:
+#      $ref: ../../common/components/parameters/query/remote_provider_page_size.yaml
+#    page_size:
+#      $ref: ../../common/components/parameters/query/page_size.yaml
+    pageable:
+      $ref: ../../common/components/parameters/query/pageable.yaml
+    x-connection-id:
+      $ref: ../../common/components/parameters/header/x-connection-id.yaml
+#    object_type:
+#      $ref: ./components/parameters/query/object_type.yaml
+#    object_name:
+#      $ref: ./components/parameters/path/object_name.yaml
+  responses:
+    badRequest:
+      $ref: ../../common/components/responses/badRequest.yaml
+    conflict:
+      $ref: ../../common/components/responses/conflict.yaml
+    forbidden:
+      $ref: ../../common/components/responses/forbidden.yaml
+    internalServerError:
+      $ref: ../../common/components/responses/internalServerError.yaml
+    notFound:
+      $ref: ../../common/components/responses/notFound.yaml
+    notImplemented:
+      $ref: ../../common/components/responses/notImplemented.yaml
+    remoteProviderError:
+      $ref: ../../common/components/responses/remoteProviderError.yaml
+    unauthorized:
+      $ref: ../../common/components/responses/unauthorized.yaml
+    unprocessableEntity:
+      $ref: ../../common/components/responses/unprocessableEntity.yaml

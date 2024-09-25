@@ -36,7 +36,7 @@ dependencies {
     annotationProcessor(libs.org.mapstruct.mapstruct.processor)
     annotationProcessor(libs.org.mapstruct.extensions.spring.mapstruct.spring.extensions)
 
-    compileOnly("jakarta.servlet:jakarta.servlet-api:6.0.0")
+    compileOnly("jakarta.servlet:jakarta.servlet-api")
 
     implementation("org.apache.commons:commons-lang3")
     implementation(libs.io.swagger.core.v3.swagger.annotations)

@@ -1,0 +1,18 @@
+name: pageable
+in: query
+schema:
+  type: "object"
+  properties:
+    direction:
+      description: "The direction parameter."
+      type: "string"
+    sort:
+      description: "The sorting parameter."
+      type: "string"
+    size:
+      description: "The number of items to be returned."
+      type: "integer"
+    continuationToken:
+      description: "The the continuationToken parameter."
+      type: "string"
+description: "Pageable parameters."

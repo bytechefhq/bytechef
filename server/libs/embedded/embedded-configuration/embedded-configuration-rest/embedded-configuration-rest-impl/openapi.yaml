@@ -16,6 +16,8 @@ tags:
   description: "The Embedded Tag Internal API"
 - name: "integration"
   description: "The Embedded Integration Internal API"
+- name: "unified-integration"
+  description: "The Embedded Unified Integration Management Internal API"
 - name: "workflow"
   description: "The Embedded Workflow Internal API"
 paths:

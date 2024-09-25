@@ -18,6 +18,14 @@ package com.bytechef.platform.component.service;
 
 import com.bytechef.component.definition.DataStreamItemReader;
 import com.bytechef.component.definition.DataStreamItemWriter;
+import com.bytechef.component.definition.UnifiedApiDefinition.Category;
+import com.bytechef.component.definition.UnifiedApiDefinition.ModelType;
+import com.bytechef.component.definition.unified.base.adapter.ProviderModelAdapter;
+import com.bytechef.component.definition.unified.base.mapper.ProviderModelMapper;
+import com.bytechef.component.definition.unified.base.model.ProviderInputModel;
+import com.bytechef.component.definition.unified.base.model.ProviderOutputModel;
+import com.bytechef.component.definition.unified.base.model.UnifiedInputModel;
+import com.bytechef.component.definition.unified.base.model.UnifiedOutputModel;
 import com.bytechef.platform.component.definition.DataStreamComponentDefinition.ComponentType;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import java.util.List;
@@ -42,6 +50,15 @@ public interface ComponentDefinitionService {
     DataStreamItemReader getDataStreamItemReader(@NonNull String componentName, int componentVersion);
 
     DataStreamItemWriter getDataStreamItemWriter(@NonNull String componentName, int componentVersion);
+
+    List<ComponentDefinition> getUnifiedApiComponentDefinitions(Category category);
+
+    ProviderModelAdapter<? super ProviderInputModel, ? extends ProviderOutputModel> getUnifiedApiProviderModelAdapter(
+        @NonNull String componentName, @NonNull Category category, @NonNull ModelType modelType);
+
+    ProviderModelMapper<? super UnifiedInputModel, ? extends UnifiedOutputModel, ? extends ProviderInputModel, ? super ProviderOutputModel>
+        getUnifiedApiProviderModelMapper(
+            @NonNull String componentName, @NonNull Category category, @NonNull ModelType modelType);
 
     boolean hasComponentDefinition(@NonNull String name, Integer version);
 }

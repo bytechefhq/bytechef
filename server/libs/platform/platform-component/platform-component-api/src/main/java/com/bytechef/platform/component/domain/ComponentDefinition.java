@@ -20,6 +20,8 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.IconUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.UnifiedApiDefinition;
+import com.bytechef.component.definition.UnifiedApiDefinition.Category;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
@@ -45,6 +47,7 @@ public class ComponentDefinition {
     private List<String> tags;
     private List<TriggerDefinitionBasic> triggers;
     private String title;
+    private Category category;
     private int version;
 
     private ComponentDefinition() {
@@ -78,6 +81,8 @@ public class ComponentDefinition {
         this.triggers = getTriggers(componentDefinition);
         this.title = getTitle(
             componentDefinition.getName(), OptionalUtils.orElse(componentDefinition.getTitle(), null));
+        this.category = OptionalUtils.mapOrElse(
+            componentDefinition.getUnifiedApi(), UnifiedApiDefinition::getCategory, null);
         this.version = componentDefinition.getVersion();
     }
 
@@ -142,6 +147,11 @@ public class ComponentDefinition {
         return triggers.size();
     }
 
+    @Nullable
+    public Category getUnifiedApiCategory() {
+        return category;
+    }
+
     public int getVersion() {
         return version;
     }
@@ -161,14 +171,15 @@ public class ComponentDefinition {
             dataStreamSupported == that.dataStreamSupported && Objects.equals(description, that.description) &&
             Objects.equals(icon, that.icon) && Objects.equals(name, that.name) &&
             Objects.equals(resources, that.resources) && Objects.equals(tags, that.tags) &&
-            Objects.equals(triggers, that.triggers) && Objects.equals(title, that.title) && version == that.version;
+            Objects.equals(triggers, that.triggers) && Objects.equals(category, that.category) &&
+            Objects.equals(title, that.title) && version == that.version;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
             actions, categories, connection, connectionRequired, dataStreamSupported, description, icon, name,
-            resources, tags, triggers, title, version);
+            resources, tags, triggers, title, category, version);
     }
 
     @Override
@@ -181,6 +192,7 @@ public class ComponentDefinition {
             ", connectionRequired=" + connectionRequired +
             ", connectionRequired=" + connectionRequired +
             ", dataStreamSupported=" + dataStreamSupported +
+            ", unifiedApiCategory=" + category +
             ", description='" + description + '\'' +
             ", icon='" + icon + '\'' +
             ", actions=" + actions +

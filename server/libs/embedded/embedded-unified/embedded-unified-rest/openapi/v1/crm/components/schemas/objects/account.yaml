@@ -1,0 +1,83 @@
+type: object
+properties:
+  addresses:
+    $ref: './addresses.yaml'
+  description:
+    type: string
+    nullable: true
+    example: Integration API
+  emails:
+    $ref: ./emails.yaml
+  id:
+    type: string
+    example: 1234
+  industry:
+    type: string
+    nullable: true
+    example: API's
+  lastActivityDate:
+    type: string
+    nullable: true
+    format: date-time
+    example: '2022-02-27T00:00:00Z'
+  lifecycleStage:
+    $ref: './lifecycle_stage.yaml'
+  name:
+    type: string
+    nullable: true
+    example: Sample Customer
+  numberOfEmployees:
+    type: integer
+    nullable: true
+    example: 276000
+  ownerId:
+    type: string
+    nullable: true
+    example: d8ceb3ff-8b7f-4fa7-b8de-849292f6ca69
+  phones:
+    $ref: './phones.yaml'
+  website:
+    type: string
+    nullable: true
+    example: https://bytechef.io/
+  customFields:
+    $ref: ./custom_fields.yaml
+  remoteId:
+    type: string
+    example: account_1234
+    nullable: true
+    description: The remote ID of the account in the context of the 3rd Party
+  remoteData:
+    type: object
+    example:
+      raw_data:
+        additional_field: some value
+    nullable: true
+    description: The remote data of the account in the context of the 3rd Party
+  createdDate:
+    type: string
+    nullable: true
+    format: date-time
+    example: '2022-02-27T00:00:00Z'
+#  isDeleted:
+#    type: boolean
+#    example: false
+  lastModifiedDate:
+    type: string
+    format: date-time
+    example: '2022-02-27T00:00:00Z'
+required:
+  - addresses
+  - description
+  - emails
+  - id
+  - industry
+  - lastActivityDate
+  - name
+  - numberOfEmployees
+  - ownerId
+  - phones
+  - website
+  - lifecycleStage
+  - createdDate
+  - lastModifiedDate
