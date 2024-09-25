@@ -37,6 +37,7 @@ import com.bytechef.component.pipedrive.trigger.PipedriveNewPersonTrigger;
 import com.bytechef.component.pipedrive.trigger.PipedriveUpdatedDealTrigger;
 import com.bytechef.component.pipedrive.trigger.PipedriveUpdatedOrganizationTrigger;
 import com.bytechef.component.pipedrive.trigger.PipedriveUpdatedPersonTrigger;
+import com.bytechef.component.pipedrive.unified.PipedriveUnifiedApi;
 import com.bytechef.component.pipedrive.util.PipedriveUtils;
 import com.bytechef.definition.BaseProperty;
 import com.google.auto.service.AutoService;
@@ -60,7 +61,8 @@ public class PipedriveComponentHandler extends AbstractPipedriveComponentHandler
             .description("The first CRM designed by salespeople, for salespeople. Do more to grow your business.")
             .customAction(true)
             .icon("path:assets/pipedrive.svg")
-            .categories(ComponentCategory.CRM);
+            .categories(ComponentCategory.CRM)
+            .unifiedApi(PipedriveUnifiedApi.UNIFIED_API_DEFINITION);
     }
 
     @Override

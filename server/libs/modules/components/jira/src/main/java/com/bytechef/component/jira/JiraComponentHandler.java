@@ -28,6 +28,7 @@ import com.bytechef.component.jira.action.JiraSearchForIssuesUsingJqlAction;
 import com.bytechef.component.jira.connection.JiraConnection;
 import com.bytechef.component.jira.trigger.JiraNewIssueTrigger;
 import com.bytechef.component.jira.trigger.JiraUpdatedIssueTrigger;
+import com.bytechef.component.jira.unifiedapi.JiraUnifiedApi;
 import com.google.auto.service.AutoService;
 
 /**
@@ -50,7 +51,8 @@ public class JiraComponentHandler implements ComponentHandler {
             JiraSearchForIssuesUsingJqlAction.ACTION_DEFINITION)
         .triggers(
             JiraNewIssueTrigger.TRIGGER_DEFINITION,
-            JiraUpdatedIssueTrigger.TRIGGER_DEFINITION);
+            JiraUpdatedIssueTrigger.TRIGGER_DEFINITION)
+        .unifiedApi(JiraUnifiedApi.UNIFIED_API_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

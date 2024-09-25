@@ -30,6 +30,7 @@ import com.bytechef.component.xero.connection.XeroConnection;
 import com.bytechef.component.xero.trigger.XeroNewBillTrigger;
 import com.bytechef.component.xero.trigger.XeroNewContactTrigger;
 import com.bytechef.component.xero.trigger.XeroNewInvoiceTrigger;
+import com.bytechef.component.xero.unified.XeroUnifiedApi;
 import com.google.auto.service.AutoService;
 
 /**
@@ -55,7 +56,8 @@ public class XeroComponentHandler implements ComponentHandler {
         .triggers(
             XeroNewBillTrigger.TRIGGER_DEFINITION,
             XeroNewContactTrigger.TRIGGER_DEFINITION,
-            XeroNewInvoiceTrigger.TRIGGER_DEFINITION);
+            XeroNewInvoiceTrigger.TRIGGER_DEFINITION)
+        .unifiedApi(XeroUnifiedApi.UNIFIED_API_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
