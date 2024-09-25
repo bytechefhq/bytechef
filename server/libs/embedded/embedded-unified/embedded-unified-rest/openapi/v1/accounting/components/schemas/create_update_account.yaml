@@ -1,0 +1,54 @@
+type: object
+properties:
+  accountNumber:
+    type: string
+    example: '12345'
+    nullable: true
+    description: The account number
+  classification:
+    type: string
+    example: Asset
+    nullable: true
+    description: The classification of the account
+  companyInfoId:
+    type: string
+    example: fb8e46-6e9fea1-e4a-7-e8cd84d10a6fc99
+    nullable: true
+    description: The ID of the associated company info
+  currentBalance:
+    type: number
+    example: 10000
+    nullable: true
+    description: The current balance of the account
+  currency:
+    type: string
+    example: USD
+    nullable: true
+    description: The currency of the account
+  description:
+    type: string
+    example: Main cash account for daily operations
+    nullable: true
+    description: A description of the account
+  name:
+    type: string
+    example: Cash
+    nullable: true
+    description: The name of the account
+  status:
+    type: string
+    example: Active
+    nullable: true
+    description: The status of the account
+  parentAccountId:
+    type: string
+    example: 7094a8c18d41e68e--9a6ac4fb-eef6edf-9
+    nullable: true
+    description: The ID of the parent account
+  type:
+    type: string
+    example: Current Asset
+    nullable: true
+    description: The type of the account
+  customFields:
+    $ref: ./objects/custom_fields.yaml

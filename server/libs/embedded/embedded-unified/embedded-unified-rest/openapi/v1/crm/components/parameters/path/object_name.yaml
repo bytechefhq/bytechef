@@ -1,0 +1,7 @@
+name: object_name
+in: path
+schema:
+  type: string
+example: MyCustomObject__c
+description: The unique name of the custom object. For Salesforce, this should end with __c. For Hubspot, this will typically be the singular form of the object.
+required: true

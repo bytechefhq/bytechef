@@ -27,6 +27,7 @@ import com.bytechef.component.definition.DataStreamDefinition;
 import com.bytechef.component.definition.Help;
 import com.bytechef.component.definition.Resources;
 import com.bytechef.component.definition.TriggerDefinition;
+import com.bytechef.component.definition.UnifiedApiDefinition;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
@@ -125,6 +126,11 @@ public class ConnectionIntTestConfiguration {
 
             @Override
             public Optional<List<? extends TriggerDefinition>> getTriggers() {
+                return Optional.empty();
+            }
+
+            @Override
+            public Optional<UnifiedApiDefinition> getUnifiedApi() {
                 return Optional.empty();
             }
 

@@ -116,5 +116,11 @@ public interface ComponentDefinition {
      *
      * @return
      */
+    Optional<UnifiedApiDefinition> getUnifiedApi();
+
+    /**
+     *
+     * @return
+     */
     int getVersion();
 }

@@ -1,0 +1,6 @@
+name: page_size
+in: query
+schema:
+  type: string
+example: 123
+description: "Number of results to return per page. (Max: 1000)"

@@ -17,9 +17,19 @@
 package com.bytechef.platform.component.service;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.DataStreamDefinition;
 import com.bytechef.component.definition.DataStreamItemReader;
 import com.bytechef.component.definition.DataStreamItemWriter;
+import com.bytechef.component.definition.UnifiedApiDefinition;
+import com.bytechef.component.definition.UnifiedApiDefinition.Category;
+import com.bytechef.component.definition.UnifiedApiDefinition.ModelType;
+import com.bytechef.component.definition.unified.base.adapter.ProviderModelAdapter;
+import com.bytechef.component.definition.unified.base.mapper.ProviderModelMapper;
+import com.bytechef.component.definition.unified.base.model.ProviderInputModel;
+import com.bytechef.component.definition.unified.base.model.ProviderOutputModel;
+import com.bytechef.component.definition.unified.base.model.UnifiedInputModel;
+import com.bytechef.component.definition.unified.base.model.UnifiedOutputModel;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.definition.DataStreamComponentDefinition.ComponentType;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -132,6 +142,68 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
                     componentName, componentVersion)))
             .getDataStreamItemWriter()
             .get();
+    }
+
+    @Override
+    public List<ComponentDefinition> getUnifiedApiComponentDefinitions(Category category) {
+        return componentDefinitionRegistry.getComponentDefinitions()
+            .stream()
+            .filter(componentDefinition -> OptionalUtils.isPresent(componentDefinition.getUnifiedApi()))
+            .map(ComponentDefinition::new)
+            .toList();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public
+        ProviderModelMapper<? super UnifiedInputModel, ? extends UnifiedOutputModel, ? extends ProviderInputModel, ? super ProviderOutputModel>
+        getUnifiedApiProviderModelMapper(
+            @NonNull String componentName, @NonNull Category category, @NonNull ModelType modelType) {
+
+        return (ProviderModelMapper<? super UnifiedInputModel, ? extends UnifiedOutputModel, ? extends ProviderInputModel, ? super ProviderOutputModel>) componentDefinitionRegistry
+            .getComponentDefinitions()
+            .stream()
+            .filter(componentDefinition -> OptionalUtils.isPresent(componentDefinition.getUnifiedApi()) &&
+                componentName.equals(componentDefinition.getName()))
+            .map(com.bytechef.component.definition.ComponentDefinition::getUnifiedApi)
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Unified API provider model mapper for component: %s not found".formatted(componentName)))
+            .filter(unifiedApiDefinition -> unifiedApiDefinition.getCategory() == category)
+            .map(UnifiedApiDefinition::getProviderMappers)
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Unified API provider model mapper for category: %s not found".formatted(category)))
+            .stream()
+            .filter(providerModelMapper -> providerModelMapper.getModelType() == modelType)
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Unified API provider model mapper for model type: %s not found".formatted(modelType)));
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public ProviderModelAdapter<? super ProviderInputModel, ? extends ProviderOutputModel>
+        getUnifiedApiProviderModelAdapter(
+            @NonNull String componentName, @NonNull Category category, @NonNull ModelType modelType) {
+
+        return (ProviderModelAdapter<? super ProviderInputModel, ? extends ProviderOutputModel>) componentDefinitionRegistry
+            .getComponentDefinitions()
+            .stream()
+            .filter(componentDefinition -> OptionalUtils.isPresent(componentDefinition.getUnifiedApi()) &&
+                componentName.equals(componentDefinition.getName()))
+            .map(com.bytechef.component.definition.ComponentDefinition::getUnifiedApi)
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Unified API provider model adapter for component: %s not found".formatted(componentName)))
+            .filter(unifiedApiDefinition -> unifiedApiDefinition.getCategory() == category)
+            .map(UnifiedApiDefinition::getProviderAdapters)
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Unified API provider model adapter for category: %s not found".formatted(category)))
+            .stream()
+            .filter(providerModelAdapter -> providerModelAdapter.getModelType() == modelType)
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Unified API provider model adapter for model type: %s not found".formatted(modelType)));
     }
 
     @Override

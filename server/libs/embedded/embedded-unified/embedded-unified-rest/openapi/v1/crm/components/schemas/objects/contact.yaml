@@ -1,0 +1,63 @@
+type: object
+properties:
+  accountId:
+    type: string
+    nullable: true
+    example: fd089246-09b1-4e3b-a60a-7a76314bbcce
+  ownerId:
+    type: string
+    nullable: true
+    example: 23e640fe-6105-4a11-a636-3aa6b6c6e762
+  addresses:
+    $ref: ./addresses.yaml
+  emails:
+    $ref: ./emails.yaml
+  firstName:
+    type: string
+    nullable: true
+    example: George
+  id:
+    type: string
+    example: 54312
+  lastActivityDate:
+    type: string
+    nullable: true
+    format: date-time
+    example: '2022-02-27T00:00:00Z'
+  lastName:
+    type: string
+    nullable: true
+    example: Xing
+  phones:
+    $ref: ./phones.yaml
+  lifecycleStage:
+    $ref: './lifecycle_stage.yaml'
+  createdDate:
+    type: string
+    nullable: true
+    format: date-time
+    example: '2022-02-27T00:00:00Z'
+#  isDeleted:
+#    type: boolean
+#    example: false
+  lastModifiedDate:
+    type: string
+    format: date-time
+    example: '2022-02-27T00:00:00Z'
+  rawData:
+    type: object
+    additionalProperties: true
+required:
+  - accountId
+  - ownerId
+  - description
+  - id
+  - addresses
+  - emails
+  - firstName
+  - lastActivityDate
+  - lastName
+  - phone_numbers
+  - lifecycleStage
+  - createdDate
+  - lastModifiedDate

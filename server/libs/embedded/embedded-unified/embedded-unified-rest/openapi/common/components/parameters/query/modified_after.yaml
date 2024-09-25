@@ -1,0 +1,7 @@
+name: modified_after
+in: query
+schema:
+  type: string
+  format: date-time
+description: If provided, will only return objects modified after this datetime. Datetime must be in ISO 8601 format and URI encoded.
+example: 2023-02-23T00:00:00Z

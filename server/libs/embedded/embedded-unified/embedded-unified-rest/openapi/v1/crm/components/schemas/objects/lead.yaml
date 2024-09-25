@@ -1,0 +1,77 @@
+type: object
+properties:
+  addresses:
+    $ref: ./addresses.yaml
+  company:
+    type: string
+    nullable: true
+    example: ByteChef
+  convertedAccountId:
+    type: string
+    nullable: true
+    example: 88cc44ca-7a34-4e8b-b0da-51c3aae34daf
+  convertedAccount:
+    $ref: './account.yaml'
+  convertedContactId:
+    type: string
+    nullable: true
+    example: 8c8de778-a219-4d6c-848c-1d57b52149f6
+  convertedContact:
+    $ref: './contact.yaml'
+#  convertedDate:
+#    type: string
+#    nullable: true
+#    format: date-time
+#    example: '2023-02-27T00:00:00Z'
+  emails:
+    $ref: ./emails.yaml
+  firstName:
+    type: string
+    nullable: true
+    example: George
+  id:
+    type: string
+    example: 54312
+  lastLame:
+    type: string
+    nullable: true
+    example: Xing
+  leadSource:
+    type: string
+    nullable: true
+    example: API Blogger
+  ownerId:
+    type: string
+    nullable: true
+    example: 62e5e0f7-becd-4ae2-be82-8b4e1d5ed8a2
+  phones:
+    $ref: ./phones.yaml
+  title:
+    type: string
+    nullable: true
+    example: Co-Founder
+  createdDate:
+    type: string
+    nullable: true
+    format: date-time
+    example: '2023-02-10T00:00:00Z'
+#  is_deleted:
+#    type: boolean
+#    example: false
+  lastModifiedDate:
+    type: string
+    format: date-time
+    example: '2022-02-27T00:00:00Z'
+required:
+  - addresses
+  - company
+  - convertedAccountId
+  - convertedContactId
+  - id
+  - lastName
+  - leadSource
+  - ownerId
+  - phoneNumbers
+  - title
+  - createdDate
+  - lastModifiedDate

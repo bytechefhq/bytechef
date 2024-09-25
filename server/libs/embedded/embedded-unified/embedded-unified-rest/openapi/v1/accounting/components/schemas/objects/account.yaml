@@ -1,0 +1,81 @@
+type: object
+properties:
+  accountNumber:
+    type: string
+    example: '1000'
+    nullable: true
+    description: The account number
+  companyInfoId:
+    type: string
+    example: 01a-99f1eefd-c98e-ed464fba8c-e64a867
+    nullable: true
+    description: The ID of the associated company info
+  classification:
+    type: string
+    example: Asset
+    nullable: true
+    description: The classification of the account
+  currentBalance:
+    type: number
+    example: 10000
+    nullable: true
+    description: The current balance of the account
+  currency:
+    type: string
+    example: USD
+    nullable: true
+    description: The currency of the account
+  description:
+    type: string
+    example: Main cash account for daily operations
+    nullable: true
+    description: A description of the account
+  id:
+    type: string
+    example: 801f9ede-c698-4e66-a7fc-48d19eebaa4f
+    nullable: true
+    description: The ID of the account record
+  name:
+    type: string
+    example: Cash
+    nullable: true
+    description: The name of the account
+  parentAccountId:
+    type: string
+    example: 8049a64c9-68ec6781eae-94fe-ebdda-1ff
+    nullable: true
+    description: The ID of the parent account
+  status:
+    type: string
+    example: Active
+    nullable: true
+    description: The status of the account
+  type:
+    type: string
+    example: Current Asset
+    nullable: true
+    description: The type of the account
+  customFields:
+    $ref: ./custom_fields.yaml
+  remoteId:
+    type: string
+    example: account_1234
+    nullable: true
+    description: The remote ID of the account in the context of the 3rd Party
+  remoteData:
+    type: object
+    example:
+      raw_data:
+        additional_field: some value
+    nullable: true
+    description: The remote data of the account in the context of the 3rd Party
+  createdDate:
+    type: string
+    nullable: true
+    format: date-time
+    example: '2022-02-27T00:00:00Z'
+  lastModifiedDate:
+    type: string
+    format: date-time
+    example: '2022-02-27T00:00:00Z'
+

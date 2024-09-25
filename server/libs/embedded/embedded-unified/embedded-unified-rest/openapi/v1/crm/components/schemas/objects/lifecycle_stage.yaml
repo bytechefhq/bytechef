@@ -1,0 +1,11 @@
+type: string
+nullable: true
+enum:
+  - SUBSCRIBER
+  - LEAD
+  - MARKETING_QUALIFIED_LEAD
+  - SALES_QUALIFIED_LEAD
+  - OPPORTUNITY
+  - CUSTOMER
+  - EVANGELIST
+  - OTHER

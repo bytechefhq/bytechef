@@ -1,0 +1,33 @@
+type: object
+properties:
+  firstName:
+    type: string
+    nullable: true
+    example: George
+  lastName:
+    type: string
+    nullable: true
+    example: Xing
+  lastActivityDate:
+    type: string
+    nullable: true
+    format: date-time
+    example: '2022-02-27T00:00:00Z'
+  accountId:
+    type: string
+    nullable: true
+    example: 64571bff-48ea-4469-9fa0-ee1a0bab38bd
+  addresses:
+    $ref: ./objects/addresses.yaml
+  emails:
+    $ref: ./objects/emails.yaml
+  phones:
+    $ref: ./objects/phones.yaml
+  ownerId:
+    type: string
+    nullable: true
+    example: 9f3e97fd-4d5d-4efc-959d-bbebfac079f5
+  lifecycleStage:
+    $ref: './objects/lifecycle_stage.yaml'
+  customFields:
+    $ref: ./objects/custom_fields.yaml

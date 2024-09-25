@@ -1,0 +1,52 @@
+type: array
+items:
+  type: object
+  properties:
+    addressType:
+      type: string
+      enum:
+        - primary
+        - mailing
+        - other
+        - billing
+        - shipping
+    city:
+      type: string
+      nullable: true
+      example: San Francisco
+    country:
+      type: string
+      nullable: true
+      example: USA
+    postalCode:
+      type: string
+      nullable: true
+      example: '94107'
+    state:
+      type: string
+      nullable: true
+      example: CA
+    street1:
+      type: string
+      nullable: true
+      example: 525 Brannan
+    street2:
+      type: string
+      nullable: true
+      example: ~
+  required:
+    - addressType
+    - city
+    - country
+    - postalCode
+    - state
+    - street1
+    - street2
+example:
+  - addressType: shipping
+    city: San Francisco
+    country: US
+    postalCode: '94107'
+    state: CA
+    street1: 525 Brannan
+    street2: ~

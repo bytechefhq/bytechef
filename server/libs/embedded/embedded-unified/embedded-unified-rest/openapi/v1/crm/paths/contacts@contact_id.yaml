@@ -1,0 +1,88 @@
+get:
+  operationId: getContact
+  summary: Get contact
+  tags:
+    - contact
+  security:
+    - bearer: []
+  parameters:
+    - $ref: ../../../common/components/parameters/query/include_raw_data.yaml
+  responses:
+    200:
+      description: Contact
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/objects/contact.yaml
+    '400':
+      $ref: ../../../common/components/responses/badRequest.yaml
+    '401':
+      $ref: ../../../common/components/responses/unauthorized.yaml
+    '403':
+      $ref: ../../../common/components/responses/forbidden.yaml
+    '404':
+      $ref: ../../../common/components/responses/notFound.yaml
+    '499':
+      $ref: ../../../common/components/responses/remoteProviderError.yaml
+    '500':
+      $ref: ../../../common/components/responses/internalServerError.yaml
+    '501':
+      $ref: ../../../common/components/responses/notImplemented.yaml
+patch:
+  operationId: updateContact
+  summary: Update contact
+  tags:
+    - contact
+  security:
+    - bearer: []
+  parameters: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../components/schemas/create_update_contact.yaml
+        examples:
+          Example:
+            value:
+              first_name: George
+              last_name: Xing
+              account_id: 0ce05511-adbc-4144-a049-6631c7ea3b04
+  responses:
+    '204':
+      description: Contact updated
+#      content:
+#        application/json:
+#          schema:
+#            type: object
+#            properties:
+#              warnings:
+#                $ref: ../../../common/components/schemas/warnings.yaml
+    '400':
+      $ref: ../../../common/components/responses/badRequest.yaml
+    '401':
+      $ref: ../../../common/components/responses/unauthorized.yaml
+    '403':
+      $ref: ../../../common/components/responses/forbidden.yaml
+    '404':
+      $ref: ../../../common/components/responses/notFound.yaml
+    '409':
+      $ref: ../../../common/components/responses/conflict.yaml
+    '422':
+      $ref: ../../../common/components/responses/unprocessableEntity.yaml
+    '499':
+      $ref: ../../../common/components/responses/remoteProviderError.yaml
+    '500':
+      $ref: ../../../common/components/responses/internalServerError.yaml
+    '501':
+      $ref: ../../../common/components/responses/notImplemented.yaml
+
+parameters:
+  - $ref: ../../../common/components/parameters/header/x-customer-id.yaml
+  - $ref: ../../../common/components/parameters/header/x-provider-name.yaml
+  - name: contact_id
+    in: path
+    required: true
+    schema:
+      type: string
+    example: 0258cbc6-6020-430a-848e-aafacbadf4ae

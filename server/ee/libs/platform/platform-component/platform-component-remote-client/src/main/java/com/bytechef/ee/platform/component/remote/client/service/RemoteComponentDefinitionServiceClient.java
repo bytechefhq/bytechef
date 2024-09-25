@@ -10,6 +10,14 @@ package com.bytechef.ee.platform.component.remote.client.service;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.definition.DataStreamItemReader;
 import com.bytechef.component.definition.DataStreamItemWriter;
+import com.bytechef.component.definition.UnifiedApiDefinition.Category;
+import com.bytechef.component.definition.UnifiedApiDefinition.ModelType;
+import com.bytechef.component.definition.unified.base.adapter.ProviderModelAdapter;
+import com.bytechef.component.definition.unified.base.mapper.ProviderModelMapper;
+import com.bytechef.component.definition.unified.base.model.ProviderInputModel;
+import com.bytechef.component.definition.unified.base.model.ProviderOutputModel;
+import com.bytechef.component.definition.unified.base.model.UnifiedInputModel;
+import com.bytechef.component.definition.unified.base.model.UnifiedOutputModel;
 import com.bytechef.ee.discovery.util.WorkerDiscoveryUtils;
 import com.bytechef.ee.platform.component.remote.client.AbstractWorkerClient;
 import com.bytechef.ee.remote.client.DefaultRestClient;
@@ -109,6 +117,30 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
 
     @Override
     public DataStreamItemWriter getDataStreamItemWriter(@NonNull String componentName, int componentVersion) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<ComponentDefinition> getUnifiedApiComponentDefinitions(
+        Category category) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ProviderModelAdapter<? super ProviderInputModel, ? extends ProviderOutputModel>
+        getUnifiedApiProviderModelAdapter(
+            @NonNull String componentName, @NonNull Category category, @NonNull ModelType modelType) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public
+        ProviderModelMapper<? super UnifiedInputModel, ? extends UnifiedOutputModel, ? extends ProviderInputModel, ? super ProviderOutputModel>
+        getUnifiedApiProviderModelMapper(
+            @NonNull String componentName, @NonNull Category category, @NonNull ModelType modelTyp) {
+
         throw new UnsupportedOperationException();
     }
 

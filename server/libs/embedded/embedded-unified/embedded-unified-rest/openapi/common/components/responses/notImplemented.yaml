@@ -1,0 +1,8 @@
+description: Not implemented
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        errors:
+          $ref: ../schemas/errors.yaml

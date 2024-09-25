@@ -1,0 +1,114 @@
+get:
+  operationId: getAccount
+  summary: Get account
+  tags:
+    - account
+  security:
+    - bearer: []
+  parameters:
+    - $ref: "../../../common/components/parameters/query/environment.yaml"
+    - $ref: ../../../common/components/parameters/query/include_raw_data.yaml
+  responses:
+    '200':
+      description: Account
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/objects/account.yaml
+#            $ref: "../openapi.yaml#/components/schemas/account"
+          examples:
+            Example:
+              value:
+                addresses:
+                  - address_type: BILLING
+                    city: San Francisco
+                    country: CX
+                    postal_code: '94107'
+                    state: CA
+                    street1: 525 Brannan
+                    street2: ~
+                  - address_type: BILLING
+                    city: San Francisco
+                    country: US
+                    postal_code: '94107'
+                    state: CA
+                    street1: 525 Brannan
+                    street2: ~
+                description: Integration API
+                id: 1234
+                industry: API's
+                last_activity_at: '2022-02-10T00:00:00Z'
+                name: ByteChef
+                number_of_employees: 276000
+                owner_id: 9377fd4d-d420-4e0b-93ea-789078a3eab4
+                phone_numbers:
+                  - phone_number: '+14151234567'
+                    phone_number_type: mobile
+                created_at: '2023-02-27T00:00:00Z'
+                updated_at: '2023-02-27T00:00:00Z'
+                website: https://bytechef.io/
+    '400':
+      $ref: ../../../common/components/responses/badRequest.yaml
+    '401':
+      $ref: ../../../common/components/responses/unauthorized.yaml
+    '403':
+      $ref: ../../../common/components/responses/forbidden.yaml
+    '404':
+      $ref: ../../../common/components/responses/notFound.yaml
+    '499':
+      $ref: ../../../common/components/responses/remoteProviderError.yaml
+    '500':
+      $ref: ../../../common/components/responses/internalServerError.yaml
+    '501':
+      $ref: ../../../common/components/responses/notImplemented.yaml
+patch:
+  operationId: updateAccount
+  summary: Update account
+  tags:
+    - account
+  security:
+    - bearer: []
+  parameters:
+    - $ref: "../../../common/components/parameters/query/environment.yaml"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../components/schemas/create_update_account.yaml
+  responses:
+    '204':
+      description: Account updated
+#      content:
+#        application/json:
+#          schema:
+#            type: object
+#            properties:
+#              warnings:
+#                $ref: ../../../common/components/schemas/warnings.yaml
+    '400':
+      $ref: ../../../common/components/responses/badRequest.yaml
+    '401':
+      $ref: ../../../common/components/responses/unauthorized.yaml
+    '403':
+      $ref: ../../../common/components/responses/forbidden.yaml
+    '404':
+      $ref: ../../../common/components/responses/notFound.yaml
+    '409':
+      $ref: ../../../common/components/responses/conflict.yaml
+    '422':
+      $ref: ../../../common/components/responses/unprocessableEntity.yaml
+    '499':
+      $ref: ../../../common/components/responses/remoteProviderError.yaml
+    '500':
+      $ref: ../../../common/components/responses/internalServerError.yaml
+    '501':
+      $ref: ../../../common/components/responses/notImplemented.yaml
+parameters:
+  - $ref: ../../../common/components/parameters/header/x-connection-id.yaml
+  - name: account_id
+    in: path
+    required: true
+    schema:
+      type: string
+      example: 0258cbc6-6020-430a-848e-aafacbadf4ae

@@ -1,0 +1,97 @@
+get:
+  operationId: getOpportunity
+  summary: Get opportunity
+  tags:
+    - opportunity
+  security:
+    - bearer: []
+  parameters:
+    - $ref: ../../../common/components/parameters/query/include_raw_data.yaml
+  responses:
+    '200':
+      description: Opportunity
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/objects/opportunity.yaml
+          examples:
+            Example:
+              value:
+                account:
+                  id: a329053d-bf86-4b82-8356-9e897aa7dacc
+                amount: 100000
+                closedate: '2023-02-27T00:00:00Z'
+                description: Wants to use open source unified API for third-party integrations
+                id: 1234
+                lastActivityAte: '2023-02-27T00:00:00Z'
+                name: Needs third-party integrations
+                owner: 93b0c2b5-26a8-4b92-b4e5-05d764eb1119
+                createdDate: '2023-02-27T00:00:00Z'
+                lastModifiedDate: '2023-02-27T00:00:00Z'
+                stage: Closed Won
+    '400':
+      $ref: ../../../common/components/responses/badRequest.yaml
+    '401':
+      $ref: ../../../common/components/responses/unauthorized.yaml
+    '403':
+      $ref: ../../../common/components/responses/forbidden.yaml
+    '404':
+      $ref: ../../../common/components/responses/notFound.yaml
+    '499':
+      $ref: ../../../common/components/responses/remoteProviderError.yaml
+    '500':
+      $ref: ../../../common/components/responses/internalServerError.yaml
+    '501':
+      $ref: ../../../common/components/responses/notImplemented.yaml
+patch:
+  operationId: updateOpportunity
+  summary: Update opportunity
+  tags:
+    - opportunity
+  security:
+    - bearer: []
+  parameters: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        $ref: ../components/schemas/create_update_opportunity.yaml
+  responses:
+    '204':
+      description: Opportunity updated
+#      content:
+#        application/json:
+#          schema:
+#            type: object
+#            properties:
+#              errors:
+#                $ref: ../../../common/components/schemas/errors.yaml
+#              warnings:
+#                $ref: ../../../common/components/schemas/warnings.yaml
+    '400':
+      $ref: ../../../common/components/responses/badRequest.yaml
+    '401':
+      $ref: ../../../common/components/responses/unauthorized.yaml
+    '403':
+      $ref: ../../../common/components/responses/forbidden.yaml
+    '404':
+      $ref: ../../../common/components/responses/notFound.yaml
+    '409':
+      $ref: ../../../common/components/responses/conflict.yaml
+    '422':
+      $ref: ../../../common/components/responses/unprocessableEntity.yaml
+    '499':
+      $ref: ../../../common/components/responses/remoteProviderError.yaml
+    '500':
+      $ref: ../../../common/components/responses/internalServerError.yaml
+    '501':
+      $ref: ../../../common/components/responses/notImplemented.yaml
+parameters:
+  - $ref: ../../../common/components/parameters/header/x-customer-id.yaml
+  - $ref: ../../../common/components/parameters/header/x-provider-name.yaml
+  - name: opportunity_id
+    in: path
+    required: true
+    schema:
+      type: string
+    example: c9f58083-a370-47b5-ad02-99160ea20372

@@ -1,0 +1,19 @@
+type: array
+items:
+  type: object
+  properties:
+    emailAddress:
+      type: string
+      example: hello@bytechef.io
+    emailAddressType:
+      type: string
+      enum:
+        - primary
+        - work
+        - other
+  required:
+    - emailAddress
+    - emailAddressType
+example:
+  - emailAddress: hello@bytechef.io
+    emailAddressType: work

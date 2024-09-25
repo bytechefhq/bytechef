@@ -1,0 +1,71 @@
+type: object
+properties:
+  account_id:
+    type: string
+    nullable: true
+    example: fd089246-09b1-4e3b-a60a-7a76314bbcce
+  amount:
+    type: integer
+    nullable: true
+    example: 100000
+  closeDate:
+    type: string
+    nullable: true
+    format: date-time
+    example: '2023-02-27T00:00:00Z'
+  description:
+    type: string
+    nullable: true
+    example: Wants to use open source unified API for third-party integrations
+  id:
+    type: string
+    example: 54312
+  lastActivityDate:
+    type: string
+    nullable: true
+    format: date-time
+    example: '2023-02-27T00:00:00Z'
+  name:
+    type: string
+    nullable: true
+    example: Needs third-party integrations
+  ownerId:
+    type: string
+    nullable: true
+    example: d8ceb3ff-8b7f-4fa7-b8de-849292f6ca69
+  pipeline:
+    type: string
+    nullable: true
+  stage:
+    type: string
+    nullable: true
+    example: 'Closed Won'
+  status:
+    type: string # TODO: enum
+    nullable: true
+    example: OPEN
+  createdDate:
+    type: string
+    nullable: true
+    format: date-time
+    example: '2023-02-27T00:00:00Z'
+#  is_deleted:
+#    type: boolean
+#    example: false
+  lastModifiedDate:
+    type: string
+    format: date-time
+    example: '2022-02-27T00:00:00Z'
+required:
+  - accountId
+  - amount
+  - description
+  - id
+  - lastActivityDate
+  - name
+  - ownerId
+  - stage
+  - status
+  - pipeline
+  - createdDate
+  - lastModifiedDate

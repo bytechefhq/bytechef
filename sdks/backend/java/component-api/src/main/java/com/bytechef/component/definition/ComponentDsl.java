@@ -24,6 +24,8 @@ import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFu
 import com.bytechef.component.definition.PropertiesDataSource.TriggerPropertiesFunction;
 import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.definition.Property.ValueProperty;
+import com.bytechef.component.definition.unified.base.adapter.ProviderModelAdapter;
+import com.bytechef.component.definition.unified.base.mapper.ProviderModelMapper;
 import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
 import com.bytechef.definition.BaseOutputDefinition.SampleOutput;
 import com.bytechef.definition.BaseOutputFunction;
@@ -283,6 +285,10 @@ public final class ComponentDsl {
 
     public static ModifiableTriggerDefinition trigger(String name) {
         return new ModifiableTriggerDefinition(name);
+    }
+
+    public static ModifiableUnifiedApiDefinition unifiedApi(UnifiedApiDefinition.Category category) {
+        return new ModifiableUnifiedApiDefinition(category);
     }
 
     public static final class ModifiableActionDefinition implements ActionDefinition {
@@ -1168,6 +1174,7 @@ public final class ComponentDsl {
         private int version = VERSION_1;
         private String title;
         private List<? extends TriggerDefinition> triggerDefinitions;
+        private UnifiedApiDefinition unifiedApiDefinition;
 
         private ModifiableComponentDefinition() {
         }
@@ -1315,6 +1322,12 @@ public final class ComponentDsl {
             return this;
         }
 
+        public ModifiableComponentDefinition unifiedApi(UnifiedApiDefinition unifiedApi) {
+            this.unifiedApiDefinition = unifiedApi;
+
+            return this;
+        }
+
         public ModifiableComponentDefinition version(int version) {
             this.version = version;
 
@@ -1390,6 +1403,11 @@ public final class ComponentDsl {
         @Override
         public Optional<List<? extends TriggerDefinition>> getTriggers() {
             return Optional.ofNullable(triggerDefinitions == null ? null : triggerDefinitions);
+        }
+
+        @Override
+        public Optional<UnifiedApiDefinition> getUnifiedApi() {
+            return Optional.ofNullable(unifiedApiDefinition);
         }
 
         @Override
@@ -3442,6 +3460,52 @@ public final class ComponentDsl {
                 ", webhookRawBody=" + webhookRawBody +
                 ", workflowSyncExecution=" + workflowSyncExecution +
                 '}';
+        }
+    }
+
+    public static class ModifiableUnifiedApiDefinition implements UnifiedApiDefinition {
+
+        private final Category category;
+
+        private List<? extends ProviderModelAdapter<?, ?>> providerAdapters;
+        private List<? extends ProviderModelMapper<?, ?, ?, ?>> providerMappers;
+
+        public ModifiableUnifiedApiDefinition(Category category) {
+            this.category = category;
+        }
+
+        public final ModifiableUnifiedApiDefinition providerAdapters(ProviderModelAdapter<?, ?>... providerAdapters) {
+
+            if (providerAdapters != null) {
+                this.providerAdapters = List.of(providerAdapters);
+            }
+
+            return this;
+        }
+
+        public final ModifiableUnifiedApiDefinition providerMappers(
+            ProviderModelMapper<?, ?, ?, ?>... providerMappers) {
+
+            if (providerMappers != null) {
+                this.providerMappers = List.of(providerMappers);
+            }
+
+            return this;
+        }
+
+        @Override
+        public Category getCategory() {
+            return category;
+        }
+
+        @Override
+        public List<? extends ProviderModelAdapter<?, ?>> getProviderAdapters() {
+            return providerAdapters;
+        }
+
+        @Override
+        public List<? extends ProviderModelMapper<?, ?, ?, ?>> getProviderMappers() {
+            return providerMappers;
         }
     }
 
