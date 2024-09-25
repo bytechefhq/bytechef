@@ -5,7 +5,17 @@ export default function getFormattedName(itemName: string, nodes: Node[]): strin
 
     const existingNodes = nodeNames.filter((name) => name?.includes(itemName));
 
-    const formattedName = existingNodes.length ? `${itemName}_${existingNodes.length + 1}` : `${itemName}_1`;
+    if (!existingNodes.length) {
+        return itemName;
+    }
 
-    return formattedName;
+    const existingNodeNumbers = existingNodes.map((name) => {
+        const nodeNameSplit = name.split('_');
+
+        return parseInt(nodeNameSplit[nodeNameSplit.length - 1]);
+    });
+
+    const maxExistingNodeNumber = Math.max(...existingNodeNumbers);
+
+    return `${itemName}_${maxExistingNodeNumber + 1}`;
 }
