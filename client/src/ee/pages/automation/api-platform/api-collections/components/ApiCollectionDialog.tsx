@@ -155,29 +155,31 @@ const ApiCollectionDialog = ({apiCollection, onClose, triggerNode}: ApiCollectio
                             shouldUnregister={false}
                         />
 
-                        <FormField
-                            control={control}
-                            name="projectVersion"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Project Version</FormLabel>
+                        {curProjectId && (
+                            <FormField
+                                control={control}
+                                name="projectVersion"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Project Version</FormLabel>
 
-                                    <FormControl>
-                                        <ProjectInstanceDialogBasicStepProjectVersionsSelect
-                                            onChange={(value) => {
-                                                field.onChange(value);
-                                                setCurProjectVersion(value);
-                                            }}
-                                            projectId={curProjectId}
-                                            projectVersion={curProjectVersion}
-                                        />
-                                    </FormControl>
+                                        <FormControl>
+                                            <ProjectInstanceDialogBasicStepProjectVersionsSelect
+                                                onChange={(value) => {
+                                                    field.onChange(value);
+                                                    setCurProjectVersion(value);
+                                                }}
+                                                projectId={curProjectId}
+                                                projectVersion={curProjectVersion}
+                                            />
+                                        </FormControl>
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                            shouldUnregister={false}
-                        />
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                                shouldUnregister={false}
+                            />
+                        )}
 
                         <FormField
                             control={control}
