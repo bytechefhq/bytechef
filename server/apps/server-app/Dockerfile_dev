@@ -24,4 +24,4 @@ COPY --from=build /build/server/apps/server-app/build/libs/*app.jar application.
 
 EXPOSE 9555
 
-ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar application.jar ${0} ${@}"]
+ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar application.jar"]
