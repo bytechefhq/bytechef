@@ -160,7 +160,7 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
             MapUtils.toMap(
                 integrationInstanceConfigurationModel.getConnectionAuthorizationParameters(),
                 Map.Entry::getKey,
-                entry -> StringUtils.obfuscate(StringUtils.toString(entry.getValue()), 28, 8)));
+                entry -> StringUtils.obfuscate(String.valueOf(entry.getValue()), 28, 8)));
 
         return Validate.notNull(integrationInstanceConfigurationModel, "integrationInstanceConfigurationModel")
             .connectionParameters(null);
