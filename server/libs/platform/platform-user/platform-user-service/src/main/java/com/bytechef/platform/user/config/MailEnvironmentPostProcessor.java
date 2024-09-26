@@ -37,7 +37,7 @@ public class MailEnvironmentPostProcessor implements EnvironmentPostProcessor {
         if (StringUtils.isBlank(environment.getProperty("bytechef.mail.host", String.class))) {
             source.put("management.health.mail.enabled", false);
         } else {
-            source.put("management.health.redis.enabled", true);
+            source.put("management.health.mail.enabled", true);
         }
 
         MapPropertySource mapPropertySource = new MapPropertySource("Custom Management Health Mail Config", source);
