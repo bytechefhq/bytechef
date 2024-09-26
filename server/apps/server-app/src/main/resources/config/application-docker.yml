@@ -4,4 +4,4 @@ springdoc:
 
 bytechef:
   resources:
-    web: file:///Volumes/dev-bp/bytechef/client/dist/
+    web: file:///opt/bytechef/client/
