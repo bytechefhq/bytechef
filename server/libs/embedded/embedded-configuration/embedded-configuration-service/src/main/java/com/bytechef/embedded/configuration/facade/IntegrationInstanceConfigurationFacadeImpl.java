@@ -667,15 +667,15 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     private String getWorkflowReferenceCode(
-        String workflowId, Integer integrationVVersion, List<IntegrationWorkflow> integrationWorkflows) {
+        String workflowId, Integer integrationVersion, List<IntegrationWorkflow> integrationWorkflows) {
 
-        if (integrationVVersion == null) {
+        if (integrationVersion == null) {
             return null;
         }
 
         return integrationWorkflows.stream()
-            .filter(projectWorkflow -> Objects.equals(projectWorkflow.getWorkflowId(), workflowId) &&
-                projectWorkflow.getIntegrationVersion() == integrationVVersion)
+            .filter(integrationWorkflow -> Objects.equals(integrationWorkflow.getWorkflowId(), workflowId) &&
+                integrationWorkflow.getIntegrationVersion() == integrationVersion)
             .findFirst()
             .map(IntegrationWorkflow::getWorkflowReferenceCode)
             .orElseThrow();
