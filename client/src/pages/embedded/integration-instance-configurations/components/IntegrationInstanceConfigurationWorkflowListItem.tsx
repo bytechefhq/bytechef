@@ -1,3 +1,4 @@
+import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/components/ui/use-toast';
 import IntegrationInstanceConfigurationEditWorkflowDialog from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationEditWorkflowDialog';
@@ -134,111 +135,25 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
 
                 {integrationInstanceConfigurationWorkflow && (
                     <div className="flex items-center gap-x-4">
-                        {/*        {workflow.manualTrigger && (*/}
-
-                        {/*            <Button*/}
-
-                        {/*                disabled={!integrationInstanceConfigurationEnabled || !integrationInstanceConfigurationWorkflow.enabled}*/}
-
-                        {/*                onClick={() => handleWorkflowRun()}*/}
-
-                        {/*                size="icon"*/}
-
-                        {/*                variant="ghost"*/}
-
-                        {/*            >*/}
-
-                        {/*                <Tooltip>*/}
-
-                        {/*                    <TooltipTrigger asChild>*/}
-
-                        {/*                        <PlayIcon className="h-5 text-success" />*/}
-
-                        {/*                    </TooltipTrigger>*/}
-
-                        {/*                    <TooltipContent>Run workflow manually</TooltipContent>*/}
-
-                        {/*                </Tooltip>*/}
-
-                        {/*            </Button>*/}
-
-                        {/*        )}*/}
-
-                        {/*        {integrationInstanceConfigurationWorkflow.staticWebhookUrl && (*/}
-
-                        {/*            <Button*/}
-
-                        {/*                disabled={!integrationInstanceConfigurationWorkflow.enabled}*/}
-
-                        {/*                onClick={() => copyToClipboard(integrationInstanceConfigurationWorkflow.staticWebhookUrl!)}*/}
-
-                        {/*                size="icon"*/}
-
-                        {/*                variant="ghost"*/}
-
-                        {/*            >*/}
-
-                        {/*                <Tooltip>*/}
-
-                        {/*                    <TooltipTrigger asChild>*/}
-
-                        {/*                        <ClipboardIcon className="h-5" />*/}
-
-                        {/*                    </TooltipTrigger>*/}
-
-                        {/*                    <TooltipContent>Copy static workflow webhook trigger url</TooltipContent>*/}
-
-                        {/*                </Tooltip>*/}
-
-                        {/*            </Button>*/}
-
-                        {/*        )}*/}
-
-                        {/*        {!workflow.manualTrigger && !integrationInstanceConfigurationWorkflow.staticWebhookUrl && (*/}
-
-                        {/*            <Switch*/}
-
-                        {/*                checked={integrationInstanceConfigurationWorkflow.enabled}*/}
-
-                        {/*                disabled={integrationInstanceConfigurationEnabled}*/}
-
-                        {/*                onCheckedChange={(value) => {*/}
-
-                        {/*                    enableIntegrationInstanceConfigurationWorkflowMutation.mutate(*/}
-
-                        {/*                        {*/}
-
-                        {/*                            enable: value,*/}
-
-                        {/*                            id: integartionInstanceConfigurationId,*/}
-
-                        {/*                            workflowId: workflow.id!,*/}
-
-                        {/*                        },*/}
-
-                        {/*                        {*/}
-
-                        {/*                            onSuccess: () => {*/}
-
-                        {/*                                integrationInstanceConfigurationWorkflow.enabled = !integrationInstanceConfigurationWorkflow?.enabled;*/}
-
-                        {/*                            },*/}
-
-                        {/*                        }*/}
-
-                        {/*                    );*/}
-
-                        {/*                }}*/}
-
-                        {/*            />*/}
-
-                        {/*        )}*/}
-
-                        {/*{workflow.triggers?.[0]?.name !== 'manual' && !projectInstanceWorkflow.staticWebhookUrl && (*/}
-
-                        {/*    <div className="w-9"></div>*/}
-
-                        {/*)}*/}
+                        <Switch
+                            checked={integrationInstanceConfigurationWorkflow.enabled}
+                            disabled={integrationInstanceConfigurationEnabled}
+                            onCheckedChange={(value) => {
+                                enableIntegrationInstanceConfigurationWorkflowMutation.mutate(
+                                    {
+                                        enable: value,
+                                        id: integrationInstanceConfigurationId,
+                                        workflowId: workflow.id!,
+                                    },
+                                    {
+                                        onSuccess: () => {
+                                            integrationInstanceConfigurationWorkflow.enabled =
+                                                !integrationInstanceConfigurationWorkflow?.enabled;
+                                        },
+                                    }
+                                );
+                            }}
+                        />
 
                         <IntegrationInstanceConfigurationWorkflowListItemDropDownMenuProps
                             integrationInstanceConfigurationEnabled={integrationInstanceConfigurationEnabled}
