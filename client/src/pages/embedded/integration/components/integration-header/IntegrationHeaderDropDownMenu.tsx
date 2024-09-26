@@ -66,11 +66,19 @@ const IntegrationHeaderDropDownMenu = ({integration}: {integration: Integration}
                                 </div>
                             </div>
 
-                            <Badge className="flex space-x-1" variant="secondary">
-                                <span>V{curIntegration.lastIntegrationVersion}</span>
+                            {curIntegration.lastPublishedDate && curIntegration.lastIntegrationVersion ? (
+                                <Badge className="flex space-x-1" variant="secondary">
+                                    <span>V{curIntegration.lastIntegrationVersion - 1}</span>
 
-                                <span>{curIntegration.lastStatus}</span>
-                            </Badge>
+                                    <span>PUBLISHED</span>
+                                </Badge>
+                            ) : (
+                                <Badge className="flex space-x-1" variant="outline">
+                                    <span>V{curIntegration.lastIntegrationVersion}</span>
+
+                                    <span>{curIntegration.lastStatus}</span>
+                                </Badge>
+                            )}
                         </DropdownMenuItem>
                     ))}
                 </DropdownMenuContent>

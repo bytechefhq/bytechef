@@ -202,11 +202,13 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                     <div className="flex items-center justify-end gap-x-6">
                         {integration.lastIntegrationVersion && (
                             <div className="flex flex-col items-end gap-y-4">
-                                <Badge className="flex space-x-1" variant="secondary">
-                                    <span>V{integration.lastIntegrationVersion}</span>
+                                {integration.lastPublishedDate && integration.lastIntegrationVersion && (
+                                    <Badge className="flex space-x-1" variant="secondary">
+                                        <span>V{integration.lastIntegrationVersion - 1}</span>
 
-                                    <span>{integration.lastStatus}</span>
-                                </Badge>
+                                        <span>PUBLISHED</span>
+                                    </Badge>
+                                )}
 
                                 <Tooltip>
                                     <TooltipTrigger>

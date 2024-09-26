@@ -25,6 +25,10 @@ const IntegrationHeaderPublishPopover = ({integration}: {integration: Integratio
                 queryKey: IntegrationKeys.integration(integration.id!),
             });
 
+            queryClient.invalidateQueries({
+                queryKey: IntegrationKeys.filteredIntegrations({}),
+            });
+
             toast({
                 description: 'The integration is published.',
             });
