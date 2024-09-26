@@ -3,6 +3,5 @@
 .github
 .gradle
 .server_hash
-client
 docs
 static
