@@ -1,4 +1,5 @@
 import {Button} from '@/components/ui/button';
+import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ChevronDownIcon, Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
@@ -22,7 +23,7 @@ interface TagProps {
 }
 
 const Tag = ({onDeleteTag, tag}: TagProps) => (
-    <div className="group flex max-h-8 items-center rounded-full border border-muted pl-2 pr-1 text-xs text-gray-700">
+    <div className="group flex max-h-8 items-center justify-between rounded-full border border-muted pl-2 pr-1 text-xs text-gray-700">
         <span className="py-1">{tag.name}</span>
 
         <Tooltip>
@@ -69,7 +70,7 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
     };
 
     return (
-        <div className="mr-4 flex items-center space-x-2">
+        <div className="mr-4 flex h-7 items-center space-x-2">
             <span className="text-xs text-gray-500">Tags:</span>
 
             {tags.slice(0, 3).map((tag) => (
@@ -77,22 +78,26 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
             ))}
 
             {tags.length > 3 && (
-                <div className="relative flex">
-                    <Button className="mr-2" onClick={() => setShowAllTags(!showAllTags)} size="icon" variant="ghost">
-                        <ChevronDownIcon />
-                    </Button>
-
-                    {showAllTags && (
-                        <div
-                            className="absolute left-0 top-full z-10 w-px space-y-2 border-0 bg-white shadow-lg"
-                            style={{maxHeight: '32px'}}
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Button
+                            className="mr-2 size-6"
+                            onClick={() => setShowAllTags(!showAllTags)}
+                            size="icon"
+                            variant="ghost"
                         >
+                            <ChevronDownIcon />
+                        </Button>
+                    </PopoverTrigger>
+
+                    <PopoverContent align="end" className="w-min p-2">
+                        <div className="flex w-min flex-col space-y-1">
                             {tags.slice(3).map((tag) => (
                                 <Tag key={tag.id} onDeleteTag={handleDeleteTag} tag={tag} />
                             ))}
                         </div>
-                    )}
-                </div>
+                    </PopoverContent>
+                </Popover>
             )}
 
             {isNewTagWindowVisible ? (
