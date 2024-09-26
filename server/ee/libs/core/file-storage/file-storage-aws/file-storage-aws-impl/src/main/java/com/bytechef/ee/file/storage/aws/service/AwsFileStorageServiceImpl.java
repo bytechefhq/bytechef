@@ -77,8 +77,7 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
         return s3Resources.stream()
             .map(S3Resource::getFilename)
             .filter(Objects::nonNull)
-            .anyMatch((filename) -> filename.substring(filename.indexOf('/') + 1)
-                .equals(directoryPath + "/" + key));
+            .anyMatch((filename) -> filename.endsWith(directoryPath + "/" + key));
     }
 
     @Override
