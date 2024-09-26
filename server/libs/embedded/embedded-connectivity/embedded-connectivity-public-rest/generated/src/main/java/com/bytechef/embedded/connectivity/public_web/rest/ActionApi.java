@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-18T05:52:25.721226+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-26T07:11:54.439119+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 @Validated
 @Tag(name = "action", description = "The Embedded Component Action Public API")
 public interface ActionApi {
@@ -49,6 +49,7 @@ public interface ActionApi {
      * @param componentName The component name. (required)
      * @param componentVersion The component version. (required)
      * @param actionName The name of the action to call. (required)
+     * @param xConnectionId The connection ID that uniquely identifies the customer in your application (optional)
      * @param executeActionRequestModel  (optional)
      * @return The list of component action objects. (status code 200)
      *         or Invalid Input (status code 400)
@@ -86,6 +87,7 @@ public interface ActionApi {
         @Parameter(name = "componentName", description = "The component name.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
         @Parameter(name = "componentVersion", description = "The component version.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(name = "actionName", description = "The name of the action to call.", required = true, in = ParameterIn.PATH) @PathVariable("actionName") String actionName,
+        @Parameter(name = "x-connection-id", description = "The connection ID that uniquely identifies the customer in your application", in = ParameterIn.HEADER) @RequestHeader(value = "x-connection-id", required = false) Long xConnectionId,
         @Parameter(name = "ExecuteActionRequestModel", description = "") @Valid @RequestBody(required = false) ExecuteActionRequestModel executeActionRequestModel
     ) {
         getRequest().ifPresent(request -> {
