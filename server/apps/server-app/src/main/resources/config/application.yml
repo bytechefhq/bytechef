@@ -103,6 +103,9 @@ spring:
     listener:
       direct:
         prefetch: 1
+  shell:
+    noninteractive:
+      enabled: false
   quartz:
     job-store-type: jdbc
     jdbc:
