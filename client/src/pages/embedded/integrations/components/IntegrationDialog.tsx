@@ -71,6 +71,12 @@ const IntegrationDialog = ({integration, onClose, triggerNode}: IntegrationDialo
     const queryClient = useQueryClient();
 
     const onSuccess = () => {
+        if (integration?.id) {
+            queryClient.invalidateQueries({
+                queryKey: IntegrationKeys.integration(integration.id),
+            });
+        }
+
         queryClient.invalidateQueries({
             queryKey: IntegrationCategoryKeys.integrationCategories,
         });

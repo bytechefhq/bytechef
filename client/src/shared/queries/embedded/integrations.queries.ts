@@ -8,7 +8,7 @@ export const IntegrationKeys = {
         ...IntegrationKeys.integrations,
         filters,
     ],
-    integration: (id: number) => ['integration', id],
+    integration: (id: number) => [...IntegrationKeys.integrations, id],
     integrations: ['integrations'] as const,
 };
 
