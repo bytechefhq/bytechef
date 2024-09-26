@@ -159,7 +159,7 @@ bytechef:
         # Trigger scheduler provider (aws(ee) | quartz) default: quartz
         provider: quartz
   data-storage:
-    # Data storage provider for files (aws(ee) | filesystem | jdbc) default: jdbc
+    # Data storage provider (aws(ee) | filesystem | jdbc) default: jdbc
     provider: jdbc
   # Edition (ce - Community Edition | ee - Enterprise Edition) default: ee
   edition: ee
