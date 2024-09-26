@@ -95,7 +95,7 @@ const ProjectInstanceDialogBasicStep = ({
                 />
             )}
 
-            {(!projectInstance?.id || updateProjectVersion) && (
+            {curProjectId && (!projectInstance?.id || updateProjectVersion) && (
                 <FormField
                     control={control}
                     name="projectVersion"

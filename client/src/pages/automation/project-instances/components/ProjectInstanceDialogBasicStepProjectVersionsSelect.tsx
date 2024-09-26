@@ -8,10 +8,10 @@ const ProjectInstanceDialogBasicStepProjectVersionsSelect = ({
     projectVersion,
 }: {
     onChange: (value: number) => void;
-    projectId?: number;
+    projectId: number;
     projectVersion?: number;
 }) => {
-    const {data: projectVersions} = useGetProjectVersionsQuery(projectId!, !!projectId);
+    const {data: projectVersions} = useGetProjectVersionsQuery(projectId);
 
     return (
         <Select
