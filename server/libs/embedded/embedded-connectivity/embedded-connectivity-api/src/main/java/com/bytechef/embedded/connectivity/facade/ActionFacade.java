@@ -23,5 +23,7 @@ import java.util.Map;
  */
 public interface ActionFacade {
 
-    Object executeAction(String componentName, Integer componentVersion, String actionName, Map<String, Object> input);
+    Object executeAction(
+        String componentName, Integer componentVersion, String actionName, Long connectionId,
+        Map<String, Object> input);
 }

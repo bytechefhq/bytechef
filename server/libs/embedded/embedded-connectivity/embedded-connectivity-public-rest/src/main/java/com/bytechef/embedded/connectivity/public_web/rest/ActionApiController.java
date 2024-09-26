@@ -40,12 +40,12 @@ public class ActionApiController implements ActionApi {
 
     @Override
     public ResponseEntity<ExecuteAction200ResponseModel> executeAction(
-        String componentName, Integer componentVersion, String actionName,
+        String componentName, Integer componentVersion, String actionName, Long connectionId,
         ExecuteActionRequestModel executeActionRequestModel) {
 
         return ResponseEntity.ok(
             new ExecuteAction200ResponseModel().output(
                 actionFacade.executeAction(
-                    componentName, componentVersion, actionName, executeActionRequestModel.getInput())));
+                    componentName, componentVersion, actionName, connectionId, executeActionRequestModel.getInput())));
     }
 }

@@ -34,12 +34,13 @@ public class ActionFacadeImpl implements ActionFacade {
 
     @Override
     public Object executeAction(
-        String componentName, Integer componentVersion, String actionName, Map<String, Object> input) {
+        String componentName, Integer componentVersion, String actionName, Long connectionId,
+        Map<String, Object> input) {
 
         // TODO connection
 
         return actionDefinitionFacade.executePerform(
-            componentName, componentVersion, actionName, AppType.EMBEDDED, null, null, null, null, input, Map.of(),
-            Map.of(), false);
+            componentName, componentVersion, actionName, AppType.EMBEDDED, null, null, null, null, input,
+            connectionId == null ? Map.of() : Map.of(componentName, connectionId), Map.of(), false);
     }
 }
