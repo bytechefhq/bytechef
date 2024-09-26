@@ -11,7 +11,7 @@ const IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect =
     integrationVersion?: number;
     onChange: (value: number) => void;
 }) => {
-    const {data: integrationVersions} = useGetIntegrationVersionsQuery(integrationId!);
+    const {data: integrationVersions} = useGetIntegrationVersionsQuery(integrationId);
 
     const filteredIntegrationVersions = integrationVersions?.filter(
         (integrationVersion) => integrationVersion.status === IntegrationStatus.Published

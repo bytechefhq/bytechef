@@ -1,25 +1,9 @@
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import {Badge} from '@/components/ui/badge';
-import {Button} from '@/components/ui/button';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import IntegrationInstanceConfigurationListItemAlertDialog from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationListItemAlertDialog';
+import IntegrationInstanceConfigurationListItemDropdownMenu from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationListItemDropdownMenu';
 import {useIntegrationInstanceConfigurationsEnabledStore} from '@/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationsEnabledStore';
 import {IntegrationInstanceConfiguration, Tag} from '@/shared/middleware/embedded/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
@@ -32,7 +16,6 @@ import {IntegrationInstanceConfigurationTagKeys} from '@/shared/queries/embedded
 import {IntegrationInstanceConfigurationKeys} from '@/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {EllipsisVerticalIcon} from 'lucide-react';
 import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 
@@ -55,6 +38,7 @@ const IntegrationInstanceConfigurationListItem = ({
     const setIntegrationInstanceConfigurationEnabled = useIntegrationInstanceConfigurationsEnabledStore(
         ({setIntegrationInstanceConfigurationEnabled}) => setIntegrationInstanceConfigurationEnabled
     );
+    const [showUpdateIntegrationVersionDialog, setShowUpdateIntegrationVersionDialog] = useState(false);
 
     const queryClient = useQueryClient();
 
@@ -207,75 +191,45 @@ const IntegrationInstanceConfigurationListItem = ({
                             onCheckedChange={handleOnCheckedChange}
                         />
 
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button size="icon" variant="ghost">
-                                    <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
-                                </Button>
-                            </DropdownMenuTrigger>
-
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => setShowEditDialog(true)}>Edit</DropdownMenuItem>
-
-                                <DropdownMenuItem
-                                    onClick={() =>
-                                        enableIntegrationInstanceConfigurationMutation.mutate({
-                                            enable: !integrationInstanceConfiguration.enabled,
-                                            id: integrationInstanceConfiguration.id!,
-                                        })
-                                    }
-                                >
-                                    {integrationInstanceConfiguration.enabled ? 'Disable' : 'Enable'}
-                                </DropdownMenuItem>
-
-                                <DropdownMenuSeparator />
-
-                                <DropdownMenuItem
-                                    className="text-destructive"
-                                    onClick={() => setShowDeleteDialog(true)}
-                                >
-                                    Delete
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                        <IntegrationInstanceConfigurationListItemDropdownMenu
+                            integrationInstanceConfigurationEnabled={integrationInstanceConfiguration.enabled!}
+                            onDeleteClick={() => setShowDeleteDialog(true)}
+                            onEditClick={() => setShowEditDialog(true)}
+                            onEnableClick={() =>
+                                enableIntegrationInstanceConfigurationMutation.mutate({
+                                    enable: !integrationInstanceConfiguration.enabled,
+                                    id: integrationInstanceConfiguration.id!,
+                                })
+                            }
+                            onUpdateIntegrationVersionClick={() => setShowUpdateIntegrationVersionDialog(true)}
+                        />
                     </div>
                 </div>
             </div>
 
-            <AlertDialog open={showDeleteDialog}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-
-                        <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete the integration and workflows it
-                            contains.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-
-                    <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>Cancel</AlertDialogCancel>
-
-                        <AlertDialogAction
-                            className="bg-destructive"
-                            onClick={() => {
-                                if (integrationInstanceConfiguration.id) {
-                                    deleteIntegrationInstanceConfigurationMutation.mutate(
-                                        integrationInstanceConfiguration.id
-                                    );
-                                }
-                            }}
-                        >
-                            Delete
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            {showDeleteDialog && (
+                <IntegrationInstanceConfigurationListItemAlertDialog
+                    onCancelClick={() => setShowDeleteDialog(false)}
+                    onDeleteClick={() => {
+                        if (integrationInstanceConfiguration.id) {
+                            deleteIntegrationInstanceConfigurationMutation.mutate(integrationInstanceConfiguration.id);
+                        }
+                    }}
+                />
+            )}
 
             {showEditDialog && (
                 <IntegrationInstanceConfigurationDialog
                     integrationInstanceConfiguration={integrationInstanceConfiguration}
                     onClose={() => setShowEditDialog(false)}
+                />
+            )}
+
+            {showUpdateIntegrationVersionDialog && (
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={integrationInstanceConfiguration}
+                    onClose={() => setShowUpdateIntegrationVersionDialog(false)}
+                    updateIntegrationVersion={true}
                 />
             )}
         </>

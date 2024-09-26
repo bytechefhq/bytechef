@@ -12,6 +12,7 @@ import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 export interface IntegrationInstanceConfigurationDialogWorkflowListItemProps {
+    componentName: string;
     control: Control<IntegrationInstanceConfiguration>;
     formState: FormState<IntegrationInstanceConfiguration>;
     label: string;
@@ -22,6 +23,7 @@ export interface IntegrationInstanceConfigurationDialogWorkflowListItemProps {
 }
 
 const IntegrationInstanceConfigurationDialogWorkflowsStepItem = ({
+    componentName,
     control,
     formState,
     label,
@@ -36,7 +38,8 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItem = ({
 
     const workflowConnections: WorkflowConnection[] = (workflow?.tasks ?? [])
         .flatMap((task) => task.connections ?? [])
-        .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []));
+        .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []))
+        .filter((connection) => connection.componentName !== componentName);
 
     useEffect(() => {
         setValue(`integrationInstanceConfigurationWorkflows.${workflowIndex!}.workflowId`, workflow.id!);

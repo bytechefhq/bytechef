@@ -16,6 +16,7 @@ import {useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
 interface IntegrationInstanceConfigurationEditWorkflowDialogProps {
+    componentName: string;
     onClose?: () => void;
     integrationInstanceConfigurationEnabled: boolean;
     integrationInstanceConfigurationWorkflow: IntegrationInstanceConfigurationWorkflow;
@@ -23,6 +24,7 @@ interface IntegrationInstanceConfigurationEditWorkflowDialogProps {
 }
 
 const IntegrationInstanceConfigurationEditWorkflowDialog = ({
+    componentName,
     integrationInstanceConfigurationEnabled,
     integrationInstanceConfigurationWorkflow,
     onClose,
@@ -132,6 +134,7 @@ const IntegrationInstanceConfigurationEditWorkflowDialog = ({
                     </DialogHeader>
 
                     <IntegrationInstanceConfigurationDialogWorkflowsStepItem
+                        componentName={componentName}
                         control={control}
                         formState={formState}
                         key={workflow.id!}

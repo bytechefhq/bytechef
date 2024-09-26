@@ -20,6 +20,7 @@ interface IntegrationInstanceConfigurationDialogBasicStepProps {
     setCurIntegrationId: Dispatch<SetStateAction<number | undefined>>;
     setCurIntegrationVersion: Dispatch<SetStateAction<number | undefined>>;
     setValue: UseFormSetValue<IntegrationInstanceConfiguration>;
+    updateIntegrationVersion?: boolean;
 }
 
 const IntegrationInstanceConfigurationDialogBasicStep = ({
@@ -31,6 +32,7 @@ const IntegrationInstanceConfigurationDialogBasicStep = ({
     setCurIntegrationId,
     setCurIntegrationVersion,
     setValue,
+    updateIntegrationVersion = false,
 }: IntegrationInstanceConfigurationDialogBasicStepProps) => {
     const [resetWorkflowsEnabledStore] = useWorkflowsEnabledStore(useShallow(({reset}) => [reset]));
 
@@ -73,24 +75,26 @@ const IntegrationInstanceConfigurationDialogBasicStep = ({
                 />
             )}
 
-            <FormField
-                control={control}
-                name="name"
-                render={({field}) => (
-                    <FormItem>
-                        <FormLabel>Name</FormLabel>
+            {!updateIntegrationVersion && (
+                <FormField
+                    control={control}
+                    name="name"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel>Name</FormLabel>
 
-                        <FormControl>
-                            <Input placeholder="My Integration" {...field} />
-                        </FormControl>
+                            <FormControl>
+                                <Input placeholder="My Integration" {...field} />
+                            </FormControl>
 
-                        <FormMessage />
-                    </FormItem>
-                )}
-                rules={{required: true}}
-            />
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                    rules={{required: true}}
+                />
+            )}
 
-            {!integrationInstanceConfiguration?.id && curIntegrationId && (
+            {curIntegrationId && (!integrationInstanceConfiguration?.id || updateIntegrationVersion) && (
                 <FormField
                     control={control}
                     name="integrationVersion"
@@ -148,51 +152,55 @@ const IntegrationInstanceConfigurationDialogBasicStep = ({
                 />
             )}
 
-            <FormField
-                control={control}
-                name="description"
-                render={({field}) => (
-                    <FormItem>
-                        <FormLabel>Description</FormLabel>
+            {!updateIntegrationVersion && (
+                <FormField
+                    control={control}
+                    name="description"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel>Description</FormLabel>
 
-                        <FormControl>
-                            <Textarea
-                                placeholder="Cute description of your integration instance configuration"
-                                {...field}
+                            <FormControl>
+                                <Textarea
+                                    placeholder="Cute description of your integration instance configuration"
+                                    {...field}
+                                />
+                            </FormControl>
+
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            )}
+
+            {!updateIntegrationVersion && (
+                <FormField
+                    control={control}
+                    name="tags"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel>Tags</FormLabel>
+
+                            <IntegrationInstanceConfigurationDialogBasicStepTagsSelect
+                                field={field}
+                                integrationInstanceConfiguration={integrationInstanceConfiguration}
+                                onCreateOption={(inputValue: string) => {
+                                    setValue('tags', [
+                                        ...(getValues().tags ?? []),
+                                        {
+                                            label: inputValue,
+                                            name: inputValue,
+                                            value: inputValue,
+                                        },
+                                    ] as never[]);
+                                }}
                             />
-                        </FormControl>
 
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
-
-            <FormField
-                control={control}
-                name="tags"
-                render={({field}) => (
-                    <FormItem>
-                        <FormLabel>Tags</FormLabel>
-
-                        <IntegrationInstanceConfigurationDialogBasicStepTagsSelect
-                            field={field}
-                            integrationInstanceConfiguration={integrationInstanceConfiguration}
-                            onCreateOption={(inputValue: string) => {
-                                setValue('tags', [
-                                    ...(getValues().tags ?? []),
-                                    {
-                                        label: inputValue,
-                                        name: inputValue,
-                                        value: inputValue,
-                                    },
-                                ] as never[]);
-                            }}
-                        />
-
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            )}
         </div>
     );
 };

@@ -48,6 +48,7 @@ const IntegrationInstanceConfigurationList = ({
 
                                 <CollapsibleContent>
                                     <IntegrationInstanceConfigurationWorkflowList
+                                        componentName={integration.componentName}
                                         integrationId={integration.id}
                                         integrationInstanceConfigurationEnabled={
                                             integrationInstanceConfigurationMap.has(

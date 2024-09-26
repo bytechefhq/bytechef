@@ -4,6 +4,7 @@ import {Control, UseFormSetValue} from 'react-hook-form';
 import {FormState} from 'react-hook-form/dist/types/form';
 
 export interface IntegrationInstanceConfigurationDialogWorkflowsStepProps {
+    componentName: string;
     control: Control<IntegrationInstanceConfiguration>;
     formState: FormState<IntegrationInstanceConfiguration>;
     setValue: UseFormSetValue<IntegrationInstanceConfiguration>;
@@ -11,6 +12,7 @@ export interface IntegrationInstanceConfigurationDialogWorkflowsStepProps {
 }
 
 const IntegrationInstanceConfigurationDialogWorkflowsStep = ({
+    componentName,
     control,
     formState,
     setValue,
@@ -20,6 +22,7 @@ const IntegrationInstanceConfigurationDialogWorkflowsStep = ({
         <ul className="h-full space-y-4">
             {workflows?.map((workflow, workflowIndex) => (
                 <IntegrationInstanceConfigurationDialogWorkflowsStepItem
+                    componentName={componentName}
                     control={control}
                     formState={formState}
                     key={workflow.id!}

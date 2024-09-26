@@ -3,13 +3,6 @@ import {IntegrationInstanceConfiguration} from '@/shared/middleware/embedded/con
 import {WorkflowConnection} from '@/shared/middleware/platform/configuration';
 import {Control} from 'react-hook-form';
 
-export interface IntegrationInstanceConfigurationDialogWorkflowsStepItemConnectionProps {
-    control: Control<IntegrationInstanceConfiguration>;
-    workflowConnection: WorkflowConnection;
-    workflowConnectionIndex: number;
-    workflowIndex: number;
-}
-
 const IntegrationInstanceConfigurationDialogWorkflowsStepItemConnections = ({
     control,
     workflowConnections,

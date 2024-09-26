@@ -131,13 +131,14 @@ const IntegrationInstanceConfigurationDialog = ({
                     setCurIntegrationId={setCurIntegrationId}
                     setCurIntegrationVersion={setCurIntegrationVersion}
                     setValue={setValue}
+                    updateIntegrationVersion={updateIntegrationVersion}
                 />
             ),
             name: 'Basic',
         },
     ];
 
-    if (oAuth2Authorization && integration) {
+    if (oAuth2Authorization && integration && !updateIntegrationVersion) {
         integrationInstanceConfigurationDialogSteps = [
             ...integrationInstanceConfigurationDialogSteps,
             {
@@ -156,12 +157,13 @@ const IntegrationInstanceConfigurationDialog = ({
         ];
     }
 
-    if (workflows && workflows.length > 0) {
+    if (integration && workflows && workflows.length > 0) {
         integrationInstanceConfigurationDialogSteps = [
             ...integrationInstanceConfigurationDialogSteps,
             {
                 content: (
                     <IntegrationInstanceConfigurationDialogWorkflowsStep
+                        componentName={integration.componentName}
                         control={control}
                         formState={formState}
                         setValue={setValue}
@@ -203,6 +205,7 @@ const IntegrationInstanceConfigurationDialog = ({
         }
 
         if (integrationInstanceConfiguration?.id) {
+            console.log(formData);
             updateIntegrationInstanceConfigurationMutation.mutate({
                 ...integrationInstanceConfiguration,
                 ...formData,
@@ -258,7 +261,7 @@ const IntegrationInstanceConfigurationDialog = ({
                     <DialogHeader>
                         <DialogTitle>
                             {updateIntegrationVersion
-                                ? 'Upgrade Integration Configuration Version'
+                                ? 'Upgrade Integration Version'
                                 : `${integrationInstanceConfiguration?.id ? 'Edit' : 'New'} Instance Configuration ${!integrationInstanceConfiguration?.id ? '-' : ''} ${
                                       !integrationInstanceConfiguration?.id
                                           ? integrationInstanceConfigurationDialogSteps[activeStepIndex].name
@@ -297,17 +300,21 @@ const IntegrationInstanceConfigurationDialog = ({
                         {integrationInstanceConfigurationDialogSteps[activeStepIndex].content}
                     </div>
 
-                    {integrationInstanceConfiguration?.id && connectionDefinition && (
-                        <div className="py-4">
-                            <ConnectionParameters
-                                authorizationParameters={
-                                    integrationInstanceConfiguration.connectionAuthorizationParameters
-                                }
-                                connectionDefinition={connectionDefinition}
-                                connectionParameters={integrationInstanceConfiguration.connectionConnectionParameters}
-                            />
-                        </div>
-                    )}
+                    {integrationInstanceConfiguration?.id &&
+                        connectionDefinition &&
+                        !updateIntegrationInstanceConfigurationMutation && (
+                            <div className="py-4">
+                                <ConnectionParameters
+                                    authorizationParameters={
+                                        integrationInstanceConfiguration.connectionAuthorizationParameters
+                                    }
+                                    connectionDefinition={connectionDefinition}
+                                    connectionParameters={
+                                        integrationInstanceConfiguration.connectionConnectionParameters
+                                    }
+                                />
+                            </div>
+                        )}
 
                     <DialogFooter>
                         {activeStepIndex === 0 && (
@@ -316,36 +323,43 @@ const IntegrationInstanceConfigurationDialog = ({
                                     <Button variant="outline">Cancel</Button>
                                 </DialogClose>
 
-                                {(!integrationInstanceConfiguration?.id || updateIntegrationVersion) &&
+                                {(!integrationInstanceConfiguration?.id ||
+                                    (workflows && workflows.length > 0 && updateIntegrationVersion)) &&
                                     oAuth2Authorization && (
                                         <Button onClick={handleSubmit(handleNextClick)}>Next</Button>
                                     )}
 
                                 {(((!workflows || workflows?.length == 0) && !oAuth2Authorization) ||
-                                    (integrationInstanceConfiguration?.id && !updateIntegrationVersion)) && (
+                                    (integrationInstanceConfiguration?.id && !updateIntegrationVersion) ||
+                                    (workflows && workflows.length === 0 && updateIntegrationVersion)) && (
                                     <Button onClick={handleSubmit(handleSaveClick)}>Save</Button>
                                 )}
                             </>
                         )}
 
-                        {activeStepIndex === 1 && oAuth2Authorization && (
-                            <>
-                                <Button onClick={() => setActiveStepIndex(activeStepIndex - 1)} variant="outline">
-                                    Previous
-                                </Button>
+                        {activeStepIndex === 1 &&
+                            oAuth2Authorization &&
+                            !updateIntegrationInstanceConfigurationMutation && (
+                                <>
+                                    <Button onClick={() => setActiveStepIndex(activeStepIndex - 1)} variant="outline">
+                                        Previous
+                                    </Button>
 
-                                {workflows && workflows?.length > 0 && (
-                                    <Button onClick={handleSubmit(handleNextClick)}>Next</Button>
-                                )}
+                                    {workflows && workflows?.length > 0 && (
+                                        <Button onClick={handleSubmit(handleNextClick)}>Next</Button>
+                                    )}
 
-                                {!workflows ||
-                                    (workflows?.length === 0 && (
-                                        <Button onClick={handleSubmit(handleSaveClick)}>Save</Button>
-                                    ))}
-                            </>
-                        )}
+                                    {!workflows ||
+                                        (workflows?.length === 0 && (
+                                            <Button onClick={handleSubmit(handleSaveClick)}>Save</Button>
+                                        ))}
+                                </>
+                            )}
 
                         {((activeStepIndex === 1 && !oAuth2Authorization) ||
+                            (activeStepIndex === 1 &&
+                                oAuth2Authorization &&
+                                updateIntegrationInstanceConfigurationMutation) ||
                             (activeStepIndex === 2 && oAuth2Authorization)) &&
                             workflows &&
                             workflows?.length > 0 && (

@@ -1,8 +1,9 @@
 import {Button} from '@/components/ui/button';
 import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {IntegrationInstanceConfigurationDialogWorkflowsStepItemConnectionProps} from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationDialogWorkflowsStepItemConnections';
 import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
+import {IntegrationInstanceConfiguration} from '@/shared/middleware/embedded/configuration';
+import {WorkflowConnection} from '@/shared/middleware/platform/configuration';
 import {useCreateConnectionMutation} from '@/shared/mutations/embedded/connections.mutations';
 import {
     ConnectionKeys,
@@ -13,7 +14,15 @@ import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componen
 import {PlusIcon} from '@radix-ui/react-icons';
 import * as Portal from '@radix-ui/react-portal';
 import {useState} from 'react';
+import {Control} from 'react-hook-form';
 import InlineSVG from 'react-inlinesvg';
+
+export interface IntegrationInstanceConfigurationDialogWorkflowsStepItemConnectionProps {
+    control: Control<IntegrationInstanceConfiguration>;
+    workflowConnection: WorkflowConnection;
+    workflowConnectionIndex: number;
+    workflowIndex: number;
+}
 
 const IntegrationInstanceConfigurationDialogWorkflowsStepItemConnection = ({
     control,

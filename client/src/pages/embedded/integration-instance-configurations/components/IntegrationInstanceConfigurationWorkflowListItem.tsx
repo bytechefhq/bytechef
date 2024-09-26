@@ -14,6 +14,7 @@ import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
 const IntegrationInstanceConfigurationWorkflowListItem = ({
+    componentName,
     filteredComponentNames,
     integrationInstanceConfigurationEnabled,
     integrationInstanceConfigurationId,
@@ -22,6 +23,7 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
     workflowComponentDefinitions,
     workflowTaskDispatcherDefinitions,
 }: {
+    componentName: string;
     filteredComponentNames?: string[];
     integrationInstanceConfigurationEnabled: boolean;
     integrationInstanceConfigurationId: number;
@@ -127,7 +129,7 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
                         <TooltipContent>Last Execution Date</TooltipContent>
                     </Tooltip>
                 ) : (
-                    'No executions'
+                    <span className="text-xs">No executions</span>
                 )}
 
                 {integrationInstanceConfigurationWorkflow && (
@@ -253,6 +255,7 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
 
             {showEditWorkflowDialog && integrationInstanceConfigurationWorkflow && (
                 <IntegrationInstanceConfigurationEditWorkflowDialog
+                    componentName={componentName}
                     integrationInstanceConfigurationEnabled={integrationInstanceConfigurationEnabled}
                     integrationInstanceConfigurationWorkflow={integrationInstanceConfigurationWorkflow}
                     onClose={() => setShowEditWorkflowDialog(false)}

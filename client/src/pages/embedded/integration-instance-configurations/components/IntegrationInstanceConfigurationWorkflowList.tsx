@@ -7,12 +7,14 @@ import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/compone
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 
 const IntegrationInstanceConfigurationWorkflowList = ({
+    componentName,
     integrationId,
     integrationInstanceConfigurationEnabled,
     integrationInstanceConfigurationId,
     integrationInstanceConfigurationWorkflows,
     integrationVersion,
 }: {
+    componentName: string;
     integrationId: number;
     integrationInstanceConfigurationId: number;
     integrationInstanceConfigurationEnabled: boolean;
@@ -104,6 +106,7 @@ const IntegrationInstanceConfigurationWorkflowList = ({
 
                             return (
                                 <IntegrationInstanceConfigurationWorkflowListItem
+                                    componentName={componentName}
                                     filteredComponentNames={filteredComponentNames}
                                     integrationInstanceConfigurationEnabled={integrationInstanceConfigurationEnabled}
                                     integrationInstanceConfigurationId={integrationInstanceConfigurationId}
