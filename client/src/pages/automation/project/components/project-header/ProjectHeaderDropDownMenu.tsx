@@ -74,11 +74,19 @@ const ProjectHeaderDropdownMenu = ({project}: {project: Project}) => {
                                 </div>
                             </div>
 
-                            <Badge className="flex space-x-1" variant="secondary">
-                                <span>V{curProject.lastProjectVersion}</span>
+                            {curProject.lastPublishedDate && curProject.lastProjectVersion ? (
+                                <Badge className="flex space-x-1" variant="secondary">
+                                    <span>V{curProject.lastProjectVersion - 1}</span>
 
-                                <span>{curProject.lastStatus}</span>
-                            </Badge>
+                                    <span>PUBLISHED</span>
+                                </Badge>
+                            ) : (
+                                <Badge className="flex space-x-1" variant="outline">
+                                    <span>V{curProject.lastProjectVersion}</span>
+
+                                    <span>{curProject.lastStatus}</span>
+                                </Badge>
+                            )}
                         </DropdownMenuItem>
                     ))}
                 </DropdownMenuContent>

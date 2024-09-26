@@ -4,6 +4,7 @@ import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Textarea} from '@/components/ui/textarea';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/components/ui/use-toast';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {usePublishProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
@@ -15,6 +16,8 @@ const ProjectHeaderPublishPopover = ({project}: {project: Project}) => {
     const [open, setOpen] = useState(false);
     const [description, setDescription] = useState<string | undefined>(undefined);
 
+    const {currentWorkspaceId} = useWorkspaceStore();
+
     const {toast} = useToast();
 
     const queryClient = useQueryClient();
@@ -23,6 +26,10 @@ const ProjectHeaderPublishPopover = ({project}: {project: Project}) => {
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ProjectKeys.project(project.id!),
+            });
+
+            queryClient.invalidateQueries({
+                queryKey: ProjectKeys.filteredProjects({id: currentWorkspaceId}),
             });
 
             toast({
