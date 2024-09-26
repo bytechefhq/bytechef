@@ -134,7 +134,7 @@ public class IntegrationInstanceConfigurationServiceImpl implements IntegrationI
         curIntegrationInstanceConfiguration.setDescription(integrationInstanceConfiguration.getDescription());
         curIntegrationInstanceConfiguration.setEnabled(integrationInstanceConfiguration.isEnabled());
         curIntegrationInstanceConfiguration.setIntegrationVersion(
-            curIntegrationInstanceConfiguration.getIntegrationVersion());
+            integrationInstanceConfiguration.getIntegrationVersion());
         curIntegrationInstanceConfiguration.setName(integrationInstanceConfiguration.getName());
         curIntegrationInstanceConfiguration.setTagIds(integrationInstanceConfiguration.getTagIds());
         curIntegrationInstanceConfiguration.setVersion(integrationInstanceConfiguration.getVersion());
