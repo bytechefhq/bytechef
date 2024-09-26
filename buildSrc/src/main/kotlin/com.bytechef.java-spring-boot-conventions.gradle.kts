@@ -42,7 +42,7 @@ if (project.hasProperty("prod")) {
 }
 
 tasks.withType(org.springframework.boot.gradle.tasks.run.BootRun::class) {
-    systemProperty("spring.profiles.active", profiles)
+    args = listOf("--spring.profiles.active=$profiles")
 }
 
 val processResources by tasks.existing(ProcessResources::class) {
