@@ -46,8 +46,8 @@ public class CacheConfiguration implements CachingConfigurer {
             RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(5))
                 .serializeKeysWith(SerializationPair.fromSerializer(new StringRedisSerializer()))
-                .serializeValuesWith(SerializationPair.fromSerializer(
-                    new JdkSerializationRedisSerializer(clazz.getClassLoader()))));
+                .serializeValuesWith(
+                    SerializationPair.fromSerializer(new JdkSerializationRedisSerializer(clazz.getClassLoader()))));
     }
 
     @Override
