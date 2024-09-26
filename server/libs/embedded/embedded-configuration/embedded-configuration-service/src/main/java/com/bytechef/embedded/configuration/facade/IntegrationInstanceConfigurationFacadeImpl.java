@@ -295,7 +295,9 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                     .filter(WorkflowConnection::required)
                     .toList());
 
-            if (requiredWorkflowConnections.size() != integrationInstanceConfigurationWorkflow.getConnectionsCount()) {
+            if ((requiredWorkflowConnections.size() - 1) != integrationInstanceConfigurationWorkflow
+                .getConnectionsCount()) {
+
                 throw new PlatformException(
                     "Not all required connections are set for a workflow with id=%s".formatted(workflow.getId()),
                     IntegrationInstanceConfigurationErrorType.REQUIRED_WORKFLOW_CONNECTIONS);
