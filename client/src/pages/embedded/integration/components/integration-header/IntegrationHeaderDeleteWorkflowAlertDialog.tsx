@@ -27,7 +27,7 @@ const IntegrationHeaderDeleteWorkflowAlertDialog = ({
             </AlertDialogHeader>
 
             <AlertDialogFooter>
-                <AlertDialogCancel onClick={() => onClose}>Cancel</AlertDialogCancel>
+                <AlertDialogCancel onClick={() => onClose()}>Cancel</AlertDialogCancel>
 
                 <AlertDialogAction className="bg-destructive" onClick={() => onDelete()}>
                     Delete
