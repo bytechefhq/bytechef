@@ -39,7 +39,7 @@ public class AwsMessageBrokerConfiguration {
     }
 
     @Bean
-    MessageBroker awsMessageBroker(SqsTemplate sqsTemplate) {
+    AwsMessageBroker awsMessageBroker(SqsTemplate sqsTemplate) {
         return new AwsMessageBroker(sqsTemplate);
     }
 
