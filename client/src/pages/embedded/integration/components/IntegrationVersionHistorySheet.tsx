@@ -25,9 +25,14 @@ const IntegrationVersionHistorySheet = ({integrationId, onClose}: IntegrationVer
                 </SheetHeader>
 
                 <div className="overflow-y-auto">
-                    <Accordion type="single">
-                        {integrationVersions &&
-                            integrationVersions.map((integrationVersion) => (
+                    {integrationVersions && (
+                        <Accordion
+                            defaultValue={
+                                integrationVersions.length > 1 ? [integrationVersions[1]!.version!.toString()] : []
+                            }
+                            type="multiple"
+                        >
+                            {integrationVersions.map((integrationVersion) => (
                                 <AccordionItem
                                     key={integrationVersion.version}
                                     value={integrationVersion.version?.toString() || ''}
@@ -56,14 +61,15 @@ const IntegrationVersionHistorySheet = ({integrationId, onClose}: IntegrationVer
                                         </div>
                                     </AccordionTrigger>
 
-                                    <AccordionContent>
+                                    <AccordionContent className="text-muted-foreground">
                                         {integrationVersion.description
                                             ? integrationVersion.description
                                             : 'No description.'}
                                     </AccordionContent>
                                 </AccordionItem>
                             ))}
-                    </Accordion>
+                        </Accordion>
+                    )}
                 </div>
             </SheetContent>
         </Sheet>

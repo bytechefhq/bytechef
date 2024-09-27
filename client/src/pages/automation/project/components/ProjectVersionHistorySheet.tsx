@@ -24,9 +24,12 @@ const ProjectVersionHistorySheet = ({onClose, projectId}: ProjectVersionHistoryS
                 </SheetHeader>
 
                 <div className="overflow-y-auto">
-                    <Accordion type="single">
-                        {projectVersions &&
-                            projectVersions.map((projectVersion) => (
+                    {projectVersions && (
+                        <Accordion
+                            defaultValue={projectVersions.length > 1 ? [projectVersions[1]!.version!.toString()] : []}
+                            type="multiple"
+                        >
+                            {projectVersions.map((projectVersion) => (
                                 <AccordionItem
                                     key={projectVersion.version}
                                     value={projectVersion.version?.toString() || ''}
@@ -57,12 +60,13 @@ const ProjectVersionHistorySheet = ({onClose, projectId}: ProjectVersionHistoryS
                                         </div>
                                     </AccordionTrigger>
 
-                                    <AccordionContent>
+                                    <AccordionContent className="text-muted-foreground">
                                         {projectVersion.description ? projectVersion.description : 'No description.'}
                                     </AccordionContent>
                                 </AccordionItem>
                             ))}
-                    </Accordion>
+                        </Accordion>
+                    )}
                 </div>
             </SheetContent>
         </Sheet>
