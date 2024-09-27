@@ -37,7 +37,7 @@ public class AwsTriggerScheduler implements TriggerScheduler {
 
     private final SchedulerClient schedulerClient;
     private final String sqsArn;
-    private final String roleArnBase;
+    private final String roleArn;
 
     @SuppressFBWarnings("EI")
     public AwsTriggerScheduler(SchedulerClient schedulerClient, ApplicationProperties.Cloud.Aws aws) {
@@ -46,26 +46,28 @@ public class AwsTriggerScheduler implements TriggerScheduler {
         String accountId = aws.getAccountId();
 
         this.sqsArn = "arn:aws:sqs:" + aws.getRegion() + ":" + accountId + ":schedule-queue";
-        this.roleArnBase = "arn:aws:iam::" + accountId + ":role/";
+        this.roleArn = "arn:aws:iam::" + accountId + ":role/schedule-role";
     }
 
     @Override
     public void cancelDynamicWebhookTriggerRefresh(String workflowExecutionId) {
         schedulerClient.deleteSchedule(request -> request.clientToken(workflowExecutionId)
-            .groupName(WEBHOOK_TRIGGER));
+            .groupName(WEBHOOK_TRIGGER)
+            .name(WEBHOOK_TRIGGER + workflowExecutionId.substring(0,16)));
     }
 
     @Override
     public void cancelScheduleTrigger(String workflowExecutionId) {
-        schedulerClient.deleteSchedule(request -> request.clientToken(workflowExecutionId)
+        schedulerClient.deleteSchedule(request -> request.clientToken(workflowExecutionId.substring(16))
             .groupName(SCHEDULE_TRIGGER)
-            .name(SCHEDULE_TRIGGER + workflowExecutionId));
+            .name(SCHEDULE_TRIGGER + workflowExecutionId.substring(0,16)));
     }
 
     @Override
     public void cancelPollingTrigger(String workflowExecutionId) {
         schedulerClient.deleteSchedule(request -> request.clientToken(workflowExecutionId)
-            .groupName(POLLING_TRIGGER));
+            .groupName(POLLING_TRIGGER)
+            .name(POLLING_TRIGGER + workflowExecutionId.substring(0,16)));
     }
 
     @Override
@@ -74,14 +76,14 @@ public class AwsTriggerScheduler implements TriggerScheduler {
         WorkflowExecutionId workflowExecutionId, Long connectionId) {
 
         Target sqsTarget = Target.builder()
-            .roleArn(roleArnBase + "schedule-role")
+            .roleArn(roleArn)
             .arn(sqsArn)
             .input("ConnectionId: " + connectionId + workflowExecutionId.toString())
             .build();
 
-        schedulerClient.createSchedule(request -> request.clientToken("" + workflowExecutionId.getInstanceId())
-            .groupName(SCHEDULE_TRIGGER)
-            .name(WEBHOOK_TRIGGER + workflowExecutionId.getInstanceId())
+        schedulerClient.createSchedule(request -> request.clientToken(workflowExecutionId.toString().substring(16))
+            .groupName(WEBHOOK_TRIGGER)
+            .name(WEBHOOK_TRIGGER + workflowExecutionId.toString().substring(0,16))
             .target(sqsTarget)
             .flexibleTimeWindow(mode -> mode.mode(FlexibleTimeWindowMode.OFF))
             .startDate(webhookExpirationDate.toInstant(ZoneOffset.UTC))); // change when choosing bytechefs aws region
@@ -92,31 +94,35 @@ public class AwsTriggerScheduler implements TriggerScheduler {
         String pattern, String zoneId, Map<String, Object> output, WorkflowExecutionId workflowExecutionId) {
 
         Target sqsTarget = Target.builder()
-            .roleArn(roleArnBase + "schedule-role")
+            .roleArn(roleArn)
             .arn(sqsArn)
-            .input("JSON output: " + JsonUtils.write(output) + workflowExecutionId.toString())
+            .input(JsonUtils.write(output) + "_Splitter_" + workflowExecutionId.toString())
+//            .retryPolicy(RetryPolicy.builder().maximumRetryAttempts().build())
+//            .sqsParameters(SqsParameters.builder().messageGroupId().build())
+            .deadLetterConfig(builder -> builder.arn(sqsArn).build())
             .build();
 
-        schedulerClient.createSchedule(request -> request.clientToken("" + workflowExecutionId.getInstanceId())
+        schedulerClient.createSchedule(request -> request.clientToken(workflowExecutionId.toString().substring(16))
             .groupName(SCHEDULE_TRIGGER)
-            .name(SCHEDULE_TRIGGER + workflowExecutionId.getInstanceId())
+            .name(SCHEDULE_TRIGGER + workflowExecutionId.toString().substring(0,16))
             .target(sqsTarget)
             .flexibleTimeWindow(mode -> mode.mode(FlexibleTimeWindowMode.OFF))
+            .scheduleExpressionTimezone(zoneId)
             .startDate(Instant.now())
-            .scheduleExpression("cron({0})".formatted(pattern)));
+            .scheduleExpression("cron(" + pattern.substring(2) + ")"));
     }
 
     @Override
     public void schedulePollingTrigger(WorkflowExecutionId workflowExecutionId) {
         Target sqsTarget = Target.builder()
-            .roleArn(roleArnBase + "polling-role")
+            .roleArn(roleArn)
             .arn(sqsArn)
             .input(workflowExecutionId.toString())
             .build();
 
-        schedulerClient.createSchedule(request -> request.clientToken("" + workflowExecutionId.getInstanceId())
+        schedulerClient.createSchedule(request -> request.clientToken(workflowExecutionId.toString().substring(16))
             .groupName(POLLING_TRIGGER)
-            .name(POLLING_TRIGGER + workflowExecutionId.getInstanceId())
+            .name(POLLING_TRIGGER + workflowExecutionId.toString().substring(0,16))
             .target(sqsTarget)
             .flexibleTimeWindow(mode -> mode.mode(FlexibleTimeWindowMode.OFF))
             .startDate(Instant.now())
