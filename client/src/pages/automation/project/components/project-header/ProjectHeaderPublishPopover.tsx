@@ -1,5 +1,5 @@
 import {Button} from '@/components/ui/button';
-import {Label} from '@/components/ui/label';
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Textarea} from '@/components/ui/textarea';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -8,17 +8,29 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {usePublishProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
+import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
 import {CircleDotIcon} from 'lucide-react';
 import {useState} from 'react';
+import {useForm} from 'react-hook-form';
+import * as z from 'zod';
+
+const formSchema = z.object({
+    description: z.string().max(256),
+});
 
 const ProjectHeaderPublishPopover = ({project}: {project: Project}) => {
     const [open, setOpen] = useState(false);
-    const [description, setDescription] = useState<string | undefined>(undefined);
 
     const {currentWorkspaceId} = useWorkspaceStore();
 
     const {toast} = useToast();
+
+    const form = useForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
+    });
+
+    const {control, handleSubmit} = form;
 
     const queryClient = useQueryClient();
 
@@ -40,6 +52,15 @@ const ProjectHeaderPublishPopover = ({project}: {project: Project}) => {
         },
     });
 
+    function publishProject({description}: {description: string}) {
+        publishProjectMutation.mutate({
+            id: project.id!,
+            publishProjectRequest: {
+                description,
+            },
+        });
+    }
+
     return (
         <Popover onOpenChange={setOpen} open={open}>
             <PopoverTrigger asChild>
@@ -55,29 +76,35 @@ const ProjectHeaderPublishPopover = ({project}: {project: Project}) => {
             </PopoverTrigger>
 
             <PopoverContent align="end" className="flex h-full w-96 flex-col justify-between space-y-4">
-                <h3 className="font-semibold">Publish Project</h3>
+                <Form {...form}>
+                    <form className="flex flex-col gap-4" onSubmit={handleSubmit(publishProject)}>
+                        <h3 className="font-semibold">Publish Project</h3>
 
-                <div className="flex-1">
-                    <Label>Description</Label>
+                        <div className="flex-1">
+                            <FormField
+                                control={control}
+                                name="description"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Description</FormLabel>
 
-                    <Textarea className="h-28" onChange={(event) => setDescription(event.target.value)}></Textarea>
-                </div>
+                                        <FormControl>
+                                            <Textarea className="h-28" {...field}></Textarea>
+                                        </FormControl>
 
-                <div className="flex justify-end">
-                    <Button
-                        onClick={() =>
-                            publishProjectMutation.mutate({
-                                id: project.id!,
-                                publishProjectRequest: {
-                                    description,
-                                },
-                            })
-                        }
-                        size="sm"
-                    >
-                        Publish
-                    </Button>
-                </div>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+
+                        <div className="flex justify-end">
+                            <Button size="sm" type="submit">
+                                Publish
+                            </Button>
+                        </div>
+                    </form>
+                </Form>
             </PopoverContent>
         </Popover>
     );
