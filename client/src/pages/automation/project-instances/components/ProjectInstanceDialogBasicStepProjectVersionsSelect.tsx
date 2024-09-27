@@ -1,6 +1,9 @@
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {Select, SelectContent, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {ProjectStatus} from '@/shared/middleware/automation/configuration';
 import {useGetProjectVersionsQuery} from '@/shared/queries/automation/projectVersions.queries';
+import {CheckIcon} from '@radix-ui/react-icons';
+import {Item, ItemIndicator, ItemText} from '@radix-ui/react-select';
+import {twMerge} from 'tailwind-merge';
 
 const ProjectInstanceDialogBasicStepProjectVersionsSelect = ({
     onChange,
@@ -29,9 +32,27 @@ const ProjectInstanceDialogBasicStepProjectVersionsSelect = ({
                     projectVersions.map(
                         (projectVersion) =>
                             projectVersion.status == ProjectStatus.Published && (
-                                <SelectItem key={projectVersion.version} value={projectVersion.version!.toString()}>
-                                    V{projectVersion.version}
-                                </SelectItem>
+                                <Item
+                                    className={twMerge(
+                                        'radix-disabled:opacity-50 flex cursor-pointer select-none items-center overflow-hidden rounded-md px-8 py-2 text-sm font-medium text-gray-700 focus:bg-gray-100 focus:outline-none'
+                                    )}
+                                    key={projectVersion.version}
+                                    value={projectVersion.version!.toString()}
+                                >
+                                    <span className="absolute right-2 flex size-3.5 items-center justify-center">
+                                        <ItemIndicator>
+                                            <CheckIcon className="size-4" />
+                                        </ItemIndicator>
+                                    </span>
+
+                                    <div className="flex flex-col">
+                                        <ItemText>V{projectVersion.version}</ItemText>
+
+                                        <div className="max-w-96 text-xs text-muted-foreground">
+                                            {projectVersion.description}
+                                        </div>
+                                    </div>
+                                </Item>
                             )
                     )}
             </SelectContent>
