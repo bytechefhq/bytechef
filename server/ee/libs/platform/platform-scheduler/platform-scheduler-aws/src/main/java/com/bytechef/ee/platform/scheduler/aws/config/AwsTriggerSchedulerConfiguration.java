@@ -17,7 +17,9 @@
 package com.bytechef.ee.platform.scheduler.aws.config;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.ee.message.broker.aws.AwsMessageBroker;
 import com.bytechef.ee.platform.scheduler.aws.AwsTriggerScheduler;
+import com.bytechef.message.broker.MessageBroker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
