@@ -103,7 +103,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
 
         const parameterObject = resolvePath(currentComponent.parameters, path);
 
-        if (!parameterObject) {
+        if (!parameterObject || !isObject(parameterObject)) {
             return;
         }
 
