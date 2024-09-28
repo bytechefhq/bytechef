@@ -84,6 +84,7 @@
     "lucide-react": "^0.446.0",
     "monaco-editor": "^0.52.0",
     "monaco-yaml": "^5.2.2",
+    "posthog-js": "^1.165.0",
     "quill-mention": "^4.1.0",
     "quill-paste-smart": "^1.4.12",
     "react": "^18.3.1",
