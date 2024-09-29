@@ -22,6 +22,4 @@ ENTRYPOINT exec \
      -Dserver.tomcat.accesslog.directory=/opt/bytechef/server/logs${ENV_JVM_MEMORY_OPTS:+ $ENV_JVM_MEMORY_OPTS} \
      -jar server/server-app.jar
 
-EXPOSE 9555
-
 FROM bytechef-base AS bytechef-server
