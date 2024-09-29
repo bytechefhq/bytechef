@@ -1,0 +1,50 @@
+---
+version: "3.9"
+services:
+  redis:
+    container_name: redis
+    image: redis:7-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    command: "redis-server --save 20 1 --loglevel warning"
+    volumes:
+      - storage_cache:/data
+  postgres:
+    container_name: postgres
+    image: postgres:14-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - storage_db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=bytechef
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  bytechef:
+    container_name: bytechef
+    image: bytechef/bytechef:latest
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - BYTECHEF_DATASOURCE_URL=jdbc:postgresql://postgres:5432/bytechef
+      - BYTECHEF_DATASOURCE_USERNAME=postgres
+      - BYTECHEF_DATASOURCE_PASSWORD=postgres
+      - BYTECHEF_SECURITY_REMEMBER-ME_KEY=e48keep1this1safe3ffb2
+      - BYTECHEF_RESOURCES_WEB=file:///opt/bytechef/client/
+      - SERVER_PORT=8080
+      - SPRING_PROFILES_ACTIVE=prod,docker
+      - SPRING_DATA_REDIS_HOST=redis
+    ports:
+      - "80:8080"
+volumes:
+  storage_db:
+    driver: "local"
+  storage_cache:
+    driver: "local"
