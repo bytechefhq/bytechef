@@ -29,6 +29,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.ReadOnlyProperty;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
@@ -93,6 +94,10 @@ public class User {
 
     @Column("reset_key")
     private String resetKey;
+
+    @Column("uuid")
+    @ReadOnlyProperty
+    private String uuid;
 
     @Override
     public boolean equals(Object o) {
@@ -177,6 +182,10 @@ public class User {
 
     public String getResetKey() {
         return resetKey;
+    }
+
+    public String getUuid() {
+        return uuid;
     }
 
     public boolean isActivated() {
