@@ -1,6 +1,6 @@
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
-import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ClickedDefinitionType} from '@/shared/types';
 import {twMerge} from 'tailwind-merge';
 
@@ -29,7 +29,7 @@ const WorkflowNodesTabs = ({
     taskDispatcherDefinitions,
     triggerComponentDefinitions,
 }: WorkflowNodesTabsProps) => {
-    const ff_1057 = useApplicationInfoStore((state) => state.featureFlags?.['ff-1057']);
+    const {isFeatureFlagEnabled} = useFeatureFlagsStore();
 
     return (
         <div className="size-full px-3">
@@ -50,7 +50,7 @@ const WorkflowNodesTabs = ({
                         </TabsTrigger>
                     )}
 
-                    {ff_1057 && !hideTaskDispatchers && (
+                    {isFeatureFlagEnabled('ff-1057') && !hideTaskDispatchers && (
                         <TabsTrigger className="w-full" value="taskDispatchers">
                             Flows
                         </TabsTrigger>

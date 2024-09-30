@@ -2,6 +2,7 @@ import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useEffect} from 'react';
 import {Outlet, useLocation} from 'react-router-dom';
 
@@ -14,31 +15,31 @@ interface SettingsProps {
 }
 
 const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
-    const {featureFlags, getApplicationInfo} = useApplicationInfoStore();
+    const {getApplicationInfo} = useApplicationInfoStore();
+
+    const {isFeatureFlagEnabled} = useFeatureFlagsStore();
 
     const location = useLocation();
 
     sidebarNavItems = sidebarNavItems.filter((navItem) => {
-        if (featureFlags) {
-            if (navItem.href === 'api-connectors') {
-                return featureFlags['ff-207'];
-            }
+        if (navItem.href === 'api-connectors') {
+            return isFeatureFlagEnabled('ff-207');
+        }
 
-            if (navItem.href?.includes('/account/appearance')) {
-                return featureFlags['ff-445'];
-            }
+        if (navItem.href?.includes('/account/appearance')) {
+            return isFeatureFlagEnabled('ff-445');
+        }
 
-            if (navItem.href === '/automation/settings/api-keys' && location.pathname.includes('automation/settings')) {
-                return featureFlags['ff-1023'];
-            }
+        if (navItem.href === '/automation/settings/api-keys' && location.pathname.includes('automation/settings')) {
+            return isFeatureFlagEnabled('ff-1023');
+        }
 
-            if (navItem.href === 'custom-components') {
-                return featureFlags['ff-1024'];
-            }
+        if (navItem.href === 'custom-components') {
+            return isFeatureFlagEnabled('ff-1024');
+        }
 
-            if (navItem.href === 'admin-api-keys' || navItem.title === 'Organization') {
-                return featureFlags['ff-1024'] || featureFlags['ff-1025'];
-            }
+        if (navItem.href === 'admin-api-keys' || navItem.title === 'Organization') {
+            return isFeatureFlagEnabled('ff-1024') || isFeatureFlagEnabled('ff-1025');
         }
 
         return true;

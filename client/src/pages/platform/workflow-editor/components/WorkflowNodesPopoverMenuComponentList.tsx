@@ -2,7 +2,7 @@ import {Input} from '@/components/ui/input';
 import WorkflowNodesTabs from '@/pages/platform/workflow-editor/components/WorkflowNodesTabs';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
-import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ClickedDefinitionType} from '@/shared/types';
 import {memo, useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -28,7 +28,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
     }: WorkflowNodesListProps) => {
         const [filter, setFilter] = useState('');
 
-        const ff_797 = useApplicationInfoStore((state) => state.featureFlags?.['ff-797'] ?? false);
+        const {isFeatureFlagEnabled} = useFeatureFlagsStore();
 
         const [filteredActionComponentDefinitions, setFilteredActionComponentDefinitions] = useState<
             Array<ComponentDefinitionBasic>
@@ -66,7 +66,11 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                                 (name?.toLowerCase().includes(filter.toLowerCase()) ||
                                     title?.toLowerCase().includes(filter.toLowerCase()))
                         )
-                        .filter(({name}) => (!ff_797 && name !== 'dataStream') || ff_797)
+                        .filter(
+                            ({name}) =>
+                                (!isFeatureFlagEnabled('ff-797') && name !== 'dataStream') ||
+                                isFeatureFlagEnabled('ff-797')
+                        )
                 );
 
                 setFilteredTriggerComponentDefinitions(
@@ -78,7 +82,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                     )
                 );
             }
-        }, [componentDefinitions, filter, ff_797]);
+        }, [componentDefinitions, filter, isFeatureFlagEnabled]);
 
         return (
             <div
