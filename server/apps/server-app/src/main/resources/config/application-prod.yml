@@ -35,3 +35,8 @@ bytechef:
     password:
   resources:
     web: file:///opt/bytechef/client/
+  analytics:
+    enabled: true
+    post-hog:
+      api-key: phc_oZ9XWAVf8xf6sI7IYBAbGldSbiud07ioZItD1XvhJ7S
+      host: https://eu.i.posthog.com
