@@ -1,3 +1,4 @@
+import LoadingIcon from '@/components/LoadingIcon';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
@@ -36,12 +37,16 @@ export const Register = () => {
         resolver: zodResolver(formSchema),
     });
 
+    const {
+        formState: {isSubmitting},
+    } = form;
+
     const navigate = useNavigate();
 
     function handleSubmit({email, password}: z.infer<typeof formSchema>) {
         reset();
 
-        register(email, password);
+        return register(email, password);
     }
 
     useEffect(() => {
@@ -182,8 +187,9 @@ export const Register = () => {
                                 )}
                             />
 
-                            <Button className="w-full" type="submit">
-                                Create an account
+                            <Button className="w-full" disabled={isSubmitting} type="submit">
+                                {isSubmitting && <LoadingIcon />}
+                                Create Account
                             </Button>
 
                             {/*<div className="py-1 text-center">OR</div>*/}

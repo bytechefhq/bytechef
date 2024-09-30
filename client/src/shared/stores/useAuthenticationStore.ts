@@ -15,8 +15,8 @@ export interface AuthenticationI {
     showLogin: boolean;
 
     clearAuthentication: () => void;
-    getAccount: () => void;
-    login: (email: string, password: string, rememberMe: boolean) => void;
+    getAccount: () => Promise<Response>;
+    login: (email: string, password: string, rememberMe: boolean) => Promise<Response>;
     logout: () => void;
     reset: () => void;
 }
@@ -78,9 +78,9 @@ export const useAuthenticationStore = create<AuthenticationI>()(
                 }));
             },
 
-            getAccount: async () => {
+            getAccount: async (): Promise<Response> => {
                 if (get().loading) {
-                    return;
+                    return Promise.resolve(new Response());
                 }
 
                 set((state) => ({
@@ -88,52 +88,56 @@ export const useAuthenticationStore = create<AuthenticationI>()(
                     loading: true,
                 }));
 
-                const response = await fetchGetAccount();
+                return fetchGetAccount().then((response) => {
+                    if (response.status === 200) {
+                        response.json().then((account) => {
+                            set((state) => ({
+                                ...state,
+                                account,
+                                authenticated: account.activated,
+                                loading: false,
+                                sessionHasBeenFetched: true,
+                            }));
+                        });
+                    } else {
+                        set((state) => ({
+                            ...state,
+                            loading: false,
+                            isAuthenticated: false,
+                            sessionHasBeenFetched: true,
+                            showLogin: true,
+                        }));
+                    }
 
-                if (response.status === 200) {
-                    const account = (await response.json()) as UserI;
-
-                    set((state) => ({
-                        ...state,
-                        account,
-                        authenticated: account.activated,
-                        loading: false,
-                        sessionHasBeenFetched: true,
-                    }));
-                } else {
-                    set((state) => ({
-                        ...state,
-                        loading: false,
-                        isAuthenticated: false,
-                        sessionHasBeenFetched: true,
-                        showLogin: true,
-                    }));
-                }
+                    return response;
+                });
             },
 
-            login: async (email: string, password: string, rememberMe: boolean) => {
+            login: async (email: string, password: string, rememberMe: boolean): Promise<Response> => {
                 const data = `username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}&remember-me=${rememberMe}&submit=Login`;
 
-                const response = await fetchAuthenticate(data);
+                return fetchAuthenticate(data).then(async (response) => {
+                    if (response.status === 200) {
+                        set((state) => ({
+                            ...state,
+                            loginError: false,
+                            loginSuccess: true,
+                            showLogin: false,
+                        }));
 
-                if (response.status === 200) {
-                    set((state) => ({
-                        ...state,
-                        loginError: false,
-                        loginSuccess: true,
-                        showLogin: false,
-                    }));
+                        const {getAccount} = get();
 
-                    const {getAccount} = get();
+                        getAccount();
+                    } else {
+                        set(() => ({
+                            ...initialState,
+                            loginError: true,
+                            showLogin: true,
+                        }));
+                    }
 
-                    getAccount();
-                } else {
-                    set(() => ({
-                        ...initialState,
-                        loginError: true,
-                        showLogin: true,
-                    }));
-                }
+                    return response;
+                });
             },
 
             logout: async () => {
