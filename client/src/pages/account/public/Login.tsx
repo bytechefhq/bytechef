@@ -1,3 +1,4 @@
+import LoadingIcon from '@/components/LoadingIcon';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
@@ -37,8 +38,12 @@ const Login = () => {
         resolver: zodResolver(formSchema),
     });
 
+    const {
+        formState: {isSubmitting},
+    } = form;
+
     const handleSubmit = ({email, password, rememberMe}: z.infer<typeof formSchema>) => {
-        login(email, password, rememberMe);
+        return login(email, password, rememberMe);
     };
 
     useEffect(() => {
@@ -142,7 +147,8 @@ const Login = () => {
                                 )}
                             />
 
-                            <Button className="w-full" type="submit">
+                            <Button className="w-full" disabled={isSubmitting} type="submit">
+                                {isSubmitting && <LoadingIcon />}
                                 Sign in
                             </Button>
 
