@@ -21,7 +21,10 @@ const formSchema = z.object({
 
 export const Register = () => {
     const {register, registerErrorMessage, registerSuccess, reset} = useRegisterStore();
-    const {getApplicationInfo, mail} = useApplicationInfoStore();
+    const {
+        getApplicationInfo,
+        signUp: {activationRequired},
+    } = useApplicationInfoStore();
 
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
@@ -45,7 +48,7 @@ export const Register = () => {
         form.reset({});
 
         if (registerSuccess) {
-            if (mail.enabled) {
+            if (activationRequired) {
                 navigate('/verify-email');
             }
         }
@@ -79,7 +82,7 @@ export const Register = () => {
                         </Alert>
                     )}
 
-                    {registerSuccess && !mail.enabled && (
+                    {registerSuccess && !activationRequired && (
                         <Alert className="mb-4" variant="success">
                             <AlertTitle>Success</AlertTitle>
 
