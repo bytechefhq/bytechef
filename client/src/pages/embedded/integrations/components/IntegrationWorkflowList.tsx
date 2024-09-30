@@ -5,7 +5,7 @@ import IntegrationWorkflowListItem from '@/pages/embedded/integrations/component
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
 import {Integration} from '@/shared/middleware/embedded/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
-import {useCreateIntegrationWorkflowMutation} from '@/shared/mutations/embedded/integrations.mutations';
+import {useCreateIntegrationWorkflowMutation} from '@/shared/mutations/embedded/workflows.mutations';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {useGetIntegrationWorkflowsQuery} from '@/shared/queries/embedded/integrationWorkflows.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';

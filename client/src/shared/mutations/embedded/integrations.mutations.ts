@@ -1,11 +1,9 @@
 import {
-    CreateIntegrationWorkflowRequest,
     Integration,
     IntegrationApi,
     IntegrationTagApi,
     PublishIntegrationOperationRequest,
     UpdateIntegrationTagsRequest,
-    Workflow,
 } from '@/shared/middleware/embedded/configuration';
 import {useMutation} from '@tanstack/react-query';
 
@@ -37,20 +35,6 @@ export const useUpdateIntegrationMutation = (mutationProps?: UpdateIntegrationMu
                 id: integration.id!,
                 integration: integration,
             });
-        },
-        onError: mutationProps?.onError,
-        onSuccess: mutationProps?.onSuccess,
-    });
-
-interface CreateIntegrationWorkflowMutationProps {
-    onSuccess?: (result: Workflow, variables: CreateIntegrationWorkflowRequest) => void;
-    onError?: (error: Error, variables: CreateIntegrationWorkflowRequest) => void;
-}
-
-export const useCreateIntegrationWorkflowMutation = (mutationProps?: CreateIntegrationWorkflowMutationProps) =>
-    useMutation({
-        mutationFn: (request: CreateIntegrationWorkflowRequest) => {
-            return new IntegrationApi().createIntegrationWorkflow(request);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
