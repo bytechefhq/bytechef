@@ -49,6 +49,7 @@ public class ApplicationProperties {
     private Oauth2 oauth2;
     private String publicUrl;
     private Resources resources;
+    private SignUp signUp;
     private Security security;
     private Tenant tenant;
     private String webhookUrl;
@@ -117,6 +118,10 @@ public class ApplicationProperties {
 
     public Resources getResources() {
         return resources;
+    }
+
+    public SignUp getSignUp() {
+        return signUp;
     }
 
     public Security getSecurity() {
@@ -201,6 +206,10 @@ public class ApplicationProperties {
 
     public void setResources(Resources resources) {
         this.resources = resources;
+    }
+
+    public void setSignUp(SignUp signUp) {
+        this.signUp = signUp;
     }
 
     public void setSecurity(Security security) {
@@ -848,6 +857,28 @@ public class ApplicationProperties {
             public void setKey(String key) {
                 this.key = key;
             }
+        }
+    }
+
+    public static class SignUp {
+
+        private boolean activationRequired;
+        private boolean enabled;
+
+        public boolean isActivationRequired() {
+            return activationRequired;
+        }
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setActivationRequired(boolean activationRequired) {
+            this.activationRequired = activationRequired;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
         }
     }
 

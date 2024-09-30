@@ -12,6 +12,9 @@ springdoc:
 info:
   application:
     edition: ${bytechef.edition}
+  signUp:
+    activationRequired: ${bytechef.signUp.activationRequired}
+    enabled: ${bytechef.signUp.enabled}
 
 management:
   endpoints:
@@ -197,6 +200,9 @@ bytechef:
     content-security-policy: "default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://storage.googleapis.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' data:"
     remember-me:
       key: remember_me
+  sign-up:
+    enabled: true
+    activation-required: false
   # Tenant support mode (single | multi - ee only) default: single
   tenant:
     mode: single

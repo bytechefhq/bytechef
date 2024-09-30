@@ -17,8 +17,6 @@
 package com.bytechef.platform.user.actuate.info;
 
 import com.bytechef.config.ApplicationProperties;
-import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.actuate.info.Info;
 import org.springframework.boot.actuate.info.InfoContributor;
 import org.springframework.stereotype.Component;
@@ -29,18 +27,16 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class MailContributor implements InfoContributor {
+public class SignUpContributor implements InfoContributor {
 
-    private final boolean mailEnabled;
+    private final ApplicationProperties.SignUp signUp;
 
-    public MailContributor(ApplicationProperties applicationProperties) {
-        ApplicationProperties.Mail mail = applicationProperties.getMail();
-
-        this.mailEnabled = StringUtils.isNotBlank(mail.getHost());
+    public SignUpContributor(ApplicationProperties applicationProperties) {
+        this.signUp = applicationProperties.getSignUp();
     }
 
     @Override
     public void contribute(Info.Builder builder) {
-        builder.withDetail("mail", Map.of("enabled", mailEnabled));
+        builder.withDetail("signUp", signUp);
     }
 }
