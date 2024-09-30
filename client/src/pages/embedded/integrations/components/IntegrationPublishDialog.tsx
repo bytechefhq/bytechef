@@ -1,12 +1,11 @@
 import {Button} from '@/components/ui/button';
-import {Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import {useToast} from '@/components/ui/use-toast';
 import {Integration} from '@/shared/middleware/embedded/configuration';
 import {usePublishIntegrationMutation} from '@/shared/mutations/embedded/integrations.mutations';
 import {IntegrationKeys} from '@/shared/queries/embedded/integrations.queries';
-import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 
@@ -37,10 +36,6 @@ const IntegrationPublishDialog = ({integration, onClose}: {integration: Integrat
                 <DialogHeader>
                     <div className="flex items-center justify-between">
                         <DialogTitle>Publish Integration {integration.componentName}</DialogTitle>
-
-                        <DialogClose asChild>
-                            <Cross2Icon className="size-4 cursor-pointer opacity-70" />
-                        </DialogClose>
                     </div>
 
                     <DialogDescription>
