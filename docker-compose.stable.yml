@@ -1,15 +1,6 @@
 ---
 version: "3.9"
 services:
-  redis:
-    container_name: redis
-    image: redis:7-alpine
-    restart: always
-    ports:
-      - "6379:6379"
-    command: "redis-server --save 20 1 --loglevel warning"
-    volumes:
-      - storage_cache:/data
   postgres:
     container_name: postgres
     image: postgres:14-alpine
@@ -38,7 +29,6 @@ services:
       - BYTECHEF_DATASOURCE_PASSWORD=postgres
       - BYTECHEF_SECURITY_REMEMBER-ME_KEY=e48keep1this1safe3ffb2
       - SERVER_PORT=8080
-      - SPRING_DATA_REDIS_HOST=redis
     ports:
       - "80:8080"
 volumes:
