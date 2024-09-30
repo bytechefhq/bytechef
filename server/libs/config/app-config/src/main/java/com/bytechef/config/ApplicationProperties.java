@@ -33,6 +33,7 @@ public class ApplicationProperties {
         CE, EE
     }
 
+    private Analytics analytics;
     private Cache cache;
     private Cloud cloud = new Cloud();
     private Component component = new Component();
@@ -55,6 +56,10 @@ public class ApplicationProperties {
     private String webhookUrl;
     private Worker worker = new Worker();
     private Workflow workflow;
+
+    public Analytics getAnalytics() {
+        return analytics;
+    }
 
     public Cache getCache() {
         return cache;
@@ -144,6 +149,10 @@ public class ApplicationProperties {
         return workflow;
     }
 
+    public void setAnalytics(Analytics analytics) {
+        this.analytics = analytics;
+    }
+
     public void setCache(Cache cache) {
         this.cache = cache;
     }
@@ -230,6 +239,50 @@ public class ApplicationProperties {
 
     public void setWorkflow(Workflow workflow) {
         this.workflow = workflow;
+    }
+
+    public static class Analytics {
+
+        private boolean enabled;
+        private PostHog postHog = new PostHog();
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public PostHog getPostHog() {
+            return postHog;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public void setPostHog(PostHog postHog) {
+            this.postHog = postHog;
+        }
+
+        public static class PostHog {
+
+            private String apiKey;
+            private String host;
+
+            public String getApiKey() {
+                return apiKey;
+            }
+
+            public String getHost() {
+                return host;
+            }
+
+            public void setApiKey(String apiKey) {
+                this.apiKey = apiKey;
+            }
+
+            public void setHost(String host) {
+                this.host = host;
+            }
+        }
     }
 
     public static class Cache {

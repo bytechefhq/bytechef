@@ -15,6 +15,11 @@ info:
   signUp:
     activationRequired: ${bytechef.signUp.activationRequired}
     enabled: ${bytechef.signUp.enabled}
+  analytics:
+    enabled: ${bytechef.analytics.enabled}
+    postHog:
+      apiKey: ${bytechef.analytics.post-hog.api-key}
+      host: ${bytechef.analytics.post-hog.host}
 
 management:
   endpoints:
@@ -145,6 +150,11 @@ springdoc:
 #####
 
 bytechef:
+  analytics:
+    enabled: false
+    post-hog:
+      api-key:
+      host:
   cache:
     # Cache provider (redis | simple) default: simple
     provider: simple
