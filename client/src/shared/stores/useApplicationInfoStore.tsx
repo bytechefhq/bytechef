@@ -9,7 +9,6 @@ export interface ApplicationInfoI {
     application: {
         edition: EditionType;
     } | null;
-    featureFlags: Record<string, boolean> | null;
     loading: boolean;
     signUp: {
         activationRequired: boolean;
@@ -55,7 +54,6 @@ export const useApplicationInfoStore = create<ApplicationInfoI>()(
                         set((state) => ({
                             ...state,
                             application: json.application,
-                            featureFlags: json.featureFlags || {},
                             loading: false,
                             signUp: json.signUp,
                         }));

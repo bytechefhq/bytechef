@@ -5,6 +5,7 @@ import {MobileSidebar} from '@/shared/layout/MobileSidebar';
 import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {
     ActivityIcon,
     FolderIcon,
@@ -98,8 +99,9 @@ const platformNavigation = [
 function App() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    const {featureFlags, getApplicationInfo} = useApplicationInfoStore();
+    const {getApplicationInfo} = useApplicationInfoStore();
     const {authenticated, getAccount, sessionHasBeenFetched, showLogin} = useAuthenticationStore();
+    const {isFeatureFlagEnabled} = useFeatureFlagsStore();
 
     const location = useLocation();
 
@@ -145,7 +147,7 @@ function App() {
                     mobileMenuOpen={mobileMenuOpen}
                     navigation={automationNavigation.filter((navItem) => {
                         if (navItem.href === '/automation/api-platform/api-collections') {
-                            return featureFlags && featureFlags['ff-1023'];
+                            return isFeatureFlagEnabled('ff-1023');
                         }
 
                         return true;
@@ -159,7 +161,7 @@ function App() {
                         location.pathname.includes('automation')
                             ? automationNavigation.filter((navItem) => {
                                   if (navItem.href === '/automation/api-platform/api-collections') {
-                                      return featureFlags && featureFlags['ff-1023'];
+                                      return isFeatureFlagEnabled('ff-1023');
                                   }
 
                                   return true;
