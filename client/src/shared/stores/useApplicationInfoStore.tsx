@@ -10,6 +10,7 @@ export interface ApplicationInfoI {
         edition: EditionType;
     } | null;
     featureFlags: Record<string, boolean> | null;
+    loading: boolean;
     signUp: {
         activationRequired: boolean;
         enabled: boolean;
@@ -26,16 +27,26 @@ const fetchGetApplicationInfo = async (): Promise<Response> => {
 
 export const useApplicationInfoStore = create<ApplicationInfoI>()(
     devtools(
-        (set) => {
+        (set, get) => {
             return {
                 application: null,
                 featureFlags: {},
+                loading: false,
                 signUp: {
                     activationRequired: false,
                     enabled: true,
                 },
 
                 getApplicationInfo: async () => {
+                    if (get().loading) {
+                        return;
+                    }
+
+                    set((state) => ({
+                        ...state,
+                        loading: true,
+                    }));
+
                     const response = await fetchGetApplicationInfo();
 
                     if (response.status === 200) {
@@ -45,6 +56,7 @@ export const useApplicationInfoStore = create<ApplicationInfoI>()(
                             ...state,
                             application: json.application,
                             featureFlags: json.featureFlags || {},
+                            loading: false,
                             signUp: json.signUp,
                         }));
                     }
