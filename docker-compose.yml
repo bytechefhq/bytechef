@@ -11,17 +11,17 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_DB=bytechef
-    healthcheck:
-      test: [ "CMD", "pg_isready", "-U", "postgres" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+#    healthcheck:
+#      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
   bytechef:
     container_name: bytechef
     image: bytechef/bytechef:latest
     depends_on:
       postgres:
-        condition: service_healthy
+        condition: service_started
     environment:
       - BYTECHEF_DATASOURCE_URL=jdbc:postgresql://postgres:5432/bytechef
       - BYTECHEF_DATASOURCE_USERNAME=postgres
