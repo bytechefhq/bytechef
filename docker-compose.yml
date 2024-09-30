@@ -26,6 +26,7 @@ services:
       - BYTECHEF_DATASOURCE_URL=jdbc:postgresql://postgres:5432/bytechef
       - BYTECHEF_DATASOURCE_USERNAME=postgres
       - BYTECHEF_DATASOURCE_PASSWORD=postgres
+      - BYTECHEF_FEATURE_FLAGS
       - BYTECHEF_SECURITY_REMEMBER-ME_KEY=e48keep1this1safe3ffb2
     ports:
       - "8080:8080"
