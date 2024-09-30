@@ -25,10 +25,10 @@ import IntegrationPublishDialog from '@/pages/embedded/integrations/components/I
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
 import {Integration, Tag} from '@/shared/middleware/embedded/configuration';
 import {
-    useCreateIntegrationWorkflowMutation,
     useDeleteIntegrationMutation,
     useUpdateIntegrationTagsMutation,
 } from '@/shared/mutations/embedded/integrations.mutations';
+import {useCreateIntegrationWorkflowMutation} from '@/shared/mutations/embedded/workflows.mutations';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {IntegrationCategoryKeys} from '@/shared/queries/embedded/integrationCategories.queries';
 import {IntegrationTagKeys} from '@/shared/queries/embedded/integrationTags.quries';

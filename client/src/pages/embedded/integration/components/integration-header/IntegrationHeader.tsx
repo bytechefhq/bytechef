@@ -16,11 +16,11 @@ import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useW
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
 import {Integration, Workflow} from '@/shared/middleware/embedded/configuration';
 import {WorkflowTestApi} from '@/shared/middleware/platform/workflow/test';
+import {useDeleteIntegrationMutation} from '@/shared/mutations/embedded/integrations.mutations';
 import {
     useCreateIntegrationWorkflowMutation,
-    useDeleteIntegrationMutation,
-} from '@/shared/mutations/embedded/integrations.mutations';
-import {useDeleteWorkflowMutation} from '@/shared/mutations/embedded/workflows.mutations';
+    useDeleteWorkflowMutation,
+} from '@/shared/mutations/embedded/workflows.mutations';
 import {IntegrationCategoryKeys} from '@/shared/queries/embedded/integrationCategories.queries';
 import {IntegrationTagKeys} from '@/shared/queries/embedded/integrationTags.quries';
 import {IntegrationWorkflowKeys} from '@/shared/queries/embedded/integrationWorkflows.queries';
