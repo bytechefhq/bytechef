@@ -23,7 +23,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 public class ExampleConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri((connectionParameters, context) -> "baseUri")
+        .baseUri((connectionParameters, context) -> "https://example.org")
         .authorizations(
         // TODO
         );

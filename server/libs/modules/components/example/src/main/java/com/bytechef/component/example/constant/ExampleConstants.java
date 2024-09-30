@@ -21,7 +21,9 @@ package com.bytechef.component.example.constant;
  */
 public final class ExampleConstants {
 
-    public static final String DUMMY = "dummy";
+    public static final String DUMMY_ACTION = "dummyAction";
+    public static final String DUMMY_TRIGGER = "dummyTrigger";
+    public static final String ID = "id";
     public static final String EXAMPLE = "example";
 
     private ExampleConstants() {
