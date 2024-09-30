@@ -37,9 +37,7 @@ services:
       - BYTECHEF_DATASOURCE_USERNAME=postgres
       - BYTECHEF_DATASOURCE_PASSWORD=postgres
       - BYTECHEF_SECURITY_REMEMBER-ME_KEY=e48keep1this1safe3ffb2
-      - BYTECHEF_RESOURCES_WEB=file:///opt/bytechef/client/
       - SERVER_PORT=8080
-      - SPRING_PROFILES_ACTIVE=prod,docker
       - SPRING_DATA_REDIS_HOST=redis
     ports:
       - "80:8080"
