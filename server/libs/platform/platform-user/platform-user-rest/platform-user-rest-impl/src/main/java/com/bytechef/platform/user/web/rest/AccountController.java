@@ -111,13 +111,13 @@ public class AccountController {
             throw new EmailAlreadyUsedException();
         }
 
-        ApplicationProperties.Mail mail = applicationProperties.getMail();
+        ApplicationProperties.SignUp signUp = applicationProperties.getSignUp();
+
+        if (!signUp.isEnabled() && (tenantService.isMultiTenantEnabled() || userService.countActiveUsers() > 0)) {
+            throw new AccountResourceException("Sign-up is disabled", AccountErrorType.SIGN_UP_DISABLED);
+        }
 
         if (tenantService.isMultiTenantEnabled()) {
-            if (StringUtils.isBlank(mail.getHost())) {
-                throw new IllegalStateException("Mail server not enabled. Please contact your administrator.");
-            }
-
             if (tenantService.tenantIdsByUserLoginExist(managedUserVM.getLogin())) {
                 throw new LoginAlreadyUsedException();
             }
@@ -138,10 +138,10 @@ public class AccountController {
 
         User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
 
-        if (StringUtils.isBlank(mail.getHost())) {
-            userService.activateRegistration(user.getActivationKey());
-        } else {
+        if (signUp.isActivationRequired()) {
             mailService.sendActivationEmail(user);
+        } else {
+            activateAccount(user.getActivationKey());
         }
     }
 

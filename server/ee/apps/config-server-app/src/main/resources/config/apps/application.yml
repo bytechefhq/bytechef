@@ -12,6 +12,9 @@ springdoc:
 info:
   application:
     edition: ${bytechef.edition}
+  signUp:
+    activationRequired: ${bytechef.signUp.activationRequired}
+    enabled: ${bytechef.signUp.enabled}
 
 management:
   endpoints:

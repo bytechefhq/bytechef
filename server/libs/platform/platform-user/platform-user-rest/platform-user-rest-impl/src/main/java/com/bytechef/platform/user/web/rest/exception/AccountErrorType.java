@@ -22,7 +22,8 @@ import org.springframework.http.HttpStatus;
 
 public enum AccountErrorType implements ErrorType {
 
-    USER_NOT_FOUND(100, HttpStatus.INTERNAL_SERVER_ERROR), ORGANIZATION_ALREADY_EXISTS(101, HttpStatus.BAD_REQUEST);
+    USER_NOT_FOUND(100, HttpStatus.INTERNAL_SERVER_ERROR), ORGANIZATION_ALREADY_EXISTS(101, HttpStatus.BAD_REQUEST),
+    SIGN_UP_DISABLED(102, HttpStatus.BAD_REQUEST);
 
     private final int errorKey;
     private final HttpStatus status;

@@ -66,10 +66,8 @@ public class MailServiceImpl implements MailService {
         this.messageSource = messageSource;
         this.templateEngine = templateEngine;
 
-        if (StringUtils.isBlank(mail.getHost())) {
-            if (log.isWarnEnabled()) {
-                log.warn("Mail server is not configured, not sending mail");
-            }
+        if (StringUtils.isBlank(mail.getHost()) && log.isWarnEnabled()) {
+            log.warn("Mail server is not configured, not sending mail");
         }
     }
 
