@@ -31,18 +31,17 @@ const WorkflowNodesPopoverMenuOperationList = ({
     trigger?: boolean;
 }) => {
     const {setLatestComponentDefinition, setWorkflow, workflow} = useWorkflowDataStore();
+    const {currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
 
-    const {componentNames} = workflow;
+    const {captureComponentUsed} = useAnalytics();
 
     const {getEdge, getNode, getNodes, setEdges, setNodes} = useReactFlow();
 
     const {updateWorkflowMutation} = useWorkflowMutation();
 
-    const {currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
-
-    const {captureComponentUsed} = useAnalytics();
-
     const queryClient = useQueryClient();
+
+    const {componentNames} = workflow;
 
     const {actions, icon, name, title, triggers, version} = componentDefinition;
 
