@@ -1,7 +1,7 @@
 # Contributing to ByteChef
 
-Thanks for taking the time for contribution to ByteChef!
-We're very welcoming community and while it's very much appreciated if you follow these guidelines it's not a requirement.
+Thanks for taking the time to contribute to ByteChef!
+We're a very welcoming community and while it's very much appreciated if you follow these guidelines it's not a requirement.
 ![anl-contributing-md](https://static.scarf.sh/a.png?x-pxid=a1e692ba-38cb-4361-a10b-b013c5e691b6)
 
 ### TABLE OF CONTENTS
