@@ -36,10 +36,10 @@ const IntegrationInstanceConfigurationListItem = ({
 }: IntegrationInstanceConfigurationListItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [showUpdateIntegrationVersionDialog, setShowUpdateIntegrationVersionDialog] = useState(false);
     const setIntegrationInstanceConfigurationEnabled = useIntegrationInstanceConfigurationsEnabledStore(
         ({setIntegrationInstanceConfigurationEnabled}) => setIntegrationInstanceConfigurationEnabled
     );
-    const [showUpdateIntegrationVersionDialog, setShowUpdateIntegrationVersionDialog] = useState(false);
 
     const {captureIntegrationInstanceConfigurationEnabled} = useAnalytics();
 
