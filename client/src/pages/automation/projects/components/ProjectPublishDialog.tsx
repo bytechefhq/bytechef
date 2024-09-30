@@ -3,6 +3,7 @@ import {DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/com
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import {useToast} from '@/components/ui/use-toast';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {usePublishProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
@@ -13,12 +14,16 @@ import {useState} from 'react';
 const ProjectPublishDialog = ({onClose, project}: {onClose: () => void; project: Project}) => {
     const [description, setDescription] = useState<string | undefined>(undefined);
 
+    const {captureProjectPublished} = useAnalytics();
+
     const {toast} = useToast();
 
     const queryClient = useQueryClient();
 
     const publishProjectMutation = usePublishProjectMutation({
         onSuccess: () => {
+            captureProjectPublished();
+
             queryClient.invalidateQueries({
                 queryKey: ProjectKeys.projects,
             });

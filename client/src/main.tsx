@@ -65,6 +65,10 @@ function renderApp() {
 
     const router = getRouter(queryClient);
 
+    router.subscribe(() => {
+        posthog.capture('$pageview');
+    });
+
     root.render(
         <React.StrictMode>
             <ThemeProvider defaultTheme="light">

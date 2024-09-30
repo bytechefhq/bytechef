@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/components/ui/use-toast';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {useDuplicateProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {useCreateProjectWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
@@ -28,6 +29,8 @@ const ProjectHeaderProjectDropDownMenu = ({
 }) => {
     const hiddenFileInputRef = useRef<HTMLInputElement>(null);
 
+    const {captureProjectWorkflowImported} = useAnalytics();
+
     const navigate = useNavigate();
 
     const {toast} = useToast();
@@ -44,6 +47,8 @@ const ProjectHeaderProjectDropDownMenu = ({
 
     const importProjectWorkflowMutation = useCreateProjectWorkflowMutation({
         onSuccess: () => {
+            captureProjectWorkflowImported();
+
             queryClient.invalidateQueries({queryKey: ProjectKeys.project(project.id!)});
 
             if (hiddenFileInputRef.current) {

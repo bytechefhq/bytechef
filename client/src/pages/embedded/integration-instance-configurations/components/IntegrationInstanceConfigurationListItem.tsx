@@ -5,6 +5,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import IntegrationInstanceConfigurationListItemAlertDialog from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationListItemAlertDialog';
 import IntegrationInstanceConfigurationListItemDropdownMenu from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationListItemDropdownMenu';
 import {useIntegrationInstanceConfigurationsEnabledStore} from '@/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationsEnabledStore';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {IntegrationInstanceConfiguration, Tag} from '@/shared/middleware/embedded/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {
@@ -40,6 +41,8 @@ const IntegrationInstanceConfigurationListItem = ({
     );
     const [showUpdateIntegrationVersionDialog, setShowUpdateIntegrationVersionDialog] = useState(false);
 
+    const {captureIntegrationInstanceConfigurationEnabled} = useAnalytics();
+
     const queryClient = useQueryClient();
 
     const deleteIntegrationInstanceConfigurationMutation = useDeleteIntegrationInstanceConfigurationMutation({
@@ -66,6 +69,8 @@ const IntegrationInstanceConfigurationListItem = ({
 
     const enableIntegrationInstanceConfigurationMutation = useEnableIntegrationInstanceConfigurationMutation({
         onSuccess: () => {
+            captureIntegrationInstanceConfigurationEnabled();
+
             queryClient.invalidateQueries({
                 queryKey: IntegrationInstanceConfigurationKeys.integrationInstanceConfigurations,
             });

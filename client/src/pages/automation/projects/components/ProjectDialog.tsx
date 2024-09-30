@@ -13,6 +13,7 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Category, Project, Tag} from '@/shared/middleware/automation/configuration';
 import {useCreateProjectMutation, useUpdateProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {ProjectCategoryKeys, useGetProjectCategoriesQuery} from '@/shared/queries/automation/projectCategories.queries';
@@ -33,6 +34,8 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
     const [isOpen, setIsOpen] = useState(!triggerNode);
 
     const {currentWorkspaceId} = useWorkspaceStore();
+
+    const {captureProjectCreated} = useAnalytics();
 
     const form = useForm<Project>({
         defaultValues: {
@@ -62,6 +65,8 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
     const queryClient = useQueryClient();
 
     const onSuccess = (project: Project) => {
+        captureProjectCreated();
+
         queryClient.invalidateQueries({
             queryKey: ProjectKeys.project(project.id!),
         });

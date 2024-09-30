@@ -23,6 +23,7 @@ import {useToast} from '@/components/ui/use-toast';
 import IntegrationDialog from '@/pages/embedded/integrations/components/IntegrationDialog';
 import IntegrationPublishDialog from '@/pages/embedded/integrations/components/IntegrationPublishDialog';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Integration, Tag} from '@/shared/middleware/embedded/configuration';
 import {
     useDeleteIntegrationMutation,
@@ -56,6 +57,8 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
 
     const hiddenFileInputRef = useRef<HTMLInputElement>(null);
 
+    const {captureIntegrationWorkflowCreated, captureIntegrationWorkflowImported} = useAnalytics();
+
     const navigate = useNavigate();
 
     const {toast} = useToast();
@@ -68,6 +71,8 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
 
     const createIntegrationWorkflowMutation = useCreateIntegrationWorkflowMutation({
         onSuccess: (workflow) => {
+            captureIntegrationWorkflowCreated();
+
             navigate(
                 `/embedded/integrations/${integration.id}/integration-workflows/${workflow?.integrationWorkflowId}`
             );
@@ -92,6 +97,8 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
 
     const importIntegrationWorkflowMutation = useCreateIntegrationWorkflowMutation({
         onSuccess: () => {
+            captureIntegrationWorkflowImported();
+
             queryClient.invalidateQueries({
                 queryKey: IntegrationKeys.integrations,
             });

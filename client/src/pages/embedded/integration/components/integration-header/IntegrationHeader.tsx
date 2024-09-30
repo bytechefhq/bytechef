@@ -14,6 +14,7 @@ import IntegrationDialog from '@/pages/embedded/integrations/components/Integrat
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Integration, Workflow} from '@/shared/middleware/embedded/configuration';
 import {WorkflowTestApi} from '@/shared/middleware/platform/workflow/test';
 import {useDeleteIntegrationMutation} from '@/shared/mutations/embedded/integrations.mutations';
@@ -62,6 +63,8 @@ const IntegrationHeader = ({
     } = useWorkflowEditorStore();
     const {setWorkflow, workflow} = useWorkflowDataStore();
 
+    const {captureIntegrationWorkflowCreated, captureIntegrationWorkflowTested} = useAnalytics();
+
     const navigate = useNavigate();
 
     const {componentNames, nodeNames} = workflow;
@@ -76,6 +79,8 @@ const IntegrationHeader = ({
 
     const createIntegrationWorkflowMutation = useCreateIntegrationWorkflowMutation({
         onSuccess: (workflow) => {
+            captureIntegrationWorkflowCreated();
+
             queryClient.invalidateQueries({
                 queryKey: IntegrationWorkflowKeys.integrationWorkflows(integrationId),
             });
@@ -156,6 +161,8 @@ const IntegrationHeader = ({
         }
 
         if (workflow.id) {
+            captureIntegrationWorkflowTested();
+
             workflowTestApi
                 .testWorkflow({
                     id: workflow.id,

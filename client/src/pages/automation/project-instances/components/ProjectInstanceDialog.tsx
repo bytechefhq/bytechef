@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import {Form} from '@/components/ui/form';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-instances/stores/useWorkflowsEnabledStore';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {
     Environment,
     ProjectInstance,
@@ -54,6 +55,8 @@ const ProjectInstanceDialog = ({
         useShallow(({reset, setWorkflowEnabled}) => [reset, setWorkflowEnabled])
     );
 
+    const {captureProjectInstanceCreated} = useAnalytics();
+
     const form = useForm<ProjectInstance>({
         defaultValues: {
             description: projectInstance?.description || undefined,
@@ -82,6 +85,10 @@ const ProjectInstanceDialog = ({
     const queryClient = useQueryClient();
 
     const onSuccess = () => {
+        if (!projectInstance?.id) {
+            captureProjectInstanceCreated();
+        }
+
         queryClient.invalidateQueries({
             queryKey: ProjectInstanceKeys.projectInstances,
         });

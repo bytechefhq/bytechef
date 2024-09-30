@@ -13,6 +13,7 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Category, Integration, Tag} from '@/shared/middleware/embedded/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {
@@ -39,6 +40,8 @@ interface IntegrationDialogProps {
 
 const IntegrationDialog = ({integration, onClose, triggerNode}: IntegrationDialogProps) => {
     const [isOpen, setIsOpen] = useState(!triggerNode);
+
+    const {captureIntegrationCreated} = useAnalytics();
 
     const form = useForm<Integration>({
         defaultValues: {
@@ -71,6 +74,8 @@ const IntegrationDialog = ({integration, onClose, triggerNode}: IntegrationDialo
     const queryClient = useQueryClient();
 
     const onSuccess = () => {
+        captureIntegrationCreated();
+
         if (integration?.id) {
             queryClient.invalidateQueries({
                 queryKey: IntegrationKeys.integration(integration.id),

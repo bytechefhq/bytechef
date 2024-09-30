@@ -5,6 +5,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectInstanceListItemAlertDialog from '@/pages/automation/project-instances/components/ProjectInstanceListItemAlertDialog';
 import ProjectInstanceListItemDropdownMenu from '@/pages/automation/project-instances/components/ProjectInstanceListItemDropdownMenu';
 import {useProjectInstancesEnabledStore} from '@/pages/automation/project-instances/stores/useProjectInstancesEnabledStore';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {ProjectInstance, Tag} from '@/shared/middleware/automation/configuration';
 import {useUpdateProjectInstanceTagsMutation} from '@/shared/mutations/automation/projectInstanceTags.mutations';
 import {
@@ -34,6 +35,8 @@ const ProjectInstanceListItem = ({projectInstance, remainingTags}: ProjectInstan
         ({setProjectInstanceEnabled}) => setProjectInstanceEnabled
     );
 
+    const {captureProjectInstanceEnabled} = useAnalytics();
+
     const queryClient = useQueryClient();
 
     const deleteProjectInstanceMutation = useDeleteProjectInstanceMutation({
@@ -60,6 +63,8 @@ const ProjectInstanceListItem = ({projectInstance, remainingTags}: ProjectInstan
 
     const enableProjectInstanceMutation = useEnableProjectInstanceMutation({
         onSuccess: () => {
+            captureProjectInstanceEnabled();
+
             queryClient.invalidateQueries({
                 queryKey: ProjectInstanceKeys.projectInstances,
             });
