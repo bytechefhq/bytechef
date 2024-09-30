@@ -31,9 +31,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @author Igor Beslic
  */
 @Configuration
-@Profile({
-    "docker"
-})
+@Profile("prod")
 public class StaticResourcesWebConfiguration implements WebMvcConfigurer {
 
     private static final Logger logger = LoggerFactory.getLogger(StaticResourcesWebConfiguration.class);

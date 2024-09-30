@@ -1,7 +1,0 @@
-springdoc:
-  api-docs:
-    enabled: false
-
-bytechef:
-  resources:
-    web: file:///opt/bytechef/client/

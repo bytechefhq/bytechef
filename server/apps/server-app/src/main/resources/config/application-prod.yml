@@ -33,3 +33,5 @@ bytechef:
     url: jdbc:postgresql://localhost:5432/bytechef
     username: root
     password:
+  resources:
+    web: file:///opt/bytechef/client/
