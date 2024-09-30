@@ -1,3 +1,4 @@
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {ActionDefinitionApi, ComponentDefinition} from '@/shared/middleware/platform/configuration';
 import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
@@ -39,6 +40,8 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
     const {currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
 
+    const {captureComponentUsed} = useAnalytics();
+
     const queryClient = useQueryClient();
 
     const {actions, icon, name, title, triggers, version} = componentDefinition;
@@ -55,6 +58,8 @@ const WorkflowNodesPopoverMenuOperationList = ({
         setLatestComponentDefinition(componentDefinition);
 
         if (trigger) {
+            captureComponentUsed(componentName, undefined, operationName);
+
             const placeholderNode = getNode(id);
 
             setNodes((nodes: Node[]) =>
@@ -145,6 +150,8 @@ const WorkflowNodesPopoverMenuOperationList = ({
             if (!clickedEdge) {
                 return;
             }
+
+            captureComponentUsed(componentName, operationName, undefined);
 
             const nodes = getNodes();
 
@@ -268,6 +275,8 @@ const WorkflowNodesPopoverMenuOperationList = ({
             if (!placeholderNode) {
                 return;
             }
+
+            captureComponentUsed(componentName, operationName, undefined);
 
             const placeholderId = placeholderNode.id;
             const childPlaceholderId = getRandomId();

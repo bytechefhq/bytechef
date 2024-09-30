@@ -1,4 +1,5 @@
 import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {
     ActionDefinitionApi,
     ComponentDefinitionApi,
@@ -28,6 +29,8 @@ export default function useHandleDrop(): [
     const {setWorkflow, workflow} = useWorkflowDataStore();
 
     const {componentNames} = workflow;
+
+    const {captureComponentUsed} = useAnalytics();
 
     const {getEdges, getNodes, setEdges, setNodes} = useReactFlow();
 
@@ -133,6 +136,12 @@ export default function useHandleDrop(): [
             queryKey: ActionDefinitionKeys.actionDefinition(getActionDefinitionRequest),
         });
 
+        captureComponentUsed(
+            newWorkflowNode.data.componentName,
+            draggedComponentDefinition.actions?.[0].name,
+            undefined
+        );
+
         saveWorkflowDefinition(
             {
                 ...newWorkflowNode.data,
@@ -237,6 +246,12 @@ export default function useHandleDrop(): [
             queryKey: ActionDefinitionKeys.actionDefinition(getActionDefinitionRequest),
         });
 
+        captureComponentUsed(
+            newWorkflowNode.data.componentName,
+            draggedComponentDefinition.actions?.[0].name,
+            undefined
+        );
+
         saveWorkflowDefinition(
             {
                 ...newWorkflowNode.data,
@@ -316,6 +331,8 @@ export default function useHandleDrop(): [
 
             return nodes;
         });
+
+        captureComponentUsed(name, undefined, triggers?.[0].name);
 
         saveWorkflowDefinition(
             {

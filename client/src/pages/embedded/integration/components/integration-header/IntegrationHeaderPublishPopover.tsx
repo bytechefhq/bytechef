@@ -4,6 +4,7 @@ import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Textarea} from '@/components/ui/textarea';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/components/ui/use-toast';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Integration} from '@/shared/middleware/embedded/configuration';
 import {usePublishIntegrationMutation} from '@/shared/mutations/embedded/integrations.mutations';
 import {IntegrationKeys} from '@/shared/queries/embedded/integrations.queries';
@@ -21,6 +22,8 @@ const formSchema = z.object({
 const IntegrationHeaderPublishPopover = ({integration}: {integration: Integration}) => {
     const [open, setOpen] = useState(false);
 
+    const {captureIntegrationPublished} = useAnalytics();
+
     const {toast} = useToast();
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -33,6 +36,8 @@ const IntegrationHeaderPublishPopover = ({integration}: {integration: Integratio
 
     const publishIntegrationMutation = usePublishIntegrationMutation({
         onSuccess: () => {
+            captureIntegrationPublished();
+
             queryClient.invalidateQueries({
                 queryKey: IntegrationKeys.integration(integration.id!),
             });

@@ -5,6 +5,7 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/compo
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {useRegisterStore} from '@/pages/account/public/stores/useRegisterStore';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {zodResolver} from '@hookform/resolvers/zod';
@@ -27,6 +28,8 @@ export const Register = () => {
         signUp: {activationRequired},
     } = useApplicationInfoStore();
 
+    const {captureUserSignedUp} = useAnalytics();
+
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
             // firstName: '',
@@ -39,6 +42,7 @@ export const Register = () => {
 
     const {
         formState: {isSubmitting},
+        getValues,
     } = form;
 
     const navigate = useNavigate();
@@ -50,13 +54,15 @@ export const Register = () => {
     }
 
     useEffect(() => {
-        form.reset({});
-
         if (registerSuccess) {
+            captureUserSignedUp(getValues().email);
+
             if (activationRequired) {
                 navigate('/verify-email');
             }
         }
+
+        form.reset({});
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [registerSuccess]);

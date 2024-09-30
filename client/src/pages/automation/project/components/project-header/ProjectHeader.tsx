@@ -15,6 +15,7 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
 import {WorkflowTestApi} from '@/shared/middleware/platform/workflow/test';
 import {useDeleteProjectMutation} from '@/shared/mutations/automation/projects.mutations';
@@ -66,6 +67,8 @@ const ProjectHeader = ({
 
     const {setCurrentNode} = useWorkflowNodeDetailsPanelStore();
 
+    const {captureProjectWorkflowCreated, captureProjectWorkflowTested} = useAnalytics();
+
     const navigate = useNavigate();
 
     const {componentNames, nodeNames} = workflow;
@@ -76,6 +79,8 @@ const ProjectHeader = ({
 
     const createProjectWorkflowMutation = useCreateProjectWorkflowMutation({
         onSuccess: (workflow) => {
+            captureProjectWorkflowCreated();
+
             queryClient.invalidateQueries({
                 queryKey: ProjectWorkflowKeys.projectWorkflows(projectId),
             });
@@ -154,6 +159,8 @@ const ProjectHeader = ({
         }
 
         if (workflow.id) {
+            captureProjectWorkflowTested();
+
             workflowTestApi
                 .testWorkflow({
                     id: workflow.id,

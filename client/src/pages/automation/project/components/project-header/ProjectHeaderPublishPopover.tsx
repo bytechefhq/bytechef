@@ -5,6 +5,7 @@ import {Textarea} from '@/components/ui/textarea';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/components/ui/use-toast';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {usePublishProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
@@ -24,6 +25,8 @@ const ProjectHeaderPublishPopover = ({project}: {project: Project}) => {
 
     const {currentWorkspaceId} = useWorkspaceStore();
 
+    const {captureProjectPublished} = useAnalytics();
+
     const {toast} = useToast();
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -36,6 +39,8 @@ const ProjectHeaderPublishPopover = ({project}: {project: Project}) => {
 
     const publishProjectMutation = usePublishProjectMutation({
         onSuccess: () => {
+            captureProjectPublished();
+
             queryClient.invalidateQueries({
                 queryKey: ProjectKeys.project(project.id!),
             });

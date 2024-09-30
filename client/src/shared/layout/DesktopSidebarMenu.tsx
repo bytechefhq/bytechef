@@ -13,6 +13,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useGetUserWorkspacesQuery} from '@/shared/queries/automation/workspaces.queries';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
@@ -26,6 +27,8 @@ const DesktopSidebarMenu = () => {
     const {account, logout} = useAuthenticationStore();
     const {currentWorkspaceId, setCurrentWorkspaceId} = useWorkspaceStore();
 
+    const {reset: resetAnalytics} = useAnalytics();
+
     const {pathname} = useLocation();
 
     const navigate = useNavigate();
@@ -35,6 +38,8 @@ const DesktopSidebarMenu = () => {
 
     const handleLogOutClick = () => {
         logout();
+
+        resetAnalytics();
     };
 
     const handleWorkflowValueChange = (value: string) => {

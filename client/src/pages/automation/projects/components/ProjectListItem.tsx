@@ -22,6 +22,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/components/ui/use-toast';
 import ProjectPublishDialog from '@/pages/automation/projects/components/ProjectPublishDialog';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Project, Tag} from '@/shared/middleware/automation/configuration';
 import {useUpdateProjectTagsMutation} from '@/shared/mutations/automation/projectTags.mutations';
 import {useDeleteProjectMutation, useDuplicateProjectMutation} from '@/shared/mutations/automation/projects.mutations';
@@ -52,6 +53,8 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
     const hiddenFileInputRef = useRef<HTMLInputElement>(null);
 
+    const {captureProjectWorkflowCreated, captureProjectWorkflowImported} = useAnalytics();
+
     const navigate = useNavigate();
 
     const {toast} = useToast();
@@ -60,6 +63,8 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
     const createProjectWorkflowMutation = useCreateProjectWorkflowMutation({
         onSuccess: (workflow) => {
+            captureProjectWorkflowCreated();
+
             navigate(`/automation/projects/${project.id}/project-workflows/${workflow?.projectWorkflowId}`);
 
             setShowWorkflowDialog(false);
@@ -86,6 +91,8 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
     const importProjectWorkflowMutation = useCreateProjectWorkflowMutation({
         onSuccess: () => {
+            captureProjectWorkflowImported();
+
             queryClient.invalidateQueries({
                 queryKey: ProjectKeys.projects,
             });

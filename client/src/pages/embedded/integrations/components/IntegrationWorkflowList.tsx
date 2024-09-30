@@ -3,6 +3,7 @@ import {Button} from '@/components/ui/button';
 import {Skeleton} from '@/components/ui/skeleton';
 import IntegrationWorkflowListItem from '@/pages/embedded/integrations/components/IntegrationWorkflowListItem';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Integration} from '@/shared/middleware/embedded/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useCreateIntegrationWorkflowMutation} from '@/shared/mutations/embedded/workflows.mutations';
@@ -18,6 +19,8 @@ const IntegrationWorkflowList = ({integration}: {integration: Integration}) => {
         actionDefinitions: true,
         triggerDefinitions: true,
     });
+
+    const {captureIntegrationWorkflowCreated} = useAnalytics();
 
     const navigate = useNavigate();
 
@@ -38,6 +41,8 @@ const IntegrationWorkflowList = ({integration}: {integration: Integration}) => {
 
     const createIntegrationWorkflowMutation = useCreateIntegrationWorkflowMutation({
         onSuccess: (workflow) => {
+            captureIntegrationWorkflowCreated();
+
             navigate(
                 `/embedded/integrations/${integration.id}/integration-workflows/${workflow?.integrationWorkflowId}`
             );

@@ -3,6 +3,7 @@ import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} fro
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import {useToast} from '@/components/ui/use-toast';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Integration} from '@/shared/middleware/embedded/configuration';
 import {usePublishIntegrationMutation} from '@/shared/mutations/embedded/integrations.mutations';
 import {IntegrationKeys} from '@/shared/queries/embedded/integrations.queries';
@@ -12,12 +13,16 @@ import {useState} from 'react';
 const IntegrationPublishDialog = ({integration, onClose}: {integration: Integration; onClose: () => void}) => {
     const [description, setDescription] = useState<string | undefined>(undefined);
 
+    const {captureIntegrationPublished} = useAnalytics();
+
     const {toast} = useToast();
 
     const queryClient = useQueryClient();
 
     const publishIntegrationMutation = usePublishIntegrationMutation({
         onSuccess: () => {
+            captureIntegrationPublished();
+
             queryClient.invalidateQueries({
                 queryKey: IntegrationKeys.integrations,
             });

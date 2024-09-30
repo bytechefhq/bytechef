@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/components/ui/use-toast';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useCreateIntegrationWorkflowMutation} from '@/shared/mutations/embedded/workflows.mutations';
 import {IntegrationKeys} from '@/shared/queries/embedded/integrations.queries';
 import {useQueryClient} from '@tanstack/react-query';
@@ -25,12 +26,16 @@ const IntegrationHeaderIntegrationDropDownMenu = ({
 }) => {
     const hiddenFileInputRef = useRef<HTMLInputElement>(null);
 
+    const {captureIntegrationWorkflowImported} = useAnalytics();
+
     const {toast} = useToast();
 
     const queryClient = useQueryClient();
 
     const importIntegrationWorkflowMutation = useCreateIntegrationWorkflowMutation({
         onSuccess: () => {
+            captureIntegrationWorkflowImported();
+
             queryClient.invalidateQueries({queryKey: IntegrationKeys.integration(integrationId)});
 
             if (hiddenFileInputRef.current) {

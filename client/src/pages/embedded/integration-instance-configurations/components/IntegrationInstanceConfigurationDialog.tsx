@@ -12,6 +12,7 @@ import {Form} from '@/components/ui/form';
 import IntegrationInstanceConfigurationDialogOauth2Step from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationDialogOauth2Step';
 import {useWorkflowsEnabledStore} from '@/pages/embedded/integration-instance-configurations/stores/useWorkflowsEnabledStore';
 import ConnectionParameters from '@/pages/platform/connection/components/ConnectionParameters';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Environment, IntegrationInstanceConfiguration} from '@/shared/middleware/embedded/configuration';
 import {AuthorizationType} from '@/shared/middleware/platform/configuration';
 import {
@@ -55,6 +56,8 @@ const IntegrationInstanceConfigurationDialog = ({
 
     const [resetWorkflowsEnabledStore] = useWorkflowsEnabledStore(useShallow(({reset}) => [reset]));
 
+    const {captureIntegrationInstanceConfigurationCreated} = useAnalytics();
+
     const form = useForm<IntegrationInstanceConfiguration>({
         defaultValues: {
             description: integrationInstanceConfiguration?.description || undefined,
@@ -97,6 +100,10 @@ const IntegrationInstanceConfigurationDialog = ({
     const queryClient = useQueryClient();
 
     const onSuccess = () => {
+        if (!integrationInstanceConfiguration?.id) {
+            captureIntegrationInstanceConfigurationCreated();
+        }
+
         queryClient.invalidateQueries({
             queryKey: IntegrationInstanceConfigurationKeys.integrationInstanceConfigurations,
         });

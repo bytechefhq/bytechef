@@ -5,6 +5,7 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/compo
 import {Checkbox} from '@/components/ui/checkbox';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {zodResolver} from '@hookform/resolvers/zod';
@@ -21,7 +22,10 @@ const formSchema = z.object({
 });
 
 const Login = () => {
-    const {authenticated, getAccount, login, loginError, reset, sessionHasBeenFetched} = useAuthenticationStore();
+    const {account, authenticated, getAccount, login, loginError, reset, sessionHasBeenFetched} =
+        useAuthenticationStore();
+
+    const {identify} = useAnalytics();
 
     const pageLocation = useLocation();
 
@@ -62,9 +66,13 @@ const Login = () => {
 
     useEffect(() => {
         if (authenticated) {
+            if (account) {
+                identify(account);
+            }
+
             navigate('/');
         }
-    }, [authenticated, navigate]);
+    }, [account, authenticated, navigate, identify]);
 
     const {from} = pageLocation.state || {from: {pathname: '/', search: pageLocation.search}};
 
