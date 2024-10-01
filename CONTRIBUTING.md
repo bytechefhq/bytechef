@@ -169,20 +169,19 @@ ByteChef platform consists of three major parts. User interface is implemented w
     ../gradlew clean compileJava
     ```
 
-7. **Change working directory to the `BYTECHEF_HOME/server/apps/server-app` folder.**
-8. Start the ByteChef server instance by running:
+7. Start the ByteChef server instance by running:
 
     ```bash
-    ../../../gradlew bootRun
+    ../gradlew -p apps/server-app bootRun
     ```
-9. **Change working directory to the `BYTECHEF_HOME/client` folder.**
-10. Install dependencies.
+8. **Change working directory to the `BYTECHEF_HOME/client` folder.**
+9. Install dependencies.
 
     ```bash
     npm install
     ```
 
-11. Serve with hot reload.
+10. Serve with hot reload.
 
     ```bash
     npm run dev
