@@ -3,7 +3,6 @@ import {ProjectStatus} from '@/shared/middleware/automation/configuration';
 import {useGetProjectVersionsQuery} from '@/shared/queries/automation/projectVersions.queries';
 import {CheckIcon} from '@radix-ui/react-icons';
 import {Item, ItemIndicator, ItemText} from '@radix-ui/react-select';
-import {twMerge} from 'tailwind-merge';
 
 const ProjectInstanceDialogBasicStepProjectVersionsSelect = ({
     onChange,
@@ -33,9 +32,7 @@ const ProjectInstanceDialogBasicStepProjectVersionsSelect = ({
                         (projectVersion) =>
                             projectVersion.status == ProjectStatus.Published && (
                                 <Item
-                                    className={twMerge(
-                                        'radix-disabled:opacity-50 flex cursor-pointer select-none items-center overflow-hidden rounded-md px-8 py-2 text-sm font-medium text-gray-700 focus:bg-gray-100 focus:outline-none'
-                                    )}
+                                    className="radix-disabled:opacity-50 flex cursor-pointer select-none items-center overflow-hidden rounded-md p-2 text-sm font-medium text-gray-700 focus:bg-gray-100 focus:outline-none"
                                     key={projectVersion.version}
                                     value={projectVersion.version!.toString()}
                                 >
