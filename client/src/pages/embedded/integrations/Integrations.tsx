@@ -9,6 +9,7 @@ import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav
 import {useGetIntegrationCategoriesQuery} from '@/shared/queries/embedded/integrationCategories.queries';
 import {useGetIntegrationTagsQuery} from '@/shared/queries/embedded/integrationTags.quries';
 import {useGetIntegrationsQuery} from '@/shared/queries/embedded/integrations.queries';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {SquareIcon, TagIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
@@ -32,6 +33,8 @@ const Integrations = () => {
     };
 
     const [filterData, setFilterData] = useState<{id?: number | string; type: Type}>(defaultCurrentState);
+
+    const ff_743 = useFeatureFlagsStore((state) => state.isFeatureFlagEnabled('ff-743'));
 
     const navigate = useNavigate();
 
@@ -135,57 +138,61 @@ const Integrations = () => {
                         title="Tags"
                     />
 
-                    <LeftSidebarNav
-                        body={
-                            <>
-                                <LeftSidebarNavItem
-                                    item={{
-                                        current: filterData?.id === 'accounting' && filterData.type === Type.UnifiedAPI,
-                                        id: 'accounting',
-                                        name: 'Accounting',
-                                        onItemClick: (id?: number | string) => {
-                                            setFilterData({
-                                                id: id as number,
-                                                type: Type.UnifiedAPI,
-                                            });
-                                        },
-                                    }}
-                                    toLink="?unifiedApiCategory=accounting"
-                                />
+                    {ff_743 && (
+                        <LeftSidebarNav
+                            body={
+                                <>
+                                    <LeftSidebarNavItem
+                                        item={{
+                                            current:
+                                                filterData?.id === 'accounting' && filterData.type === Type.UnifiedAPI,
+                                            id: 'accounting',
+                                            name: 'Accounting',
+                                            onItemClick: (id?: number | string) => {
+                                                setFilterData({
+                                                    id: id as number,
+                                                    type: Type.UnifiedAPI,
+                                                });
+                                            },
+                                        }}
+                                        toLink="?unifiedApiCategory=accounting"
+                                    />
 
-                                <LeftSidebarNavItem
-                                    item={{
-                                        current: filterData?.id === 'commerce' && filterData.type === Type.UnifiedAPI,
-                                        id: 'commerce',
-                                        name: 'Commerce',
-                                        onItemClick: (id?: number | string) => {
-                                            setFilterData({
-                                                id: id as number,
-                                                type: Type.UnifiedAPI,
-                                            });
-                                        },
-                                    }}
-                                    toLink="?unifiedApiCategory=commerce"
-                                />
+                                    <LeftSidebarNavItem
+                                        item={{
+                                            current:
+                                                filterData?.id === 'commerce' && filterData.type === Type.UnifiedAPI,
+                                            id: 'commerce',
+                                            name: 'Commerce',
+                                            onItemClick: (id?: number | string) => {
+                                                setFilterData({
+                                                    id: id as number,
+                                                    type: Type.UnifiedAPI,
+                                                });
+                                            },
+                                        }}
+                                        toLink="?unifiedApiCategory=commerce"
+                                    />
 
-                                <LeftSidebarNavItem
-                                    item={{
-                                        current: filterData?.id === 'crm' && filterData.type === Type.UnifiedAPI,
-                                        id: 'crm',
-                                        name: 'CRM',
-                                        onItemClick: (id?: number | string) => {
-                                            setFilterData({
-                                                id: id as string,
-                                                type: Type.UnifiedAPI,
-                                            });
-                                        },
-                                    }}
-                                    toLink="?unifiedApiCategory=crm"
-                                />
-                            </>
-                        }
-                        title="Unified API"
-                    />
+                                    <LeftSidebarNavItem
+                                        item={{
+                                            current: filterData?.id === 'crm' && filterData.type === Type.UnifiedAPI,
+                                            id: 'crm',
+                                            name: 'CRM',
+                                            onItemClick: (id?: number | string) => {
+                                                setFilterData({
+                                                    id: id as string,
+                                                    type: Type.UnifiedAPI,
+                                                });
+                                            },
+                                        }}
+                                        toLink="?unifiedApiCategory=crm"
+                                    />
+                                </>
+                            }
+                            title="Unified API"
+                        />
+                    )}
                 </>
             }
             leftSidebarHeader={<Header position="sidebar" title="Integrations" />}
