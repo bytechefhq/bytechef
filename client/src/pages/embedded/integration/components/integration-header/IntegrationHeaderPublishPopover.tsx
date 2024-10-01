@@ -16,7 +16,7 @@ import {useForm} from 'react-hook-form';
 import * as z from 'zod';
 
 const formSchema = z.object({
-    description: z.string().max(256),
+    description: z.string().max(256).optional(),
 });
 
 const IntegrationHeaderPublishPopover = ({integration}: {integration: Integration}) => {
@@ -54,7 +54,7 @@ const IntegrationHeaderPublishPopover = ({integration}: {integration: Integratio
         },
     });
 
-    function publishIntegration({description}: {description: string}) {
+    function publishIntegration({description}: {description?: string}) {
         publishIntegrationMutation.mutate({
             id: integration.id!,
             publishIntegrationRequest: {
