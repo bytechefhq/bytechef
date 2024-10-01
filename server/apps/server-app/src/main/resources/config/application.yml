@@ -20,6 +20,7 @@ info:
     postHog:
       apiKey: ${bytechef.analytics.post-hog.api-key}
       host: ${bytechef.analytics.post-hog.host}
+  featureFlags: ${bytechef.featureFlags}
 
 management:
   endpoints:
