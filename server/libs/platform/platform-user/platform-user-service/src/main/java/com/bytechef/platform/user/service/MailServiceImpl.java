@@ -69,6 +69,7 @@ public class MailServiceImpl implements MailService {
         if (StringUtils.isBlank(mail.getHost()) && log.isWarnEnabled()) {
             log.warn("Mail server is not configured, not sending mail");
         }
+
     }
 
     @Override
