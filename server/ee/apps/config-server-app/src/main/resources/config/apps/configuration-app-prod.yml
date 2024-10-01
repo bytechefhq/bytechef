@@ -1,7 +1,0 @@
-#####
-
-bytechef:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/bytechef_configuration
-    username: root
-    password:

@@ -53,13 +53,13 @@ public class TaskWorkerMessageBrokerConfigurerConfiguration {
         TaskWorkerDelegate taskWorkerDelegate = new TaskWorkerDelegate(messageEventPostReceiveProcessors, taskWorker);
 
         return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
-            Map<String, Object> subscriptions = applicationProperties.getWorker()
+            Map<String, Integer> subscriptions = applicationProperties.getWorker()
                 .getTask()
                 .getSubscriptions();
 
             subscriptions.forEach((routeName, concurrency) -> messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar, TaskWorkerMessageRoute.ofTaskMessageRoute(routeName),
-                Integer.parseInt((String) concurrency), taskWorkerDelegate, "onTaskExecutionEvent"));
+                concurrency, taskWorkerDelegate, "onTaskExecutionEvent"));
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar, TaskWorkerMessageRoute.CONTROL_EVENTS, 1, taskWorkerDelegate,

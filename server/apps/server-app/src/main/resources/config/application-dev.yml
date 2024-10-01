@@ -20,13 +20,16 @@ spring:
 bytechef:
   datasource:
     # PostgreSQL database
+    #    url: jdbc:postgresql://localhost:5432/bytechef
+    #    username: postgres
+    #    password: postgres
+    # H2 database
+    #    url: jdbc:h2:file:~/.bytechef/bytechef;DB_CLOSE_ON_EXIT=FALSE;CASE_INSENSITIVE_IDENTIFIERS=TRUE
+    #    username: sa
+    #    password:
     url: jdbc:postgresql://localhost:5432/bytechef
     username: postgres
     password: postgres
-    # H2 database
-#    url: jdbc:h2:file:~/.bytechef/bytechef;DB_CLOSE_ON_EXIT=FALSE;CASE_INSENSITIVE_IDENTIFIERS=TRUE
-#    username: sa
-#    password:
   mail:
     host: localhost
     port: 1025

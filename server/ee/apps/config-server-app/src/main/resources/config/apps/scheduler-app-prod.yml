@@ -1,6 +1,0 @@
-spring:
-  datasource:
-    type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://localhost:5432/bytechef_scheduler
-    username: root
-    password:
