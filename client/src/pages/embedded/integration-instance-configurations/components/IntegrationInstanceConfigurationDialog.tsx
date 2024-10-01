@@ -307,21 +307,17 @@ const IntegrationInstanceConfigurationDialog = ({
                         {integrationInstanceConfigurationDialogSteps[activeStepIndex].content}
                     </div>
 
-                    {integrationInstanceConfiguration?.id &&
-                        connectionDefinition &&
-                        !updateIntegrationInstanceConfigurationMutation && (
-                            <div className="py-4">
-                                <ConnectionParameters
-                                    authorizationParameters={
-                                        integrationInstanceConfiguration.connectionAuthorizationParameters
-                                    }
-                                    connectionDefinition={connectionDefinition}
-                                    connectionParameters={
-                                        integrationInstanceConfiguration.connectionConnectionParameters
-                                    }
-                                />
-                            </div>
-                        )}
+                    {integrationInstanceConfiguration?.id && connectionDefinition && !updateIntegrationVersion && (
+                        <div className="py-4">
+                            <ConnectionParameters
+                                authorizationParameters={
+                                    integrationInstanceConfiguration.connectionAuthorizationParameters
+                                }
+                                connectionDefinition={connectionDefinition}
+                                connectionParameters={integrationInstanceConfiguration.connectionConnectionParameters}
+                            />
+                        </div>
+                    )}
 
                     <DialogFooter>
                         {activeStepIndex === 0 && (
@@ -344,29 +340,25 @@ const IntegrationInstanceConfigurationDialog = ({
                             </>
                         )}
 
-                        {activeStepIndex === 1 &&
-                            oAuth2Authorization &&
-                            !updateIntegrationInstanceConfigurationMutation && (
-                                <>
-                                    <Button onClick={() => setActiveStepIndex(activeStepIndex - 1)} variant="outline">
-                                        Previous
-                                    </Button>
+                        {activeStepIndex === 1 && oAuth2Authorization && !updateIntegrationVersion && (
+                            <>
+                                <Button onClick={() => setActiveStepIndex(activeStepIndex - 1)} variant="outline">
+                                    Previous
+                                </Button>
 
-                                    {workflows && workflows?.length > 0 && (
-                                        <Button onClick={handleSubmit(handleNextClick)}>Next</Button>
-                                    )}
+                                {workflows && workflows?.length > 0 && (
+                                    <Button onClick={handleSubmit(handleNextClick)}>Next</Button>
+                                )}
 
-                                    {!workflows ||
-                                        (workflows?.length === 0 && (
-                                            <Button onClick={handleSubmit(handleSaveClick)}>Save</Button>
-                                        ))}
-                                </>
-                            )}
+                                {!workflows ||
+                                    (workflows?.length === 0 && (
+                                        <Button onClick={handleSubmit(handleSaveClick)}>Save</Button>
+                                    ))}
+                            </>
+                        )}
 
                         {((activeStepIndex === 1 && !oAuth2Authorization) ||
-                            (activeStepIndex === 1 &&
-                                oAuth2Authorization &&
-                                updateIntegrationInstanceConfigurationMutation) ||
+                            (activeStepIndex === 1 && oAuth2Authorization && updateIntegrationVersion) ||
                             (activeStepIndex === 2 && oAuth2Authorization)) &&
                             workflows &&
                             workflows?.length > 0 && (
