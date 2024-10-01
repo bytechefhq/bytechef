@@ -79,6 +79,16 @@ const IntegrationHeaderIntegrationDropDownMenu = ({
                 <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => onEdit()}>Edit</DropdownMenuItem>
 
+                    <DropdownMenuItem
+                        onClick={() => {
+                            if (hiddenFileInputRef.current) {
+                                hiddenFileInputRef.current.click();
+                            }
+                        }}
+                    >
+                        Import Workflow
+                    </DropdownMenuItem>
+
                     <DropdownMenuSeparator />
 
                     <DropdownMenuItem className="text-destructive" onClick={() => onDelete()}>
