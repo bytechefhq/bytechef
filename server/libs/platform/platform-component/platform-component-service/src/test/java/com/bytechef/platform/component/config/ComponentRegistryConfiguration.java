@@ -106,6 +106,19 @@ public class ComponentRegistryConfiguration {
     WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @Bean
+    ApplicationProperties applicationProperties() {
+        ApplicationProperties applicationProperties = new ApplicationProperties();
+
+        ApplicationProperties.Component component = new ApplicationProperties.Component();
+
+        component.setRegistry(new ApplicationProperties.Component.Registry());
+
+        applicationProperties.setComponent(component);
+
+        return applicationProperties;
+    }
+
+    @Bean
     List<ComponentHandler> componentHandlers() {
         return List.of(PETSTORE_COMPONENT_HANDLER);
     }

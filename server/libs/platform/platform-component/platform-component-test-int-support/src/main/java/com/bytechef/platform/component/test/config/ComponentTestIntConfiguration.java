@@ -99,6 +99,19 @@ public class ComponentTestIntConfiguration {
     }
 
     @Bean
+    ApplicationProperties applicationProperties() {
+        ApplicationProperties applicationProperties = new ApplicationProperties();
+
+        ApplicationProperties.Component component = new ApplicationProperties.Component();
+
+        component.setRegistry(new ApplicationProperties.Component.Registry());
+
+        applicationProperties.setComponent(component);
+
+        return applicationProperties;
+    }
+
+    @Bean
     ClassPathResourceWorkflowRepository classPathResourceWorkflowRepository(
         ResourcePatternResolver resourcePatternResolver) {
 

@@ -29,33 +29,36 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @SuppressFBWarnings("EI")
 public class ApplicationProperties {
 
+    /**
+     * Edition.
+     */
     public enum Edition {
         CE, EE
     }
 
-    private Analytics analytics;
-    private Cache cache;
+    private Analytics analytics = new Analytics();
+    private Cache cache = new Cache();
     private Cloud cloud = new Cloud();
     private Component component = new Component();
     private Coordinator coordinator = new Coordinator();
-    private Datasource datasource;
+    private Datasource datasource = new Datasource();
     private DataStorage dataStorage;
-    private DiscoveryService discoveryService;
+    private DiscoveryService discoveryService = new DiscoveryService();
     private Edition edition;
     private Encryption encryption;
-    private List<String> featureFlags;
-    private FileStorage fileStorage;
-    private Mail mail;
-    private MessageBroker messageBroker;
-    private Oauth2 oauth2;
+    private List<String> featureFlags = List.of();
+    private FileStorage fileStorage = new FileStorage();
+    private Mail mail = new Mail();
+    private MessageBroker messageBroker = new MessageBroker();
+    private Oauth2 oauth2 = new Oauth2();
     private String publicUrl;
-    private Resources resources;
-    private SignUp signUp;
+    private Resources resources = new Resources();
     private Security security;
-    private Tenant tenant;
+    private SignUp signUp = new SignUp();
+    private Tenant tenant = new Tenant();
     private String webhookUrl;
     private Worker worker = new Worker();
-    private Workflow workflow;
+    private Workflow workflow = new Workflow();
 
     public Analytics getAnalytics() {
         return analytics;
@@ -125,12 +128,12 @@ public class ApplicationProperties {
         return resources;
     }
 
-    public SignUp getSignUp() {
-        return signUp;
-    }
-
     public Security getSecurity() {
         return security;
+    }
+
+    public SignUp getSignUp() {
+        return signUp;
     }
 
     public Tenant getTenant() {
@@ -217,12 +220,12 @@ public class ApplicationProperties {
         this.resources = resources;
     }
 
-    public void setSignUp(SignUp signUp) {
-        this.signUp = signUp;
-    }
-
     public void setSecurity(Security security) {
         this.security = security;
+    }
+
+    public void setSignUp(SignUp signUp) {
+        this.signUp = signUp;
     }
 
     public void setTenant(Tenant tenant) {
@@ -241,9 +244,13 @@ public class ApplicationProperties {
         this.workflow = workflow;
     }
 
+    /**
+     * Analytics properties.
+     */
     public static class Analytics {
 
         private boolean enabled;
+
         private PostHog postHog = new PostHog();
 
         public boolean isEnabled() {
@@ -262,6 +269,9 @@ public class ApplicationProperties {
             this.postHog = postHog;
         }
 
+        /**
+         * PostHog properties.
+         */
         public static class PostHog {
 
             private String apiKey;
@@ -285,13 +295,19 @@ public class ApplicationProperties {
         }
     }
 
+    /**
+     * Cache properties.
+     */
     public static class Cache {
 
+        /**
+         * Cache provider.
+         */
         public enum Provider {
             REDIS, SIMPLE
         }
 
-        private Provider provider;
+        private Provider provider = Provider.SIMPLE;
 
         public Provider getProvider() {
             return provider;
@@ -302,14 +318,20 @@ public class ApplicationProperties {
         }
     }
 
+    /**
+     * Cloud properties.
+     */
     public static class Cloud {
 
+        /**
+         * Cloud provider.
+         */
         public enum Provider {
-            AWS
+            AWS, NONE
         }
 
-        private Aws aws = new Aws();
-        private Provider provider;
+        private Aws aws;
+        private Provider provider = Provider.NONE;
 
         public Aws getAws() {
             return aws;
@@ -327,6 +349,9 @@ public class ApplicationProperties {
             this.provider = provider;
         }
 
+        /**
+         * AWS properties.
+         */
         public static class Aws {
 
             private String accessKeyId;
@@ -368,6 +393,9 @@ public class ApplicationProperties {
         }
     }
 
+    /**
+     * Component properties.
+     */
     public static class Component {
 
         private Registry registry = new Registry();
@@ -380,9 +408,12 @@ public class ApplicationProperties {
             this.registry = registry;
         }
 
+        /**
+         * Registry properties.
+         */
         public static class Registry {
 
-            private List<String> exclude = List.of();
+            private List<String> exclude;
 
             public List<String> getExclude() {
                 return exclude;
@@ -394,6 +425,9 @@ public class ApplicationProperties {
         }
     }
 
+    /**
+     * Coordinator properties.
+     */
     public static class Coordinator {
 
         private boolean enabled = true;
@@ -424,6 +458,9 @@ public class ApplicationProperties {
             this.trigger = trigger;
         }
 
+        /**
+         * Task properties.
+         */
         public static class Task {
 
             private Subscriptions subscriptions = new Subscriptions();
@@ -436,6 +473,9 @@ public class ApplicationProperties {
                 this.subscriptions = subscriptions;
             }
 
+            /**
+             * Subscriptions properties.
+             */
             public static class Subscriptions {
 
                 private int applicationEvents = 1;
@@ -495,6 +535,9 @@ public class ApplicationProperties {
             }
         }
 
+        /**
+         * Trigger properties.
+         */
         public static class Trigger {
 
             private Subscriptions subscriptions = new Subscriptions();
@@ -517,13 +560,19 @@ public class ApplicationProperties {
                 this.subscriptions = subscriptions;
             }
 
+            /**
+             * Scheduler properties.
+             */
             public static class Scheduler {
 
+                /**
+                 * Scheduler provider.
+                 */
                 public enum Provider {
                     AWS, QUARTZ
                 }
 
-                private Provider provider;
+                private Provider provider = Provider.QUARTZ;
 
                 public Provider getProvider() {
                     return provider;
@@ -534,6 +583,9 @@ public class ApplicationProperties {
                 }
             }
 
+            /**
+             * Subscriptions properties.
+             */
             public static class Subscriptions {
 
                 private int applicationEvents = 1;
@@ -594,6 +646,9 @@ public class ApplicationProperties {
         }
     }
 
+    /**
+     * Datasource properties.
+     */
     public static class Datasource {
 
         private String password;
@@ -642,9 +697,12 @@ public class ApplicationProperties {
         }
     }
 
+    /**
+     * Discovery service properties.
+     */
     public static class DiscoveryService {
 
-        private Provider provider;
+        private Provider provider = Provider.REDIS;
 
         public Provider getProvider() {
             return provider;
@@ -654,21 +712,29 @@ public class ApplicationProperties {
             this.provider = provider;
         }
 
+        /**
+         * Discovery service provider.
+         */
         public enum Provider {
             REDIS
         }
     }
 
+    /**
+     * FileStorage properties.
+     */
     public static class FileStorage {
 
+        /**
+         * FileStorage provider.
+         */
         public enum Provider {
             AWS, FILESYSTEM, JDBC
         }
 
-        private Aws aws;
-
-        private Filesystem filesystem;
-        private Provider provider;
+        private Aws aws = new Aws();
+        private Filesystem filesystem = new Filesystem();
+        private Provider provider = Provider.FILESYSTEM;
 
         public Aws getAws() {
             return aws;
@@ -694,6 +760,9 @@ public class ApplicationProperties {
             this.provider = provider;
         }
 
+        /**
+         * AWS properties.
+         */
         public static class Aws {
 
             private String bucket;
@@ -707,6 +776,9 @@ public class ApplicationProperties {
             }
         }
 
+        /**
+         * Filesystem properties.
+         */
         public static class Filesystem {
 
             private String basedir;
@@ -721,13 +793,19 @@ public class ApplicationProperties {
         }
     }
 
+    /**
+     * Encryption properties.
+     */
     public static class Encryption {
 
+        /**
+         * Encryption provider.
+         */
         public enum Provider {
             AWS, FILESYSTEM;
         }
 
-        private Provider provider;
+        private Provider provider = Provider.FILESYSTEM;
 
         public Provider getProvider() {
             return provider;
@@ -738,13 +816,16 @@ public class ApplicationProperties {
         }
     }
 
+    /**
+     * Mail properties.
+     */
     public static class Mail {
 
         private String from;
         private String host;
         private String baseUrl;
         private String password;
-        private int port;
+        private int port = 25;
         private String tempDomainListUrl;
         private String username;
 
@@ -805,9 +886,16 @@ public class ApplicationProperties {
         }
     }
 
+    /**
+     * MessageBroker properties.
+     */
     public static class MessageBroker {
 
-        private Provider provider;
+        public enum Provider {
+            AMQP, AWS, JMS, KAFKA, REDIS
+        }
+
+        private Provider provider = Provider.JMS;
 
         public Provider getProvider() {
             return provider;
@@ -816,12 +904,11 @@ public class ApplicationProperties {
         public void setProvider(Provider provider) {
             this.provider = provider;
         }
-
-        public enum Provider {
-            AMQP, AWS, JMS, KAFKA, REDIS
-        }
     }
 
+    /**
+     * Oauth2 properties.
+     */
     public static class Oauth2 {
 
         private Map<String, OAuth2App> predefinedApps = new HashMap<>();
@@ -865,6 +952,9 @@ public class ApplicationProperties {
         }
     }
 
+    /**
+     * Resources properties.
+     */
     public static class Resources {
 
         private String web;
@@ -878,10 +968,13 @@ public class ApplicationProperties {
         }
     }
 
+    /**
+     * Security properties.
+     */
     public static class Security {
 
         private String contentSecurityPolicy;
-        private RememberMe rememberMe;
+        private RememberMe rememberMe = new RememberMe();
 
         public String getContentSecurityPolicy() {
             return contentSecurityPolicy;
@@ -899,6 +992,9 @@ public class ApplicationProperties {
             this.rememberMe = rememberMe;
         }
 
+        /**
+         * RememberMe properties.
+         */
         public static class RememberMe {
 
             private String key;
@@ -913,10 +1009,13 @@ public class ApplicationProperties {
         }
     }
 
+    /**
+     * Sign up properties.
+     */
     public static class SignUp {
 
         private boolean activationRequired;
-        private boolean enabled;
+        private boolean enabled = true;
 
         public boolean isActivationRequired() {
             return activationRequired;
@@ -935,9 +1034,19 @@ public class ApplicationProperties {
         }
     }
 
+    /**
+     * Tenant properties.
+     */
     public static class Tenant {
 
-        private Mode mode;
+        /**
+         * Tenant provider.
+         */
+        public enum Mode {
+            MULTI, SINGLE
+        }
+
+        private Mode mode = Mode.SINGLE;
 
         public Mode getMode() {
             return mode;
@@ -946,12 +1055,11 @@ public class ApplicationProperties {
         public void setMode(Mode mode) {
             this.mode = mode;
         }
-
-        public enum Mode {
-            MULTI, SINGLE
-        }
     }
 
+    /**
+     * Worker properties.
+     */
     public static class Worker {
 
         private boolean enabled = true;
@@ -973,24 +1081,30 @@ public class ApplicationProperties {
             this.task = task;
         }
 
+        /**
+         * Task properties.
+         */
         public static class Task {
 
-            private Map<String, Object> subscriptions = new HashMap<>();
+            private Map<String, Integer> subscriptions = new HashMap<>();
 
-            public Map<String, Object> getSubscriptions() {
+            public Map<String, Integer> getSubscriptions() {
                 return subscriptions;
             }
 
-            public void setSubscriptions(Map<String, Object> subscriptions) {
+            public void setSubscriptions(Map<String, Integer> subscriptions) {
                 this.subscriptions = subscriptions;
             }
         }
     }
 
+    /**
+     * Workflow properties.
+     */
     public static class Workflow {
 
-        private OutputStorage outputStorage;
-        private Repository repository;
+        private OutputStorage outputStorage = new OutputStorage();
+        private Repository repository = new Repository();
 
         public OutputStorage getOutputStorage() {
             return outputStorage;
@@ -1008,13 +1122,19 @@ public class ApplicationProperties {
             this.repository = repository;
         }
 
+        /**
+         * OutputStorage properties.
+         */
         public static class OutputStorage {
 
+            /**
+             * OutputStorage provider.
+             */
             public enum Provider {
                 AWS, FILESYSTEM, JDBC
             }
 
-            private Provider provider;
+            private Provider provider = Provider.JDBC;
 
             public Provider getProvider() {
                 return provider;
@@ -1025,12 +1145,15 @@ public class ApplicationProperties {
             }
         }
 
+        /**
+         * Repository properties.
+         */
         public static class Repository {
 
-            private Classpath classpath;
-            private Filesystem filesystem;
-            private Git git;
-            private Jdbc jdbc;
+            private Classpath classpath = new Classpath();
+            private Filesystem filesystem = new Filesystem();
+            private Git git = new Git();
+            private Jdbc jdbc = new Jdbc();
 
             public Classpath getClasspath() {
                 return classpath;
@@ -1064,6 +1187,9 @@ public class ApplicationProperties {
                 this.jdbc = jdbc;
             }
 
+            /**
+             * Filesystem properties.
+             */
             public static class Classpath {
 
                 private boolean enabled;
@@ -1086,6 +1212,9 @@ public class ApplicationProperties {
                 }
             }
 
+            /**
+             * Filesystem properties.
+             */
             public static class Filesystem {
 
                 private boolean enabled;
@@ -1108,6 +1237,9 @@ public class ApplicationProperties {
                 }
             }
 
+            /**
+             * Git properties.
+             */
             public static class Git {
 
                 private String branch;
@@ -1166,9 +1298,12 @@ public class ApplicationProperties {
                 }
             }
 
+            /**
+             * Jdbc properties.
+             */
             public static class Jdbc {
 
-                private boolean enabled;
+                private boolean enabled = true;
 
                 public boolean isEnabled() {
                     return enabled;
