@@ -93,34 +93,41 @@ const WorkflowNodesPopoverMenuOperationList = ({
                             type: 'workflow',
                         };
 
-                        saveWorkflowDefinition(newTriggerNode.data, workflow, updateWorkflowMutation, undefined, () => {
-                            queryClient.invalidateQueries({
-                                queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
-                                    id: workflow.id!,
-                                    lastWorkflowNodeName: currentNode?.name,
-                                }),
-                            });
-
-                            setWorkflow({
-                                ...workflow,
-                                componentNames: [componentName, ...componentNames.slice(1)],
-                            });
-
-                            if (currentNode?.trigger) {
-                                setCurrentNode(newTriggerNode.data);
-                            }
-
-                            if (trigger) {
-                                setCurrentComponent({
-                                    componentName: newTriggerNode.data.componentName,
-                                    notes: newTriggerNode.data.description,
-                                    operationName: newTriggerNode.data.operationName,
-                                    title: newTriggerNode.data.label,
-                                    type: newTriggerNode.data.type,
-                                    workflowNodeName: newTriggerNode.data.workflowNodeName,
+                        saveWorkflowDefinition(
+                            newTriggerNode.data,
+                            workflow,
+                            updateWorkflowMutation,
+                            queryClient,
+                            undefined,
+                            () => {
+                                queryClient.invalidateQueries({
+                                    queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
+                                        id: workflow.id!,
+                                        lastWorkflowNodeName: currentNode?.name,
+                                    }),
                                 });
+
+                                setWorkflow({
+                                    ...workflow,
+                                    componentNames: [componentName, ...componentNames.slice(1)],
+                                });
+
+                                if (currentNode?.trigger) {
+                                    setCurrentNode(newTriggerNode.data);
+                                }
+
+                                if (trigger) {
+                                    setCurrentComponent({
+                                        componentName: newTriggerNode.data.componentName,
+                                        notes: newTriggerNode.data.description,
+                                        operationName: newTriggerNode.data.operationName,
+                                        title: newTriggerNode.data.label,
+                                        type: newTriggerNode.data.type,
+                                        workflowNodeName: newTriggerNode.data.workflowNodeName,
+                                    });
+                                }
                             }
-                        });
+                        );
 
                         return newTriggerNode;
                     }
@@ -253,6 +260,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                     },
                     workflow!,
                     updateWorkflowMutation,
+                    queryClient,
                     previousWorkflowNodeIndex,
                     () => {
                         queryClient.invalidateQueries({
@@ -337,6 +345,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                                 },
                                 workflow!,
                                 updateWorkflowMutation,
+                                queryClient,
                                 undefined,
                                 () => {
                                     queryClient.invalidateQueries({

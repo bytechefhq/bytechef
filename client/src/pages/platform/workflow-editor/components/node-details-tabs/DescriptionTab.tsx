@@ -4,6 +4,7 @@ import {Textarea} from '@/components/ui/textarea';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {NodeDataType, UpdateWorkflowMutationType} from '@/shared/types';
+import {useQueryClient} from '@tanstack/react-query';
 import {ChangeEvent} from 'react';
 import {useDebouncedCallback} from 'use-debounce';
 
@@ -12,6 +13,8 @@ import saveWorkflowDefinition from '../../utils/saveWorkflowDefinition';
 const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: UpdateWorkflowMutationType}) => {
     const {workflow} = useWorkflowDataStore();
     const {currentComponent, currentNode, setCurrentComponent} = useWorkflowNodeDetailsPanelStore();
+
+    const queryClient = useQueryClient();
 
     const componentData: NodeDataType = {
         componentName: currentComponent!.componentName!,
@@ -34,6 +37,7 @@ const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: Updat
             {...componentData, label: event.target.value},
             workflow,
             updateWorkflowMutation,
+            queryClient,
             undefined,
             () => {
                 setCurrentComponent({
@@ -56,6 +60,7 @@ const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: Updat
             },
             workflow,
             updateWorkflowMutation,
+            queryClient,
             undefined,
             () => {
                 setCurrentComponent({

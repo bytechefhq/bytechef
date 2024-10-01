@@ -150,7 +150,8 @@ export default function useHandleDrop(): [
                 }),
             },
             workflow,
-            updateWorkflowMutation
+            updateWorkflowMutation,
+            queryClient
         );
     }
 
@@ -261,6 +262,7 @@ export default function useHandleDrop(): [
             },
             workflow,
             updateWorkflowMutation,
+            queryClient,
             targetEdgeIndex
         );
     }
@@ -343,7 +345,8 @@ export default function useHandleDrop(): [
                 }),
             },
             workflow,
-            updateWorkflowMutation
+            updateWorkflowMutation,
+            queryClient
         );
     }
 
