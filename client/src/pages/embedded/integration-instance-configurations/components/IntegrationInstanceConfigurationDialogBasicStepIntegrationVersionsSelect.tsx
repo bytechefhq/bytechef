@@ -3,7 +3,6 @@ import {IntegrationStatus} from '@/shared/middleware/embedded/configuration';
 import {useGetIntegrationVersionsQuery} from '@/shared/queries/embedded/integrationVersions.queries';
 import {CheckIcon} from '@radix-ui/react-icons';
 import {Item, ItemIndicator, ItemText} from '@radix-ui/react-select';
-import {twMerge} from 'tailwind-merge';
 
 const IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect = ({
     integrationId,
@@ -35,9 +34,7 @@ const IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect =
                 {filteredIntegrationVersions &&
                     filteredIntegrationVersions.map((integrationVersion) => (
                         <Item
-                            className={twMerge(
-                                'radix-disabled:opacity-50 flex cursor-pointer select-none items-center overflow-hidden rounded-md px-8 py-2 text-sm font-medium text-gray-700 focus:bg-gray-100 focus:outline-none'
-                            )}
+                            className="radix-disabled:opacity-50 flex cursor-pointer select-none items-center overflow-hidden rounded-md p-2 text-sm font-medium text-gray-700 focus:bg-gray-100 focus:outline-none"
                             key={integrationVersion.version}
                             value={integrationVersion.version!.toString()}
                         >
