@@ -18,7 +18,7 @@ import reactLogo from '../../assets/logo.svg';
 const DesktopSidebarNavigationMenu = () => {
     const {setCurrentType} = useAppTypeStore();
 
-    const {isFeatureFlagEnabled} = useFeatureFlagsStore();
+    const ff_520 = useFeatureFlagsStore((state) => state.isFeatureFlagEnabled('ff-520'));
 
     const handleClick = (appType: AppType) => {
         setCurrentType(appType);
@@ -46,7 +46,7 @@ const DesktopSidebarNavigationMenu = () => {
                                 </div>
                             </li>
 
-                            {isFeatureFlagEnabled('ff-520') && (
+                            {ff_520 && (
                                 <ListItem onClick={() => handleClick(AppType.EMBEDDED)} title="Embedded">
                                     Build integrations for your product.
                                 </ListItem>
