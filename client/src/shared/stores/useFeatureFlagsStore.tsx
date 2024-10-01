@@ -5,6 +5,7 @@ import {devtools} from 'zustand/middleware';
 export interface FeatureFlagsI {
     featureFlags: Record<string, boolean>;
     init: () => void;
+    loading: boolean;
     isFeatureFlagEnabled: (featureFlag: string) => boolean;
 }
 
@@ -20,6 +21,15 @@ export const useFeatureFlagsStore = create<FeatureFlagsI>()(
             return {
                 featureFlags: {},
                 init: () => {
+                    if (get().loading) {
+                        return;
+                    }
+
+                    set((state) => ({
+                        ...state,
+                        loading: true,
+                    }));
+
                     fetchGetActuatorInfo()
                         .then((response) => response.json())
                         .then((applicationInfo) => {
@@ -29,6 +39,7 @@ export const useFeatureFlagsStore = create<FeatureFlagsI>()(
                                     ...state.featureFlags,
                                     ...applicationInfo.featureFlags,
                                 },
+                                loading: false,
                             }));
                         });
                 },
@@ -65,6 +76,7 @@ export const useFeatureFlagsStore = create<FeatureFlagsI>()(
 
                     return featureFlags[featureFlag] ?? false;
                 },
+                loading: false,
             };
         },
         {
