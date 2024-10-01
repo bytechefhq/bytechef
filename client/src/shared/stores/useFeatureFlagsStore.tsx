@@ -8,7 +8,7 @@ export interface FeatureFlagsI {
     isFeatureFlagEnabled: (featureFlag: string) => boolean;
 }
 
-const fetchGetApplicationInfo = async (): Promise<Response> => {
+const fetchGetActuatorInfo = async (): Promise<Response> => {
     return await fetch('/actuator/info', {
         method: 'GET',
     }).then((response) => response);
@@ -20,7 +20,7 @@ export const useFeatureFlagsStore = create<FeatureFlagsI>()(
             return {
                 featureFlags: {},
                 init: () => {
-                    fetchGetApplicationInfo()
+                    fetchGetActuatorInfo()
                         .then((response) => response.json())
                         .then((applicationInfo) => {
                             set((state) => ({

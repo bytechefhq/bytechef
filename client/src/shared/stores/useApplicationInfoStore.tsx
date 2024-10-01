@@ -18,7 +18,7 @@ export interface ApplicationInfoI {
     getApplicationInfo: () => void;
 }
 
-const fetchGetApplicationInfo = async (): Promise<Response> => {
+const fetchGetActuatorInfo = async (): Promise<Response> => {
     return await fetch('/actuator/info', {
         method: 'GET',
     }).then((response) => response);
@@ -46,7 +46,7 @@ export const useApplicationInfoStore = create<ApplicationInfoI>()(
                         loading: true,
                     }));
 
-                    const response = await fetchGetApplicationInfo();
+                    const response = await fetchGetActuatorInfo();
 
                     if (response.status === 200) {
                         const json = await response.json();
