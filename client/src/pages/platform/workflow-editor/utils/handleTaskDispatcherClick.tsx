@@ -123,6 +123,7 @@ export default async function handleTaskDispatcherClick({
                             },
                             workflow!,
                             updateWorkflowMutation,
+                            queryClient,
                             undefined,
                             () => {
                                 queryClient.invalidateQueries({

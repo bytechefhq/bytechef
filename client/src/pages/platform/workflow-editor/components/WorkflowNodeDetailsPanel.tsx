@@ -249,6 +249,7 @@ const WorkflowNodeDetailsPanel = ({
             },
             workflow,
             updateWorkflowMutation,
+            queryClient,
             undefined,
             () => {
                 setCurrentComponent({

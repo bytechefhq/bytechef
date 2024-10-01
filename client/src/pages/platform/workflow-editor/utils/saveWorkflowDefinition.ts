@@ -21,6 +21,7 @@ export default async function saveWorkflowDefinition(
     nodeData: NodeDataType,
     workflow: Workflow,
     updateWorkflowMutation: UseMutationResult<Workflow, Error, UpdateWorkflowRequestType, unknown>,
+    queryClient: QueryClient,
     index?: number,
     onSuccess?: (workflow: Workflow) => void
 ) {
@@ -64,8 +65,6 @@ export default async function saveWorkflowDefinition(
     let {version} = nodeData;
 
     let {operationName} = nodeData;
-
-    const queryClient = new QueryClient();
 
     if (taskDispatcher && componentName && version) {
         const newNodeTaskDispatcherDefinition = await queryClient.fetchQuery({
