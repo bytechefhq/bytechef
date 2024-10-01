@@ -8,17 +8,13 @@ import {useNavigate} from 'react-router-dom';
 const Home = () => {
     const {currentType, setCurrentType} = useAppTypeStore();
 
-    const {init, isFeatureFlagEnabled} = useFeatureFlagsStore();
+    const {isFeatureFlagEnabled} = useFeatureFlagsStore();
 
     const navigate = useNavigate();
 
     const handleClick = (appType: AppType) => {
         setCurrentType(appType);
     };
-
-    useEffect(() => {
-        init();
-    }, [init]);
 
     useEffect(() => {
         if (!isFeatureFlagEnabled('ff-520')) {

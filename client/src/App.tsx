@@ -101,7 +101,7 @@ function App() {
 
     const {getApplicationInfo} = useApplicationInfoStore();
     const {authenticated, getAccount, sessionHasBeenFetched, showLogin} = useAuthenticationStore();
-    const {isFeatureFlagEnabled} = useFeatureFlagsStore();
+    const {init: initFeatureFlags, isFeatureFlagEnabled} = useFeatureFlagsStore();
 
     const location = useLocation();
 
@@ -123,6 +123,10 @@ function App() {
     useEffect(() => {
         getApplicationInfo();
     }, [getApplicationInfo]);
+
+    useEffect(() => {
+        initFeatureFlags();
+    }, [initFeatureFlags]);
 
     useEffect(() => {
         if (showLogin) {
