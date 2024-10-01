@@ -10,17 +10,17 @@ springdoc:
 ---
 
 info:
-  application:
-    edition: ${bytechef.edition}
-  signUp:
-    activationRequired: ${bytechef.signUp.activationRequired}
-    enabled: ${bytechef.signUp.enabled}
   analytics:
     enabled: ${bytechef.analytics.enabled}
     postHog:
       apiKey: ${bytechef.analytics.post-hog.api-key}
       host: ${bytechef.analytics.post-hog.host}
+  application:
+    edition: ${bytechef.edition}
   featureFlags: ${bytechef.featureFlags}
+  signUp:
+    activationRequired: ${bytechef.signUp.activationRequired}
+    enabled: ${bytechef.signUp.enabled}
 
 management:
   endpoints:
