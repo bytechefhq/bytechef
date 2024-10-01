@@ -66,15 +66,16 @@ public class ImageHelperRotateImageAction {
     protected static FileEntry perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
 
-        FileEntry image = inputParameters.getRequiredFileEntry(IMAGE);
+        FileEntry imageFileEntry = inputParameters.getRequiredFileEntry(IMAGE);
 
-        BufferedImage bufferedImage = ImageIO.read((File) actionContext.file(file -> file.toTempFile(image)));
+        BufferedImage bufferedImage = ImageIO.read((File) actionContext.file(file -> file.toTempFile(imageFileEntry)));
 
         BufferedImage rotatedImage =
             rotateImage(inputParameters.getRequiredInteger(DEGREE), bufferedImage);
 
         return storeBufferedImage(
-            actionContext, rotatedImage, image.getExtension(), inputParameters.getRequiredString(RESULT_FILE_NAME));
+            actionContext, rotatedImage, imageFileEntry.getExtension(),
+            inputParameters.getRequiredString(RESULT_FILE_NAME));
     }
 
     private static BufferedImage rotateImage(int degree, BufferedImage bufferedImage) {
@@ -90,5 +91,4 @@ public class ImageHelperRotateImageAction {
 
         return newImage;
     }
-
 }
