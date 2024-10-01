@@ -67,8 +67,8 @@ const ProjectInstanceDialogWorkflowsStepItemInputs = ({
     return properties?.length ? (
         <Properties
             control={control}
+            controlPath={`projectInstanceWorkflows.${workflowIndex!}.inputs`}
             formState={formState}
-            path={`projectInstanceWorkflows.${workflowIndex!}.inputs`}
             properties={properties}
         />
     ) : (
