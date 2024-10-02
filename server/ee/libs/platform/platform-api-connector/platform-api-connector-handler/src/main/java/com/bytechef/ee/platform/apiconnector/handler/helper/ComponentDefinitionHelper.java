@@ -20,6 +20,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Property;
+import com.bytechef.definition.BaseProperty;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnector;
 import com.bytechef.platform.apiconnector.file.storage.ApiConnectorFileStorage;
 import com.bytechef.platform.component.definition.ActionDefinitionWrapper;
@@ -57,7 +58,8 @@ public class ComponentDefinitionHelper {
 
         this.apiConnectorFileStorage = apiConnectorFileStorage;
         this.objectMapper = objectMapper.copy()
-            .addMixIn(Property.class, PropertyMixIn.class);
+            .addMixIn(Property.class, PropertyMixIn.class)
+            .addMixIn(BaseProperty.BaseValueProperty.class, PropertyMixIn.class);
     }
 
     public ComponentDefinitionWrapper readComponentDefinition(ApiConnector apiConnector) {
