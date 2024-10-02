@@ -109,8 +109,12 @@ Create a new .paper file on which you can write at a given path
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Paper path/name | STRING | TEXT  |  The path of the new paper file. Starts with / as root.  |
+| Path | STRING | TEXT  |  The path of the new paper file. Root is /.  |
 | Filename | STRING | TEXT  |  Name of the paper file  |
+| Text | STRING | TEXT_AREA  |  The text to write into the file.  |
+| Auto Rename | BOOLEAN | SELECT  |  If there's a conflict, as determined by mode, have the Dropbox server try to autorename the file to avoid conflict.  |
+| Mute | BOOLEAN | SELECT  |  Normally, users are made aware of any file modifications in their Dropbox account via notifications in the client software. If true, this tells the clients that this modification shouldn't result in a user notification.  |
+| Strict conflict | BOOLEAN | SELECT  |  Be more strict about how each WriteMode detects conflict. For example, always return a conflict error when mode = WriteMode.update and the given "rev" doesn't match the existing file's "rev", even if the existing file has been deleted.  |
 
 
 ### Output
@@ -334,4 +338,4 @@ Type: OBJECT
 
 [Setting up OAuth2](https://developers.dropbox.com/oauth-guide)
 
-<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(52.81250000% + 32px)"><iframe src="https://www.guidejar.com/embed/756fb792-9de7-4ac9-b58a-c8c8a95fab66?type=1&controls=on" width="100%" height="100%" style="position:absolute;inset:0" allowfullscreen frameborder="0"></iframe></div>
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(52.81250000% + 32px)"><iframe src="https://www.guidejar.com/embed/756fb792-9de7-4ac9-b58a-c8c8a95fab66?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe></div>
