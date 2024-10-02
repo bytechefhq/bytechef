@@ -15,7 +15,7 @@ export function RightSidebar({
     }[];
 }) {
     return (
-        <aside className={twMerge('hidden bg-muted lg:flex lg:shrink-0', className)}>
+        <div className={twMerge('hidden lg:flex lg:shrink-0', className)}>
             <div className="flex w-[56px]">
                 <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
                     <div className="flex-1">
@@ -45,6 +45,6 @@ export function RightSidebar({
                     </div>
                 </div>
             </div>
-        </aside>
+        </div>
     );
 }
