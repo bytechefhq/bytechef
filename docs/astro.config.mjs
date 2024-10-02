@@ -55,6 +55,16 @@ export default defineConfig({
                         },
                     ],
                 },
+                {
+                    label: 'Developer Guide',
+                    items: [
+                        {
+                            label: 'Components',
+                            autogenerate: { directory: '/developing_guide/components' },
+                            collapsed: true,
+                        }
+                    ]
+                },
 				{
 					label: 'Reference',
                     items: [
