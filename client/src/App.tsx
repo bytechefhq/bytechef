@@ -101,11 +101,25 @@ function App() {
 
     const {getApplicationInfo} = useApplicationInfoStore();
     const {authenticated, getAccount, sessionHasBeenFetched, showLogin} = useAuthenticationStore();
-    const {init: initFeatureFlags, isFeatureFlagEnabled} = useFeatureFlagsStore();
+    const {init: initFeatureFlags, isFeatureFlagEnabled, loading: loadingFeatureFlags} = useFeatureFlagsStore();
 
     const location = useLocation();
 
     const navigate = useNavigate();
+
+    const filteredAutomationNavigation = automationNavigation.filter((navItem) => {
+        if (navItem.href === '/automation/api-platform/api-collections') {
+            return isFeatureFlagEnabled('ff-1023');
+        }
+
+        return true;
+    });
+
+    const navigation = location.pathname.includes('automation')
+        ? filteredAutomationNavigation
+        : location.pathname.includes('embedded')
+          ? embeddedNavigation
+          : [];
 
     useFetchInterceptor();
 
@@ -144,37 +158,21 @@ function App() {
         return <></>;
     }
 
+    if (loadingFeatureFlags) {
+        return <></>;
+    }
+
     return (
         <div className="flex h-full">
             <TooltipProvider>
                 <MobileSidebar
                     mobileMenuOpen={mobileMenuOpen}
-                    navigation={automationNavigation.filter((navItem) => {
-                        if (navItem.href === '/automation/api-platform/api-collections') {
-                            return isFeatureFlagEnabled('ff-1023');
-                        }
-
-                        return true;
-                    })}
+                    navigation={navigation}
                     setMobileMenuOpen={setMobileMenuOpen}
                     user={user}
                 />
 
-                <DesktopSidebar
-                    navigation={
-                        location.pathname.includes('automation')
-                            ? automationNavigation.filter((navItem) => {
-                                  if (navItem.href === '/automation/api-platform/api-collections') {
-                                      return isFeatureFlagEnabled('ff-1023');
-                                  }
-
-                                  return true;
-                              })
-                            : location.pathname.includes('embedded')
-                              ? embeddedNavigation
-                              : []
-                    }
-                />
+                <DesktopSidebar navigation={navigation} />
 
                 <div className="flex min-w-0 flex-1 flex-col">
                     <MobileTopNavigation setMobileMenuOpen={setMobileMenuOpen} />
