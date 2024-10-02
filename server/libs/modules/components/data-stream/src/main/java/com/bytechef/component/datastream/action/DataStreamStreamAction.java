@@ -24,6 +24,7 @@ import static com.bytechef.component.datastream.constant.DataStreamConstants.INS
 import static com.bytechef.component.datastream.constant.DataStreamConstants.JOB_ID;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.SOURCE;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.TENANT_ID;
+import static com.bytechef.component.datastream.constant.DataStreamConstants.TEST_ENVIRONMENT;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.TYPE;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
@@ -115,6 +116,9 @@ public class DataStreamStreamAction {
                         put(JOB_ID, new JobParameter<>(actionContextAware.getJobId(), Long.class));
                         put(SOURCE, new JobParameter<>(extensions.getMap(SOURCE), Map.class));
                         put(TENANT_ID, new JobParameter<>(TenantContext.getCurrentTenantId(), String.class));
+                        put(
+                            TEST_ENVIRONMENT,
+                            new JobParameter<>(actionContextAware.isTestEnvironment(), Boolean.class));
 
                         if (actionContextAware.getType() != null) {
                             put(TYPE, new JobParameter<>(String.valueOf(actionContextAware.getType()), String.class));

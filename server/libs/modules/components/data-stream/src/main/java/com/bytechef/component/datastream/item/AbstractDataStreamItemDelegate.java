@@ -22,6 +22,7 @@ import static com.bytechef.component.datastream.constant.DataStreamConstants.INS
 import static com.bytechef.component.datastream.constant.DataStreamConstants.INSTANCE_WORKFLOW_ID;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.JOB_ID;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.TENANT_ID;
+import static com.bytechef.component.datastream.constant.DataStreamConstants.TEST_ENVIRONMENT;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.TYPE;
 
 import com.bytechef.commons.util.MapUtils;
@@ -50,6 +51,7 @@ public abstract class AbstractDataStreamItemDelegate {
     protected DataStreamContext context;
     protected Parameters inputParameters;
     protected String tenantId;
+    protected boolean testEnvironment;
 
     private final String componentTypeName;
     private final ContextFactory contextFactory;
@@ -71,8 +73,7 @@ public abstract class AbstractDataStreamItemDelegate {
         componentVersion = MapUtils.getRequiredInteger(componentTypeParameterMap, "componentVersion");
 
         Map<String, ?> connectionParameterMap = MapUtils.getMap(
-            MapUtils.getMap(
-                getParameterMap(jobParameters, CONNECTION_PARAMETERS), componentTypeName, Map.of()),
+            MapUtils.getMap(getParameterMap(jobParameters, CONNECTION_PARAMETERS), componentTypeName, Map.of()),
             "parameters");
 
         connectionParameters = connectionParameterMap == null
@@ -107,6 +108,11 @@ public abstract class AbstractDataStreamItemDelegate {
         tenantId = (String) Validate.notNull(jobParameter, "tenantId is required")
             .getValue();
 
+        jobParameter = jobParameters.getParameter(TEST_ENVIRONMENT);
+
+        testEnvironment = (boolean) Validate.notNull(jobParameter, "testEnvironment is required")
+            .getValue();
+
         jobParameter = jobParameters.getParameter(TYPE);
 
         AppType type = null;
@@ -118,7 +124,7 @@ public abstract class AbstractDataStreamItemDelegate {
         context = new DataStreamContextImpl(
             contextFactory.createActionContext(
                 componentName, componentVersion, DataStreamConstants.STREAM, type, instanceId, instanceWorkflowId,
-                null, jobId, null, false));
+                null, jobId, null, testEnvironment));
 
         doBeforeStep(stepExecution);
     }

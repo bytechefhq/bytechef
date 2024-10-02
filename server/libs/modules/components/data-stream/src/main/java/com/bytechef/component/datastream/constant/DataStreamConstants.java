@@ -28,6 +28,7 @@ public class DataStreamConstants {
     public static final String CONNECTION_PARAMETERS = "connectionParameters";
     public static final String JOB_ID = "jobId";
     public static final String TENANT_ID = "tenantId";
+    public static final String TEST_ENVIRONMENT = "testEnvironment";
     public static final String INSTANCE_ID = "instanceId";
     public static final String INSTANCE_WORKFLOW_ID = "instanceWorkflowId";
     public static final String TYPE = "type";
