@@ -30,7 +30,7 @@ import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.time;
-import static com.bytechef.platform.component.datastream.JdbcDataStream.dataStream;
+import static com.bytechef.platform.component.jdbc.datastream.JdbcDataStream.dataStream;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.ComponentHandler;

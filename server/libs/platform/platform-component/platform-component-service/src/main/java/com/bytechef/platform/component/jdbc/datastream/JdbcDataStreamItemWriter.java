@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.datastream;
+package com.bytechef.platform.component.jdbc.datastream;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.DataStreamContext;

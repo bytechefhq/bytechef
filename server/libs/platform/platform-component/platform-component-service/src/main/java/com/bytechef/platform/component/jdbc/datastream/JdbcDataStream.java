@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.datastream;
+package com.bytechef.platform.component.jdbc.datastream;
 
 import static com.bytechef.component.definition.ComponentDsl.dataStreamWriter;
 
