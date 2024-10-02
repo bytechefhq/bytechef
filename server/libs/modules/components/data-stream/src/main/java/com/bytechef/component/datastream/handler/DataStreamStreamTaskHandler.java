@@ -25,10 +25,10 @@ import org.springframework.stereotype.Component;
 /**
  * @author Ivica Cardic
  */
-@Component(DATA_STREAM + "/v1/sync")
-public class DataStreamSyncTaskHandler extends AbstractTaskHandler {
+@Component(DATA_STREAM + "/v1/stream")
+public class DataStreamStreamTaskHandler extends AbstractTaskHandler {
 
-    public DataStreamSyncTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        super("dataStream", 1, "sync", actionDefinitionFacade);
+    public DataStreamStreamTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
+        super("dataStream", 1, "stream", actionDefinitionFacade);
     }
 }
