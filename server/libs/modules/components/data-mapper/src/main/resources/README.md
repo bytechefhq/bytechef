@@ -24,7 +24,7 @@ By defining these mappings, the Rename Keys action effectively helps in normaliz
 
 ### Example
 
-<div style="position:relative;height:100%;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(51.87165775% + 32px)"><iframe src="https://www.guidejar.com/embed/177e078b-541d-44e0-8a5b-f7ef2748d6dd?type=1&controls=on" width="100%" height="100%" style="position:absolute;inset:0" allowfullscreen frameborder="0"></iframe></div>
+<div style="position:relative;height:100%;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(51.87165775% + 32px)"><iframe src="https://www.guidejar.com/embed/177e078b-541d-44e0-8a5b-f7ef2748d6dd?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe></div>
 
 ## Replace Value
 
@@ -70,7 +70,7 @@ This action can be used when you want to replace multiple values, but don't know
 
 ### Example
 
-<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(51.87165775% + 32px)"><iframe src="https://www.guidejar.com/embed/b8136d72-51b0-4edc-b3d9-f9d58a49a4c0?type=1&controls=on" width="100%" height="100%" style="position:absolute;inset:0" allowfullscreen frameborder="0"></iframe></div>
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(51.87165775% + 32px)"><iframe src="https://www.guidejar.com/embed/b8136d72-51b0-4edc-b3d9-f9d58a49a4c0?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe></div>
 
 ## Replace Multiple Values by Key
 
@@ -95,7 +95,7 @@ This method is especially useful for restructuring or transforming the structure
 
 ### Example
 
-<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(51.87165775% + 32px)"><iframe src="https://www.guidejar.com/embed/4da6cdd8-d5e1-40ed-b8b6-b54a88369f6d?type=1&controls=on" width="100%" height="100%" style="position:absolute;inset:0" allowfullscreen frameborder="0"></iframe></div>
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(51.87165775% + 32px)"><iframe src="https://www.guidejar.com/embed/4da6cdd8-d5e1-40ed-b8b6-b54a88369f6d?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe></div>
 
 ## Map Objects to Object
 
@@ -145,7 +145,7 @@ This action is designed to convert a given single object or an array of objects 
 
 ### Example
 
-<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(63.92358560% + 32px)"><iframe src="https://www.guidejar.com/embed/901fe11a-f79e-474f-9a23-8036fdcfca01?type=1&controls=on" width="100%" height="100%" style="position:absolute;inset:0" allowfullscreen frameborder="0"></iframe></div>
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(63.92358560% + 32px)"><iframe src="https://www.guidejar.com/embed/901fe11a-f79e-474f-9a23-8036fdcfca01?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe></div>
 
 ## Merge and Pivot Properties by Key
 
@@ -166,4 +166,4 @@ This action transforms an array of objects into a new, consolidated object based
 
 ### Example
 
-<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(53.24754902% + 32px)"><iframe src="https://www.guidejar.com/embed/2bda7178-8fa4-48af-9526-b5192d0b8fb1?type=1&controls=on" width="100%" height="100%" style="position:absolute;inset:0" allowfullscreen frameborder="0"></iframe></div>
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(53.24754902% + 32px)"><iframe src="https://www.guidejar.com/embed/2bda7178-8fa4-48af-9526-b5192d0b8fb1?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe></div>
