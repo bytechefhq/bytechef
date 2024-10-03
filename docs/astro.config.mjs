@@ -37,7 +37,7 @@ export default defineConfig({
                         {
                             label: 'Getting Started',
                             items: [
-                                { label: 'Introduction', link: '/automation/getting-started/introduction' },
+                                // { label: 'Introduction', link: '/automation/getting-started/introduction' },
                                 { label: 'Quick Start', link: '/automation/getting-started/quick-start' },
                             ],
                         },
@@ -49,7 +49,7 @@ export default defineConfig({
                         {
                             label: 'Getting Started',
                             items: [
-                                { label: 'Introduction', link: '/embedded/getting-started/introduction' },
+                                // { label: 'Introduction', link: '/embedded/getting-started/introduction' },
                                 { label: 'Quick Start', link: '/embedded/getting-started/quick-start' },
                             ]
                         },
