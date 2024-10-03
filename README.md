@@ -96,9 +96,10 @@ Use browser and open http://localhost/login. Chose Create Account link to setup 
 [//]: # ()
 [//]: # (If you want to self-host ByteChef, we have [guides]&#40;https://docs.bytechef.io/self-hosting?utm_source=github&utm_medium=organic&utm_campaign=readme&#41; for Docker, AWS and more.)
 [//]: # ()
-[//]: # (## Documentation)
-[//]: # ()
-[//]: # (- [Getting Started]&#40;https://docs.bytechef.io/introduction?utm_source=github&utm_medium=organic&utm_campaign=readme&#41;)
+## Documentation
+
+- [Getting Started](https://docs.bytechef.io/introduction?utm_source=github&utm_medium=organic&utm_campaign=readme)
+
 [//]: # (- [Architecture]&#40;https://docs.bytechef.io/architecture?utm_source=github&utm_medium=organic&utm_campaign=readme&#41;)
 [//]: # (- [Components Reference]&#40;https://docs.bytechef.io/components&#41;)
 
