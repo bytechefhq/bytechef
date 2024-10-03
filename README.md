@@ -32,7 +32,9 @@ ByteChef can help you as:
 1. Automation solution, which allows customers to integrate applications used internally to automate their own business processes.
 2. Embedded solution targeted explicitly for products which allow your customers to integrate applications they use with your product.
 
-[//]: # (## Getting Started)
+## Getting Started
+There are couple ways to give ByteChef a quick spin on your local machine. You can use this to test, learn or contribute.
+
 [//]: # ()
 [//]: # (### ByteChef Cloud)
 [//]: # ()
@@ -42,19 +44,54 @@ ByteChef can help you as:
 [//]: # ()
 [//]: # (For a step-by-step guide on ByteChef Cloud, [see the docs]&#40;https://docs.bytechef.io/cloud/getting-started?utm_medium=organic&utm_campaign=readme&#41;.)
 [//]: # ()
-[//]: # (### Try using Docker)
-[//]: # ()
-[//]: # (Want to give ByteChef a quick spin on your local machine? You can run the following command from your terminal to have ByteChef up and running right away.)
-[//]: # ()
-[//]: # (```bashTaskHandler)
-[//]: # (docker run \)
-[//]: # (  --name bytechef \)
-[//]: # (  --restart unless-stopped \)
-[//]: # (  -p 3000:3000 \)
-[//]: # (  bytechef/try:latest)
-[//]: # (```)
-[//]: # (Then, open http://localhost:3000 in your browser.)
-[//]: # ()
+
+### Docker
+1. Docker Compose
+
+Requirement: Docker Desktop
+
+This is the fastest possible way to start Bytechef. Download docker-compose.yml [docker-compose.yml](https://github.com/bytechefhq/bytechef/blob/master/docker-compose.yml) to your machine. Find it in this bytechef repository root. Execute:
+```bashTaskHandler
+docker compose -f docker-compose.yml up
+```
+Both postgres database and bytechef docker container would start.
+2. Docker (run containers)
+
+This option demands pinch of focus as it allows user to profile containers. Run the following commands from your terminal to have ByteChef up and running right away.
+
+#### Create Docker Network
+```bashTaskHandler
+docker network create -d bridge bytechef_network
+```
+#### Start Postgres Docker Container
+```bashTaskHandler
+docker run --name postgres -d -p 5432:5432 \
+	--env POSTGRES_USER=postgres \
+	--env POSTGRES_PASSWORD=postgres \
+	--network bytechef_network \
+	-v /opt/postgre/data:/var/lib/postgresql/data \
+	postgres:15-alpine
+```
+NOTE: `-v` mount option is not mandatory. It mounts local DB storage to make easier access to DB infrastructure files.
+
+#### Start ByteChef Docker Container
+```bashTaskHandler
+docker run --name bytechef -it -p 80:8080 \
+    --env SERVER_PORT=8080 \
+    --env SPRING_PROFILES_ACTIVE=prod \
+    --env BYTECHEF_DATASOURCE_URL=jdbc:postgresql://postgres:5432/bytechef \
+    --env BYTECHEF_DATASOURCE_USERNAME=postgres \
+    --env BYTECHEF_DATASOURCE_PASSWORD=postgres \
+    --env BYTECHEF_SECURITY_REMEMBER_ME_KEY=e48612ba1fd46fa7089fe9f5085d8d164b53ffb2 \
+    --network bytechef_network \
+    bytechef/bytechef:latest
+```
+NOTE: `-it` (interactive) flag may be replaced with `-d` (daemon). Keep it interactive if you want to track logs which can be handy for troubleshooting.
+
+3. Access Bytechef
+
+Use browser and open http://localhost/login. Chose Create Account link to setup user and than use same user and password to sign in.
+
 [//]: # (### Self-Hosted)
 [//]: # ()
 [//]: # (If you want to self-host ByteChef, we have [guides]&#40;https://docs.bytechef.io/self-hosting?utm_source=github&utm_medium=organic&utm_campaign=readme&#41; for Docker, AWS and more.)
