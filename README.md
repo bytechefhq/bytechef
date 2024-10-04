@@ -66,11 +66,11 @@ docker network create -d bridge bytechef_network
 #### Start Postgres Docker Container
 ```bashTaskHandler
 docker run --name postgres -d -p 5432:5432 \
-	--env POSTGRES_USER=postgres \
-	--env POSTGRES_PASSWORD=postgres \
-	--network bytechef_network \
-	-v /opt/postgre/data:/var/lib/postgresql/data \
-	postgres:15-alpine
+    --env POSTGRES_USER=postgres \
+    --env POSTGRES_PASSWORD=postgres \
+    --network bytechef_network \
+    -v /opt/postgre/data:/var/lib/postgresql/data \
+    postgres:15-alpine
 ```
 NOTE: `-v` mount option is not mandatory. It mounts local DB storage to make easier access to DB infrastructure files.
 
