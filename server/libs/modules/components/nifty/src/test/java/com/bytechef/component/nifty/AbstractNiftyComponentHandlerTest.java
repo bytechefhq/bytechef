@@ -16,8 +16,17 @@
 
 package com.bytechef.component.nifty;
 
+import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Test;
+
 /**
+ * Provides the base test implementation for the REST based component.
+ *
  * @generated
  */
-public class NiftyComponentHandlerTest extends AbstractNiftyComponentHandlerTest {
+public abstract class AbstractNiftyComponentHandlerTest {
+    @Test
+    public void testGetDefinition() {
+        JsonFileAssert.assertEquals("definition/nifty_v1.json", new NiftyComponentHandler().getDefinition());
+    }
 }

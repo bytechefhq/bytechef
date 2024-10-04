@@ -1,0 +1,70 @@
+---
+openapi: "3.0.2"
+info:
+  title: "Nifty"
+  description: "Nifty Project Management is a software tool that streamlines team collaboration and project tracking with features like task management, timelines, and communication tools to enhance productivity."
+  version: "v1"
+servers:
+  - url: "https://openapi.niftypm.com/api/v1.0"
+paths:
+  /tasks:
+    post:
+      summary: "Create Task"
+      description: "Creates new task"
+      operationId: "createTask"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "Task"
+              properties:
+                task_group_id:
+                  title: "Status"
+                  type: "string"
+                name:
+                  type: "string"
+                  format: "uuid"
+                  description: "Name of the task."
+                description:
+                  type: "string"
+                  description: "Description of the task."
+                due_date:
+                  type: "string"
+                  format: "date-time"
+                  description: "Due date for the task."
+              required:
+                - "task_group_id"
+                - "name"
+      responses:
+        201:
+          description: "Creation confirmation. Returns created Account"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                      name:
+                        type: "string"
+                      project:
+                        type: "string"
+                      description:
+                        type: "string"
+                      due_date:
+                        type: "string"
+                        format: "date-time"
+components:
+  securitySchemes:
+    oauth2:
+      type: "oauth2"
+      flows:
+        authorizationCode:
+          authorizationUrl: "https://nifty.pm/authorize"
+          tokenUrl: "https://openapi.niftypm.com/oauth/token"
+          refreshUrl: "https://openapi.niftypm.com/oauth/token"

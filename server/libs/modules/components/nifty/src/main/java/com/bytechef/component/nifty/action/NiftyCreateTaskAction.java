@@ -16,86 +16,57 @@
 
 package com.bytechef.component.nifty.action;
 
+import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.nifty.constant.NiftyConstants.CREATE_TASK;
-import static com.bytechef.component.nifty.constant.NiftyConstants.DESCRIPTION;
-import static com.bytechef.component.nifty.constant.NiftyConstants.DUE_DATE;
-import static com.bytechef.component.nifty.constant.NiftyConstants.NAME;
-import static com.bytechef.component.nifty.constant.NiftyConstants.PROJECT;
-import static com.bytechef.component.nifty.constant.NiftyConstants.TASK_GROUP_ID;
+import static com.bytechef.component.definition.Context.Http.BodyContentType;
+import static com.bytechef.component.definition.Context.Http.ResponseType;
 
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
-import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.nifty.util.NiftyOptionUtils;
+import com.bytechef.component.definition.ComponentDsl;
+import java.util.Map;
 
 /**
- * @author Luka Ljubić
+ * Provides a list of the component actions.
+ *
+ * @generated
  */
 public class NiftyCreateTaskAction {
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_TASK)
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createTask")
         .title("Create Task")
-        .description("Create a new task")
-        .properties(
-            string(NAME)
-                .label("Name")
-                .description("Name of the task")
-                .maxLength(50)
+        .description("Creates new task")
+        .metadata(
+            Map.of(
+                "method", "POST",
+                "path", "/tasks", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
+
+            ))
+        .properties(object("__item").properties(string("task_group_id").label("Status")
+            .required(true),
+            string("name").label("Name")
+                .description("Name of the task.")
                 .required(true),
-            string(DESCRIPTION)
-                .label("Description")
+            string("description").label("Description")
                 .description("Description of the task.")
-                .maxLength(320)
                 .required(false),
-            string(PROJECT)
-                .label("Project")
-                .description("Project within which the task will be created.")
-                .options((ActionOptionsFunction<String>) NiftyOptionUtils::getProjectIdOptions)
-                .required(true),
-            string(TASK_GROUP_ID)
-                .label("Status")
-                .options((ActionOptionsFunction<String>) NiftyOptionUtils::getTaskGroupIdOptions)
-                .optionsLookupDependsOn(PROJECT)
-                .required(true),
-            dateTime(DUE_DATE)
-                .label("Due date")
+            dateTime("due_date").label("Due Date")
                 .description("Due date for the task.")
                 .required(false))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        string("id"),
-                        string(NAME),
-                        string(PROJECT),
-                        string(DESCRIPTION),
-                        string(DUE_DATE),
-                        string("task_group"))))
-        .perform(NiftyCreateTaskAction::perform);
+            .label("Task")
+            .required(true)
+            .metadata(
+                Map.of(
+                    "type", PropertyType.BODY)))
+        .output(outputSchema(object().properties(object("body")
+            .properties(string("id").required(false), string("name").required(false), string("project").required(false),
+                string("description").required(false), dateTime("due_date").required(false))
+            .required(false))
+            .metadata(
+                Map.of(
+                    "responseType", ResponseType.JSON))));
 
     private NiftyCreateTaskAction() {
-    }
-
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        return actionContext.http(http -> http.post("/tasks"))
-            .body(
-                Http.Body.of(
-                    NAME, inputParameters.getRequiredString(NAME),
-                    DESCRIPTION, inputParameters.getString(DESCRIPTION),
-                    TASK_GROUP_ID, inputParameters.getRequiredString(TASK_GROUP_ID),
-                    DUE_DATE, inputParameters.getLocalDateTime(DUE_DATE)))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
     }
 }

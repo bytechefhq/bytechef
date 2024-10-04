@@ -16,43 +16,35 @@
 
 package com.bytechef.component.nifty.connection;
 
+import static com.bytechef.component.definition.Authorization.AuthorizationType;
 import static com.bytechef.component.definition.Authorization.CLIENT_ID;
 import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.Authorization.AuthorizationType;
-import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import java.util.List;
+import com.bytechef.component.definition.ComponentDsl;
 
 /**
- * @author Luka Ljubić
+ * Provides the component connection definition.
+ *
+ * @generated
  */
 public class NiftyConnection {
-
-    public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+    public static final ComponentDsl.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://openapi.niftypm.com/api/v1.0")
-        .authorizations(
-            authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-                .title("OAuth2 Authorization Code")
-                .properties(
-                    string(CLIENT_ID)
-                        .label("Client id")
-                        .required(true),
-                    string(CLIENT_SECRET)
-                        .label("Client secret")
-                        .required(true))
-                .authorizationUrl((connection, context) -> "https://nifty.pm/authorize")
-                .tokenUrl((connection, context) -> "https://openapi.niftypm.com/oauth/token")
-                .refreshUrl((connection, context) -> "https://openapi.niftypm.com/oauth/token")
-                .scopes((connection, context) -> List.of(
-                    "task",
-                    "project",
-                    "milestone",
-                    "subtask",
-                    "subteam",
-                    "statuses")));
+        .authorizations(authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+            .title("OAuth2 Authorization Code")
+            .properties(
+                string(CLIENT_ID)
+                    .label("Client Id")
+                    .required(true),
+                string(CLIENT_SECRET)
+                    .label("Client Secret")
+                    .required(true))
+            .authorizationUrl((connectionParameters, context) -> "https://nifty.pm/authorize")
+            .tokenUrl((connectionParameters, context) -> "https://openapi.niftypm.com/oauth/token")
+            .refreshUrl((connectionParameters, context) -> "https://openapi.niftypm.com/oauth/token"));
 
     private NiftyConnection() {
     }
