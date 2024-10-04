@@ -17,6 +17,7 @@
 package com.bytechef.component.nifty.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.nifty.constant.NiftyConstants.ID;
 import static com.bytechef.component.nifty.constant.NiftyConstants.NAME;
 import static com.bytechef.component.nifty.constant.NiftyConstants.PROJECT;
 
@@ -53,7 +54,7 @@ public class NiftyOptionUtils {
         if (body != null && body.get("items") instanceof List<?> list) {
             for (Object item : list) {
                 if (item instanceof Map<?, ?> map) {
-                    options.add(option((String) map.get(NAME), (String) map.get("id")));
+                    options.add(option((String) map.get(NAME), (String) map.get(ID)));
                 }
             }
         }
@@ -75,7 +76,7 @@ public class NiftyOptionUtils {
         if (body != null && body.get("projects") instanceof List<?> list) {
             for (Object item : list) {
                 if (item instanceof Map<?, ?> map) {
-                    options.add(option((String) map.get(NAME), (String) map.get("id")));
+                    options.add(option((String) map.get(NAME), (String) map.get(ID)));
                 }
             }
         }

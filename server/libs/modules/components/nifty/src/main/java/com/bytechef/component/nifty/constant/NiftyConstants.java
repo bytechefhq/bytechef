@@ -16,18 +16,26 @@
 
 package com.bytechef.component.nifty.constant;
 
+import static com.bytechef.component.definition.ComponentDsl.string;
+
+import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.nifty.util.NiftyOptionUtils;
+
 /**
  * @author Luka Ljubić
  */
-public final class NiftyConstants {
+public class NiftyConstants {
 
-    public static final String CREATE_TASK = "createTask";
-    public static final String DESCRIPTION = "description";
-    public static final String DUE_DATE = "due_date";
+    public static final String ID = "id";
     public static final String NAME = "name";
     public static final String PROJECT = "project";
-    public static final String NIFTY = "nifty";
-    public static final String TASK_GROUP_ID = "task_group_id";
+
+    public static final ModifiableStringProperty PROJECT_PROPERTY = string(PROJECT)
+        .label("Project")
+        .description("Project within which the task will be created.")
+        .options((ActionOptionsFunction<String>) NiftyOptionUtils::getProjectIdOptions)
+        .required(true);
 
     private NiftyConstants() {
     }
