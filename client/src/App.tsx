@@ -1,6 +1,7 @@
 import {Toaster} from '@/components/ui/toaster';
 import useFetchInterceptor from '@/config/useFetchInterceptor';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {useHelpHub} from '@/shared/hooks/useHelpHub';
 import {DesktopSidebar} from '@/shared/layout/DesktopSidebar';
 import {MobileSidebar} from '@/shared/layout/MobileSidebar';
 import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
@@ -102,6 +103,7 @@ function App() {
 
     const analytics = useAnalytics();
 
+    const helpHub = useHelpHub();
 
     const location = useLocation();
 
@@ -128,6 +130,23 @@ function App() {
     useEffect(() => {
         analytics.init();
     }, [analytics]);
+
+    useEffect(() => {
+        helpHub.init();
+    }, [helpHub]);
+
+    useEffect(() => {
+        if (authenticated) {
+            if (account) {
+                helpHub.boot(account);
+                helpHub.addRouter();
+            }
+        }
+
+        return () => {
+            helpHub.shutdown();
+        };
+    }, [authenticated, account, helpHub]);
 
     useEffect(() => {
         document.title =
