@@ -8,7 +8,7 @@ import {useNavigate} from 'react-router-dom';
 const Home = () => {
     const {currentType, setCurrentType} = useAppTypeStore();
 
-    const {isFeatureFlagEnabled} = useFeatureFlagsStore();
+    const ff_520 = useFeatureFlagsStore()('ff-520');
 
     const navigate = useNavigate();
 
@@ -17,7 +17,7 @@ const Home = () => {
     };
 
     useEffect(() => {
-        if (!isFeatureFlagEnabled('ff-520')) {
+        if (!ff_520) {
             navigate('/automation');
         }
 
@@ -28,9 +28,9 @@ const Home = () => {
                 navigate('/embedded');
             }
         }
-    }, [currentType, navigate, isFeatureFlagEnabled]);
+    }, [currentType, navigate, ff_520]);
 
-    return isFeatureFlagEnabled('ff-520') ? (
+    return ff_520 ? (
         <Dialog.Root open={currentType === undefined}>
             <Dialog.Portal>
                 <Dialog.Overlay className="fixed inset-0 z-50 bg-black/80" />

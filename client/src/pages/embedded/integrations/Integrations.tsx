@@ -34,9 +34,9 @@ const Integrations = () => {
 
     const [filterData, setFilterData] = useState<{id?: number | string; type: Type}>(defaultCurrentState);
 
-    const ff_743 = useFeatureFlagsStore((state) => state.isFeatureFlagEnabled('ff-743'));
-
     const navigate = useNavigate();
+
+    const ff_743 = useFeatureFlagsStore()('ff-743');
 
     const {
         data: integrations,

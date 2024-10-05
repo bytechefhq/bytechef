@@ -17,7 +17,7 @@ interface SettingsProps {
 const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
     const {getApplicationInfo} = useApplicationInfoStore();
 
-    const {isFeatureFlagEnabled} = useFeatureFlagsStore();
+    const isFeatureFlagEnabled = useFeatureFlagsStore();
 
     const location = useLocation();
 

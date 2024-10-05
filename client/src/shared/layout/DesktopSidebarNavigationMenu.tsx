@@ -18,7 +18,7 @@ import reactLogo from '../../assets/logo.svg';
 const DesktopSidebarNavigationMenu = () => {
     const {setCurrentType} = useAppTypeStore();
 
-    const ff_520 = useFeatureFlagsStore((state) => state.isFeatureFlagEnabled('ff-520'));
+    const ff_520 = useFeatureFlagsStore()('ff-520');
 
     const handleClick = (appType: AppType) => {
         setCurrentType(appType);
@@ -36,27 +36,27 @@ const DesktopSidebarNavigationMenu = () => {
                         <img alt="ByteChef" className="h-8 w-auto" src={reactLogo} />
                     </NavigationMenuTrigger>
 
-                    <NavigationMenuContent>
-                        <ul className="grid w-[450px] gap-3 p-4 lg:grid-cols-[.60fr_1fr]">
-                            <li className="row-span-3">
-                                <div className=" flex size-full select-none items-center gap-2 rounded-md bg-gradient-to-b from-muted/50 to-muted p-4 no-underline outline-none focus:shadow-md">
-                                    <img alt="ByteChef" className="size-8" src={reactLogo} />
+                    {ff_520 && (
+                        <NavigationMenuContent>
+                            <ul className="grid w-[450px] gap-3 p-4 lg:grid-cols-[.60fr_1fr]">
+                                <li className="row-span-3">
+                                    <div className=" flex size-full select-none items-center gap-2 rounded-md bg-gradient-to-b from-muted/50 to-muted p-4 no-underline outline-none focus:shadow-md">
+                                        <img alt="ByteChef" className="size-8" src={reactLogo} />
 
-                                    <div className="my-2 text-lg font-medium">ByteChef</div>
-                                </div>
-                            </li>
+                                        <div className="my-2 text-lg font-medium">ByteChef</div>
+                                    </div>
+                                </li>
 
-                            {ff_520 && (
                                 <ListItem onClick={() => handleClick(AppType.EMBEDDED)} title="Embedded">
                                     Build integrations for your product.
                                 </ListItem>
-                            )}
 
-                            <ListItem onClick={() => handleClick(AppType.AUTOMATION)} title="Automation">
-                                Automate your daily work.
-                            </ListItem>
-                        </ul>
-                    </NavigationMenuContent>
+                                <ListItem onClick={() => handleClick(AppType.AUTOMATION)} title="Automation">
+                                    Automate your daily work.
+                                </ListItem>
+                            </ul>
+                        </NavigationMenuContent>
+                    )}
                 </NavigationMenuItem>
             </NavigationMenuList>
 

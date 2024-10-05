@@ -98,8 +98,7 @@ function App() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const {getApplicationInfo} = useApplicationInfoStore();
-    const {authenticated, getAccount, sessionHasBeenFetched, showLogin} = useAuthenticationStore();
-    const {init: initFeatureFlags, isFeatureFlagEnabled, loading: loadingFeatureFlags} = useFeatureFlagsStore();
+    const {account, authenticated, getAccount, sessionHasBeenFetched, showLogin} = useAuthenticationStore();
 
     const analytics = useAnalytics();
 
@@ -109,9 +108,11 @@ function App() {
 
     const navigate = useNavigate();
 
+    const ff_1023 = useFeatureFlagsStore()('ff-1023');
+
     const filteredAutomationNavigation = automationNavigation.filter((navItem) => {
         if (navItem.href === '/automation/api-platform/api-collections') {
-            return isFeatureFlagEnabled('ff-1023');
+            return ff_1023;
         }
 
         return true;
@@ -160,10 +161,6 @@ function App() {
     useEffect(() => {
         getApplicationInfo();
     }, [getApplicationInfo]);
-
-    useEffect(() => {
-        initFeatureFlags();
-    }, [initFeatureFlags]);
 
     useEffect(() => {
         if (showLogin) {
