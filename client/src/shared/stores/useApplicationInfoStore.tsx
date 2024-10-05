@@ -9,6 +9,12 @@ export interface ApplicationInfoI {
     application: {
         edition: EditionType;
     } | null;
+    helpHub: {
+        enabled: boolean;
+        commandBar: {
+            orgId: string | undefined;
+        };
+    };
     loading: boolean;
     signUp: {
         activationRequired: boolean;
@@ -31,6 +37,12 @@ export const useApplicationInfoStore = create<ApplicationInfoI>()(
                 application: null,
                 featureFlags: {},
                 loading: false,
+                helpHub: {
+                    enabled: true,
+                    commandBar: {
+                        orgId: undefined,
+                    },
+                },
                 signUp: {
                     activationRequired: false,
                     enabled: true,
@@ -54,6 +66,10 @@ export const useApplicationInfoStore = create<ApplicationInfoI>()(
                         set((state) => ({
                             ...state,
                             application: json.application,
+                            helpHub: {
+                                enabled: json.helpHub.enabled === 'true',
+                                commandBar: json.helpHub.commandBar,
+                            },
                             loading: false,
                             signUp: json.signUp,
                         }));
