@@ -13,10 +13,9 @@ export interface AuthenticationI {
     loginError: boolean;
     sessionHasBeenFetched: boolean;
     showLogin: boolean;
-
     clearAuthentication: () => void;
-    getAccount: () => Promise<Response>;
-    login: (email: string, password: string, rememberMe: boolean) => Promise<Response>;
+    getAccount: () => void;
+    login: (email: string, password: string, rememberMe: boolean) => Promise<void>;
     logout: () => void;
     reset: () => void;
 }
@@ -78,9 +77,9 @@ export const useAuthenticationStore = create<AuthenticationI>()(
                 }));
             },
 
-            getAccount: async (): Promise<Response> => {
+            getAccount: async () => {
                 if (get().loading) {
-                    return Promise.resolve(new Response());
+                    return;
                 }
 
                 set((state) => ({
@@ -88,7 +87,7 @@ export const useAuthenticationStore = create<AuthenticationI>()(
                     loading: true,
                 }));
 
-                return fetchGetAccount().then((response) => {
+                fetchGetAccount().then((response) => {
                     if (response.status === 200) {
                         response.json().then((account) => {
                             set((state) => ({
@@ -113,7 +112,7 @@ export const useAuthenticationStore = create<AuthenticationI>()(
                 });
             },
 
-            login: async (email: string, password: string, rememberMe: boolean): Promise<Response> => {
+            login: async (email: string, password: string, rememberMe: boolean): Promise<void> => {
                 const data = `username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}&remember-me=${rememberMe}&submit=Login`;
 
                 return fetchAuthenticate(data).then(async (response) => {
@@ -135,8 +134,6 @@ export const useAuthenticationStore = create<AuthenticationI>()(
                             showLogin: true,
                         }));
                     }
-
-                    return response;
                 });
             },
 
