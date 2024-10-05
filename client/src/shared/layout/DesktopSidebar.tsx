@@ -7,6 +7,7 @@ import {Button} from '@/components/ui/button';
 import {useCopilotStore} from '@/pages/platform/copilot/stores/useCopilotStore';
 import DesktopSidebarMenu from '@/shared/layout/DesktopSidebarMenu';
 import DesktopSidebarNavigationMenu from '@/shared/layout/DesktopSidebarNavigationMenu';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {BotMessageSquareIcon} from 'lucide-react';
 import React from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -23,6 +24,8 @@ export function DesktopSidebar({
     }[];
 }) {
     const {setShowCopilot, showCopilot} = useCopilotStore();
+
+    const ff_1570 = useFeatureFlagsStore()('ff-1570');
 
     return (
         <aside className={twMerge('hidden bg-muted lg:flex lg:shrink-0', className)}>
@@ -55,9 +58,11 @@ export function DesktopSidebar({
                     </div>
 
                     <div className="flex shrink-0 flex-col items-center justify-center gap-4 py-4">
-                        <Button onClick={() => setShowCopilot(!showCopilot)} size="icon" variant="ghost">
-                            <BotMessageSquareIcon className="size-7" />
-                        </Button>
+                        {ff_1570 && (
+                            <Button onClick={() => setShowCopilot(!showCopilot)} size="icon" variant="ghost">
+                                <BotMessageSquareIcon className="size-7" />
+                            </Button>
+                        )}
 
                         <DesktopSidebarMenu />
                     </div>

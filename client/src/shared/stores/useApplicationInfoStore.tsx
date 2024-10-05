@@ -16,6 +16,7 @@ export interface ApplicationInfoI {
     application: {
         edition: EditionType;
     } | null;
+    featureFlags: Record<string, boolean>;
     helpHub: {
         enabled: boolean;
         commandBar: {
@@ -84,6 +85,7 @@ export const useApplicationInfoStore = create<ApplicationInfoI>()(
                                 postHog: json.analytics.postHog,
                             },
                             application: json.application,
+                            featureFlags: json.featureFlags,
                             helpHub: {
                                 enabled: json.helpHub.enabled === 'true',
                                 commandBar: json.helpHub.commandBar,

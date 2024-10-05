@@ -30,7 +30,7 @@ const IntegrationInstanceConfigurations = () => {
     const [environment, setEnvironment] = useState<number>(getEnvironment());
     const [filterData, setFilterData] = useState<{id?: number | string; type: Type}>(getFilterData());
 
-    const ff_743 = useFeatureFlagsStore((state) => state.isFeatureFlagEnabled('ff-743'));
+    const ff_743 = useFeatureFlagsStore()('ff-743');
 
     const {
         data: componentDefinitions,

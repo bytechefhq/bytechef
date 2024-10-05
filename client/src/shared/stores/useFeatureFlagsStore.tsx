@@ -1,82 +1,30 @@
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {posthog} from 'posthog-js';
-import {create} from 'zustand';
+import {useRef} from 'react';
+import {createStore, useStore} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
 export interface FeatureFlagsI {
     featureFlags: Record<string, boolean>;
-    init: () => void;
-    loading: boolean;
-    isFeatureFlagEnabled: (featureFlag: string) => boolean;
+    set: (featureFlag: string, value: boolean) => void;
 }
 
-const fetchGetActuatorInfo = async (): Promise<Response> => {
-    return await fetch('/actuator/info', {
-        method: 'GET',
-    }).then((response) => response);
-};
-
-export const useFeatureFlagsStore = create<FeatureFlagsI>()(
+const featureFlagsStore = createStore<FeatureFlagsI>()(
     devtools(
-        (set, get) => {
+        (set) => {
             return {
                 featureFlags: {},
-                init: () => {
-                    if (get().loading) {
-                        return;
-                    }
-
-                    set((state) => ({
-                        ...state,
-                        loading: true,
-                    }));
-
-                    fetchGetActuatorInfo()
-                        .then((response) => response.json())
-                        .then((applicationInfo) => {
-                            set((state) => ({
-                                ...state,
-                                featureFlags: {
-                                    ...state.featureFlags,
-                                    ...applicationInfo.featureFlags,
-                                },
-                                loading: false,
-                            }));
-                        });
-                },
-                isFeatureFlagEnabled: (featureFlag: string): boolean => {
-                    const {featureFlags} = get();
-
-                    if (featureFlags[featureFlag] !== undefined) {
-                        return featureFlags[featureFlag];
-                    }
-
+                set: (featureFlag: string, value: boolean) => {
                     set((state) => {
                         return {
                             ...state,
                             featureFlags: {
                                 ...state.featureFlags,
-                                [featureFlag]: false,
+                                [featureFlag]: value,
                             },
                         };
                     });
-
-                    posthog.onFeatureFlags(function () {
-                        if (posthog.isFeatureEnabled(featureFlag)) {
-                            set((state) => {
-                                return {
-                                    ...state,
-                                    featureFlags: {
-                                        ...state.featureFlags,
-                                        [featureFlag]: true,
-                                    },
-                                };
-                            });
-                        }
-                    });
-
-                    return featureFlags[featureFlag] ?? false;
                 },
-                loading: false,
             };
         },
         {
@@ -84,3 +32,39 @@ export const useFeatureFlagsStore = create<FeatureFlagsI>()(
         }
     )
 );
+
+export const useFeatureFlagsStore = (): ((featureFlag: string) => boolean) => {
+    const loadingRef = useRef(false);
+
+    const {featureFlags, set} = useStore(featureFlagsStore, (state) => state);
+
+    const {featureFlags: localFeatureFlags} = useApplicationInfoStore();
+
+    return (featureFlag: string): boolean => {
+        if (localFeatureFlags[featureFlag] !== undefined) {
+            return featureFlags[featureFlag];
+        }
+
+        if (featureFlags[featureFlag] !== undefined) {
+            return featureFlags[featureFlag];
+        }
+
+        if (loadingRef.current) {
+            return false;
+        }
+
+        loadingRef.current = true;
+
+        posthog.onFeatureFlags(function () {
+            if (posthog.isFeatureEnabled(featureFlag)) {
+                set(featureFlag, true);
+            } else {
+                set(featureFlag, false);
+            }
+
+            loadingRef.current = false;
+        });
+
+        return featureFlags[featureFlag] ?? false;
+    };
+};

@@ -28,7 +28,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
     }: WorkflowNodesListProps) => {
         const [filter, setFilter] = useState('');
 
-        const {isFeatureFlagEnabled} = useFeatureFlagsStore();
+        const ff_797 = useFeatureFlagsStore()('ff-797');
 
         const [filteredActionComponentDefinitions, setFilteredActionComponentDefinitions] = useState<
             Array<ComponentDefinitionBasic>
@@ -66,11 +66,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                                 (name?.toLowerCase().includes(filter.toLowerCase()) ||
                                     title?.toLowerCase().includes(filter.toLowerCase()))
                         )
-                        .filter(
-                            ({name}) =>
-                                (!isFeatureFlagEnabled('ff-797') && name !== 'dataStream') ||
-                                isFeatureFlagEnabled('ff-797')
-                        )
+                        .filter(({name}) => (!ff_797 && name !== 'dataStream') || ff_797)
                 );
 
                 setFilteredTriggerComponentDefinitions(
@@ -82,7 +78,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                     )
                 );
             }
-        }, [componentDefinitions, filter, isFeatureFlagEnabled]);
+        }, [componentDefinitions, filter, ff_797]);
 
         return (
             <div

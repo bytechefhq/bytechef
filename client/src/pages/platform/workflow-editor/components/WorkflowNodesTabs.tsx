@@ -29,7 +29,7 @@ const WorkflowNodesTabs = ({
     taskDispatcherDefinitions,
     triggerComponentDefinitions,
 }: WorkflowNodesTabsProps) => {
-    const {isFeatureFlagEnabled} = useFeatureFlagsStore();
+    const ff_1057 = useFeatureFlagsStore()('ff-1057');
 
     return (
         <div className="size-full px-3">
@@ -50,7 +50,7 @@ const WorkflowNodesTabs = ({
                         </TabsTrigger>
                     )}
 
-                    {isFeatureFlagEnabled('ff-1057') && !hideTaskDispatchers && (
+                    {ff_1057 && !hideTaskDispatchers && (
                         <TabsTrigger className="w-full" value="taskDispatchers">
                             Flows
                         </TabsTrigger>
