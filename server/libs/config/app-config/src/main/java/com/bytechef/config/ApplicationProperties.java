@@ -48,6 +48,7 @@ public class ApplicationProperties {
     private Encryption encryption;
     private List<String> featureFlags = List.of();
     private FileStorage fileStorage = new FileStorage();
+    private HelpHub helpHub = new HelpHub();
     private Mail mail = new Mail();
     private MessageBroker messageBroker = new MessageBroker();
     private Oauth2 oauth2 = new Oauth2();
@@ -106,6 +107,10 @@ public class ApplicationProperties {
 
     public FileStorage getFileStorage() {
         return fileStorage;
+    }
+
+    public HelpHub getHelpHub() {
+        return helpHub;
     }
 
     public Mail getMail() {
@@ -198,6 +203,10 @@ public class ApplicationProperties {
 
     public void setFileStorage(FileStorage fileStorage) {
         this.fileStorage = fileStorage;
+    }
+
+    public void setHelpHub(HelpHub helpHub) {
+        this.helpHub = helpHub;
     }
 
     public void setMail(Mail mail) {
@@ -813,6 +822,44 @@ public class ApplicationProperties {
 
         public void setProvider(Provider provider) {
             this.provider = provider;
+        }
+    }
+
+    /**
+     * HelpHub properties.
+     */
+    public static class HelpHub {
+
+        private CommandBar commandBar = new CommandBar();
+        private boolean enabled;
+
+        public CommandBar getCommandBar() {
+            return commandBar;
+        }
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setCommandBar(CommandBar commandBar) {
+            this.commandBar = commandBar;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public static class CommandBar {
+
+            private String orgId;
+
+            public String getOrgId() {
+                return orgId;
+            }
+
+            public void setOrgId(String orgId) {
+                this.orgId = orgId;
+            }
         }
     }
 

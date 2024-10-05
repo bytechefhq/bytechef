@@ -18,6 +18,10 @@ info:
   application:
     edition: ${bytechef.edition}
   featureFlags: ${bytechef.featureFlags}
+  helpHub:
+    enabled: ${bytechef.helpHub.enabled}
+    commandBar:
+      orgId: ${bytechef.helpHub.command-bar.orgId}
   signUp:
     activationRequired: ${bytechef.signUp.activationRequired}
     enabled: ${bytechef.signUp.enabled}

@@ -34,3 +34,8 @@ bytechef:
     post-hog:
       api-key: phc_oZ9XWAVf8xf6sI7IYBAbGldSbiud07ioZItD1XvhJ7S
       host: https://eu.i.posthog.com
+  helpHub:
+    enabled: true
+    command-bar:
+      orgId: 3816ef6c
+
