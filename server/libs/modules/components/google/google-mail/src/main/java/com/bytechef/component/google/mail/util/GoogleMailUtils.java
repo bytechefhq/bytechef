@@ -16,6 +16,7 @@
 
 package com.bytechef.component.google.mail.util;
 
+import static com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.integer;
@@ -53,7 +54,6 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TO
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.VALUE;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -447,6 +447,14 @@ public class GoogleMailUtils {
             .users()
             .messages()
             .send(ME, message)
+            .execute();
+    }
+
+    public static Void deleteMail(Parameters inputParameters, Gmail service) throws IOException {
+        return service
+            .users()
+            .messages()
+            .delete(ME, inputParameters.getRequiredString(ID))
             .execute();
     }
 
