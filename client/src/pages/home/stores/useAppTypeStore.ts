@@ -22,7 +22,7 @@ export const useAppTypeStore = create<AppTypeI>()(
                     })),
             }),
             {
-                name: 'app-type',
+                name: 'bytechef.app-type',
             }
         )
     )

@@ -25,7 +25,7 @@ export const useWorkspaceStore = create<WorkspaceStateI>()(
                     })),
             }),
             {
-                name: 'workspace',
+                name: 'bytechef.workspace',
             }
         )
     )

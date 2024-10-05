@@ -23,7 +23,7 @@ const ThemeProviderContext = createContext<ThemeProviderStateI>(initialState);
 export function ThemeProvider({
     children,
     defaultTheme = 'system',
-    storageKey = 'bytechef-ui-theme',
+    storageKey = 'bytechef.ui-theme',
     ...props
 }: ThemeProviderProps) {
     const [theme, setTheme] = useState<ThemeType>(
