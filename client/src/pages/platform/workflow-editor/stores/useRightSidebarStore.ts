@@ -17,7 +17,7 @@ const useRightSidebarStore = create<RightSidebarStateI>()(
                     })),
             }),
             {
-                name: 'right-sidebar',
+                name: 'bytechef.right-sidebar',
             }
         )
     )
