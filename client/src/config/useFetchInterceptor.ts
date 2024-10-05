@@ -15,16 +15,20 @@ export default function useFetchInterceptor() {
     const unregister = fetchIntercept.register({
         /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         request(url: string, config: any): Promise<any[]> | any[] {
-            return [
-                url,
-                {
-                    ...config,
-                    headers: {
-                        ...config.headers,
-                        'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
+            if (url.includes('/internal/')) {
+                return [
+                    url,
+                    {
+                        ...config,
+                        headers: {
+                            ...config.headers,
+                            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
+                        },
                     },
-                },
-            ];
+                ];
+            } else {
+                return [url, config];
+            }
         },
 
         response: function (response) {
