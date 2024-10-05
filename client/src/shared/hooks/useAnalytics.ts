@@ -1,6 +1,7 @@
 import {UserI} from '@/shared/models/user.model';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {usePostHog} from 'posthog-js/react';
+import {useRef} from 'react';
 
 export interface AnalyticsI {
     captureComponentUsed(name: string, actionName?: string, triggerName?: string): void;
@@ -20,11 +21,14 @@ export interface AnalyticsI {
     captureProjectWorkflowTested(): void;
     captureUserSignedUp(email: string): void;
     identify(account: UserI): void;
+    init(): void;
     reset(): void;
 }
 
 export const useAnalytics = (): AnalyticsI => {
-    const {application} = useApplicationInfoStore();
+    const initializedRef = useRef(false);
+
+    const {analytics, application} = useApplicationInfoStore();
 
     const posthog = usePostHog();
 
@@ -84,6 +88,20 @@ export const useAnalytics = (): AnalyticsI => {
                 name: `${account.firstName} ${account.lastName}`,
             });
             // posthog?.group('company', account);
+        },
+        init: () => {
+            if (initializedRef.current) {
+                return;
+            }
+
+            if (analytics.enabled && analytics.postHog.apiKey && analytics.postHog.host) {
+                posthog.init(analytics.postHog.apiKey, {
+                    api_host: analytics.postHog.host,
+                    person_profiles: 'identified_only',
+                });
+
+                initializedRef.current = true;
+            }
         },
         reset: () => {
             posthog.reset();
