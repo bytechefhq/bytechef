@@ -77,6 +77,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
+    "commandbar": "^1.14.0",
     "d3-hierarchy": "^3.1.2",
     "d3-timer": "^3.0.1",
     "date-fns": "^4.1.0",
