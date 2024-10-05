@@ -1,5 +1,6 @@
 import {Toaster} from '@/components/ui/toaster';
 import useFetchInterceptor from '@/config/useFetchInterceptor';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {DesktopSidebar} from '@/shared/layout/DesktopSidebar';
 import {MobileSidebar} from '@/shared/layout/MobileSidebar';
 import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
@@ -21,8 +22,6 @@ import {
 } from 'lucide-react';
 import {useEffect, useState} from 'react';
 import {Outlet, useLocation, useNavigate} from 'react-router-dom';
-
-import {TooltipProvider} from './components/ui/tooltip';
 
 const user = {
     email: 'emily.selman@example.com',
@@ -101,6 +100,9 @@ function App() {
     const {authenticated, getAccount, sessionHasBeenFetched, showLogin} = useAuthenticationStore();
     const {init: initFeatureFlags, isFeatureFlagEnabled, loading: loadingFeatureFlags} = useFeatureFlagsStore();
 
+    const analytics = useAnalytics();
+
+
     const location = useLocation();
 
     const navigate = useNavigate();
@@ -122,6 +124,10 @@ function App() {
     }
 
     useFetchInterceptor();
+
+    useEffect(() => {
+        analytics.init();
+    }, [analytics]);
 
     useEffect(() => {
         document.title =
@@ -154,31 +160,27 @@ function App() {
         }
     }, [authenticated, sessionHasBeenFetched, navigate]);
 
-    if (!authenticated || loadingFeatureFlags) {
-        return <></>;
-    }
-
-    return (
+    return authenticated ? (
         <div className="flex h-full">
-            <TooltipProvider>
-                <MobileSidebar
-                    mobileMenuOpen={mobileMenuOpen}
-                    navigation={navigation}
-                    setMobileMenuOpen={setMobileMenuOpen}
-                    user={user}
-                />
+            <MobileSidebar
+                mobileMenuOpen={mobileMenuOpen}
+                navigation={navigation}
+                setMobileMenuOpen={setMobileMenuOpen}
+                user={user}
+            />
 
-                <DesktopSidebar navigation={navigation} />
+            <DesktopSidebar navigation={navigation} />
 
-                <div className="flex min-w-0 flex-1 flex-col">
-                    <MobileTopNavigation setMobileMenuOpen={setMobileMenuOpen} />
+            <div className="flex min-w-0 flex-1 flex-col">
+                <MobileTopNavigation setMobileMenuOpen={setMobileMenuOpen} />
 
-                    <Outlet />
-                </div>
-            </TooltipProvider>
+                <Outlet />
+            </div>
 
             <Toaster />
         </div>
+    ) : (
+        <Outlet />
     );
 }
 

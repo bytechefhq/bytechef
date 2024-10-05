@@ -6,6 +6,13 @@ import {devtools} from 'zustand/middleware';
 export type EditionType = 'ce' | 'ee';
 
 export interface ApplicationInfoI {
+    analytics: {
+        enabled: boolean;
+        postHog: {
+            apiKey: string | undefined;
+            host: string | undefined;
+        };
+    };
     application: {
         edition: EditionType;
     } | null;
@@ -34,6 +41,13 @@ export const useApplicationInfoStore = create<ApplicationInfoI>()(
     devtools(
         (set, get) => {
             return {
+                analytics: {
+                    enabled: false,
+                    postHog: {
+                        apiKey: undefined,
+                        host: undefined,
+                    },
+                },
                 application: null,
                 featureFlags: {},
                 loading: false,
@@ -65,6 +79,10 @@ export const useApplicationInfoStore = create<ApplicationInfoI>()(
 
                         set((state) => ({
                             ...state,
+                            analytics: {
+                                enabled: json.analytics.enabled === 'true',
+                                postHog: json.analytics.postHog,
+                            },
                             application: json.application,
                             helpHub: {
                                 enabled: json.helpHub.enabled === 'true',

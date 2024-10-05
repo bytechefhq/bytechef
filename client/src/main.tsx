@@ -7,6 +7,7 @@ import './styles/index.css';
 
 import './styles/components.css';
 
+import {TooltipProvider} from '@/components/ui/tooltip';
 import {ThemeProvider} from '@/shared/providers/theme-provider';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools';
@@ -19,21 +20,6 @@ import {PostHogProvider} from 'posthog-js/react';
 import {RouterProvider} from 'react-router-dom';
 
 import {getRouter} from './routes';
-
-const fetchGetApplicationInfo = fetch('/actuator/info', {
-    method: 'GET',
-}).then((response) => response.json());
-
-window.onload = async () => {
-    const applicationInfo = await fetchGetApplicationInfo;
-
-    if (applicationInfo.analytics.enabled === 'true') {
-        posthog.init(applicationInfo.analytics.postHog.apiKey, {
-            api_host: applicationInfo.analytics.postHog.host,
-            person_profiles: 'identified_only',
-        });
-    }
-};
 
 window.MonacoEnvironment = {
     getWorker(moduleId: string, label: string) {
@@ -74,7 +60,9 @@ function renderApp() {
             <ThemeProvider defaultTheme="light">
                 <QueryClientProvider client={queryClient}>
                     <PostHogProvider client={posthog}>
-                        <RouterProvider router={router} />
+                        <TooltipProvider>
+                            <RouterProvider router={router} />
+                        </TooltipProvider>
                     </PostHogProvider>
 
                     <ReactQueryDevtools buttonPosition="bottom-right" initialIsOpen={false} />

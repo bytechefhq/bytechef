@@ -127,281 +127,286 @@ const platformSettingsRoutes = {
 export const getRouter = (queryClient: QueryClient) =>
     createBrowserRouter([
         {
-            element: <Activate />,
-            path: 'activate',
-        },
-        {
-            element: <OAuthPopup />,
-            path: '/callback',
-        },
-        {
-            element: <Login />,
-            path: '/login',
-        },
-        {
-            element: <Register />,
-            path: '/register',
-        },
-        {
             children: [
                 {
-                    element: <PasswordResetInit />,
-                    path: 'init',
+                    element: <Activate />,
+                    path: 'activate',
                 },
                 {
-                    element: <PasswordResetFinish />,
-                    path: 'finish',
+                    element: <OAuthPopup />,
+                    path: '/callback',
                 },
-            ],
-            path: 'password-reset',
-        },
-        {
-            element: <VerifyEmail />,
-            path: '/verify-email',
-        },
-        {
-            children: [
+                {
+                    element: <Login />,
+                    path: '/login',
+                },
+                {
+                    element: <Register />,
+                    path: '/register',
+                },
                 {
                     children: [
                         {
-                            index: true,
-                            loader: async () => {
-                                return redirect('projects');
-                            },
-                        },
-                        getAccountRoutes('/automation'),
-                        {
-                            children: [],
-                            element: (
-                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                    <Projects />
-                                </PrivateRoute>
-                            ),
-                            path: 'projects',
+                            element: <PasswordResetInit />,
+                            path: 'init',
                         },
                         {
-                            element: (
-                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                    <Project />
-                                </PrivateRoute>
-                            ),
-                            loader: async ({params}) =>
-                                queryClient.ensureQueryData({
-                                    queryFn: () =>
-                                        new ProjectApi().getProject({
-                                            id: parseInt(params.projectId!),
-                                        }),
-                                    queryKey: ProjectKeys.project(parseInt(params.projectId!)),
-                                }),
-                            path: 'projects/:projectId/project-workflows/:projectWorkflowId',
+                            element: <PasswordResetFinish />,
+                            path: 'finish',
                         },
-                        {
-                            element: (
-                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                    <ProjectInstances />
-                                </PrivateRoute>
-                            ),
-                            path: 'instances',
-                        },
-                        {
-                            element: (
-                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                    <AutomationConnections />
-                                </PrivateRoute>
-                            ),
-                            path: 'connections',
-                        },
+                    ],
+                    path: 'password-reset',
+                },
+                {
+                    element: <VerifyEmail />,
+                    path: '/verify-email',
+                },
+                {
+                    children: [
                         {
                             children: [
+                                {
+                                    index: true,
+                                    loader: async () => {
+                                        return redirect('projects');
+                                    },
+                                },
+                                getAccountRoutes('/automation'),
+                                {
+                                    children: [],
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <Projects />
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'projects',
+                                },
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <EEVersion>
-                                                <ApiCollections />
-                                            </EEVersion>
+                                            <Project />
                                         </PrivateRoute>
                                     ),
-                                    path: 'api-collections',
-                                },
-                            ],
-                            path: 'api-platform',
-                        },
-                        {
-                            element: (
-                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                    <AutomationWorkflowExecutions />
-                                </PrivateRoute>
-                            ),
-                            path: 'executions',
-                        },
-                        {
-                            children: [
-                                {
-                                    index: true,
-                                    loader: async () => {
-                                        return redirect('workspaces');
-                                    },
-                                },
-                                {
-                                    element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
-                                            <EEVersion>
-                                                <Workspaces />
-                                            </EEVersion>
-                                        </PrivateRoute>
-                                    ),
-                                    path: 'workspaces',
-                                },
-                                {
-                                    element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
-                                            <AutomationApiKeys />
-                                        </PrivateRoute>
-                                    ),
-                                    path: 'api-keys',
-                                },
-                                ...platformSettingsRoutes.children,
-                            ],
-                            element: (
-                                <Settings
-                                    sidebarNavItems={[
-                                        {
-                                            href: '/automation/settings/workspaces',
-                                            title: 'Workspaces',
-                                        },
-                                        {
-                                            href: '/automation/settings/api-keys',
-                                            title: 'API Keys',
-                                        },
-                                        ...platformSettingsRoutes.navItems,
-                                    ]}
-                                />
-                            ),
-                            path: 'settings',
-                        },
-                    ],
-                    errorElement: <ErrorPage />,
-                    path: 'automation',
-                },
-                {
-                    children: [
-                        {
-                            index: true,
-                            loader: async () => {
-                                return redirect('integrations');
-                            },
-                        },
-                        getAccountRoutes('/embedded'),
-                        {
-                            element: <Integrations />,
-                            path: 'integrations',
-                        },
-                        {
-                            element: (
-                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                    <Integration />
-                                </PrivateRoute>
-                            ),
-                            loader: async ({params}) =>
-                                queryClient.ensureQueryData({
-                                    queryFn: () =>
-                                        new IntegrationApi().getIntegration({
-                                            id: parseInt(params.integrationId!),
+                                    loader: async ({params}) =>
+                                        queryClient.ensureQueryData({
+                                            queryFn: () =>
+                                                new ProjectApi().getProject({
+                                                    id: parseInt(params.projectId!),
+                                                }),
+                                            queryKey: ProjectKeys.project(parseInt(params.projectId!)),
                                         }),
-                                    queryKey: IntegrationKeys.integration(parseInt(params.integrationId!)),
-                                }),
-                            path: 'integrations/:integrationId/integration-workflows/:integrationWorkflowId',
-                        },
-                        {
-                            element: (
-                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                    <IntegrationInstanceConfigurations />
-                                </PrivateRoute>
-                            ),
-                            path: 'configurations',
-                        },
-                        {
-                            element: (
-                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                    <ConnectedUsers />
-                                </PrivateRoute>
-                            ),
-                            path: 'connected-users',
-                        },
-                        {
-                            element: (
-                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                    <AppEvents />
-                                </PrivateRoute>
-                            ),
-                            path: 'app-events',
-                        },
-                        {
-                            element: (
-                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                    <EmbeddedConnections />
-                                </PrivateRoute>
-                            ),
-                            path: 'connections',
-                        },
-                        {
-                            element: (
-                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                    <EmbeddedIntegrationWorkflowExecutions />
-                                </PrivateRoute>
-                            ),
-                            path: 'executions',
+                                    path: 'projects/:projectId/project-workflows/:projectWorkflowId',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <ProjectInstances />
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'instances',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <AutomationConnections />
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'connections',
+                                },
+                                {
+                                    children: [
+                                        {
+                                            element: (
+                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                                    <EEVersion>
+                                                        <ApiCollections />
+                                                    </EEVersion>
+                                                </PrivateRoute>
+                                            ),
+                                            path: 'api-collections',
+                                        },
+                                    ],
+                                    path: 'api-platform',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <AutomationWorkflowExecutions />
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'executions',
+                                },
+                                {
+                                    children: [
+                                        {
+                                            index: true,
+                                            loader: async () => {
+                                                return redirect('workspaces');
+                                            },
+                                        },
+                                        {
+                                            element: (
+                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                                                    <EEVersion>
+                                                        <Workspaces />
+                                                    </EEVersion>
+                                                </PrivateRoute>
+                                            ),
+                                            path: 'workspaces',
+                                        },
+                                        {
+                                            element: (
+                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                                                    <AutomationApiKeys />
+                                                </PrivateRoute>
+                                            ),
+                                            path: 'api-keys',
+                                        },
+                                        ...platformSettingsRoutes.children,
+                                    ],
+                                    element: (
+                                        <Settings
+                                            sidebarNavItems={[
+                                                {
+                                                    href: '/automation/settings/workspaces',
+                                                    title: 'Workspaces',
+                                                },
+                                                {
+                                                    href: '/automation/settings/api-keys',
+                                                    title: 'API Keys',
+                                                },
+                                                ...platformSettingsRoutes.navItems,
+                                            ]}
+                                        />
+                                    ),
+                                    path: 'settings',
+                                },
+                            ],
+                            errorElement: <ErrorPage />,
+                            path: 'automation',
                         },
                         {
                             children: [
                                 {
                                     index: true,
                                     loader: async () => {
-                                        return redirect('api-keys');
+                                        return redirect('integrations');
                                     },
                                 },
+                                getAccountRoutes('/embedded'),
                                 {
-                                    element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
-                                            <EmbeddedApiKeys />
-                                        </PrivateRoute>
-                                    ),
-                                    path: 'api-keys',
+                                    element: <Integrations />,
+                                    path: 'integrations',
                                 },
                                 {
                                     element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
-                                            <SigningKeys />
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <Integration />
                                         </PrivateRoute>
                                     ),
-                                    path: 'signing-keys',
+                                    loader: async ({params}) =>
+                                        queryClient.ensureQueryData({
+                                            queryFn: () =>
+                                                new IntegrationApi().getIntegration({
+                                                    id: parseInt(params.integrationId!),
+                                                }),
+                                            queryKey: IntegrationKeys.integration(parseInt(params.integrationId!)),
+                                        }),
+                                    path: 'integrations/:integrationId/integration-workflows/:integrationWorkflowId',
                                 },
-                                ...platformSettingsRoutes.children,
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <IntegrationInstanceConfigurations />
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'configurations',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <ConnectedUsers />
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'connected-users',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <AppEvents />
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'app-events',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <EmbeddedConnections />
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'connections',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <EmbeddedIntegrationWorkflowExecutions />
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'executions',
+                                },
+                                {
+                                    children: [
+                                        {
+                                            index: true,
+                                            loader: async () => {
+                                                return redirect('api-keys');
+                                            },
+                                        },
+                                        {
+                                            element: (
+                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                                                    <EmbeddedApiKeys />
+                                                </PrivateRoute>
+                                            ),
+                                            path: 'api-keys',
+                                        },
+                                        {
+                                            element: (
+                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                                                    <SigningKeys />
+                                                </PrivateRoute>
+                                            ),
+                                            path: 'signing-keys',
+                                        },
+                                        ...platformSettingsRoutes.children,
+                                    ],
+                                    element: (
+                                        <Settings
+                                            sidebarNavItems={[
+                                                {
+                                                    href: '/embedded/settings/api-keys',
+                                                    title: 'API Keys',
+                                                },
+                                                {
+                                                    href: '/embedded/settings/signing-keys',
+                                                    title: 'Signing Keys',
+                                                },
+                                                ...platformSettingsRoutes.navItems,
+                                            ]}
+                                        />
+                                    ),
+                                    path: 'settings',
+                                },
                             ],
-                            element: (
-                                <Settings
-                                    sidebarNavItems={[
-                                        {
-                                            href: '/embedded/settings/api-keys',
-                                            title: 'API Keys',
-                                        },
-                                        {
-                                            href: '/embedded/settings/signing-keys',
-                                            title: 'Signing Keys',
-                                        },
-                                        ...platformSettingsRoutes.navItems,
-                                    ]}
-                                />
-                            ),
-                            path: 'settings',
+                            errorElement: <ErrorPage />,
+                            path: 'embedded',
+                        },
+                        {
+                            element: <Home />,
+                            index: true,
                         },
                     ],
-                    errorElement: <ErrorPage />,
-                    path: 'embedded',
-                },
-                {
-                    element: <Home />,
-                    index: true,
+                    path: '/',
                 },
             ],
             element: <App />,
