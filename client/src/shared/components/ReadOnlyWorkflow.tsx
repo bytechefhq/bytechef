@@ -112,7 +112,7 @@ const ReadOnlyWorkflowEditor = ({
     }, [defaultNodesWithWorkflowNodes, workflow.id]);
 
     return (
-        <div className="flex h-full flex-1 flex-col rounded-xl bg-muted">
+        <div className="flex h-full flex-1 flex-col rounded-xl bg-transparent">
             <ReactFlow
                 defaultEdges={defaultEdgesWithWorkflowEdges}
                 defaultNodes={defaultNodesWithWorkflowNodes || defaultNodes}

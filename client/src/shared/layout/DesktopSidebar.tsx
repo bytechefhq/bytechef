@@ -26,7 +26,7 @@ export function DesktopSidebar({
 
     return (
         <aside className={twMerge('hidden bg-muted lg:flex lg:shrink-0', className)}>
-            <div className="flex w-[56px]">
+            <div className="flex w-[56px] border-r border-muted bg-muted">
                 <div className="flex min-h-0 flex-1 flex-col">
                     <div className="flex-1">
                         <div className="flex items-center justify-center py-4">

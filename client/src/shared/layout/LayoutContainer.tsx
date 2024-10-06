@@ -70,7 +70,7 @@ const LayoutContainer = ({
                         </div>
 
                         <div className="absolute inset-0 mt-5 overflow-auto">
-                            <nav className="flex h-full flex-col">
+                            <nav className="flex h-full flex-col bg-muted/50">
                                 <div className="space-y-1">{leftSidebarBody}</div>
                             </nav>
                         </div>
@@ -81,13 +81,13 @@ const LayoutContainer = ({
             {leftSidebarOpen && (
                 <aside
                     className={twMerge(
-                        'hidden lg:flex lg:flex-col bg-white',
+                        'hidden lg:flex lg:flex-col bg-background',
                         !topHeader && 'lg:fixed lg:inset-y-0',
                         topHeader && 'lg:absolute lg:bottom-0 lg:top-14',
                         leftSidebarWidths[leftSidebarWidth][0]
                     )}
                 >
-                    <nav className="flex h-full flex-col border-r">
+                    <nav className="flex h-full flex-col border-r border-muted bg-muted/50">
                         {leftSidebarHeader}
 
                         <div className="size-full overflow-y-auto">{leftSidebarBody}</div>
@@ -119,7 +119,7 @@ const LayoutContainer = ({
                 )}
 
                 {rightToolbarOpen && !!rightToolbarBody && (
-                    <aside className="hidden border-l bg-muted lg:flex lg:shrink-0">
+                    <aside className="hidden border-l border-muted bg-muted/50 lg:flex lg:shrink-0">
                         <div className="flex flex-1 flex-col overflow-y-auto">{rightToolbarBody}</div>
                     </aside>
                 )}

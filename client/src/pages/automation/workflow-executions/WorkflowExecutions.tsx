@@ -322,7 +322,7 @@ export const WorkflowExecutions = () => {
                         <Label>Environment</Label>
 
                         <Select onValueChange={handleEnvironmentChange} value={filterEnvironment}>
-                            <SelectTrigger className="w-full">
+                            <SelectTrigger className="w-full bg-background">
                                 <SelectValue placeholder="Select environment" />
                             </SelectTrigger>
 

@@ -31,16 +31,18 @@ const IntegrationInstanceConfigurationWorkflowSheet = () => {
             }
             open
         >
-            <SheetContent className="flex flex-col  bg-gray-100 p-4 sm:max-w-[780px]">
-                <h1 className="text-lg font-semibold">
-                    {workflow?.label} <span className="text-sm font-normal text-gray-500">(read-only)</span>
-                </h1>
+            <SheetContent className="flex flex-col bg-white p-4 sm:max-w-[780px]">
+                <div className="size-full bg-muted/50 p-4">
+                    <h1 className="text-lg font-semibold">
+                        {workflow?.label} <span className="text-sm font-normal text-gray-500">(read-only)</span>
+                    </h1>
 
-                {componentDefinitions && workflow ? (
-                    <ReadOnlyWorkflowEditor componentDefinitions={componentDefinitions} workflow={workflow} />
-                ) : (
-                    <LoadingIcon />
-                )}
+                    {componentDefinitions && workflow ? (
+                        <ReadOnlyWorkflowEditor componentDefinitions={componentDefinitions} workflow={workflow} />
+                    ) : (
+                        <LoadingIcon />
+                    )}
+                </div>
             </SheetContent>
         </Sheet>
     );

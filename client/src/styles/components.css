@@ -4,7 +4,7 @@
 
 @layer components {
     .heading-tertiary {
-        @apply font-semibold uppercase text-gray-500;
+        @apply font-semibold uppercase text-muted-foreground;
     }
 }
 

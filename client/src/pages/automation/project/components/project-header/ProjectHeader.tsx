@@ -181,7 +181,7 @@ const ProjectHeader = ({
     };
 
     return (
-        <header className="flex items-center border-b py-2 pl-3 pr-2.5">
+        <header className="flex items-center border-b border-muted bg-muted/50 py-2 pl-3 pr-2.5">
             <div className="flex flex-1">{project && <ProjectHeaderDropdownMenu project={project} />}</div>
 
             <div className="flex items-center space-x-12">

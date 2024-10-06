@@ -51,7 +51,7 @@ const DataPillPanelBodyPropertiesItem = ({
     return (
         <>
             <AccordionTrigger
-                className="group flex w-full items-center justify-between border-gray-100 bg-white p-4 group-data-[state=closed]:border-b"
+                className="group flex w-full items-center justify-between border-muted bg-background p-4 group-data-[state=closed]:border-b"
                 key={`accordion-trigger-${workflowNodeName}`}
             >
                 <div className="flex items-center space-x-4">
@@ -76,7 +76,7 @@ const DataPillPanelBodyPropertiesItem = ({
             </AccordionTrigger>
 
             <AccordionContent
-                className="size-full space-y-2 border-b border-gray-100 px-4 pb-4"
+                className="size-full space-y-2 border-b border-muted px-4 pb-4"
                 key={`accordion-content-${workflowNodeName}`}
             >
                 {outputSchema ? (

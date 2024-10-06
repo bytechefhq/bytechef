@@ -24,7 +24,7 @@ const WorkflowExecutionSheet = () => {
             <SheetContent className="flex w-11/12 gap-0 p-0 sm:max-w-screen-xl">
                 {workflowExecutionLoading && <span>Loading...</span>}
 
-                <div className="flex w-7/12 flex-col border-r border-gray-100 bg-white">
+                <div className="flex w-7/12 flex-col border-r border-muted bg-white">
                     {workflowExecution?.job && (
                         <WorkflowExecutionAccordion
                             job={workflowExecution.job}

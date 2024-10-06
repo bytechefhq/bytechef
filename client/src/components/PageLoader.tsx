@@ -1,13 +1,15 @@
 import {CrossCircledIcon} from '@radix-ui/react-icons';
 import {PropsWithChildren} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 type TErrorType = Error | null;
 
 const PageLoader = ({
     children,
+    className,
     errors = [],
     loading,
-}: PropsWithChildren<{errors?: Array<TErrorType>; loading: boolean}>) => {
+}: PropsWithChildren<{errors?: Array<TErrorType>; className?: string; loading: boolean}>) => {
     let errorExists = false;
 
     errors.forEach((error) => {
@@ -19,7 +21,7 @@ const PageLoader = ({
     return (
         <>
             {errorExists || loading ? (
-                <div className="flex min-h-screen min-w-full items-center justify-center p-5">
+                <div className={twMerge('flex min-h-screen min-w-full items-center justify-center p-5', className)}>
                     {errorExists ? (
                         <div className="flex items-center text-red-700">
                             <CrossCircledIcon aria-hidden="true" className="mr-1 size-5 text-red-400" />
