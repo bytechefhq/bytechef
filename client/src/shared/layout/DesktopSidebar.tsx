@@ -3,8 +3,11 @@ import {Link} from 'react-router-dom';
 
 import './DesktopSidebar.css';
 
+import {Button} from '@/components/ui/button';
+import {useCopilotStore} from '@/pages/platform/copilot/stores/useCopilotStore';
 import DesktopSidebarMenu from '@/shared/layout/DesktopSidebarMenu';
 import DesktopSidebarNavigationMenu from '@/shared/layout/DesktopSidebarNavigationMenu';
+import {BotMessageSquareIcon} from 'lucide-react';
 import React from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -19,6 +22,8 @@ export function DesktopSidebar({
         icon: React.ForwardRefExoticComponent<Omit<React.SVGProps<SVGSVGElement>, 'ref'>>;
     }[];
 }) {
+    const {setShowCopilot, showCopilot} = useCopilotStore();
+
     return (
         <aside className={twMerge('hidden bg-muted lg:flex lg:shrink-0', className)}>
             <div className="flex w-[56px]">
@@ -49,7 +54,11 @@ export function DesktopSidebar({
                         </nav>
                     </div>
 
-                    <div className="flex shrink-0 justify-center py-4">
+                    <div className="flex shrink-0 flex-col items-center justify-center gap-4 py-4">
+                        <Button onClick={() => setShowCopilot(!showCopilot)} size="icon" variant="ghost">
+                            <BotMessageSquareIcon className="size-7" />
+                        </Button>
+
                         <DesktopSidebarMenu />
                     </div>
                 </div>
