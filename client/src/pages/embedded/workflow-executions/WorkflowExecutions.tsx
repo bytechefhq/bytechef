@@ -315,7 +315,11 @@ export const WorkflowExecutions = () => {
             header={
                 workflowExecutions &&
                 workflowExecutions.length > 0 && (
-                    <Header centerTitle={true} position="main" title="All Workflow Executions" />
+                    <Header
+                        centerTitle={true}
+                        position="main"
+                        title={<span className="text-base">All Workflow Executions</span>}
+                    />
                 )
             }
             leftSidebarBody={

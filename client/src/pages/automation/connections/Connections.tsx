@@ -6,8 +6,10 @@ import ConnectionDialog from '@/pages/platform/connection/components/ConnectionD
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
+import {Tag} from '@/shared/middleware/automation/configuration';
 import {ConnectionEnvironment} from '@/shared/middleware/automation/connection';
 import {Connection} from '@/shared/middleware/embedded/connection';
+import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useCreateConnectionMutation} from '@/shared/mutations/automation/connections.mutations';
 import {
     ConnectionKeys,
@@ -16,7 +18,7 @@ import {
 } from '@/shared/queries/automation/connections.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {Link2Icon, TagIcon} from 'lucide-react';
-import {useEffect, useState} from 'react';
+import {ReactNode, useEffect, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
 import ConnectionList from './components/ConnectionList';
@@ -25,6 +27,36 @@ export enum Type {
     Component,
     Tag,
 }
+
+const FilterTitle = ({
+    componentDefinitions,
+    filterData,
+    tags,
+}: {
+    componentDefinitions: ComponentDefinitionBasic[] | undefined;
+    filterData: {id?: number | string; type: Type};
+    tags: Tag[] | undefined;
+}) => {
+    const [searchParams] = useSearchParams();
+
+    let pageTitle: string | ReactNode | undefined;
+
+    if (filterData.type === Type.Component) {
+        pageTitle = componentDefinitions?.find(
+            (componentDefinition) => componentDefinition.name === filterData.id
+        )?.name;
+    } else {
+        pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
+    }
+
+    return (
+        <div className="space-x-1">
+            <span className="text-sm uppercase text-muted-foreground">{`Filter by ${searchParams.get('tagId') ? 'tag' : 'component'}:`}</span>
+
+            <span className="text-base">{pageTitle ?? 'All Components'}</span>
+        </div>
+    );
+};
 
 export const Connections = () => {
     const [searchParams] = useSearchParams();
@@ -67,20 +99,6 @@ export const Connections = () => {
     });
 
     const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetConnectionTagsQuery();
-
-    let pageTitle: string | undefined;
-
-    if (filterData.type === Type.Component) {
-        pageTitle = componentDefinitions?.find(
-            (componentDefinition) => componentDefinition.name === filterData.id
-        )?.title;
-    } else {
-        pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
-    }
-
-    pageTitle = !pageTitle
-        ? 'All Connections'
-        : `Filter by ${searchParams.get('tagId') ? 'tag' : 'component'}: ${pageTitle}`;
 
     function getEnvironment() {
         return searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : 1;
@@ -131,7 +149,13 @@ export const Connections = () => {
                                 useGetConnectionTagsQuery={useGetConnectionTagsQuery}
                             />
                         }
-                        title={pageTitle}
+                        title={
+                            <FilterTitle
+                                componentDefinitions={componentDefinitions}
+                                filterData={filterData}
+                                tags={tags}
+                            />
+                        }
                     />
                 )
             }

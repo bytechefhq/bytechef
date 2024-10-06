@@ -6,12 +6,12 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import {Environment, ProjectInstance} from '@/shared/middleware/automation/configuration';
+import {Environment, Project, ProjectInstance, Tag} from '@/shared/middleware/automation/configuration';
 import {useGetProjectInstanceTagsQuery} from '@/shared/queries/automation/projectInstanceTags.queries';
 import {useGetWorkspaceProjectInstancesQuery} from '@/shared/queries/automation/projectInstances.queries';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {Layers3Icon, TagIcon} from 'lucide-react';
-import {useEffect, useState} from 'react';
+import {ReactNode, useEffect, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
 import ProjectInstanceDialog from './components/ProjectInstanceDialog';
@@ -22,6 +22,34 @@ export enum Type {
     Project,
     Tag,
 }
+
+const FilterTitle = ({
+    filterData,
+    projects,
+    tags,
+}: {
+    filterData: {id?: number; type: Type};
+    projects: Project[] | undefined;
+    tags: Tag[] | undefined;
+}) => {
+    const [searchParams] = useSearchParams();
+
+    let pageTitle: string | ReactNode | undefined;
+
+    if (filterData.type === Type.Project) {
+        pageTitle = projects?.find((project) => project.id === filterData.id)?.name;
+    } else {
+        pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
+    }
+
+    return (
+        <div className="space-x-1">
+            <span className="text-sm uppercase text-muted-foreground">{`Filter by ${searchParams.get('tagId') ? 'tag' : 'project'}:`}</span>
+
+            <span className="text-base">{pageTitle ?? 'All Projects'}</span>
+        </div>
+    );
+};
 
 const ProjectInstances = () => {
     const [searchParams] = useSearchParams();
@@ -75,18 +103,6 @@ const ProjectInstances = () => {
 
     const {projectInstanceWorkflowSheetOpen} = useProjectInstanceWorkflowSheetStore();
 
-    let pageTitle: string | undefined;
-
-    if (filterData.type === Type.Project) {
-        pageTitle = projects?.find((project) => project.id === filterData.id)?.name;
-    } else {
-        pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
-    }
-
-    pageTitle = !pageTitle
-        ? 'All Instances'
-        : `Filter by ${searchParams.get('tagId') ? 'tag' : 'project'}: ${pageTitle}`;
-
     function getEnvironment() {
         return searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : 1;
     }
@@ -127,7 +143,7 @@ const ProjectInstances = () => {
                                 triggerNode={<Button>New Instance</Button>}
                             />
                         }
-                        title={pageTitle}
+                        title={<FilterTitle filterData={filterData} projects={projects} tags={tags} />}
                     />
                 )
             }

@@ -8,14 +8,19 @@ import useIntegrationInstanceConfigurationWorkflowSheetStore from '@/pages/embed
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import {Environment, IntegrationInstanceConfiguration} from '@/shared/middleware/embedded/configuration';
+import {
+    Environment,
+    Integration,
+    IntegrationInstanceConfiguration,
+    Tag,
+} from '@/shared/middleware/embedded/configuration';
 import {useGetIntegrationInstanceConfigurationTagsQuery} from '@/shared/queries/embedded/integrationInstanceConfigurationTags.queries';
 import {useGetIntegrationInstanceConfigurationsQuery} from '@/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useGetIntegrationsQuery} from '@/shared/queries/embedded/integrations.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {Settings2Icon, TagIcon} from 'lucide-react';
-import {useEffect, useState} from 'react';
+import {ReactNode, useEffect, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
 export enum Type {
@@ -23,6 +28,34 @@ export enum Type {
     Tag,
     UnifiedAPI,
 }
+
+const FilterTitle = ({
+    filterData,
+    integrations,
+    tags,
+}: {
+    filterData: {id?: number | string; type: Type};
+    integrations: Integration[] | undefined;
+    tags: Tag[] | undefined;
+}) => {
+    const [searchParams] = useSearchParams();
+
+    let pageTitle: string | ReactNode | undefined;
+
+    if (filterData.type === Type.Integration) {
+        pageTitle = integrations?.find((integration) => integration.id === filterData.id)?.name;
+    } else {
+        pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
+    }
+
+    return (
+        <div className="space-x-1">
+            <span className="text-sm uppercase text-muted-foreground">{`Filter by ${searchParams.get('tagId') ? 'tag' : 'integration'}:`}</span>
+
+            <span className="text-base">{pageTitle ?? 'All Integrations'}</span>
+        </div>
+    );
+};
 
 const IntegrationInstanceConfigurations = () => {
     const [searchParams] = useSearchParams();
@@ -90,18 +123,6 @@ const IntegrationInstanceConfigurations = () => {
 
     const {integrationInstanceConfigurationWorkflowSheetOpen} = useIntegrationInstanceConfigurationWorkflowSheetStore();
 
-    let pageTitle: string | undefined;
-
-    if (filterData.type === Type.Integration) {
-        pageTitle = integrations?.find((integration) => integration.id === filterData.id)?.componentName;
-    } else {
-        pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
-    }
-
-    pageTitle = !pageTitle
-        ? 'All Instance Configurations'
-        : `Filter by ${searchParams.get('tagId') ? 'tag' : 'integration'}: ${pageTitle}`;
-
     function getEnvironment() {
         return searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : 1;
     }
@@ -145,7 +166,7 @@ const IntegrationInstanceConfigurations = () => {
                                 />
                             )
                         }
-                        title={pageTitle}
+                        title={<FilterTitle filterData={filterData} integrations={integrations} tags={tags} />}
                     />
                 )
             }

@@ -5,11 +5,12 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
+import {Category, Tag} from '@/shared/middleware/automation/configuration';
 import {useGetProjectCategoriesQuery} from '@/shared/queries/automation/projectCategories.queries';
 import {useGetProjectTagsQuery} from '@/shared/queries/automation/projectTags.queries';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {FolderIcon, TagIcon} from 'lucide-react';
-import {useState} from 'react';
+import {ReactNode, useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 
 import ProjectDialog from './components/ProjectDialog';
@@ -19,6 +20,34 @@ export enum Type {
     Category,
     Tag,
 }
+
+const FilterTitle = ({
+    categories,
+    filterData,
+    tags,
+}: {
+    categories: Category[] | undefined;
+    filterData: {id?: number; type: Type};
+    tags: Tag[] | undefined;
+}) => {
+    const [searchParams] = useSearchParams();
+
+    let pageTitle: string | ReactNode | undefined;
+
+    if (filterData.type === Type.Category) {
+        pageTitle = categories?.find((category) => category.id === filterData.id)?.name;
+    } else {
+        pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
+    }
+
+    return (
+        <div className="space-x-1">
+            <span className="text-sm uppercase text-muted-foreground">{`Filter by ${searchParams.get('tagId') ? 'tag' : 'category'}:`}</span>
+
+            <span className="text-base">{pageTitle ?? 'All Categories'}</span>
+        </div>
+    );
+};
 
 const Projects = () => {
     const [searchParams] = useSearchParams();
@@ -52,18 +81,6 @@ const Projects = () => {
 
     const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetProjectTagsQuery();
 
-    let pageTitle: string | undefined;
-
-    if (filterData.type === Type.Category) {
-        pageTitle = categories?.find((category) => category.id === filterData.id)?.name;
-    } else {
-        pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
-    }
-
-    pageTitle = !pageTitle
-        ? 'All Projects'
-        : `Filter by ${searchParams.get('tagId') ? 'tag' : 'category'}: ${pageTitle}`;
-
     return (
         <LayoutContainer
             header={
@@ -85,7 +102,7 @@ const Projects = () => {
                                 triggerNode={<Button>New Project</Button>}
                             />
                         }
-                        title={pageTitle}
+                        title={<FilterTitle categories={categories} filterData={filterData} tags={tags} />}
                     />
                 )
             }
