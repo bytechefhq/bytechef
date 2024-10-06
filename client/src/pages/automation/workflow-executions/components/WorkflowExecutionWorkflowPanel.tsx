@@ -20,7 +20,7 @@ const WorkflowExecutionWorkflowPanel = ({workflowExecution}: {workflowExecution:
     );
 
     return (
-        <div className="flex size-full flex-col bg-muted">
+        <div className="flex size-full flex-col bg-muted/50">
             {workflow?.label && (
                 <h1 className="p-4 text-lg font-semibold">
                     {`${project?.name}/${projectInstance?.environment}/${workflow?.label}`}

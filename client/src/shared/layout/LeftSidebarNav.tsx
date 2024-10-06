@@ -42,7 +42,7 @@ const LeftSidebarNavItem = ({icon, item: {current, id, name, onItemClick}, toLin
         aria-current={current ? 'page' : undefined}
         className={cn(
             buttonVariants({variant: 'ghost'}),
-            current ? 'bg-muted hover:bg-muted' : 'hover:bg-muted',
+            current ? 'bg-background hover:bg-background' : 'hover:bg-background',
             'justify-start px-2'
         )}
         onClick={() => (onItemClick ? onItemClick(id) : null)}
@@ -50,7 +50,7 @@ const LeftSidebarNavItem = ({icon, item: {current, id, name, onItemClick}, toLin
     >
         {icon}
 
-        <span className="truncate">{name}</span>
+        <span className={cn('truncate', current && 'font-semibold')}>{name}</span>
     </Link>
 );
 

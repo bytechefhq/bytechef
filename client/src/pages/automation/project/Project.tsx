@@ -241,7 +241,6 @@ const Project = () => {
     return (
         <>
             <LayoutContainer
-                className="border-l bg-muted dark:bg-background"
                 leftSidebarOpen={false}
                 rightSidebarBody={
                     componentDefinitions &&
@@ -271,11 +270,12 @@ const Project = () => {
                 }
             >
                 <PageLoader
+                    className="bg-muted/50"
                     errors={[componentsError, taskDispatcherDefinitionsError]}
                     loading={componentsIsLoading || taskDispatcherDefinitionsLoading}
                 >
                     {componentDefinitions && !!taskDispatcherDefinitions && workflow?.id && (
-                        <ResizablePanelGroup className="flex-1" direction="vertical">
+                        <ResizablePanelGroup className="flex-1 bg-muted/50" direction="vertical">
                             <ResizablePanel className="relative" defaultSize={65}>
                                 <ConnectionReactQueryProvider
                                     value={{

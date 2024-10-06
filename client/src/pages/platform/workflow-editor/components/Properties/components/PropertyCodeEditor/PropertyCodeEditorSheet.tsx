@@ -75,7 +75,7 @@ const PropertyCodeEditorSheet = ({
                             <SheetTitle>Edit Script</SheetTitle>
 
                             <div className="flex items-center">
-                                <div className="mr-4 flex items-center">
+                                <div className="mr-10 flex items-center">
                                     {!scriptIsRunning && (
                                         <Tooltip>
                                             <TooltipTrigger asChild>

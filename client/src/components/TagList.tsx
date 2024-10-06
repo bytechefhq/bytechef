@@ -148,7 +148,7 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
                 </>
             ) : (
                 <div
-                    className="flex size-6 cursor-pointer items-center justify-center rounded border border-gray-100 hover:bg-gray-200"
+                    className="flex size-6 cursor-pointer items-center justify-center rounded border border-muted hover:bg-gray-200"
                     onClick={(event) => {
                         event.preventDefault();
 
