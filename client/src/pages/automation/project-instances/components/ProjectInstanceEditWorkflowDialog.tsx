@@ -1,7 +1,7 @@
 import {Button} from '@/components/ui/button';
 import {Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import {Form} from '@/components/ui/form';
-import ProjectInstanceDialogWorkflowsStepItem from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItem';
+import ProjectInstanceDialogWorkflowsStepItem from '@/pages/automation/project-instances/components/project-instance-dialog/ProjectInstanceDialogWorkflowsStepItem';
 import {
     ProjectInstance,
     ProjectInstanceWorkflow,

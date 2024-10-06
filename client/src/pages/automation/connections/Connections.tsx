@@ -21,7 +21,7 @@ import {Link2Icon, TagIcon} from 'lucide-react';
 import {ReactNode, useEffect, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
-import ConnectionList from './components/ConnectionList';
+import ConnectionList from './components/connection-list/ConnectionList';
 
 export enum Type {
     Component,

@@ -2,7 +2,7 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import IntegrationDialog from '@/pages/embedded/integrations/components/IntegrationDialog';
-import IntegrationList from '@/pages/embedded/integrations/components/IntegrationList';
+import IntegrationList from '@/pages/embedded/integrations/components/integration-list/IntegrationList';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
