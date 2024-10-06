@@ -6,7 +6,7 @@ interface HeaderProps {
     className?: string;
     position?: 'main' | 'sidebar';
     right?: ReactNode;
-    title: string;
+    title: string | ReactNode;
     titleClassName?: string;
 }
 
