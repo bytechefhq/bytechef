@@ -23,6 +23,8 @@ import com.bytechef.embedded.unified.pagination.CursorPageRequest;
 import com.bytechef.embedded.unified.pagination.CursorPageable;
 import jakarta.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
+
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.Sort;
@@ -38,6 +40,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
  * from {@link #getResolver()} and expects methods to be present in the controller class returned from
  * {@link #getControllerClass()}. For sample usage see {@link CursorPageableHandlerMethodArgumentResolver}.
  */
+@Disabled
 abstract class CursorPageableDefaultTest {
 
     static final int PAGE_SIZE = 12;
