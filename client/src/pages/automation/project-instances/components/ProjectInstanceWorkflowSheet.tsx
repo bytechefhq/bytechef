@@ -22,7 +22,10 @@ const ProjectInstanceWorkflowSheet = () => {
     );
 
     return (
-        <Sheet onOpenChange={() => setProjectInstanceWorkflowSheetOpen(!projectInstanceWorkflowSheetOpen)} open>
+        <Sheet
+            onOpenChange={() => setProjectInstanceWorkflowSheetOpen(!projectInstanceWorkflowSheetOpen)}
+            open={projectInstanceWorkflowSheetOpen}
+        >
             <SheetContent className="flex flex-col bg-white p-0 sm:max-w-[780px]">
                 <div className="size-full bg-muted/50 p-4">
                     <h1 className="text-lg font-semibold">

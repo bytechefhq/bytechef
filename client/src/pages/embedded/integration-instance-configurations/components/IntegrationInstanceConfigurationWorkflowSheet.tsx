@@ -29,7 +29,7 @@ const IntegrationInstanceConfigurationWorkflowSheet = () => {
             onOpenChange={() =>
                 setIntegrationInstanceConfigurationWorkflowSheetOpen(!integrationInstanceConfigurationWorkflowSheetOpen)
             }
-            open
+            open={integrationInstanceConfigurationWorkflowSheetOpen}
         >
             <SheetContent className="flex flex-col bg-white p-4 sm:max-w-[780px]">
                 <div className="size-full bg-muted/50 p-4">

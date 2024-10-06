@@ -16,7 +16,6 @@ import {useSearchParams} from 'react-router-dom';
 
 import ProjectInstanceDialog from './components/project-instance-dialog/ProjectInstanceDialog';
 import ProjectInstanceList from './components/project-instance-list/ProjectInstanceList';
-import useProjectInstanceWorkflowSheetStore from './stores/useProjectInstanceWorkflowSheetStore';
 
 export enum Type {
     Project,
@@ -100,8 +99,6 @@ const ProjectInstances = () => {
     }
 
     const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetProjectInstanceTagsQuery();
-
-    const {projectInstanceWorkflowSheetOpen} = useProjectInstanceWorkflowSheetStore();
 
     function getEnvironment() {
         return searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : 1;
@@ -267,7 +264,7 @@ const ProjectInstances = () => {
                                 )
                         )}
 
-                        {projectInstanceWorkflowSheetOpen && <ProjectInstanceWorkflowSheet />}
+                        <ProjectInstanceWorkflowSheet />
                     </div>
                 ) : (
                     <EmptyList
