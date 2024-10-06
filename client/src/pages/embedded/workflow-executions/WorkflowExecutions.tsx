@@ -25,8 +25,8 @@ import {ActivityIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 
-import WorkflowExecutionSheet from './components/WorkflowExecutionSheet';
 import WorkflowExecutionsTable from './components/WorkflowExecutionsTable';
+import WorkflowExecutionSheet from './components/workflow-execution-sheet/WorkflowExecutionSheet';
 
 const jobStatusOptions = [
     {

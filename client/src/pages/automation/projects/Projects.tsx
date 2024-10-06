@@ -14,7 +14,7 @@ import {ReactNode, useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 
 import ProjectDialog from './components/ProjectDialog';
-import ProjectList from './components/ProjectList';
+import ProjectList from './components/project-list/ProjectList';
 
 export enum Type {
     Category,

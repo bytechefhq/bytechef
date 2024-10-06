@@ -14,8 +14,8 @@ import {Layers3Icon, TagIcon} from 'lucide-react';
 import {ReactNode, useEffect, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
-import ProjectInstanceDialog from './components/ProjectInstanceDialog';
-import ProjectInstanceList from './components/ProjectInstanceList';
+import ProjectInstanceDialog from './components/project-instance-dialog/ProjectInstanceDialog';
+import ProjectInstanceList from './components/project-instance-list/ProjectInstanceList';
 import useProjectInstanceWorkflowSheetStore from './stores/useProjectInstanceWorkflowSheetStore';
 
 export enum Type {
