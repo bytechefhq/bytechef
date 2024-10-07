@@ -24,7 +24,7 @@ const CopilotPanel = () => {
                         <div className="flex flex-col space-y-1.5 p-6">
                             <div className="flex items-center">
                                 <div className="flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                                    U
+                                    <span>U</span>
                                 </div>
 
                                 <h3 className="ml-2 text-sm font-semibold">User</h3>
@@ -41,7 +41,7 @@ const CopilotPanel = () => {
                         <div className="flex flex-col space-y-1.5 p-6">
                             <div className="flex items-center">
                                 <div className="flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                                    A
+                                    <span>A</span>
                                 </div>
 
                                 <h3 className="ml-2 text-sm font-semibold">Assistant</h3>
@@ -121,7 +121,7 @@ const CopilotPanel = () => {
                         <div className="flex flex-col space-y-1.5 p-6">
                             <div className="flex items-center">
                                 <div className="flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                                    U
+                                    <span>U</span>
                                 </div>
 
                                 <h3 className="ml-2 text-sm font-semibold">User</h3>
@@ -138,7 +138,7 @@ const CopilotPanel = () => {
                         <div className="flex flex-col space-y-1.5 p-6">
                             <div className="flex items-center">
                                 <div className="flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                                    A
+                                    <span>A</span>
                                 </div>
 
                                 <h3 className="ml-2 text-sm font-semibold">Assistant</h3>
@@ -152,8 +152,6 @@ const CopilotPanel = () => {
 
                                 <br />
 
-                                <br />
-
                                 <span>
                                     Supervised learning is a method where the algorithm learns from labeled training
                                     data. In other words, the input data comes with the correct answers (labels), and
@@ -162,11 +160,7 @@ const CopilotPanel = () => {
 
                                 <br />
 
-                                <br />
-
                                 <span>Key points about supervised learning:</span>
-
-                                <br />
 
                                 <br />
 
@@ -218,8 +212,6 @@ const CopilotPanel = () => {
                                     spam&apos;. It learns the characteristics of spam emails and can then classify new,
                                     unseen emails.
                                 </span>
-
-                                <br />
 
                                 <br />
 

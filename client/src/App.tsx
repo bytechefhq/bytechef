@@ -31,11 +31,13 @@ const user = {
     name: 'Emily Selman',
 };
 
-const automationNavigation: {
+type NavigationType = {
     name: string;
     href: string;
     icon: LucideIcon;
-}[] = [
+};
+
+const automationNavigation: NavigationType[] = [
     {
         href: '/automation/projects',
         icon: FolderIcon,
@@ -59,11 +61,7 @@ const automationNavigation: {
     },
 ];
 
-const embeddedNavigation: {
-    name: string;
-    href: string;
-    icon: LucideIcon;
-}[] = [
+const embeddedNavigation: NavigationType[] = [
     {
         href: '/embedded/integrations',
         icon: SquareIcon,
@@ -115,11 +113,13 @@ function App() {
         return true;
     });
 
-    const navigation = location.pathname.includes('automation')
-        ? filteredAutomationNavigation
-        : location.pathname.includes('embedded')
-          ? embeddedNavigation
-          : [];
+    let navigation: NavigationType[] = [];
+
+    if (location.pathname.includes('automation')) {
+        navigation = filteredAutomationNavigation;
+    } else if (location.pathname.includes('embedded')) {
+        navigation = embeddedNavigation;
+    }
 
     useFetchInterceptor();
 
@@ -154,11 +154,7 @@ function App() {
         }
     }, [authenticated, sessionHasBeenFetched, navigate]);
 
-    if (!authenticated) {
-        return <></>;
-    }
-
-    if (loadingFeatureFlags) {
+    if (!authenticated || loadingFeatureFlags) {
         return <></>;
     }
 
