@@ -14,10 +14,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {useHelpHub} from '@/shared/hooks/useHelpHub';
 import {useGetUserWorkspacesQuery} from '@/shared/queries/automation/workspaces.queries';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {PlusIcon} from '@radix-ui/react-icons';
+import {useQueryClient} from '@tanstack/react-query';
 import {SettingsIcon, User2Icon, UserRoundCog} from 'lucide-react';
 import React, {useEffect} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
@@ -27,19 +29,24 @@ const DesktopSidebarMenu = () => {
     const {account, logout} = useAuthenticationStore();
     const {currentWorkspaceId, setCurrentWorkspaceId} = useWorkspaceStore();
 
-    const {reset: resetAnalytics} = useAnalytics();
+    const analytics = useAnalytics();
+
+    const helpHub = useHelpHub();
 
     const {pathname} = useLocation();
 
     const navigate = useNavigate();
 
+    const queryClient = useQueryClient();
+
     /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
     const {data: workspaces} = useGetUserWorkspacesQuery(account?.id!, !!account);
 
     const handleLogOutClick = () => {
+        analytics.reset();
+        helpHub.shutdown();
+        queryClient.resetQueries();
         logout();
-
-        resetAnalytics();
     };
 
     const handleWorkflowValueChange = (value: string) => {
