@@ -136,11 +136,9 @@ function App() {
     }, [helpHub]);
 
     useEffect(() => {
-        if (authenticated) {
-            if (account) {
-                helpHub.boot(account);
-                helpHub.addRouter();
-            }
+        if (authenticated && account) {
+            helpHub.boot(account);
+            helpHub.addRouter();
         }
 
         return () => {
