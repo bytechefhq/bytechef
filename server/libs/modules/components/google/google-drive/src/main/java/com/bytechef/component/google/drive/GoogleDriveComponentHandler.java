@@ -60,5 +60,5 @@ public class GoogleDriveComponentHandler implements ComponentHandler {
     public ComponentDefinition getDefinition() {
         return COMPONENT_DEFINITION;
     }
-    
+
 }
