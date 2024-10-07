@@ -29,6 +29,9 @@ import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.Drive;
 import java.io.IOException;
 
+/**
+ * @author Mayank Madan
+ */
 public class GoogleDriveDeleteFileAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteFile")
@@ -46,12 +49,13 @@ public class GoogleDriveDeleteFileAction {
     }
 
     public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters,
-        ActionContext actionContext) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
+
         Drive drive = GoogleServices.getDrive(connectionParameters);
-        return drive.files()
+
+        return drive
+            .files()
             .delete(inputParameters.getRequiredString(FILE_ID))
             .execute();
     }
-
 }
