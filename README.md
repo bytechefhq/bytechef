@@ -46,37 +46,38 @@ There are couple ways to give ByteChef a quick spin on your local machine. You c
 [//]: # ()
 
 ### Docker
-1. Docker Compose
+#### Method 1 - Start Containers With Docker Compose
 
-Requirement: Docker Desktop
+**Requirement:** [Docker Desktop](https://www.docker.com/products/docker-desktop/) - Docker compose allows you to configure and run several dependent docker containers. Some OS environments may not support it. In that case follow Method 2 described later.
 
-This is the fastest possible way to start Bytechef. Download docker-compose.yml [docker-compose.yml](https://github.com/bytechefhq/bytechef/blob/master/docker-compose.yml) to your machine. Find it in this bytechef repository root. Execute:
+This is the fastest possible way to start Bytechef. There is [docker-compose.yml](https://github.com/bytechefhq/bytechef/blob/master/docker-compose.yml) in the repository root. Either checkout repository locally to your machine or download file. Make sure you execute this command taking care of correct path to `docker-compose.yml` file:
 ```bashTaskHandler
 docker compose -f docker-compose.yml up
 ```
 Both postgres database and bytechef docker container would start.
-2. Docker (run containers)
+#### Method 2 - Start Containers With Classic Docker
 
 This option demands pinch of focus as it allows user to profile containers. Run the following commands from your terminal to have ByteChef up and running right away.
 
-#### Create Docker Network
+##### Create Docker Network
 ```bashTaskHandler
 docker network create -d bridge bytechef_network
 ```
-#### Start Postgres Docker Container
+##### Start Postgres Docker Container
 ```bashTaskHandler
 docker run --name postgres -d -p 5432:5432 \
     --env POSTGRES_USER=postgres \
     --env POSTGRES_PASSWORD=postgres \
+    --hostname postgres \
     --network bytechef_network \
     -v /opt/postgre/data:/var/lib/postgresql/data \
     postgres:15-alpine
 ```
 NOTE: `-v` mount option is not mandatory. It mounts local DB storage to make easier access to DB infrastructure files.
 
-#### Start ByteChef Docker Container
+##### Start ByteChef Docker Container
 ```bashTaskHandler
-docker run --name bytechef -it -p 80:8080 \
+docker run --name bytechef -it -p 8080:8080 \
     --env SERVER_PORT=8080 \
     --env SPRING_PROFILES_ACTIVE=prod \
     --env BYTECHEF_DATASOURCE_URL=jdbc:postgresql://postgres:5432/bytechef \
@@ -86,11 +87,11 @@ docker run --name bytechef -it -p 80:8080 \
     --network bytechef_network \
     bytechef/bytechef:latest
 ```
-NOTE: `-it` (interactive) flag may be replaced with `-d` (daemon). Keep it interactive if you want to track logs which can be handy for troubleshooting.
+NOTE: `-it` (interactive) flag may be replaced with `-d` (detached). Keep it interactive if you want to track logs which can be handy for troubleshooting. Use `-p 8080:8080` to customize port. 
 
-3. Access Bytechef
+###  Access Bytechef
 
-Use browser and open http://localhost/login. Chose Create Account link to setup user and than use same user and password to sign in.
+Use browser and open http://localhost:8080/login (please take care about port - if port setting is modified in docker compose file or docker run command, this URL should be updated). Chose Create Account link to setup user and than use same user and password to sign in.
 
 [//]: # (### Self-Hosted)
 [//]: # ()
