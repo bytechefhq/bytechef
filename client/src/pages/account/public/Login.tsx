@@ -9,10 +9,8 @@ import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {useQueryClient} from '@tanstack/react-query';
-import React, {useEffect} from 'react';
 import {useForm} from 'react-hook-form';
-import {Link, Navigate, useLocation, useNavigate} from 'react-router-dom';
+import {Link, Navigate, useLocation} from 'react-router-dom';
 import {z} from 'zod';
 
 const formSchema = z.object({
@@ -22,16 +20,11 @@ const formSchema = z.object({
 });
 
 const Login = () => {
-    const {account, authenticated, getAccount, login, loginError, reset, sessionHasBeenFetched} =
-        useAuthenticationStore();
+    const {authenticated, login, loginError} = useAuthenticationStore();
 
-    const {identify} = useAnalytics();
+    const analytics = useAnalytics();
 
     const pageLocation = useLocation();
-
-    const navigate = useNavigate();
-
-    const queryClient = useQueryClient();
 
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
@@ -46,33 +39,13 @@ const Login = () => {
         formState: {isSubmitting},
     } = form;
 
-    const handleSubmit = ({email, password, rememberMe}: z.infer<typeof formSchema>) => {
-        return login(email, password, rememberMe);
-    };
-
-    useEffect(() => {
-        reset();
-    }, [reset]);
-
-    useEffect(() => {
-        if (!sessionHasBeenFetched) {
-            getAccount();
-        }
-
-        if (sessionHasBeenFetched) {
-            queryClient.resetQueries();
-        }
-    }, [sessionHasBeenFetched, queryClient, getAccount]);
-
-    useEffect(() => {
-        if (authenticated) {
+    const handleSubmit = async ({email, password, rememberMe}: z.infer<typeof formSchema>) => {
+        return login(email, password, rememberMe).then((account) => {
             if (account) {
-                identify(account);
+                analytics.identify(account);
             }
-
-            navigate('/');
-        }
-    }, [account, authenticated, navigate, identify]);
+        });
+    };
 
     const {from} = pageLocation.state || {from: {pathname: '/', search: pageLocation.search}};
 

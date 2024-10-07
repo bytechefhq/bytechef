@@ -26,7 +26,8 @@ export interface AnalyticsI {
 }
 
 export const useAnalytics = (): AnalyticsI => {
-    const initializedRef = useRef(false);
+    const initRef = useRef(false);
+    const identifyRef = useRef(false);
 
     const {analytics, application} = useApplicationInfoStore();
 
@@ -82,6 +83,12 @@ export const useAnalytics = (): AnalyticsI => {
             posthog.capture('user_signed_up', {email});
         },
         identify: (account: UserI) => {
+            if (identifyRef.current) {
+                return;
+            }
+
+            identifyRef.current = true;
+
             posthog?.identify(account.uuid, {
                 edition: application?.edition,
                 email: account.email,
@@ -90,7 +97,7 @@ export const useAnalytics = (): AnalyticsI => {
             // posthog?.group('company', account);
         },
         init: () => {
-            if (initializedRef.current) {
+            if (initRef.current) {
                 return;
             }
 
@@ -100,11 +107,13 @@ export const useAnalytics = (): AnalyticsI => {
                     person_profiles: 'identified_only',
                 });
 
-                initializedRef.current = true;
+                initRef.current = true;
             }
         },
         reset: () => {
             posthog.reset();
+
+            identifyRef.current = false;
         },
     };
 };

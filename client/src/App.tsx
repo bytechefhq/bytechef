@@ -8,6 +8,7 @@ import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
+import {useQueryClient} from '@tanstack/react-query';
 import {
     ActivityIcon,
     FolderIcon,
@@ -98,7 +99,14 @@ function App() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const {getApplicationInfo} = useApplicationInfoStore();
-    const {account, authenticated, getAccount, sessionHasBeenFetched, showLogin} = useAuthenticationStore();
+    const {
+        account,
+        authenticated,
+        getAccount,
+        reset: resetAuthentication,
+        sessionHasBeenFetched,
+        showLogin,
+    } = useAuthenticationStore();
 
     const analytics = useAnalytics();
 
@@ -107,6 +115,8 @@ function App() {
     const location = useLocation();
 
     const navigate = useNavigate();
+
+    const queryClient = useQueryClient();
 
     const ff_1023 = useFeatureFlagsStore()('ff-1023');
 
@@ -137,15 +147,11 @@ function App() {
     }, [helpHub]);
 
     useEffect(() => {
-        if (authenticated && account) {
+        if (account) {
             helpHub.boot(account);
             helpHub.addRouter();
         }
-
-        return () => {
-            helpHub.shutdown();
-        };
-    }, [authenticated, account, helpHub]);
+    }, [account, helpHub]);
 
     useEffect(() => {
         document.title =
@@ -155,8 +161,11 @@ function App() {
     }, [location]);
 
     useEffect(() => {
-        getAccount();
-    }, [getAccount]);
+        if (!sessionHasBeenFetched) {
+            getAccount();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [sessionHasBeenFetched]);
 
     useEffect(() => {
         getApplicationInfo();
@@ -172,7 +181,18 @@ function App() {
         if (sessionHasBeenFetched && !authenticated) {
             navigate('/login');
         }
-    }, [authenticated, sessionHasBeenFetched, navigate]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [authenticated, sessionHasBeenFetched]);
+
+    useEffect(() => {
+        if (!authenticated) {
+            analytics.reset();
+            helpHub.shutdown();
+            resetAuthentication();
+            queryClient.resetQueries();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [authenticated]);
 
     return authenticated ? (
         <div className="flex h-full">

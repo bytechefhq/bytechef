@@ -14,8 +14,8 @@ export interface AuthenticationI {
     sessionHasBeenFetched: boolean;
     showLogin: boolean;
     clearAuthentication: () => void;
-    getAccount: () => void;
-    login: (email: string, password: string, rememberMe: boolean) => Promise<void>;
+    getAccount: () => Promise<UserI | undefined>;
+    login: (email: string, password: string, rememberMe: boolean) => Promise<UserI | undefined>;
     logout: () => void;
     reset: () => void;
 }
@@ -77,7 +77,7 @@ export const useAuthenticationStore = create<AuthenticationI>()(
                 }));
             },
 
-            getAccount: async () => {
+            getAccount: async (): Promise<UserI | undefined> => {
                 if (get().loading) {
                     return;
                 }
@@ -87,9 +87,9 @@ export const useAuthenticationStore = create<AuthenticationI>()(
                     loading: true,
                 }));
 
-                fetchGetAccount().then((response) => {
+                return fetchGetAccount().then((response) => {
                     if (response.status === 200) {
-                        response.json().then((account) => {
+                        return response.json().then((account) => {
                             set((state) => ({
                                 ...state,
                                 account,
@@ -97,6 +97,8 @@ export const useAuthenticationStore = create<AuthenticationI>()(
                                 loading: false,
                                 sessionHasBeenFetched: true,
                             }));
+
+                            return account;
                         });
                     } else {
                         set((state) => ({
@@ -107,15 +109,13 @@ export const useAuthenticationStore = create<AuthenticationI>()(
                             showLogin: true,
                         }));
                     }
-
-                    return response;
                 });
             },
 
-            login: async (email: string, password: string, rememberMe: boolean): Promise<void> => {
+            login: async (email: string, password: string, rememberMe: boolean): Promise<UserI | undefined> => {
                 const data = `username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}&remember-me=${rememberMe}&submit=Login`;
 
-                return fetchAuthenticate(data).then(async (response) => {
+                return fetchAuthenticate(data).then((response) => {
                     if (response.status === 200) {
                         set((state) => ({
                             ...state,
@@ -126,7 +126,7 @@ export const useAuthenticationStore = create<AuthenticationI>()(
 
                         const {getAccount} = get();
 
-                        getAccount();
+                        return getAccount();
                     } else {
                         set(() => ({
                             ...initialState,
@@ -147,10 +147,10 @@ export const useAuthenticationStore = create<AuthenticationI>()(
                     }));
                 }
 
-                // const {getAccount} = get();
+                const {getAccount} = get();
 
                 // fetch new csrf token
-                // getAccount();
+                getAccount();
             },
 
             reset: () => {
