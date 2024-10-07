@@ -20,8 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ID;
 
-import java.io.IOException;
-
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
@@ -29,33 +27,31 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.drive.util.GoogleDriveUtils;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.Drive;
+import java.io.IOException;
 
 public class GoogleDriveDeleteFileAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteFile")
-            .title("Delete file")
-            .description("Delete a selected file from Google Drive file.")
-            .properties(
-                    string(FILE_ID)
-                            .label("File")
-                            .description("The id of a file to delete.")
-                            .options((ActionOptionsFunction<String>) GoogleDriveUtils::getFileOptions)
-                            .required(true))
-            .output()
-            .perform(GoogleDriveDeleteFileAction::perform);
+        .title("Delete file")
+        .description("Delete a selected file from Google Drive.")
+        .properties(
+            string(FILE_ID)
+                .label("File")
+                .description("The id of a file to delete.")
+                .options((ActionOptionsFunction<String>) GoogleDriveUtils::getFileOptions)
+                .required(true))
+        .perform(GoogleDriveDeleteFileAction::perform);
 
     private GoogleDriveDeleteFileAction() {
     }
 
-    public static Void perform(
-            Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
-            throws IOException {
-
+    public static Object perform(
+        Parameters inputParameters, Parameters connectionParameters,
+        ActionContext actionContext) throws IOException {
         Drive drive = GoogleServices.getDrive(connectionParameters);
-
-        return drive
-        .files()
-        .delete(inputParameters.getRequiredString(FILE_ID))
-        .execute();
+        return drive.files()
+            .delete(inputParameters.getRequiredString(FILE_ID))
+            .execute();
     }
+
 }
