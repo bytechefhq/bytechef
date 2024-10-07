@@ -254,7 +254,7 @@ public class GoogleMailUtils {
             .getLabels();
 
         for (Label label : labels) {
-            options.add(option(label.getName(), label.getName()));
+            options.add(option(label.getName(), label.getId()));
         }
 
         return options;
