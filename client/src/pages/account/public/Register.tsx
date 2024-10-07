@@ -47,11 +47,11 @@ export const Register = () => {
 
     const navigate = useNavigate();
 
-    function handleSubmit({email, password}: z.infer<typeof formSchema>) {
+    const handleSubmit = async ({email, password}: z.infer<typeof formSchema>) => {
         reset();
 
         return register(email, password);
-    }
+    };
 
     useEffect(() => {
         if (registerSuccess) {
