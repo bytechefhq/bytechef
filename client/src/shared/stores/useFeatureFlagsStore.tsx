@@ -41,19 +41,23 @@ export const useFeatureFlagsStore = (): ((featureFlag: string) => boolean) => {
     const {featureFlags: localFeatureFlags} = useApplicationInfoStore();
 
     return (featureFlag: string): boolean => {
-        if (localFeatureFlags[featureFlag] !== undefined) {
-            return featureFlags[featureFlag];
-        }
-
-        if (featureFlags[featureFlag] !== undefined) {
-            return featureFlags[featureFlag];
-        }
-
         if (loadingRef.current) {
             return false;
         }
 
         loadingRef.current = true;
+
+        if (localFeatureFlags[featureFlag] !== undefined) {
+            loadingRef.current = false;
+
+            return featureFlags[featureFlag];
+        }
+
+        if (featureFlags[featureFlag] !== undefined) {
+            loadingRef.current = false;
+
+            return featureFlags[featureFlag];
+        }
 
         posthog.onFeatureFlags(function () {
             if (posthog.isFeatureEnabled(featureFlag)) {
