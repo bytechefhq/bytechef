@@ -689,6 +689,9 @@ public class ApplicationProperties {
         }
     }
 
+    /**
+     *
+     */
     public static class DataStorage {
 
         public enum Provider {
