@@ -9,7 +9,7 @@ export interface RegisterI {
     registerErrorMessage: string;
     registerSuccess: boolean;
 
-    register: (email: string, password: string) => Promise<Response>;
+    register: (email: string, password: string) => Promise<void>;
     reset: () => void;
 }
 
@@ -30,7 +30,7 @@ export const useRegisterStore = create<RegisterI>()(
             registerSuccess: false,
             registerErrorMessage: '',
 
-            register: async (email: string, password: string): Promise<Response> => {
+            register: async (email: string, password: string): Promise<void> => {
                 return fetchRegister(JSON.stringify({email, langKey: 'en', login: email, password})).then(
                     (response) => {
                         if (response.status === 201) {
@@ -44,8 +44,6 @@ export const useRegisterStore = create<RegisterI>()(
                                 }));
                             });
                         }
-
-                        return response;
                     }
                 );
             },
