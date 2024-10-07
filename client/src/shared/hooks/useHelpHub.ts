@@ -12,7 +12,8 @@ export interface HelpHubI {
 }
 
 export const useHelpHub = (): HelpHubI => {
-    const initializedRef = useRef(false);
+    const initRef = useRef(false);
+    const bootRef = useRef(false);
 
     const {application, helpHub} = useApplicationInfoStore();
 
@@ -27,7 +28,13 @@ export const useHelpHub = (): HelpHubI => {
             }
         },
         boot: (account: UserI) => {
+            if (bootRef.current) {
+                return;
+            }
+
             if (window.CommandBar) {
+                bootRef.current = true;
+
                 window.CommandBar.boot(account.uuid, {
                     edition: application?.edition,
                     email: account.email,
@@ -36,20 +43,22 @@ export const useHelpHub = (): HelpHubI => {
             }
         },
         init: () => {
-            if (initializedRef.current) {
+            if (initRef.current) {
                 return;
             }
 
             if (helpHub.enabled && helpHub.commandBar.orgId) {
                 init(helpHub.commandBar.orgId);
 
-                initializedRef.current = true;
+                initRef.current = true;
             }
         },
         shutdown: () => {
             if (window.CommandBar) {
                 window.CommandBar.shutdown();
             }
+
+            bootRef.current = false;
         },
     };
 };
