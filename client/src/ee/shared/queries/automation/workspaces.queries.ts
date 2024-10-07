@@ -8,13 +8,6 @@ export const WorkspaceKeys = {
     workspaces: ['workspaces'] as const,
 };
 
-export const useGetUserWorkspacesQuery = (userId: number, enabled?: boolean) =>
-    useQuery<Workspace[], Error>({
-        queryKey: WorkspaceKeys.userWorkspaces(userId),
-        queryFn: () => new WorkspaceApi().getUserWorkspaces({id: userId}),
-        enabled: enabled === undefined ? true : enabled,
-    });
-
 export const useGetWorkspacesQuery = (enabled?: boolean) =>
     useQuery<Workspace[], Error>({
         queryKey: WorkspaceKeys.workspaces,
