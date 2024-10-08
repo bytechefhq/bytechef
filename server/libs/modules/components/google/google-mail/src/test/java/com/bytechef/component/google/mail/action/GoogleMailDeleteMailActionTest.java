@@ -17,24 +17,40 @@
 package com.bytechef.component.google.mail.action;
 
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
-import static org.mockito.Mockito.mockStatic;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.google.mail.util.GoogleMailUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.google.api.services.gmail.Gmail;
 import java.io.IOException;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
+import org.mockito.ArgumentCaptor;
 
 public class GoogleMailDeleteMailActionTest extends AbstractGoogleMailActionTest {
 
-    @SuppressWarnings("unused")
+    private final Gmail.Users mockedUsers = mock(Gmail.Users.class);
+    private final Gmail.Users.Messages mockedMessages = mock(Gmail.Users.Messages.class);
+    private final Gmail.Users.Messages.Delete mockedDelete = mock(Gmail.Users.Messages.Delete.class);
+    private final ArgumentCaptor<String> userIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> idArgumentCaptor = ArgumentCaptor.forClass(String.class);
+
     @Test
     void testPerform() throws IOException {
         Parameters parameters = MockParametersFactory.create(Map.of(ID, "id"));
-        try (MockedStatic<GoogleMailUtils> googleMailUtilsMockedStatic = mockStatic(GoogleMailUtils.class)) {
-            GoogleMailDeleteMailAction.perform(parameters, parameters, mockedActionContext);
-        }
+
+        when(mockedGmail.users())
+            .thenReturn(mockedUsers);
+        when(mockedUsers.messages())
+            .thenReturn(mockedMessages);
+        when(mockedMessages.delete(userIdArgumentCaptor.capture(), idArgumentCaptor.capture()))
+            .thenReturn(mockedDelete);
+
+        GoogleMailDeleteMailAction.perform(parameters, parameters, mockedActionContext);
+        assertEquals(ME, userIdArgumentCaptor.getValue());
+        assertEquals("id", idArgumentCaptor.getValue());
     }
 }
