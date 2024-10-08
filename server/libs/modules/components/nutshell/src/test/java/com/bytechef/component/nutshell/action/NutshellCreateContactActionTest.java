@@ -18,63 +18,36 @@ package com.bytechef.component.nutshell.action;
 
 import static com.bytechef.component.nutshell.constant.NutshellConstants.DESCRIPTION;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.EMAIL;
-import static com.bytechef.component.nutshell.constant.NutshellConstants.EMAILS;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.NAME;
-import static com.bytechef.component.nutshell.constant.NutshellConstants.VALUE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.nutshell.util.NutshellUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 
 /**
  * @author Monika Kušter
  */
 class NutshellCreateContactActionTest {
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
     private final ActionContext mockedContext = mock(ActionContext.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Object mockedObject = mock(Object.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(NAME, "full name", DESCRIPTION, "some description", EMAIL, "test@mail.com"));
-    private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @Test
     void testPerform() {
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(mockedObject);
+        try (MockedStatic<NutshellUtils> nutshellUtilsMockedStatic = mockStatic(NutshellUtils.class)) {
 
-        Object result = NutshellCreateContactAction.perform(mockedParameters, mockedParameters, mockedContext);
+            NutshellCreateContactAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        Http.Body body = bodyArgumentCaptor.getValue();
-
-        Map<String, Object> contactMap = new HashMap<>();
-
-        contactMap.put(NAME, "full name");
-        contactMap.put(DESCRIPTION, "some description");
-        contactMap.put(EMAILS, List.of(Map.of(VALUE, "test@mail.com")));
-
-        assertEquals(Map.of("contacts", List.of(contactMap)), body.getContent());
-
-        assertEquals(mockedObject, result);
+            nutshellUtilsMockedStatic.verify(
+                () -> NutshellUtils.createEntityBasedOnType(mockedParameters, mockedContext, false), times(1));
+        }
     }
 }
