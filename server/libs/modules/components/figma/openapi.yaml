@@ -116,3 +116,4 @@ components:
           scopes:
             file_comments:write: "Post and delete comments and comment reactions in files."
             files:read: "Read files, projects, users, versions, comments, components & styles, and webhooks."
+            webhooks:write: " "
