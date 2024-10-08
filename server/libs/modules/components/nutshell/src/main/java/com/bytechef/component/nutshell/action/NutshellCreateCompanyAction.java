@@ -30,16 +30,12 @@ import static com.bytechef.component.nutshell.constant.NutshellConstants.NAME;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.PHONE;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.PHONES;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.VALUE;
+import static com.bytechef.component.nutshell.util.NutshellUtils.createEntityBasedOnType;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
-import com.bytechef.component.definition.TypeReference;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Kalaiyarasan Raja
@@ -101,33 +97,6 @@ public class NutshellCreateCompanyAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        Map<String, Object> companyMap = createCompanyMap(inputParameters);
-
-        return actionContext
-            .http(http -> http.post("/accounts"))
-            .body(Http.Body.of("accounts", List.of(companyMap)))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        return createEntityBasedOnType(inputParameters, actionContext, true);
     }
-
-    private static Map<String, Object> createCompanyMap(Parameters inputParameters) {
-        Map<String, Object> companyMap = new HashMap<>();
-        companyMap.put(NAME, inputParameters.getRequiredString(NAME));
-        companyMap.put(DESCRIPTION, inputParameters.getString(DESCRIPTION, ""));
-
-        addIfPresent(inputParameters, EMAIL, EMAILS, companyMap);
-        addIfPresent(inputParameters, PHONE, PHONES, companyMap);
-
-        return companyMap;
-    }
-
-    private static void addIfPresent(Parameters inputParameters, String key, String mapKey, Map<String, Object> map) {
-        String value = inputParameters.getString(key);
-
-        if (value != null) {
-            map.put(mapKey, List.of(Map.of(VALUE, value)));
-        }
-    }
-
 }
