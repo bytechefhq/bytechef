@@ -89,7 +89,6 @@ class GoogleMailUtilsTest {
     private final Gmail.Users.Messages.Get mockedGet = mock(Gmail.Users.Messages.Get.class);
     private final Message mockedMessage = mock(Message.class);
     private final Gmail.Users.Messages.Send mockedSend = mock(Gmail.Users.Messages.Send.class);
-    private final Gmail.Users.Messages.Delete mockedDelete = mock(Gmail.Users.Messages.Delete.class);
     private final Gmail.Users.Messages mockedMessages = mock(Gmail.Users.Messages.class);
 
     @BeforeEach
@@ -309,21 +308,5 @@ class GoogleMailUtilsTest {
 
         assertEquals(mockedMessage, result);
         assertEquals(ME, userIdArgumentCaptor.getValue());
-    }
-
-    @Test
-    void testDeleteMail() throws IOException {
-        parameters = MockParametersFactory.create(Map.of(ID, "id"));
-
-        when(mockedGmail.users())
-            .thenReturn(mockedUsers);
-        when(mockedUsers.messages())
-            .thenReturn(mockedMessages);
-        when(mockedMessages.delete(userIdArgumentCaptor.capture(), idArgumentCaptor.capture()))
-            .thenReturn(mockedDelete);
-
-        GoogleMailUtils.deleteMail(parameters, mockedGmail);
-        assertEquals(ME, userIdArgumentCaptor.getValue());
-        assertEquals("id", idArgumentCaptor.getValue());
     }
 }
