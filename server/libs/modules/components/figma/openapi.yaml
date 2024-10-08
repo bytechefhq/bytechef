@@ -1,0 +1,66 @@
+---
+openapi: "3.0.2"
+info:
+  title: "Figma"
+  description: "Figma is a cloud-based design and prototyping tool that enables teams to collaborate in real-time on user interface and user experience projects."
+  version: "v1"
+servers:
+  - url: "https://api.figma.com"
+paths:
+  /v1/files/{fileKey}/comments:
+    post:
+      summary: "Post Comment"
+      description: "Posts a new comment on the file."
+      operationId: "postComment"
+      parameters:
+        - name: "fileKey"
+          in: "path"
+          description: "File to add comments in. Figma file key copy from Figma file URL."
+          required: true
+          schema:
+            type: "string"
+            title: "File Key"
+      requestBody:
+        description: "Comment to post."
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required:
+                - "message"
+              properties:
+                message:
+                  type: "string"
+                  description: "Comment to post on the file."
+                  title: "Comment"
+      responses:
+        200:
+          description: "Creation confirmation."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                      file_key:
+                        type: "string"
+                      parent_id:
+                        type: "string"
+                      message:
+                        type: "string"
+components:
+  securitySchemes:
+    oauth2:
+      type: "oauth2"
+      flows:
+        authorizationCode:
+          authorizationUrl: "https://www.figma.com/oauth"
+          tokenUrl: "https://www.figma.com/api/oauth/token"
+          refreshUrl: "https://www.figma.com/api/oauth/refresh"
+          scopes:
+            file_comments:write: " "
