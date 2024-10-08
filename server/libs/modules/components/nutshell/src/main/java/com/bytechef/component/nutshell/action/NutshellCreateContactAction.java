@@ -31,15 +31,11 @@ import static com.bytechef.component.nutshell.constant.NutshellConstants.NAME;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.PHONE;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.PHONES;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.VALUE;
+import static com.bytechef.component.nutshell.util.NutshellUtils.createEntityBasedOnType;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
-import com.bytechef.component.definition.TypeReference;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Monika Kušter
@@ -101,32 +97,6 @@ public class NutshellCreateContactAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        Map<String, Object> contactMap = createContactMap(inputParameters);
-
-        return actionContext
-            .http(http -> http.post("/contacts"))
-            .body(Http.Body.of("contacts", List.of(contactMap)))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-    }
-
-    private static Map<String, Object> createContactMap(Parameters inputParameters) {
-        Map<String, Object> contactMap = new HashMap<>();
-        contactMap.put(NAME, inputParameters.getRequiredString(NAME));
-        contactMap.put(DESCRIPTION, inputParameters.getString(DESCRIPTION, ""));
-
-        addIfPresent(inputParameters, EMAIL, EMAILS, contactMap);
-        addIfPresent(inputParameters, PHONE, PHONES, contactMap);
-
-        return contactMap;
-    }
-
-    private static void addIfPresent(Parameters inputParameters, String key, String mapKey, Map<String, Object> map) {
-        String value = inputParameters.getString(key);
-
-        if (value != null) {
-            map.put(mapKey, List.of(Map.of(VALUE, value)));
-        }
+        return createEntityBasedOnType(inputParameters, actionContext, false);
     }
 }
