@@ -1,36 +1,44 @@
 <p align="center">
-<a href="https://www.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme">
-  <img src="static/bytechef_logo.png" alt="ByteChef Logo" width="350">
-</a>
+    <a href="https://www.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme">
+        <img src="static/bytechef_logo.png" alt="API integration and workflow automation platform" width="350">
+    </a>
 </p>
 
-ByteChef is an open-source, low-code, extendable API integration and workflow automation platform. It automates daily routines that require interaction between independent business applications. ByteChef maintains automation definitions in easy-to-understand workflow like format.
-![anl-readme-md](https://static.scarf.sh/a.png?x-pxid=ceb7a380-3bfc-4e25-8068-1445d2d02359)
+<h1 align="center" style="border-bottom: none">API integration and workflow automation platform</h1>
 
-[Website](https://www.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme) - [Discord](https://discord.gg/VKvNxHjpYx) - [Twitter](https://twitter.com/bytechefhq)
+<p align="center">
+    <a href="https://www.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme">Website</a> - <a href="https://docs.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme">Documentation</a> - <a href="https://discord.gg/VKvNxHjpYx">Discord</a> - <a href="https://twitter.com/bytechefhq">Twitter</a>
+</p>
 
-[![CI Build](https://github.com/bytechefhq/bytechef/actions/workflows/build_push.yml/badge.svg)](https://github.com/bytechefhq/bytechef/actions/workflows/build_push.yml) [![License](https://img.shields.io/static/v1?label=license&message=Apache&nbsp;v2.0&color=brightgreen)](https://github.com/bytechefhq/bytechef/blob/master/LICENSE)
+<p align="center">
+    <a href="https://github.com/bytechefhq/bytechef/actions/workflows/build_push.yml"><img src="https://github.com/bytechefhq/bytechef/actions/workflows/build_push.yml/badge.svg"></a> <a href="https://github.com/bytechefhq/bytechef/blob/master/LICENSE"><img src="https://img.shields.io/static/v1?label=license&message=Apache&nbsp;v2.0&color=brightgreen"></a>
+</p>
 
 > UPDATE: ByteChef is under active development, we are in the alpha stage and some features might be currently missing or disabled.
 
 <img src="static/screenshot.png" alt="ByteChef Screenshot" style="max-width: 100%;">
 
-## Why ByteChef?
+## What is ByteChef?
 
-Due to increasing number of various applications and services used inside organizations, engineering teams are under constant pressure to develop new integrations and workflows to automate work inside those organizations.
-ByteChef has the necessary infrastructure and features to integrate various applications and services and build workflows across organization:
+ByteChef is an open-source, low-code, extendable API integration and workflow automation platform. ByteChef can help you as:
 
-1. Install ByteChef on the premise to have a full control over execution and data, besides being able to use a hosted version.
-2. Define workflows via the UI editor by drag-and-dropping connectors and defining their relations, thus empowering your citizen developers. If you need to go beyond no-code workflow definition, your developers can leverage our low-code capabilities and write custom functions as part of your workflows, or extend ByteChef by developing custom connectors.
-3. A more extensive range of various flow controls that can be used in the workflow like if, switch, loop, each, parallel, etc. Also, new conditionals can be added.
-4. Develop custom connectors in four languages: Java, JavaScript, Python, and Ruby.
-5. Write custom functions(executed during the workflow execution when you need to write the code) in the languages mentioned above.
-6. All languages are executed inside ONE runtime(no need for various execution runtimes for each language), simplifying scalability. You can start with one instance only, scale as required, and at the same time mix languages for your customizations.
+- An automation solution that allows you to integrate and build automation workflows across your SaaS apps, internal APIs, and databases.
+- An embedded solution targeted explicitly for SaaS products, allowing your customers to integrate applications they use with your product.
 
-ByteChef can help you as:
+### Key Features
 
-1. Automation solution, which allows customers to integrate applications used internally to automate their own business processes.
-2. Embedded solution targeted explicitly for products which allow your customers to integrate applications they use with your product.
+- Intuitive UI Workflow Editor: build and visualize workflows via the UI editor by dragging and dropping components and defining their relations.
+- Event-Driven & Scheduled Workflows: automate scheduled and real-time event-driven workflows via a simple trigger definition.
+- Multiple flow controls: use the range of various flow controls such as condition, switch, loop, each, parallel, etc.
+- Built-In Code Editor: if you need to go beyond no-code workflow definition, leverage our low-code capabilities and write workflow definitions in YAML/JSON format and blocks of the code executed during the workflow execution in one of the languages: Java, JavaScript, Python, and Ruby with syntax highlighting, auto-completion and real-time syntax validation.
+- Rich Component Ecosystem: hundreds of components built in to extract data from any database, SaaS applications, internal APIs, or cloud storage.
+- Extendable: develop custom connectors when no built-in connectors exist in the abovementioned languages.
+- AI ready: built-in AI components that can run multiple AI models and other AI algorithms.
+- Developer ready: expose your workflows as APIs to be consumed by other applications or call directly APIs of targeted services. The platform handles authentication.
+- Version Control Friendly: write your workflows from the UI editor and push them to your preferred Git branch directly from ByteChef, enabling best practices with CI/CD pipelines and version control systems.
+- Self-hosted: install ByteChef on the premise to have complete control over execution and data, in addition to being able to use a hosted version.
+- Scalable: it is designed to handle millions of workflows with high availability and fault tolerance. Start with one instance only, and scale as required.
+- Structure & Resilience: bring resilience to your workflows with labels, sub-flows, retries, timeout, error handling, inputs, outputs that generate artifacts in the UI, variables, conditional branching, advanced scheduling, event triggers, dynamic tasks, sequential and parallel tasks, and skip tasks or triggers when needed by disabling them.
 
 ## Getting Started
 There are couple ways to give ByteChef a quick spin on your local machine. You can use this to test, learn or contribute.
@@ -46,6 +54,7 @@ There are couple ways to give ByteChef a quick spin on your local machine. You c
 [//]: # ()
 
 ### Docker
+
 #### Method 1 - Start Containers With Docker Compose
 
 **Requirement:** [Docker Desktop](https://www.docker.com/products/docker-desktop/) - Docker compose allows you to configure and run several dependent docker containers. Some OS environments may not support it. In that case follow Method 2 described later.
@@ -55,6 +64,7 @@ This is the fastest possible way to start Bytechef. There is [docker-compose.yml
 docker compose -f docker-compose.yml up
 ```
 Both postgres database and bytechef docker container would start.
+
 #### Method 2 - Start Containers With Classic Docker
 
 This option demands pinch of focus as it allows user to profile containers. Run the following commands from your terminal to have ByteChef up and running right away.
@@ -87,7 +97,7 @@ docker run --name bytechef -it -p 8080:8080 \
     --network bytechef_network \
     bytechef/bytechef:latest
 ```
-NOTE: `-it` (interactive) flag may be replaced with `-d` (detached). Keep it interactive if you want to track logs which can be handy for troubleshooting. Use `-p 8080:8080` to customize port. 
+NOTE: `-it` (interactive) flag may be replaced with `-d` (detached). Keep it interactive if you want to track logs which can be handy for troubleshooting. Use `-p 8080:8080` to customize port.
 
 ###  Access Bytechef
 
@@ -99,7 +109,11 @@ Use browser and open http://localhost:8080/login (please take care about port - 
 [//]: # ()
 ## Documentation
 
-- [Getting Started](https://docs.bytechef.io/introduction?utm_source=github&utm_medium=organic&utm_campaign=readme)
+Documentation is available at [docs.bytechef.io](https://docs.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme). It covers all the necessary information to get started with ByteChef, including installation, configuration, and usage.
+
+- [Getting Started](https://docs.bytechef.io/automation/getting-started/introduction?utm_source=github&utm_medium=organic&utm_campaign=readme)
+- [Developer Guide](https://docs.bytechef.io/developing_guide/components/connectors_manual?utm_source=github&utm_medium=organic&utm_campaign=readme)
+- [Component Reference](https://docs.bytechef.io/reference/components/accelo?utm_source=github&utm_medium=organic&utm_campaign=readme)
 
 [//]: # (- [Architecture]&#40;https://docs.bytechef.io/architecture?utm_source=github&utm_medium=organic&utm_campaign=readme&#41;)
 [//]: # (- [Components Reference]&#40;https://docs.bytechef.io/components&#41;)
@@ -131,3 +145,5 @@ ByteChef is released under Apache License v2.0. See [LICENSE](LICENSE) for more 
 
 ## Note
 This project has started as a fork of [Piper](https://github.com/okayrunner/piper), an open-source, distributed workflow engine.
+
+![anl-readme-md](https://static.scarf.sh/a.png?x-pxid=ceb7a380-3bfc-4e25-8068-1445d2d02359)
