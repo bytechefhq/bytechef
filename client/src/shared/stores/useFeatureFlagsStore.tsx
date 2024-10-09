@@ -50,7 +50,7 @@ export const useFeatureFlagsStore = (): ((featureFlag: string) => boolean) => {
         if (localFeatureFlags[featureFlag] !== undefined) {
             loadingRef.current = false;
 
-            return featureFlags[featureFlag];
+            return localFeatureFlags[featureFlag];
         }
 
         if (featureFlags[featureFlag] !== undefined) {
