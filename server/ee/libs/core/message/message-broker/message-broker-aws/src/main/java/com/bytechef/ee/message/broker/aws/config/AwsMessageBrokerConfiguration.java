@@ -8,7 +8,6 @@
 package com.bytechef.ee.message.broker.aws.config;
 
 import com.bytechef.ee.message.broker.aws.AwsMessageBroker;
-import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.annotation.ConditionalOnMessageBrokerAws;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.awspring.cloud.sqs.operations.SqsTemplate;

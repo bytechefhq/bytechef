@@ -17,18 +17,14 @@
 package com.bytechef.ee.platform.scheduler.aws;
 
 import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.commons.util.MapUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
-import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.scheduler.SchedulerClient;
@@ -63,9 +59,8 @@ public class AwsTriggerScheduler implements TriggerScheduler {
             schedulerClient.deleteSchedule(request -> request.clientToken(workflowExecutionId.substring(16))
                 .groupName(WEBHOOK_TRIGGER)
                 .name(WEBHOOK_TRIGGER + workflowExecutionId.substring(0, 16)));
-        }
-        catch(RuntimeException e){
-            if(logger.isInfoEnabled()){
+        } catch (RuntimeException e) {
+            if (logger.isInfoEnabled()) {
                 logger.info("Dynamic Webhook Trigger Refresh not defined");
             }
         }
@@ -75,14 +70,14 @@ public class AwsTriggerScheduler implements TriggerScheduler {
     public void cancelScheduleTrigger(String workflowExecutionId) {
         schedulerClient.deleteSchedule(request -> request.clientToken(workflowExecutionId.substring(16))
             .groupName(SCHEDULE_TRIGGER)
-            .name(SCHEDULE_TRIGGER + workflowExecutionId.substring(0,16)));
+            .name(SCHEDULE_TRIGGER + workflowExecutionId.substring(0, 16)));
     }
 
     @Override
     public void cancelPollingTrigger(String workflowExecutionId) {
         schedulerClient.deleteSchedule(request -> request.clientToken(workflowExecutionId.substring(16))
             .groupName(POLLING_TRIGGER)
-            .name(POLLING_TRIGGER + workflowExecutionId.substring(0,16)));
+            .name(POLLING_TRIGGER + workflowExecutionId.substring(0, 16)));
     }
 
     @Override
@@ -96,9 +91,11 @@ public class AwsTriggerScheduler implements TriggerScheduler {
             .input(connectionId + SPLITTER + workflowExecutionId.toString())
             .build();
 
-        schedulerClient.createSchedule(request -> request.clientToken(workflowExecutionId.toString().substring(16))
+        schedulerClient.createSchedule(request -> request.clientToken(workflowExecutionId.toString()
+            .substring(16))
             .groupName(WEBHOOK_TRIGGER)
-            .name(WEBHOOK_TRIGGER + workflowExecutionId.toString().substring(0,16))
+            .name(WEBHOOK_TRIGGER + workflowExecutionId.toString()
+                .substring(0, 16))
             .target(sqsTarget)
             .flexibleTimeWindow(mode -> mode.mode(FlexibleTimeWindowMode.OFF))
             .startDate(webhookExpirationDate.toInstant(ZoneOffset.UTC))); // change when choosing bytechefs aws region
@@ -112,12 +109,15 @@ public class AwsTriggerScheduler implements TriggerScheduler {
             .roleArn(roleArn)
             .arn(sqsArn + ":schedule-queue")
             .input(JsonUtils.write(output) + SPLITTER + workflowExecutionId.toString())
-            .deadLetterConfig(builder -> builder.arn(sqsArn).build())
+            .deadLetterConfig(builder -> builder.arn(sqsArn)
+                .build())
             .build();
 
-        schedulerClient.createSchedule(request -> request.clientToken(workflowExecutionId.toString().substring(16))
+        schedulerClient.createSchedule(request -> request.clientToken(workflowExecutionId.toString()
+            .substring(16))
             .groupName(SCHEDULE_TRIGGER)
-            .name(SCHEDULE_TRIGGER + workflowExecutionId.toString().substring(0,16))
+            .name(SCHEDULE_TRIGGER + workflowExecutionId.toString()
+                .substring(0, 16))
             .target(sqsTarget)
             .flexibleTimeWindow(mode -> mode.mode(FlexibleTimeWindowMode.OFF))
             .scheduleExpressionTimezone(zoneId)
@@ -133,9 +133,11 @@ public class AwsTriggerScheduler implements TriggerScheduler {
             .input(workflowExecutionId.toString())
             .build();
 
-        schedulerClient.createSchedule(request -> request.clientToken(workflowExecutionId.toString().substring(16))
+        schedulerClient.createSchedule(request -> request.clientToken(workflowExecutionId.toString()
+            .substring(16))
             .groupName(POLLING_TRIGGER)
-            .name(POLLING_TRIGGER + workflowExecutionId.toString().substring(0,16))
+            .name(POLLING_TRIGGER + workflowExecutionId.toString()
+                .substring(0, 16))
             .target(sqsTarget)
             .flexibleTimeWindow(mode -> mode.mode(FlexibleTimeWindowMode.OFF))
             .startDate(Instant.now())

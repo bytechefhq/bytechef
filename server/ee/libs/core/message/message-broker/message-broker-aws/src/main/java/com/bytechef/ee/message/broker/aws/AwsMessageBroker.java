@@ -12,9 +12,8 @@ import com.bytechef.message.route.MessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.awspring.cloud.sqs.operations.SqsSendOptions;
 import io.awspring.cloud.sqs.operations.SqsTemplate;
-import org.springframework.messaging.Message;
-
 import java.util.Optional;
+import org.springframework.messaging.Message;
 
 /**
  * @version ee
@@ -39,7 +38,7 @@ public class AwsMessageBroker implements MessageBroker {
         });
     }
 
-    public <T> Optional<T> receive(String queueName, Class<T> clazz){
+    public <T> Optional<T> receive(String queueName, Class<T> clazz) {
         Optional<Message<T>> message = sqsTemplate.receive(from -> from.queue(queueName), clazz);
 
         return message.map(Message::getPayload);
