@@ -101,13 +101,13 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : {
-          "mimeType" : "plain/text",
           "name" : "new-file.txt",
-          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+          "mimeType" : "plain/text"
         }
       },
       "outputSchema" : {
@@ -188,13 +188,13 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : {
-        "mimeType" : "plain/text",
         "name" : "new-file.txt",
-        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+        "mimeType" : "plain/text"
       }
     },
     "properties" : [ {
@@ -318,9 +318,9 @@
       }
     } ],
     "title" : "Upload file",
+    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -554,9 +554,9 @@
       }
     } ],
     "title" : "Read file",
+    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -645,13 +645,13 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : {
-          "mimeType" : "plain/text",
           "name" : "new-file.txt",
-          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+          "mimeType" : "plain/text"
         }
       },
       "outputSchema" : {
@@ -732,13 +732,13 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : {
-        "mimeType" : "plain/text",
         "name" : "new-file.txt",
-        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+        "mimeType" : "plain/text"
       }
     },
     "properties" : [ {
@@ -786,9 +786,9 @@
       }
     } ],
     "title" : "Create new folder",
+    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -877,13 +877,13 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : {
-          "mimeType" : "plain/text",
           "name" : "new-file.txt",
-          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+          "mimeType" : "plain/text"
         }
       },
       "outputSchema" : {
@@ -964,13 +964,13 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : {
-        "mimeType" : "plain/text",
         "name" : "new-file.txt",
-        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+        "mimeType" : "plain/text"
       }
     },
     "properties" : [ {
@@ -1070,9 +1070,9 @@
       }
     } ],
     "title" : "Create new text file",
+    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1106,9 +1106,9 @@
       }
     } ],
     "title" : "Delete file",
+    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1128,11 +1128,14 @@
           "metadata" : { },
           "required" : null,
           "name" : null,
-          "type" : "FILE_ENTRY",
+          "type" : "OBJECT",
           "defaultValue" : null,
           "exampleValue" : null,
           "label" : null,
           "placeholder" : null,
+          "additionalProperties" : null,
+          "multipleValues" : null,
+          "options" : null,
           "properties" : [ {
             "advancedOption" : null,
             "description" : null,
@@ -1140,8 +1143,8 @@
             "expressionEnabled" : null,
             "hidden" : null,
             "metadata" : { },
-            "required" : true,
-            "name" : "extension",
+            "required" : null,
+            "name" : "id",
             "type" : "STRING",
             "defaultValue" : null,
             "exampleValue" : null,
@@ -1160,7 +1163,27 @@
             "expressionEnabled" : null,
             "hidden" : null,
             "metadata" : { },
-            "required" : true,
+            "required" : null,
+            "name" : "kind",
+            "type" : "STRING",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
+            "options" : null,
+            "optionsDataSource" : null
+          }, {
+            "advancedOption" : null,
+            "description" : null,
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
             "name" : "mimeType",
             "type" : "STRING",
             "defaultValue" : null,
@@ -1180,7 +1203,7 @@
             "expressionEnabled" : null,
             "hidden" : null,
             "metadata" : { },
-            "required" : true,
+            "required" : null,
             "name" : "name",
             "type" : "STRING",
             "defaultValue" : null,
@@ -1193,28 +1216,9 @@
             "minLength" : null,
             "options" : null,
             "optionsDataSource" : null
-          }, {
-            "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : true,
-            "name" : "url",
-            "type" : "STRING",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "controlType" : "TEXT",
-            "languageId" : null,
-            "maxLength" : null,
-            "minLength" : null,
-            "options" : null,
-            "optionsDataSource" : null
           } ],
-          "controlType" : "FILE_ENTRY"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
@@ -1227,11 +1231,14 @@
         "metadata" : { },
         "required" : null,
         "name" : null,
-        "type" : "FILE_ENTRY",
+        "type" : "OBJECT",
         "defaultValue" : null,
         "exampleValue" : null,
         "label" : null,
         "placeholder" : null,
+        "additionalProperties" : null,
+        "multipleValues" : null,
+        "options" : null,
         "properties" : [ {
           "advancedOption" : null,
           "description" : null,
@@ -1239,8 +1246,8 @@
           "expressionEnabled" : null,
           "hidden" : null,
           "metadata" : { },
-          "required" : true,
-          "name" : "extension",
+          "required" : null,
+          "name" : "id",
           "type" : "STRING",
           "defaultValue" : null,
           "exampleValue" : null,
@@ -1259,7 +1266,27 @@
           "expressionEnabled" : null,
           "hidden" : null,
           "metadata" : { },
-          "required" : true,
+          "required" : null,
+          "name" : "kind",
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        }, {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
           "name" : "mimeType",
           "type" : "STRING",
           "defaultValue" : null,
@@ -1279,7 +1306,7 @@
           "expressionEnabled" : null,
           "hidden" : null,
           "metadata" : { },
-          "required" : true,
+          "required" : null,
           "name" : "name",
           "type" : "STRING",
           "defaultValue" : null,
@@ -1292,28 +1319,9 @@
           "minLength" : null,
           "options" : null,
           "optionsDataSource" : null
-        }, {
-          "advancedOption" : null,
-          "description" : null,
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : true,
-          "name" : "url",
-          "type" : "STRING",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : null,
-          "placeholder" : null,
-          "controlType" : "TEXT",
-          "languageId" : null,
-          "maxLength" : null,
-          "minLength" : null,
-          "options" : null,
-          "optionsDataSource" : null
         } ],
-        "controlType" : "FILE_ENTRY"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -1385,9 +1393,9 @@
       }
     } ],
     "title" : "Copy file",
+    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   } ],
   "connection" : {
     "authorizations" : [ {
@@ -1439,25 +1447,26 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "authorizationUrl" : { },
-      "clientSecret" : null,
-      "refreshToken" : null,
       "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : { },
       "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : { },
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : { },
       "scopes" : { },
-      "tokenUrl" : { },
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : { }
+      "refreshToken" : null,
+      "tokenUrl" : { }
     } ],
     "properties" : null,
     "version" : 1,
     "authorizationRequired" : null,
-    "baseUri" : null,
-    "test" : null
+    "test" : null,
+    "baseUri" : null
   },
+  "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -1559,15 +1568,15 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "ARRAY_BUILDER"
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
@@ -1663,15 +1672,15 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "ARRAY_BUILDER"
+        "controlType" : "ARRAY_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -1703,17 +1712,17 @@
     "type" : "POLLING",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
+    "poll" : { },
+    "deduplicate" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
+    "dynamicWebhookRefresh" : null,
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
     "dwebhookRequest" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
-    "deduplicate" : null,
-    "poll" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
     "webhookValidateOnEnable" : null
   }, {
     "batch" : null,
@@ -1816,15 +1825,15 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "ARRAY_BUILDER"
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
@@ -1920,15 +1929,15 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "ARRAY_BUILDER"
+        "controlType" : "ARRAY_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -1960,19 +1969,18 @@
     "type" : "POLLING",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
+    "poll" : { },
+    "deduplicate" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
+    "dynamicWebhookRefresh" : null,
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
     "dwebhookRequest" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
-    "deduplicate" : null,
-    "poll" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
     "webhookValidateOnEnable" : null
   } ],
-  "dataStream" : null,
   "unifiedApi" : null
 }
