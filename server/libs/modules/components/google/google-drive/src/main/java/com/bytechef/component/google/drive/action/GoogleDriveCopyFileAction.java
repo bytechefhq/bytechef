@@ -17,11 +17,14 @@
 package com.bytechef.component.google.drive.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.fileEntry;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ID;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_NAME;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.ID;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.MIME_TYPE;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.NAME;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PARENT_FOLDER;
 
 import com.bytechef.component.definition.ActionContext;
@@ -59,7 +62,14 @@ public class GoogleDriveCopyFileAction {
                 .description(
                     "The ID of the folder where the copied file will be stored.")
                 .options((ActionOptionsFunction<String>) GoogleDriveUtils::getFolderOptions))
-        .output(outputSchema(fileEntry()))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(ID),
+                        string("kind"),
+                        string(MIME_TYPE),
+                        string(NAME))))
         .perform(GoogleDriveCopyFileAction::perform);
 
     private GoogleDriveCopyFileAction() {
