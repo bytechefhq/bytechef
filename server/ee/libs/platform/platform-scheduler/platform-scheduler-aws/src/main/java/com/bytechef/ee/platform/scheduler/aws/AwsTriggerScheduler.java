@@ -17,21 +17,27 @@
 package com.bytechef.ee.platform.scheduler.aws;
 
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.scheduler.SchedulerClient;
 import software.amazon.awssdk.services.scheduler.model.FlexibleTimeWindowMode;
 import software.amazon.awssdk.services.scheduler.model.Target;
 
 public class AwsTriggerScheduler implements TriggerScheduler {
 
+    private static final Logger logger = LoggerFactory.getLogger(AwsTriggerScheduler.class);
     private static final String SCHEDULE_TRIGGER = "ScheduleTrigger";
     private static final String POLLING_TRIGGER = "PollingTrigger";
     private static final String WEBHOOK_TRIGGER = "DynamicWebhookTriggerRefresh";
@@ -53,9 +59,16 @@ public class AwsTriggerScheduler implements TriggerScheduler {
 
     @Override
     public void cancelDynamicWebhookTriggerRefresh(String workflowExecutionId) {
-        schedulerClient.deleteSchedule(request -> request.clientToken(workflowExecutionId.substring(16))
-            .groupName(WEBHOOK_TRIGGER)
-            .name(WEBHOOK_TRIGGER + workflowExecutionId.substring(0,16)));
+        try {
+            schedulerClient.deleteSchedule(request -> request.clientToken(workflowExecutionId.substring(16))
+                .groupName(WEBHOOK_TRIGGER)
+                .name(WEBHOOK_TRIGGER + workflowExecutionId.substring(0, 16)));
+        }
+        catch(RuntimeException e){
+            if(logger.isInfoEnabled()){
+                logger.info("Dynamic Webhook Trigger Refresh not defined");
+            }
+        }
     }
 
     @Override
