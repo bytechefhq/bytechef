@@ -1,5 +1,5 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {Link} from 'react-router-dom';
+import {Link, useLocation} from 'react-router-dom';
 
 import './DesktopSidebar.css';
 
@@ -23,6 +23,8 @@ export function DesktopSidebar({
         icon: React.ForwardRefExoticComponent<Omit<React.SVGProps<SVGSVGElement>, 'ref'>>;
     }[];
 }) {
+    const {pathname} = useLocation();
+    console.log(pathname);
     const {setShowCopilot, showCopilot} = useCopilotStore();
 
     const ff_1570 = useFeatureFlagsStore()('ff-1570');
@@ -38,21 +40,25 @@ export function DesktopSidebar({
 
                         <nav aria-label="Sidebar" className="flex flex-col items-center overflow-y-auto">
                             {navigation.map((item) => (
-                                <Link
-                                    className="flex items-center rounded-lg p-3 hover:text-blue-600"
-                                    key={item.name}
-                                    to={item.href}
-                                >
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                            <item.icon aria-hidden="true" className="size-7" />
-                                        </TooltipTrigger>
+                                <div className="p-1" key={item.name}>
+                                    <Link
+                                        className={twMerge(
+                                            'flex items-center rounded-lg p-2 hover:text-blue-600',
+                                            pathname.includes(item.href) && 'text-blue-600'
+                                        )}
+                                        to={item.href}
+                                    >
+                                        <Tooltip>
+                                            <TooltipTrigger>
+                                                <item.icon aria-hidden="true" className="size-7" />
+                                            </TooltipTrigger>
 
-                                        <TooltipContent side="right">{item.name}</TooltipContent>
-                                    </Tooltip>
+                                            <TooltipContent side="right">{item.name}</TooltipContent>
+                                        </Tooltip>
 
-                                    <span className="sr-only">{item.name}</span>
-                                </Link>
+                                        <span className="sr-only">{item.name}</span>
+                                    </Link>
+                                </div>
                             ))}
                         </nav>
                     </div>
