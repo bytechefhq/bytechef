@@ -35,6 +35,9 @@ import com.google.api.services.drive.model.File;
 import java.io.IOException;
 import java.util.Collections;
 
+/**
+ * @author Mayank Madan
+ */
 public class GoogleDriveCopyFileAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("copyFile")
@@ -63,21 +66,23 @@ public class GoogleDriveCopyFileAction {
     }
 
     public static File perform(
-        Parameters inputParameters, Parameters connectionParameters,
-        ActionContext actionContext) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
+
         Drive drive = GoogleServices.getDrive(connectionParameters);
+        String fileId = inputParameters.getRequiredString(FILE_ID);
+
         File originalFile = drive.files()
-            .get(inputParameters.getRequiredString(FILE_ID))
+            .get(fileId)
             .execute();
-        // Setting parent to copy it to correct destination folder
+
         File newFile = new File()
             .setName(inputParameters.getRequiredString(FILE_NAME))
             .setParents(Collections.singletonList(inputParameters.getRequiredString(PARENT_FOLDER)))
             .setMimeType(originalFile.getMimeType());
 
-        return drive.files()
-            .copy(inputParameters.getRequiredString(FILE_ID), newFile)
+        return drive
+            .files()
+            .copy(fileId, newFile)
             .execute();
     }
-
 }
