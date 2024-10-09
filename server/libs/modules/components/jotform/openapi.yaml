@@ -1,0 +1,56 @@
+---
+openapi: "3.0.2"
+info:
+  title: "JotForm"
+  description: "JotForm is an online form builder that enables users to create customized forms for various purposes without needing coding skills."
+  version: "v1"
+servers:
+  - url: "https://api.jotform.com"
+paths:
+  /form/{formId}/submissions:
+    get:
+      summary: "Get Form Submissions"
+      description: "Get all submissions for a specific form."
+      operationId: "getFormSubmissions"
+      parameters:
+        - name: "formId"
+          description: "Form to retrieve submissions for."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            title: "Form"
+      responses:
+        201:
+          description: "Creation confirmation. Returns created Account"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      content:
+                        type: "array"
+                        items:
+                          type: "object"
+                          properties:
+                            id:
+                              type: "string"
+                            form_id:
+                              type: "string"
+                            status:
+                              type: "string"
+                            new:
+                              type: "string"
+                            flag:
+                              type: "string"
+                            notes:
+                              type: "string"
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: "apiKey"
+      in: "header"
+      name: "APIKEY"
