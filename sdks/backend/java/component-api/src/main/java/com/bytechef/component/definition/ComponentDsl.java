@@ -1602,7 +1602,7 @@ public final class ComponentDsl {
         @Override
         public String toString() {
             return "ModifiableConnectionDefinition{" +
-                ", version=" + version +
+                "version=" + version +
                 ", authorizationRequired=" + authorizationRequired +
                 ", authorizations=" + authorizations +
                 ", properties=" + properties +

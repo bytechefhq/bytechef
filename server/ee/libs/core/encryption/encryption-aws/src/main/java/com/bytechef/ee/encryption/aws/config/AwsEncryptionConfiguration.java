@@ -8,6 +8,7 @@
 package com.bytechef.ee.encryption.aws.config;
 
 import com.bytechef.ee.encryption.aws.AwsEncryptionKey;
+import com.bytechef.encryption.EncryptionKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -35,8 +36,9 @@ public class AwsEncryptionConfiguration {
     }
 
     @Bean
-    AwsEncryptionKey
-        awsEncryptionKey(AwsCredentialsProvider awsCredentialsProvider, AwsRegionProvider awsRegionProvider) {
+    AwsEncryptionKey awsEncryptionKey(
+        AwsCredentialsProvider awsCredentialsProvider, AwsRegionProvider awsRegionProvider) {
+
         SecretsManagerClient client = SecretsManagerClient.builder()
             .credentialsProvider(awsCredentialsProvider)
             .region(awsRegionProvider.getRegion())

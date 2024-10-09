@@ -58,5 +58,4 @@ class AwsFileStorageConfiguration {
 
         return new S3Template(s3Client, s3OutputStreamProvider, s3ObjectConverter, s3Presigner);
     }
-
 }
