@@ -239,7 +239,7 @@ public class GoogleMailUtils {
         return mimeMessage;
     }
 
-    public static List<Option<String>> getLabelIdOptions(
+    public static List<Option<String>> getLabelOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context)
         throws IOException {
