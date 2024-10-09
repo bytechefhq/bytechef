@@ -23,6 +23,7 @@ import static com.bytechef.component.github.constant.GithubConstants.GITHUB;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.github.action.GithubAddAssigneesToIssueAction;
 import com.bytechef.component.github.action.GithubCreateCommentOnIssueAction;
 import com.bytechef.component.github.action.GithubCreateIssueAction;
 import com.bytechef.component.github.action.GithubGetIssueAction;
@@ -44,7 +45,8 @@ public class GithubComponentHandler implements ComponentHandler {
         .actions(
             GithubCreateIssueAction.ACTION_DEFINITION,
             GithubGetIssueAction.ACTION_DEFINITION,
-            GithubCreateCommentOnIssueAction.ACTION_DEFINITION)
+            GithubCreateCommentOnIssueAction.ACTION_DEFINITION,
+            GithubAddAssigneesToIssueAction.ACTION_DEFINITION)
         .icon("path:assets/github.svg")
         .triggers(
             GithubNewIssueTrigger.TRIGGER_DEFINITION,
