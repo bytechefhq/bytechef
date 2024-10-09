@@ -16,8 +16,7 @@ export default defineConfig({
                 {
                     tag: 'script',
                     attrs: {
-                        src: 'https://plausible.io/js/script.js',
-                        'data-domain': 'docs.bytechef.io',
+                        src: '/javascript/analytics.js',
                     },
                 },
             ],
