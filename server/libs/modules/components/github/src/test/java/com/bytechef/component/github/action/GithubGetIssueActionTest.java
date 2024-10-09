@@ -18,12 +18,17 @@ package com.bytechef.component.github.action;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Luka Ljubic
  */
 class GithubGetIssueActionTest extends AbstractGithubActionTest {
+
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of());
 
     @Test
     void testPerform() {
