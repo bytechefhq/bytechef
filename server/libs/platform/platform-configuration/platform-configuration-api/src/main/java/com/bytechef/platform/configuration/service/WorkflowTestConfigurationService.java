@@ -41,7 +41,7 @@ public interface WorkflowTestConfigurationService {
     WorkflowTestConfiguration saveWorkflowTestConfiguration(WorkflowTestConfiguration workflowTestConfiguration);
 
     void saveWorkflowTestConfigurationConnection(
-        String workflowId, String workflowNodeName, String key, long connectionId);
+        String workflowId, String workflowNodeName, String key, long connectionId, boolean workflowNodeTrigger);
 
     void saveWorkflowTestConfigurationInputs(String workflowId, Map<String, String> inputs);
 
