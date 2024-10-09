@@ -454,27 +454,58 @@
       "exampleValue" : null,
       "label" : "Form",
       "placeholder" : null,
-      "controlType" : "TEXT",
+      "controlType" : "SELECT",
       "languageId" : null,
       "maxLength" : null,
       "minLength" : null,
       "options" : null,
-      "optionsDataSource" : null
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
     } ],
     "title" : "Get Form Submissions",
-    "workflowNodeDescription" : null,
     "perform" : null,
+    "workflowNodeDescription" : null,
     "processErrorResponse" : null
   } ],
-  "triggers" : [ ],
   "dataStream" : null,
   "unifiedApi" : null,
+  "triggers" : [ ],
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
       "description" : null,
       "name" : "api_key",
       "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "region",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Region",
+        "placeholder" : null,
+        "controlType" : "SELECT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : [ {
+          "description" : null,
+          "label" : "US (jotform.com)",
+          "value" : "us"
+        }, {
+          "description" : null,
+          "label" : "EU (eu.jotform.com)",
+          "value" : "eu"
+        } ],
+        "optionsDataSource" : null
+      }, {
         "advancedOption" : null,
         "description" : null,
         "displayCondition" : null,
@@ -506,7 +537,7 @@
         "type" : "STRING",
         "defaultValue" : null,
         "exampleValue" : null,
-        "label" : "Value",
+        "label" : "API Key",
         "placeholder" : null,
         "controlType" : "TEXT",
         "languageId" : null,
