@@ -17,13 +17,11 @@
 package com.bytechef.component.google.mail.action;
 
 import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import static com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ADD_LABEL_IDS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.LABEL_IDS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
@@ -39,12 +37,10 @@ import com.google.api.services.gmail.model.Message;
 import com.google.api.services.gmail.model.ModifyMessageRequest;
 import java.io.IOException;
 
+/**
+ * @author J. Iamsamang
+ */
 public class GoogleMailAddLabelAction {
-
-    public static final ModifiableStringProperty LABEL_ID_PROPERTY = string("Label")
-        .label("Label ID")
-        .description("Label ID to add to this message")
-        .options((ActionOptionsFunction<String>) GoogleMailUtils::getLabelIdOptions);
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("addLabels")
         .title("Add labels")
@@ -55,11 +51,14 @@ public class GoogleMailAddLabelAction {
                 .description("ID of the message to add labels")
                 .options((ActionOptionsFunction<String>) GoogleMailUtils::getMessageIdOptions)
                 .required(true),
-            array(ADD_LABEL_IDS)
-                .label("Label IDs")
-                .description(
-                    "A list of IDs of labels to add to this message. You can add up to 100 labels with each update.")
-                .items(LABEL_ID_PROPERTY)
+            array(LABEL_IDS)
+                .label("Labels")
+                .description("Labels to add to this message. You can add up to 100 labels with each update.")
+                .items(
+                    string("label")
+                        .label("Label")
+                        .description("Label to add to this message")
+                        .options((ActionOptionsFunction<String>) GoogleMailUtils::getLabelOptions))
                 .maxItems(100)
                 .required(true))
         .output(
@@ -77,14 +76,16 @@ public class GoogleMailAddLabelAction {
 
     public static Message perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
-        Gmail service = GoogleServices.getMail(connectionParameters);
-        ModifyMessageRequest messageRequest = new ModifyMessageRequest();
-        messageRequest.setAddLabelIds(inputParameters.getRequiredList(ADD_LABEL_IDS, String.class));
-        return service
+
+        Gmail gmail = GoogleServices.getMail(connectionParameters);
+
+        ModifyMessageRequest messageRequest = new ModifyMessageRequest()
+            .setAddLabelIds(inputParameters.getRequiredList(LABEL_IDS, String.class));
+
+        return gmail
             .users()
             .messages()
             .modify(ME, inputParameters.getRequiredString(ID), messageRequest)
             .execute();
     }
-
 }

@@ -16,8 +16,8 @@
 
 package com.bytechef.component.google.mail.action;
 
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ADD_LABEL_IDS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.LABEL_IDS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,7 +35,10 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-public class GoogleMailAddLabelActionTest extends AbstractGoogleMailActionTest {
+/**
+ * @author J. Iamsamang
+ */
+class GoogleMailAddLabelActionTest extends AbstractGoogleMailActionTest {
 
     private final Gmail.Users.Messages mockedMessages = mock(Gmail.Users.Messages.class);
     private final Gmail.Users mockedUsers = mock(Gmail.Users.class);
@@ -49,7 +52,7 @@ public class GoogleMailAddLabelActionTest extends AbstractGoogleMailActionTest {
     @Test
     void testPerform() throws IOException {
         Parameters parameters =
-            MockParametersFactory.create(Map.of(ID, "1", ADD_LABEL_IDS, Arrays.asList("1", "2", "3")));
+            MockParametersFactory.create(Map.of(ID, "1", LABEL_IDS, Arrays.asList("1", "2", "3")));
 
         when(mockedGmail.users())
             .thenReturn(mockedUsers);
