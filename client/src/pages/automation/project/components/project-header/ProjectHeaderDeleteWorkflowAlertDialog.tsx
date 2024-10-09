@@ -8,27 +8,33 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { KeyboardKey, useKeyDown } from '@/shared/hooks/useKeyDown';
 
-const ProjectHeaderDeleteWorkflowAlertDialog = ({onClose, onDelete}: {onClose: () => void; onDelete: () => void}) => (
-    <AlertDialog open={true}>
-        <AlertDialogContent>
-            <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+const ProjectHeaderDeleteWorkflowAlertDialog = ({onClose, onDelete}: {onClose: () => void; onDelete: () => void}) => {
+    useKeyDown(onDelete, [KeyboardKey.enter]);
 
-                <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete the workflow.
-                </AlertDialogDescription>
-            </AlertDialogHeader>
+    
+    return (
+        <AlertDialog open={true}>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
 
-            <AlertDialogFooter>
-                <AlertDialogCancel onClick={onClose}>Cancel</AlertDialogCancel>
+                    <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete the workflow.
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
 
-                <AlertDialogAction className="bg-destructive" onClick={() => onDelete()}>
-                    Delete
-                </AlertDialogAction>
-            </AlertDialogFooter>
-        </AlertDialogContent>
-    </AlertDialog>
-);
+                <AlertDialogFooter>
+                    <AlertDialogCancel onClick={onClose}>Cancel</AlertDialogCancel>
+
+                    <AlertDialogAction className="bg-destructive" onClick={() => onDelete()}>
+                        Delete
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+    )
+};
 
 export default ProjectHeaderDeleteWorkflowAlertDialog;
