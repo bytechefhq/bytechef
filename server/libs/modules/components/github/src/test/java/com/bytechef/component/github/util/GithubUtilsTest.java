@@ -118,21 +118,21 @@ class GithubUtilsTest {
 
     @Test
     void testGetCollaborators() {
-      List<Map<String, Object>> body = new ArrayList<>();
-      Map<String, Object> items = new LinkedHashMap<>();
-      items.put("name", "John Doe");
-      items.put("login", "jdTest123");
-      body.add(items);
+        List<Map<String, Object>> body = new ArrayList<>();
+        Map<String, Object> items = new LinkedHashMap<>();
+        items.put("name", "John Doe");
+        items.put("login", "jdTest123");
+        body.add(items);
 
-      when(mockedResponse.getBody(any(TypeReference.class)))
-        .thenReturn(body);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(body);
 
-      List<Option<String>> expectedOptions = new ArrayList<>();
+        List<Option<String>> expectedOptions = new ArrayList<>();
 
-      expectedOptions.add(option("John Doe", "jdTest123"));
+        expectedOptions.add(option("John Doe", "jdTest123"));
 
-      assertEquals(expectedOptions,
-        GithubUtils.getCollaborators(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+        assertEquals(expectedOptions,
+            GithubUtils.getCollaborators(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
     }
 
     @Test

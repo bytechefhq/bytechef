@@ -107,23 +107,24 @@ public class GithubUtils {
     }
 
     public static List<Option<String>> getCollaborators(
-      Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-      ActionContext context) {
-      List<Option<String>> collaborators = new ArrayList<>();
-      List<Map<String, Object>> body = context
-        .http(http -> http.get(
-          "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY) + "/collaborators"))
-        .configuration(responseType(Http.ResponseType.JSON))
-        .execute()
-        .getBody(new TypeReference<>() {});
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
+        ActionContext context) {
+        List<Option<String>> collaborators = new ArrayList<>();
+        List<Map<String, Object>> body = context
+            .http(http -> http.get(
+                "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY)
+                    + "/collaborators"))
+            .configuration(responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
 
-      for (Object item : body) {
-        if (item instanceof Map<?, ?> map) {
-          collaborators.add(option((String) map.get("name"), (String) map.get("login")));
+        for (Object item : body) {
+            if (item instanceof Map<?, ?> map) {
+                collaborators.add(option((String) map.get("name"), (String) map.get("login")));
+            }
         }
-      }
 
-      return collaborators;
+        return collaborators;
     }
 
     public static Integer subscribeWebhook(String repositry, String event, String webhookUrl, TriggerContext context) {
