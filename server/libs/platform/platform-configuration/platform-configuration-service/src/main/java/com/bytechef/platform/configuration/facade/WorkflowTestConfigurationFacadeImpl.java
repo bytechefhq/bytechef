@@ -97,8 +97,11 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
 
         validateConnection(workflowNodeName, workflowConnectionKey, connectionId, workflow);
 
+        boolean workflowNodeTrigger = WorkflowTrigger.fetch(workflow, workflowNodeName)
+            .isPresent();
+
         workflowTestConfigurationService.saveWorkflowTestConfigurationConnection(
-            workflowId, workflowNodeName, workflowConnectionKey, connectionId);
+            workflowId, workflowNodeName, workflowConnectionKey, connectionId, workflowNodeTrigger);
     }
 
     @Override

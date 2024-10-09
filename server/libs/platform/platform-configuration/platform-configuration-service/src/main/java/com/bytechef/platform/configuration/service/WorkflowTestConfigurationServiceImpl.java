@@ -106,9 +106,17 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
 
     @Override
     public void saveWorkflowTestConfigurationConnection(
-        String workflowId, String workflowNodeName, String key, long connectionId) {
+        String workflowId, String workflowNodeName, String key, long connectionId, boolean workflowNodeTrigger) {
 
         WorkflowTestConfiguration workflowTestConfiguration = getWorkflowTestConfiguration(workflowId);
+
+        List<WorkflowTestConfigurationConnection> connections = workflowTestConfiguration.getConnections();
+
+        if (workflowNodeTrigger) {
+            connections = connections.stream()
+                .filter(connection -> !Objects.equals(connection.getWorkflowNodeName(), workflowNodeName))
+                .toList();
+        }
 
         WorkflowTestConfigurationConnection workflowTestConfigurationConnection =
             new WorkflowTestConfigurationConnection(connectionId, key, workflowNodeName);
@@ -116,7 +124,7 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
         workflowTestConfiguration.setConnections(
             CollectionUtils.concat(
                 CollectionUtils.filter(
-                    workflowTestConfiguration.getConnections(),
+                    connections,
                     connection -> !(Objects.equals(connection.getWorkflowConnectionKey(), key) &&
                         Objects.equals(connection.getWorkflowNodeName(), workflowNodeName))),
                 List.of(workflowTestConfigurationConnection)));
