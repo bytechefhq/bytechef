@@ -36,7 +36,6 @@ public class GoogleMailConstants {
     private GoogleMailConstants() {
     }
 
-    public static final String ADD_LABEL_IDS = "addLabelIds";
     public static final String ATTACHMENTS = "attachments";
     public static final String BCC = "bcc";
     public static final String BODY = "body";
