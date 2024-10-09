@@ -87,6 +87,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:insightly"))
     implementation(project(":server:libs:modules:components:intercom"))
     implementation(project(":server:libs:modules:components:jira"))
+    implementation(project(":server:libs:modules:components:jotform"))
     implementation(project(":server:libs:modules:components:json-file"))
     implementation(project(":server:libs:modules:components:keap"))
     implementation(project(":server:libs:modules:components:llm:amazon-bedrock"))
