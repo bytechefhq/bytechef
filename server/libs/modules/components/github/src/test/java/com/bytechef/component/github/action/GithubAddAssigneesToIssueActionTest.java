@@ -16,43 +16,42 @@
 
 package com.bytechef.component.github.action;
 
-import com.bytechef.component.definition.Context;
-import com.bytechef.component.github.util.GithubUtils;
-import org.junit.jupiter.api.Test;
-
-import java.util.Map;
-
-import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
-import static com.bytechef.component.github.constant.GithubConstants.ISSUE;
 import static com.bytechef.component.github.constant.GithubConstants.ASSIGNEES;
+import static com.bytechef.component.github.constant.GithubConstants.ISSUE;
+import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
+
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.github.util.GithubUtils;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Mayank Madan
  */
-public class GithubAddAssigneesToIssueActionTest extends AbstractGithubActionTest{
-    private final Map<String, Object> propertyStubsMap = Map.of(REPOSITORY, "testRepo",ISSUE, "testIssue", ASSIGNEES, "githubUsername");
+public class GithubAddAssigneesToIssueActionTest extends AbstractGithubActionTest {
+    private final Map<String, Object> propertyStubsMap =
+        Map.of(REPOSITORY, "testRepo", ISSUE, "testIssue", ASSIGNEES, "githubUsername");
 
-  @Test
-  void testPerform() {
+    @Test
+    void testPerform() {
 
-    when(mockedParameters.getRequiredString(REPOSITORY))
-      .thenReturn((String) propertyStubsMap.get(REPOSITORY));
-    when(mockedParameters.getRequiredString(ISSUE))
-      .thenReturn((String) propertyStubsMap.get(ISSUE));
-    when(mockedParameters.getRequiredString(ASSIGNEES))
-      .thenReturn((String) propertyStubsMap.get(ASSIGNEES));
-    when(GithubUtils.getOwnerName(mockedContext))
-      .thenReturn("testOwner");
+        when(mockedParameters.getRequiredString(REPOSITORY))
+            .thenReturn((String) propertyStubsMap.get(REPOSITORY));
+        when(mockedParameters.getRequiredString(ISSUE))
+            .thenReturn((String) propertyStubsMap.get(ISSUE));
+        when(mockedParameters.getRequiredString(ASSIGNEES))
+            .thenReturn((String) propertyStubsMap.get(ASSIGNEES));
+        when(GithubUtils.getOwnerName(mockedContext))
+            .thenReturn("testOwner");
 
-    Map<String, Object> result = GithubAddAssigneesToIssueAction
-      .perform(mockedParameters, mockedParameters, mockedContext);
-
-    Context.Http.Body body = bodyArgumentCaptor.getValue();
-    Map<?, ?> map = (Map<?, ?>) body.getContent();
-    assertEquals(propertyStubsMap.get(ASSIGNEES) , map.get(ASSIGNEES));
-  }
-
+        Map<String, Object> result = GithubAddAssigneesToIssueAction
+            .perform(mockedParameters, mockedParameters, mockedContext);
+        assertEquals(responseMap, result);
+        Context.Http.Body body = bodyArgumentCaptor.getValue();
+        Map<?, ?> map = (Map<?, ?>) body.getContent();
+        assertEquals(propertyStubsMap.get(ASSIGNEES), map.get(ASSIGNEES));
+    }
 
 }
