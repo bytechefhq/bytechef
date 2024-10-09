@@ -8,7 +8,6 @@
 package com.bytechef.ee.encryption.aws.config;
 
 import com.bytechef.ee.encryption.aws.AwsEncryptionKey;
-import com.bytechef.encryption.EncryptionKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
