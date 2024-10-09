@@ -30,13 +30,16 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-public class GoogleMailDeleteMailActionTest extends AbstractGoogleMailActionTest {
+/**
+ * @author J. Iamsamang
+ */
+class GoogleMailDeleteMailActionTest extends AbstractGoogleMailActionTest {
 
-    private final Gmail.Users mockedUsers = mock(Gmail.Users.class);
-    private final Gmail.Users.Messages mockedMessages = mock(Gmail.Users.Messages.class);
-    private final Gmail.Users.Messages.Delete mockedDelete = mock(Gmail.Users.Messages.Delete.class);
-    private final ArgumentCaptor<String> userIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<String> idArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final Gmail.Users.Messages.Delete mockedDelete = mock(Gmail.Users.Messages.Delete.class);
+    private final Gmail.Users.Messages mockedMessages = mock(Gmail.Users.Messages.class);
+    private final Gmail.Users mockedUsers = mock(Gmail.Users.class);
+    private final ArgumentCaptor<String> userIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void testPerform() throws IOException {
@@ -50,6 +53,7 @@ public class GoogleMailDeleteMailActionTest extends AbstractGoogleMailActionTest
             .thenReturn(mockedDelete);
 
         GoogleMailDeleteMailAction.perform(parameters, parameters, mockedActionContext);
+
         assertEquals(ME, userIdArgumentCaptor.getValue());
         assertEquals("id", idArgumentCaptor.getValue());
     }

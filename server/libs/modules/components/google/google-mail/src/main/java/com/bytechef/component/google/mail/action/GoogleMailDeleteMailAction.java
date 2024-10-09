@@ -34,6 +34,7 @@ import java.io.IOException;
  * @author J. Iamsamang
  */
 public class GoogleMailDeleteMailAction {
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteMail")
         .title("Delete Mail")
         .description("Delete an email from your Gmail account permanently via Id")
@@ -50,11 +51,13 @@ public class GoogleMailDeleteMailAction {
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
-        Gmail service = GoogleServices.getMail(connectionParameters);
-        return service.users()
+
+        Gmail gmail = GoogleServices.getMail(connectionParameters);
+
+        return gmail
+            .users()
             .messages()
             .delete(ME, inputParameters.getRequiredString(ID))
             .execute();
     }
-
 }
