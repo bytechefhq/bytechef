@@ -35,21 +35,23 @@ import org.junit.jupiter.api.Test;
  * @author Mayank Madan
  */
 public class GoogleDriveCopyFileActionTest extends AbstractGoogleDriveActionTest {
-    private final Parameters mockInputParameters = MockParametersFactory.create(Map.of(FILE_ID, "originalFileId",
-        FILE_NAME, "newFileName", PARENT_FOLDER, "newFolderId"));
-    private final File testFile =
-        new File().setName("newFileName")
-            .setParents(Collections.singletonList("newFolderId"))
-            .setMimeType("application" +
-                "/pdf");
+    private final Parameters mockInputParameters = MockParametersFactory.create(
+        Map.of(FILE_ID, "originalFileId", FILE_NAME, "newFileName", PARENT_FOLDER, "newFolderId"));
+    private final File testFile = new File()
+        .setName("newFileName")
+        .setParents(Collections.singletonList("newFolderId"))
+        .setMimeType("application/pdf");
 
     @Test
     public void testPerform() throws IOException {
-
-        when(mockedFiles.get(fileIdArgumentCaptor.capture())).thenReturn(mockedGet);
-        when(mockedGet.execute()).thenReturn(testFile);
-        when(mockedFiles.copy("originalFileId", testFile)).thenReturn(mockedCopy);
-        when(mockedCopy.execute()).thenReturn(testFile);
+        when(mockedFiles.get(fileIdArgumentCaptor.capture()))
+            .thenReturn(mockedGet);
+        when(mockedGet.execute())
+            .thenReturn(testFile);
+        when(mockedFiles.copy("originalFileId", testFile))
+            .thenReturn(mockedCopy);
+        when(mockedCopy.execute())
+            .thenReturn(testFile);
 
         File copiedFile = GoogleDriveCopyFileAction.perform(mockInputParameters, mockInputParameters, mockedContext);
 
