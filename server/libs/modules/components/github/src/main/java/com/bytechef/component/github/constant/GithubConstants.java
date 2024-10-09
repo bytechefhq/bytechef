@@ -16,6 +16,7 @@
 
 package com.bytechef.component.github.constant;
 
+import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
@@ -28,15 +29,15 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
  */
 public class GithubConstants {
 
+    public static final String ADD_ASSIGNEES_TO_ISSUE = "addAssigneesToIssue";
+    public static final String ASSIGNEES = "assignees";
     public static final String BODY = "body";
     public static final String CREATE_ISSUE = "createIssue";
     public static final String CREATE_COMMENT_ON_ISSUE = "createCommentOnIssue";
-    public static final String ADD_ASSIGNEES_TO_ISSUE = "addAssigneesToIssue";
     public static final String GITHUB = "github";
     public static final String GET_ISSUE = "getIssue";
     public static final String ID = "id";
     public static final String ISSUE = "issue";
-    public static final String ASSIGNEES = "assignees";
     public static final String NEW_ISSUE = "newIssue";
     public static final String NEW_PULL_REQUEST = "newPullRequest";
     public static final String REPOSITORY = "repository";
@@ -50,6 +51,14 @@ public class GithubConstants {
             integer("number"),
             string(TITLE),
             string("state"),
+            array(ASSIGNEES)
+                .items(
+                    object()
+                        .properties(
+                            string("login"),
+                            string(ID),
+                            string("html_url"),
+                            string("type"))),
             string(BODY));
 
     private GithubConstants() {
