@@ -127,6 +127,27 @@ public class GithubUtils {
         return collaborators;
     }
 
+  public static List<Option<String>> getLabels(
+    Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
+    ActionContext context) {
+    List<Option<String>> labels = new ArrayList<>();
+    List<Map<String, Object>> body = context
+      .http(http -> http.get(
+        "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY)
+          + "/labels"))
+      .configuration(responseType(Http.ResponseType.JSON))
+      .execute()
+      .getBody(new TypeReference<>() {});
+
+    for (Object item : body) {
+      if (item instanceof Map<?, ?> map) {
+        labels.add(option((String) map.get("name"), (String) map.get("name")));
+      }
+    }
+
+    return labels;
+  }
+
     public static Integer subscribeWebhook(String repositry, String event, String webhookUrl, TriggerContext context) {
         Map<String, Object> body = context
             .http(http -> http.post("/repos/" + getOwnerName(context) + "/" + repositry + "/hooks"))
