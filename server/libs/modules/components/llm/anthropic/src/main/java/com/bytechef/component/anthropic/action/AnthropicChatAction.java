@@ -99,15 +99,18 @@ public class AnthropicChatAction {
         public ChatOptions createChatOptions(Parameters inputParameters) {
             AnthropicChatOptions.Builder builder = AnthropicChatOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
-                .withTemperature(inputParameters.getFloat(TEMPERATURE))
+                .withTemperature(inputParameters.getDouble(TEMPERATURE))
                 .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
-                .withTopP(inputParameters.getFloat(TOP_P))
+                .withTopP(inputParameters.getDouble(TOP_P))
                 .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
                 .withTopK(inputParameters.getInteger(TOP_K));
 
             List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});
-            if (functions != null)
+
+            if (functions != null) {
                 builder.withFunctions(new HashSet<>(functions));
+            }
+
             return builder.build();
         }
 

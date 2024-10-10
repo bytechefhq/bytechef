@@ -116,22 +116,22 @@ public class AmazonBedrockJurassic2ChatAction {
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
             return BedrockAi21Jurassic2ChatOptions.builder()
-                .withTemperature(inputParameters.getFloat(TEMPERATURE))
+                .withTemperature(inputParameters.getDouble(TEMPERATURE))
                 .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
-                .withTopP(inputParameters.getFloat(TOP_P))
+                .withTopP(inputParameters.getDouble(TOP_P))
                 .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
                 .withTopK(inputParameters.getInteger(TOP_K))
                 .withMinTokens(inputParameters.getInteger(AmazonBedrockConstants.MIN_TOKENS))
                 .withNumResults(inputParameters.getInteger(N))
                 .withPrompt(inputParameters.getString(PROMPT))
                 .withCountPenaltyOptions(BedrockAi21Jurassic2ChatOptions.Penalty.builder()
-                    .scale(inputParameters.getFloat(COUNT_PENALTY))
+                    .scale(inputParameters.getDouble(COUNT_PENALTY))
                     .build())
                 .withFrequencyPenaltyOptions(BedrockAi21Jurassic2ChatOptions.Penalty.builder()
-                    .scale(inputParameters.getFloat(FREQUENCY_PENALTY))
+                    .scale(inputParameters.getDouble(FREQUENCY_PENALTY))
                     .build())
                 .withPresencePenaltyOptions(BedrockAi21Jurassic2ChatOptions.Penalty.builder()
-                    .scale(inputParameters.getFloat(PRESENCE_PENALTY))
+                    .scale(inputParameters.getDouble(PRESENCE_PENALTY))
                     .build())
                 .build();
         }

@@ -88,9 +88,9 @@ public class AmazonBedrockLlamaChatAction {
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
             return BedrockLlamaChatOptions.builder()
-                .withTemperature(inputParameters.getFloat(TEMPERATURE))
+                .withTemperature(inputParameters.getDouble(TEMPERATURE))
                 .withMaxGenLen(inputParameters.getInteger(MAX_TOKENS))
-                .withTopP(inputParameters.getFloat(TOP_P))
+                .withTopP(inputParameters.getDouble(TOP_P))
                 .build();
         }
 

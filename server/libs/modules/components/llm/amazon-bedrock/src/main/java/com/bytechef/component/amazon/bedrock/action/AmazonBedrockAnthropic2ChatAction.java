@@ -97,9 +97,9 @@ public class AmazonBedrockAnthropic2ChatAction {
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
             return AnthropicChatOptions.builder()
-                .withTemperature(inputParameters.getFloat(TEMPERATURE))
+                .withTemperature(inputParameters.getDouble(TEMPERATURE))
                 .withMaxTokensToSample(inputParameters.getInteger(MAX_TOKENS))
-                .withTopP(inputParameters.getFloat(TOP_P))
+                .withTopP(inputParameters.getDouble(TOP_P))
                 .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
                 .withTopK(inputParameters.getInteger(TOP_K))
                 .build();

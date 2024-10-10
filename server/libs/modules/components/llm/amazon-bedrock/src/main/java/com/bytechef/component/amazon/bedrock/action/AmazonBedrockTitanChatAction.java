@@ -92,9 +92,9 @@ public class AmazonBedrockTitanChatAction {
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
             return BedrockTitanChatOptions.builder()
-                .withTemperature(inputParameters.getFloat(TEMPERATURE))
+                .withTemperature(inputParameters.getDouble(TEMPERATURE))
                 .withMaxTokenCount(inputParameters.getInteger(MAX_TOKENS))
-                .withTopP(inputParameters.getFloat(TOP_P))
+                .withTopP(inputParameters.getDouble(TOP_P))
                 .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
                 .build();
         }

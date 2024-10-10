@@ -115,9 +115,9 @@ public class VertexGeminiChatAction {
 
             VertexAiGeminiChatOptions.Builder builder = VertexAiGeminiChatOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
-                .withTemperature(inputParameters.getFloat(TEMPERATURE))
+                .withTemperature(inputParameters.getDouble(TEMPERATURE))
                 .withMaxOutputTokens(inputParameters.getInteger(MAX_TOKENS))
-                .withTopP(inputParameters.getFloat(TOP_P))
+                .withTopP(inputParameters.getDouble(TOP_P))
                 .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
                 .withTopK(inputParameters.getFloat(TOP_K))
                 .withCandidateCount(inputParameters.getInteger(N))
