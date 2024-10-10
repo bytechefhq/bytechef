@@ -8,9 +8,9 @@
 package com.bytechef.ee.platform.scheduler.aws;
 
 import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.DYNAMIC_WEBHOOK_TRIGGER_REFRESH;
-import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.TRIGGER_SCHEDULER_DYNAMIC_WEBHOOK_TRIGGER_REFRESH_QUEUE;
-import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.TRIGGER_SCHEDULER_POLLING_TRIGGER_QUEUE;
-import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.TRIGGER_SCHEDULER_SCHEDULE_TRIGGER_QUEUE;
+import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.SCHEDULER_DYNAMIC_WEBHOOK_TRIGGER_REFRESH_QUEUE;
+import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.SCHEDULER_POLLING_TRIGGER_QUEUE;
+import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.SCHEDULER_SCHEDULE_TRIGGER_QUEUE;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.config.ApplicationProperties;
@@ -90,7 +90,7 @@ public class AwsTriggerScheduler implements TriggerScheduler {
 
         Target sqsTarget = Target.builder()
             .roleArn(roleArn)
-            .arn(sqsArn + ":" + TRIGGER_SCHEDULER_DYNAMIC_WEBHOOK_TRIGGER_REFRESH_QUEUE)
+            .arn(sqsArn + ":" + SCHEDULER_DYNAMIC_WEBHOOK_TRIGGER_REFRESH_QUEUE)
             .input(workflowExecutionIdString + SPLITTER + connectionId)
             .build();
 
@@ -108,7 +108,7 @@ public class AwsTriggerScheduler implements TriggerScheduler {
 
         Target sqsTarget = Target.builder()
             .roleArn(roleArn)
-            .arn(sqsArn + ":" + TRIGGER_SCHEDULER_POLLING_TRIGGER_QUEUE)
+            .arn(sqsArn + ":" + SCHEDULER_POLLING_TRIGGER_QUEUE)
             .input(workflowExecutionIdString)
             .build();
 
@@ -129,9 +129,9 @@ public class AwsTriggerScheduler implements TriggerScheduler {
 
         Target sqsTarget = Target.builder()
             .roleArn(roleArn)
-            .arn(sqsArn + ":" + TRIGGER_SCHEDULER_SCHEDULE_TRIGGER_QUEUE)
+            .arn(sqsArn + ":" + SCHEDULER_SCHEDULE_TRIGGER_QUEUE)
             .input(workflowExecutionIdString + SPLITTER + JsonUtils.write(output))
-            .deadLetterConfig(builder -> builder.arn(sqsArn + ":" + TRIGGER_SCHEDULER_SCHEDULE_TRIGGER_QUEUE)
+            .deadLetterConfig(builder -> builder.arn(sqsArn + ":" + SCHEDULER_SCHEDULE_TRIGGER_QUEUE)
                 .build())
             .build();
 
