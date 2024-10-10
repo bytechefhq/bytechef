@@ -91,7 +91,7 @@ public class AwsTriggerScheduler implements TriggerScheduler {
         Target sqsTarget = Target.builder()
             .roleArn(roleArn)
             .arn(sqsArn + ":" + TRIGGER_SCHEDULER_DYNAMIC_WEBHOOK_TRIGGER_REFRESH_QUEUE)
-            .input(connectionId + SPLITTER + workflowExecutionIdString)
+            .input(workflowExecutionIdString + SPLITTER + connectionId)
             .build();
 
         schedulerClient.createSchedule(request -> request.clientToken(workflowExecutionIdString.substring(16))
@@ -130,7 +130,7 @@ public class AwsTriggerScheduler implements TriggerScheduler {
         Target sqsTarget = Target.builder()
             .roleArn(roleArn)
             .arn(sqsArn + ":" + TRIGGER_SCHEDULER_SCHEDULE_TRIGGER_QUEUE)
-            .input(JsonUtils.write(output) + SPLITTER + workflowExecutionIdString)
+            .input(workflowExecutionIdString + SPLITTER + JsonUtils.write(output))
             .deadLetterConfig(builder -> builder.arn(sqsArn)
                 .build())
             .build();

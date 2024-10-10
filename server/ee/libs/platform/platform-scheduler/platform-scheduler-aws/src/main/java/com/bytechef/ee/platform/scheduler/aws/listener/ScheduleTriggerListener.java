@@ -39,8 +39,8 @@ public class ScheduleTriggerListener {
         eventPublisher.publishEvent(
             new TriggerListenerEvent(
                 new TriggerListenerEvent.ListenerParameters(
-                    WorkflowExecutionId.parse(split[1]), LocalDateTimeUtils.toLocalDateTime(fireTime),
+                    WorkflowExecutionId.parse(split[0]), LocalDateTimeUtils.toLocalDateTime(fireTime),
                     MapUtils.concat(
-                        Map.of("datetime", fireTime.toString()), JsonUtils.readMap(split[0], String.class)))));
+                        Map.of("datetime", fireTime.toString()), JsonUtils.readMap(split[1], String.class)))));
     }
 }
