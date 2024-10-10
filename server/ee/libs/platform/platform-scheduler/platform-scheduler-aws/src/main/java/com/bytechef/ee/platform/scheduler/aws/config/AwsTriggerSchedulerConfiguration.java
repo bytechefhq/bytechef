@@ -16,13 +16,20 @@
 
 package com.bytechef.ee.platform.scheduler.aws.config;
 
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.ee.message.broker.aws.AwsMessageBroker;
 import com.bytechef.ee.platform.scheduler.aws.AwsTriggerScheduler;
+import com.bytechef.ee.platform.scheduler.aws.listeners.DynamicWebhookListener;
+import com.bytechef.ee.platform.scheduler.aws.listeners.PollingListener;
+import com.bytechef.ee.platform.scheduler.aws.listeners.ScheduleListener;
 import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
+import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
+import com.bytechef.platform.workflow.execution.service.TriggerStateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
@@ -55,5 +62,25 @@ public class AwsTriggerSchedulerConfiguration {
             .build();
 
         return new AwsTriggerScheduler(client, aws);
+    }
+
+    @Bean
+    public DynamicWebhookListener dynamicWebhookListener(AwsCredentialsProvider awsCredentialsProvider, AwsRegionProvider awsRegionProvider, InstanceAccessorRegistry instanceAccessorRegistry, TriggerDefinitionFacade triggerDefinitionFacade, TriggerStateService triggerStateService, WorkflowService workflowService){
+        SchedulerClient client = SchedulerClient.builder()
+            .credentialsProvider(awsCredentialsProvider)
+            .region(awsRegionProvider.getRegion())
+            .build();
+
+        return new DynamicWebhookListener(client, instanceAccessorRegistry, triggerDefinitionFacade, triggerStateService, workflowService);
+    }
+
+    @Bean
+    public ScheduleListener scheduleListener(ApplicationEventPublisher eventPublisher){
+        return new ScheduleListener(eventPublisher);
+    }
+
+    @Bean
+    public PollingListener pollingListener(ApplicationEventPublisher eventPublisher){
+        return new PollingListener(eventPublisher);
     }
 }
