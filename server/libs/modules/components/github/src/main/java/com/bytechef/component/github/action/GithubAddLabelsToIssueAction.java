@@ -32,12 +32,11 @@ import static com.bytechef.component.github.util.GithubUtils.getOwnerName;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.github.util.GithubUtils;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -50,17 +49,17 @@ public class GithubAddLabelsToIssueAction {
         .description("Adds labels to the specified issue.")
         .properties(
             string(REPOSITORY)
-                .options((OptionsDataSource.ActionOptionsFunction<String>) GithubUtils::getRepositoryOptions)
+                .options((ActionOptionsFunction<String>) GithubUtils::getRepositoryOptions)
                 .label("Repository")
                 .required(true),
             string(ISSUE)
-                .options((OptionsDataSource.ActionOptionsFunction<String>) GithubUtils::getIssueOptions)
+                .options((ActionOptionsFunction<String>) GithubUtils::getIssueOptions)
                 .optionsLookupDependsOn(REPOSITORY)
                 .label("Issue")
                 .description("The issue to add labels to.")
                 .required(true),
             string(LABELS)
-                .options((OptionsDataSource.ActionOptionsFunction<String>) GithubUtils::getLabels)
+                .options((ActionOptionsFunction<String>) GithubUtils::getLabels)
                 .optionsLookupDependsOn(REPOSITORY)
                 .label("Labels")
                 .description("The list of labels to add to the issue.")
@@ -78,7 +77,7 @@ public class GithubAddLabelsToIssueAction {
     private GithubAddLabelsToIssueAction() {
     }
 
-    public static List<Object> perform(
+    public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         return context
