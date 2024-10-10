@@ -20,9 +20,13 @@ import static com.bytechef.component.github.constant.GithubConstants.ISSUE;
 import static com.bytechef.component.github.constant.GithubConstants.LABELS;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Collections;
 import java.util.Map;
@@ -34,13 +38,16 @@ import org.junit.jupiter.api.Test;
 class GithubAddLabelsToIssueActionTest extends AbstractGithubActionTest {
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(REPOSITORY, "testRepo", ISSUE, "testIssue", LABELS, "help-wanted"));
+    private final Object mockedObject = mock(Object.class);
 
     @Test
     void testPerform() {
-        Map<String, Object> result =
-            GithubAddLabelsToIssueAction.perform(mockedParameters, mockedParameters, mockedContext);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(mockedObject);
 
-        assertEquals(responseMap, result);
+        Object result = GithubAddLabelsToIssueAction.perform(mockedParameters, mockedParameters, mockedContext);
+
+        assertEquals(mockedObject, result);
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
