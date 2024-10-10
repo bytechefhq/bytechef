@@ -20,7 +20,9 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.github.constant.GithubConstants.ID;
+import static com.bytechef.component.github.constant.GithubConstants.NAME;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
+import static com.bytechef.component.github.constant.GithubConstants.TITLE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
@@ -44,6 +46,21 @@ public class GithubUtils {
     private GithubUtils() {
     }
 
+    public static List<Option<String>> getCollaborators(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
+        ActionContext context) {
+
+        List<Map<String, Object>> body = context
+            .http(http -> http.get(
+                "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY)
+                    + "/collaborators"))
+            .configuration(responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        return getOptions(body, NAME, "login");
+    }
+
     public static Map<String, Object> getContent(WebhookBody body) {
         Map<String, Object> content = body.getContent(new TypeReference<>() {});
 
@@ -65,15 +82,22 @@ public class GithubUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> options = new ArrayList<>();
+        return getOptions(body, TITLE, "number");
+    }
 
-        for (Object item : body) {
-            if (item instanceof Map<?, ?> map) {
-                options.add(option((String) map.get("title"), String.valueOf(map.get("number"))));
-            }
-        }
+    public static List<Option<String>> getLabels(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
+        ActionContext context) {
 
-        return options;
+        List<Map<String, Object>> body = context
+            .http(http -> http.get(
+                "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY)
+                    + "/labels"))
+            .configuration(responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        return getOptions(body, NAME, NAME);
     }
 
     public static String getOwnerName(Context context) {
@@ -95,57 +119,18 @@ public class GithubUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
+        return getOptions(body, NAME, NAME);
+    }
+
+    private static List<Option<String>> getOptions(List<Map<String, Object>> body, String label, String value) {
         List<Option<String>> options = new ArrayList<>();
 
         for (Object item : body) {
             if (item instanceof Map<?, ?> map) {
-                options.add(option((String) map.get("name"), (String) map.get("name")));
+                options.add(option((String) map.get(label), String.valueOf(map.get(value))));
             }
         }
-
         return options;
-    }
-
-    public static List<Option<String>> getCollaborators(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        ActionContext context) {
-        List<Option<String>> collaborators = new ArrayList<>();
-        List<Map<String, Object>> body = context
-            .http(http -> http.get(
-                "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY)
-                    + "/collaborators"))
-            .configuration(responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        for (Object item : body) {
-            if (item instanceof Map<?, ?> map) {
-                collaborators.add(option((String) map.get("name"), (String) map.get("login")));
-            }
-        }
-
-        return collaborators;
-    }
-
-    public static List<Option<String>> getLabels(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        ActionContext context) {
-        List<Option<String>> labels = new ArrayList<>();
-        List<Map<String, Object>> body = context
-            .http(http -> http.get(
-                "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY)
-                    + "/labels"))
-            .configuration(responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        for (Object item : body) {
-            if (item instanceof Map<?, ?> map) {
-                labels.add(option((String) map.get("name"), (String) map.get("name")));
-            }
-        }
-
-        return labels;
     }
 
     public static Integer subscribeWebhook(String repositry, String event, String webhookUrl, TriggerContext context) {
