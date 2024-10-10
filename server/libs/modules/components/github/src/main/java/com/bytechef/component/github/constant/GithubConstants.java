@@ -61,11 +61,11 @@ public class GithubConstants {
                             string(ID),
                             string("html_url"),
                             string("type"))),
-          array(LABELS)
-            .items(
-              object()
-                .properties(
-                  string("name"))),
+            array(LABELS)
+                .items(
+                    object()
+                        .properties(
+                            string("name"))),
             string(BODY));
 
     private GithubConstants() {
