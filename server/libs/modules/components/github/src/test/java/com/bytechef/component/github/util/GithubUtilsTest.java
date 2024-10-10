@@ -135,6 +135,22 @@ class GithubUtilsTest {
             GithubUtils.getCollaborators(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
     }
 
+  @Test
+  void testGetLabels() {
+    List<Map<String, Object>> body = new ArrayList<>();
+    body.add(Map.of("name", "Bug", "id", "12323123"));
+
+    when(mockedResponse.getBody(any(TypeReference.class)))
+      .thenReturn(body);
+
+    List<Option<String>> expectedOptions = new ArrayList<>();
+
+    expectedOptions.add(option("Bug", "Bug"));
+
+    assertEquals(expectedOptions,
+      GithubUtils.getLabels(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+  }
+
     @Test
     void testGetOwnerName() {
         Map<String, Object> body = new LinkedHashMap<>();
