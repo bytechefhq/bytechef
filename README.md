@@ -11,10 +11,10 @@
 </p>
 
 <p align="center">
-    <a href="https://github.com/bytechefhq/bytechef/actions/workflows/build_push.yml"><img src="https://github.com/bytechefhq/bytechef/actions/workflows/build_push.yml/badge.svg"></a> <a href="https://github.com/bytechefhq/bytechef/blob/master/LICENSE"><img src="https://img.shields.io/static/v1?label=license&message=Apache&nbsp;v2.0&color=brightgreen"></a>
+    <a href="https://github.com/bytechefhq/bytechef/actions/workflows/build_push.yml"><img src="https://github.com/bytechefhq/bytechef/actions/workflows/build_push.yml/badge.svg"></a> <a href="https://github.com/bytechefhq/bytechef/blob/master/LICENSE"><img src="https://img.shields.io/static/v1?label=license&message=Apache%20v2.0&color=brightgreen"></a>
 </p>
 
-> UPDATE: ByteChef is under active development, we are in the alpha stage and some features might be currently missing or disabled.
+> UPDATE: ByteChef is under active development. We are in the alpha stage, and some features might be missing or disabled.
 
 <img src="static/screenshot.png" alt="ByteChef Screenshot" style="max-width: 100%;">
 
@@ -30,7 +30,7 @@ ByteChef is an open-source, low-code, extendable API integration and workflow au
 - Intuitive UI Workflow Editor: build and visualize workflows via the UI editor by dragging and dropping components and defining their relations.
 - Event-Driven & Scheduled Workflows: automate scheduled and real-time event-driven workflows via a simple trigger definition.
 - Multiple flow controls: use the range of various flow controls such as condition, switch, loop, each, parallel, etc.
-- Built-In Code Editor: if you need to go beyond no-code workflow definition, leverage our low-code capabilities and write workflow definitions in YAML/JSON format and blocks of the code executed during the workflow execution in one of the languages: Java, JavaScript, Python, and Ruby with syntax highlighting, auto-completion and real-time syntax validation.
+- Built-In Code Editor: if you need to go beyond no-code workflow definition, leverage our low-code capabilities and write workflow definitions in JSON format and blocks of the code executed during the workflow execution in one of the languages: Java, JavaScript, Python, and Ruby with syntax highlighting, auto-completion and real-time syntax validation.
 - Rich Component Ecosystem: hundreds of components built in to extract data from any database, SaaS applications, internal APIs, or cloud storage.
 - Extendable: develop custom connectors when no built-in connectors exist in the abovementioned languages.
 - AI ready: built-in AI components that can run multiple AI models and other AI algorithms.
