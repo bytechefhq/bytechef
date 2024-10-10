@@ -58,8 +58,8 @@ public class DynamicWebhookTriggerRefreshListener {
     @SqsListener(TRIGGER_SCHEDULER_DYNAMIC_WEBHOOK_TRIGGER_REFRESH_QUEUE)
     public void onSchedule(String message) {
         String[] split = message.split(SPLITTER_PATTERN);
-        String workflowExecutionId = split[1];
-        Long connectionId = Long.valueOf(split[0]);
+        String workflowExecutionId = split[0];
+        Long connectionId = Long.valueOf(split[1]);
 
         LocalDateTime webhookExpirationDate = refreshDynamicWebhookTrigger(
             WorkflowExecutionId.parse(workflowExecutionId), connectionId);
