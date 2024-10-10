@@ -1,25 +1,20 @@
 /*
  * Copyright 2023-present ByteChef Inc.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.platform.scheduler.aws.listeners;
+package com.bytechef.ee.platform.scheduler.aws.listener;
+
+import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.DYNAMIC_WEBHOOK_TRIGGER_REFRESH;
+import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.SPLITTER_PATTERN;
+import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.TRIGGER_SCHEDULER_DYNAMIC_WEBHOOK_TRIGGER_REFRESH_QUEUE;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.component.definition.TriggerDefinition;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
@@ -33,18 +28,24 @@ import java.time.ZoneOffset;
 import software.amazon.awssdk.services.scheduler.SchedulerClient;
 import software.amazon.awssdk.services.scheduler.model.UpdateScheduleRequest;
 
-public class DynamicWebhookListener {
-    private InstanceAccessorRegistry instanceAccessorRegistry;
-    private TriggerDefinitionFacade remoteTriggerDefinitionFacade;
-    private TriggerStateService triggerStateService;
-    private WorkflowService workflowService;
+/**
+ * @version ee
+ *
+ * @author Marko Kriskovic
+ */
+public class DynamicWebhookTriggerRefreshListener {
 
+    private final InstanceAccessorRegistry instanceAccessorRegistry;
+    private final TriggerDefinitionFacade remoteTriggerDefinitionFacade;
+    private final TriggerStateService triggerStateService;
+    private final WorkflowService workflowService;
     private final SchedulerClient schedulerClient;
-    private static String WEBHOOK_TRIGGER = "DynamicWebhookTriggerRefresh";
 
-    public DynamicWebhookListener(SchedulerClient schedulerClient, InstanceAccessorRegistry instanceAccessorRegistry,
+    public DynamicWebhookTriggerRefreshListener(
+        InstanceAccessorRegistry instanceAccessorRegistry, SchedulerClient schedulerClient,
         TriggerDefinitionFacade remoteTriggerDefinitionFacade, TriggerStateService triggerStateService,
         WorkflowService workflowService) {
+
         this.schedulerClient = schedulerClient;
         this.instanceAccessorRegistry = instanceAccessorRegistry;
         this.remoteTriggerDefinitionFacade = remoteTriggerDefinitionFacade;
@@ -52,9 +53,9 @@ public class DynamicWebhookListener {
         this.workflowService = workflowService;
     }
 
-    @SqsListener("webhook-queue")
+    @SqsListener(TRIGGER_SCHEDULER_DYNAMIC_WEBHOOK_TRIGGER_REFRESH_QUEUE)
     public void onSchedule(String message) {
-        String[] split = message.split("\\|_\\$plitter_\\|");
+        String[] split = message.split(SPLITTER_PATTERN);
         String workflowExecutionId = split[1];
         Long connectionId = Long.valueOf(split[0]);
 
@@ -62,12 +63,13 @@ public class DynamicWebhookListener {
             WorkflowExecutionId.parse(workflowExecutionId), connectionId);
 
         if (webhookExpirationDate != null) {
-            schedulerClient.updateSchedule(UpdateScheduleRequest.builder()
-                .clientToken(WEBHOOK_TRIGGER + workflowExecutionId.substring(16))
-                .groupName(WEBHOOK_TRIGGER)
-                .name(WEBHOOK_TRIGGER + workflowExecutionId.substring(0, 16))
-                .startDate(webhookExpirationDate.toInstant(ZoneOffset.UTC))
-                .build());
+            schedulerClient.updateSchedule(
+                UpdateScheduleRequest.builder()
+                    .clientToken(DYNAMIC_WEBHOOK_TRIGGER_REFRESH + workflowExecutionId.substring(16))
+                    .groupName(DYNAMIC_WEBHOOK_TRIGGER_REFRESH)
+                    .name(DYNAMIC_WEBHOOK_TRIGGER_REFRESH + workflowExecutionId.substring(0, 16))
+                    .startDate(webhookExpirationDate.toInstant(ZoneOffset.UTC))
+                    .build());
         }
     }
 
@@ -86,8 +88,7 @@ public class DynamicWebhookListener {
 
     private LocalDateTime refreshDynamicWebhookTrigger(WorkflowExecutionId workflowExecutionId, Long connectionId) {
         WorkflowNodeType workflowNodeType = getComponentOperation(workflowExecutionId);
-        TriggerDefinition.WebhookEnableOutput output =
-            OptionalUtils.get(triggerStateService.fetchValue(workflowExecutionId));
+        WebhookEnableOutput output = OptionalUtils.get(triggerStateService.fetchValue(workflowExecutionId));
         LocalDateTime webhookExpirationDate = null;
 
         output = remoteTriggerDefinitionFacade.executeDynamicWebhookRefresh(
