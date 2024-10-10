@@ -131,7 +131,7 @@ public class AwsTriggerScheduler implements TriggerScheduler {
             .roleArn(roleArn)
             .arn(sqsArn + ":" + TRIGGER_SCHEDULER_SCHEDULE_TRIGGER_QUEUE)
             .input(workflowExecutionIdString + SPLITTER + JsonUtils.write(output))
-            .deadLetterConfig(builder -> builder.arn(sqsArn)
+            .deadLetterConfig(builder -> builder.arn(sqsArn + ":" + TRIGGER_SCHEDULER_SCHEDULE_TRIGGER_QUEUE)
                 .build())
             .build();
 
