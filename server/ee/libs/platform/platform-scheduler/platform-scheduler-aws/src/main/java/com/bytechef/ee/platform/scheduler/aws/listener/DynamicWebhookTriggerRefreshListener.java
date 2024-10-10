@@ -22,6 +22,7 @@ import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorReg
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.service.TriggerStateService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.awspring.cloud.sqs.annotation.SqsListener;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -41,6 +42,7 @@ public class DynamicWebhookTriggerRefreshListener {
     private final WorkflowService workflowService;
     private final SchedulerClient schedulerClient;
 
+    @SuppressFBWarnings("EI")
     public DynamicWebhookTriggerRefreshListener(
         InstanceAccessorRegistry instanceAccessorRegistry, SchedulerClient schedulerClient,
         TriggerDefinitionFacade remoteTriggerDefinitionFacade, TriggerStateService triggerStateService,
