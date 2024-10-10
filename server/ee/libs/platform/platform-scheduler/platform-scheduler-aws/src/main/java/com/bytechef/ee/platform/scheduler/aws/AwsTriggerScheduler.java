@@ -25,6 +25,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Map;
+
 import software.amazon.awssdk.services.scheduler.SchedulerClient;
 import software.amazon.awssdk.services.scheduler.model.FlexibleTimeWindowMode;
 import software.amazon.awssdk.services.scheduler.model.Target;
@@ -34,6 +35,7 @@ public class AwsTriggerScheduler implements TriggerScheduler {
     private static final String SCHEDULE_TRIGGER = "ScheduleTrigger";
     private static final String POLLING_TRIGGER = "PollingTrigger";
     private static final String WEBHOOK_TRIGGER = "DynamicWebhookTriggerRefresh";
+    private static final String SPLITTER = "|_$plitter_|";
 
     private final SchedulerClient schedulerClient;
     private final String sqsArn;
@@ -45,13 +47,13 @@ public class AwsTriggerScheduler implements TriggerScheduler {
 
         String accountId = aws.getAccountId();
 
-        this.sqsArn = "arn:aws:sqs:" + aws.getRegion() + ":" + accountId + ":schedule-queue";
+        this.sqsArn = "arn:aws:sqs:" + aws.getRegion() + ":" + accountId;
         this.roleArn = "arn:aws:iam::" + accountId + ":role/schedule-role";
     }
 
     @Override
     public void cancelDynamicWebhookTriggerRefresh(String workflowExecutionId) {
-        schedulerClient.deleteSchedule(request -> request.clientToken(workflowExecutionId)
+        schedulerClient.deleteSchedule(request -> request.clientToken(workflowExecutionId.substring(16))
             .groupName(WEBHOOK_TRIGGER)
             .name(WEBHOOK_TRIGGER + workflowExecutionId.substring(0,16)));
     }
@@ -65,7 +67,7 @@ public class AwsTriggerScheduler implements TriggerScheduler {
 
     @Override
     public void cancelPollingTrigger(String workflowExecutionId) {
-        schedulerClient.deleteSchedule(request -> request.clientToken(workflowExecutionId)
+        schedulerClient.deleteSchedule(request -> request.clientToken(workflowExecutionId.substring(16))
             .groupName(POLLING_TRIGGER)
             .name(POLLING_TRIGGER + workflowExecutionId.substring(0,16)));
     }
@@ -77,8 +79,8 @@ public class AwsTriggerScheduler implements TriggerScheduler {
 
         Target sqsTarget = Target.builder()
             .roleArn(roleArn)
-            .arn(sqsArn)
-            .input("ConnectionId: " + connectionId + workflowExecutionId.toString())
+            .arn(sqsArn + ":webhook-queue")
+            .input(connectionId + SPLITTER + workflowExecutionId.toString())
             .build();
 
         schedulerClient.createSchedule(request -> request.clientToken(workflowExecutionId.toString().substring(16))
@@ -95,10 +97,8 @@ public class AwsTriggerScheduler implements TriggerScheduler {
 
         Target sqsTarget = Target.builder()
             .roleArn(roleArn)
-            .arn(sqsArn)
-            .input(JsonUtils.write(output) + "_Splitter_" + workflowExecutionId.toString())
-//            .retryPolicy(RetryPolicy.builder().maximumRetryAttempts().build())
-//            .sqsParameters(SqsParameters.builder().messageGroupId().build())
+            .arn(sqsArn + ":schedule-queue")
+            .input(JsonUtils.write(output) + SPLITTER + workflowExecutionId.toString())
             .deadLetterConfig(builder -> builder.arn(sqsArn).build())
             .build();
 
@@ -116,7 +116,7 @@ public class AwsTriggerScheduler implements TriggerScheduler {
     public void schedulePollingTrigger(WorkflowExecutionId workflowExecutionId) {
         Target sqsTarget = Target.builder()
             .roleArn(roleArn)
-            .arn(sqsArn)
+            .arn(sqsArn + ":polling-queue")
             .input(workflowExecutionId.toString())
             .build();
 
