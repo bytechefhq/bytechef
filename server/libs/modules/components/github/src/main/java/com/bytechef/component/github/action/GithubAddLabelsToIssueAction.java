@@ -17,23 +17,27 @@
 package com.bytechef.component.github.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.github.constant.GithubConstants.ADD_LABELS_TO_ISSUE;
+import static com.bytechef.component.github.constant.GithubConstants.ID;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE;
-import static com.bytechef.component.github.constant.GithubConstants.ISSUE_OUTPUT_PROPERTY;
 import static com.bytechef.component.github.constant.GithubConstants.LABELS;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static com.bytechef.component.github.util.GithubUtils.getOwnerName;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.github.util.GithubUtils;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -61,25 +65,30 @@ public class GithubAddLabelsToIssueAction {
                 .label("Labels")
                 .description("The list of labels to add to the issue.")
                 .required(true))
-        .output(outputSchema(ISSUE_OUTPUT_PROPERTY))
+        .output(outputSchema(
+            array()
+                .items(
+                    object()
+                        .properties(
+                            string(ID),
+                            string("name"),
+                            string("description")))))
         .perform(GithubAddLabelsToIssueAction::perform);
 
     private GithubAddLabelsToIssueAction() {
     }
 
-    public static Map<String, Object> perform(
+    public static List<Object> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        // add label api returns back the list of added labels
-        context
+        return context
             .http(http -> http.post(
                 "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY)
                     + "/issues/" + inputParameters.getRequiredString(ISSUE) + "/labels"))
-            .body(Context.Http.Body.of(
+            .body(Http.Body.of(
                 Map.of(LABELS, Collections.singletonList(inputParameters.getRequiredString(LABELS)))))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
-            .execute();
-        // Fetching update issue post label assignment
-        return GithubGetIssueAction.perform(inputParameters, connectionParameters, context);
+            .configuration(responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
     }
 }
