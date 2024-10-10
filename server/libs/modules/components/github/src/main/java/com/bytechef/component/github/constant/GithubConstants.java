@@ -40,6 +40,7 @@ public class GithubConstants {
     public static final String ID = "id";
     public static final String ISSUE = "issue";
     public static final String LABELS = "labels";
+    public static final String NAME = "name";
     public static final String NEW_ISSUE = "newIssue";
     public static final String NEW_PULL_REQUEST = "newPullRequest";
     public static final String REPOSITORY = "repository";
@@ -65,7 +66,9 @@ public class GithubConstants {
                 .items(
                     object()
                         .properties(
-                            string("name"))),
+                            string(ID),
+                            string(NAME),
+                            string("description"))),
             string(BODY));
 
     private GithubConstants() {
