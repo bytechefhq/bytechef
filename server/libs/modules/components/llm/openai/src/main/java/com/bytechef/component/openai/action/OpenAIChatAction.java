@@ -110,14 +110,14 @@ public class OpenAIChatAction {
         public ChatOptions createChatOptions(Parameters inputParameters) {
             OpenAiChatOptions.Builder builder = OpenAiChatOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
-                .withFrequencyPenalty(inputParameters.getFloat(FREQUENCY_PENALTY))
+                .withFrequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
                 .withLogitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
                 .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
                 .withN(inputParameters.getInteger(N))
-                .withPresencePenalty(inputParameters.getFloat(PRESENCE_PENALTY))
+                .withPresencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
                 .withStop(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .withTemperature(inputParameters.getFloat(TEMPERATURE))
-                .withTopP(inputParameters.getFloat(TOP_P))
+                .withTemperature(inputParameters.getDouble(TEMPERATURE))
+                .withTopP(inputParameters.getDouble(TOP_P))
                 .withUser(inputParameters.getString(USER));
 
             List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});

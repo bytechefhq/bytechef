@@ -46,7 +46,6 @@ import static com.bytechef.component.llm.constant.LLMConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.USER;
 import static com.bytechef.component.llm.constant.LLMConstants.USER_PROPERTY;
 
-import com.azure.ai.openai.OpenAIClient;
 import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.core.credential.KeyCredential;
 import com.bytechef.component.definition.ActionContext;
@@ -109,14 +108,14 @@ public class AzureOpenAIChatAction {
 
             AzureOpenAiChatOptions.Builder builder = AzureOpenAiChatOptions.builder()
                 .withDeploymentName(inputParameters.getRequiredString(MODEL))
-                .withFrequencyPenalty(inputParameters.getFloat(FREQUENCY_PENALTY))
+                .withFrequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
                 .withLogitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
                 .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
                 .withN(inputParameters.getInteger(N))
-                .withPresencePenalty(inputParameters.getFloat(PRESENCE_PENALTY))
+                .withPresencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
                 .withStop(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .withTemperature(inputParameters.getFloat(TEMPERATURE))
-                .withTopP(inputParameters.getFloat(TOP_P))
+                .withTemperature(inputParameters.getDouble(TEMPERATURE))
+                .withTopP(inputParameters.getDouble(TOP_P))
                 .withUser(inputParameters.getString(USER))
                 .withResponseFormat(format);
 
@@ -131,12 +130,12 @@ public class AzureOpenAIChatAction {
 
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            OpenAIClient openAIClient = new OpenAIClientBuilder()
+            OpenAIClientBuilder openAIClientBuilder = new OpenAIClientBuilder()
                 .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
-                .endpoint(connectionParameters.getString(ENDPOINT))
-                .buildClient();
+                .endpoint(connectionParameters.getString(ENDPOINT));
 
-            return new AzureOpenAiChatModel(openAIClient, (AzureOpenAiChatOptions) createChatOptions(inputParameters));
+            return new AzureOpenAiChatModel(
+                openAIClientBuilder, (AzureOpenAiChatOptions) createChatOptions(inputParameters));
         }
     };
 }

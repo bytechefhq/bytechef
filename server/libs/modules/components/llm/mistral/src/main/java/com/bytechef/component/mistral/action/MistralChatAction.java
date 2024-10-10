@@ -108,9 +108,9 @@ public class MistralChatAction {
 
             MistralAiChatOptions.Builder builder = MistralAiChatOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
-                .withTemperature(inputParameters.getFloat(TEMPERATURE))
+                .withTemperature(inputParameters.getDouble(TEMPERATURE))
                 .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
-                .withTopP(inputParameters.getFloat(TOP_P))
+                .withTopP(inputParameters.getDouble(TOP_P))
                 .withStop(inputParameters.getList(STOP, new TypeReference<>() {}))
                 .withSafePrompt(inputParameters.getBoolean(SAFE_PROMPT))
                 .withRandomSeed(inputParameters.getInteger(SEED))

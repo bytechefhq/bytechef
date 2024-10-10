@@ -135,9 +135,9 @@ public class AmazonBedrockCohereChatAction {
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
             return BedrockCohereChatOptions.builder()
-                .withTemperature(inputParameters.getFloat(TEMPERATURE))
+                .withTemperature(inputParameters.getDouble(TEMPERATURE))
                 .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
-                .withTopP(inputParameters.getFloat(TOP_P))
+                .withTopP(inputParameters.getDouble(TOP_P))
                 .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
                 .withTopK(inputParameters.getInteger(TOP_K))
                 .withLogitBias(new CohereChatBedrockApi.CohereChatRequest.LogitBias(

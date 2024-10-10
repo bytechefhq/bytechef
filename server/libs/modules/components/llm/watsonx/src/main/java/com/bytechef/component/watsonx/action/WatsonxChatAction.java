@@ -111,14 +111,14 @@ public class WatsonxChatAction {
         public ChatOptions createChatOptions(Parameters inputParameters) {
             return WatsonxAiChatOptions.builder()
                 .withModel(inputParameters.getString(MODEL))
-                .withTemperature(inputParameters.getFloat(TEMPERATURE))
+                .withTemperature(inputParameters.getDouble(TEMPERATURE))
                 .withMaxNewTokens(inputParameters.getInteger(MAX_TOKENS))
-                .withTopP(inputParameters.getFloat(TOP_P))
+                .withTopP(inputParameters.getDouble(TOP_P))
                 .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
                 .withTopK(inputParameters.getInteger(TOP_K))
                 .withMinNewTokens(inputParameters.getInteger(MIN_TOKENS))
                 .withRandomSeed(inputParameters.getInteger(SEED))
-                .withRepetitionPenalty(inputParameters.getFloat(REPETITION_PENALTY))
+                .withRepetitionPenalty(inputParameters.getDouble(REPETITION_PENALTY))
                 .withDecodingMethod(inputParameters.getString(DECODING_METHOD))
                 .build();
         }
@@ -129,7 +129,7 @@ public class WatsonxChatAction {
                 new WatsonxAiApi(
                     connectionParameters.getString(URL),
                     connectionParameters.getString(STREAM_ENDPOINT), connectionParameters.getString(TEXT_ENDPOINT),
-                    connectionParameters.getString(PROJECT_ID), connectionParameters.getString(TOKEN),
+                    null, connectionParameters.getString(PROJECT_ID), connectionParameters.getString(TOKEN),
                     RestClient.builder()),
                 (WatsonxAiChatOptions) createChatOptions(inputParameters));
         }
