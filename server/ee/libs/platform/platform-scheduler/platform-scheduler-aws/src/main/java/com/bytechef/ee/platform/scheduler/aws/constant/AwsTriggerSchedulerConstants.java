@@ -16,8 +16,8 @@ public class AwsTriggerSchedulerConstants {
 
     public static final String DYNAMIC_WEBHOOK_TRIGGER_REFRESH = "DynamicWebhookTriggerRefresh";
     public static final String SPLITTER_PATTERN = "\\|_\\$plitter_\\|";
-    public static final String TRIGGER_SCHEDULER_DYNAMIC_WEBHOOK_TRIGGER_REFRESH_QUEUE =
-        "trigger-scheduler-dynamic-webhook-trigger-refresh-queue";
-    public static final String TRIGGER_SCHEDULER_POLLING_TRIGGER_QUEUE = "trigger-scheduler-polling-trigger-queue";
-    public static final String TRIGGER_SCHEDULER_SCHEDULE_TRIGGER_QUEUE = "trigger-scheduler-schedule-trigger-queue";
+    public static final String SCHEDULER_DYNAMIC_WEBHOOK_TRIGGER_REFRESH_QUEUE =
+        "scheduler-dynamic_webhook_trigger_refresh_queue";
+    public static final String SCHEDULER_POLLING_TRIGGER_QUEUE = "scheduler-polling_trigger_queue";
+    public static final String SCHEDULER_SCHEDULE_TRIGGER_QUEUE = "scheduler-schedule_trigger_queue";
 }
