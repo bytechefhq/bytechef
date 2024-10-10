@@ -43,6 +43,8 @@
       "title" : "Bearer Token",
       "type" : "BEARER_TOKEN",
       "acquire" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
       "refreshToken" : null,
@@ -52,9 +54,7 @@
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
-      "tokenUrl" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null
+      "tokenUrl" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -95,28 +95,16 @@
       "minLength" : null,
       "options" : [ {
         "description" : null,
-        "label" : "gpt-4o-mini",
-        "value" : "gpt-4o-mini"
-      }, {
-        "description" : null,
-        "label" : "gpt-4",
-        "value" : "gpt-4"
-      }, {
-        "description" : null,
         "label" : "gpt-4-0125-preview",
         "value" : "gpt-4-0125-preview"
       }, {
         "description" : null,
-        "label" : "gpt-3.5-turbo",
-        "value" : "gpt-3.5-turbo"
+        "label" : "o1-preview-2024-09-12",
+        "value" : "o1-preview-2024-09-12"
       }, {
         "description" : null,
         "label" : "gpt-4-turbo-preview",
         "value" : "gpt-4-turbo-preview"
-      }, {
-        "description" : null,
-        "label" : "gpt-4-turbo-2024-04-09",
-        "value" : "gpt-4-turbo-2024-04-09"
       }, {
         "description" : null,
         "label" : "gpt-4-turbo",
@@ -127,8 +115,36 @@
         "value" : "gpt-4-32k"
       }, {
         "description" : null,
+        "label" : "gpt-4o-mini",
+        "value" : "gpt-4o-mini"
+      }, {
+        "description" : null,
+        "label" : "gpt-4",
+        "value" : "gpt-4"
+      }, {
+        "description" : null,
+        "label" : "o1-preview",
+        "value" : "o1-preview"
+      }, {
+        "description" : null,
+        "label" : "gpt-3.5-turbo",
+        "value" : "gpt-3.5-turbo"
+      }, {
+        "description" : null,
+        "label" : "gpt-4-turbo-2024-04-09",
+        "value" : "gpt-4-turbo-2024-04-09"
+      }, {
+        "description" : null,
         "label" : "gpt-3.5-turbo-0125",
         "value" : "gpt-3.5-turbo-0125"
+      }, {
+        "description" : null,
+        "label" : "o1-mini",
+        "value" : "o1-mini"
+      }, {
+        "description" : null,
+        "label" : "o1-mini-2024-09-12",
+        "value" : "o1-mini-2024-09-12"
       }, {
         "description" : null,
         "label" : "gpt-3.5-turbo-1106",
@@ -543,9 +559,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Ask",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1118,9 +1134,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create image",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1481,9 +1497,9 @@
       "controlType" : "NUMBER"
     } ],
     "title" : "Text-To-Speech",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1949,11 +1965,11 @@
       "controlType" : "NUMBER"
     } ],
     "title" : "Create transcriptions",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "dataStream" : null,
   "triggers" : null,
+  "dataStream" : null,
   "unifiedApi" : null
 }

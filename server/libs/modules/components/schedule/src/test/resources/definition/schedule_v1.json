@@ -960,6 +960,10 @@
     "type" : "LISTENER",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
+    "dynamicWebhookRefresh" : null,
+    "processErrorResponse" : null,
+    "webhookValidateOnEnable" : null,
+    "workflowNodeDescription" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "dwebhookRequest" : null,
@@ -967,11 +971,7 @@
     "listenerEnable" : { },
     "webhookValidate" : null,
     "deduplicate" : null,
-    "poll" : null,
-    "dynamicWebhookRefresh" : null,
-    "processErrorResponse" : null,
-    "webhookValidateOnEnable" : null,
-    "workflowNodeDescription" : null
+    "poll" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1439,6 +1439,10 @@
     "type" : "LISTENER",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
+    "dynamicWebhookRefresh" : null,
+    "processErrorResponse" : null,
+    "webhookValidateOnEnable" : null,
+    "workflowNodeDescription" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "dwebhookRequest" : null,
@@ -1446,11 +1450,7 @@
     "listenerEnable" : { },
     "webhookValidate" : null,
     "deduplicate" : null,
-    "poll" : null,
-    "dynamicWebhookRefresh" : null,
-    "processErrorResponse" : null,
-    "webhookValidateOnEnable" : null,
-    "workflowNodeDescription" : null
+    "poll" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1890,6 +1890,10 @@
     "type" : "LISTENER",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
+    "dynamicWebhookRefresh" : null,
+    "processErrorResponse" : null,
+    "webhookValidateOnEnable" : null,
+    "workflowNodeDescription" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "dwebhookRequest" : null,
@@ -1897,11 +1901,7 @@
     "listenerEnable" : { },
     "webhookValidate" : null,
     "deduplicate" : null,
-    "poll" : null,
-    "dynamicWebhookRefresh" : null,
-    "processErrorResponse" : null,
-    "webhookValidateOnEnable" : null,
-    "workflowNodeDescription" : null
+    "poll" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2132,6 +2132,10 @@
     "type" : "LISTENER",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
+    "dynamicWebhookRefresh" : null,
+    "processErrorResponse" : null,
+    "webhookValidateOnEnable" : null,
+    "workflowNodeDescription" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "dwebhookRequest" : null,
@@ -2139,11 +2143,7 @@
     "listenerEnable" : { },
     "webhookValidate" : null,
     "deduplicate" : null,
-    "poll" : null,
-    "dynamicWebhookRefresh" : null,
-    "processErrorResponse" : null,
-    "webhookValidateOnEnable" : null,
-    "workflowNodeDescription" : null
+    "poll" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2472,6 +2472,10 @@
     "type" : "LISTENER",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
+    "dynamicWebhookRefresh" : null,
+    "processErrorResponse" : null,
+    "webhookValidateOnEnable" : null,
+    "workflowNodeDescription" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "dwebhookRequest" : null,
@@ -2479,11 +2483,7 @@
     "listenerEnable" : { },
     "webhookValidate" : null,
     "deduplicate" : null,
-    "poll" : null,
-    "dynamicWebhookRefresh" : null,
-    "processErrorResponse" : null,
-    "webhookValidateOnEnable" : null,
-    "workflowNodeDescription" : null
+    "poll" : null
   } ],
   "unifiedApi" : null,
   "version" : 1,

@@ -43,18 +43,18 @@
       "title" : "Bearer Token",
       "type" : "BEARER_TOKEN",
       "acquire" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
-      "tokenUrl" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null
+      "tokenUrl" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -233,16 +233,16 @@
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "controlType" : "ARRAY_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "ARRAY_BUILDER"
       } ],
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Create account",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -325,21 +325,21 @@
                 "maxValue" : null,
                 "minValue" : null,
                 "options" : null,
-                "controlType" : "INTEGER",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "INTEGER"
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
             "maxItems" : null,
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null
       },
@@ -410,21 +410,21 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -640,23 +640,23 @@
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "Create contacts",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -739,21 +739,21 @@
                 "maxValue" : null,
                 "minValue" : null,
                 "options" : null,
-                "controlType" : "INTEGER",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "INTEGER"
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
             "maxItems" : null,
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null
       },
@@ -824,21 +824,21 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -910,23 +910,23 @@
           "label" : "Reminder Date",
           "placeholder" : null,
           "options" : null,
-          "controlType" : "DATE",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "DATE"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "Create tasks",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   } ],
   "dataStream" : null,
   "unifiedApi" : null,

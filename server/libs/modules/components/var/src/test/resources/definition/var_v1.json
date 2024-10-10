@@ -472,9 +472,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Set value",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
   "triggers" : null,
   "dataStream" : null,

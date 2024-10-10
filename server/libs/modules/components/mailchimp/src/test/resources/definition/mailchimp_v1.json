@@ -1381,19 +1381,15 @@
           "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : {
-          "email_address" : "string",
-          "status" : "subscribed",
-          "unsubscribe_reason" : "string",
-          "timestamp_opt" : "2019-08-24T14:15:22",
           "ip_opt" : "string",
           "location" : {
-            "longitude" : 0,
             "region" : "string",
             "latitude" : 0,
             "dstoff" : 0,
             "timezone" : "string",
             "country_code" : "string",
-            "gmtoff" : 0
+            "gmtoff" : 0,
+            "longitude" : 0
           },
           "ip_signup" : "string",
           "tags" : [ {
@@ -1401,9 +1397,9 @@
             "name" : "string"
           } ],
           "marketing_permissions" : [ {
-            "text" : "string",
             "marketing_permission_id" : "string",
-            "enabled" : true
+            "enabled" : true,
+            "text" : "string"
           } ],
           "email_type" : "string",
           "language" : "string",
@@ -1414,11 +1410,11 @@
           "timestamp_signup" : "2019-08-24T14:15:22",
           "id" : "string",
           "_links" : [ {
-            "method" : "GET",
             "targetSchema" : "string",
             "schema" : "string",
             "href" : "string",
-            "rel" : "string"
+            "rel" : "string",
+            "method" : "GET"
           } ],
           "web_id" : 0,
           "member_rating" : 0,
@@ -1439,9 +1435,9 @@
             "avg_click_rate" : 0,
             "avg_open_rate" : 0,
             "ecommerce_data" : {
-              "total_revenue" : 0,
               "number_of_orders" : 0,
-              "currency_code" : "USD"
+              "currency_code" : "USD",
+              "total_revenue" : 0
             }
           },
           "contact_id" : "string",
@@ -1450,7 +1446,11 @@
             "note_id" : 0,
             "created_at" : "2019-08-24T14:15:22",
             "note" : "string"
-          }
+          },
+          "email_address" : "string",
+          "status" : "subscribed",
+          "unsubscribe_reason" : "string",
+          "timestamp_opt" : "2019-08-24T14:15:22"
         }
       },
       "outputSchema" : {
@@ -2737,19 +2737,15 @@
         "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : {
-        "email_address" : "string",
-        "status" : "subscribed",
-        "unsubscribe_reason" : "string",
-        "timestamp_opt" : "2019-08-24T14:15:22",
         "ip_opt" : "string",
         "location" : {
-          "longitude" : 0,
           "region" : "string",
           "latitude" : 0,
           "dstoff" : 0,
           "timezone" : "string",
           "country_code" : "string",
-          "gmtoff" : 0
+          "gmtoff" : 0,
+          "longitude" : 0
         },
         "ip_signup" : "string",
         "tags" : [ {
@@ -2757,9 +2753,9 @@
           "name" : "string"
         } ],
         "marketing_permissions" : [ {
-          "text" : "string",
           "marketing_permission_id" : "string",
-          "enabled" : true
+          "enabled" : true,
+          "text" : "string"
         } ],
         "email_type" : "string",
         "language" : "string",
@@ -2770,11 +2766,11 @@
         "timestamp_signup" : "2019-08-24T14:15:22",
         "id" : "string",
         "_links" : [ {
-          "method" : "GET",
           "targetSchema" : "string",
           "schema" : "string",
           "href" : "string",
-          "rel" : "string"
+          "rel" : "string",
+          "method" : "GET"
         } ],
         "web_id" : 0,
         "member_rating" : 0,
@@ -2795,9 +2791,9 @@
           "avg_click_rate" : 0,
           "avg_open_rate" : 0,
           "ecommerce_data" : {
-            "total_revenue" : 0,
             "number_of_orders" : 0,
-            "currency_code" : "USD"
+            "currency_code" : "USD",
+            "total_revenue" : 0
           }
         },
         "contact_id" : "string",
@@ -2806,7 +2802,11 @@
           "note_id" : 0,
           "created_at" : "2019-08-24T14:15:22",
           "note" : "string"
-        }
+        },
+        "email_address" : "string",
+        "status" : "subscribed",
+        "unsubscribe_reason" : "string",
+        "timestamp_opt" : "2019-08-24T14:15:22"
       }
     },
     "properties" : [ {
