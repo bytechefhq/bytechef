@@ -16,16 +16,14 @@
 
 package com.bytechef.component.github.action;
 
-import static com.bytechef.component.github.constant.GithubConstants.ASSIGNEES;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE;
-import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static com.bytechef.component.github.constant.GithubConstants.LABELS;
+import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
-
 import java.util.Collections;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -34,18 +32,18 @@ import org.junit.jupiter.api.Test;
  * @author Mayank Madan
  */
 class GithubAddLabelsToIssueActionTest extends AbstractGithubActionTest {
-  private final Parameters mockedParameters = MockParametersFactory.create(
-    Map.of(REPOSITORY, "testRepo", ISSUE, "testIssue", LABELS, "help-wanted"));
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(REPOSITORY, "testRepo", ISSUE, "testIssue", LABELS, "help-wanted"));
 
-  @Test
-  void testPerform() {
-    Map<String, Object> result =
-      GithubAddLabelsToIssueAction.perform(mockedParameters, mockedParameters, mockedContext);
+    @Test
+    void testPerform() {
+        Map<String, Object> result =
+            GithubAddLabelsToIssueAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-    assertEquals(responseMap, result);
+        assertEquals(responseMap, result);
 
-    Http.Body body = bodyArgumentCaptor.getValue();
+        Http.Body body = bodyArgumentCaptor.getValue();
 
-    assertEquals(Map.of(LABELS, Collections.singletonList("help-wanted")), body.getContent());
-  }
+        assertEquals(Map.of(LABELS, Collections.singletonList("help-wanted")), body.getContent());
+    }
 }
