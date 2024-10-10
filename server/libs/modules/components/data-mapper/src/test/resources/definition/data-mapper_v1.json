@@ -130,9 +130,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Rename keys",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1487,9 +1487,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Replace value",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2371,9 +2371,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Replace all specified values",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2510,9 +2510,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Replace multiple values by key",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2793,9 +2793,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Map objects to object",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2939,9 +2939,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Map objects to array",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -3038,11 +3038,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Merge and pivot properties by key",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
-  "triggers" : null,
   "dataStream" : null,
+  "triggers" : null,
   "unifiedApi" : null
 }

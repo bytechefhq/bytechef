@@ -83,6 +83,8 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -92,9 +94,7 @@
       "tokenUrl" : { },
       "authorizationUrl" : { },
       "clientSecret" : null,
-      "refreshToken" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "refreshToken" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -343,9 +343,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create channel",
-    "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -778,9 +778,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Send channel message",
-    "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1110,11 +1110,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Send chat message",
-    "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "perform" : { }
   } ],
-  "dataStream" : null,
   "triggers" : null,
+  "dataStream" : null,
   "unifiedApi" : null
 }

@@ -222,6 +222,8 @@
       "title" : null,
       "type" : "CUSTOM",
       "acquire" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
       "refreshToken" : null,
@@ -231,9 +233,7 @@
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
-      "tokenUrl" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "tokenUrl" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -491,9 +491,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Get Object",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -572,9 +572,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Get URL",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -815,9 +815,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "List Objects",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -916,9 +916,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Get Pre-signed Object",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1141,11 +1141,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Put Object",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "triggers" : null,
   "dataStream" : null,
+  "triggers" : null,
   "unifiedApi" : null
 }

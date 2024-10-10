@@ -131,8 +131,6 @@
       "title" : null,
       "type" : "CUSTOM",
       "acquire" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -140,9 +138,11 @@
       "refreshUrl" : null,
       "scopes" : null,
       "tokenUrl" : null,
-      "clientSecret" : null,
       "authorizationUrl" : null,
-      "refreshToken" : null
+      "clientSecret" : null,
+      "refreshToken" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -464,9 +464,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Ask Anthropic3",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -765,9 +765,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Ask Anthropic2",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1207,9 +1207,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Ask Cohere",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1628,9 +1628,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Ask Jurassic2",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1668,6 +1668,18 @@
         "value" : "meta.llama2-13b-chat-v1"
       }, {
         "description" : null,
+        "label" : "meta.llama3-1-8b-instruct-v1:0",
+        "value" : "meta.llama3-1-8b-instruct-v1:0"
+      }, {
+        "description" : null,
+        "label" : "meta.llama3-2-11b-instruct-v1:0",
+        "value" : "meta.llama3-2-11b-instruct-v1:0"
+      }, {
+        "description" : null,
+        "label" : "meta.llama3-1-70b-instruct-v1:0",
+        "value" : "meta.llama3-1-70b-instruct-v1:0"
+      }, {
+        "description" : null,
         "label" : "meta.llama3-70b-instruct-v1:0",
         "value" : "meta.llama3-70b-instruct-v1:0"
       }, {
@@ -1676,8 +1688,24 @@
         "value" : "meta.llama3-8b-instruct-v1:0"
       }, {
         "description" : null,
+        "label" : "meta.llama3-2-90b-instruct-v1:0",
+        "value" : "meta.llama3-2-90b-instruct-v1:0"
+      }, {
+        "description" : null,
         "label" : "meta.llama2-70b-chat-v1",
         "value" : "meta.llama2-70b-chat-v1"
+      }, {
+        "description" : null,
+        "label" : "meta.llama3-2-1b-instruct-v1:0",
+        "value" : "meta.llama3-2-1b-instruct-v1:0"
+      }, {
+        "description" : null,
+        "label" : "meta.llama3-2-3b-instruct-v1:0",
+        "value" : "meta.llama3-2-3b-instruct-v1:0"
+      }, {
+        "description" : null,
+        "label" : "meta.llama3-1-405b-instruct-v1:0",
+        "value" : "meta.llama3-1-405b-instruct-v1:0"
       } ],
       "optionsDataSource" : null
     }, {
@@ -1873,9 +1901,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Ask Llama",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2155,9 +2183,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Ask Titan",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
   "triggers" : null,
   "dataStream" : null,

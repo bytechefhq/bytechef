@@ -43,6 +43,8 @@
       "title" : "Bearer Token",
       "type" : "BEARER_TOKEN",
       "acquire" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null,
       "apply" : { },
       "clientId" : null,
       "pkce" : null,
@@ -52,9 +54,7 @@
       "tokenUrl" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
-      "refreshToken" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null
+      "refreshToken" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -411,9 +411,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Send channel message",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -737,9 +737,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create channel",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -968,9 +968,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Send direct message",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
   "triggers" : [ ],
   "dataStream" : null,

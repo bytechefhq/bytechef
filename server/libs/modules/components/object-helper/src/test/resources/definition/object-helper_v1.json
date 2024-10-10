@@ -49,9 +49,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Convert from JSON string",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -135,11 +135,11 @@
       "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "Convert to JSON string",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "dataStream" : null,
   "triggers" : null,
+  "dataStream" : null,
   "unifiedApi" : null
 }

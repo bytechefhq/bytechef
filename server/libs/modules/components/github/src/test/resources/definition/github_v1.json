@@ -65,16 +65,16 @@
       "acquire" : null,
       "authorizationCallback" : null,
       "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationUrl" : { },
-      "clientSecret" : null,
-      "refreshToken" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : { },
-      "tokenUrl" : { }
+      "tokenUrl" : { },
+      "authorizationUrl" : { },
+      "clientSecret" : null,
+      "refreshToken" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -169,8 +169,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "NUMBER"
+            "controlType" : "NUMBER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -188,8 +188,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -251,8 +251,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
@@ -333,8 +333,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "NUMBER"
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -352,8 +352,8 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "INTEGER"
+          "controlType" : "INTEGER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -415,8 +415,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -575,8 +575,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "NUMBER"
+            "controlType" : "NUMBER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -594,8 +594,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -657,8 +657,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
@@ -739,8 +739,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "NUMBER"
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -758,8 +758,8 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "INTEGER"
+          "controlType" : "INTEGER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -821,8 +821,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -964,8 +964,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "NUMBER"
+            "controlType" : "NUMBER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -983,8 +983,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -1046,8 +1046,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
@@ -1128,8 +1128,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "NUMBER"
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -1147,8 +1147,8 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "INTEGER"
+          "controlType" : "INTEGER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -1210,8 +1210,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -1391,8 +1391,8 @@
               "minValue" : null,
               "numberPrecision" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "NUMBER"
+              "controlType" : "NUMBER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -1410,8 +1410,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "INTEGER"
+              "controlType" : "INTEGER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -1473,8 +1473,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -1529,11 +1529,11 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "INTEGER"
+              "controlType" : "INTEGER",
+              "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -1608,8 +1608,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "INTEGER"
+              "controlType" : "INTEGER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -1704,11 +1704,11 @@
                 "maxValue" : null,
                 "minValue" : null,
                 "options" : null,
-                "optionsDataSource" : null,
-                "controlType" : "INTEGER"
+                "controlType" : "INTEGER",
+                "optionsDataSource" : null
               } ],
-              "optionsDataSource" : null,
-              "controlType" : "OBJECT_BUILDER"
+              "controlType" : "OBJECT_BUILDER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -1746,8 +1746,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "INTEGER"
+              "controlType" : "INTEGER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -1765,8 +1765,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "INTEGER"
+              "controlType" : "INTEGER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -1788,11 +1788,11 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
@@ -1890,8 +1890,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "NUMBER"
+            "controlType" : "NUMBER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -1909,8 +1909,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -1972,8 +1972,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -2028,11 +2028,11 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -2107,8 +2107,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -2203,11 +2203,11 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "INTEGER"
+              "controlType" : "INTEGER",
+              "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -2245,8 +2245,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -2264,8 +2264,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -2287,11 +2287,11 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -2327,14 +2327,14 @@
     "workflowNodeDescription" : null,
     "dynamicWebhookRefresh" : null,
     "webhookValidateOnEnable" : null,
+    "deduplicate" : null,
+    "poll" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
     "dwebhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "webhookValidate" : null,
-    "deduplicate" : null,
-    "poll" : null
+    "webhookValidate" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2378,8 +2378,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -2414,8 +2414,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "INTEGER"
+              "controlType" : "INTEGER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -2493,11 +2493,11 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "INTEGER"
+              "controlType" : "INTEGER",
+              "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -2552,11 +2552,11 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "INTEGER"
+              "controlType" : "INTEGER",
+              "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -2611,8 +2611,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "INTEGER"
+              "controlType" : "INTEGER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -2707,11 +2707,11 @@
                 "maxValue" : null,
                 "minValue" : null,
                 "options" : null,
-                "optionsDataSource" : null,
-                "controlType" : "INTEGER"
+                "controlType" : "INTEGER",
+                "optionsDataSource" : null
               } ],
-              "optionsDataSource" : null,
-              "controlType" : "OBJECT_BUILDER"
+              "controlType" : "OBJECT_BUILDER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -2749,8 +2749,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "INTEGER"
+              "controlType" : "INTEGER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -2768,8 +2768,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "INTEGER"
+              "controlType" : "INTEGER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -2791,11 +2791,11 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
@@ -2833,8 +2833,8 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "INTEGER"
+          "controlType" : "INTEGER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -2869,8 +2869,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -2948,11 +2948,11 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -3007,11 +3007,11 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -3066,8 +3066,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -3162,11 +3162,11 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "INTEGER"
+              "controlType" : "INTEGER",
+              "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -3204,8 +3204,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -3223,8 +3223,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -3246,11 +3246,11 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -3286,14 +3286,14 @@
     "workflowNodeDescription" : null,
     "dynamicWebhookRefresh" : null,
     "webhookValidateOnEnable" : null,
+    "deduplicate" : null,
+    "poll" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
     "dwebhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "webhookValidate" : null,
-    "deduplicate" : null,
-    "poll" : null
+    "webhookValidate" : null
   } ],
   "unifiedApi" : null
 }

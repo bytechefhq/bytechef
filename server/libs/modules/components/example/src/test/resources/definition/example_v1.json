@@ -13,6 +13,14 @@
   "resources" : null,
   "version" : 1,
   "title" : "Example",
+  "connection" : {
+    "authorizations" : [ ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -75,14 +83,6 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "connection" : {
-    "authorizations" : [ ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "dataStream" : null,
   "triggers" : null,
   "unifiedApi" : null

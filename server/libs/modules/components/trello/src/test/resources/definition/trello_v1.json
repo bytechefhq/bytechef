@@ -63,6 +63,8 @@
       "title" : null,
       "type" : "CUSTOM",
       "acquire" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
       "refreshToken" : null,
@@ -72,9 +74,7 @@
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
-      "tokenUrl" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "tokenUrl" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -132,9 +132,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Board",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -479,11 +479,10 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Card",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -790,6 +789,10 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
     "dwebhookRequest" : { },
@@ -797,11 +800,8 @@
     "listenerEnable" : null,
     "webhookValidate" : null,
     "deduplicate" : null,
-    "poll" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null
+    "poll" : null
   } ],
+  "dataStream" : null,
   "unifiedApi" : null
 }

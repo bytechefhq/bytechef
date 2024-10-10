@@ -2384,6 +2384,20 @@
     "workflowNodeDescription" : null,
     "perform" : null
   } ],
+  "dataStream" : null,
+  "unifiedApi" : {
+    "category" : "CRM",
+    "providerAdapters" : [ {
+      "modelType" : "ACCOUNT"
+    }, {
+      "modelType" : "CONTACT"
+    } ],
+    "providerMappers" : [ {
+      "modelType" : "ACCOUNT"
+    }, {
+      "modelType" : "CONTACT"
+    } ]
+  },
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -3254,10 +3268,10 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
     "listenerDisable" : null,
@@ -3266,19 +3280,5 @@
     "webhookValidate" : null,
     "deduplicate" : null,
     "poll" : null
-  } ],
-  "dataStream" : null,
-  "unifiedApi" : {
-    "category" : "CRM",
-    "providerAdapters" : [ {
-      "modelType" : "ACCOUNT"
-    }, {
-      "modelType" : "CONTACT"
-    } ],
-    "providerMappers" : [ {
-      "modelType" : "ACCOUNT"
-    }, {
-      "modelType" : "CONTACT"
-    } ]
-  }
+  } ]
 }
