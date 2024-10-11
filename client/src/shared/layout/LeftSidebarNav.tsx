@@ -15,9 +15,9 @@ export interface LeftSidebarNavProps {
 }
 
 const LeftSidebarNav = ({body, className, title}: LeftSidebarNavProps) => (
-    <div className={twMerge('px-2', className)}>
+    <div className={twMerge('px-2 mb-4', className)}>
         {body && (
-            <div aria-label={title} className="mb-4 flex space-x-2 lg:flex-col lg:space-x-0">
+            <div aria-label={title} className="flex space-x-2 lg:flex-col lg:space-x-0">
                 {title && <SidebarSubtitle title={title} />}
 
                 {body}
