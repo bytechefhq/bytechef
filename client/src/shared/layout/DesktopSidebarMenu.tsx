@@ -20,7 +20,7 @@ import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {PlusIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {SettingsIcon, User2Icon, UserRoundCog} from 'lucide-react';
+import {HelpCircleIcon, SettingsIcon, User2Icon, UserRoundCog} from 'lucide-react';
 import React, {useEffect} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 
@@ -159,6 +159,19 @@ const DesktopSidebarMenu = () => {
                             <UserRoundCog className="size-5" />
 
                             <span>Your account</span>
+                        </div>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem
+                        className="cursor-pointer font-semibold"
+                        onClick={() =>
+                            navigate(`${pathname.startsWith('/automation') ? '/automation' : '/embedded'}/account`)
+                        }
+                    >
+                        <div className="flex items-center space-x-1">
+                            <HelpCircleIcon className="size-5" />
+
+                            <span>Resource Center</span>
                         </div>
                     </DropdownMenuItem>
                 </div>
