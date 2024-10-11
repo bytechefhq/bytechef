@@ -25,6 +25,13 @@ paths:
           required: false
           schema:
             $ref: '../embedded-configuration-public-rest/embedded-configuration-public-rest-impl/openapi.yaml#/components/schemas/Environment'
+        - name: "connectedUserId"
+          description: "The id of a connected user."
+          in: "query"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "The list of active integrations."
