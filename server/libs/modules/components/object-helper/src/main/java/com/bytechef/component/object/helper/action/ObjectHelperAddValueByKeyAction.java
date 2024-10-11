@@ -25,6 +25,7 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.nullable;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.time;
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.ADD_VALUE_BY_KEY;
@@ -111,17 +112,17 @@ public class ObjectHelperAddValueByKeyAction {
                 .description("Value to be added or updated.")
                 .displayCondition("valueType == 10")
                 .required(true))
-        .output()
+        .output(outputSchema(object()))
         .perform(ObjectHelperAddValueByKeyAction::perform);
 
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-        Map<String, Object> sourceObject = inputParameters.getRequiredMap(SOURCE, Object.class);
-        // Because sourceObject is immutable map, it needs to convert into a new hashmap before adding
-        // or updating key/value.
-        Map<String, Object> modifiedObject = new HashMap<>(Map.copyOf(sourceObject));
+        Map<String, Object> modifiedObject =
+            new HashMap<>(Map.copyOf(inputParameters.getRequiredMap(SOURCE, Object.class)));
+
         String targetKey = inputParameters.getRequiredString(KEY);
         Object value = inputParameters.getRequired(VALUE);
+
         modifiedObject.put(targetKey, value);
         return modifiedObject;
     }
