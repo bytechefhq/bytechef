@@ -33,7 +33,7 @@ const ProjectHeaderPublishPopover = ({project}: {project: Project}) => {
         resolver: zodResolver(formSchema),
     });
 
-    const {control, handleSubmit} = form;
+    const {control, handleSubmit, reset} = form;
 
     const queryClient = useQueryClient();
 
@@ -52,6 +52,8 @@ const ProjectHeaderPublishPopover = ({project}: {project: Project}) => {
             toast({
                 description: 'The project is published.',
             });
+
+            reset({description: undefined});
 
             setOpen(false);
         },
