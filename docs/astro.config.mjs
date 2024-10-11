@@ -9,7 +9,7 @@ export default defineConfig({
 		starlight({
 			title: 'ByteChef',
             logo: {
-                src: './src/assets/logo.svg',
+                src: './src/assets/icons/logo.svg',
             },
             head: [
                 // Plausible.io web analytics script tag.
