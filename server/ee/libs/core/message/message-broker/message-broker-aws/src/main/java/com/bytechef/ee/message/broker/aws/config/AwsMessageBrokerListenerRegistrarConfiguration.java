@@ -81,6 +81,8 @@ public class AwsMessageBrokerListenerRegistrarConfiguration
     }
 
     private SqsEndpoint createListenerEndpoint(String queueName, Object listener, Method listenerMethod) {
+        queueName = queueName.replace(".", "-");
+
         SqsEndpoint endpoint = new SqsEndpoint.SqsEndpointBuilder()
             .id(queueName + "Endpoint")
             .queueNames(List.of(queueName))
