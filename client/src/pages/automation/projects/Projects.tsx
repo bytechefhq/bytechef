@@ -10,7 +10,7 @@ import {useGetProjectCategoriesQuery} from '@/shared/queries/automation/projectC
 import {useGetProjectTagsQuery} from '@/shared/queries/automation/projectTags.queries';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {FolderIcon, TagIcon} from 'lucide-react';
-import {ReactNode, useState} from 'react';
+import {ReactNode} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 
 import ProjectDialog from './components/ProjectDialog';
@@ -52,7 +52,7 @@ const FilterTitle = ({
 const Projects = () => {
     const [searchParams] = useSearchParams();
 
-    const defaultCurrentState = {
+    const filterData = {
         id: searchParams.get('categoryId')
             ? parseInt(searchParams.get('categoryId')!)
             : searchParams.get('tagId')
@@ -60,8 +60,6 @@ const Projects = () => {
               : undefined,
         type: searchParams.get('tagId') ? Type.Tag : Type.Category,
     };
-
-    const [filterData, setFilterData] = useState<{id?: number; type: Type}>(defaultCurrentState);
 
     const {currentWorkspaceId} = useWorkspaceStore();
 
@@ -115,12 +113,6 @@ const Projects = () => {
                                     item={{
                                         current: !filterData?.id && filterData.type === Type.Category,
                                         name: 'All Categories',
-                                        onItemClick: (id?: number | string) => {
-                                            setFilterData({
-                                                id: id as number,
-                                                type: Type.Category,
-                                            });
-                                        },
                                     }}
                                 />
 
@@ -132,12 +124,6 @@ const Projects = () => {
                                                     filterData?.id === item.id && filterData.type === Type.Category,
                                                 id: item.id,
                                                 name: item.name,
-                                                onItemClick: (id?: number | string) => {
-                                                    setFilterData({
-                                                        id: id as number,
-                                                        type: Type.Category,
-                                                    });
-                                                },
                                             }}
                                             key={item.name}
                                             toLink={`?categoryId=${item.id}`}
@@ -160,12 +146,6 @@ const Projects = () => {
                                                     current: filterData?.id === item.id && filterData.type === Type.Tag,
                                                     id: item.id!,
                                                     name: item.name,
-                                                    onItemClick: (id?: number | string) => {
-                                                        setFilterData({
-                                                            id: id as number,
-                                                            type: Type.Tag,
-                                                        });
-                                                    },
                                                 }}
                                                 key={item.id}
                                                 toLink={`?tagId=${item.id}`}
