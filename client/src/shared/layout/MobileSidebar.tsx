@@ -1,5 +1,4 @@
 import {Dialog, DialogContent} from '@/components/ui/dialog';
-import {Cross2Icon} from '@radix-ui/react-icons';
 
 import reactLogo from '../../assets/logo.svg';
 
@@ -17,17 +16,24 @@ interface MobileSidebarProps {
 export function MobileSidebar({mobileMenuOpen, navigation, setMobileMenuOpen, user}: MobileSidebarProps) {
     return (
         <Dialog onOpenChange={setMobileMenuOpen} open={mobileMenuOpen}>
-            <DialogContent className="flex h-full flex-col bg-white focus:outline-none">
-                <div className="absolute right-4 top-0 pt-4">
-                    <button
-                        className="ml-1 items-center justify-center rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
-                        onClick={() => setMobileMenuOpen(false)}
-                    >
-                        <span className="sr-only">Close sidebar</span>
+            <DialogContent className="flex h-full flex-col bg-white p-0 focus:outline-none">
+                {/*<div className="absolute right-4 top-0 pt-4">*/}
 
-                        <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />
-                    </button>
-                </div>
+                {/*    <button*/}
+
+                {/*        className="ml-1 items-center justify-center rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"*/}
+
+                {/*        onClick={() => setMobileMenuOpen(false)}*/}
+
+                {/*    >*/}
+
+                {/*        <span className="sr-only">Close sidebar</span>*/}
+
+                {/*        <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />*/}
+
+                {/*    </button>*/}
+
+                {/*</div>*/}
 
                 <div className="pb-4 pt-5">
                     <div className="flex shrink-0 items-center px-4">
