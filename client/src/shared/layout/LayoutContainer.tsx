@@ -8,14 +8,17 @@ interface SidebarContentLayoutProps {
     footer?: ReactNode;
     header?: ReactNode;
     leftSidebarBody?: ReactNode;
+    leftSidebarClass?: string;
     leftSidebarHeader?: ReactNode;
     leftSidebarOpen?: boolean;
     leftSidebarWidth?: '56' | '64' | '72' | '96' | '112';
     rightSidebarBody?: ReactNode;
+    rightSidebarClass?: string;
     rightSidebarHeader?: ReactNode;
     rightSidebarOpen?: boolean;
     rightSidebarWidth?: '96' | '460';
     rightToolbarBody?: ReactNode;
+    rightToolbarClass?: string;
     rightToolbarOpen?: boolean;
     topHeader?: ReactNode;
 }
@@ -39,21 +42,24 @@ const LayoutContainer = ({
     footer,
     header,
     leftSidebarBody,
+    leftSidebarClass,
     leftSidebarHeader,
     leftSidebarOpen = true,
     leftSidebarWidth = '64',
     rightSidebarBody,
+    rightSidebarClass,
     rightSidebarHeader,
     rightSidebarOpen = false,
     rightSidebarWidth = '460',
     rightToolbarBody,
+    rightToolbarClass,
     rightToolbarOpen = false,
     topHeader,
 }: PropsWithChildren<SidebarContentLayoutProps>) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     return (
-        <div className={twMerge('size-full overflow-auto', topHeader && 'flex flex-col', className)}>
+        <div className={twMerge('size-full overflow-auto', className)}>
             <Dialog open={sidebarOpen}>
                 <DialogContent className="h-full sm:max-w-[425px]">
                     <div className="relative">
@@ -81,13 +87,13 @@ const LayoutContainer = ({
             {leftSidebarOpen && (
                 <aside
                     className={twMerge(
-                        'hidden lg:flex lg:flex-col bg-background',
-                        !topHeader && 'lg:fixed lg:inset-y-0',
-                        topHeader && 'lg:absolute lg:bottom-0 lg:top-14',
+                        'hidden lg:flex lg:flex-col border-r border-muted bg-muted/50',
+                        'lg:fixed lg:inset-y-0',
+                        leftSidebarClass,
                         leftSidebarWidths[leftSidebarWidth][0]
                     )}
                 >
-                    <nav className="flex h-full flex-col border-r border-muted bg-muted/50">
+                    <nav className="flex h-full flex-col">
                         {leftSidebarHeader}
 
                         <div className="size-full overflow-y-auto">{leftSidebarBody}</div>
@@ -95,34 +101,42 @@ const LayoutContainer = ({
                 </aside>
             )}
 
-            {topHeader}
+            <div
+                className={twMerge(
+                    'size-full',
+                    topHeader && 'flex flex-col',
+                    leftSidebarOpen && leftSidebarWidths[leftSidebarWidth][1]
+                )}
+            >
+                {topHeader}
 
-            <div className={twMerge('flex h-full w-full', leftSidebarOpen && leftSidebarWidths[leftSidebarWidth][1])}>
-                <main className="flex size-full flex-col">
-                    {header}
+                <div className="flex size-full">
+                    <main className="flex size-full flex-col">
+                        {header}
 
-                    <div className="flex flex-1 overflow-y-auto">{children}</div>
+                        <div className="flex flex-1 overflow-y-auto">{children}</div>
 
-                    {footer}
-                </main>
+                        {footer}
+                    </main>
 
-                {rightSidebarOpen && !!rightSidebarBody && (
-                    <aside className="hidden lg:flex lg:shrink-0">
-                        <div className={twMerge('flex', rightSidebarWidths[rightSidebarWidth])}>
-                            <div className="flex h-full flex-1 flex-col">
-                                {rightSidebarHeader}
+                    {rightSidebarOpen && !!rightSidebarBody && (
+                        <aside className={twMerge('hidden lg:flex lg:shrink-0', rightSidebarClass)}>
+                            <div className={twMerge('flex', rightSidebarWidths[rightSidebarWidth])}>
+                                <div className="flex h-full flex-1 flex-col">
+                                    {rightSidebarHeader}
 
-                                {rightSidebarBody}
+                                    {rightSidebarBody}
+                                </div>
                             </div>
-                        </div>
-                    </aside>
-                )}
+                        </aside>
+                    )}
 
-                {rightToolbarOpen && !!rightToolbarBody && (
-                    <aside className="hidden border-l border-muted bg-muted/50 lg:flex lg:shrink-0">
-                        <div className="flex flex-1 flex-col overflow-y-auto">{rightToolbarBody}</div>
-                    </aside>
-                )}
+                    {rightToolbarOpen && !!rightToolbarBody && (
+                        <aside className={twMerge('hidden lg:flex lg:shrink-0', rightToolbarClass)}>
+                            <div className="flex flex-1 flex-col overflow-y-auto">{rightToolbarBody}</div>
+                        </aside>
+                    )}
+                </div>
             </div>
         </div>
     );
