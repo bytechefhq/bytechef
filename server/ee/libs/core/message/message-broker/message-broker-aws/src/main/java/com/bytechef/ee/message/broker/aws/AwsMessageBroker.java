@@ -29,7 +29,8 @@ public class AwsMessageBroker implements MessageBroker {
 
     @Override
     public void send(MessageRoute route, Object message) {
-        String modifiedRoute = route.getName().replace(".", "-");
+        String modifiedRoute = route.getName()
+            .replace(".", "-");
 
         sqsTemplate.sendAsync(to -> {
             SqsSendOptions<Object> queue = to.queue(modifiedRoute);
