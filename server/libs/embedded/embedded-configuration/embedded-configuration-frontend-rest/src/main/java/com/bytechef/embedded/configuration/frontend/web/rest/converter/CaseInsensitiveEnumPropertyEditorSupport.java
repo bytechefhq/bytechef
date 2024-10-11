@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.embedded.configuration.connected.user.token.web.rest.converter;
+package com.bytechef.embedded.configuration.frontend.web.rest.converter;
 
 import com.bytechef.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import java.beans.PropertyEditorSupport;

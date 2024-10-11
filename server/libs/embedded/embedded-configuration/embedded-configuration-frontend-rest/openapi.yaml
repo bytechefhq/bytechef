@@ -4,7 +4,7 @@ info:
   title: "The Embedded Configuration by Connected User Token accessible API"
   version: "1"
 servers:
-- url: "/api/embedded/by-connected-user-token"
+- url: "/api/embedded/frontend"
 tags:
 - name: "integration"
   description: "The Embedded Integration by Connected User Token accessible API"

@@ -31,9 +31,9 @@ public class SwaggerConfiguration {
     @Bean
     public GroupedOpenApi embeddedByConnectedUserTokeOpenApi() {
         return GroupedOpenApi.builder()
-            .group("embedded-by-connected-user-token")
-            .displayName("Embedded by Connected User Token API")
-            .pathsToMatch("/api/embedded/by-connected-user-token/v1/**")
+            .group("embedded-frontend")
+            .displayName("Embedded Frontend V1 API")
+            .pathsToMatch("/api/embedded/frontend/v1/**")
             .build();
     }
 

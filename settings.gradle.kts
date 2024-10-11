@@ -115,7 +115,7 @@ include("server:libs:embedded:embedded-connected-user:embedded-connected-user-ap
 include("server:libs:embedded:embedded-connected-user:embedded-connected-user-rest")
 include("server:libs:embedded:embedded-connected-user:embedded-connected-user-service")
 include("server:libs:embedded:embedded-configuration:embedded-configuration-api")
-include("server:libs:embedded:embedded-configuration:embedded-configuration-connected-user-token-rest")
+include("server:libs:embedded:embedded-configuration:embedded-configuration-frontend-rest")
 include("server:libs:embedded:embedded-configuration:embedded-configuration-instance-impl")
 include("server:libs:embedded:embedded-configuration:embedded-configuration-public-rest:embedded-configuration-public-rest-api")
 include("server:libs:embedded:embedded-configuration:embedded-configuration-public-rest:embedded-configuration-public-rest-impl")

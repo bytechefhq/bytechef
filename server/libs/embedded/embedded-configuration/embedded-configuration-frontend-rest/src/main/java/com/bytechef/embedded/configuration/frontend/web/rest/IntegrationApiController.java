@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.embedded.configuration.connected.user.token.web.rest;
+package com.bytechef.embedded.configuration.frontend.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.embedded.configuration.connected.user.token.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
+import com.bytechef.embedded.configuration.frontend.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.embedded.configuration.facade.IntegrationFacade;
 import com.bytechef.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.embedded.configuration.public_.web.rest.model.IntegrationModel;
@@ -28,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,8 +36,9 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @author Ivica Cardic
  */
-@RestController("com.bytechef.embedded.configuration.connected.user.token.web.rest.IntegrationApiController")
-@RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/by-connected-user-token/v1")
+@CrossOrigin(origins = "*")
+@RestController("com.bytechef.embedded.configuration.frontend.web.rest.IntegrationApiController")
+@RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/frontend/v1")
 @ConditionalOnCoordinator
 public class IntegrationApiController implements IntegrationApi {
 

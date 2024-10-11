@@ -1,4 +1,4 @@
-package com.bytechef.embedded.configuration.connected.user.token.web.rest;
+package com.bytechef.embedded.configuration.frontend.web.rest;
 
 import org.springframework.web.context.request.NativeWebRequest;
 

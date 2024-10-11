@@ -45,7 +45,7 @@ public class ConnectedUserAuthenticationFilter extends AbstractPublicApiAuthenti
     public ConnectedUserAuthenticationFilter(
         AuthenticationManager authenticationManager, SigningKeyService signingKeyService) {
 
-        super("/api/embedded/by-connected-user-token/v[0-9]+/.+", authenticationManager);
+        super("/api/embedded/frontend/v[0-9]+/.+", authenticationManager);
 
         this.signingKeyService = signingKeyService;
     }
