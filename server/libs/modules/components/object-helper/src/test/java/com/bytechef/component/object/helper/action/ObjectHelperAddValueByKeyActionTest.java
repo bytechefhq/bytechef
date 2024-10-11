@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author J. Iamsamang
  */
-public class ObjectHelperAddValueByKeyActionTest {
+class ObjectHelperAddValueByKeyActionTest {
 
     private static final ActionContext mockedContext = mock(ActionContext.class);
     private static final Parameters mockedParameters = mock(Parameters.class);
@@ -48,14 +48,13 @@ public class ObjectHelperAddValueByKeyActionTest {
         Parameters inputParameters = MockParametersFactory.create(
             Map.of(SOURCE, sourceObject, KEY, key, VALUE_TYPE, 0, VALUE, valueObject));
 
-        // Note: VALUE_TYPE is for displayCondition and has nothing to do with the logic of perform function
         Object resultObject = ObjectHelperAddValueByKeyAction.perform(inputParameters, mockedParameters, mockedContext);
 
         Assertions.assertEquals(expectedObject, resultObject);
     }
 
     @Test
-    public void testPerformAddValueByKey() {
+    void testPerformAddValueByKey() {
         // Adding new value with new key
         testWith("{'a':1}", "b", "2", "{'a':1,'b':2}");
         testWith("{'a':1}", "b", "'2'", "{'a':1,'b':'2'}");
