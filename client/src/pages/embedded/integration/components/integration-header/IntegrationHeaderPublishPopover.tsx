@@ -30,7 +30,7 @@ const IntegrationHeaderPublishPopover = ({integration}: {integration: Integratio
         resolver: zodResolver(formSchema),
     });
 
-    const {control, handleSubmit} = form;
+    const {control, handleSubmit, reset} = form;
 
     const queryClient = useQueryClient();
 
@@ -49,6 +49,8 @@ const IntegrationHeaderPublishPopover = ({integration}: {integration: Integratio
             toast({
                 description: 'The integration is published.',
             });
+
+            reset({description: undefined});
 
             setOpen(false);
         },
