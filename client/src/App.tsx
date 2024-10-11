@@ -1,5 +1,7 @@
 import {Toaster} from '@/components/ui/toaster';
 import useFetchInterceptor from '@/config/useFetchInterceptor';
+import CopilotPanel from '@/pages/platform/copilot/CopilotPanel';
+import {useCopilotStore} from '@/pages/platform/copilot/stores/useCopilotStore';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useHelpHub} from '@/shared/hooks/useHelpHub';
 import {DesktopSidebar} from '@/shared/layout/DesktopSidebar';
@@ -108,6 +110,8 @@ function App() {
         showLogin,
     } = useAuthenticationStore();
 
+    const {showCopilot} = useCopilotStore();
+
     const analytics = useAnalytics();
 
     const helpHub = useHelpHub();
@@ -208,7 +212,15 @@ function App() {
             <div className="flex min-w-0 flex-1 flex-col">
                 <MobileTopNavigation setMobileMenuOpen={setMobileMenuOpen} />
 
-                <Outlet />
+                <div className="flex size-full">
+                    <Outlet />
+
+                    {showCopilot && (
+                        <aside className="border-l border-gray-200">
+                            <CopilotPanel />
+                        </aside>
+                    )}
+                </div>
             </div>
 
             <Toaster />

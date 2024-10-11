@@ -3,15 +3,18 @@ import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import {useCopilotStore} from '@/pages/platform/copilot/stores/useCopilotStore';
 import {Cross2Icon} from '@radix-ui/react-icons';
-import {ArrowUpIcon} from 'lucide-react';
+import {ArrowUpIcon, BotMessageSquareIcon} from 'lucide-react';
+import React from 'react';
 
 const CopilotPanel = () => {
     const {setShowCopilot} = useCopilotStore();
 
     return (
-        <div className="relative flex h-full min-h-[50vh] w-[450px] flex-col rounded-xl bg-muted/50 px-3 py-2 lg:col-span-2">
+        <div className="relative flex h-full min-h-[50vh] w-[450px] flex-col rounded-xl bg-muted/50 p-3 lg:col-span-2">
             <div className="mb-4 flex items-center justify-between">
-                <h4>AI Copilot</h4>
+                <div className="flex items-center space-x-1">
+                    <BotMessageSquareIcon className="size-6" /> <h4>AI Copilot</h4>
+                </div>
 
                 <Button onClick={() => setShowCopilot(false)} size="icon" variant="ghost">
                     <Cross2Icon />

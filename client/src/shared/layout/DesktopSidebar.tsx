@@ -24,7 +24,7 @@ export function DesktopSidebar({
     }[];
 }) {
     const {pathname} = useLocation();
-    console.log(pathname);
+
     const {setShowCopilot, showCopilot} = useCopilotStore();
 
     const ff_1570 = useFeatureFlagsStore()('ff-1570');

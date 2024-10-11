@@ -1,5 +1,5 @@
 import {create} from 'zustand';
-import {devtools} from 'zustand/middleware';
+import {devtools, persist} from 'zustand/middleware';
 
 interface CopilotStateI {
     showCopilot: boolean;
@@ -8,23 +8,20 @@ interface CopilotStateI {
 
 export const useCopilotStore = create<CopilotStateI>()(
     devtools(
-        (set) => ({
-            setShowCopilot: (showCopilot) =>
-                set(() => {
-                    if (showCopilot) {
-                        window.CommandBar.openCopilot();
-                    } else {
-                        window.CommandBar.closeHelpHub();
-                    }
-
-                    return {
-                        showCopilot,
-                    };
-                }),
-            showCopilot: false,
-        }),
-        {
-            name: 'copilot',
-        }
+        persist(
+            (set) => ({
+                setShowCopilot: (showCopilot) =>
+                    set((state) => {
+                        return {
+                            ...state,
+                            showCopilot,
+                        };
+                    }),
+                showCopilot: false,
+            }),
+            {
+                name: 'bytechef.copilot',
+            }
+        )
     )
 );
