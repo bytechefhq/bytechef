@@ -16,7 +16,7 @@ const ProjectHeaderOutputButton = ({
         <Tooltip>
             <TooltipTrigger asChild>
                 <Button
-                    className="hover:bg-gray-200"
+                    className="hover:bg-muted"
                     onClick={() => {
                         setShowBottomPanelOpen(!showBottomPanel);
 
