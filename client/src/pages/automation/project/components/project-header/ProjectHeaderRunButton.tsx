@@ -7,7 +7,7 @@ const ProjectHeaderRunButton = ({onRunClick, runDisabled}: {onRunClick: () => vo
         <Tooltip>
             <TooltipTrigger asChild>
                 <Button
-                    className="hover:bg-gray-200"
+                    className="hover:bg-muted"
                     disabled={runDisabled}
                     onClick={() => onRunClick()}
                     size="icon"

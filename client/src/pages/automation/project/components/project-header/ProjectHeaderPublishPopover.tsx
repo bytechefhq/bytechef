@@ -69,7 +69,7 @@ const ProjectHeaderPublishPopover = ({project}: {project: Project}) => {
     return (
         <Popover onOpenChange={setOpen} open={open}>
             <PopoverTrigger asChild>
-                <Button className="hover:bg-gray-200" size="icon" variant="ghost">
+                <Button className="hover:bg-muted" size="icon" variant="ghost">
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <CircleDotIcon className="h-5" />

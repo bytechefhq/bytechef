@@ -20,7 +20,7 @@ const WorkflowTaskExecutionItem = ({
         <li
             className={twMerge(
                 'flex w-full cursor-pointer items-center justify-between p-4 hover:bg-muted',
-                selected && 'font-semibold bg-gray-50'
+                selected && 'font-semibold bg-muted/50'
             )}
             onClick={() => onClick && onClick()}
         >
