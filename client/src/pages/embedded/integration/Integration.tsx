@@ -2,6 +2,9 @@ import PageLoader from '@/components/PageLoader';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import IntegrationVersionHistorySheet from '@/pages/embedded/integration/components/IntegrationVersionHistorySheet';
 import IntegrationHeader from '@/pages/embedded/integration/components/integration-header/IntegrationHeader';
+import IntegrationsSidebar from '@/pages/embedded/integration/components/integrations-sidebar/IntegrationsSidebar';
+import IntegrationsSidebarFilterPopover from '@/pages/embedded/integration/components/integrations-sidebar/IntegrationsSidebarFilterPopover';
+import useIntegrationsLeftSidebarStore from '@/pages/embedded/integration/stores/useIntegrationsLeftSidebarStore';
 import {ConnectionReactQueryProvider} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
 import WorkflowCodeEditorSheet from '@/pages/platform/workflow-editor/components/WorkflowCodeEditorSheet';
 import WorkflowEditorLayout from '@/pages/platform/workflow-editor/components/WorkflowEditorLayout';
@@ -15,6 +18,7 @@ import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRig
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {RightSidebar} from '@/shared/layout/RightSidebar';
 import {useCreateConnectionMutation} from '@/shared/mutations/embedded/connections.mutations';
@@ -43,6 +47,7 @@ import {CableIcon, Code2Icon, HistoryIcon, PuzzleIcon, SlidersIcon} from 'lucide
 import {useEffect, useRef, useState} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useParams} from 'react-router-dom';
+import {twMerge} from 'tailwind-merge';
 
 const Integration = () => {
     const [showIntegrationVersionHistorySheet, setShowIntegrationVersionHistorySheet] = useState(false);
@@ -50,9 +55,10 @@ const Integration = () => {
     const [showWorkflowInputsSheet, setShowWorkflowInputsSheet] = useState(false);
     const [showWorkflowOutputsSheet, setShowWorkflowOutputsSheet] = useState(false);
 
+    const {leftSidebarOpen} = useIntegrationsLeftSidebarStore();
+    const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
     const {workflowIsRunning, workflowTestExecution} = useWorkflowEditorStore();
     const {setShowBottomPanelOpen, setShowEditWorkflowDialog} = useWorkflowEditorStore();
-    const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
     const {setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
     const {setComponentDefinitions, setTaskDispatcherDefinitions, setWorkflow, workflow} = useWorkflowDataStore();
 
@@ -246,7 +252,12 @@ const Integration = () => {
     return (
         <>
             <LayoutContainer
-                leftSidebarOpen={false}
+                className={twMerge('bg-muted/50', !leftSidebarOpen && 'border-l')}
+                leftSidebarBody={<IntegrationsSidebar integrationId={+integrationId!} />}
+                leftSidebarClass="bg-muted border-l border-gray-200"
+                leftSidebarHeader={<Header right={<IntegrationsSidebarFilterPopover />} title="Integrations" />}
+                leftSidebarOpen={leftSidebarOpen}
+                leftSidebarWidth="96"
                 rightSidebarBody={
                     componentDefinitions &&
                     taskDispatcherDefinitions && (
@@ -261,6 +272,7 @@ const Integration = () => {
                 rightSidebarOpen={rightSidebarOpen}
                 rightSidebarWidth="96"
                 rightToolbarBody={<RightSidebar navigation={rightSidebarNavigation} />}
+                rightToolbarClass="border-l border-l-gray-200 bg-muted/50"
                 rightToolbarOpen={true}
                 topHeader={
                     integrationId && (

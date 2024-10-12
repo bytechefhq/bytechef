@@ -62,7 +62,6 @@ const ProjectHeader = ({
         showEditWorkflowDialog,
         workflowIsRunning,
     } = useWorkflowEditorStore();
-
     const {setWorkflow, workflow} = useWorkflowDataStore();
     const {setCurrentNode} = useWorkflowNodeDetailsPanelStore();
 
@@ -116,7 +115,7 @@ const ProjectHeader = ({
             setShowDeleteWorkflowAlertDialog(false);
 
             navigate(
-                `/automation/projects/${projectId}/project-workflows/${project?.projectWorkflowIds?.filter((projectWorkflowId) => projectWorkflowId !== (workflow as Workflow).projectWorkflowId)[0]}`
+                `/automation/projects/${projectId}/project-workflows/${project?.projectWorkflowIds?.filter((projectWorkflowId) => projectWorkflowId !== (workflow as Workflow).projectWorkflowId)[0]}?${searchParams}`
             );
 
             queryClient.removeQueries({
@@ -144,7 +143,6 @@ const ProjectHeader = ({
 
     const handleProjectWorkflowValueChange = (projectWorkflowId: number) => {
         setWorkflowTestExecution(undefined);
-
         setCurrentNode(undefined);
 
         navigate(`/automation/projects/${projectId}/project-workflows/${projectWorkflowId}?${searchParams}`);
