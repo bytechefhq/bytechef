@@ -7,7 +7,7 @@ export default defineConfig({
     site: 'https://docs.bytechef.io',
 	integrations: [
 		starlight({
-			title: 'ByteChef | Integration and automation chef for business applications',
+			title: 'ByteChef',
             description: 'ByteChef is an open-source, low-code tool for integrating and building automation workflows across your SaaS apps, internal APIs, and databases.',
             logo: {
                 src: './src/assets/icons/logo.svg',
