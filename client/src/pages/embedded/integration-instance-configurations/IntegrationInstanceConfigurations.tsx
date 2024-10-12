@@ -2,24 +2,20 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import IntegrationInstanceConfigurationWorkflowSheet from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationWorkflowSheet';
+import IntegrationInstanceConfigurationsFilterTitle from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationsFilterTitle';
 import IntegrationInstanceConfigurationDialog from '@/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialog';
 import IntegrationInstanceConfigurationList from '@/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-list/IntegrationInstanceConfigurationList';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import {
-    Environment,
-    Integration,
-    IntegrationInstanceConfiguration,
-    Tag,
-} from '@/shared/middleware/embedded/configuration';
+import {Environment, IntegrationInstanceConfiguration} from '@/shared/middleware/embedded/configuration';
 import {useGetIntegrationInstanceConfigurationTagsQuery} from '@/shared/queries/embedded/integrationInstanceConfigurationTags.queries';
 import {useGetIntegrationInstanceConfigurationsQuery} from '@/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useGetIntegrationsQuery} from '@/shared/queries/embedded/integrations.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {Settings2Icon, TagIcon} from 'lucide-react';
-import {ReactNode, useEffect, useState} from 'react';
+import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
 export enum Type {
@@ -28,39 +24,19 @@ export enum Type {
     UnifiedAPI,
 }
 
-const FilterTitle = ({
-    filterData,
-    integrations,
-    tags,
-}: {
-    filterData: {id?: number | string; type: Type};
-    integrations: Integration[] | undefined;
-    tags: Tag[] | undefined;
-}) => {
-    const [searchParams] = useSearchParams();
-
-    let pageTitle: string | ReactNode | undefined;
-
-    if (filterData.type === Type.Integration) {
-        pageTitle = integrations?.find((integration) => integration.id === filterData.id)?.name;
-    } else {
-        pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
-    }
-
-    return (
-        <div className="space-x-1">
-            <span className="text-sm uppercase text-muted-foreground">{`Filter by ${searchParams.get('tagId') ? 'tag' : 'integration'}:`}</span>
-
-            <span className="text-base">{pageTitle ?? 'All Integrations'}</span>
-        </div>
-    );
-};
-
 const IntegrationInstanceConfigurations = () => {
     const [searchParams] = useSearchParams();
 
     const [environment, setEnvironment] = useState<number>(getEnvironment());
-    const [filterData, setFilterData] = useState<{id?: number | string; type: Type}>(getFilterData());
+
+    const filterData: {id: number | string | undefined; type: Type} = {
+        id: searchParams.get('integrationId')
+            ? parseInt(searchParams.get('integrationId')!)
+            : searchParams.get('tagId')
+              ? parseInt(searchParams.get('tagId')!)
+              : undefined,
+        type: searchParams.get('tagId') ? Type.Tag : Type.Integration,
+    };
 
     const ff_743 = useFeatureFlagsStore()('ff-743');
 
@@ -124,24 +100,6 @@ const IntegrationInstanceConfigurations = () => {
         return searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : 1;
     }
 
-    function getFilterData() {
-        return searchParams.get('integrationId') || searchParams.get('tagId')
-            ? {
-                  id: searchParams.get('integrationId')
-                      ? parseInt(searchParams.get('integrationId')!)
-                      : parseInt(searchParams.get('tagId')!),
-                  type: searchParams.get('tagId') ? Type.Tag : Type.Integration,
-              }
-            : {type: Type.Integration};
-    }
-
-    useEffect(() => {
-        setEnvironment(searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : 1);
-        setFilterData(getFilterData());
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [searchParams]);
-
     return (
         <LayoutContainer
             header={
@@ -163,7 +121,13 @@ const IntegrationInstanceConfigurations = () => {
                                 />
                             )
                         }
-                        title={<FilterTitle filterData={filterData} integrations={integrations} tags={tags} />}
+                        title={
+                            <IntegrationInstanceConfigurationsFilterTitle
+                                filterData={filterData}
+                                integrations={integrations}
+                                tags={tags}
+                            />
+                        }
                     />
                 )
             }
@@ -201,12 +165,6 @@ const IntegrationInstanceConfigurations = () => {
                                     item={{
                                         current: !filterData?.id && filterData.type === Type.Integration,
                                         name: 'All Integrations',
-                                        onItemClick: (id?: number | string) => {
-                                            setFilterData({
-                                                id: id as number,
-                                                type: Type.Integration,
-                                            });
-                                        },
                                     }}
                                 />
 
@@ -223,12 +181,6 @@ const IntegrationInstanceConfigurations = () => {
                                                         (componentDefinition) =>
                                                             componentDefinition.name === item.componentName!
                                                     )?.title ?? '',
-                                                onItemClick: (id?: number | string) => {
-                                                    setFilterData({
-                                                        id: id as number,
-                                                        type: Type.Integration,
-                                                    });
-                                                },
                                             }}
                                             key={item.componentName}
                                             toLink={`?integrationId=${item.id}&environment=${environment ?? ''}`}
@@ -251,12 +203,6 @@ const IntegrationInstanceConfigurations = () => {
                                                     current: filterData?.id === item.id && filterData.type === Type.Tag,
                                                     id: item.id!,
                                                     name: item.name,
-                                                    onItemClick: (id?: number | string) => {
-                                                        setFilterData({
-                                                            id: id as number,
-                                                            type: Type.Tag,
-                                                        });
-                                                    },
                                                 }}
                                                 key={item.id}
                                                 toLink={`?tagId=${item.id}&environment=${environment ?? ''}`}
@@ -280,12 +226,6 @@ const IntegrationInstanceConfigurations = () => {
                                                 filterData?.id === 'accounting' && filterData.type === Type.UnifiedAPI,
                                             id: 'accounting',
                                             name: 'Accounting',
-                                            onItemClick: (id?: number | string) => {
-                                                setFilterData({
-                                                    id: id as number,
-                                                    type: Type.UnifiedAPI,
-                                                });
-                                            },
                                         }}
                                         toLink="?unifiedApiCategory=accounting"
                                     />
@@ -296,12 +236,6 @@ const IntegrationInstanceConfigurations = () => {
                                                 filterData?.id === 'commerce' && filterData.type === Type.UnifiedAPI,
                                             id: 'commerce',
                                             name: 'Commerce',
-                                            onItemClick: (id?: number | string) => {
-                                                setFilterData({
-                                                    id: id as number,
-                                                    type: Type.UnifiedAPI,
-                                                });
-                                            },
                                         }}
                                         toLink="?unifiedApiCategory=commerce"
                                     />
@@ -311,12 +245,6 @@ const IntegrationInstanceConfigurations = () => {
                                             current: filterData?.id === 'crm' && filterData.type === Type.UnifiedAPI,
                                             id: 'crm',
                                             name: 'CRM',
-                                            onItemClick: (id?: number | string) => {
-                                                setFilterData({
-                                                    id: id as string,
-                                                    type: Type.UnifiedAPI,
-                                                });
-                                            },
                                         }}
                                         toLink="?unifiedApiCategory=crm"
                                     />
