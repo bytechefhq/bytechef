@@ -2,17 +2,18 @@ import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import IntegrationHeaderDeleteIntegrationAlertDialog from '@/pages/embedded/integration/components/integration-header/IntegrationHeaderDeleteIntegrationAlertDialog';
 import IntegrationHeaderDeleteWorkflowAlertDialog from '@/pages/embedded/integration/components/integration-header/IntegrationHeaderDeleteWorkflowAlertDialog';
-import IntegrationHeaderDropDownMenu from '@/pages/embedded/integration/components/integration-header/IntegrationHeaderDropDownMenu';
 import IntegrationHeaderIntegrationDropDownMenu from '@/pages/embedded/integration/components/integration-header/IntegrationHeaderIntegrationDropDownMenu';
 import IntegrationHeaderOutputButton from '@/pages/embedded/integration/components/integration-header/IntegrationHeaderOutputButton';
 import IntegrationHeaderPublishPopover from '@/pages/embedded/integration/components/integration-header/IntegrationHeaderPublishPopover';
 import IntegrationHeaderRunButton from '@/pages/embedded/integration/components/integration-header/IntegrationHeaderRunButton';
 import IntegrationHeaderStopButton from '@/pages/embedded/integration/components/integration-header/IntegrationHeaderStopButton';
+import IntegrationHeaderTitle from '@/pages/embedded/integration/components/integration-header/IntegrationHeaderTitle';
 import IntegrationHeaderWorkflowDropDownMenu from '@/pages/embedded/integration/components/integration-header/IntegrationHeaderWorkflowDropDownMenu';
 import IntegrationHeaderWorkflowSelect from '@/pages/embedded/integration/components/integration-header/IntegrationHeaderWorkflowSelect';
 import IntegrationDialog from '@/pages/embedded/integrations/components/IntegrationDialog';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Integration, Workflow} from '@/shared/middleware/embedded/configuration';
@@ -32,7 +33,7 @@ import {PlusIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {RefObject, useState} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
-import {useLoaderData, useNavigate} from 'react-router-dom';
+import {useLoaderData, useNavigate, useSearchParams} from 'react-router-dom';
 
 const workflowTestApi = new WorkflowTestApi();
 
@@ -62,10 +63,13 @@ const IntegrationHeader = ({
         workflowIsRunning,
     } = useWorkflowEditorStore();
     const {setWorkflow, workflow} = useWorkflowDataStore();
+    const {setCurrentNode} = useWorkflowNodeDetailsPanelStore();
 
     const {captureIntegrationWorkflowCreated, captureIntegrationWorkflowTested} = useAnalytics();
 
     const navigate = useNavigate();
+
+    const [searchParams] = useSearchParams();
 
     const {componentNames, nodeNames} = workflow;
 
@@ -114,9 +118,8 @@ const IntegrationHeader = ({
         onSuccess: () => {
             setShowDeleteWorkflowAlertDialog(false);
 
-            navigate('/embedded/integrations');
             navigate(
-                `/embedded/integrations/${integrationId}/integration-workflows/${integration?.integrationWorkflowIds?.filter((integrationWorkflowId) => integrationWorkflowId !== (workflow as Workflow).integrationWorkflowId)[0]}`
+                `/embedded/integrations/${integrationId}/integration-workflows/${integration?.integrationWorkflowIds?.filter((integrationWorkflowId) => integrationWorkflowId !== (workflow as Workflow).integrationWorkflowId)[0]}?${searchParams}`
             );
 
             queryClient.removeQueries({
@@ -147,8 +150,11 @@ const IntegrationHeader = ({
 
     const handleIntegrationWorkflowValueChange = (integrationWorkflowId: number) => {
         setWorkflowTestExecution(undefined);
+        setCurrentNode(undefined);
 
-        navigate(`/embedded/integrations/${integrationId}/integration-workflows/${integrationWorkflowId}`);
+        navigate(
+            `/embedded/integrations/${integrationId}/integration-workflows/${integrationWorkflowId}?${searchParams}`
+        );
     };
 
     const handleRunClick = () => {
@@ -183,10 +189,8 @@ const IntegrationHeader = ({
     };
 
     return (
-        <header className="flex items-center border-b border-muted bg-muted/50 py-2 pl-3 pr-2.5">
-            <div className="flex flex-1">
-                {integration && <IntegrationHeaderDropDownMenu integration={integration} />}
-            </div>
+        <header className="flex items-center border-b bg-muted/50 py-2 pl-3 pr-2.5">
+            <div className="flex flex-1">{integration && <IntegrationHeaderTitle integration={integration} />}</div>
 
             <div className="flex items-center space-x-12">
                 <div className="flex space-x-1">

@@ -30,7 +30,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';
 import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
-import {Link} from 'react-router-dom';
+import {Link, useSearchParams} from 'react-router-dom';
 
 const IntegrationWorkflowListItem = ({
     filteredComponentNames,
@@ -51,6 +51,8 @@ const IntegrationWorkflowListItem = ({
 }) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showEditDialog, setShowEditDialog] = useState(false);
+
+    const [searchParams] = useSearchParams();
 
     const queryClient = useQueryClient();
 
@@ -84,7 +86,7 @@ const IntegrationWorkflowListItem = ({
         <li className="flex items-center justify-between rounded-md px-2 py-1 hover:bg-gray-50" key={workflow.id}>
             <Link
                 className="flex flex-1 items-center"
-                to={`/embedded/integrations/${integration.id}/integration-workflows/${workflow.integrationWorkflowId}`}
+                to={`/embedded/integrations/${integration.id}/integration-workflows/${workflow.integrationWorkflowId}?${searchParams}`}
             >
                 <div className="w-80 text-sm font-semibold">{workflow.label}</div>
 

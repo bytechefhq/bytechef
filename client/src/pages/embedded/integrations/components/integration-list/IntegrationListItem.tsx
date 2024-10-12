@@ -40,7 +40,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';
 import {ChangeEvent, useRef, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
-import {Link, useNavigate} from 'react-router-dom';
+import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 
 import TagList from '../../../../../components/TagList';
 
@@ -61,6 +61,8 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
 
     const navigate = useNavigate();
 
+    const [searchParams] = useSearchParams();
+
     const {toast} = useToast();
 
     const {data: componentDefinition} = useGetComponentDefinitionQuery({
@@ -74,7 +76,7 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
             captureIntegrationWorkflowCreated();
 
             navigate(
-                `/embedded/integrations/${integration.id}/integration-workflows/${workflow?.integrationWorkflowId}`
+                `/embedded/integrations/${integration.id}/integration-workflows/${workflow?.integrationWorkflowId}?${searchParams}`
             );
 
             setShowWorkflowDialog(false);
@@ -146,7 +148,7 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                                 integration?.integrationWorkflowIds.length > 0 ? (
                                     <Link
                                         className="flex items-center gap-2"
-                                        to={`/embedded/integrations/${integration?.id}/integration-workflows/${integration?.integrationWorkflowIds![0]}`}
+                                        to={`/embedded/integrations/${integration?.id}/integration-workflows/${integration?.integrationWorkflowIds![0]}?${searchParams}`}
                                     >
                                         {componentDefinition?.icon && (
                                             <InlineSVG className="size-6 flex-none" src={componentDefinition.icon} />
@@ -209,11 +211,17 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                     <div className="flex items-center justify-end gap-x-6">
                         {integration.lastIntegrationVersion && (
                             <div className="flex flex-col items-end gap-y-4">
-                                {integration.lastPublishedDate && integration.lastIntegrationVersion && (
-                                    <Badge className="flex space-x-1" variant="secondary">
+                                {integration.lastPublishedDate && integration.lastIntegrationVersion ? (
+                                    <Badge className="flex space-x-1" variant="success">
                                         <span>V{integration.lastIntegrationVersion - 1}</span>
 
                                         <span>PUBLISHED</span>
+                                    </Badge>
+                                ) : (
+                                    <Badge className="flex space-x-1" variant="secondary">
+                                        <span>V{integration.lastIntegrationVersion}</span>
+
+                                        <span>{integration.lastStatus}</span>
                                     </Badge>
                                 )}
 

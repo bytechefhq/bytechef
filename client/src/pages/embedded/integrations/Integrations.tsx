@@ -3,15 +3,14 @@ import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import IntegrationDialog from '@/pages/embedded/integrations/components/IntegrationDialog';
 import IntegrationsFilterTitle from '@/pages/embedded/integrations/components/IntegrationsFilterTitle';
+import IntegrationsLeftSidebarNav from '@/pages/embedded/integrations/components/IntegrationsLeftSidebarNav';
 import IntegrationList from '@/pages/embedded/integrations/components/integration-list/IntegrationList';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
 import {useGetIntegrationCategoriesQuery} from '@/shared/queries/embedded/integrationCategories.queries';
 import {useGetIntegrationTagsQuery} from '@/shared/queries/embedded/integrationTags.quries';
 import {useGetIntegrationsQuery} from '@/shared/queries/embedded/integrations.queries';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {SquareIcon, TagIcon} from 'lucide-react';
+import {SquareIcon} from 'lucide-react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 
 export enum Type {
@@ -34,8 +33,6 @@ const Integrations = () => {
 
     const navigate = useNavigate();
 
-    const ff_743 = useFeatureFlagsStore()('ff-743');
-
     const {
         data: integrations,
         error: integrationsError,
@@ -51,100 +48,33 @@ const Integrations = () => {
 
     return (
         <LayoutContainer
-            leftSidebarBody={
-                <>
-                    <LeftSidebarNav
-                        body={
-                            <>
-                                <LeftSidebarNavItem
-                                    item={{
-                                        current: !filterData?.id && filterData.type === Type.Category,
-                                        name: 'All Categories',
+            header={
+                integrations &&
+                integrations?.length > 0 && (
+                    <Header
+                        centerTitle={true}
+                        position="main"
+                        right={
+                            integrations &&
+                            integrations.length > 0 && (
+                                <IntegrationDialog
+                                    integration={undefined}
+                                    onClose={(integration) => {
+                                        if (integration) {
+                                            navigate(
+                                                `/embedded/integrations/${integration?.id}/integration-workflows/${integration?.integrationWorkflowIds![0]}`
+                                            );
+                                        }
                                     }}
+                                    triggerNode={<Button>New Integration</Button>}
                                 />
-
-                                {!categoriesLoading &&
-                                    categories?.map((item) => (
-                                        <LeftSidebarNavItem
-                                            item={{
-                                                current:
-                                                    filterData?.id === item.id && filterData.type === Type.Category,
-                                                id: item.id,
-                                                name: item.name,
-                                            }}
-                                            key={item.name}
-                                            toLink={`?categoryId=${item.id}`}
-                                        />
-                                    ))}
-                            </>
+                            )
                         }
-                        title="Categories"
+                        title={<IntegrationsFilterTitle categories={categories} filterData={filterData} tags={tags} />}
                     />
-
-                    <LeftSidebarNav
-                        body={
-                            <>
-                                {!tagsLoading &&
-                                    (tags?.length ? (
-                                        tags?.map((item) => (
-                                            <LeftSidebarNavItem
-                                                icon={<TagIcon className="mr-1 size-4" />}
-                                                item={{
-                                                    current: filterData?.id === item.id && filterData.type === Type.Tag,
-                                                    id: item.id!,
-                                                    name: item.name,
-                                                }}
-                                                key={item.id}
-                                                toLink={`?tagId=${item.id}`}
-                                            />
-                                        ))
-                                    ) : (
-                                        <p className="px-3 text-xs">No tags.</p>
-                                    ))}
-                            </>
-                        }
-                        title="Tags"
-                    />
-
-                    {ff_743 && (
-                        <LeftSidebarNav
-                            body={
-                                <>
-                                    <LeftSidebarNavItem
-                                        item={{
-                                            current:
-                                                filterData?.id === 'accounting' && filterData.type === Type.UnifiedAPI,
-                                            id: 'accounting',
-                                            name: 'Accounting',
-                                        }}
-                                        toLink="?unifiedApiCategory=accounting"
-                                    />
-
-                                    <LeftSidebarNavItem
-                                        item={{
-                                            current:
-                                                filterData?.id === 'commerce' && filterData.type === Type.UnifiedAPI,
-                                            id: 'commerce',
-                                            name: 'Commerce',
-                                        }}
-                                        toLink="?unifiedApiCategory=commerce"
-                                    />
-
-                                    <LeftSidebarNavItem
-                                        item={{
-                                            current: filterData?.id === 'crm' && filterData.type === Type.UnifiedAPI,
-                                            id: 'crm',
-                                            name: 'CRM',
-                                        }}
-                                        toLink="?unifiedApiCategory=crm"
-                                    />
-                                </>
-                            }
-                            title="Unified API"
-                        />
-                    )}
-                </>
+                )
             }
+            leftSidebarBody={<IntegrationsLeftSidebarNav categories={categories} filterData={filterData} tags={tags} />}
             leftSidebarHeader={<Header position="sidebar" title="Integrations" />}
         >
             <PageLoader
@@ -152,35 +82,7 @@ const Integrations = () => {
                 loading={categoriesLoading || integrationsLoading || tagsLoading}
             >
                 {integrations && integrations?.length > 0 && tags ? (
-                    <div className="flex size-full flex-col">
-                        <Header
-                            centerTitle={true}
-                            position="main"
-                            right={
-                                integrations &&
-                                integrations.length > 0 && (
-                                    <IntegrationDialog
-                                        integration={undefined}
-                                        onClose={(integration) => {
-                                            if (integration) {
-                                                navigate(
-                                                    `/embedded/integrations/${integration?.id}/integration-workflows/${integration?.integrationWorkflowIds![0]}`
-                                                );
-                                            }
-                                        }}
-                                        triggerNode={<Button>New Integration</Button>}
-                                    />
-                                )
-                            }
-                            title={
-                                <IntegrationsFilterTitle categories={categories} filterData={filterData} tags={tags} />
-                            }
-                        />
-
-                        <div className="flex-1 overflow-y-auto">
-                            <IntegrationList integrations={integrations} tags={tags} />
-                        </div>
-                    </div>
+                    <IntegrationList integrations={integrations} tags={tags} />
                 ) : (
                     <EmptyList
                         button={
