@@ -1,15 +1,15 @@
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
+import ProjectsLeftSidebarNav from '@/pages/automation/projects/components/ProjectsLeftSidebarNav';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
 import {Category, Tag} from '@/shared/middleware/automation/configuration';
 import {useGetProjectCategoriesQuery} from '@/shared/queries/automation/projectCategories.queries';
 import {useGetProjectTagsQuery} from '@/shared/queries/automation/projectTags.queries';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
-import {FolderIcon, TagIcon} from 'lucide-react';
+import {FolderIcon} from 'lucide-react';
 import {ReactNode} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 
@@ -104,62 +104,7 @@ const Projects = () => {
                     />
                 )
             }
-            leftSidebarBody={
-                <>
-                    <LeftSidebarNav
-                        body={
-                            <>
-                                <LeftSidebarNavItem
-                                    item={{
-                                        current: !filterData?.id && filterData.type === Type.Category,
-                                        name: 'All Categories',
-                                    }}
-                                />
-
-                                {!categoriesIsLoading &&
-                                    categories?.map((item) => (
-                                        <LeftSidebarNavItem
-                                            item={{
-                                                current:
-                                                    filterData?.id === item.id && filterData.type === Type.Category,
-                                                id: item.id,
-                                                name: item.name,
-                                            }}
-                                            key={item.name}
-                                            toLink={`?categoryId=${item.id}`}
-                                        />
-                                    ))}
-                            </>
-                        }
-                        title="Categories"
-                    />
-
-                    <LeftSidebarNav
-                        body={
-                            <>
-                                {!tagsIsLoading &&
-                                    (tags?.length ? (
-                                        tags?.map((item) => (
-                                            <LeftSidebarNavItem
-                                                icon={<TagIcon className="mr-1 size-4" />}
-                                                item={{
-                                                    current: filterData?.id === item.id && filterData.type === Type.Tag,
-                                                    id: item.id!,
-                                                    name: item.name,
-                                                }}
-                                                key={item.id}
-                                                toLink={`?tagId=${item.id}`}
-                                            />
-                                        ))
-                                    ) : (
-                                        <span className="px-3 text-xs">No defined tags.</span>
-                                    ))}
-                            </>
-                        }
-                        title="Tags"
-                    />
-                </>
-            }
+            leftSidebarBody={<ProjectsLeftSidebarNav categories={categories} filterData={filterData} tags={tags} />}
             leftSidebarHeader={<Header position="sidebar" title="Projects" />}
         >
             <PageLoader

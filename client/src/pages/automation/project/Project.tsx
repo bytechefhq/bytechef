@@ -2,6 +2,9 @@ import PageLoader from '@/components/PageLoader';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import ProjectVersionHistorySheet from '@/pages/automation/project/components/ProjectVersionHistorySheet';
 import ProjectHeader from '@/pages/automation/project/components/project-header/ProjectHeader';
+import ProjectsSidebar from '@/pages/automation/project/components/projects-sidebar/ProjectsSidebar';
+import ProjectsSidebarFilterPopover from '@/pages/automation/project/components/projects-sidebar/ProjectsSidebarFilterPopover';
+import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {
     ConnectionReactQueryProvider,
@@ -19,6 +22,7 @@ import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRig
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {RightSidebar} from '@/shared/layout/RightSidebar';
 import {useCreateConnectionMutation} from '@/shared/mutations/automation/connections.mutations';
@@ -44,6 +48,7 @@ import {CableIcon, Code2Icon, HistoryIcon, PuzzleIcon, SlidersIcon} from 'lucide
 import {useEffect, useRef, useState} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useParams} from 'react-router-dom';
+import {twMerge} from 'tailwind-merge';
 
 const Project = () => {
     const [showProjectVersionHistorySheet, setShowProjectVersionHistorySheet] = useState(false);
@@ -57,6 +62,7 @@ const Project = () => {
         setShowWorkflowCodeEditorSheet,
         showWorkflowCodeEditorSheet,
     } = useWorkflowEditorStore();
+    const {leftSidebarOpen} = useProjectsLeftSidebarStore();
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
     const {setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
     const {currentWorkspaceId} = useWorkspaceStore();
@@ -241,7 +247,12 @@ const Project = () => {
     return (
         <>
             <LayoutContainer
-                leftSidebarOpen={false}
+                className={twMerge('bg-muted/50', !leftSidebarOpen && 'border-l')}
+                leftSidebarBody={<ProjectsSidebar projectId={+projectId!} />}
+                leftSidebarClass="bg-muted border-l border-gray-200"
+                leftSidebarHeader={<Header right={<ProjectsSidebarFilterPopover />} title="Projects" />}
+                leftSidebarOpen={leftSidebarOpen}
+                leftSidebarWidth="96"
                 rightSidebarBody={
                     componentDefinitions &&
                     taskDispatcherDefinitions && (
@@ -256,6 +267,7 @@ const Project = () => {
                 rightSidebarOpen={rightSidebarOpen}
                 rightSidebarWidth="96"
                 rightToolbarBody={<RightSidebar navigation={rightSidebarNavigation} />}
+                rightToolbarClass="border-l border-l-gray-200 bg-muted/50"
                 rightToolbarOpen={true}
                 topHeader={
                     projectId && (

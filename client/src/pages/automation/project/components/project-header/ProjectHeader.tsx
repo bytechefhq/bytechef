@@ -2,12 +2,12 @@ import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectHeaderDeleteProjectAlertDialog from '@/pages/automation/project/components/project-header/ProjectHeaderDeleteProjectAlertDialog';
 import ProjectHeaderDeleteWorkflowAlertDialog from '@/pages/automation/project/components/project-header/ProjectHeaderDeleteWorkflowAlertDialog';
-import ProjectHeaderDropdownMenu from '@/pages/automation/project/components/project-header/ProjectHeaderDropDownMenu';
 import ProjectHeaderOutputButton from '@/pages/automation/project/components/project-header/ProjectHeaderOutputButton';
 import ProjectHeaderProjectDropDownMenu from '@/pages/automation/project/components/project-header/ProjectHeaderProjectDropDownMenu';
 import ProjectHeaderPublishPopover from '@/pages/automation/project/components/project-header/ProjectHeaderPublishPopover';
 import ProjectHeaderRunButton from '@/pages/automation/project/components/project-header/ProjectHeaderRunButton';
 import ProjectHeaderStopButton from '@/pages/automation/project/components/project-header/ProjectHeaderStopButton';
+import ProjectHeaderTitle from '@/pages/automation/project/components/project-header/ProjectHeaderTitle';
 import ProjectHeaderWorkflowDropDownMenu from '@/pages/automation/project/components/project-header/ProjectHeaderWorkflowDropDownMenu';
 import ProjectHeaderWorkflowSelect from '@/pages/automation/project/components/project-header/ProjectHeaderWorkflowSelect';
 import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog';
@@ -33,7 +33,7 @@ import {PlusIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {RefObject, useState} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
-import {useLoaderData, useNavigate} from 'react-router-dom';
+import {useLoaderData, useNavigate, useSearchParams} from 'react-router-dom';
 
 const workflowTestApi = new WorkflowTestApi();
 
@@ -64,12 +64,13 @@ const ProjectHeader = ({
     } = useWorkflowEditorStore();
 
     const {setWorkflow, workflow} = useWorkflowDataStore();
-
     const {setCurrentNode} = useWorkflowNodeDetailsPanelStore();
 
     const {captureProjectWorkflowCreated, captureProjectWorkflowTested} = useAnalytics();
 
     const navigate = useNavigate();
+
+    const [searchParams] = useSearchParams();
 
     const {componentNames, nodeNames} = workflow;
 
@@ -146,7 +147,7 @@ const ProjectHeader = ({
 
         setCurrentNode(undefined);
 
-        navigate(`/automation/projects/${projectId}/project-workflows/${projectWorkflowId}`);
+        navigate(`/automation/projects/${projectId}/project-workflows/${projectWorkflowId}?${searchParams}`);
     };
 
     const handleRunClick = () => {
@@ -181,8 +182,8 @@ const ProjectHeader = ({
     };
 
     return (
-        <header className="flex items-center border-b border-muted bg-muted/50 py-2 pl-3 pr-2.5">
-            <div className="flex flex-1">{project && <ProjectHeaderDropdownMenu project={project} />}</div>
+        <header className="flex items-center border-b bg-muted/50 py-2.5 pl-3 pr-2.5">
+            <div className="flex flex-1">{project && <ProjectHeaderTitle project={project} />}</div>
 
             <div className="flex items-center space-x-12">
                 <div className="flex space-x-1">
@@ -203,7 +204,7 @@ const ProjectHeader = ({
                             createWorkflowMutation={createProjectWorkflowMutation}
                             parentId={projectId}
                             triggerNode={
-                                <Button className="hover:bg-gray-200" size="icon" variant="ghost">
+                                <Button className="hover:bg-muted" size="icon" variant="ghost">
                                     <Tooltip>
                                         <TooltipTrigger asChild>
                                             <PlusIcon className="mx-2 size-5" />

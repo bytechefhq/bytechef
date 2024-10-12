@@ -35,7 +35,7 @@ import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';
 import {ChangeEvent, useRef, useState} from 'react';
-import {Link, useNavigate} from 'react-router-dom';
+import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 
 import TagList from '../../../../../components/TagList';
 import ProjectDialog from '../ProjectDialog';
@@ -57,6 +57,8 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
     const navigate = useNavigate();
 
+    const [searchParams] = useSearchParams();
+
     const {toast} = useToast();
 
     const queryClient = useQueryClient();
@@ -65,7 +67,9 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
         onSuccess: (workflow) => {
             captureProjectWorkflowCreated();
 
-            navigate(`/automation/projects/${project.id}/project-workflows/${workflow?.projectWorkflowId}`);
+            navigate(
+                `/automation/projects/${project.id}/project-workflows/${workflow?.projectWorkflowId}?${searchParams}`
+            );
 
             setShowWorkflowDialog(false);
         },
@@ -132,10 +136,9 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
             <div className="flex w-full items-center justify-between rounded-md px-2 hover:bg-gray-50">
                 <div className="flex flex-1 items-center border-b border-muted py-5 group-data-[state='open']:border-none">
                     <div className="flex-1">
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
                             <Link
-                                className="flex gap-2"
-                                to={`/automation/projects/${project?.id}/project-workflows/${project?.projectWorkflowIds![0]}`}
+                                to={`/automation/projects/${project?.id}/project-workflows/${project?.projectWorkflowIds![0]}?${searchParams}`}
                             >
                                 {project.description ? (
                                     <Tooltip>
@@ -189,11 +192,17 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
                     <div className="flex items-center justify-end gap-x-6">
                         <div className="flex flex-col items-end gap-y-4">
-                            {project.lastPublishedDate && project.lastProjectVersion && (
-                                <Badge className="flex space-x-1" variant="secondary">
+                            {project.lastPublishedDate && project.lastProjectVersion ? (
+                                <Badge className="flex space-x-1" variant="success">
                                     <span>V{project.lastProjectVersion - 1}</span>
 
                                     <span>PUBLISHED</span>
+                                </Badge>
+                            ) : (
+                                <Badge className="flex space-x-1" variant="secondary">
+                                    <span>V{project.lastProjectVersion}</span>
+
+                                    <span>{project.lastStatus}</span>
                                 </Badge>
                             )}
 
