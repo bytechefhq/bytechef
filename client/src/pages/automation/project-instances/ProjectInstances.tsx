@@ -2,16 +2,17 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import ProjectInstanceWorkflowSheet from '@/pages/automation/project-instances/components/ProjectInstanceWorkflowSheet';
+import ProjectInstancesFilterTitle from '@/pages/automation/project-instances/components/ProjectInstancesFilterTitle';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import {Environment, Project, ProjectInstance, Tag} from '@/shared/middleware/automation/configuration';
+import {Environment, ProjectInstance} from '@/shared/middleware/automation/configuration';
 import {useGetProjectInstanceTagsQuery} from '@/shared/queries/automation/projectInstanceTags.queries';
 import {useGetWorkspaceProjectInstancesQuery} from '@/shared/queries/automation/projectInstances.queries';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {Layers3Icon, TagIcon} from 'lucide-react';
-import {ReactNode, useEffect, useState} from 'react';
+import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
 import ProjectInstanceDialog from './components/project-instance-dialog/ProjectInstanceDialog';
@@ -22,41 +23,23 @@ export enum Type {
     Tag,
 }
 
-const FilterTitle = ({
-    filterData,
-    projects,
-    tags,
-}: {
-    filterData: {id?: number; type: Type};
-    projects: Project[] | undefined;
-    tags: Tag[] | undefined;
-}) => {
-    const [searchParams] = useSearchParams();
-
-    let pageTitle: string | ReactNode | undefined;
-
-    if (filterData.type === Type.Project) {
-        pageTitle = projects?.find((project) => project.id === filterData.id)?.name;
-    } else {
-        pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
-    }
-
-    return (
-        <div className="space-x-1">
-            <span className="text-sm uppercase text-muted-foreground">{`Filter by ${searchParams.get('tagId') ? 'tag' : 'project'}:`}</span>
-
-            <span className="text-base">{pageTitle ?? 'All Projects'}</span>
-        </div>
-    );
-};
-
 const ProjectInstances = () => {
     const [searchParams] = useSearchParams();
 
-    const [environment, setEnvironment] = useState<number>(getEnvironment());
-    const [filterData, setFilterData] = useState<{id?: number; type: Type}>(getFilterData());
+    const [environment, setEnvironment] = useState<number>(
+        searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : 1
+    );
 
     const {currentWorkspaceId} = useWorkspaceStore();
+
+    const filterData = {
+        id: searchParams.get('projectId')
+            ? parseInt(searchParams.get('projectId')!)
+            : searchParams.get('tagId')
+              ? parseInt(searchParams.get('tagId')!)
+              : undefined,
+        type: searchParams.get('tagId') ? Type.Tag : Type.Project,
+    };
 
     const {
         data: projects,
@@ -100,28 +83,6 @@ const ProjectInstances = () => {
 
     const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetProjectInstanceTagsQuery();
 
-    function getEnvironment() {
-        return searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : 1;
-    }
-
-    function getFilterData() {
-        return searchParams.get('projectId') || searchParams.get('tagId')
-            ? {
-                  id: searchParams.get('projectId')
-                      ? parseInt(searchParams.get('projectId')!)
-                      : parseInt(searchParams.get('tagId')!),
-                  type: searchParams.get('tagId') ? Type.Tag : Type.Project,
-              }
-            : {type: Type.Project};
-    }
-
-    useEffect(() => {
-        setEnvironment(getEnvironment());
-        setFilterData(getFilterData());
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [searchParams]);
-
     return (
         <LayoutContainer
             header={
@@ -140,7 +101,7 @@ const ProjectInstances = () => {
                                 triggerNode={<Button>New Instance</Button>}
                             />
                         }
-                        title={<FilterTitle filterData={filterData} projects={projects} tags={tags} />}
+                        title={<ProjectInstancesFilterTitle filterData={filterData} projects={projects} tags={tags} />}
                     />
                 )
             }
@@ -178,12 +139,6 @@ const ProjectInstances = () => {
                                     item={{
                                         current: !filterData?.id && filterData.type === Type.Project,
                                         name: 'All Projects',
-                                        onItemClick: (id?: number | string) => {
-                                            setFilterData({
-                                                id: id as number,
-                                                type: Type.Project,
-                                            });
-                                        },
                                     }}
                                     toLink={`?environment=${environment ?? ''}`}
                                 />
@@ -195,12 +150,6 @@ const ProjectInstances = () => {
                                                 current: filterData?.id === item.id && filterData.type === Type.Project,
                                                 id: item.id,
                                                 name: item.name,
-                                                onItemClick: (id?: number | string) => {
-                                                    setFilterData({
-                                                        id: id as number,
-                                                        type: Type.Project,
-                                                    });
-                                                },
                                             }}
                                             key={item.name}
                                             toLink={`?projectId=${item.id}&environment=${environment ?? ''}`}
@@ -223,12 +172,6 @@ const ProjectInstances = () => {
                                                     current: filterData?.id === item.id && filterData.type === Type.Tag,
                                                     id: item.id!,
                                                     name: item.name,
-                                                    onItemClick: (id?: number | string) => {
-                                                        setFilterData({
-                                                            id: id as number,
-                                                            type: Type.Tag,
-                                                        });
-                                                    },
                                                 }}
                                                 key={item.id}
                                                 toLink={`?tagId=${item.id}&environment=${environment ?? ''}`}
