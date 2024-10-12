@@ -27,7 +27,7 @@ const IntegrationHeaderWorkflowSelect = ({
             onValueChange={(value) => onValueChange(+value)}
             value={integrationWorkflowId.toString()}
         >
-            <SelectTrigger className="mr-0.5 w-60 border-0 shadow-none hover:bg-gray-200">
+            <SelectTrigger className="mr-0.5 w-60 border-0 shadow-none hover:bg-muted">
                 <SelectValue className="font-semibold" placeholder="Select a workflow" />
             </SelectTrigger>
 

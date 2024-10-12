@@ -16,7 +16,7 @@ const IntegrationHeaderDropDownMenu = ({integration}: {integration: Integration}
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button className="flex cursor-pointer items-center space-x-2 hover:bg-gray-200" variant="ghost">
+                <Button className="flex cursor-pointer items-center space-x-2 hover:bg-muted" variant="ghost">
                     <h1>{integration?.componentName}</h1>
 
                     {integration && (
