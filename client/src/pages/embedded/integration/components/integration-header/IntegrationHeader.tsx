@@ -206,7 +206,7 @@ const IntegrationHeader = ({
                             createWorkflowMutation={createIntegrationWorkflowMutation}
                             parentId={integrationId}
                             triggerNode={
-                                <Button className="hover:bg-gray-200" size="icon" variant="ghost">
+                                <Button className="hover:bg-muted" size="icon" variant="ghost">
                                     <Tooltip>
                                         <TooltipTrigger asChild>
                                             <PlusIcon className="mx-2 size-5" />

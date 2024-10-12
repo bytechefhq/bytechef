@@ -7,7 +7,7 @@ const IntegrationHeaderRunButton = ({onRunClick, runDisabled}: {onRunClick: () =
         <Tooltip>
             <TooltipTrigger asChild>
                 <Button
-                    className="hover:bg-gray-200"
+                    className="hover:bg-muted"
                     disabled={runDisabled}
                     onClick={() => onRunClick()}
                     size="icon"
