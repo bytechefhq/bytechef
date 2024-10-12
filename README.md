@@ -32,7 +32,7 @@ ByteChef is an open-source, low-code, extendable API integration and workflow au
 - Multiple flow controls: use the range of various flow controls such as condition, switch, loop, each, parallel, etc.
 - Built-In Code Editor: if you need to go beyond no-code workflow definition, leverage our low-code capabilities and write workflow definitions in JSON format and blocks of the code executed during the workflow execution in one of the languages: Java, JavaScript, Python, and Ruby with syntax highlighting, auto-completion and real-time syntax validation.
 - Rich Component Ecosystem: hundreds of components built in to extract data from any database, SaaS applications, internal APIs, or cloud storage.
-- Extendable: develop custom connectors when no built-in connectors exist in the abovementioned languages.
+- Extendable: develop custom connectors when no built-in connectors exist in the above-mentioned languages.
 - AI ready: built-in AI components that can run multiple AI models and other AI algorithms.
 - Developer ready: expose your workflows as APIs to be consumed by other applications or call directly APIs of targeted services. The platform handles authentication.
 - Version Control Friendly: write your workflows from the UI editor and push them to your preferred Git branch directly from ByteChef, enabling best practices with CI/CD pipelines and version control systems.
