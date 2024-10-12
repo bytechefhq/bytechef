@@ -1,13 +1,12 @@
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
+import ConnectionsFilterTitle from '@/pages/embedded/connections/components/ConnectionsFilterTitle';
 import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import {Tag} from '@/shared/middleware/embedded/configuration';
 import {Connection, ConnectionEnvironment} from '@/shared/middleware/embedded/connection';
-import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useCreateConnectionMutation} from '@/shared/mutations/embedded/connections.mutations';
 import {
     ConnectionKeys,
@@ -16,7 +15,7 @@ import {
 } from '@/shared/queries/embedded/connections.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {Link2Icon, TagIcon} from 'lucide-react';
-import {ReactNode, useEffect, useState} from 'react';
+import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
 import ConnectionList from './components/connection-list/ConnectionList';
@@ -26,44 +25,21 @@ export enum Type {
     Tag,
 }
 
-const FilterTitle = ({
-    componentDefinitions,
-    filterData,
-    tags,
-}: {
-    componentDefinitions: ComponentDefinitionBasic[] | undefined;
-    filterData: {id?: number | string; type: Type};
-    tags: Tag[] | undefined;
-}) => {
-    const [searchParams] = useSearchParams();
-
-    let pageTitle: string | ReactNode | undefined;
-
-    if (filterData.type === Type.Component) {
-        pageTitle = componentDefinitions?.find(
-            (componentDefinition) => componentDefinition.name === filterData.id
-        )?.name;
-    } else {
-        pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
-    }
-
-    return (
-        <div className="space-x-1">
-            <span className="text-sm uppercase text-muted-foreground">{`Filter by ${searchParams.get('tagId') ? 'tag' : 'component'}:`}</span>
-
-            <span className="text-base">{pageTitle ?? 'All Components'}</span>
-        </div>
-    );
-};
-
 export const Connections = () => {
     const [searchParams] = useSearchParams();
 
-    const [environment, setEnvironment] = useState<number>(getEnvironment());
-    const [filterData, setFilterData] = useState<{
-        id?: number | string;
-        type: Type;
-    }>(getFilterData());
+    const [environment, setEnvironment] = useState<number>(
+        searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : 1
+    );
+
+    const filterData = {
+        id: searchParams.get('componentName')
+            ? searchParams.get('componentName')
+            : searchParams.get('tagId')
+              ? parseInt(searchParams.get('tagId')!)
+              : undefined,
+        type: searchParams.get('tagId') ? Type.Tag : Type.Component,
+    };
 
     const {
         data: allConnections,
@@ -95,28 +71,6 @@ export const Connections = () => {
 
     const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetConnectionTagsQuery();
 
-    function getEnvironment() {
-        return searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : 1;
-    }
-
-    function getFilterData() {
-        return searchParams.get('componentName') || searchParams.get('tagId')
-            ? {
-                  id: searchParams.get('componentName')
-                      ? searchParams.get('componentName')!
-                      : parseInt(searchParams.get('tagId')!),
-                  type: searchParams.get('tagId') ? Type.Tag : Type.Component,
-              }
-            : {type: Type.Component};
-    }
-
-    useEffect(() => {
-        setEnvironment(getEnvironment());
-        setFilterData(getFilterData());
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [searchParams]);
-
     return (
         <LayoutContainer
             header={
@@ -145,7 +99,7 @@ export const Connections = () => {
                             />
                         }
                         title={
-                            <FilterTitle
+                            <ConnectionsFilterTitle
                                 componentDefinitions={componentDefinitions}
                                 filterData={filterData}
                                 tags={tags}
@@ -189,12 +143,6 @@ export const Connections = () => {
                                     item={{
                                         current: !filterData?.id && filterData.type === Type.Component,
                                         name: 'All Components',
-                                        onItemClick: (id?: number | string) => {
-                                            setFilterData({
-                                                id,
-                                                type: Type.Component,
-                                            });
-                                        },
                                     }}
                                 />
 
@@ -206,11 +154,6 @@ export const Connections = () => {
                                                     filterData?.id === item.name && filterData.type === Type.Component,
                                                 id: item.name!,
                                                 name: item.title!,
-                                                onItemClick: (id?: number | string) =>
-                                                    setFilterData({
-                                                        id,
-                                                        type: Type.Component,
-                                                    }),
                                             }}
                                             key={item.name}
                                             toLink={`?componentName=${item.name}&environment=${environment ?? ''}`}
@@ -235,12 +178,6 @@ export const Connections = () => {
                                                     current: filterData?.id === item.id && filterData.type === Type.Tag,
                                                     id: item.id!,
                                                     name: item.name,
-                                                    onItemClick: (id?: number | string) => {
-                                                        setFilterData({
-                                                            id,
-                                                            type: Type.Tag,
-                                                        });
-                                                    },
                                                 }}
                                                 key={item.id}
                                                 toLink={`?tagId=${item.id}&environment=${environment ?? ''}`}
