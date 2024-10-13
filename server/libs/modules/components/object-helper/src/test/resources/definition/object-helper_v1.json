@@ -15,10 +15,6 @@
   "resources": null,
   "version": 1,
   "title": "Object Helper",
-  "connection": null,
-  "unifiedApi": null,
-  "dataStream": null,
-  "triggers": null,
   "actions": [
     {
       "batch": null,
@@ -30,8 +26,8 @@
       "outputDefinition": {
         "output": null,
         "outputResponse": null,
-        "sampleOutput": null,
-        "outputSchema": null
+        "outputSchema": null,
+        "sampleOutput": null
       },
       "properties": [
         {
@@ -57,9 +53,9 @@
         }
       ],
       "title": "Convert from JSON string",
-      "perform": {},
       "processErrorResponse": null,
-      "workflowNodeDescription": null
+      "workflowNodeDescription": null,
+      "perform": {}
     },
     {
       "batch": null,
@@ -71,8 +67,8 @@
       "outputDefinition": {
         "output": null,
         "outputResponse": null,
-        "sampleOutput": null,
-        "outputSchema": null
+        "outputSchema": null,
+        "sampleOutput": null
       },
       "properties": [
         {
@@ -103,8 +99,8 @@
               "value": 2
             }
           ],
-          "controlType": "SELECT",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "SELECT"
         },
         {
           "advancedOption": null,
@@ -124,8 +120,8 @@
           "multipleValues": null,
           "options": null,
           "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         },
         {
           "advancedOption": null,
@@ -146,14 +142,14 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }
       ],
       "title": "Convert to JSON string",
-      "perform": {},
       "processErrorResponse": null,
-      "workflowNodeDescription": null
+      "workflowNodeDescription": null,
+      "perform": {}
     },
     {
       "batch": null,
@@ -183,12 +179,11 @@
             "multipleValues": null,
             "options": null,
             "properties": null,
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           },
           "sampleOutput": null
         },
-        "sampleOutput": null,
         "outputSchema": {
           "advancedOption": null,
           "description": null,
@@ -207,9 +202,10 @@
           "multipleValues": null,
           "options": null,
           "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
-        }
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
+        },
+        "sampleOutput": null
       },
       "properties": [
         {
@@ -230,8 +226,8 @@
           "multipleValues": null,
           "options": null,
           "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         },
         {
           "advancedOption": null,
@@ -322,8 +318,8 @@
               "value": 10
             }
           ],
-          "controlType": "SELECT",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "SELECT"
         },
         {
           "advancedOption": null,
@@ -344,8 +340,8 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         },
         {
           "advancedOption": null,
@@ -390,8 +386,8 @@
           "label": "Value",
           "placeholder": null,
           "options": null,
-          "controlType": "DATE",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE"
         },
         {
           "advancedOption": null,
@@ -408,8 +404,8 @@
           "label": "Value",
           "placeholder": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         },
         {
           "advancedOption": null,
@@ -428,8 +424,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         },
         {
           "advancedOption": null,
@@ -467,8 +463,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         },
         {
           "advancedOption": null,
@@ -488,8 +484,8 @@
           "multipleValues": null,
           "options": null,
           "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         },
         {
           "advancedOption": null,
@@ -527,27 +523,27 @@
           "label": "Value",
           "placeholder": null,
           "options": null,
-          "controlType": "TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "TIME"
         }
       ],
       "title": "Add value to the object by key",
-      "perform": {},
       "processErrorResponse": null,
-      "workflowNodeDescription": null
+      "workflowNodeDescription": null,
+      "perform": {}
     },
     {
       "batch": null,
       "deprecated": null,
-      "description": "Add values from list to object or array. If the source is object, the items in the list will be treated as Key-value pairs. If it is array, the items in the list will be all added",
+      "description": "Add values from list to object or array. If the source is object, the items in the list will be treated as Key-value pairs. If the value is array of objects, key-value pairs will be added to every object in the array.",
       "help": null,
       "metadata": null,
       "name": "addKeyValuePairs",
       "outputDefinition": {
         "output": null,
         "outputResponse": null,
-        "sampleOutput": null,
-        "outputSchema": null
+        "outputSchema": null,
+        "sampleOutput": null
       },
       "properties": [
         {
@@ -578,8 +574,8 @@
               "value": 2
             }
           ],
-          "controlType": "SELECT",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "SELECT"
         },
         {
           "advancedOption": null,
@@ -588,20 +584,42 @@
           "expressionEnabled": null,
           "hidden": null,
           "metadata": {},
-          "required": null,
+          "required": true,
           "name": "source",
           "type": "ARRAY",
           "defaultValue": null,
           "exampleValue": null,
           "label": "Source",
           "placeholder": null,
-          "items": null,
+          "items": [
+            {
+              "advancedOption": null,
+              "description": null,
+              "displayCondition": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "metadata": {},
+              "required": null,
+              "name": null,
+              "type": "OBJECT",
+              "defaultValue": null,
+              "exampleValue": null,
+              "label": null,
+              "placeholder": null,
+              "additionalProperties": null,
+              "multipleValues": null,
+              "options": null,
+              "properties": null,
+              "optionsDataSource": null,
+              "controlType": "OBJECT_BUILDER"
+            }
+          ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         },
         {
           "advancedOption": null,
@@ -610,7 +628,7 @@
           "expressionEnabled": null,
           "hidden": null,
           "metadata": {},
-          "required": null,
+          "required": true,
           "name": "source",
           "type": "OBJECT",
           "defaultValue": null,
@@ -621,39 +639,17 @@
           "multipleValues": null,
           "options": null,
           "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
-        },
-        {
-          "advancedOption": null,
-          "description": "Array of values to be added.",
-          "displayCondition": "sourceType == 1",
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": {},
-          "required": null,
-          "name": "value",
-          "type": "ARRAY",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": "Array of values",
-          "placeholder": null,
-          "items": null,
-          "maxItems": null,
-          "minItems": null,
-          "multipleValues": null,
-          "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         },
         {
           "advancedOption": null,
           "description": "Array of Key-Value pairs to be added or updated.",
-          "displayCondition": "sourceType == 2",
+          "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
           "metadata": {},
-          "required": null,
+          "required": true,
           "name": "value",
           "type": "ARRAY",
           "defaultValue": null,
@@ -680,22 +676,26 @@
               "minItems": 2,
               "multipleValues": null,
               "options": null,
-              "controlType": "ARRAY_BUILDER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "ARRAY_BUILDER"
             }
           ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }
       ],
       "title": "Add Key-Value pairs to object or array",
-      "perform": {},
       "processErrorResponse": null,
-      "workflowNodeDescription": null
+      "workflowNodeDescription": null,
+      "perform": {}
     }
-  ]
+  ],
+  "connection": null,
+  "triggers": null,
+  "dataStream": null,
+  "unifiedApi": null
 }

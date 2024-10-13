@@ -54,7 +54,7 @@ public class ObjectHelperAddKeyValuePairActionTest {
     void testPerformAddKeyValuePairs() {
         // Test with the initial array
         testWith("[{'a':1}]", "[1, 2, 3]", "[{'a':1}]");
-        testWith("[{'a':1}, {'b':1}]", "[['b', 2]]", "[{'a':1,'b':2}, {'b':2}");
+        testWith("[{'a':1}, {'b':1}]", "[['b', 2]]", "[{'a':1,'b':2}, {'b':2}]");
         testWith("[{'a':1}, {'b':1}]", "[[1, 2]]", "[{'a':1}, {'b':1}]");
 
         // Test with the initial object
