@@ -44,7 +44,7 @@ public class ObjectHelperAddKeyValuePairsAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action(ADD_KEY_VALUE_PAIRS)
         .title("Add Key-Value pairs to object or array")
         .description("Add values from list to object or array. If the source is object, the items in the list will " +
-            "be treated as Key-value pairs. If it is array, the items in the list will be all added")
+            "be treated as Key-value pairs. If the value is array of objects, key-value pairs will be added to every object in the array.")
         .properties(
             integer(SOURCE_TYPE)
                 .label("Type of initial object")
@@ -56,23 +56,23 @@ public class ObjectHelperAddKeyValuePairsAction {
             array(SOURCE)
                 .label("Source")
                 .description("Source object to be added or updated")
-                .displayCondition("sourceType == 1"),
+                .displayCondition("sourceType == 1")
+                .items(object())
+                .required(true),
             object(SOURCE)
                 .label("Source")
                 .description("Source object to be added or updated")
-                .displayCondition("sourceType == 2"),
-            array(VALUE)
-                .label("Array of values")
-                .description("Array of values to be added.")
-                .displayCondition("sourceType == 1"),
+                .displayCondition("sourceType == 2")
+                .required(true),
             array(VALUE)
                 .label("Array of Key-Value pairs")
                 .description("Array of Key-Value pairs to be added or updated.")
-                .displayCondition("sourceType == 2")
                 .items(
-                    array().label("Key-Value pair")
+                    array()
+                        .label("Key-Value pair")
                         .maxItems(2)
-                        .minItems(2)))
+                        .minItems(2))
+                .required(true))
         .perform(ObjectHelperAddKeyValuePairsAction::perform)
         .output();
 
