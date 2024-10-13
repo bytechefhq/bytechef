@@ -16,8 +16,16 @@
 
 package com.bytechef.component.nifty;
 
+import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Test;
+
 /**
  * @generated
  */
-public class NiftyComponentHandlerTest extends AbstractNiftyComponentHandlerTest {
+public class NiftyComponentHandlerTest {
+    @Test
+    void testGetComponentDefinition() {
+
+        JsonFileAssert.assertEquals("definition/nifty_v1.json", new NiftyComponentHandler().getDefinition());
+    }
 }

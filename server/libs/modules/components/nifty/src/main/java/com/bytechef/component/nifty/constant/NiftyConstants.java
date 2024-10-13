@@ -16,16 +16,14 @@
 
 package com.bytechef.component.nifty.constant;
 
+import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.string;
+
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.nifty.util.NiftyOptionUtils;
-
-import java.util.Arrays;
 import java.util.List;
-
-import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.component.definition.ComponentDsl.string;
 
 /**
  * @author Luka Ljubić
@@ -39,10 +37,10 @@ public class NiftyConstants {
     public static final String TEMPLATE_TYPE = "template_type";
     public static final String ACCESS_TYPE = "access_type";
 
-    public static final List<Option<String>> ACCESS_TYPES = List.of( option("Public", "public"),
-        option("Private", "private"), option("Internal", "internal"));
-    public static final List<Option<String>> PROJECT_TYPES = List.of( option("Simple", "simple"),
-        option("Kanban", "kanban"), option("Scrum", "scrum"),  option("Custom", "custom"));
+    public static final List<Option<String>> ACCESS_TYPES = List.of(option("Public", "public"),
+        option("Limited", "limited"));
+    public static final List<Option<String>> PROJECT_TYPES = List.of(option("Simple", "simple"),
+        option("Kanban", "kanban"), option("Scrum", "scrum"), option("Custom", "custom"));
 
     public static final ModifiableStringProperty PROJECT_PROPERTY = string(PROJECT)
         .label("Project")

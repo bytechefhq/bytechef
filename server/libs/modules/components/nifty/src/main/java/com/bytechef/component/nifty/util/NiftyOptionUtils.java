@@ -89,13 +89,14 @@ public class NiftyOptionUtils {
         String searchText, ActionContext context) {
 
         Map<String, Object> body = context.http(http -> http.get("/templates"))
+            .queryParameter("type", "project")
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
         List<Option<String>> options = new ArrayList<>();
 
-        if (body != null && body.get("templates") instanceof List<?> list) {
+        if (body != null && body.get("items") instanceof List<?> list) {
             for (Object item : list) {
                 if (item instanceof Map<?, ?> map) {
                     options.add(option((String) map.get(NAME), (String) map.get(ID)));
