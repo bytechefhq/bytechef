@@ -27,13 +27,12 @@ import static com.bytechef.component.object.helper.constant.ObjectHelperConstant
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.VALUE;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,10 +42,12 @@ import java.util.Map;
  */
 public class ObjectHelperAddKeyValuePairsAction {
 
-    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action(ADD_KEY_VALUE_PAIRS)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(ADD_KEY_VALUE_PAIRS)
         .title("Add Key-Value pairs to object or array")
-        .description("Add values from list to object or array. If the source is object, the items in the list will " +
-            "be treated as Key-value pairs. If the value is array of objects, key-value pairs will be added to every object in the array.")
+        .description(
+            "Add values from list to object or array. If the source is object, the items in the list will be " +
+                "treated as Key-value pairs. If the value is array of objects, key-value pairs will be added to " +
+                "every object in the array.")
         .properties(
             integer(SOURCE_TYPE)
                 .label("Type of initial object")
@@ -80,42 +81,41 @@ public class ObjectHelperAddKeyValuePairsAction {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    protected static Object
-        perform(Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-        int sourceType = inputParameters.getRequired(SOURCE_TYPE, int.class);
-        // Case 1: the initial object is an array
-        // add all items to the initial array
-        if (sourceType == 1) {
-            List<Object> modifiedArray = new ArrayList<>(Arrays.asList(inputParameters.getArray(SOURCE)));
-            List<Object> resultArray = new ArrayList<Object>();
+    protected static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+
+        Integer sourceType = inputParameters.getRequiredInteger(SOURCE_TYPE);
+
+        if (sourceType.equals(1)) {
+            List<Object> modifiedArray = inputParameters.getRequiredList(SOURCE, Object.class);
             Object[] valueArray = inputParameters.getArray(VALUE);
+            List<Object> resultArray = new ArrayList<>();
+
             for (Object sourceObject : modifiedArray) {
                 var sourceMap = objectMapper.convertValue(sourceObject, new TypeReference<Map<String, Object>>() {});
+
                 resultArray.add(addKeyValuePairsToObject(sourceMap, valueArray));
             }
+
             return resultArray;
-        }
-        // Case 2: the initial object is a map
-        // add all key-value pairs in the list to the initial map
-        else {
-            Map<String, Object> modifiedObject =
-                new HashMap<>(Map.copyOf(inputParameters.getRequiredMap(SOURCE, Object.class)));
+        } else {
+            Map<String, Object> modifiedObject = inputParameters.getRequiredMap(SOURCE, Object.class);
 
             Object[] keyValuePairs = inputParameters.getArray(VALUE);
-            return addKeyValuePairsToObject(modifiedObject, keyValuePairs);
+
+            return addKeyValuePairsToObject(new HashMap<>(modifiedObject), keyValuePairs);
         }
     }
 
     private static Object addKeyValuePairsToObject(Map<String, Object> sourceObject, Object[] keyValuePairs) {
         for (Object objectPair : keyValuePairs) {
             JsonNode node = objectMapper.convertValue(objectPair, JsonNode.class);
-            // If an item in array is a pair of key and value.
-            // Therefore, size of the item must be two and the first value must be string
-            if (node.isArray() && node.size() == 2 && node.get(0)
-                .isTextual()) {
-                String key = node.get(0)
-                    .asText();
+
+            JsonNode firstJsonNode = node.get(0);
+            if (node.isArray() && node.size() == 2 && firstJsonNode.isTextual()) {
+                String key = firstJsonNode.asText();
                 Object val = objectMapper.convertValue(node.get(1), Object.class);
+
                 sourceObject.put(key, val);
             }
         }
