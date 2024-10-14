@@ -29,37 +29,36 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class ObjectHelperAddKeyValuePairActionTest {
-    private static final ActionContext mockedContext = mock(ActionContext.class);
-    private static final Parameters mockedParameters = mock(Parameters.class);
+class ObjectHelperAddKeyValuePairActionTest {
+
     private static final Gson gson = new Gson();
 
-    private void testWith(String sourceJson, String valueJson, String expectedJson) {
+    @Test
+    void testPerformForObject() {
+        testWith("{'a':1}", "[1, 2, 3]", "{'a':1}");
+        testWith("{'a':1}", "[['b', 2], 3, ['c', 3, 3]]", "{'a':1,'b':2}");
+        testWith("{'a':1}", "[['a', 2]]", "{'a':2}");
+    }
 
+    @Test
+    void testPerformForArray() {
+        testWith("[{'a':1}]", "[1, 2, 3]", "[{'a':1}]");
+        testWith("[{'a':1}, {'b':1}]", "[['b', 2]]", "[{'a':1,'b':2}, {'b':2}]");
+        testWith("[{'a':1}, {'b':1}]", "[[1, 2]]", "[{'a':1}, {'b':1}]");
+    }
+
+    private void testWith(String sourceJson, String valueJson, String expectedJson) {
         Object sourceObject = gson.fromJson(sourceJson, Object.class);
         Object valueObject = gson.fromJson(valueJson, Object.class);
         Object expectedObject = gson.fromJson(expectedJson, Object.class);
         int sourceType = sourceJson.startsWith("[") ? 1 : 2;
 
-        Parameters inputParameters = MockParametersFactory.create(
+        Parameters mockedParameters = MockParametersFactory.create(
             Map.of(SOURCE, sourceObject, SOURCE_TYPE, sourceType, VALUE, valueObject));
 
         Object resultObject =
-            ObjectHelperAddKeyValuePairsAction.perform(inputParameters, mockedParameters, mockedContext);
+            ObjectHelperAddKeyValuePairsAction.perform(mockedParameters, mockedParameters, mock(ActionContext.class));
 
         Assertions.assertEquals(expectedObject, resultObject);
-    }
-
-    @Test
-    void testPerformAddKeyValuePairs() {
-        // Test with the initial array
-        testWith("[{'a':1}]", "[1, 2, 3]", "[{'a':1}]");
-        testWith("[{'a':1}, {'b':1}]", "[['b', 2]]", "[{'a':1,'b':2}, {'b':2}]");
-        testWith("[{'a':1}, {'b':1}]", "[[1, 2]]", "[{'a':1}, {'b':1}]");
-
-        // Test with the initial object
-        testWith("{'a':1}", "[1, 2, 3]", "{'a':1}");
-        testWith("{'a':1}", "[['b', 2], 3, ['c', 3, 3]]", "{'a':1,'b':2}");
-        testWith("{'a':1}", "[['a', 2]]", "{'a':2}");
     }
 }
