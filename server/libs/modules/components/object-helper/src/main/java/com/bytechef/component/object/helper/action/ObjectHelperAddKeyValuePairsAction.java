@@ -18,20 +18,27 @@ package com.bytechef.component.object.helper.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.date;
+import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.nullable;
+import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.ComponentDsl.time;
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.SOURCE;
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.SOURCE_TYPE;
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.VALUE;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,24 +66,48 @@ public class ObjectHelperAddKeyValuePairsAction {
                 .label("Source")
                 .description("Source object to be added or updated")
                 .displayCondition("sourceType == 1")
-                .items(object())
+                .items(
+                    object()
+                        .additionalProperties(
+                            array(), bool(), date(), dateTime(), integer(), number(), nullable(), object(), string(),
+                            time()))
                 .required(true),
             object(SOURCE)
                 .label("Source")
                 .description("Source object to be added or updated")
                 .displayCondition("sourceType == 2")
+                .additionalProperties(
+                    array(), bool(), date(), dateTime(), integer(), number(), nullable(), object(), string(), time())
                 .required(true),
-            array(VALUE)
+            object(VALUE)
                 .label("Array of Key-Value pairs")
                 .description("Array of Key-Value pairs to be added or updated.")
-                .items(
-                    array()
-                        .label("Key-Value pair")
-                        .maxItems(2)
-                        .minItems(2))
+                .additionalProperties(bool(), string(), number(), object(), array(), dateTime(), date(), time())
                 .required(true))
         .perform(ObjectHelperAddKeyValuePairsAction::perform)
-        .output();
+        .output(getOutputSchema());
+
+    private static ActionDefinition.SingleConnectionOutputFunction getOutputSchema() {
+        return (inputParameters, connectionParameters, context) -> {
+            int sourceType = inputParameters.getRequiredInteger(SOURCE_TYPE);
+
+            if (sourceType == 1) {
+                return new OutputResponse(
+                    array()
+                        .items(
+                            object()
+                                .additionalProperties(
+                                    array(), bool(), date(), dateTime(), integer(), number(), nullable(), object(),
+                                    string(), time())));
+            } else {
+                return new OutputResponse(
+                    object()
+                        .additionalProperties(
+                            array(), bool(), date(), dateTime(), integer(), number(), nullable(), object(), string(),
+                            time()));
+            }
+        };
+    }
 
     private ObjectHelperAddKeyValuePairsAction() {
     }
@@ -87,40 +118,31 @@ public class ObjectHelperAddKeyValuePairsAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         Integer sourceType = inputParameters.getRequiredInteger(SOURCE_TYPE);
+        Map<String, Object> keyValuePairs = inputParameters.getRequiredMap(VALUE, Object.class);
 
         if (sourceType.equals(1)) {
             List<Object> modifiedArray = inputParameters.getRequiredList(SOURCE, Object.class);
-            Object[] valueArray = inputParameters.getArray(VALUE);
-            List<Object> resultArray = new ArrayList<>();
 
             for (Object sourceObject : modifiedArray) {
                 var sourceMap = objectMapper.convertValue(sourceObject, new TypeReference<Map<String, Object>>() {});
 
-                resultArray.add(addKeyValuePairsToObject(sourceMap, valueArray));
+                return addKeyValuePairsToObject(sourceMap, keyValuePairs);
             }
 
-            return resultArray;
         } else {
             Map<String, Object> modifiedObject = inputParameters.getRequiredMap(SOURCE, Object.class);
 
-            Object[] keyValuePairs = inputParameters.getArray(VALUE);
-
             return addKeyValuePairsToObject(new HashMap<>(modifiedObject), keyValuePairs);
         }
+
+        return null;
     }
 
-    private static Object addKeyValuePairsToObject(Map<String, Object> sourceObject, Object[] keyValuePairs) {
-        for (Object objectPair : keyValuePairs) {
-            JsonNode node = objectMapper.convertValue(objectPair, JsonNode.class);
+    private static Object addKeyValuePairsToObject(
+        Map<String, Object> sourceObject, Map<String, Object> keyValuePairs) {
 
-            JsonNode firstJsonNode = node.get(0);
-            if (node.isArray() && node.size() == 2 && firstJsonNode.isTextual()) {
-                String key = firstJsonNode.asText();
-                Object val = objectMapper.convertValue(node.get(1), Object.class);
+        sourceObject.putAll(keyValuePairs);
 
-                sourceObject.put(key, val);
-            }
-        }
         return sourceObject;
     }
 }
