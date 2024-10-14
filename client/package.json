@@ -111,6 +111,7 @@
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^2.0.2",
+    "@dagrejs/dagre": "^1.1.4",
     "@storybook/addon-actions": "^8.3.3",
     "@storybook/addon-essentials": "^8.3.3",
     "@storybook/addon-interactions": "^8.3.3",

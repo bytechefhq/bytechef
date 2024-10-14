@@ -25,7 +25,6 @@ import {
 } from '@/shared/middleware/platform/configuration';
 import {UseMutationResult} from '@tanstack/react-query';
 import {ReactNode} from 'react';
-import {Node} from 'reactflow';
 
 export type DataPillType = {
     componentName?: string;
@@ -65,6 +64,7 @@ export type ComponentType = {
     };
     metadata?: {
         ui?: {
+            condition?: string;
             dynamicPropertyTypes?: {[key: string]: string};
         };
     };
@@ -103,6 +103,7 @@ export type NodeDataType = {
     label?: string;
     metadata?: {
         ui?: {
+            condition?: string;
             dynamicPropertyTypes?: {[key: string]: string};
         };
     };
@@ -127,6 +128,7 @@ export type NodeType = {
     };
     metadata?: {
         ui?: {
+            condition?: string;
             dynamicPropertyTypes?: {[key: string]: string};
         };
     };
@@ -144,12 +146,6 @@ export type NodeType = {
     type: string;
     version: number;
     workflowNodeName?: string;
-};
-
-export type NodeWithMetadataType = Node & {
-    metadata?: {
-        conditionChild?: boolean;
-    };
 };
 
 export type SubPropertyType = PropertyAllType & {custom: boolean};

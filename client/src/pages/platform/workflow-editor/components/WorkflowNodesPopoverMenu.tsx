@@ -10,13 +10,13 @@ import {twMerge} from 'tailwind-merge';
 import {useWorkflowMutation} from '../providers/workflowMutationProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
-import handleTaskDispatcherClick from '../utils/handleTaskDispatcherClick';
+import handleConditionClick from '../utils/handleConditionClick';
 import WorkflowNodesPopoverMenuComponentList from './WorkflowNodesPopoverMenuComponentList';
 import WorkflowNodesPopoverMenuOperationList from './WorkflowNodesPopoverMenuOperationList';
 
 interface WorkflowNodesPopoverMenuProps extends PropsWithChildren {
     condition?: boolean;
-    id: string;
+    sourceNodeId: string;
     edge?: boolean;
     hideActionComponents?: boolean;
     hideTriggerComponents?: boolean;
@@ -30,7 +30,7 @@ const WorkflowNodesPopoverMenu = ({
     hideActionComponents = false,
     hideTaskDispatchers = false,
     hideTriggerComponents = false,
-    id,
+    sourceNodeId,
 }: WorkflowNodesPopoverMenuProps) => {
     const [actionPanelOpen, setActionPanelOpen] = useState(false);
     const [componentDefinitionToBeAdded, setComponentDefinitionToBeAdded] = useState<ComponentDefinition | null>(null);
@@ -40,7 +40,7 @@ const WorkflowNodesPopoverMenu = ({
 
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
-    const {getNode, setEdges, setNodes} = useReactFlow();
+    const {getNode, setNodes} = useReactFlow();
 
     const {updateWorkflowMutation} = useWorkflowMutation();
 
@@ -53,19 +53,17 @@ const WorkflowNodesPopoverMenu = ({
     };
 
     const handleComponentClick = async (clickedItem: ClickedDefinitionType) => {
-        if (clickedItem.taskDispatcher) {
-            await handleTaskDispatcherClick({
+        if (clickedItem.name.includes('condition')) {
+            await handleConditionClick({
                 clickedItem,
                 currentNode,
                 edge,
                 getNode,
-                id,
                 queryClient,
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                setEdges: setEdges as any,
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 setNodes: setNodes as any,
                 setWorkflow,
+                sourceNodeId,
                 updateWorkflowMutation,
                 workflow,
             });
@@ -125,8 +123,8 @@ const WorkflowNodesPopoverMenu = ({
                         hideActionComponents={hideActionComponents}
                         hideTaskDispatchers={hideTaskDispatchers}
                         hideTriggerComponents={hideTriggerComponents}
-                        id={id}
                         selectedComponentName={componentDefinitionToBeAdded?.name}
+                        sourceNodeId={sourceNodeId}
                     />
 
                     {actionPanelOpen && componentDefinitionToBeAdded && (
@@ -134,7 +132,7 @@ const WorkflowNodesPopoverMenu = ({
                             componentDefinition={componentDefinitionToBeAdded}
                             condition={condition}
                             edge={edge}
-                            id={id}
+                            sourceNodeId={sourceNodeId}
                             trigger={trigger}
                         />
                     )}

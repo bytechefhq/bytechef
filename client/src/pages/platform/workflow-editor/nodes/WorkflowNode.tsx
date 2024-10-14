@@ -148,7 +148,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
             {isHovered && (
                 <div className="absolute left-[-40px] pr-4">
                     {data.trigger ? (
-                        <WorkflowNodesPopoverMenu hideActionComponents hideTaskDispatchers id={id}>
+                        <WorkflowNodesPopoverMenu hideActionComponents hideTaskDispatchers sourceNodeId={id}>
                             <Button
                                 className="bg-white p-2 shadow-md hover:text-blue-500 hover:shadow-sm"
                                 title="Change trigger component"
