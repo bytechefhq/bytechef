@@ -13,7 +13,7 @@ interface WorkflowNodesListProps {
     hideActionComponents?: boolean;
     hideTriggerComponents?: boolean;
     hideTaskDispatchers?: boolean;
-    id: string;
+    sourceNodeId: string;
     selectedComponentName?: string;
 }
 

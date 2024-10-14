@@ -10,13 +10,10 @@ import {ComponentOperationType} from '@/shared/types';
 import {DragEventHandler, useCallback, useEffect, useMemo, useState} from 'react';
 import ReactFlow, {Controls, MiniMap, useReactFlow, useStore} from 'reactflow';
 
-import ConditionChildEdge from '../edges/ConditionChildEdge';
-import ConditionEdge from '../edges/ConditionEdge';
 import PlaceholderEdge from '../edges/PlaceholderEdge';
 import WorkflowEdge from '../edges/WorkflowEdge';
 import useHandleDrop from '../hooks/useHandleDrop';
 import useLayout from '../hooks/useLayout';
-import ConditionNode from '../nodes/ConditionNode';
 import PlaceholderNode from '../nodes/PlaceholderNode';
 import WorkflowNode from '../nodes/WorkflowNode';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -42,7 +39,6 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
 
     const nodeTypes = useMemo(
         () => ({
-            condition: ConditionNode,
             placeholder: PlaceholderNode,
             workflow: WorkflowNode,
         }),
@@ -51,8 +47,6 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
 
     const edgeTypes = useMemo(
         () => ({
-            condition: ConditionEdge,
-            conditionChild: ConditionChildEdge,
             placeholder: PlaceholderEdge,
             workflow: WorkflowEdge,
         }),

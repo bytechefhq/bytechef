@@ -9,7 +9,7 @@ const PlaceholderNode = ({data, id}: NodeProps) => {
     const [isDropzoneActive, setDropzoneActive] = useState(false);
 
     return (
-        <WorkflowNodesPopoverMenu hideTriggerComponents id={id}>
+        <WorkflowNodesPopoverMenu condition={!!data.metadata?.ui?.condition} hideTriggerComponents sourceNodeId={id}>
             <div
                 className={twMerge(
                     'mx-[22px] flex cursor-pointer items-center justify-center rounded-md text-lg text-gray-500 shadow-none hover:scale-110 hover:bg-gray-500 hover:text-white',

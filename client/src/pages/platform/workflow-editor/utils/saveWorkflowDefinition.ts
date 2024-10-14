@@ -10,6 +10,8 @@ import {TaskDispatcherKeys} from '@/shared/queries/platform/taskDispatcherDefini
 import {NodeDataType, WorkflowDefinitionType} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
+import getNextPlaceholderId from './getNextPlaceholderId';
+
 const SPACE = 4;
 
 type UpdateWorkflowRequestType = {
@@ -22,7 +24,7 @@ export default async function saveWorkflowDefinition(
     workflow: Workflow,
     updateWorkflowMutation: UseMutationResult<Workflow, Error, UpdateWorkflowRequestType, unknown>,
     queryClient: QueryClient,
-    index?: number,
+    nodeIndex?: number,
     onSuccess?: (workflow: Workflow) => void
 ) {
     const workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow.definition!);
@@ -151,12 +153,66 @@ export default async function saveWorkflowDefinition(
         };
 
         tasks[existingTaskIndex] = combinedTask;
-    } else if (index !== undefined && index > -1) {
+    } else {
         tasks = [...(workflowDefinition.tasks || [])];
 
-        tasks.splice(index, 0, newTask);
-    } else {
-        tasks = [...(workflowDefinition.tasks || []), newTask];
+        if (nodeData.metadata?.ui?.condition) {
+            if (nodeIndex !== undefined && nodeIndex !== -1) {
+                const tasksAfterCurrent = tasks.slice(nodeIndex);
+
+                const placeholderCorrectedTasksAfterCurrent = tasksAfterCurrent.map((task) => {
+                    let taskCondition = task.metadata?.ui?.condition;
+
+                    if (taskCondition && nodeData.metadata?.ui?.condition) {
+                        const taskConditionSide = taskCondition.includes('left')
+                            ? 'left'
+                            : taskCondition.includes('right')
+                              ? 'right'
+                              : null;
+
+                        const nodeConditionSide = nodeData.metadata.ui.condition.includes('left')
+                            ? 'left'
+                            : nodeData.metadata.ui.condition.includes('right')
+                              ? 'right'
+                              : null;
+
+                        if (taskConditionSide && nodeConditionSide && taskConditionSide === nodeConditionSide) {
+                            taskCondition = getNextPlaceholderId(taskCondition);
+                        }
+                    }
+
+                    if (task.metadata?.ui?.condition) {
+                        return {
+                            ...task,
+                            metadata: {
+                                ...task.metadata,
+                                ui: {
+                                    ...task.metadata?.ui,
+                                    // condition: getNextPlaceholderId(task.metadata?.ui?.condition),
+                                    condition: taskCondition,
+                                },
+                            },
+                        };
+                    }
+
+                    return task;
+                });
+
+                tasks = [...tasks.slice(0, nodeIndex), ...placeholderCorrectedTasksAfterCurrent];
+
+                tasks.splice(nodeIndex, 0, newTask);
+            } else {
+                tasks.push(newTask);
+            }
+        } else if (nodeIndex !== undefined && nodeIndex > -1) {
+            const tasksAfterCurrent = tasks.slice(nodeIndex);
+
+            tasks = [...tasks.slice(0, nodeIndex), ...tasksAfterCurrent];
+
+            tasks.splice(nodeIndex, 0, newTask);
+        } else {
+            tasks.push(newTask);
+        }
     }
 
     updateWorkflowMutation.mutate(

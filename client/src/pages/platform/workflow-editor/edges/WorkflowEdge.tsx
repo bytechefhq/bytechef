@@ -36,7 +36,7 @@ export default function WorkflowEdge({
                 style={style}
             />
 
-            <WorkflowNodesPopoverMenu edge hideTriggerComponents id={id}>
+            <WorkflowNodesPopoverMenu edge hideTriggerComponents sourceNodeId={id}>
                 <g
                     onDragEnter={() => setDropzoneActive(true)}
                     onDragLeave={() => setDropzoneActive(false)}
