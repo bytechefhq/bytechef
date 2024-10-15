@@ -32,13 +32,12 @@ export const Connections = () => {
         searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : 1
     );
 
+    const componentName = searchParams.get('componentName');
+    const tagId = searchParams.get('tagId');
+
     const filterData = {
-        id: searchParams.get('componentName')
-            ? searchParams.get('componentName')
-            : searchParams.get('tagId')
-              ? parseInt(searchParams.get('tagId')!)
-              : undefined,
-        type: searchParams.get('tagId') ? Type.Tag : Type.Component,
+        id: componentName ? componentName : tagId ? parseInt(tagId) : undefined,
+        type: tagId ? Type.Tag : Type.Component,
     };
 
     const {

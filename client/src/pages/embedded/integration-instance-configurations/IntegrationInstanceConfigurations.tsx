@@ -29,13 +29,12 @@ const IntegrationInstanceConfigurations = () => {
 
     const [environment, setEnvironment] = useState<number>(getEnvironment());
 
+    const integrationId = searchParams.get('integrationId');
+    const tagId = searchParams.get('tagId');
+
     const filterData: {id: number | string | undefined; type: Type} = {
-        id: searchParams.get('integrationId')
-            ? parseInt(searchParams.get('integrationId')!)
-            : searchParams.get('tagId')
-              ? parseInt(searchParams.get('tagId')!)
-              : undefined,
-        type: searchParams.get('tagId') ? Type.Tag : Type.Integration,
+        id: integrationId ? parseInt(integrationId) : tagId ? parseInt(tagId) : undefined,
+        type: tagId ? Type.Tag : Type.Integration,
     };
 
     const ff_743 = useFeatureFlagsStore()('ff-743');
