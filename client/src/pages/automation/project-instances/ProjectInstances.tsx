@@ -32,13 +32,12 @@ const ProjectInstances = () => {
 
     const {currentWorkspaceId} = useWorkspaceStore();
 
+    const projectId = searchParams.get('projectId');
+    const tagId = searchParams.get('tagId');
+
     const filterData = {
-        id: searchParams.get('projectId')
-            ? parseInt(searchParams.get('projectId')!)
-            : searchParams.get('tagId')
-              ? parseInt(searchParams.get('tagId')!)
-              : undefined,
-        type: searchParams.get('tagId') ? Type.Tag : Type.Project,
+        id: projectId ? parseInt(projectId) : tagId ? parseInt(tagId) : undefined,
+        type: tagId ? Type.Tag : Type.Project,
     };
 
     const {
