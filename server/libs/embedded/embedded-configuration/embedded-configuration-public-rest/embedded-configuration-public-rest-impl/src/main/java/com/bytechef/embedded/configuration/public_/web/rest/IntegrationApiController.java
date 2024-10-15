@@ -50,7 +50,9 @@ public class IntegrationApiController implements IntegrationApi {
     }
 
     @Override
-    public ResponseEntity<List<IntegrationModel>> getIntegrations(EnvironmentModel xEnvironment) {
+    public ResponseEntity<List<IntegrationModel>> getIntegrations(
+        String externalUserId, EnvironmentModel xEnvironment) {
+
         Environment environment = xEnvironment == null
             ? Environment.PRODUCTION : Environment.valueOf(StringUtils.upperCase(xEnvironment.name()));
 
