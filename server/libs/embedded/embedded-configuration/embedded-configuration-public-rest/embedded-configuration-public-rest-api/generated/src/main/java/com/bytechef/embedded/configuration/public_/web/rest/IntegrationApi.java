@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-25T21:33:13.828661+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-15T16:53:16.867410+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
 @Validated
 @Tag(name = "integration", description = "The Embedded Integration Public API")
 public interface IntegrationApi {
@@ -46,6 +46,7 @@ public interface IntegrationApi {
      * GET /integrations : Get active configurations
      * Get active integrations.
      *
+     * @param externalUserId The external id of a connected user. (required)
      * @param xEnvironment The environment. (optional)
      * @return The list of active integrations. (status code 200)
      */
@@ -67,6 +68,7 @@ public interface IntegrationApi {
     )
     
     default ResponseEntity<List<IntegrationModel>> getIntegrations(
+        @NotNull @Parameter(name = "externalUserId", description = "The external id of a connected user.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "externalUserId", required = true) String externalUserId,
         @Parameter(name = "x-environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "x-environment", required = false) EnvironmentModel xEnvironment
     ) {
         getRequest().ifPresent(request -> {
