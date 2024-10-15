@@ -36,13 +36,12 @@ export const Connections = () => {
 
     const {currentWorkspaceId} = useWorkspaceStore();
 
+    const componentName = searchParams.get('componentName');
+    const tagId = searchParams.get('tagId');
+
     const filterData = {
-        id: searchParams.get('componentName')
-            ? searchParams.get('componentName')
-            : searchParams.get('tagId')
-              ? parseInt(searchParams.get('tagId')!)
-              : undefined,
-        type: searchParams.get('tagId') ? Type.Tag : Type.Component,
+        id: componentName ? componentName : tagId ? parseInt(tagId) : undefined,
+        type: tagId ? Type.Tag : Type.Component,
     };
 
     const {

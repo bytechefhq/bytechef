@@ -25,13 +25,12 @@ const Projects = () => {
 
     const [searchParams] = useSearchParams();
 
+    const categoryId = searchParams.get('categoryId');
+    const tagId = searchParams.get('tagId');
+
     const filterData = {
-        id: searchParams.get('categoryId')
-            ? parseInt(searchParams.get('categoryId')!)
-            : searchParams.get('tagId')
-              ? parseInt(searchParams.get('tagId')!)
-              : undefined,
-        type: searchParams.get('tagId') ? Type.Tag : Type.Category,
+        id: categoryId ? parseInt(categoryId) : tagId ? parseInt(tagId) : undefined,
+        type: tagId ? Type.Tag : Type.Category,
     };
 
     const navigate = useNavigate();
