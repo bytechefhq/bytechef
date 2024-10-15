@@ -25,6 +25,12 @@ paths:
           required: false
           schema:
             $ref: '#/components/schemas/Environment'
+        - name: "externalUserId"
+          description: "The external id of a connected user."
+          in: "query"
+          required: true
+          schema:
+            type: "string"
       responses:
         "200":
           description: "The list of active integrations."
