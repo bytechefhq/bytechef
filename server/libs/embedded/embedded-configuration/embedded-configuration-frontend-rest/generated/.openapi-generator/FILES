@@ -1,4 +1,4 @@
 README.md
 pom.xml
-src/main/java/com/bytechef/embedded/configuration/frontend/web/rest/ApiUtil.java
-src/main/java/com/bytechef/embedded/configuration/frontend/web/rest/IntegrationApi.java
+src/main/java/com/bytechef/embedded/configuration/connected/user/token/web/rest/ApiUtil.java
+src/main/java/com/bytechef/embedded/configuration/connected/user/token/web/rest/IntegrationApi.java
