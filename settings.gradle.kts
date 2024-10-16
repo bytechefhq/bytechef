@@ -137,6 +137,9 @@ include("server:libs:embedded:embedded-workflow:embedded-workflow-execution:embe
 include("server:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-rest")
 include("server:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-service")
 
+include("server:libs:platform:platform-ai:platform-ai-api")
+include("server:libs:platform:platform-ai:platform-ai-rest")
+include("server:libs:platform:platform-ai:platform-ai-service")
 include("server:libs:platform:platform-api")
 include("server:libs:platform:platform-category:platform-category-api")
 include("server:libs:platform:platform-category:platform-category-rest:platform-category-rest-api")

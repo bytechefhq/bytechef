@@ -36,6 +36,7 @@ public class ApplicationProperties {
         CE, EE
     }
 
+    private Ai ai = new Ai();
     private Analytics analytics = new Analytics();
     private Cache cache = new Cache();
     private Cloud cloud = new Cloud();
@@ -60,6 +61,10 @@ public class ApplicationProperties {
     private String webhookUrl;
     private Worker worker = new Worker();
     private Workflow workflow = new Workflow();
+
+    public Ai getAi() {
+        return ai;
+    }
 
     public Analytics getAnalytics() {
         return analytics;
@@ -157,6 +162,10 @@ public class ApplicationProperties {
         return workflow;
     }
 
+    public void setAi(Ai ai) {
+        this.ai = ai;
+    }
+
     public void setAnalytics(Analytics analytics) {
         this.analytics = analytics;
     }
@@ -251,6 +260,79 @@ public class ApplicationProperties {
 
     public void setWorkflow(Workflow workflow) {
         this.workflow = workflow;
+    }
+
+    /**
+     * Ai properties.
+     */
+    public static class Ai {
+
+        private boolean enabled;
+        private OpenAi openAi = new OpenAi();
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public OpenAi getOpenAi() {
+            return openAi;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public void setOpenAi(OpenAi openAi) {
+            this.openAi = openAi;
+        }
+
+        public static class OpenAi {
+
+            private String apiKey;
+            private Chat chat = new Chat();
+
+            public String getApiKey() {
+                return apiKey;
+            }
+
+            public Chat getChat() {
+                return chat;
+            }
+
+            public void setApiKey(String apiKey) {
+                this.apiKey = apiKey;
+            }
+
+            public void setChat(Chat chat) {
+                this.chat = chat;
+            }
+
+            public static class Chat {
+
+                private Options options = new Options();
+
+                public Options getOptions() {
+                    return options;
+                }
+
+                public void setOptions(Options options) {
+                    this.options = options;
+                }
+
+                public static class Options {
+
+                    private String model;
+
+                    public String getModel() {
+                        return model;
+                    }
+
+                    public void setModel(String model) {
+                        this.model = model;
+                    }
+                }
+            }
+        }
     }
 
     /**
