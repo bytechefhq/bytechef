@@ -17,8 +17,8 @@
 package com.bytechef.embedded.configuration.frontend.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.embedded.configuration.frontend.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.embedded.configuration.facade.IntegrationFacade;
+import com.bytechef.embedded.configuration.frontend.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.embedded.configuration.public_.web.rest.model.IntegrationModel;
 import com.bytechef.platform.constant.Environment;
