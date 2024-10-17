@@ -23,7 +23,6 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.github.constant.GithubConstants.BODY;
-import static com.bytechef.component.github.constant.GithubConstants.CREATE_ISSUE;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE_OUTPUT_PROPERTY;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static com.bytechef.component.github.constant.GithubConstants.TITLE;
@@ -39,7 +38,7 @@ import java.util.Map;
 
 public class GithubCreateIssueAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_ISSUE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createIssue")
         .title("Create issue")
         .description("Create Issue in GitHub Repository")
         .properties(

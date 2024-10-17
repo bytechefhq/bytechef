@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.github.constant.GithubConstants.GET_ISSUE;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE_OUTPUT_PROPERTY;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
@@ -40,7 +39,7 @@ import java.util.Map;
  */
 public class GithubGetIssueAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(GET_ISSUE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getIssue")
         .title("Get Issue")
         .description("Get information from a specific issue")
         .properties(

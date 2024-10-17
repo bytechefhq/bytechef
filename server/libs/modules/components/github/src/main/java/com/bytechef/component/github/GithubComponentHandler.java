@@ -18,7 +18,6 @@ package com.bytechef.component.github;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.github.connection.GithubConnection.CONNECTION_DEFINITION;
-import static com.bytechef.component.github.constant.GithubConstants.GITHUB;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -38,7 +37,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class GithubComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(GITHUB)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("github")
         .title("Github")
         .description("GitHub is a web-based platform for version control and collaboration using Git.")
         .categories(ComponentCategory.DEVELOPER_TOOLS)

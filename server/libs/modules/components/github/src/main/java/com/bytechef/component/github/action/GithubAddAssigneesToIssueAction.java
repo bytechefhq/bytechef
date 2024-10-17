@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.github.constant.GithubConstants.ADD_ASSIGNEES_TO_ISSUE;
 import static com.bytechef.component.github.constant.GithubConstants.ASSIGNEES;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE_OUTPUT_PROPERTY;
@@ -41,7 +40,7 @@ import java.util.Map;
  */
 public class GithubAddAssigneesToIssueAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(ADD_ASSIGNEES_TO_ISSUE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("addAssigneesToIssue")
         .title("Add assignee to an issue")
         .description("Adds an assignees to the specified issue.")
         .properties(

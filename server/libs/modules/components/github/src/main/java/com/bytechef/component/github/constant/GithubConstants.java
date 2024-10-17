@@ -29,14 +29,9 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
  */
 public class GithubConstants {
 
-    public static final String ADD_ASSIGNEES_TO_ISSUE = "addAssigneesToIssue";
-    public static final String ADD_LABELS_TO_ISSUE = "addLabelsToIssue";
     public static final String ASSIGNEES = "assignees";
     public static final String BODY = "body";
     public static final String CREATE_ISSUE = "createIssue";
-    public static final String CREATE_COMMENT_ON_ISSUE = "createCommentOnIssue";
-    public static final String GITHUB = "github";
-    public static final String GET_ISSUE = "getIssue";
     public static final String ID = "id";
     public static final String ISSUE = "issue";
     public static final String LABELS = "labels";
