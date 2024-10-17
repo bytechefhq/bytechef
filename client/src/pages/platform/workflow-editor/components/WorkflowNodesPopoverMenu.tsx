@@ -34,6 +34,7 @@ const WorkflowNodesPopoverMenu = ({
 }: WorkflowNodesPopoverMenuProps) => {
     const [actionPanelOpen, setActionPanelOpen] = useState(false);
     const [componentDefinitionToBeAdded, setComponentDefinitionToBeAdded] = useState<ComponentDefinition | null>(null);
+    const [popoverOpen, setPopoverOpen] = useState(false);
     const [trigger, setTrigger] = useState(false);
 
     const {componentDefinitions, setWorkflow, taskDispatcherDefinitions, workflow} = useWorkflowDataStore();
@@ -97,7 +98,16 @@ const WorkflowNodesPopoverMenu = ({
     }, [componentDefinitionToBeAdded]);
 
     return (
-        <Popover onOpenChange={(open) => !open && handleActionPanelClose()}>
+        <Popover
+            onOpenChange={(open) => {
+                setPopoverOpen(open);
+
+                if (!open) {
+                    handleActionPanelClose();
+                }
+            }}
+            open={popoverOpen}
+        >
             <PopoverTrigger asChild>{children}</PopoverTrigger>
 
             <PopoverContent
@@ -132,6 +142,7 @@ const WorkflowNodesPopoverMenu = ({
                             componentDefinition={componentDefinitionToBeAdded}
                             condition={condition}
                             edge={edge}
+                            setPopoverOpen={setPopoverOpen}
                             sourceNodeId={sourceNodeId}
                             trigger={trigger}
                         />
