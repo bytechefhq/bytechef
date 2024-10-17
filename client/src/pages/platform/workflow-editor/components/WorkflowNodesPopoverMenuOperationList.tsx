@@ -22,6 +22,7 @@ interface WorkflowNodesPopoverMenuOperationListProps {
     componentDefinition: ComponentDefinition;
     condition?: boolean;
     edge?: boolean;
+    setPopoverOpen: (open: boolean) => void;
     sourceNodeId: string;
     trigger?: boolean;
 }
@@ -30,6 +31,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
     componentDefinition,
     condition,
     edge,
+    setPopoverOpen,
     sourceNodeId,
     trigger,
 }: WorkflowNodesPopoverMenuOperationListProps) => {
@@ -283,6 +285,8 @@ const WorkflowNodesPopoverMenuOperationList = ({
                     workflow,
                 });
 
+                setPopoverOpen(false);
+
                 return;
             }
 
@@ -301,7 +305,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 type: 'placeholder',
             };
 
-            setNodes((nodes: Node[]) =>
+            setNodes((nodes) =>
                 nodes
                     .map((node) => {
                         if (node.id !== placeholderId) {
