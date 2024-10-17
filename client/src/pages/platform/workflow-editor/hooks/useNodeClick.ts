@@ -23,7 +23,7 @@ export default function useNodeClick(data: NodeProps['data'], id: NodeProps['id'
 
         setCurrentNode(data);
 
-        if (data.componentName && data.operationName) {
+        if (data.type) {
             setCurrentComponent({
                 componentName: data.componentName,
                 displayConditions: data.displayConditions,

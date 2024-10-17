@@ -431,7 +431,13 @@ const WorkflowNodeDetailsPanel = ({
     const data = currentComponentDefinition || currentTaskDispatcherDefinition;
     const dataFetched = currentActionFetched || currentTriggerFetched;
 
-    if (!workflowNodeDetailsPanelOpen || !currentNode?.name || !data || !matchingOperation?.name || !dataFetched) {
+    if (
+        !workflowNodeDetailsPanelOpen ||
+        !currentNode?.name ||
+        !data ||
+        (currentComponent?.operationName && !matchingOperation?.name) ||
+        (currentComponent?.operationName && !dataFetched)
+    ) {
         return <></>;
     }
 
