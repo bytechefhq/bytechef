@@ -69,7 +69,7 @@ export type ComponentType = {
         };
     };
     notes?: string;
-    operationName: string;
+    operationName?: string;
     parameters?: {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         [key: string]: any;
