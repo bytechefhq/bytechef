@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.github.constant.GithubConstants.ADD_LABELS_TO_ISSUE;
 import static com.bytechef.component.github.constant.GithubConstants.ID;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE;
 import static com.bytechef.component.github.constant.GithubConstants.LABELS;
@@ -44,7 +43,7 @@ import java.util.Map;
  */
 public class GithubAddLabelsToIssueAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(ADD_LABELS_TO_ISSUE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("addLabelsToIssue")
         .title("Add labels to an issue")
         .description("Adds labels to the specified issue.")
         .properties(

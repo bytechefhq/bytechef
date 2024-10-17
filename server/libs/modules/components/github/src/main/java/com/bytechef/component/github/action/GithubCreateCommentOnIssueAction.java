@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.github.constant.GithubConstants.BODY;
-import static com.bytechef.component.github.constant.GithubConstants.CREATE_COMMENT_ON_ISSUE;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE_OUTPUT_PROPERTY;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
@@ -42,7 +41,7 @@ import java.util.Map;
  */
 public class GithubCreateCommentOnIssueAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_COMMENT_ON_ISSUE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createCommentOnIssue")
         .title("Create comment on a issue")
         .description("Adds a comment to the specified issue.")
         .properties(
