@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import {useEffect} from 'react';
 
 export enum KeyboardKey {
     enter = 'Enter',
@@ -6,22 +6,21 @@ export enum KeyboardKey {
 }
 
 export const useKeyDown = (callback: () => void, keys: KeyboardKey[]) => {
-  const onKeyDown = (event: KeyboardEvent) => {
-    const wasAnyKeyPressed = keys.some((key) => event.key === key);
+    const onKeyDown = (event: KeyboardEvent) => {
+        const wasAnyKeyPressed = keys.some((key) => event.key === key);
 
-    if (wasAnyKeyPressed) {
-      event.preventDefault();
-      callback();
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener('keydown', onKeyDown);
-
-    // Clean up event listener on unmount
-    return () => {
-      document.removeEventListener('keydown', onKeyDown);
+        if (wasAnyKeyPressed) {
+            event.preventDefault();
+            callback();
+        }
     };
-  }, [keys, callback]);
-};
 
+    useEffect(() => {
+        document.addEventListener('keydown', onKeyDown);
+
+        // Clean up event listener on unmount
+        return () => {
+            document.removeEventListener('keydown', onKeyDown);
+        };
+    }, [keys, callback]);
+};
