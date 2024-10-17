@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.SOURCE;
-import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.STRINGIFY;
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.TYPE;
 
 import com.bytechef.component.definition.ActionContext;
@@ -34,7 +33,7 @@ import com.bytechef.component.definition.Parameters;
  */
 public class ObjectHelperStringifyAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(STRINGIFY)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("stringify")
         .title("Convert to JSON string")
         .description("Writes the object/array to a JSON string.")
         .properties(
@@ -56,6 +55,9 @@ public class ObjectHelperStringifyAction {
                 .required(true))
         .output()
         .perform(ObjectHelperStringifyAction::perform);
+
+    private ObjectHelperStringifyAction() {
+    }
 
     protected static String perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {

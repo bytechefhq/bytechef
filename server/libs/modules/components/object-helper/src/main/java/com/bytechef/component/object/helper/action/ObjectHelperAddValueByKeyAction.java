@@ -28,7 +28,6 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.time;
-import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.ADD_VALUE_BY_KEY;
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.KEY;
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.SOURCE;
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.TYPE_OPTIONS;
@@ -36,7 +35,7 @@ import static com.bytechef.component.object.helper.constant.ObjectHelperConstant
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.VALUE_TYPE;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +44,8 @@ import java.util.Map;
  * @author J. Iamsamang
  */
 public class ObjectHelperAddValueByKeyAction {
-    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action(ADD_VALUE_BY_KEY)
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("addValueByKey")
         .title("Add value to the object by key")
         .description("Add value to the object by key if it exists. Otherwise, update the value")
         .properties(
@@ -115,8 +115,12 @@ public class ObjectHelperAddValueByKeyAction {
         .output(outputSchema(object()))
         .perform(ObjectHelperAddValueByKeyAction::perform);
 
+    private ObjectHelperAddValueByKeyAction() {
+    }
+
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+
         Map<String, Object> modifiedObject =
             new HashMap<>(Map.copyOf(inputParameters.getRequiredMap(SOURCE, Object.class)));
 
@@ -124,7 +128,7 @@ public class ObjectHelperAddValueByKeyAction {
         Object value = inputParameters.getRequired(VALUE);
 
         modifiedObject.put(targetKey, value);
+
         return modifiedObject;
     }
-
 }

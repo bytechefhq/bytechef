@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.ADD_KEY_VALUE_PAIRS;
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.SOURCE;
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.SOURCE_TYPE;
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.VALUE;
@@ -42,7 +41,7 @@ import java.util.Map;
  */
 public class ObjectHelperAddKeyValuePairsAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(ADD_KEY_VALUE_PAIRS)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("addKeyValuePairs")
         .title("Add Key-Value pairs to object or array")
         .description(
             "Add values from list to object or array. If the source is object, the items in the list will be " +
@@ -78,6 +77,9 @@ public class ObjectHelperAddKeyValuePairsAction {
                 .required(true))
         .perform(ObjectHelperAddKeyValuePairsAction::perform)
         .output();
+
+    private ObjectHelperAddKeyValuePairsAction() {
+    }
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
