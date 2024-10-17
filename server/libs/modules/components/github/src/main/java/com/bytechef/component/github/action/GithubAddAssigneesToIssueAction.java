@@ -16,50 +16,54 @@
 
 package com.bytechef.component.github.action;
 
-import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.github.constant.GithubConstants.BODY;
+import static com.bytechef.component.github.constant.GithubConstants.ASSIGNEES;
+import static com.bytechef.component.github.constant.GithubConstants.ISSUE;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE_OUTPUT_PROPERTY;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
-import static com.bytechef.component.github.constant.GithubConstants.TITLE;
 import static com.bytechef.component.github.util.GithubUtils.getOwnerName;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.github.util.GithubUtils;
 import java.util.Map;
 
-public class GithubCreateIssueAction {
+/**
+ * @author Mayank Madan
+ */
+public class GithubAddAssigneesToIssueAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createIssue")
-        .title("Create issue")
-        .description("Create Issue in GitHub Repository")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("addAssigneesToIssue")
+        .title("Add assignee to an issue")
+        .description("Adds an assignees to the specified issue.")
         .properties(
             string(REPOSITORY)
-                .label("Repository")
-                .description("Repository where new issue will be created.")
                 .options((ActionOptionsFunction<String>) GithubUtils::getRepositoryOptions)
+                .label("Repository")
                 .required(true),
-            string(TITLE)
-                .label("Title")
-                .description("Title of the issue.")
-                .maxLength(100)
-                .required(false),
-            string(BODY)
-                .label("Description")
-                .description("The description of the issue.")
-                .required(false))
+            string(ISSUE)
+                .options((ActionOptionsFunction<String>) GithubUtils::getIssueOptions)
+                .optionsLookupDependsOn(REPOSITORY)
+                .label("Issue")
+                .description("The issue to add assignee to.")
+                .required(true),
+            string(ASSIGNEES)
+                .options((ActionOptionsFunction<String>) GithubUtils::getCollaborators)
+                .optionsLookupDependsOn(REPOSITORY)
+                .label("Assignees")
+                .description("The list of assignees to add to the issue.")
+                .required(true))
         .output(outputSchema(ISSUE_OUTPUT_PROPERTY))
-        .perform(GithubCreateIssueAction::perform);
+        .perform(GithubAddAssigneesToIssueAction::perform);
 
-    private GithubCreateIssueAction() {
+    private GithubAddAssigneesToIssueAction() {
     }
 
     public static Map<String, Object> perform(
@@ -67,12 +71,11 @@ public class GithubCreateIssueAction {
 
         return context
             .http(http -> http.post(
-                "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY) + "/issues"))
-            .body(
-                Body.of(
-                    TITLE, inputParameters.getRequiredString(TITLE),
-                    BODY, inputParameters.getString(BODY)))
-            .configuration(responseType(ResponseType.JSON))
+                "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY)
+                    + "/issues/" + inputParameters.getRequiredString(ISSUE) + "/assignees"))
+            .body(Http.Body.of(
+                Map.of(ASSIGNEES, inputParameters.getRequiredString(ASSIGNEES))))
+            .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
     }

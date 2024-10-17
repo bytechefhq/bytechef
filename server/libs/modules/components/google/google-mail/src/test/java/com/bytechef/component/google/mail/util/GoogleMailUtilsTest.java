@@ -106,10 +106,13 @@ class GoogleMailUtilsTest {
     }
 
     @Test
-    void testGetLabelIdOptions() throws IOException {
+    void testGetLabelOptions() throws IOException {
         parameters = MockParametersFactory.create(Map.of(ACCESS_TOKEN, "id"));
 
-        List<Label> labels = List.of(new Label().setName("label1"), new Label().setName("label2"));
+        List<Label> labels = List.of(new Label().setName("label1")
+            .setId("label1"),
+            new Label().setName("label2")
+                .setId("label2"));
 
         when(mockedGmail.users())
             .thenReturn(mockedUsers);
@@ -120,7 +123,7 @@ class GoogleMailUtilsTest {
         when(mockedLabelsList.execute())
             .thenReturn(new ListLabelsResponse().setLabels(labels));
 
-        List<Option<String>> result = GoogleMailUtils.getLabelIdOptions(
+        List<Option<String>> result = GoogleMailUtils.getLabelOptions(
             parameters, parameters, Map.of(), anyString(), mockedContext);
 
         assertEquals("me", userIdArgumentCaptor.getValue());

@@ -16,57 +16,76 @@
 
 package com.bytechef.component.github.action;
 
-import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.github.constant.GithubConstants.ID;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE;
-import static com.bytechef.component.github.constant.GithubConstants.ISSUE_OUTPUT_PROPERTY;
+import static com.bytechef.component.github.constant.GithubConstants.LABELS;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static com.bytechef.component.github.util.GithubUtils.getOwnerName;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.github.util.GithubUtils;
+import java.util.Collections;
 import java.util.Map;
 
 /**
- * @author Luka Ljubić
+ * @author Mayank Madan
  */
-public class GithubGetIssueAction {
+public class GithubAddLabelsToIssueAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getIssue")
-        .title("Get Issue")
-        .description("Get information from a specific issue")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("addLabelsToIssue")
+        .title("Add labels to an issue")
+        .description("Adds labels to the specified issue.")
         .properties(
             string(REPOSITORY)
-                .label("Repository")
                 .options((ActionOptionsFunction<String>) GithubUtils::getRepositoryOptions)
+                .label("Repository")
                 .required(true),
             string(ISSUE)
-                .label("Issue")
-                .description("The issue you want to get details from.")
                 .options((ActionOptionsFunction<String>) GithubUtils::getIssueOptions)
                 .optionsLookupDependsOn(REPOSITORY)
+                .label("Issue")
+                .description("The issue to add labels to.")
+                .required(true),
+            string(LABELS)
+                .options((ActionOptionsFunction<String>) GithubUtils::getLabels)
+                .optionsLookupDependsOn(REPOSITORY)
+                .label("Labels")
+                .description("The list of labels to add to the issue.")
                 .required(true))
-        .output(outputSchema(ISSUE_OUTPUT_PROPERTY))
-        .perform(GithubGetIssueAction::perform);
+        .output(outputSchema(
+            array()
+                .items(
+                    object()
+                        .properties(
+                            string(ID),
+                            string("name"),
+                            string("description")))))
+        .perform(GithubAddLabelsToIssueAction::perform);
 
-    private GithubGetIssueAction() {
+    private GithubAddLabelsToIssueAction() {
     }
 
-    public static Map<String, Object> perform(
+    public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         return context
-            .http(http -> http.get(
-                "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY) + "/issues/"
-                    + inputParameters.getString(ISSUE)))
-            .configuration(responseType(ResponseType.JSON))
+            .http(http -> http.post(
+                "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY)
+                    + "/issues/" + inputParameters.getRequiredString(ISSUE) + "/labels"))
+            .body(Http.Body.of(
+                Map.of(LABELS, Collections.singletonList(inputParameters.getRequiredString(LABELS)))))
+            .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
     }

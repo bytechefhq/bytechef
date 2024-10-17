@@ -18,11 +18,12 @@ package com.bytechef.component.github;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.github.connection.GithubConnection.CONNECTION_DEFINITION;
-import static com.bytechef.component.github.constant.GithubConstants.GITHUB;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.github.action.GithubAddAssigneesToIssueAction;
+import com.bytechef.component.github.action.GithubAddLabelsToIssueAction;
 import com.bytechef.component.github.action.GithubCreateCommentOnIssueAction;
 import com.bytechef.component.github.action.GithubCreateIssueAction;
 import com.bytechef.component.github.action.GithubGetIssueAction;
@@ -36,7 +37,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class GithubComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(GITHUB)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("github")
         .title("Github")
         .description("GitHub is a web-based platform for version control and collaboration using Git.")
         .categories(ComponentCategory.DEVELOPER_TOOLS)
@@ -44,7 +45,9 @@ public class GithubComponentHandler implements ComponentHandler {
         .actions(
             GithubCreateIssueAction.ACTION_DEFINITION,
             GithubGetIssueAction.ACTION_DEFINITION,
-            GithubCreateCommentOnIssueAction.ACTION_DEFINITION)
+            GithubCreateCommentOnIssueAction.ACTION_DEFINITION,
+            GithubAddAssigneesToIssueAction.ACTION_DEFINITION,
+            GithubAddLabelsToIssueAction.ACTION_DEFINITION)
         .icon("path:assets/github.svg")
         .triggers(
             GithubNewIssueTrigger.TRIGGER_DEFINITION,

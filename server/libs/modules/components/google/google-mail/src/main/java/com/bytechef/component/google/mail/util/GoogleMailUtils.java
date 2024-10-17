@@ -239,7 +239,7 @@ public class GoogleMailUtils {
         return mimeMessage;
     }
 
-    public static List<Option<String>> getLabelIdOptions(
+    public static List<Option<String>> getLabelOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context)
         throws IOException {
@@ -254,7 +254,7 @@ public class GoogleMailUtils {
             .getLabels();
 
         for (Label label : labels) {
-            options.add(option(label.getName(), label.getName()));
+            options.add(option(label.getName(), label.getId()));
         }
 
         return options;

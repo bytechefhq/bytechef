@@ -21,6 +21,8 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.object.helper.action.ObjectHelperAddKeyValuePairsAction;
+import com.bytechef.component.object.helper.action.ObjectHelperAddValueByKeyAction;
 import com.bytechef.component.object.helper.action.ObjectHelperParseAction;
 import com.bytechef.component.object.helper.action.ObjectHelperStringifyAction;
 import com.bytechef.component.object.helper.constant.ObjectHelperConstants;
@@ -39,7 +41,9 @@ public class ObjectHelperComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.HELPERS)
         .actions(
             ObjectHelperParseAction.ACTION_DEFINITION,
-            ObjectHelperStringifyAction.ACTION_DEFINITION);
+            ObjectHelperStringifyAction.ACTION_DEFINITION,
+            ObjectHelperAddValueByKeyAction.ACTION_DEFINITION,
+            ObjectHelperAddKeyValuePairsAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

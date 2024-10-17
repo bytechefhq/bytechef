@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.nutshell.action.NutshellCreateCompanyAction;
 import com.bytechef.component.nutshell.action.NutshellCreateContactAction;
 import com.bytechef.component.nutshell.connection.NutshellConnection;
 import com.google.auto.service.AutoService;
@@ -40,7 +41,9 @@ public class NutshellComponentHandler implements ComponentHandler {
         .icon("path:assets/nutshell.svg")
         .categories(ComponentCategory.CRM)
         .connection(NutshellConnection.CONNECTION_DEFINITION)
-        .actions(NutshellCreateContactAction.ACTION_DEFINITION);
+        .actions(
+            NutshellCreateContactAction.ACTION_DEFINITION,
+            NutshellCreateCompanyAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

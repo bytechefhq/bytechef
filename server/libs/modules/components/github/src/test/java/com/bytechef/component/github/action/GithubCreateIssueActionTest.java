@@ -19,10 +19,13 @@ package com.bytechef.component.github.action;
 import static com.bytechef.component.github.constant.GithubConstants.BODY;
 import static com.bytechef.component.github.constant.GithubConstants.TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context.Http.Body;
-import java.util.HashMap;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -31,14 +34,13 @@ import org.junit.jupiter.api.Test;
  */
 class GithubCreateIssueActionTest extends AbstractGithubActionTest {
 
+    private final Map<String, Object> parameterMap = Map.of(TITLE, "name", BODY, "description");
+    private final Parameters mockedParameters = MockParametersFactory.create(parameterMap);
+
     @Test
     void testPerform() {
-        Map<String, Object> propertyStubsMap = createPropertyStubsMap();
-
-        when(mockedParameters.getRequiredString(TITLE))
-            .thenReturn((String) propertyStubsMap.get(TITLE));
-        when(mockedParameters.getString(BODY))
-            .thenReturn((String) propertyStubsMap.get(BODY));
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(responseMap);
 
         Map<String, Object> result = GithubCreateIssueAction.perform(mockedParameters, mockedParameters, mockedContext);
 
@@ -46,15 +48,6 @@ class GithubCreateIssueActionTest extends AbstractGithubActionTest {
 
         Body body = bodyArgumentCaptor.getValue();
 
-        assertEquals(propertyStubsMap, body.getContent());
-    }
-
-    private static Map<String, Object> createPropertyStubsMap() {
-        Map<String, Object> propertyStubsMap = new HashMap<>();
-
-        propertyStubsMap.put(TITLE, "name");
-        propertyStubsMap.put(BODY, "description");
-
-        return propertyStubsMap;
+        assertEquals(parameterMap, body.getContent());
     }
 }

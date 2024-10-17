@@ -18,9 +18,13 @@ package com.bytechef.component.github.action;
 
 import static com.bytechef.component.github.constant.GithubConstants.BODY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -29,10 +33,12 @@ import org.junit.jupiter.api.Test;
  */
 class GithubCreateCommentOnIssueActionTest extends AbstractGithubActionTest {
 
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(BODY, "comment"));
+
     @Test
     void testPerform() {
-        when(mockedParameters.getRequiredString(BODY))
-            .thenReturn("comment");
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(responseMap);
 
         Map<String, Object> result =
             GithubCreateCommentOnIssueAction.perform(mockedParameters, mockedParameters, mockedContext);

@@ -18,31 +18,35 @@ package com.bytechef.component.object.helper.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.SOURCE;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.object.helper.constant.ObjectHelperConstants;
 
 /**
  * @author Ivica Cardic
  */
 public class ObjectHelperParseAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(ObjectHelperConstants.PARSE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("parse")
         .title("Convert from JSON string")
         .description("Converts the JSON string to object/array.")
-        .properties(string(ObjectHelperConstants.SOURCE)
-            .label("Source")
-            .description("The JSON string to convert to the data.")
-            .required(true))
+        .properties(
+            string(SOURCE)
+                .label("Source")
+                .description("The JSON string to convert to the data.")
+                .required(true))
         .output()
         .perform(ObjectHelperParseAction::perform);
+
+    private ObjectHelperParseAction() {
+    }
 
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        Object input = inputParameters.getRequired(ObjectHelperConstants.SOURCE);
+        Object input = inputParameters.getRequired(SOURCE);
 
         return context.json(json -> json.read((String) input));
     }

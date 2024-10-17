@@ -95,10 +95,10 @@ public class GoogleMailSearchEmailAction {
                 .required(false),
             string(LABEL)
                 .label("Label")
-                .options((ActionOptionsFunction<String>) GoogleMailUtils::getLabelIdOptions)
+                .options((ActionOptionsFunction<String>) GoogleMailUtils::getLabelOptions)
                 .required(false),
             array(LABEL_IDS)
-                .label("Label IDs")
+                .label("Labels")
                 .description(
                     "Only return messages with labels that match all of the specified label IDs. Messages in a " +
                         "thread might have labels that other messages in the same thread don't have.")

@@ -16,7 +16,6 @@
 
 package com.bytechef.component.nutshell.action;
 
-import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
@@ -34,40 +33,41 @@ import static com.bytechef.component.nutshell.constant.NutshellConstants.VALUE;
 import static com.bytechef.component.nutshell.util.NutshellUtils.createEntityBasedOnType;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 
 /**
- * @author Monika Kušter
+ * @author Kalaiyarasan Raja
  */
-public class NutshellCreateContactAction {
+public class NutshellCreateCompanyAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
-        .title("Create Contact")
-        .description("Creates new contact")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createCompany")
+        .title("Create Company")
+        .description("Creates new company")
         .properties(
             string(NAME)
                 .label("Name")
-                .description("Full name of the contact.")
+                .description("Full name of the company.")
                 .required(true),
             string(DESCRIPTION)
                 .label("Description")
-                .description("Description of the contact, which appears under their name.")
+                .description("Detailed Description of the company.")
                 .required(false),
             string(EMAIL)
                 .label("Email")
-                .description("Primary email address of the contact.")
+                .description("Primary email address of the company.")
                 .required(false),
             string(PHONE)
                 .label("Phone")
-                .description("Primary phone number of the contact")
+                .description("Primary phone number of the company")
                 .controlType(ControlType.PHONE)
                 .required(false))
         .output(
             outputSchema(
                 object()
                     .properties(
-                        array("contacts")
+                        array("accounts")
                             .items(
                                 object()
                                     .properties(
@@ -89,14 +89,14 @@ public class NutshellCreateContactAction {
                                                         bool(IS_PRIMARY),
                                                         string(NAME),
                                                         string(VALUE))))))))
-        .perform(NutshellCreateContactAction::perform);
+        .perform(NutshellCreateCompanyAction::perform);
 
-    private NutshellCreateContactAction() {
+    private NutshellCreateCompanyAction() {
     }
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return createEntityBasedOnType(inputParameters, actionContext, false);
+        return createEntityBasedOnType(inputParameters, actionContext, true);
     }
 }

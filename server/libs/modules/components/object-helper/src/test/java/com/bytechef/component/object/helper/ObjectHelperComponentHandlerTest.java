@@ -22,10 +22,10 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class ObjectHelperComponentHandlerTest {
+class ObjectHelperComponentHandlerTest {
 
     @Test
-    public void testGetComponentDefinition() {
+    void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
             "definition/object-helper_v1.json", new ObjectHelperComponentHandler().getDefinition());
     }

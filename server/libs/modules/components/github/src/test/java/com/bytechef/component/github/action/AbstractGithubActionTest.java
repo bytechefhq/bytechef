@@ -22,8 +22,6 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +35,6 @@ abstract class AbstractGithubActionTest {
     protected ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
     protected ActionContext mockedContext = mock(ActionContext.class);
     protected Http.Executor mockedExecutor = mock(Http.Executor.class);
-    protected Parameters mockedParameters = mock(Parameters.class);
     protected Http.Response mockedResponse = mock(Http.Response.class);
     protected Map<String, Object> responseMap = Map.of("result", List.of("123", "abc"));
 
@@ -51,7 +48,5 @@ abstract class AbstractGithubActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseMap);
     }
 }

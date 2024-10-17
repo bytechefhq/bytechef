@@ -32,9 +32,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
 /**
- * @author Monika Kušter
+ * @author Kalaiyarasan Raja
  */
-class NutshellCreateContactActionTest {
+class NutshellCreateCompanyActionTest {
 
     private final ActionContext mockedContext = mock(ActionContext.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
@@ -44,10 +44,10 @@ class NutshellCreateContactActionTest {
     void testPerform() {
         try (MockedStatic<NutshellUtils> nutshellUtilsMockedStatic = mockStatic(NutshellUtils.class)) {
 
-            NutshellCreateContactAction.perform(mockedParameters, mockedParameters, mockedContext);
+            NutshellCreateCompanyAction.perform(mockedParameters, mockedParameters, mockedContext);
 
             nutshellUtilsMockedStatic.verify(
-                () -> NutshellUtils.createEntityBasedOnType(mockedParameters, mockedContext, false), times(1));
+                () -> NutshellUtils.createEntityBasedOnType(mockedParameters, mockedContext, true), times(1));
         }
     }
 }
