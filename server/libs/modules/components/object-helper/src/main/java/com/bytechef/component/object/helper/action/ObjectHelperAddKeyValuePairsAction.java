@@ -39,7 +39,6 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -126,7 +125,8 @@ public class ObjectHelperAddKeyValuePairsAction {
             List<Map<String, Object>> mapList = new ArrayList<>();
             List<Object> modifiedArray = inputParameters.getRequiredList(SOURCE, Object.class);
             for (Object sourceObject : modifiedArray) {
-                Map<String, Object> sourceMap = objectMapper.convertValue(sourceObject, new TypeReference<Map<String, Object>>() {});
+                Map<String, Object> sourceMap =
+                    objectMapper.convertValue(sourceObject, new TypeReference<Map<String, Object>>() {});
 
                 mapList.add(addKeyValuePairsToObject(sourceMap, keyValuePairs));
             }
