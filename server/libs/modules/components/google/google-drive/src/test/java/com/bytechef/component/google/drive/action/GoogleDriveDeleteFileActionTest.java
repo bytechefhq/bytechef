@@ -57,7 +57,7 @@ class GoogleDriveDeleteFileActionTest extends AbstractGoogleDriveActionTest {
     }
 
     @Test
-    public void testPerformThrowsIOException() throws IOException {
+    void testPerformThrowsIOException() throws IOException {
         when(mockedFiles.delete(fileIdArgumentCaptor.capture()))
             .thenReturn(mockedDelete);
 
