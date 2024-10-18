@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Mayank Madan
  */
-public class GoogleDriveCopyFileActionTest extends AbstractGoogleDriveActionTest {
+class GoogleDriveCopyFileActionTest extends AbstractGoogleDriveActionTest {
     private final Parameters mockInputParameters = MockParametersFactory.create(
         Map.of(FILE_ID, "originalFileId", FILE_NAME, "newFileName", PARENT_FOLDER, "newFolderId"));
     private final File testFile = new File()
@@ -43,7 +43,7 @@ public class GoogleDriveCopyFileActionTest extends AbstractGoogleDriveActionTest
         .setMimeType("application/pdf");
 
     @Test
-    public void testPerform() throws IOException {
+    void testPerform() throws IOException {
         when(mockedFiles.get(fileIdArgumentCaptor.capture()))
             .thenReturn(mockedGet);
         when(mockedGet.execute())

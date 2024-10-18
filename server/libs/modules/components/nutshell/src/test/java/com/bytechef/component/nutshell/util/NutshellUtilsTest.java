@@ -40,7 +40,7 @@ import org.mockito.ArgumentCaptor;
 /**
  * @author Monika Kušter
  */
-public class NutshellUtilsTest {
+class NutshellUtilsTest {
 
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
     private final ActionContext mockedContext = mock(ActionContext.class);
