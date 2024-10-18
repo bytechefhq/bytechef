@@ -35,16 +35,17 @@ class ObjectHelperAddKeyValuePairActionTest {
 
     @Test
     void testPerformForObject() {
-        testWith("{'a':1}", "[1, 2, 3]", "{'a':1}");
-        testWith("{'a':1}", "[['b', 2], 3, ['c', 3, 3]]", "{'a':1,'b':2}");
-        testWith("{'a':1}", "[['a', 2]]", "{'a':2}");
+        testWith("{'a':1}", "{'b':2}", "{'a':1,'b':2}");
+        testWith("{'a':1}", "{'a':2}", "{'a':2}");
+        testWith("{'a':1}", "{'a':2,'c':3}", "{'a':2,'c':3}");
+        testWith("{'a':1}", "{'b':{'a':[{'c':1}]}}", "{'a':1,'b':{'a':[{'c':1}]}}");
     }
 
     @Test
     void testPerformForArray() {
-        testWith("[{'a':1}]", "[1, 2, 3]", "[{'a':1}]");
-        testWith("[{'a':1}, {'b':1}]", "[['b', 2]]", "[{'a':1,'b':2}, {'b':2}]");
-        testWith("[{'a':1}, {'b':1}]", "[[1, 2]]", "[{'a':1}, {'b':1}]");
+        testWith("[{'a':1}]", "{'b':2}", "[{'a':1,'b':2}]");
+        testWith("[{'a':1}, {'b':1}]", "{'a':2}", "[{'a':2},{'a':2,'b':1}]");
+        testWith("[{'a':1}, {'b':1}]", "{'b':{'a':[{'c':1}]}}", "[{'a':1,'b':{'a':[{'c':1}]}},{'b':{'a':[{'c':1}]}}]");
     }
 
     private void testWith(String sourceJson, String valueJson, String expectedJson) {
