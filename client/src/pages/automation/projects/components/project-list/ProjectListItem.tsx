@@ -152,13 +152,9 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                                     <span className="text-base font-semibold">{project.name}</span>
                                 )}
                             </Link>
-
-                            {project.category && (
-                                <span className="text-xs uppercase text-gray-700">{project.category.name}</span>
-                            )}
                         </div>
 
-                        <div className="relative mt-2 min-h-8 sm:flex sm:items-center sm:justify-between">
+                        <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">
                             <div className="flex items-center">
                                 <CollapsibleTrigger className="group mr-4 flex items-center text-xs font-semibold text-gray-700">
                                     <div className="mr-1">
