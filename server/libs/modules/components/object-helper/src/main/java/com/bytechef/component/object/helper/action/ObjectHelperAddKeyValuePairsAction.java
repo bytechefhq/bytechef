@@ -49,6 +49,8 @@ import java.util.Map;
  */
 public class ObjectHelperAddKeyValuePairsAction {
 
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("addKeyValuePairs")
         .title("Add Key-Value pairs to object or array")
         .description(
@@ -88,6 +90,32 @@ public class ObjectHelperAddKeyValuePairsAction {
         .perform(ObjectHelperAddKeyValuePairsAction::perform)
         .output(getOutputSchema());
 
+    private ObjectHelperAddKeyValuePairsAction() {
+    }
+
+    protected static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+
+        Integer sourceType = inputParameters.getRequiredInteger(SOURCE_TYPE);
+        Map<String, Object> keyValuePairs = inputParameters.getRequiredMap(VALUE, Object.class);
+
+        if (sourceType.equals(1)) {
+            List<Map<String, Object>> mapList = new ArrayList<>();
+            List<Object> modifiedArray = inputParameters.getRequiredList(SOURCE, Object.class);
+            for (Object sourceObject : modifiedArray) {
+                Map<String, Object> sourceMap =
+                    OBJECT_MAPPER.convertValue(sourceObject, new TypeReference<Map<String, Object>>() {});
+
+                mapList.add(addKeyValuePairsToObject(sourceMap, keyValuePairs));
+            }
+            return mapList;
+        } else {
+            Map<String, Object> modifiedObject = inputParameters.getRequiredMap(SOURCE, Object.class);
+
+            return addKeyValuePairsToObject(new HashMap<>(modifiedObject), keyValuePairs);
+        }
+    }
+
     private static ActionDefinition.SingleConnectionOutputFunction getOutputSchema() {
         return (inputParameters, connectionParameters, context) -> {
             int sourceType = inputParameters.getRequiredInteger(SOURCE_TYPE);
@@ -108,34 +136,6 @@ public class ObjectHelperAddKeyValuePairsAction {
                             time()));
             }
         };
-    }
-
-    private ObjectHelperAddKeyValuePairsAction() {
-    }
-
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        Integer sourceType = inputParameters.getRequiredInteger(SOURCE_TYPE);
-        Map<String, Object> keyValuePairs = inputParameters.getRequiredMap(VALUE, Object.class);
-
-        if (sourceType.equals(1)) {
-            List<Map<String, Object>> mapList = new ArrayList<>();
-            List<Object> modifiedArray = inputParameters.getRequiredList(SOURCE, Object.class);
-            for (Object sourceObject : modifiedArray) {
-                Map<String, Object> sourceMap =
-                    objectMapper.convertValue(sourceObject, new TypeReference<Map<String, Object>>() {});
-
-                mapList.add(addKeyValuePairsToObject(sourceMap, keyValuePairs));
-            }
-            return mapList;
-        } else {
-            Map<String, Object> modifiedObject = inputParameters.getRequiredMap(SOURCE, Object.class);
-
-            return addKeyValuePairsToObject(new HashMap<>(modifiedObject), keyValuePairs);
-        }
     }
 
     private static Map<String, Object> addKeyValuePairsToObject(
