@@ -16,18 +16,24 @@
 
 package com.bytechef.component.nutshell.util;
 
+import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.DESCRIPTION;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.EMAIL;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.EMAILS;
+import static com.bytechef.component.nutshell.constant.NutshellConstants.ID;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.NAME;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.PHONE;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.PHONES;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.VALUE;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,17 +62,55 @@ public class NutshellUtils {
         map.put(NAME, inputParameters.getRequiredString(NAME));
         map.put(DESCRIPTION, inputParameters.getString(DESCRIPTION, ""));
 
-        addIfPresent(inputParameters, EMAIL, EMAILS, map);
-        addIfPresent(inputParameters, PHONE, PHONES, map);
+        addToListIfPresent(inputParameters, EMAIL, EMAILS, map);
+        addToListIfPresent(inputParameters, PHONE, PHONES, map);
 
         return map;
     }
 
-    private static void addIfPresent(Parameters inputParameters, String key, String mapKey, Map<String, Object> map) {
+    private static void
+        addToListIfPresent(Parameters inputParameters, String key, String mapKey, Map<String, Object> map) {
         String value = inputParameters.getString(key);
 
         if (value != null) {
             map.put(mapKey, List.of(Map.of(VALUE, value)));
         }
+    }
+
+    public static void addIfPresent(Parameters inputParameters, String key, String mapKey, Map<String, Object> map) {
+        String value = inputParameters.getString(key);
+
+        if (value != null) {
+            map.put(mapKey, Map.of(key, value));
+        }
+    }
+
+    public static List<Option<String>> getUserOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringMap, String s,
+        Context context) {
+
+        List<Option<String>> options = new ArrayList<>();
+        Map<String, ?> body = context.http(http -> http.get("/users"))
+            .configuration(responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        if (body.get("users") instanceof List<?> userList) {
+            options = getOptions(userList, NAME, ID);
+        }
+
+        return options;
+
+    }
+
+    private static List<Option<String>> getOptions(List<?> itemList, String label, String value) {
+        List<Option<String>> options = new ArrayList<>();
+
+        for (Object item : itemList) {
+            if (item instanceof Map<?, ?> map) {
+                options.add(option((String) map.get(label), String.valueOf(map.get(value))));
+            }
+        }
+        return options;
     }
 }
