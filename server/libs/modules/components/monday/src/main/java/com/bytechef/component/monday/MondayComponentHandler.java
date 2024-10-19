@@ -21,6 +21,7 @@ import static com.bytechef.component.monday.constant.MondayConstants.MONDAY;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.monday.action.MondayCreateBoardAction;
 import com.bytechef.component.monday.action.MondayCreateColumnAction;
 import com.bytechef.component.monday.action.MondayCreateGroupAction;
 import com.bytechef.component.monday.action.MondayCreateItemAction;
@@ -43,7 +44,8 @@ public class MondayComponentHandler implements ComponentHandler {
         .actions(
             MondayCreateColumnAction.ACTION_DEFINITION,
             MondayCreateGroupAction.ACTION_DEFINITION,
-            MondayCreateItemAction.ACTION_DEFINITION)
+            MondayCreateItemAction.ACTION_DEFINITION,
+            MondayCreateBoardAction.ACTION_DEFINITION)
         .triggers(MondayNewItemInBoardTrigger.TRIGGER_DEFINITION);
 
     @Override
