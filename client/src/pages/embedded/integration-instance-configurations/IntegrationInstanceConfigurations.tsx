@@ -122,6 +122,7 @@ const IntegrationInstanceConfigurations = () => {
                         }
                         title={
                             <IntegrationInstanceConfigurationsFilterTitle
+                                environment={environment}
                                 filterData={filterData}
                                 integrations={integrations}
                                 tags={tags}
@@ -255,6 +256,7 @@ const IntegrationInstanceConfigurations = () => {
                 </>
             }
             leftSidebarHeader={<Header position="sidebar" title="Instance Configurations" />}
+            leftSidebarWidth="72"
         >
             <PageLoader
                 errors={[

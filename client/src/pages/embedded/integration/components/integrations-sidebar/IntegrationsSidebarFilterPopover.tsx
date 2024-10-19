@@ -30,7 +30,7 @@ const IntegrationsSidebarFilterPopover = () => {
                 <div>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button className="size-8" size="icon" variant="ghost">
+                            <Button className="size-8 hover:bg-background/50" size="icon" variant="ghost">
                                 <FilterIcon className="size-5" />
                             </Button>
                         </TooltipTrigger>

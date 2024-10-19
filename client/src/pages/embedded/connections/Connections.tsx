@@ -100,6 +100,7 @@ export const Connections = () => {
                         title={
                             <ConnectionsFilterTitle
                                 componentDefinitions={componentDefinitions}
+                                environment={environment}
                                 filterData={filterData}
                                 tags={tags}
                             />
@@ -190,6 +191,7 @@ export const Connections = () => {
                 </>
             }
             leftSidebarHeader={<Header position="sidebar" title="Connections" />}
+            leftSidebarWidth="72"
         >
             <PageLoader
                 errors={[allConnectionsError, connectionsError, tagsError]}

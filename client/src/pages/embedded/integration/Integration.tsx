@@ -254,7 +254,7 @@ const Integration = () => {
             <LayoutContainer
                 className={twMerge('bg-muted/50', !leftSidebarOpen && 'border-l')}
                 leftSidebarBody={<IntegrationsSidebar integrationId={+integrationId!} />}
-                leftSidebarClass="bg-muted border-l border-gray-200"
+                leftSidebarClass="bg-muted"
                 leftSidebarHeader={<Header right={<IntegrationsSidebarFilterPopover />} title="Integrations" />}
                 leftSidebarOpen={leftSidebarOpen}
                 leftSidebarWidth="96"
@@ -272,7 +272,7 @@ const Integration = () => {
                 rightSidebarOpen={rightSidebarOpen}
                 rightSidebarWidth="96"
                 rightToolbarBody={<RightSidebar navigation={rightSidebarNavigation} />}
-                rightToolbarClass="border-l border-l-gray-200 bg-muted/50"
+                rightToolbarClass="border-l bg-muted/50"
                 rightToolbarOpen={true}
                 topHeader={
                     integrationId && (

@@ -1,3 +1,4 @@
+import {Badge} from '@/components/ui/badge';
 import {Type} from '@/pages/embedded/connections/Connections';
 import {Tag} from '@/shared/middleware/embedded/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
@@ -6,10 +7,12 @@ import {useSearchParams} from 'react-router-dom';
 
 const ConnectionsFilterTitle = ({
     componentDefinitions,
+    environment,
     filterData,
     tags,
 }: {
     componentDefinitions: ComponentDefinitionBasic[] | undefined;
+    environment: number;
     filterData: {id: string | number | null | undefined; type: Type};
     tags: Tag[] | undefined;
 }) => {
@@ -27,9 +30,21 @@ const ConnectionsFilterTitle = ({
 
     return (
         <div className="space-x-1">
-            <span className="text-sm uppercase text-muted-foreground">{`Filter by ${searchParams.get('tagId') ? 'tag' : 'component'}:`}</span>
+            <span className="text-sm uppercase text-muted-foreground">Filter by environment:</span>
 
-            <span className="text-base">{pageTitle ?? 'All Components'}</span>
+            <Badge variant="secondary">
+                <span className="text-sm">
+                    {environment === 1 ? 'Development' : environment === 2 ? 'Test' : 'Production'}
+                </span>
+            </Badge>
+
+            <span className="text-sm uppercase text-muted-foreground">
+                {searchParams.get('tagId') ? 'tag' : 'component'}:
+            </span>
+
+            <Badge variant="secondary">
+                <span className="text-sm">{pageTitle ?? 'All Components'}</span>
+            </Badge>
         </div>
     );
 };

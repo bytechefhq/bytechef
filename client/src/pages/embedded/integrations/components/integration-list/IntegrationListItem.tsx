@@ -147,11 +147,11 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                                 {integration?.integrationWorkflowIds &&
                                 integration?.integrationWorkflowIds.length > 0 ? (
                                     <Link
-                                        className="flex items-center gap-2"
+                                        className="flex items-center gap-1"
                                         to={`/embedded/integrations/${integration?.id}/integration-workflows/${integration?.integrationWorkflowIds![0]}?${searchParams}`}
                                     >
                                         {componentDefinition?.icon && (
-                                            <InlineSVG className="size-6 flex-none" src={componentDefinition.icon} />
+                                            <InlineSVG className="size-5 flex-none" src={componentDefinition.icon} />
                                         )}
 
                                         <span className="text-base font-semibold text-gray-900">
@@ -159,19 +159,15 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                                         </span>
                                     </Link>
                                 ) : (
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-1">
                                         {componentDefinition?.icon && (
-                                            <InlineSVG className="size-6 flex-none" src={componentDefinition.icon} />
+                                            <InlineSVG className="size-5 flex-none" src={componentDefinition.icon} />
                                         )}
 
                                         <span className="text-base font-semibold text-gray-900">
                                             {integration?.name}
                                         </span>
                                     </div>
-                                )}
-
-                                {integration.category && (
-                                    <span className="text-xs uppercase text-gray-700">{integration.category.name}</span>
                                 )}
                             </div>
                         </div>

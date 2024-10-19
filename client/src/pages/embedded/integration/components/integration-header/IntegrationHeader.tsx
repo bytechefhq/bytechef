@@ -189,7 +189,7 @@ const IntegrationHeader = ({
     };
 
     return (
-        <header className="flex items-center border-b bg-muted/50 py-2 pl-3 pr-2.5">
+        <header className="flex items-center border-b bg-muted/50 py-2.5 pl-3 pr-2.5">
             <div className="flex flex-1">{integration && <IntegrationHeaderTitle integration={integration} />}</div>
 
             <div className="flex items-center space-x-12">
@@ -210,7 +210,7 @@ const IntegrationHeader = ({
                             createWorkflowMutation={createIntegrationWorkflowMutation}
                             parentId={integrationId}
                             triggerNode={
-                                <Button className="hover:bg-muted" size="icon" variant="ghost">
+                                <Button className="hover:bg-background/70" size="icon" variant="ghost">
                                     <Tooltip>
                                         <TooltipTrigger asChild>
                                             <PlusIcon className="mx-2 size-5" />

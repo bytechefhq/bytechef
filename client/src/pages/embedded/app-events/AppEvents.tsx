@@ -45,6 +45,7 @@ const AppEvents = () => {
                     />
                 }
                 leftSidebarHeader={<Header title="App Events" />}
+                leftSidebarWidth="72"
             >
                 {appEvents && appEvents.length > 0 ? (
                     <AppEventList appEvents={appEvents} />

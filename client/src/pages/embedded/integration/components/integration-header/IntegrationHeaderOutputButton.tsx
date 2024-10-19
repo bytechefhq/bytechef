@@ -16,7 +16,7 @@ const IntegrationHeaderOutputButton = ({
         <Tooltip>
             <TooltipTrigger asChild>
                 <Button
-                    className="hover:bg-muted"
+                    className="hover:bg-background/70"
                     onClick={() => {
                         setShowBottomPanelOpen(!showBottomPanel);
 

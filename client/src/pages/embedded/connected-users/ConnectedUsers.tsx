@@ -199,7 +199,10 @@ const ConnectedUsers = () => {
                     </Footer>
                 )
             }
-            header={connectedUsers && connectedUsers?.length > 0 && <Header position="main" title="All Users" />}
+            header={
+                connectedUsers &&
+                connectedUsers?.length > 0 && <Header centerTitle={true} position="main" title="All Users" />
+            }
             leftSidebarBody={
                 <Form {...form}>
                     <form className="space-y-4 px-4" onSubmit={form.handleSubmit(filterConnectedUsers)}>
