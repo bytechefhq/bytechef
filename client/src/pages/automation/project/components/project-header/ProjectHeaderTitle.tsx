@@ -13,7 +13,12 @@ const ProjectHeaderTitle = ({project}: {project: Project}) => {
         <div className="flex items-center space-x-2">
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Button onClick={() => setLeftSidebarOpen(!leftSidebarOpen)} size="icon" variant="ghost">
+                    <Button
+                        className="hover:bg-background/70"
+                        onClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
+                        size="icon"
+                        variant="ghost"
+                    >
                         <PanelLeftIcon className="size-5" />
                     </Button>
                 </TooltipTrigger>
