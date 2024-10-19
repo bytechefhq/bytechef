@@ -145,9 +145,7 @@ const ProjectInstanceListItem = ({projectInstance, remainingTags}: ProjectInstan
 
                     <div className="flex items-center justify-end gap-x-6">
                         <div className="flex flex-col items-end gap-y-4">
-                            <Badge variant={projectInstance.enabled ? 'success' : 'secondary'}>
-                                {projectInstance.enabled ? 'Enabled' : 'Disabled'}
-                            </Badge>
+                            <Switch checked={projectInstance.enabled} onCheckedChange={handleOnCheckedChange} />
 
                             <Tooltip>
                                 <TooltipTrigger className="flex items-center text-sm text-gray-500">
@@ -163,12 +161,6 @@ const ProjectInstanceListItem = ({projectInstance, remainingTags}: ProjectInstan
                                 <TooltipContent>Last Execution Date</TooltipContent>
                             </Tooltip>
                         </div>
-
-                        <Switch
-                            checked={projectInstance.enabled}
-                            className="mr-11"
-                            onCheckedChange={handleOnCheckedChange}
-                        />
 
                         <ProjectInstanceListItemDropdownMenu
                             onDeleteClick={() => setShowDeleteDialog(true)}
