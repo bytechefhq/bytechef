@@ -129,11 +129,13 @@ const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps
                         <div className="flex items-center justify-end gap-x-6">
                             <div className="flex flex-col items-end gap-y-4">
                                 {connection.credentialStatus === 'VALID' ? (
-                                    <Badge variant={connection.active ? 'success' : 'secondary'}>
+                                    <Badge className="uppercase" variant={connection.active ? 'success' : 'secondary'}>
                                         {connection.active ? 'Active' : 'Not Active'}
                                     </Badge>
                                 ) : (
-                                    <Badge variant="destructive">{connection.credentialStatus}</Badge>
+                                    <Badge className="uppercase" variant="destructive">
+                                        {connection.credentialStatus}
+                                    </Badge>
                                 )}
 
                                 {connection.createdDate && (

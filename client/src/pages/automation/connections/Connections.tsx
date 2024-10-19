@@ -105,6 +105,7 @@ export const Connections = () => {
                         title={
                             <ConnectionsFilterTitle
                                 componentDefinitions={componentDefinitions}
+                                environment={environment}
                                 filterData={filterData}
                                 tags={tags}
                             />
