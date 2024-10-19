@@ -25,11 +25,15 @@ public class MondayConstants {
 
     public static final String BOARD_ID = "board_id";
     public static final String BOARDS = "boards";
+    public static final String BOARD_NAME = "board_name";
+    public static final String BOARD_KIND = "board_kind";
     public static final String COLUMN_TYPE = "column_type";
+    public static final String CREATE_BOARD = "createBoard";
     public static final String CREATE_COLUMN = "createColumn";
     public static final String CREATE_GROUP = "createGroup";
     public static final String CREATE_ITEM = "createItem";
     public static final String DATA = "data";
+    public static final String DESCRIPTION = "description";
     public static final String END_DATE = "endDate";
     public static final String FROM = "from";
     public static final String GROUP_ID = "group_id";
