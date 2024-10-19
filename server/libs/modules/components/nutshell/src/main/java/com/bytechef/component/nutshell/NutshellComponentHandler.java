@@ -23,6 +23,7 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.nutshell.action.NutshellCreateCompanyAction;
 import com.bytechef.component.nutshell.action.NutshellCreateContactAction;
+import com.bytechef.component.nutshell.action.NutshellCreateLeadAction;
 import com.bytechef.component.nutshell.connection.NutshellConnection;
 import com.google.auto.service.AutoService;
 
@@ -43,7 +44,8 @@ public class NutshellComponentHandler implements ComponentHandler {
         .connection(NutshellConnection.CONNECTION_DEFINITION)
         .actions(
             NutshellCreateContactAction.ACTION_DEFINITION,
-            NutshellCreateCompanyAction.ACTION_DEFINITION);
+            NutshellCreateCompanyAction.ACTION_DEFINITION,
+            NutshellCreateLeadAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
