@@ -153,26 +153,6 @@ const ProjectInstanceWorkflowListItem = ({
 
                 {projectInstanceWorkflow && (
                     <div className="flex items-center gap-x-4">
-                        <Switch
-                            checked={projectInstanceWorkflow.enabled}
-                            disabled={projectInstanceEnabled}
-                            onCheckedChange={(value) => {
-                                enableProjectInstanceWorkflowMutation.mutate(
-                                    {
-                                        enable: value,
-                                        id: projectInstanceId,
-                                        workflowId: workflow.id!,
-                                    },
-                                    {
-                                        onSuccess: () => {
-                                            projectInstanceWorkflow.enabled = !projectInstanceWorkflow?.enabled;
-                                        },
-                                    }
-                                );
-                            }}
-                            onClick={(event) => event.stopPropagation()}
-                        />
-
                         {(!workflow.triggers?.length || workflow.triggers?.[0]?.type.includes('manual')) && (
                             <Button
                                 disabled={!projectInstanceEnabled || !projectInstanceWorkflow.enabled}
@@ -207,8 +187,26 @@ const ProjectInstanceWorkflowListItem = ({
                             </Button>
                         )}
 
-                        {!(workflow.triggers?.length == 0 || workflow.triggers?.[0]?.type.includes('manual')) &&
-                            !projectInstanceWorkflow.staticWebhookUrl && <div className="w-9"></div>}
+                        <Switch
+                            checked={projectInstanceWorkflow.enabled}
+                            className="mr-2"
+                            disabled={projectInstanceEnabled}
+                            onCheckedChange={(value) => {
+                                enableProjectInstanceWorkflowMutation.mutate(
+                                    {
+                                        enable: value,
+                                        id: projectInstanceId,
+                                        workflowId: workflow.id!,
+                                    },
+                                    {
+                                        onSuccess: () => {
+                                            projectInstanceWorkflow.enabled = !projectInstanceWorkflow?.enabled;
+                                        },
+                                    }
+                                );
+                            }}
+                            onClick={(event) => event.stopPropagation()}
+                        />
 
                         <ProjectInstanceWorkflowListItemDropdownMenu
                             onEditClick={() => setShowEditWorkflowDialog(true)}
