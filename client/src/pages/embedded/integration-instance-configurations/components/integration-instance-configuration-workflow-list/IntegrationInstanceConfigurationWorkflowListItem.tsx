@@ -137,6 +137,7 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
                     <div className="flex items-center gap-x-4">
                         <Switch
                             checked={integrationInstanceConfigurationWorkflow.enabled}
+                            className="mr-2"
                             disabled={integrationInstanceConfigurationEnabled}
                             onCheckedChange={(value) => {
                                 enableIntegrationInstanceConfigurationWorkflowMutation.mutate(

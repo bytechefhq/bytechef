@@ -75,6 +75,7 @@ const Integrations = () => {
             }
             leftSidebarBody={<IntegrationsLeftSidebarNav categories={categories} filterData={filterData} tags={tags} />}
             leftSidebarHeader={<Header position="sidebar" title="Integrations" />}
+            leftSidebarWidth="72"
         >
             <PageLoader
                 errors={[categoriesError, integrationsError, tagsError]}

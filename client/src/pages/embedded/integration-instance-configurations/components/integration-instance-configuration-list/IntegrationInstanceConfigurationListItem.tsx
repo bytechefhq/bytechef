@@ -102,16 +102,6 @@ const IntegrationInstanceConfigurationListItem = ({
                     <div className="flex-1">
                         <div className="flex items-center justify-between">
                             <div className="flex w-full items-center gap-2">
-                                <div className="flex items-center gap-2">
-                                    {componentDefinition?.icon && (
-                                        <InlineSVG className="size-6 flex-none" src={componentDefinition.icon} />
-                                    )}
-
-                                    <span className="text-base font-semibold text-gray-900">
-                                        {integrationInstanceConfiguration?.name}
-                                    </span>
-                                </div>
-
                                 {integrationInstanceConfiguration.integrationVersion ? (
                                     <Badge variant="secondary">
                                         V{integrationInstanceConfiguration.integrationVersion}
@@ -120,9 +110,15 @@ const IntegrationInstanceConfigurationListItem = ({
                                     ''
                                 )}
 
-                                <span className="text-xs uppercase text-gray-700">
-                                    {integrationInstanceConfiguration?.environment}
-                                </span>
+                                <div className="flex items-center gap-1">
+                                    {componentDefinition?.icon && (
+                                        <InlineSVG className="size-5 flex-none" src={componentDefinition.icon} />
+                                    )}
+
+                                    <span className="text-base font-semibold text-gray-900">
+                                        {integrationInstanceConfiguration?.name}
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
@@ -172,9 +168,10 @@ const IntegrationInstanceConfigurationListItem = ({
 
                     <div className="flex items-center justify-end gap-x-6">
                         <div className="flex flex-col items-end gap-y-4">
-                            <Badge variant={integrationInstanceConfiguration.enabled ? 'success' : 'secondary'}>
-                                {integrationInstanceConfiguration.enabled ? 'Enabled' : 'Disabled'}
-                            </Badge>
+                            <Switch
+                                checked={integrationInstanceConfiguration.enabled}
+                                onCheckedChange={handleOnCheckedChange}
+                            />
 
                             <Tooltip>
                                 <TooltipTrigger className="flex items-center text-sm text-gray-500">
@@ -183,18 +180,13 @@ const IntegrationInstanceConfigurationListItem = ({
                                             {`Executed at ${integrationInstanceConfiguration.lastExecutionDate?.toLocaleDateString()} ${integrationInstanceConfiguration.lastExecutionDate?.toLocaleTimeString()}`}
                                         </span>
                                     ) : (
-                                        '-'
+                                        <span className="text-xs">No executions</span>
                                     )}
                                 </TooltipTrigger>
 
                                 <TooltipContent>Last Execution Date</TooltipContent>
                             </Tooltip>
                         </div>
-
-                        <Switch
-                            checked={integrationInstanceConfiguration.enabled}
-                            onCheckedChange={handleOnCheckedChange}
-                        />
 
                         <IntegrationInstanceConfigurationListItemDropdownMenu
                             integrationInstanceConfigurationEnabled={integrationInstanceConfiguration.enabled!}

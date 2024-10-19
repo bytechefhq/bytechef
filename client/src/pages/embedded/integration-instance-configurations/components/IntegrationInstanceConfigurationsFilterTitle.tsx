@@ -1,13 +1,16 @@
+import {Badge} from '@/components/ui/badge';
 import {Type} from '@/pages/embedded/integration-instance-configurations/IntegrationInstanceConfigurations';
 import {Integration, Tag} from '@/shared/middleware/embedded/configuration';
 import {ReactNode} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
 const IntegrationInstanceConfigurationsFilterTitle = ({
+    environment,
     filterData,
     integrations,
     tags,
 }: {
+    environment: number;
     filterData: {id?: number | string; type: Type};
     integrations: Integration[] | undefined;
     tags: Tag[] | undefined;
@@ -24,9 +27,19 @@ const IntegrationInstanceConfigurationsFilterTitle = ({
 
     return (
         <div className="space-x-1">
-            <span className="text-sm uppercase text-muted-foreground">{`Filter by ${searchParams.get('tagId') ? 'tag' : 'integration'}:`}</span>
+            <span className="text-sm uppercase text-muted-foreground">Filter by environment:</span>
 
-            <span className="text-base">{pageTitle ?? 'All Integrations'}</span>
+            <Badge variant="secondary">
+                <span className="text-sm">{environment === 1 ? 'Test' : 'Production'}</span>
+            </Badge>
+
+            <span className="text-sm uppercase text-muted-foreground">
+                {searchParams.get('tagId') ? 'tag' : 'integration'}:
+            </span>
+
+            <Badge variant="secondary">
+                <span className="text-sm">{pageTitle ?? 'All Integrations'}</span>
+            </Badge>
         </div>
     );
 };

@@ -86,10 +86,10 @@ const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps
                         <div className="flex items-center justify-between">
                             <div className="relative flex items-center gap-2">
                                 {componentDefinition?.icon && (
-                                    <InlineSVG className="size-6 flex-none" src={componentDefinition.icon} />
+                                    <InlineSVG className="size-5 flex-none" src={componentDefinition.icon} />
                                 )}
 
-                                {!componentDefinition?.icon && <Component1Icon className="mr-1 size-6 flex-none" />}
+                                {!componentDefinition?.icon && <Component1Icon className="mr-1 size-5 flex-none" />}
 
                                 <span className="text-base font-semibold text-gray-900">{connection.name}</span>
 
@@ -98,7 +98,7 @@ const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps
                         </div>
 
                         <div className="mt-2 sm:flex sm:items-center sm:justify-between">
-                            <div className="flex h-[38px] items-center" onClick={(event) => event.preventDefault()}>
+                            <div className="flex items-center" onClick={(event) => event.preventDefault()}>
                                 {connection.tags && (
                                     <TagList
                                         getRequest={(id, tags) => ({
@@ -120,11 +120,13 @@ const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps
                     <div className="flex items-center justify-end gap-x-6">
                         <div className="flex flex-col items-end gap-y-4">
                             {connection.credentialStatus === 'VALID' ? (
-                                <Badge variant={connection.active ? 'success' : 'secondary'}>
+                                <Badge className="uppercase" variant={connection.active ? 'success' : 'secondary'}>
                                     {connection.active ? 'Active' : 'Not Active'}
                                 </Badge>
                             ) : (
-                                <Badge variant="destructive">{connection.credentialStatus}</Badge>
+                                <Badge className="uppercase" variant="destructive">
+                                    {connection.credentialStatus}
+                                </Badge>
                             )}
 
                             {connection.createdDate && (

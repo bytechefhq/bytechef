@@ -15,14 +15,14 @@ import {WorkflowIcon} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 
 const IntegrationWorkflowList = ({integration}: {integration: Integration}) => {
+    const {captureIntegrationWorkflowCreated} = useAnalytics();
+
+    const navigate = useNavigate();
+
     const {data: componentDefinitions, isLoading: isComponentDefinitionsLoading} = useGetComponentDefinitionsQuery({
         actionDefinitions: true,
         triggerDefinitions: true,
     });
-
-    const {captureIntegrationWorkflowCreated} = useAnalytics();
-
-    const navigate = useNavigate();
 
     const {data: taskDispatcherDefinitions, isLoading: isTaskDispatcherDefinitionsLoading} =
         useGetTaskDispatcherDefinitionsQuery();
