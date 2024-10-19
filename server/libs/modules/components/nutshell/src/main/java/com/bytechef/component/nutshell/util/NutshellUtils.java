@@ -27,13 +27,12 @@ import static com.bytechef.component.nutshell.constant.NutshellConstants.PHONES;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.VALUE;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.definition.ComponentDsl;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
