@@ -100,7 +100,14 @@ const ProjectInstances = () => {
                                 triggerNode={<Button>New Instance</Button>}
                             />
                         }
-                        title={<ProjectInstancesFilterTitle filterData={filterData} projects={projects} tags={tags} />}
+                        title={
+                            <ProjectInstancesFilterTitle
+                                environment={environment}
+                                filterData={filterData}
+                                projects={projects}
+                                tags={tags}
+                            />
+                        }
                     />
                 )
             }
