@@ -16,8 +16,7 @@
 
 package com.bytechef.component.nutshell.util;
 
-import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.definition.Context.Http;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.DESCRIPTION;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.EMAIL;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.EMAILS;
@@ -33,6 +32,8 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.definition.ComponentDsl;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -91,7 +92,7 @@ public class NutshellUtils {
 
         List<Option<String>> options = new ArrayList<>();
         Map<String, ?> body = context.http(http -> http.get("/users"))
-            .configuration(responseType(Http.ResponseType.JSON))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
@@ -108,7 +109,7 @@ public class NutshellUtils {
 
         for (Object item : itemList) {
             if (item instanceof Map<?, ?> map) {
-                options.add(option((String) map.get(label), String.valueOf(map.get(value))));
+                options.add(ComponentDsl.option((String) map.get(label), String.valueOf(map.get(value))));
             }
         }
         return options;
