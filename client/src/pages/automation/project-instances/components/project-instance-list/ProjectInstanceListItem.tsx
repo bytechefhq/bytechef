@@ -93,6 +93,8 @@ const ProjectInstanceListItem = ({projectInstance, remainingTags}: ProjectInstan
                     <div className="flex-1">
                         <div className="flex items-center justify-between">
                             <div className="flex w-full items-center gap-2">
+                                <Badge variant="secondary">V{projectInstance.projectVersion}</Badge>
+
                                 {projectInstance.description ? (
                                     <Tooltip>
                                         <TooltipTrigger>
@@ -104,10 +106,6 @@ const ProjectInstanceListItem = ({projectInstance, remainingTags}: ProjectInstan
                                 ) : (
                                     <span className="text-base font-semibold">{projectInstance.name}</span>
                                 )}
-
-                                <Badge variant="secondary">V{projectInstance.projectVersion}</Badge>
-
-                                <span className="text-xs uppercase text-gray-700">{projectInstance?.environment}</span>
                             </div>
                         </div>
 
