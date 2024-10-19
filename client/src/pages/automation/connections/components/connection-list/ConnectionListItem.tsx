@@ -95,14 +95,12 @@ const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps
                             <div className="flex items-center justify-between">
                                 <div className="relative flex items-center gap-2">
                                     {componentDefinition?.icon && (
-                                        <InlineSVG className="size-6 flex-none" src={componentDefinition.icon} />
+                                        <InlineSVG className="size-5 flex-none" src={componentDefinition.icon} />
                                     )}
 
-                                    {!componentDefinition?.icon && <Component1Icon className="mr-1 size-6 flex-none" />}
+                                    {!componentDefinition?.icon && <Component1Icon className="mr-1 size-5 flex-none" />}
 
                                     <span className="text-base font-semibold">{connection.name}</span>
-
-                                    <span className="text-xs uppercase text-gray-700">{connection.environment}</span>
                                 </div>
                             </div>
 
