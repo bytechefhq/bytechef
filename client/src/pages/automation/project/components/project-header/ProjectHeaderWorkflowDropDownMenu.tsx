@@ -41,7 +41,7 @@ const ProjectHeaderWorkflowDropDownMenu = ({
                 <div>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button className="hover:bg-muted" size="icon" variant="ghost">
+                            <Button className="hover:bg-background/70" size="icon" variant="ghost">
                                 <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
                             </Button>
                         </TooltipTrigger>

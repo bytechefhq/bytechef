@@ -3,7 +3,7 @@ import {SquareIcon} from 'lucide-react';
 
 const ProjectHeaderStopButton = () => (
     <Button
-        className="hover:bg-muted"
+        className="hover:bg-background/70"
         onClick={() => {
             // TODO
         }}
