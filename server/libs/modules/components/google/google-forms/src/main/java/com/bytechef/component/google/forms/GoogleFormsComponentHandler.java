@@ -23,10 +23,12 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.google.forms.action.GoogleFormsGetFormAction;
+import com.bytechef.component.google.forms.action.GoogleFormsGetResponseAction;
 import com.google.auto.service.AutoService;
 
 /**
  * @author Monika Kušter
+ * @author Vihar Shah
  */
 @AutoService(ComponentHandler.class)
 public class GoogleFormsComponentHandler implements ComponentHandler {
@@ -39,7 +41,9 @@ public class GoogleFormsComponentHandler implements ComponentHandler {
         .icon("path:assets/google-forms.svg")
         .categories(ComponentCategory.SURVEYS_AND_FEEDBACK)
         .connection(CONNECTION_DEFINITION)
-        .actions(GoogleFormsGetFormAction.ACTION_DEFINITION);
+        .actions(
+            GoogleFormsGetFormAction.ACTION_DEFINITION,
+            GoogleFormsGetResponseAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
