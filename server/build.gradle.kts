@@ -22,15 +22,7 @@ subprojects {
 
     configure<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension> {
         imports {
-            mavenBom("org.springframework.cloud:spring-cloud-dependencies:" + rootProject.libs.versions.org.springframework.cloud.dependencies.get())
-        }
-
-        applyMavenExclusions(false)
-    }
-
-    configure<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension> {
-        imports {
-            mavenBom("software.amazon.awssdk:bom:" + rootProject.libs.versions.awssdk.get())
+            mavenBom("org.springframework.cloud:spring-cloud-dependencies:" + rootProject.libs.versions.spring.cloud.dependencies.get())
         }
 
         applyMavenExclusions(false)
@@ -38,5 +30,7 @@ subprojects {
 
     dependencies {
         implementation(platform("io.awspring.cloud:spring-cloud-aws-dependencies:${rootProject.libs.versions.spring.cloud.aws.get()}"))
+        implementation(platform("software.amazon.awssdk:bom:${rootProject.libs.versions.awssdk.get()}"))
+//        implementation(platform("org.springframework.ai:spring-ai-bom:${rootProject.libs.versions.spring.ai.get()}"))
     }
 }

@@ -1,9 +1,9 @@
 version="1.0"
 
 dependencies {
-    implementation("org.springframework.ai:spring-ai-openai:1.0.0-M3")
-    implementation("org.junit.jupiter:junit-jupiter-api:5.10.3")
-    implementation("org.mockito:mockito-core:5.11.0")
+    implementation("org.springframework.ai:spring-ai-openai:${rootProject.libs.versions.spring.ai.get()}")
+    implementation("org.junit.jupiter:junit-jupiter-api")
+    implementation("org.mockito:mockito-core")
 }
 
 subprojects {

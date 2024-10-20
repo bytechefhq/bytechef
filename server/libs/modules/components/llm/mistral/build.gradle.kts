@@ -1,5 +1,5 @@
 version="1.0"
 
 dependencies {
-    implementation("org.springframework.ai:spring-ai-mistral-ai:1.0.0-M3")
+    implementation("org.springframework.ai:spring-ai-mistral-ai:${rootProject.libs.versions.spring.ai.get()}")
 }

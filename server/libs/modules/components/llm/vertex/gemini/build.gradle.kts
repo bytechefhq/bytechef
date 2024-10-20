@@ -1,5 +1,5 @@
 version="1.0"
 
 dependencies {
-    implementation("org.springframework.ai:spring-ai-vertex-ai-gemini:1.0.0-M3")
+    implementation("org.springframework.ai:spring-ai-vertex-ai-gemini:${rootProject.libs.versions.spring.ai.get()}")
 }
