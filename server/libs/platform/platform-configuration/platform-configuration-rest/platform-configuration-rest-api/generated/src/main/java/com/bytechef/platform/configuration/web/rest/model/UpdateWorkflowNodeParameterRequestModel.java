@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("updateWorkflowNodeParameter_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-09-18T05:52:28.072330+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-20T13:40:06.558198+02:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 public class UpdateWorkflowNodeParameterRequestModel {
 
   private Boolean includeInMetadata = false;
