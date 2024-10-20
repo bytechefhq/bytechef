@@ -18,18 +18,21 @@ import {
     CredentialStatusFromJSON,
     CredentialStatusFromJSONTyped,
     CredentialStatusToJSON,
+    CredentialStatusToJSONTyped,
 } from './CredentialStatus';
 import type { Tag } from './Tag';
 import {
     TagFromJSON,
     TagFromJSONTyped,
     TagToJSON,
+    TagToJSONTyped,
 } from './Tag';
 import type { ConnectionEnvironment } from './ConnectionEnvironment';
 import {
     ConnectionEnvironmentFromJSON,
     ConnectionEnvironmentFromJSONTyped,
     ConnectionEnvironmentToJSON,
+    ConnectionEnvironmentToJSONTyped,
 } from './ConnectionEnvironment';
 
 /**
@@ -184,10 +187,15 @@ export function ConnectionBaseFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-export function ConnectionBaseToJSON(value?: Omit<ConnectionBase, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'> | null): any {
+  export function ConnectionBaseToJSON(json: any): ConnectionBase {
+      return ConnectionBaseToJSONTyped(json, false);
+  }
+
+  export function ConnectionBaseToJSONTyped(value?: Omit<ConnectionBase, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'authorizationName': value['authorizationName'],

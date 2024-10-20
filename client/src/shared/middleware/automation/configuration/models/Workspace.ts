@@ -98,10 +98,15 @@ export function WorkspaceFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     };
 }
 
-export function WorkspaceToJSON(value?: Omit<Workspace, 'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'> | null): any {
+  export function WorkspaceToJSON(json: any): Workspace {
+      return WorkspaceToJSONTyped(json, false);
+  }
+
+  export function WorkspaceToJSONTyped(value?: Omit<Workspace, 'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'description': value['description'],

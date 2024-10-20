@@ -48,10 +48,15 @@ export function PublishProjectRequestFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-export function PublishProjectRequestToJSON(value?: PublishProjectRequest | null): any {
+  export function PublishProjectRequestToJSON(json: any): PublishProjectRequest {
+      return PublishProjectRequestToJSONTyped(json, false);
+  }
+
+  export function PublishProjectRequestToJSONTyped(value?: PublishProjectRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'description': value['description'],

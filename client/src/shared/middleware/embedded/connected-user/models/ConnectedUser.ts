@@ -18,6 +18,7 @@ import {
     ConnectedUserIntegrationInstanceFromJSON,
     ConnectedUserIntegrationInstanceFromJSONTyped,
     ConnectedUserIntegrationInstanceToJSON,
+    ConnectedUserIntegrationInstanceToJSONTyped,
 } from './ConnectedUserIntegrationInstance';
 
 /**
@@ -133,10 +134,15 @@ export function ConnectedUserFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function ConnectedUserToJSON(value?: Omit<ConnectedUser, 'createdBy'|'createdDate'|'externalId'|'id'|'metadata'|'lastModifiedBy'|'lastModifiedDate'> | null): any {
+  export function ConnectedUserToJSON(json: any): ConnectedUser {
+      return ConnectedUserToJSONTyped(json, false);
+  }
+
+  export function ConnectedUserToJSONTyped(value?: Omit<ConnectedUser, 'createdBy'|'createdDate'|'externalId'|'id'|'metadata'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'email': value['email'],

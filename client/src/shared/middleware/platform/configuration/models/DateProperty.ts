@@ -18,30 +18,35 @@ import {
     OptionsDataSourceFromJSON,
     OptionsDataSourceFromJSONTyped,
     OptionsDataSourceToJSON,
+    OptionsDataSourceToJSONTyped,
 } from './OptionsDataSource';
 import type { ControlType } from './ControlType';
 import {
     ControlTypeFromJSON,
     ControlTypeFromJSONTyped,
     ControlTypeToJSON,
+    ControlTypeToJSONTyped,
 } from './ControlType';
 import type { Option } from './Option';
 import {
     OptionFromJSON,
     OptionFromJSONTyped,
     OptionToJSON,
+    OptionToJSONTyped,
 } from './Option';
 import type { PropertyType } from './PropertyType';
 import {
     PropertyTypeFromJSON,
     PropertyTypeFromJSONTyped,
     PropertyTypeToJSON,
+    PropertyTypeToJSONTyped,
 } from './PropertyType';
 import type { ValueProperty } from './ValueProperty';
 import {
     ValuePropertyFromJSON,
     ValuePropertyFromJSONTyped,
     ValuePropertyToJSON,
+    ValuePropertyToJSONTyped,
 } from './ValueProperty';
 
 /**
@@ -94,7 +99,7 @@ export function DatePropertyFromJSONTyped(json: any, ignoreDiscriminator: boolea
         return json;
     }
     return {
-        ...ValuePropertyFromJSONTyped(json, ignoreDiscriminator),
+        ...ValuePropertyFromJSONTyped(json, true),
         'defaultValue': json['defaultValue'] == null ? undefined : (new Date(json['defaultValue'])),
         'exampleValue': json['exampleValue'] == null ? undefined : (new Date(json['exampleValue'])),
         'options': json['options'] == null ? undefined : ((json['options'] as Array<any>).map(OptionFromJSON)),
@@ -102,12 +107,17 @@ export function DatePropertyFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-export function DatePropertyToJSON(value?: DateProperty | null): any {
+  export function DatePropertyToJSON(json: any): DateProperty {
+      return DatePropertyToJSONTyped(json, false);
+  }
+
+  export function DatePropertyToJSONTyped(value?: DateProperty | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
-        ...ValuePropertyToJSON(value),
+        ...ValuePropertyToJSONTyped(value, true),
         'defaultValue': value['defaultValue'] == null ? undefined : ((value['defaultValue']).toISOString().substring(0,10)),
         'exampleValue': value['exampleValue'] == null ? undefined : ((value['exampleValue']).toISOString().substring(0,10)),
         'options': value['options'] == null ? undefined : ((value['options'] as Array<any>).map(OptionToJSON)),

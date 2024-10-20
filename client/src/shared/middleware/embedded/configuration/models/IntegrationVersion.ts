@@ -18,6 +18,7 @@ import {
     IntegrationStatusFromJSON,
     IntegrationStatusFromJSONTyped,
     IntegrationStatusToJSON,
+    IntegrationStatusToJSONTyped,
 } from './IntegrationStatus';
 
 /**
@@ -78,10 +79,15 @@ export function IntegrationVersionFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function IntegrationVersionToJSON(value?: Omit<IntegrationVersion, 'version'> | null): any {
+  export function IntegrationVersionToJSON(json: any): IntegrationVersion {
+      return IntegrationVersionToJSONTyped(json, false);
+  }
+
+  export function IntegrationVersionToJSONTyped(value?: Omit<IntegrationVersion, 'version'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'description': value['description'],

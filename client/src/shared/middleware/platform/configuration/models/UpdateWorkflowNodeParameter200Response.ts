@@ -62,10 +62,15 @@ export function UpdateWorkflowNodeParameter200ResponseFromJSONTyped(json: any, i
     };
 }
 
-export function UpdateWorkflowNodeParameter200ResponseToJSON(value?: UpdateWorkflowNodeParameter200Response | null): any {
+  export function UpdateWorkflowNodeParameter200ResponseToJSON(json: any): UpdateWorkflowNodeParameter200Response {
+      return UpdateWorkflowNodeParameter200ResponseToJSONTyped(json, false);
+  }
+
+  export function UpdateWorkflowNodeParameter200ResponseToJSONTyped(value?: UpdateWorkflowNodeParameter200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'metadata': value['metadata'],

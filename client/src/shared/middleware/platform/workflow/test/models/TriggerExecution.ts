@@ -18,18 +18,21 @@ import {
     ExecutionErrorFromJSON,
     ExecutionErrorFromJSONTyped,
     ExecutionErrorToJSON,
+    ExecutionErrorToJSONTyped,
 } from './ExecutionError';
 import type { WorkflowTrigger } from './WorkflowTrigger';
 import {
     WorkflowTriggerFromJSON,
     WorkflowTriggerFromJSONTyped,
     WorkflowTriggerToJSON,
+    WorkflowTriggerToJSONTyped,
 } from './WorkflowTrigger';
 import type { ComponentDefinitionBasic } from './ComponentDefinitionBasic';
 import {
     ComponentDefinitionBasicFromJSON,
     ComponentDefinitionBasicFromJSONTyped,
     ComponentDefinitionBasicToJSON,
+    ComponentDefinitionBasicToJSONTyped,
 } from './ComponentDefinitionBasic';
 
 /**
@@ -231,10 +234,15 @@ export function TriggerExecutionFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-export function TriggerExecutionToJSON(value?: Omit<TriggerExecution, 'createdBy'|'createdDate'|'endDate'|'executionTime'|'id'|'input'|'lastModifiedBy'|'lastModifiedDate'|'maxRetries'|'output'|'priority'|'retryAttempts'|'retryDelay'|'retryDelayFactor'|'retryDelayMillis'|'startDate'|'status'|'type'> | null): any {
+  export function TriggerExecutionToJSON(json: any): TriggerExecution {
+      return TriggerExecutionToJSONTyped(json, false);
+  }
+
+  export function TriggerExecutionToJSONTyped(value?: Omit<TriggerExecution, 'createdBy'|'createdDate'|'endDate'|'executionTime'|'id'|'input'|'lastModifiedBy'|'lastModifiedDate'|'maxRetries'|'output'|'priority'|'retryAttempts'|'retryDelay'|'retryDelayFactor'|'retryDelayMillis'|'startDate'|'status'|'type'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'batch': value['batch'],

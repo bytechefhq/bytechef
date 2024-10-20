@@ -57,10 +57,15 @@ export function WorkflowOutputFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-export function WorkflowOutputToJSON(value?: WorkflowOutput | null): any {
+  export function WorkflowOutputToJSON(json: any): WorkflowOutput {
+      return WorkflowOutputToJSONTyped(json, false);
+  }
+
+  export function WorkflowOutputToJSONTyped(value?: WorkflowOutput | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'name': value['name'],

@@ -18,18 +18,21 @@ import {
     CategoryFromJSON,
     CategoryFromJSONTyped,
     CategoryToJSON,
+    CategoryToJSONTyped,
 } from './Category';
 import type { IntegrationStatus } from './IntegrationStatus';
 import {
     IntegrationStatusFromJSON,
     IntegrationStatusFromJSONTyped,
     IntegrationStatusToJSON,
+    IntegrationStatusToJSONTyped,
 } from './IntegrationStatus';
 import type { Tag } from './Tag';
 import {
     TagFromJSON,
     TagFromJSONTyped,
     TagToJSON,
+    TagToJSONTyped,
 } from './Tag';
 
 /**
@@ -176,10 +179,15 @@ export function IntegrationFromJSONTyped(json: any, ignoreDiscriminator: boolean
     };
 }
 
-export function IntegrationToJSON(value?: Omit<Integration, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastIntegrationVersion'> | null): any {
+  export function IntegrationToJSON(json: any): Integration {
+      return IntegrationToJSONTyped(json, false);
+  }
+
+  export function IntegrationToJSONTyped(value?: Omit<Integration, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastIntegrationVersion'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'allowMultipleInstances': value['allowMultipleInstances'],

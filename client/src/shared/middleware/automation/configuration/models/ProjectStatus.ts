@@ -47,3 +47,7 @@ export function ProjectStatusToJSON(value?: ProjectStatus | null): any {
     return value as any;
 }
 
+export function ProjectStatusToJSONTyped(value: any, ignoreDiscriminator: boolean): ProjectStatus {
+    return value as ProjectStatus;
+}
+

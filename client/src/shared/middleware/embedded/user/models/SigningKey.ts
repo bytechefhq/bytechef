@@ -18,6 +18,7 @@ import {
     EnvironmentFromJSON,
     EnvironmentFromJSONTyped,
     EnvironmentToJSON,
+    EnvironmentToJSONTyped,
 } from './Environment';
 
 /**
@@ -115,10 +116,15 @@ export function SigningKeyFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     };
 }
 
-export function SigningKeyToJSON(value?: Omit<SigningKey, 'createdBy'|'createdDate'|'id'|'keyId'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'> | null): any {
+  export function SigningKeyToJSON(json: any): SigningKey {
+      return SigningKeyToJSONTyped(json, false);
+  }
+
+  export function SigningKeyToJSONTyped(value?: Omit<SigningKey, 'createdBy'|'createdDate'|'id'|'keyId'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'environment': EnvironmentToJSON(value['environment']),

@@ -71,10 +71,15 @@ export function ConnectionDefinitionBasicFromJSONTyped(json: any, ignoreDiscrimi
     };
 }
 
-export function ConnectionDefinitionBasicToJSON(value?: ConnectionDefinitionBasic | null): any {
+  export function ConnectionDefinitionBasicToJSON(json: any): ConnectionDefinitionBasic {
+      return ConnectionDefinitionBasicToJSONTyped(json, false);
+  }
+
+  export function ConnectionDefinitionBasicToJSONTyped(value?: ConnectionDefinitionBasic | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'componentDescription': value['componentDescription'],

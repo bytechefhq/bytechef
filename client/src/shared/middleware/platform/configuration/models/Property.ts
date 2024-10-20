@@ -18,21 +18,22 @@ import {
     PropertyTypeFromJSON,
     PropertyTypeFromJSONTyped,
     PropertyTypeToJSON,
+    PropertyTypeToJSONTyped,
 } from './PropertyType';
 
-import { ArrayPropertyFromJSONTyped } from './ArrayProperty';
-import { BooleanPropertyFromJSONTyped } from './BooleanProperty';
-import { DatePropertyFromJSONTyped } from './DateProperty';
-import { DateTimePropertyFromJSONTyped } from './DateTimeProperty';
-import { DynamicPropertiesPropertyFromJSONTyped } from './DynamicPropertiesProperty';
-import { FileEntryPropertyFromJSONTyped } from './FileEntryProperty';
-import { IntegerPropertyFromJSONTyped } from './IntegerProperty';
-import { NullPropertyFromJSONTyped } from './NullProperty';
-import { NumberPropertyFromJSONTyped } from './NumberProperty';
-import { ObjectPropertyFromJSONTyped } from './ObjectProperty';
-import { StringPropertyFromJSONTyped } from './StringProperty';
-import { TaskPropertyFromJSONTyped } from './TaskProperty';
-import { TimePropertyFromJSONTyped } from './TimeProperty';
+import { ArrayProperty, ArrayPropertyFromJSONTyped, ArrayPropertyToJSON, ArrayPropertyToJSONTyped } from './ArrayProperty';
+import { BooleanProperty, BooleanPropertyFromJSONTyped, BooleanPropertyToJSON, BooleanPropertyToJSONTyped } from './BooleanProperty';
+import { DateProperty, DatePropertyFromJSONTyped, DatePropertyToJSON, DatePropertyToJSONTyped } from './DateProperty';
+import { DateTimeProperty, DateTimePropertyFromJSONTyped, DateTimePropertyToJSON, DateTimePropertyToJSONTyped } from './DateTimeProperty';
+import { DynamicPropertiesProperty, DynamicPropertiesPropertyFromJSONTyped, DynamicPropertiesPropertyToJSON, DynamicPropertiesPropertyToJSONTyped } from './DynamicPropertiesProperty';
+import { FileEntryProperty, FileEntryPropertyFromJSONTyped, FileEntryPropertyToJSON, FileEntryPropertyToJSONTyped } from './FileEntryProperty';
+import { IntegerProperty, IntegerPropertyFromJSONTyped, IntegerPropertyToJSON, IntegerPropertyToJSONTyped } from './IntegerProperty';
+import { NullProperty, NullPropertyFromJSONTyped, NullPropertyToJSON, NullPropertyToJSONTyped } from './NullProperty';
+import { NumberProperty, NumberPropertyFromJSONTyped, NumberPropertyToJSON, NumberPropertyToJSONTyped } from './NumberProperty';
+import { ObjectProperty, ObjectPropertyFromJSONTyped, ObjectPropertyToJSON, ObjectPropertyToJSONTyped } from './ObjectProperty';
+import { StringProperty, StringPropertyFromJSONTyped, StringPropertyToJSON, StringPropertyToJSONTyped } from './StringProperty';
+import { TaskProperty, TaskPropertyFromJSONTyped, TaskPropertyToJSON, TaskPropertyToJSONTyped } from './TaskProperty';
+import { TimeProperty, TimePropertyFromJSONTyped, TimePropertyToJSON, TimePropertyToJSONTyped } from './TimeProperty';
 /**
  * A base property.
  * @export
@@ -109,43 +110,43 @@ export function PropertyFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     }
     if (!ignoreDiscriminator) {
         if (json['type'] === 'ARRAY') {
-            return ArrayPropertyFromJSONTyped(json, true);
+            return ArrayPropertyFromJSONTyped(json, ignoreDiscriminator);
         }
         if (json['type'] === 'BOOLEAN') {
-            return BooleanPropertyFromJSONTyped(json, true);
+            return BooleanPropertyFromJSONTyped(json, ignoreDiscriminator);
         }
         if (json['type'] === 'DATE') {
-            return DatePropertyFromJSONTyped(json, true);
+            return DatePropertyFromJSONTyped(json, ignoreDiscriminator);
         }
         if (json['type'] === 'DATE_TIME') {
-            return DateTimePropertyFromJSONTyped(json, true);
+            return DateTimePropertyFromJSONTyped(json, ignoreDiscriminator);
         }
         if (json['type'] === 'DYNAMIC_PROPERTIES') {
-            return DynamicPropertiesPropertyFromJSONTyped(json, true);
+            return DynamicPropertiesPropertyFromJSONTyped(json, ignoreDiscriminator);
         }
         if (json['type'] === 'FILE_ENTRY') {
-            return FileEntryPropertyFromJSONTyped(json, true);
+            return FileEntryPropertyFromJSONTyped(json, ignoreDiscriminator);
         }
         if (json['type'] === 'INTEGER') {
-            return IntegerPropertyFromJSONTyped(json, true);
+            return IntegerPropertyFromJSONTyped(json, ignoreDiscriminator);
         }
         if (json['type'] === 'NULL') {
-            return NullPropertyFromJSONTyped(json, true);
+            return NullPropertyFromJSONTyped(json, ignoreDiscriminator);
         }
         if (json['type'] === 'NUMBER') {
-            return NumberPropertyFromJSONTyped(json, true);
+            return NumberPropertyFromJSONTyped(json, ignoreDiscriminator);
         }
         if (json['type'] === 'OBJECT') {
-            return ObjectPropertyFromJSONTyped(json, true);
+            return ObjectPropertyFromJSONTyped(json, ignoreDiscriminator);
         }
         if (json['type'] === 'STRING') {
-            return StringPropertyFromJSONTyped(json, true);
+            return StringPropertyFromJSONTyped(json, ignoreDiscriminator);
         }
         if (json['type'] === 'TASK') {
-            return TaskPropertyFromJSONTyped(json, true);
+            return TaskPropertyFromJSONTyped(json, ignoreDiscriminator);
         }
         if (json['type'] === 'TIME') {
-            return TimePropertyFromJSONTyped(json, true);
+            return TimePropertyFromJSONTyped(json, ignoreDiscriminator);
         }
     }
     return {
@@ -161,10 +162,48 @@ export function PropertyFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     };
 }
 
-export function PropertyToJSON(value?: Property | null): any {
+  export function PropertyToJSON(json: any): Property {
+      return PropertyToJSONTyped(json, false);
+  }
+
+  export function PropertyToJSONTyped(value?: Property | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
+    if (!ignoreDiscriminator) {
+        switch (value['type']) {
+            case 'ARRAY':
+                return ArrayPropertyToJSONTyped(value as ArrayProperty, ignoreDiscriminator);
+            case 'BOOLEAN':
+                return BooleanPropertyToJSONTyped(value as BooleanProperty, ignoreDiscriminator);
+            case 'DATE':
+                return DatePropertyToJSONTyped(value as DateProperty, ignoreDiscriminator);
+            case 'DATE_TIME':
+                return DateTimePropertyToJSONTyped(value as DateTimeProperty, ignoreDiscriminator);
+            case 'DYNAMIC_PROPERTIES':
+                return DynamicPropertiesPropertyToJSONTyped(value as DynamicPropertiesProperty, ignoreDiscriminator);
+            case 'FILE_ENTRY':
+                return FileEntryPropertyToJSONTyped(value as FileEntryProperty, ignoreDiscriminator);
+            case 'INTEGER':
+                return IntegerPropertyToJSONTyped(value as IntegerProperty, ignoreDiscriminator);
+            case 'NULL':
+                return NullPropertyToJSONTyped(value as NullProperty, ignoreDiscriminator);
+            case 'NUMBER':
+                return NumberPropertyToJSONTyped(value as NumberProperty, ignoreDiscriminator);
+            case 'OBJECT':
+                return ObjectPropertyToJSONTyped(value as ObjectProperty, ignoreDiscriminator);
+            case 'STRING':
+                return StringPropertyToJSONTyped(value as StringProperty, ignoreDiscriminator);
+            case 'TASK':
+                return TaskPropertyToJSONTyped(value as TaskProperty, ignoreDiscriminator);
+            case 'TIME':
+                return TimePropertyToJSONTyped(value as TimeProperty, ignoreDiscriminator);
+            default:
+                throw new Error(`No variant of Property exists with 'type=${value['type']}'`);
+        }
+    }
+
     return {
         
         'advancedOption': value['advancedOption'],

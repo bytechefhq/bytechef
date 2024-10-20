@@ -64,10 +64,15 @@ export function ImportOpenApiSpecificationRequestFromJSONTyped(json: any, ignore
     };
 }
 
-export function ImportOpenApiSpecificationRequestToJSON(value?: ImportOpenApiSpecificationRequest | null): any {
+  export function ImportOpenApiSpecificationRequestToJSON(json: any): ImportOpenApiSpecificationRequest {
+      return ImportOpenApiSpecificationRequestToJSONTyped(json, false);
+  }
+
+  export function ImportOpenApiSpecificationRequestToJSONTyped(value?: ImportOpenApiSpecificationRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'name': value['name'],

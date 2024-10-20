@@ -48,10 +48,15 @@ export function CreateProjectInstanceWorkflowJob200ResponseFromJSONTyped(json: a
     };
 }
 
-export function CreateProjectInstanceWorkflowJob200ResponseToJSON(value?: CreateProjectInstanceWorkflowJob200Response | null): any {
+  export function CreateProjectInstanceWorkflowJob200ResponseToJSON(json: any): CreateProjectInstanceWorkflowJob200Response {
+      return CreateProjectInstanceWorkflowJob200ResponseToJSONTyped(json, false);
+  }
+
+  export function CreateProjectInstanceWorkflowJob200ResponseToJSONTyped(value?: CreateProjectInstanceWorkflowJob200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'jobId': value['jobId'],

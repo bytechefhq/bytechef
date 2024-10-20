@@ -48,10 +48,15 @@ export function CreateJob200ResponseFromJSONTyped(json: any, ignoreDiscriminator
     };
 }
 
-export function CreateJob200ResponseToJSON(value?: CreateJob200Response | null): any {
+  export function CreateJob200ResponseToJSON(json: any): CreateJob200Response {
+      return CreateJob200ResponseToJSONTyped(json, false);
+  }
+
+  export function CreateJob200ResponseToJSONTyped(value?: CreateJob200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'jobId': value['jobId'],

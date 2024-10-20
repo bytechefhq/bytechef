@@ -18,36 +18,42 @@ import {
     WorkflowBasicFromJSON,
     WorkflowBasicFromJSONTyped,
     WorkflowBasicToJSON,
+    WorkflowBasicToJSONTyped,
 } from './WorkflowBasic';
 import type { IntegrationInstanceConfiguration } from './IntegrationInstanceConfiguration';
 import {
     IntegrationInstanceConfigurationFromJSON,
     IntegrationInstanceConfigurationFromJSONTyped,
     IntegrationInstanceConfigurationToJSON,
+    IntegrationInstanceConfigurationToJSONTyped,
 } from './IntegrationInstanceConfiguration';
 import type { TriggerExecution } from './TriggerExecution';
 import {
     TriggerExecutionFromJSON,
     TriggerExecutionFromJSONTyped,
     TriggerExecutionToJSON,
+    TriggerExecutionToJSONTyped,
 } from './TriggerExecution';
 import type { IntegrationBasic } from './IntegrationBasic';
 import {
     IntegrationBasicFromJSON,
     IntegrationBasicFromJSONTyped,
     IntegrationBasicToJSON,
+    IntegrationBasicToJSONTyped,
 } from './IntegrationBasic';
 import type { IntegrationInstanceBasic } from './IntegrationInstanceBasic';
 import {
     IntegrationInstanceBasicFromJSON,
     IntegrationInstanceBasicFromJSONTyped,
     IntegrationInstanceBasicToJSON,
+    IntegrationInstanceBasicToJSONTyped,
 } from './IntegrationInstanceBasic';
 import type { Job } from './Job';
 import {
     JobFromJSON,
     JobFromJSONTyped,
     JobToJSON,
+    JobToJSONTyped,
 } from './Job';
 
 /**
@@ -127,10 +133,15 @@ export function WorkflowExecutionFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-export function WorkflowExecutionToJSON(value?: Omit<WorkflowExecution, 'id'> | null): any {
+  export function WorkflowExecutionToJSON(json: any): WorkflowExecution {
+      return WorkflowExecutionToJSONTyped(json, false);
+  }
+
+  export function WorkflowExecutionToJSONTyped(value?: Omit<WorkflowExecution, 'id'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'integration': IntegrationBasicToJSON(value['integration']),

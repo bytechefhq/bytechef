@@ -18,24 +18,28 @@ import {
     TriggerDefinitionFromJSON,
     TriggerDefinitionFromJSONTyped,
     TriggerDefinitionToJSON,
+    TriggerDefinitionToJSONTyped,
 } from './TriggerDefinition';
 import type { Property } from './Property';
 import {
     PropertyFromJSON,
     PropertyFromJSONTyped,
     PropertyToJSON,
+    PropertyToJSONTyped,
 } from './Property';
 import type { ActionDefinition } from './ActionDefinition';
 import {
     ActionDefinitionFromJSON,
     ActionDefinitionFromJSONTyped,
     ActionDefinitionToJSON,
+    ActionDefinitionToJSONTyped,
 } from './ActionDefinition';
 import type { TaskDispatcherDefinition } from './TaskDispatcherDefinition';
 import {
     TaskDispatcherDefinitionFromJSON,
     TaskDispatcherDefinitionFromJSONTyped,
     TaskDispatcherDefinitionToJSON,
+    TaskDispatcherDefinitionToJSONTyped,
 } from './TaskDispatcherDefinition';
 
 /**
@@ -110,10 +114,15 @@ export function WorkflowNodeOutputFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function WorkflowNodeOutputToJSON(value?: WorkflowNodeOutput | null): any {
+  export function WorkflowNodeOutputToJSON(json: any): WorkflowNodeOutput {
+      return WorkflowNodeOutputToJSONTyped(json, false);
+  }
+
+  export function WorkflowNodeOutputToJSONTyped(value?: WorkflowNodeOutput | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'actionDefinition': ActionDefinitionToJSON(value['actionDefinition']),

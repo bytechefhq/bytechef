@@ -18,6 +18,7 @@ import {
     EnvironmentFromJSON,
     EnvironmentFromJSONTyped,
     EnvironmentToJSON,
+    EnvironmentToJSONTyped,
 } from './Environment';
 
 /**
@@ -128,10 +129,15 @@ export function IntegrationInstanceBasicFromJSONTyped(json: any, ignoreDiscrimin
     };
 }
 
-export function IntegrationInstanceBasicToJSON(value?: Omit<IntegrationInstanceBasic, 'connectionId'|'connectedUserId'|'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'> | null): any {
+  export function IntegrationInstanceBasicToJSON(json: any): IntegrationInstanceBasic {
+      return IntegrationInstanceBasicToJSONTyped(json, false);
+  }
+
+  export function IntegrationInstanceBasicToJSONTyped(value?: Omit<IntegrationInstanceBasic, 'connectionId'|'connectedUserId'|'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'enabled': value['enabled'],

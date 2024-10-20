@@ -18,6 +18,7 @@ import {
     WebhookRetryFromJSON,
     WebhookRetryFromJSONTyped,
     WebhookRetryToJSON,
+    WebhookRetryToJSONTyped,
 } from './WebhookRetry';
 
 /**
@@ -69,10 +70,15 @@ export function WebhookFromJSONTyped(json: any, ignoreDiscriminator: boolean): W
     };
 }
 
-export function WebhookToJSON(value?: Webhook | null): any {
+  export function WebhookToJSON(json: any): Webhook {
+      return WebhookToJSONTyped(json, false);
+  }
+
+  export function WebhookToJSONTyped(value?: Webhook | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'type': value['type'],

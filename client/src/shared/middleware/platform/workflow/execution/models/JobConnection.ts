@@ -62,10 +62,15 @@ export function JobConnectionFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function JobConnectionToJSON(value?: JobConnection | null): any {
+  export function JobConnectionToJSON(json: any): JobConnection {
+      return JobConnectionToJSONTyped(json, false);
+  }
+
+  export function JobConnectionToJSONTyped(value?: JobConnection | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'id': value['id'],

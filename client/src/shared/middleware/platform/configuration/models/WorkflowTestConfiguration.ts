@@ -18,6 +18,7 @@ import {
     WorkflowTestConfigurationConnectionFromJSON,
     WorkflowTestConfigurationConnectionFromJSONTyped,
     WorkflowTestConfigurationConnectionToJSON,
+    WorkflowTestConfigurationConnectionToJSONTyped,
 } from './WorkflowTestConfigurationConnection';
 
 /**
@@ -104,10 +105,15 @@ export function WorkflowTestConfigurationFromJSONTyped(json: any, ignoreDiscrimi
     };
 }
 
-export function WorkflowTestConfigurationToJSON(value?: Omit<WorkflowTestConfiguration, 'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'|'workflowId'> | null): any {
+  export function WorkflowTestConfigurationToJSON(json: any): WorkflowTestConfiguration {
+      return WorkflowTestConfigurationToJSONTyped(json, false);
+  }
+
+  export function WorkflowTestConfigurationToJSONTyped(value?: Omit<WorkflowTestConfiguration, 'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'|'workflowId'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'inputs': value['inputs'],

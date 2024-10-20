@@ -47,3 +47,7 @@ export function CredentialStatusToJSON(value?: CredentialStatus | null): any {
     return value as any;
 }
 
+export function CredentialStatusToJSONTyped(value: any, ignoreDiscriminator: boolean): CredentialStatus {
+    return value as CredentialStatus;
+}
+

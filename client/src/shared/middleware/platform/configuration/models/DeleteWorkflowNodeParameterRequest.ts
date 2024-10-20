@@ -57,10 +57,15 @@ export function DeleteWorkflowNodeParameterRequestFromJSONTyped(json: any, ignor
     };
 }
 
-export function DeleteWorkflowNodeParameterRequestToJSON(value?: DeleteWorkflowNodeParameterRequest | null): any {
+  export function DeleteWorkflowNodeParameterRequestToJSON(json: any): DeleteWorkflowNodeParameterRequest {
+      return DeleteWorkflowNodeParameterRequestToJSONTyped(json, false);
+  }
+
+  export function DeleteWorkflowNodeParameterRequestToJSONTyped(value?: DeleteWorkflowNodeParameterRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'path': value['path'],

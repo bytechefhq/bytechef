@@ -18,6 +18,7 @@ import {
     IntegrationStatusFromJSON,
     IntegrationStatusFromJSONTyped,
     IntegrationStatusToJSON,
+    IntegrationStatusToJSONTyped,
 } from './IntegrationStatus';
 
 /**
@@ -136,10 +137,15 @@ export function IntegrationBasicFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-export function IntegrationBasicToJSON(value?: Omit<IntegrationBasic, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastIntegrationVersion'> | null): any {
+  export function IntegrationBasicToJSON(json: any): IntegrationBasic {
+      return IntegrationBasicToJSONTyped(json, false);
+  }
+
+  export function IntegrationBasicToJSONTyped(value?: Omit<IntegrationBasic, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastIntegrationVersion'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'allowMultipleInstances': value['allowMultipleInstances'],

@@ -50,3 +50,7 @@ export function HttpMethodToJSON(value?: HttpMethod | null): any {
     return value as any;
 }
 
+export function HttpMethodToJSONTyped(value: any, ignoreDiscriminator: boolean): HttpMethod {
+    return value as HttpMethod;
+}
+

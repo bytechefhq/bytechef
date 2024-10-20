@@ -18,12 +18,14 @@ import {
     DataStreamComponentFromJSON,
     DataStreamComponentFromJSONTyped,
     DataStreamComponentToJSON,
+    DataStreamComponentToJSONTyped,
 } from './DataStreamComponent';
 import type { WorkflowConnection } from './WorkflowConnection';
 import {
     WorkflowConnectionFromJSON,
     WorkflowConnectionFromJSONTyped,
     WorkflowConnectionToJSON,
+    WorkflowConnectionToJSONTyped,
 } from './WorkflowConnection';
 
 /**
@@ -154,10 +156,15 @@ export function WorkflowTaskFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-export function WorkflowTaskToJSON(value?: Omit<WorkflowTask, 'connections'> | null): any {
+  export function WorkflowTaskToJSON(json: any): WorkflowTask {
+      return WorkflowTaskToJSONTyped(json, false);
+  }
+
+  export function WorkflowTaskToJSONTyped(value?: Omit<WorkflowTask, 'connections'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'description': value['description'],

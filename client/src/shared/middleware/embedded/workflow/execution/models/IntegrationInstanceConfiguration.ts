@@ -18,18 +18,21 @@ import {
     IntegrationInstanceConfigurationWorkflowFromJSON,
     IntegrationInstanceConfigurationWorkflowFromJSONTyped,
     IntegrationInstanceConfigurationWorkflowToJSON,
+    IntegrationInstanceConfigurationWorkflowToJSONTyped,
 } from './IntegrationInstanceConfigurationWorkflow';
 import type { Environment } from './Environment';
 import {
     EnvironmentFromJSON,
     EnvironmentFromJSONTyped,
     EnvironmentToJSON,
+    EnvironmentToJSONTyped,
 } from './Environment';
 import type { Tag } from './Tag';
 import {
     TagFromJSON,
     TagFromJSONTyped,
     TagToJSON,
+    TagToJSONTyped,
 } from './Tag';
 
 /**
@@ -196,10 +199,15 @@ export function IntegrationInstanceConfigurationFromJSONTyped(json: any, ignoreD
     };
 }
 
-export function IntegrationInstanceConfigurationToJSON(value?: Omit<IntegrationInstanceConfiguration, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'connectionAuthorizationParameters'|'connectionConnectionParameters'|'integration'> | null): any {
+  export function IntegrationInstanceConfigurationToJSON(json: any): IntegrationInstanceConfiguration {
+      return IntegrationInstanceConfigurationToJSONTyped(json, false);
+  }
+
+  export function IntegrationInstanceConfigurationToJSONTyped(value?: Omit<IntegrationInstanceConfiguration, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'connectionAuthorizationParameters'|'connectionConnectionParameters'|'integration'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'description': value['description'],

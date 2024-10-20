@@ -81,10 +81,15 @@ export function WorkflowConnectionFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function WorkflowConnectionToJSON(value?: WorkflowConnection | null): any {
+  export function WorkflowConnectionToJSON(json: any): WorkflowConnection {
+      return WorkflowConnectionToJSONTyped(json, false);
+  }
+
+  export function WorkflowConnectionToJSONTyped(value?: WorkflowConnection | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'componentName': value['componentName'],

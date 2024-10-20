@@ -18,24 +18,28 @@ import {
     ControlTypeFromJSON,
     ControlTypeFromJSONTyped,
     ControlTypeToJSON,
+    ControlTypeToJSONTyped,
 } from './ControlType';
 import type { PropertyType } from './PropertyType';
 import {
     PropertyTypeFromJSON,
     PropertyTypeFromJSONTyped,
     PropertyTypeToJSON,
+    PropertyTypeToJSONTyped,
 } from './PropertyType';
 import type { Property } from './Property';
 import {
     PropertyFromJSON,
     PropertyFromJSONTyped,
     PropertyToJSON,
+    PropertyToJSONTyped,
 } from './Property';
 import type { ValueProperty } from './ValueProperty';
 import {
     ValuePropertyFromJSON,
     ValuePropertyFromJSONTyped,
     ValuePropertyToJSON,
+    ValuePropertyToJSONTyped,
 } from './ValueProperty';
 
 /**
@@ -70,17 +74,22 @@ export function FileEntryPropertyFromJSONTyped(json: any, ignoreDiscriminator: b
         return json;
     }
     return {
-        ...ValuePropertyFromJSONTyped(json, ignoreDiscriminator),
+        ...ValuePropertyFromJSONTyped(json, true),
         'properties': json['properties'] == null ? undefined : ((json['properties'] as Array<any>).map(PropertyFromJSON)),
     };
 }
 
-export function FileEntryPropertyToJSON(value?: FileEntryProperty | null): any {
+  export function FileEntryPropertyToJSON(json: any): FileEntryProperty {
+      return FileEntryPropertyToJSONTyped(json, false);
+  }
+
+  export function FileEntryPropertyToJSONTyped(value?: FileEntryProperty | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
-        ...ValuePropertyToJSON(value),
+        ...ValuePropertyToJSONTyped(value, true),
         'properties': value['properties'] == null ? undefined : ((value['properties'] as Array<any>).map(PropertyToJSON)),
     };
 }

@@ -18,6 +18,7 @@ import {
     ExecutionErrorFromJSON,
     ExecutionErrorFromJSONTyped,
     ExecutionErrorToJSON,
+    ExecutionErrorToJSONTyped,
 } from './ExecutionError';
 
 /**
@@ -62,10 +63,15 @@ export function ScriptTestExecutionFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-export function ScriptTestExecutionToJSON(value?: ScriptTestExecution | null): any {
+  export function ScriptTestExecutionToJSON(json: any): ScriptTestExecution {
+      return ScriptTestExecutionToJSONTyped(json, false);
+  }
+
+  export function ScriptTestExecutionToJSONTyped(value?: ScriptTestExecution | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'error': ExecutionErrorToJSON(value['error']),

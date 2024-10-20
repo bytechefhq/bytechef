@@ -70,10 +70,15 @@ export function WorkflowInputFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function WorkflowInputToJSON(value?: WorkflowInput | null): any {
+  export function WorkflowInputToJSON(json: any): WorkflowInput {
+      return WorkflowInputToJSONTyped(json, false);
+  }
+
+  export function WorkflowInputToJSONTyped(value?: WorkflowInput | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'label': value['label'],

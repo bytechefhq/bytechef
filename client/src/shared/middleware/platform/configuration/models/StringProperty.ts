@@ -18,30 +18,35 @@ import {
     OptionsDataSourceFromJSON,
     OptionsDataSourceFromJSONTyped,
     OptionsDataSourceToJSON,
+    OptionsDataSourceToJSONTyped,
 } from './OptionsDataSource';
 import type { ControlType } from './ControlType';
 import {
     ControlTypeFromJSON,
     ControlTypeFromJSONTyped,
     ControlTypeToJSON,
+    ControlTypeToJSONTyped,
 } from './ControlType';
 import type { Option } from './Option';
 import {
     OptionFromJSON,
     OptionFromJSONTyped,
     OptionToJSON,
+    OptionToJSONTyped,
 } from './Option';
 import type { PropertyType } from './PropertyType';
 import {
     PropertyTypeFromJSON,
     PropertyTypeFromJSONTyped,
     PropertyTypeToJSON,
+    PropertyTypeToJSONTyped,
 } from './PropertyType';
 import type { ValueProperty } from './ValueProperty';
 import {
     ValuePropertyFromJSON,
     ValuePropertyFromJSONTyped,
     ValuePropertyToJSON,
+    ValuePropertyToJSONTyped,
 } from './ValueProperty';
 
 /**
@@ -112,7 +117,7 @@ export function StringPropertyFromJSONTyped(json: any, ignoreDiscriminator: bool
         return json;
     }
     return {
-        ...ValuePropertyFromJSONTyped(json, ignoreDiscriminator),
+        ...ValuePropertyFromJSONTyped(json, true),
         'languageId': json['languageId'] == null ? undefined : json['languageId'],
         'defaultValue': json['defaultValue'] == null ? undefined : json['defaultValue'],
         'exampleValue': json['exampleValue'] == null ? undefined : json['exampleValue'],
@@ -123,12 +128,17 @@ export function StringPropertyFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-export function StringPropertyToJSON(value?: StringProperty | null): any {
+  export function StringPropertyToJSON(json: any): StringProperty {
+      return StringPropertyToJSONTyped(json, false);
+  }
+
+  export function StringPropertyToJSONTyped(value?: StringProperty | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
-        ...ValuePropertyToJSON(value),
+        ...ValuePropertyToJSONTyped(value, true),
         'languageId': value['languageId'],
         'defaultValue': value['defaultValue'],
         'exampleValue': value['exampleValue'],

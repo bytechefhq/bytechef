@@ -49,10 +49,15 @@ export function TaskDispatcherOperationRequestFromJSONTyped(json: any, ignoreDis
     };
 }
 
-export function TaskDispatcherOperationRequestToJSON(value?: TaskDispatcherOperationRequest | null): any {
+  export function TaskDispatcherOperationRequestToJSON(json: any): TaskDispatcherOperationRequest {
+      return TaskDispatcherOperationRequestToJSONTyped(json, false);
+  }
+
+  export function TaskDispatcherOperationRequestToJSONTyped(value?: TaskDispatcherOperationRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'parameters': value['parameters'],

@@ -83,10 +83,15 @@ export function PageFromJSONTyped(json: any, ignoreDiscriminator: boolean): Page
     };
 }
 
-export function PageToJSON(value?: Page | null): any {
+  export function PageToJSON(json: any): Page {
+      return PageToJSONTyped(json, false);
+  }
+
+  export function PageToJSONTyped(value?: Page | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'number': value['number'],

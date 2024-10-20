@@ -50,3 +50,7 @@ export function TriggerTypeToJSON(value?: TriggerType | null): any {
     return value as any;
 }
 
+export function TriggerTypeToJSONTyped(value: any, ignoreDiscriminator: boolean): TriggerType {
+    return value as TriggerType;
+}
+

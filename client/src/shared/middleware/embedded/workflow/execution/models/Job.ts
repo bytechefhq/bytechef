@@ -18,18 +18,21 @@ import {
     ExecutionErrorFromJSON,
     ExecutionErrorFromJSONTyped,
     ExecutionErrorToJSON,
+    ExecutionErrorToJSONTyped,
 } from './ExecutionError';
 import type { TaskExecution } from './TaskExecution';
 import {
     TaskExecutionFromJSON,
     TaskExecutionFromJSONTyped,
     TaskExecutionToJSON,
+    TaskExecutionToJSONTyped,
 } from './TaskExecution';
 import type { Webhook } from './Webhook';
 import {
     WebhookFromJSON,
     WebhookFromJSONTyped,
     WebhookToJSON,
+    WebhookToJSONTyped,
 } from './Webhook';
 
 /**
@@ -203,10 +206,15 @@ export function JobFromJSONTyped(json: any, ignoreDiscriminator: boolean): Job {
     };
 }
 
-export function JobToJSON(value?: Omit<Job, 'createdBy'|'createdDate'|'currentTask'|'id'|'inputs'|'label'|'lastModifiedBy'|'lastModifiedDate'|'outputs'|'parentTaskExecutionId'|'priority'|'startDate'|'status'|'webhooks'|'workflowId'> | null): any {
+  export function JobToJSON(json: any): Job {
+      return JobToJSONTyped(json, false);
+  }
+
+  export function JobToJSONTyped(value?: Omit<Job, 'createdBy'|'createdDate'|'currentTask'|'id'|'inputs'|'label'|'lastModifiedBy'|'lastModifiedDate'|'outputs'|'parentTaskExecutionId'|'priority'|'startDate'|'status'|'webhooks'|'workflowId'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'endDate': value['endDate'] == null ? undefined : ((value['endDate']).toISOString()),

@@ -18,18 +18,21 @@ import {
     ControlTypeFromJSON,
     ControlTypeFromJSONTyped,
     ControlTypeToJSON,
+    ControlTypeToJSONTyped,
 } from './ControlType';
 import type { PropertyType } from './PropertyType';
 import {
     PropertyTypeFromJSON,
     PropertyTypeFromJSONTyped,
     PropertyTypeToJSON,
+    PropertyTypeToJSONTyped,
 } from './PropertyType';
 import type { Property } from './Property';
 import {
     PropertyFromJSON,
     PropertyFromJSONTyped,
     PropertyToJSON,
+    PropertyToJSONTyped,
 } from './Property';
 
 /**
@@ -77,19 +80,24 @@ export function ValuePropertyFromJSONTyped(json: any, ignoreDiscriminator: boole
         return json;
     }
     return {
-        ...PropertyFromJSONTyped(json, ignoreDiscriminator),
+        ...PropertyFromJSONTyped(json, true),
         'controlType': ControlTypeFromJSON(json['controlType']),
         'label': json['label'] == null ? undefined : json['label'],
         'placeholder': json['placeholder'] == null ? undefined : json['placeholder'],
     };
 }
 
-export function ValuePropertyToJSON(value?: ValueProperty | null): any {
+  export function ValuePropertyToJSON(json: any): ValueProperty {
+      return ValuePropertyToJSONTyped(json, false);
+  }
+
+  export function ValuePropertyToJSONTyped(value?: ValueProperty | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
-        ...PropertyToJSON(value),
+        ...PropertyToJSONTyped(value, true),
         'controlType': ControlTypeToJSON(value['controlType']),
         'label': value['label'],
         'placeholder': value['placeholder'],

@@ -18,18 +18,21 @@ import {
     ControlTypeFromJSON,
     ControlTypeFromJSONTyped,
     ControlTypeToJSON,
+    ControlTypeToJSONTyped,
 } from './ControlType';
 import type { PropertyType } from './PropertyType';
 import {
     PropertyTypeFromJSON,
     PropertyTypeFromJSONTyped,
     PropertyTypeToJSON,
+    PropertyTypeToJSONTyped,
 } from './PropertyType';
 import type { ValueProperty } from './ValueProperty';
 import {
     ValuePropertyFromJSON,
     ValuePropertyFromJSONTyped,
     ValuePropertyToJSON,
+    ValuePropertyToJSONTyped,
 } from './ValueProperty';
 
 /**
@@ -57,7 +60,11 @@ export function NullPropertyFromJSONTyped(json: any, ignoreDiscriminator: boolea
     return json;
 }
 
-export function NullPropertyToJSON(value?: NullProperty | null): any {
+  export function NullPropertyToJSON(json: any): NullProperty {
+      return NullPropertyToJSONTyped(json, false);
+  }
+
+  export function NullPropertyToJSONTyped(value?: NullProperty | null, ignoreDiscriminator: boolean = false): any {
     return value;
 }
 

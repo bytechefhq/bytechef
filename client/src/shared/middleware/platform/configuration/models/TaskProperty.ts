@@ -18,12 +18,14 @@ import {
     PropertyTypeFromJSON,
     PropertyTypeFromJSONTyped,
     PropertyTypeToJSON,
+    PropertyTypeToJSONTyped,
 } from './PropertyType';
 import type { Property } from './Property';
 import {
     PropertyFromJSON,
     PropertyFromJSONTyped,
     PropertyToJSON,
+    PropertyToJSONTyped,
 } from './Property';
 
 /**
@@ -58,17 +60,22 @@ export function TaskPropertyFromJSONTyped(json: any, ignoreDiscriminator: boolea
         return json;
     }
     return {
-        ...PropertyFromJSONTyped(json, ignoreDiscriminator),
+        ...PropertyFromJSONTyped(json, true),
         'name': json['name'] == null ? undefined : json['name'],
     };
 }
 
-export function TaskPropertyToJSON(value?: TaskProperty | null): any {
+  export function TaskPropertyToJSON(json: any): TaskProperty {
+      return TaskPropertyToJSONTyped(json, false);
+  }
+
+  export function TaskPropertyToJSONTyped(value?: TaskProperty | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
-        ...PropertyToJSON(value),
+        ...PropertyToJSONTyped(value, true),
         'name': value['name'],
     };
 }

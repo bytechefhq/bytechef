@@ -62,10 +62,15 @@ export function IntegrationInstanceConfigurationWorkflowConnectionFromJSONTyped(
     };
 }
 
-export function IntegrationInstanceConfigurationWorkflowConnectionToJSON(value?: IntegrationInstanceConfigurationWorkflowConnection | null): any {
+  export function IntegrationInstanceConfigurationWorkflowConnectionToJSON(json: any): IntegrationInstanceConfigurationWorkflowConnection {
+      return IntegrationInstanceConfigurationWorkflowConnectionToJSONTyped(json, false);
+  }
+
+  export function IntegrationInstanceConfigurationWorkflowConnectionToJSONTyped(value?: IntegrationInstanceConfigurationWorkflowConnection | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'connectionId': value['connectionId'],

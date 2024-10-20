@@ -97,10 +97,15 @@ export function WorkflowBasicFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function WorkflowBasicToJSON(value?: Omit<WorkflowBasic, 'createdBy'|'createdDate'|'id'|'label'|'lastModifiedBy'|'lastModifiedDate'> | null): any {
+  export function WorkflowBasicToJSON(json: any): WorkflowBasic {
+      return WorkflowBasicToJSONTyped(json, false);
+  }
+
+  export function WorkflowBasicToJSONTyped(value?: Omit<WorkflowBasic, 'createdBy'|'createdDate'|'id'|'label'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'description': value['description'],

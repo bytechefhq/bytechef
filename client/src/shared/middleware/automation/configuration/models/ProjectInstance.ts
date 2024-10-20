@@ -18,18 +18,21 @@ import {
     ProjectInstanceWorkflowFromJSON,
     ProjectInstanceWorkflowFromJSONTyped,
     ProjectInstanceWorkflowToJSON,
+    ProjectInstanceWorkflowToJSONTyped,
 } from './ProjectInstanceWorkflow';
 import type { Environment } from './Environment';
 import {
     EnvironmentFromJSON,
     EnvironmentFromJSONTyped,
     EnvironmentToJSON,
+    EnvironmentToJSONTyped,
 } from './Environment';
 import type { Tag } from './Tag';
 import {
     TagFromJSON,
     TagFromJSONTyped,
     TagToJSON,
+    TagToJSONTyped,
 } from './Tag';
 
 /**
@@ -175,10 +178,15 @@ export function ProjectInstanceFromJSONTyped(json: any, ignoreDiscriminator: boo
     };
 }
 
-export function ProjectInstanceToJSON(value?: Omit<ProjectInstance, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'project'> | null): any {
+  export function ProjectInstanceToJSON(json: any): ProjectInstance {
+      return ProjectInstanceToJSONTyped(json, false);
+  }
+
+  export function ProjectInstanceToJSONTyped(value?: Omit<ProjectInstance, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'project'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'description': value['description'],

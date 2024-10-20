@@ -48,10 +48,15 @@ export function OptionsDataSourceFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-export function OptionsDataSourceToJSON(value?: OptionsDataSource | null): any {
+  export function OptionsDataSourceToJSON(json: any): OptionsDataSource {
+      return OptionsDataSourceToJSONTyped(json, false);
+  }
+
+  export function OptionsDataSourceToJSONTyped(value?: OptionsDataSource | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'optionsLookupDependsOn': value['optionsLookupDependsOn'],

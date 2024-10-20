@@ -18,18 +18,21 @@ import {
     PropertiesDataSourceFromJSON,
     PropertiesDataSourceFromJSONTyped,
     PropertiesDataSourceToJSON,
+    PropertiesDataSourceToJSONTyped,
 } from './PropertiesDataSource';
 import type { PropertyType } from './PropertyType';
 import {
     PropertyTypeFromJSON,
     PropertyTypeFromJSONTyped,
     PropertyTypeToJSON,
+    PropertyTypeToJSONTyped,
 } from './PropertyType';
 import type { Property } from './Property';
 import {
     PropertyFromJSON,
     PropertyFromJSONTyped,
     PropertyToJSON,
+    PropertyToJSONTyped,
 } from './Property';
 
 /**
@@ -70,18 +73,23 @@ export function DynamicPropertiesPropertyFromJSONTyped(json: any, ignoreDiscrimi
         return json;
     }
     return {
-        ...PropertyFromJSONTyped(json, ignoreDiscriminator),
+        ...PropertyFromJSONTyped(json, true),
         'header': json['header'] == null ? undefined : json['header'],
         'propertiesDataSource': json['propertiesDataSource'] == null ? undefined : PropertiesDataSourceFromJSON(json['propertiesDataSource']),
     };
 }
 
-export function DynamicPropertiesPropertyToJSON(value?: DynamicPropertiesProperty | null): any {
+  export function DynamicPropertiesPropertyToJSON(json: any): DynamicPropertiesProperty {
+      return DynamicPropertiesPropertyToJSONTyped(json, false);
+  }
+
+  export function DynamicPropertiesPropertyToJSONTyped(value?: DynamicPropertiesProperty | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
-        ...PropertyToJSON(value),
+        ...PropertyToJSONTyped(value, true),
         'header': value['header'],
         'propertiesDataSource': PropertiesDataSourceToJSON(value['propertiesDataSource']),
     };

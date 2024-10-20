@@ -69,10 +69,15 @@ export function OAuth2AuthorizationParametersFromJSONTyped(json: any, ignoreDisc
     };
 }
 
-export function OAuth2AuthorizationParametersToJSON(value?: OAuth2AuthorizationParameters | null): any {
+  export function OAuth2AuthorizationParametersToJSON(json: any): OAuth2AuthorizationParameters {
+      return OAuth2AuthorizationParametersToJSONTyped(json, false);
+  }
+
+  export function OAuth2AuthorizationParametersToJSONTyped(value?: OAuth2AuthorizationParameters | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'authorizationUrl': value['authorizationUrl'],

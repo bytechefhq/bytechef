@@ -18,12 +18,14 @@ import {
     HelpFromJSON,
     HelpFromJSONTyped,
     HelpToJSON,
+    HelpToJSONTyped,
 } from './Help';
 import type { Property } from './Property';
 import {
     PropertyFromJSON,
     PropertyFromJSONTyped,
     PropertyToJSON,
+    PropertyToJSONTyped,
 } from './Property';
 
 /**
@@ -119,10 +121,15 @@ export function ActionDefinitionFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-export function ActionDefinitionToJSON(value?: ActionDefinition | null): any {
+  export function ActionDefinitionToJSON(json: any): ActionDefinition {
+      return ActionDefinitionToJSONTyped(json, false);
+  }
+
+  export function ActionDefinitionToJSONTyped(value?: ActionDefinition | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'componentName': value['componentName'],

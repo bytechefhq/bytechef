@@ -18,30 +18,35 @@ import {
     WorkflowBasicFromJSON,
     WorkflowBasicFromJSONTyped,
     WorkflowBasicToJSON,
+    WorkflowBasicToJSONTyped,
 } from './WorkflowBasic';
 import type { TriggerExecution } from './TriggerExecution';
 import {
     TriggerExecutionFromJSON,
     TriggerExecutionFromJSONTyped,
     TriggerExecutionToJSON,
+    TriggerExecutionToJSONTyped,
 } from './TriggerExecution';
 import type { ProjectInstanceBasic } from './ProjectInstanceBasic';
 import {
     ProjectInstanceBasicFromJSON,
     ProjectInstanceBasicFromJSONTyped,
     ProjectInstanceBasicToJSON,
+    ProjectInstanceBasicToJSONTyped,
 } from './ProjectInstanceBasic';
 import type { Job } from './Job';
 import {
     JobFromJSON,
     JobFromJSONTyped,
     JobToJSON,
+    JobToJSONTyped,
 } from './Job';
 import type { ProjectBasic } from './ProjectBasic';
 import {
     ProjectBasicFromJSON,
     ProjectBasicFromJSONTyped,
     ProjectBasicToJSON,
+    ProjectBasicToJSONTyped,
 } from './ProjectBasic';
 
 /**
@@ -114,10 +119,15 @@ export function WorkflowExecutionFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-export function WorkflowExecutionToJSON(value?: Omit<WorkflowExecution, 'id'> | null): any {
+  export function WorkflowExecutionToJSON(json: any): WorkflowExecution {
+      return WorkflowExecutionToJSONTyped(json, false);
+  }
+
+  export function WorkflowExecutionToJSONTyped(value?: Omit<WorkflowExecution, 'id'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'job': JobToJSON(value['job']),

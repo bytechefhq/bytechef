@@ -18,12 +18,14 @@ import {
     ApiConnectorEndpointFromJSON,
     ApiConnectorEndpointFromJSONTyped,
     ApiConnectorEndpointToJSON,
+    ApiConnectorEndpointToJSONTyped,
 } from './ApiConnectorEndpoint';
 import type { Tag } from './Tag';
 import {
     TagFromJSON,
     TagFromJSONTyped,
     TagToJSON,
+    TagToJSONTyped,
 } from './Tag';
 
 /**
@@ -168,10 +170,15 @@ export function ApiConnectorFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-export function ApiConnectorToJSON(value?: Omit<ApiConnector, 'createdBy'|'createdDate'|'definition'|'lastModifiedBy'|'lastModifiedDate'|'specification'> | null): any {
+  export function ApiConnectorToJSON(json: any): ApiConnector {
+      return ApiConnectorToJSONTyped(json, false);
+  }
+
+  export function ApiConnectorToJSONTyped(value?: Omit<ApiConnector, 'createdBy'|'createdDate'|'definition'|'lastModifiedBy'|'lastModifiedDate'|'specification'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'connectorVersion': value['connectorVersion'],

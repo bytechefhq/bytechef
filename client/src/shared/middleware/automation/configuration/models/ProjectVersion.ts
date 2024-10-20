@@ -18,6 +18,7 @@ import {
     ProjectStatusFromJSON,
     ProjectStatusFromJSONTyped,
     ProjectStatusToJSON,
+    ProjectStatusToJSONTyped,
 } from './ProjectStatus';
 
 /**
@@ -78,10 +79,15 @@ export function ProjectVersionFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-export function ProjectVersionToJSON(value?: Omit<ProjectVersion, 'version'> | null): any {
+  export function ProjectVersionToJSON(json: any): ProjectVersion {
+      return ProjectVersionToJSONTyped(json, false);
+  }
+
+  export function ProjectVersionToJSONTyped(value?: Omit<ProjectVersion, 'version'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'description': value['description'],

@@ -18,36 +18,42 @@ import {
     ConnectionDefinitionBasicFromJSON,
     ConnectionDefinitionBasicFromJSONTyped,
     ConnectionDefinitionBasicToJSON,
+    ConnectionDefinitionBasicToJSONTyped,
 } from './ConnectionDefinitionBasic';
 import type { ActionDefinitionBasic } from './ActionDefinitionBasic';
 import {
     ActionDefinitionBasicFromJSON,
     ActionDefinitionBasicFromJSONTyped,
     ActionDefinitionBasicToJSON,
+    ActionDefinitionBasicToJSONTyped,
 } from './ActionDefinitionBasic';
 import type { Resources } from './Resources';
 import {
     ResourcesFromJSON,
     ResourcesFromJSONTyped,
     ResourcesToJSON,
+    ResourcesToJSONTyped,
 } from './Resources';
 import type { UnifiedApiCategory } from './UnifiedApiCategory';
 import {
     UnifiedApiCategoryFromJSON,
     UnifiedApiCategoryFromJSONTyped,
     UnifiedApiCategoryToJSON,
+    UnifiedApiCategoryToJSONTyped,
 } from './UnifiedApiCategory';
 import type { ComponentCategory } from './ComponentCategory';
 import {
     ComponentCategoryFromJSON,
     ComponentCategoryFromJSONTyped,
     ComponentCategoryToJSON,
+    ComponentCategoryToJSONTyped,
 } from './ComponentCategory';
 import type { TriggerDefinitionBasic } from './TriggerDefinitionBasic';
 import {
     TriggerDefinitionBasicFromJSON,
     TriggerDefinitionBasicFromJSONTyped,
     TriggerDefinitionBasicToJSON,
+    TriggerDefinitionBasicToJSONTyped,
 } from './TriggerDefinitionBasic';
 
 /**
@@ -181,10 +187,15 @@ export function ComponentDefinitionFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-export function ComponentDefinitionToJSON(value?: ComponentDefinition | null): any {
+  export function ComponentDefinitionToJSON(json: any): ComponentDefinition {
+      return ComponentDefinitionToJSONTyped(json, false);
+  }
+
+  export function ComponentDefinitionToJSONTyped(value?: ComponentDefinition | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'actions': value['actions'] == null ? undefined : ((value['actions'] as Array<any>).map(ActionDefinitionBasicToJSON)),

@@ -48,10 +48,15 @@ export function DeleteWorkflowNodeParameter200ResponseFromJSONTyped(json: any, i
     };
 }
 
-export function DeleteWorkflowNodeParameter200ResponseToJSON(value?: DeleteWorkflowNodeParameter200Response | null): any {
+  export function DeleteWorkflowNodeParameter200ResponseToJSON(json: any): DeleteWorkflowNodeParameter200Response {
+      return DeleteWorkflowNodeParameter200ResponseToJSONTyped(json, false);
+  }
+
+  export function DeleteWorkflowNodeParameter200ResponseToJSONTyped(value?: DeleteWorkflowNodeParameter200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'parameters': value['parameters'],

@@ -92,10 +92,15 @@ export function ComponentDefinitionBasicFromJSONTyped(json: any, ignoreDiscrimin
     };
 }
 
-export function ComponentDefinitionBasicToJSON(value?: ComponentDefinitionBasic | null): any {
+  export function ComponentDefinitionBasicToJSON(json: any): ComponentDefinitionBasic {
+      return ComponentDefinitionBasicToJSONTyped(json, false);
+  }
+
+  export function ComponentDefinitionBasicToJSONTyped(value?: ComponentDefinitionBasic | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'actionsCount': value['actionsCount'],

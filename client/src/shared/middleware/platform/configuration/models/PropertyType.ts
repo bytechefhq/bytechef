@@ -58,3 +58,7 @@ export function PropertyTypeToJSON(value?: PropertyType | null): any {
     return value as any;
 }
 
+export function PropertyTypeToJSONTyped(value: any, ignoreDiscriminator: boolean): PropertyType {
+    return value as PropertyType;
+}
+

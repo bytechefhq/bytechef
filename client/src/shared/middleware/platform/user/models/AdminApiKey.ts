@@ -99,10 +99,15 @@ export function AdminApiKeyFromJSONTyped(json: any, ignoreDiscriminator: boolean
     };
 }
 
-export function AdminApiKeyToJSON(value?: Omit<AdminApiKey, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'|'secretKey'> | null): any {
+  export function AdminApiKeyToJSON(json: any): AdminApiKey {
+      return AdminApiKeyToJSONTyped(json, false);
+  }
+
+  export function AdminApiKeyToJSONTyped(value?: Omit<AdminApiKey, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'|'secretKey'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'name': value['name'],

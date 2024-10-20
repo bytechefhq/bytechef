@@ -18,36 +18,42 @@ import {
     OptionsDataSourceFromJSON,
     OptionsDataSourceFromJSONTyped,
     OptionsDataSourceToJSON,
+    OptionsDataSourceToJSONTyped,
 } from './OptionsDataSource';
 import type { ControlType } from './ControlType';
 import {
     ControlTypeFromJSON,
     ControlTypeFromJSONTyped,
     ControlTypeToJSON,
+    ControlTypeToJSONTyped,
 } from './ControlType';
 import type { Option } from './Option';
 import {
     OptionFromJSON,
     OptionFromJSONTyped,
     OptionToJSON,
+    OptionToJSONTyped,
 } from './Option';
 import type { PropertyType } from './PropertyType';
 import {
     PropertyTypeFromJSON,
     PropertyTypeFromJSONTyped,
     PropertyTypeToJSON,
+    PropertyTypeToJSONTyped,
 } from './PropertyType';
 import type { Property } from './Property';
 import {
     PropertyFromJSON,
     PropertyFromJSONTyped,
     PropertyToJSON,
+    PropertyToJSONTyped,
 } from './Property';
 import type { ValueProperty } from './ValueProperty';
 import {
     ValuePropertyFromJSON,
     ValuePropertyFromJSONTyped,
     ValuePropertyToJSON,
+    ValuePropertyToJSONTyped,
 } from './ValueProperty';
 
 /**
@@ -124,7 +130,7 @@ export function ArrayPropertyFromJSONTyped(json: any, ignoreDiscriminator: boole
         return json;
     }
     return {
-        ...ValuePropertyFromJSONTyped(json, ignoreDiscriminator),
+        ...ValuePropertyFromJSONTyped(json, true),
         'defaultValue': json['defaultValue'] == null ? undefined : json['defaultValue'],
         'exampleValue': json['exampleValue'] == null ? undefined : json['exampleValue'],
         'items': json['items'] == null ? undefined : ((json['items'] as Array<any>).map(PropertyFromJSON)),
@@ -136,12 +142,17 @@ export function ArrayPropertyFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function ArrayPropertyToJSON(value?: ArrayProperty | null): any {
+  export function ArrayPropertyToJSON(json: any): ArrayProperty {
+      return ArrayPropertyToJSONTyped(json, false);
+  }
+
+  export function ArrayPropertyToJSONTyped(value?: ArrayProperty | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
-        ...ValuePropertyToJSON(value),
+        ...ValuePropertyToJSONTyped(value, true),
         'defaultValue': value['defaultValue'],
         'exampleValue': value['exampleValue'],
         'items': value['items'] == null ? undefined : ((value['items'] as Array<any>).map(PropertyToJSON)),

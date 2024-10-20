@@ -55,10 +55,15 @@ export function OAuth2PropertiesFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-export function OAuth2PropertiesToJSON(value?: Omit<OAuth2Properties, 'redirectUri'|'predefinedApps'> | null): any {
+  export function OAuth2PropertiesToJSON(json: any): OAuth2Properties {
+      return OAuth2PropertiesToJSONTyped(json, false);
+  }
+
+  export function OAuth2PropertiesToJSONTyped(value?: Omit<OAuth2Properties, 'redirectUri'|'predefinedApps'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
     };

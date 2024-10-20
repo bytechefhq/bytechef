@@ -48,10 +48,15 @@ export function GetWorkflowNodeParameterDisplayConditions200ResponseFromJSONType
     };
 }
 
-export function GetWorkflowNodeParameterDisplayConditions200ResponseToJSON(value?: GetWorkflowNodeParameterDisplayConditions200Response | null): any {
+  export function GetWorkflowNodeParameterDisplayConditions200ResponseToJSON(json: any): GetWorkflowNodeParameterDisplayConditions200Response {
+      return GetWorkflowNodeParameterDisplayConditions200ResponseToJSONTyped(json, false);
+  }
+
+  export function GetWorkflowNodeParameterDisplayConditions200ResponseToJSONTyped(value?: GetWorkflowNodeParameterDisplayConditions200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'displayConditions': value['displayConditions'],

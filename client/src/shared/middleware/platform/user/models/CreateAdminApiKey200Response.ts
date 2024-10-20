@@ -48,10 +48,15 @@ export function CreateAdminApiKey200ResponseFromJSONTyped(json: any, ignoreDiscr
     };
 }
 
-export function CreateAdminApiKey200ResponseToJSON(value?: CreateAdminApiKey200Response | null): any {
+  export function CreateAdminApiKey200ResponseToJSON(json: any): CreateAdminApiKey200Response {
+      return CreateAdminApiKey200ResponseToJSONTyped(json, false);
+  }
+
+  export function CreateAdminApiKey200ResponseToJSONTyped(value?: CreateAdminApiKey200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'secretKey': value['secretKey'],

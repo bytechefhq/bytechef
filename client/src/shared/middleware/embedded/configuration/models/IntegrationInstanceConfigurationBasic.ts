@@ -18,6 +18,7 @@ import {
     EnvironmentFromJSON,
     EnvironmentFromJSONTyped,
     EnvironmentToJSON,
+    EnvironmentToJSONTyped,
 } from './Environment';
 
 /**
@@ -135,10 +136,15 @@ export function IntegrationInstanceConfigurationBasicFromJSONTyped(json: any, ig
     };
 }
 
-export function IntegrationInstanceConfigurationBasicToJSON(value?: Omit<IntegrationInstanceConfigurationBasic, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'> | null): any {
+  export function IntegrationInstanceConfigurationBasicToJSON(json: any): IntegrationInstanceConfigurationBasic {
+      return IntegrationInstanceConfigurationBasicToJSONTyped(json, false);
+  }
+
+  export function IntegrationInstanceConfigurationBasicToJSONTyped(value?: Omit<IntegrationInstanceConfigurationBasic, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'description': value['description'],

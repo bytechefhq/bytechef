@@ -48,10 +48,15 @@ export function PublishIntegrationRequestFromJSONTyped(json: any, ignoreDiscrimi
     };
 }
 
-export function PublishIntegrationRequestToJSON(value?: PublishIntegrationRequest | null): any {
+  export function PublishIntegrationRequestToJSON(json: any): PublishIntegrationRequest {
+      return PublishIntegrationRequestToJSONTyped(json, false);
+  }
+
+  export function PublishIntegrationRequestToJSONTyped(value?: PublishIntegrationRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'description': value['description'],

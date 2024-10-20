@@ -18,6 +18,7 @@ import {
     HttpMethodFromJSON,
     HttpMethodFromJSONTyped,
     HttpMethodToJSON,
+    HttpMethodToJSONTyped,
 } from './HttpMethod';
 
 /**
@@ -128,10 +129,15 @@ export function ApiConnectorEndpointFromJSONTyped(json: any, ignoreDiscriminator
     };
 }
 
-export function ApiConnectorEndpointToJSON(value?: Omit<ApiConnectorEndpoint, 'createdBy'|'createdDate'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'> | null): any {
+  export function ApiConnectorEndpointToJSON(json: any): ApiConnectorEndpoint {
+      return ApiConnectorEndpointToJSONTyped(json, false);
+  }
+
+  export function ApiConnectorEndpointToJSONTyped(value?: Omit<ApiConnectorEndpoint, 'createdBy'|'createdDate'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'description': value['description'],

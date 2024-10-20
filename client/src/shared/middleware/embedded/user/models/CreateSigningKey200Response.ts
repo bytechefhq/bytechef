@@ -48,10 +48,15 @@ export function CreateSigningKey200ResponseFromJSONTyped(json: any, ignoreDiscri
     };
 }
 
-export function CreateSigningKey200ResponseToJSON(value?: CreateSigningKey200Response | null): any {
+  export function CreateSigningKey200ResponseToJSON(json: any): CreateSigningKey200Response {
+      return CreateSigningKey200ResponseToJSONTyped(json, false);
+  }
+
+  export function CreateSigningKey200ResponseToJSONTyped(value?: CreateSigningKey200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'privateKey': value['privateKey'],

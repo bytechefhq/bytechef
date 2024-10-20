@@ -146,10 +146,15 @@ export function CustomComponentFromJSONTyped(json: any, ignoreDiscriminator: boo
     };
 }
 
-export function CustomComponentToJSON(value?: Omit<CustomComponent, 'createdBy'|'createdDate'|'language'|'lastModifiedBy'|'lastModifiedDate'> | null): any {
+  export function CustomComponentToJSON(json: any): CustomComponent {
+      return CustomComponentToJSONTyped(json, false);
+  }
+
+  export function CustomComponentToJSONTyped(value?: Omit<CustomComponent, 'createdBy'|'createdDate'|'language'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'componentVersion': value['componentVersion'],

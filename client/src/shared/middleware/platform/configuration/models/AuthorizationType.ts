@@ -56,3 +56,7 @@ export function AuthorizationTypeToJSON(value?: AuthorizationType | null): any {
     return value as any;
 }
 
+export function AuthorizationTypeToJSONTyped(value: any, ignoreDiscriminator: boolean): AuthorizationType {
+    return value as AuthorizationType;
+}
+

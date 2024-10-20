@@ -18,12 +18,14 @@ import {
     AuthorizationFromJSON,
     AuthorizationFromJSONTyped,
     AuthorizationToJSON,
+    AuthorizationToJSONTyped,
 } from './Authorization';
 import type { Property } from './Property';
 import {
     PropertyFromJSON,
     PropertyFromJSONTyped,
     PropertyToJSON,
+    PropertyToJSONTyped,
 } from './Property';
 
 /**
@@ -112,10 +114,15 @@ export function ConnectionDefinitionFromJSONTyped(json: any, ignoreDiscriminator
     };
 }
 
-export function ConnectionDefinitionToJSON(value?: ConnectionDefinition | null): any {
+  export function ConnectionDefinitionToJSON(json: any): ConnectionDefinition {
+      return ConnectionDefinitionToJSONTyped(json, false);
+  }
+
+  export function ConnectionDefinitionToJSONTyped(value?: ConnectionDefinition | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'authorizationRequired': value['authorizationRequired'],

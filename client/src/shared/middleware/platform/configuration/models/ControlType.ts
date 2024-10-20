@@ -64,3 +64,7 @@ export function ControlTypeToJSON(value?: ControlType | null): any {
     return value as any;
 }
 
+export function ControlTypeToJSONTyped(value: any, ignoreDiscriminator: boolean): ControlType {
+    return value as ControlType;
+}
+

@@ -18,6 +18,7 @@ import {
     HelpFromJSON,
     HelpFromJSONTyped,
     HelpToJSON,
+    HelpToJSONTyped,
 } from './Help';
 
 /**
@@ -77,10 +78,15 @@ export function ActionDefinitionBasicFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-export function ActionDefinitionBasicToJSON(value?: ActionDefinitionBasic | null): any {
+  export function ActionDefinitionBasicToJSON(json: any): ActionDefinitionBasic {
+      return ActionDefinitionBasicToJSONTyped(json, false);
+  }
+
+  export function ActionDefinitionBasicToJSONTyped(value?: ActionDefinitionBasic | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'description': value['description'],

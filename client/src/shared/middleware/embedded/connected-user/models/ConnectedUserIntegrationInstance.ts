@@ -18,6 +18,7 @@ import {
     CredentialStatusFromJSON,
     CredentialStatusFromJSONTyped,
     CredentialStatusToJSON,
+    CredentialStatusToJSONTyped,
 } from './CredentialStatus';
 
 /**
@@ -99,10 +100,15 @@ export function ConnectedUserIntegrationInstanceFromJSONTyped(json: any, ignoreD
     };
 }
 
-export function ConnectedUserIntegrationInstanceToJSON(value?: Omit<ConnectedUserIntegrationInstance, 'id'|'integrationId'|'integrationVersion'|'connectionId'> | null): any {
+  export function ConnectedUserIntegrationInstanceToJSON(json: any): ConnectedUserIntegrationInstance {
+      return ConnectedUserIntegrationInstanceToJSONTyped(json, false);
+  }
+
+  export function ConnectedUserIntegrationInstanceToJSONTyped(value?: Omit<ConnectedUserIntegrationInstance, 'id'|'integrationId'|'integrationVersion'|'connectionId'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'componentName': value['componentName'],

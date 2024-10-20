@@ -91,10 +91,15 @@ export function TagFromJSONTyped(json: any, ignoreDiscriminator: boolean): Tag {
     };
 }
 
-export function TagToJSON(value?: Omit<Tag, 'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'> | null): any {
+  export function TagToJSON(json: any): Tag {
+      return TagToJSONTyped(json, false);
+  }
+
+  export function TagToJSONTyped(value?: Omit<Tag, 'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'id': value['id'],

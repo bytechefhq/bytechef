@@ -18,12 +18,14 @@ import {
     TriggerExecutionFromJSON,
     TriggerExecutionFromJSONTyped,
     TriggerExecutionToJSON,
+    TriggerExecutionToJSONTyped,
 } from './TriggerExecution';
 import type { Job } from './Job';
 import {
     JobFromJSON,
     JobFromJSONTyped,
     JobToJSON,
+    JobToJSONTyped,
 } from './Job';
 
 /**
@@ -68,10 +70,15 @@ export function WorkflowTestExecutionFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-export function WorkflowTestExecutionToJSON(value?: WorkflowTestExecution | null): any {
+  export function WorkflowTestExecutionToJSON(json: any): WorkflowTestExecution {
+      return WorkflowTestExecutionToJSONTyped(json, false);
+  }
+
+  export function WorkflowTestExecutionToJSONTyped(value?: WorkflowTestExecution | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'job': JobToJSON(value['job']),

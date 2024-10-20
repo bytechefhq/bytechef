@@ -18,12 +18,14 @@ import {
     AuthorizationTypeFromJSON,
     AuthorizationTypeFromJSONTyped,
     AuthorizationTypeToJSON,
+    AuthorizationTypeToJSONTyped,
 } from './AuthorizationType';
 import type { Property } from './Property';
 import {
     PropertyFromJSON,
     PropertyFromJSONTyped,
     PropertyToJSON,
+    PropertyToJSONTyped,
 } from './Property';
 
 /**
@@ -91,10 +93,15 @@ export function AuthorizationFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function AuthorizationToJSON(value?: Authorization | null): any {
+  export function AuthorizationToJSON(json: any): Authorization {
+      return AuthorizationToJSONTyped(json, false);
+  }
+
+  export function AuthorizationToJSONTyped(value?: Authorization | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'description': value['description'],

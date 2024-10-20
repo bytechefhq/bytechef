@@ -18,18 +18,21 @@ import {
     TriggerTypeFromJSON,
     TriggerTypeFromJSONTyped,
     TriggerTypeToJSON,
+    TriggerTypeToJSONTyped,
 } from './TriggerType';
 import type { Help } from './Help';
 import {
     HelpFromJSON,
     HelpFromJSONTyped,
     HelpToJSON,
+    HelpToJSONTyped,
 } from './Help';
 import type { Property } from './Property';
 import {
     PropertyFromJSON,
     PropertyFromJSONTyped,
     PropertyToJSON,
+    PropertyToJSONTyped,
 } from './Property';
 
 /**
@@ -135,10 +138,15 @@ export function TriggerDefinitionFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-export function TriggerDefinitionToJSON(value?: TriggerDefinition | null): any {
+  export function TriggerDefinitionToJSON(json: any): TriggerDefinition {
+      return TriggerDefinitionToJSONTyped(json, false);
+  }
+
+  export function TriggerDefinitionToJSONTyped(value?: TriggerDefinition | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'componentName': value['componentName'],

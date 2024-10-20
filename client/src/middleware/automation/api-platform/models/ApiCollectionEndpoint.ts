@@ -18,6 +18,7 @@ import {
     HttpMethodFromJSON,
     HttpMethodFromJSONTyped,
     HttpMethodToJSON,
+    HttpMethodToJSONTyped,
 } from './HttpMethod';
 
 /**
@@ -152,10 +153,15 @@ export function ApiCollectionEndpointFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-export function ApiCollectionEndpointToJSON(value?: Omit<ApiCollectionEndpoint, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'projectInstanceWorkflowId'> | null): any {
+  export function ApiCollectionEndpointToJSON(json: any): ApiCollectionEndpoint {
+      return ApiCollectionEndpointToJSONTyped(json, false);
+  }
+
+  export function ApiCollectionEndpointToJSONTyped(value?: Omit<ApiCollectionEndpoint, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'projectInstanceWorkflowId'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'apiCollectionId': value['apiCollectionId'],

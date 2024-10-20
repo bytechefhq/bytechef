@@ -18,6 +18,7 @@ import {
     EnvironmentFromJSON,
     EnvironmentFromJSONTyped,
     EnvironmentToJSON,
+    EnvironmentToJSONTyped,
 } from './Environment';
 
 /**
@@ -135,10 +136,15 @@ export function ProjectInstanceBasicFromJSONTyped(json: any, ignoreDiscriminator
     };
 }
 
-export function ProjectInstanceBasicToJSON(value?: Omit<ProjectInstanceBasic, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'> | null): any {
+  export function ProjectInstanceBasicToJSON(json: any): ProjectInstanceBasic {
+      return ProjectInstanceBasicToJSONTyped(json, false);
+  }
+
+  export function ProjectInstanceBasicToJSONTyped(value?: Omit<ProjectInstanceBasic, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'description': value['description'],

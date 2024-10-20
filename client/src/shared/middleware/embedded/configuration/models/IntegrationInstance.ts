@@ -18,12 +18,14 @@ import {
     IntegrationInstanceWorkflowFromJSON,
     IntegrationInstanceWorkflowFromJSONTyped,
     IntegrationInstanceWorkflowToJSON,
+    IntegrationInstanceWorkflowToJSONTyped,
 } from './IntegrationInstanceWorkflow';
 import type { Environment } from './Environment';
 import {
     EnvironmentFromJSON,
     EnvironmentFromJSONTyped,
     EnvironmentToJSON,
+    EnvironmentToJSONTyped,
 } from './Environment';
 
 /**
@@ -155,10 +157,15 @@ export function IntegrationInstanceFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-export function IntegrationInstanceToJSON(value?: Omit<IntegrationInstance, 'connectionId'|'connectedUserId'|'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'integrationInstanceConfiguration'|'integrationInstanceWorkflows'> | null): any {
+  export function IntegrationInstanceToJSON(json: any): IntegrationInstance {
+      return IntegrationInstanceToJSONTyped(json, false);
+  }
+
+  export function IntegrationInstanceToJSONTyped(value?: Omit<IntegrationInstance, 'connectionId'|'connectedUserId'|'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'integrationInstanceConfiguration'|'integrationInstanceWorkflows'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'enabled': value['enabled'],

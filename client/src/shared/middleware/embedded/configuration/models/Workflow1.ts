@@ -18,30 +18,35 @@ import {
     WorkflowOutputFromJSON,
     WorkflowOutputFromJSONTyped,
     WorkflowOutputToJSON,
+    WorkflowOutputToJSONTyped,
 } from './WorkflowOutput';
 import type { WorkflowFormat } from './WorkflowFormat';
 import {
     WorkflowFormatFromJSON,
     WorkflowFormatFromJSONTyped,
     WorkflowFormatToJSON,
+    WorkflowFormatToJSONTyped,
 } from './WorkflowFormat';
 import type { WorkflowTask } from './WorkflowTask';
 import {
     WorkflowTaskFromJSON,
     WorkflowTaskFromJSONTyped,
     WorkflowTaskToJSON,
+    WorkflowTaskToJSONTyped,
 } from './WorkflowTask';
 import type { WorkflowTrigger } from './WorkflowTrigger';
 import {
     WorkflowTriggerFromJSON,
     WorkflowTriggerFromJSONTyped,
     WorkflowTriggerToJSON,
+    WorkflowTriggerToJSONTyped,
 } from './WorkflowTrigger';
 import type { WorkflowInput } from './WorkflowInput';
 import {
     WorkflowInputFromJSON,
     WorkflowInputFromJSONTyped,
     WorkflowInputToJSON,
+    WorkflowInputToJSONTyped,
 } from './WorkflowInput';
 
 /**
@@ -225,10 +230,15 @@ export function Workflow1FromJSONTyped(json: any, ignoreDiscriminator: boolean):
     };
 }
 
-export function Workflow1ToJSON(value?: Omit<Workflow1, 'createdBy'|'createdDate'|'connectionsCount'|'id'|'inputs'|'inputsCount'|'label'|'lastModifiedBy'|'lastModifiedDate'|'outputs'|'maxRetries'|'workflowTaskComponentNames'|'workflowTriggerComponentNames'|'tasks'|'triggers'> | null): any {
+  export function Workflow1ToJSON(json: any): Workflow1 {
+      return Workflow1ToJSONTyped(json, false);
+  }
+
+  export function Workflow1ToJSONTyped(value?: Omit<Workflow1, 'createdBy'|'createdDate'|'connectionsCount'|'id'|'inputs'|'inputsCount'|'label'|'lastModifiedBy'|'lastModifiedDate'|'outputs'|'maxRetries'|'workflowTaskComponentNames'|'workflowTriggerComponentNames'|'tasks'|'triggers'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'definition': value['definition'],

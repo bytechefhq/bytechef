@@ -72,10 +72,15 @@ export function IntegrationInstanceWorkflowFromJSONTyped(json: any, ignoreDiscri
     };
 }
 
-export function IntegrationInstanceWorkflowToJSON(value?: IntegrationInstanceWorkflow | null): any {
+  export function IntegrationInstanceWorkflowToJSON(json: any): IntegrationInstanceWorkflow {
+      return IntegrationInstanceWorkflowToJSONTyped(json, false);
+  }
+
+  export function IntegrationInstanceWorkflowToJSONTyped(value?: IntegrationInstanceWorkflow | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'inputs': value['inputs'],

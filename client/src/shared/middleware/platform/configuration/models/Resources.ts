@@ -48,10 +48,15 @@ export function ResourcesFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     };
 }
 
-export function ResourcesToJSON(value?: Resources | null): any {
+  export function ResourcesToJSON(json: any): Resources {
+      return ResourcesToJSONTyped(json, false);
+  }
+
+  export function ResourcesToJSONTyped(value?: Resources | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'documentationUrl': value['documentationUrl'],

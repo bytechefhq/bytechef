@@ -18,30 +18,35 @@ import {
     WorkflowOutputFromJSON,
     WorkflowOutputFromJSONTyped,
     WorkflowOutputToJSON,
+    WorkflowOutputToJSONTyped,
 } from './WorkflowOutput';
 import type { WorkflowFormat } from './WorkflowFormat';
 import {
     WorkflowFormatFromJSON,
     WorkflowFormatFromJSONTyped,
     WorkflowFormatToJSON,
+    WorkflowFormatToJSONTyped,
 } from './WorkflowFormat';
 import type { WorkflowTask } from './WorkflowTask';
 import {
     WorkflowTaskFromJSON,
     WorkflowTaskFromJSONTyped,
     WorkflowTaskToJSON,
+    WorkflowTaskToJSONTyped,
 } from './WorkflowTask';
 import type { WorkflowTrigger } from './WorkflowTrigger';
 import {
     WorkflowTriggerFromJSON,
     WorkflowTriggerFromJSONTyped,
     WorkflowTriggerToJSON,
+    WorkflowTriggerToJSONTyped,
 } from './WorkflowTrigger';
 import type { WorkflowInput } from './WorkflowInput';
 import {
     WorkflowInputFromJSON,
     WorkflowInputFromJSONTyped,
     WorkflowInputToJSON,
+    WorkflowInputToJSONTyped,
 } from './WorkflowInput';
 
 /**
@@ -239,10 +244,15 @@ export function WorkflowFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     };
 }
 
-export function WorkflowToJSON(value?: Omit<Workflow, 'createdBy'|'createdDate'|'connectionsCount'|'id'|'inputs'|'inputsCount'|'label'|'lastModifiedBy'|'lastModifiedDate'|'outputs'|'maxRetries'|'workflowTaskComponentNames'|'workflowTriggerComponentNames'|'tasks'|'triggers'|'integrationWorkflowId'|'workflowReferenceCode'> | null): any {
+  export function WorkflowToJSON(json: any): Workflow {
+      return WorkflowToJSONTyped(json, false);
+  }
+
+  export function WorkflowToJSONTyped(value?: Omit<Workflow, 'createdBy'|'createdDate'|'connectionsCount'|'id'|'inputs'|'inputsCount'|'label'|'lastModifiedBy'|'lastModifiedDate'|'outputs'|'maxRetries'|'workflowTaskComponentNames'|'workflowTriggerComponentNames'|'tasks'|'triggers'|'integrationWorkflowId'|'workflowReferenceCode'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'definition': value['definition'],

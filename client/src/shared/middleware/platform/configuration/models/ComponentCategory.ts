@@ -56,10 +56,15 @@ export function ComponentCategoryFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-export function ComponentCategoryToJSON(value?: ComponentCategory | null): any {
+  export function ComponentCategoryToJSON(json: any): ComponentCategory {
+      return ComponentCategoryToJSONTyped(json, false);
+  }
+
+  export function ComponentCategoryToJSONTyped(value?: ComponentCategory | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'key': value['key'],

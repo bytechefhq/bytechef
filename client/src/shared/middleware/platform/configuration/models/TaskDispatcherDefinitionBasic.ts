@@ -18,6 +18,7 @@ import {
     ResourcesFromJSON,
     ResourcesFromJSONTyped,
     ResourcesToJSON,
+    ResourcesToJSONTyped,
 } from './Resources';
 
 /**
@@ -84,10 +85,15 @@ export function TaskDispatcherDefinitionBasicFromJSONTyped(json: any, ignoreDisc
     };
 }
 
-export function TaskDispatcherDefinitionBasicToJSON(value?: TaskDispatcherDefinitionBasic | null): any {
+  export function TaskDispatcherDefinitionBasicToJSON(json: any): TaskDispatcherDefinitionBasic {
+      return TaskDispatcherDefinitionBasicToJSONTyped(json, false);
+  }
+
+  export function TaskDispatcherDefinitionBasicToJSONTyped(value?: TaskDispatcherDefinitionBasic | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'description': value['description'],

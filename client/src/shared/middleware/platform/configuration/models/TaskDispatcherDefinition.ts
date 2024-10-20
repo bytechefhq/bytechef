@@ -18,12 +18,14 @@ import {
     ResourcesFromJSON,
     ResourcesFromJSONTyped,
     ResourcesToJSON,
+    ResourcesToJSONTyped,
 } from './Resources';
 import type { Property } from './Property';
 import {
     PropertyFromJSON,
     PropertyFromJSONTyped,
     PropertyToJSON,
+    PropertyToJSONTyped,
 } from './Property';
 
 /**
@@ -127,10 +129,15 @@ export function TaskDispatcherDefinitionFromJSONTyped(json: any, ignoreDiscrimin
     };
 }
 
-export function TaskDispatcherDefinitionToJSON(value?: TaskDispatcherDefinition | null): any {
+  export function TaskDispatcherDefinitionToJSON(json: any): TaskDispatcherDefinition {
+      return TaskDispatcherDefinitionToJSONTyped(json, false);
+  }
+
+  export function TaskDispatcherDefinitionToJSONTyped(value?: TaskDispatcherDefinition | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'description': value['description'],

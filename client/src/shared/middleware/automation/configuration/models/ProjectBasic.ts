@@ -18,6 +18,7 @@ import {
     ProjectStatusFromJSON,
     ProjectStatusFromJSONTyped,
     ProjectStatusToJSON,
+    ProjectStatusToJSONTyped,
 } from './ProjectStatus';
 
 /**
@@ -121,10 +122,15 @@ export function ProjectBasicFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-export function ProjectBasicToJSON(value?: Omit<ProjectBasic, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastProjectVersion'> | null): any {
+  export function ProjectBasicToJSON(json: any): ProjectBasic {
+      return ProjectBasicToJSONTyped(json, false);
+  }
+
+  export function ProjectBasicToJSONTyped(value?: Omit<ProjectBasic, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastProjectVersion'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'description': value['description'],

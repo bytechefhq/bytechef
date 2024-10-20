@@ -18,18 +18,21 @@ import {
     ExecutionErrorFromJSON,
     ExecutionErrorFromJSONTyped,
     ExecutionErrorToJSON,
+    ExecutionErrorToJSONTyped,
 } from './ExecutionError';
 import type { WorkflowTask } from './WorkflowTask';
 import {
     WorkflowTaskFromJSON,
     WorkflowTaskFromJSONTyped,
     WorkflowTaskToJSON,
+    WorkflowTaskToJSONTyped,
 } from './WorkflowTask';
 import type { ComponentDefinitionBasic } from './ComponentDefinitionBasic';
 import {
     ComponentDefinitionBasicFromJSON,
     ComponentDefinitionBasicFromJSONTyped,
     ComponentDefinitionBasicToJSON,
+    ComponentDefinitionBasicToJSONTyped,
 } from './ComponentDefinitionBasic';
 
 /**
@@ -253,10 +256,15 @@ export function TaskExecutionFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function TaskExecutionToJSON(value?: Omit<TaskExecution, 'createdBy'|'createdDate'|'endDate'|'executionTime'|'id'|'input'|'jobId'|'lastModifiedBy'|'lastModifiedDate'|'maxRetries'|'output'|'parentId'|'priority'|'progress'|'retryAttempts'|'retryDelay'|'retryDelayFactor'|'startDate'|'status'|'taskNumber'|'retryDelayMillis'|'type'> | null): any {
+  export function TaskExecutionToJSON(json: any): TaskExecution {
+      return TaskExecutionToJSONTyped(json, false);
+  }
+
+  export function TaskExecutionToJSONTyped(value?: Omit<TaskExecution, 'createdBy'|'createdDate'|'endDate'|'executionTime'|'id'|'input'|'jobId'|'lastModifiedBy'|'lastModifiedDate'|'maxRetries'|'output'|'parentId'|'priority'|'progress'|'retryAttempts'|'retryDelay'|'retryDelayFactor'|'startDate'|'status'|'taskNumber'|'retryDelayMillis'|'type'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'component': ComponentDefinitionBasicToJSON(value['component']),

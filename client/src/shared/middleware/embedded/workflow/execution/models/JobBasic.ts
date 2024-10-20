@@ -135,10 +135,15 @@ export function JobBasicFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     };
 }
 
-export function JobBasicToJSON(value?: Omit<JobBasic, 'createdBy'|'createdDate'|'id'|'label'|'lastModifiedBy'|'lastModifiedDate'|'priority'|'startDate'|'status'|'workflowId'> | null): any {
+  export function JobBasicToJSON(json: any): JobBasic {
+      return JobBasicToJSONTyped(json, false);
+  }
+
+  export function JobBasicToJSONTyped(value?: Omit<JobBasic, 'createdBy'|'createdDate'|'id'|'label'|'lastModifiedBy'|'lastModifiedDate'|'priority'|'startDate'|'status'|'workflowId'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'endDate': value['endDate'] == null ? undefined : ((value['endDate']).toISOString()),

@@ -18,30 +18,35 @@ import {
     WorkflowBasicFromJSON,
     WorkflowBasicFromJSONTyped,
     WorkflowBasicToJSON,
+    WorkflowBasicToJSONTyped,
 } from './WorkflowBasic';
 import type { JobBasic } from './JobBasic';
 import {
     JobBasicFromJSON,
     JobBasicFromJSONTyped,
     JobBasicToJSON,
+    JobBasicToJSONTyped,
 } from './JobBasic';
 import type { IntegrationBasic } from './IntegrationBasic';
 import {
     IntegrationBasicFromJSON,
     IntegrationBasicFromJSONTyped,
     IntegrationBasicToJSON,
+    IntegrationBasicToJSONTyped,
 } from './IntegrationBasic';
 import type { IntegrationInstanceConfigurationBasic } from './IntegrationInstanceConfigurationBasic';
 import {
     IntegrationInstanceConfigurationBasicFromJSON,
     IntegrationInstanceConfigurationBasicFromJSONTyped,
     IntegrationInstanceConfigurationBasicToJSON,
+    IntegrationInstanceConfigurationBasicToJSONTyped,
 } from './IntegrationInstanceConfigurationBasic';
 import type { IntegrationInstanceBasic } from './IntegrationInstanceBasic';
 import {
     IntegrationInstanceBasicFromJSON,
     IntegrationInstanceBasicFromJSONTyped,
     IntegrationInstanceBasicToJSON,
+    IntegrationInstanceBasicToJSONTyped,
 } from './IntegrationInstanceBasic';
 
 /**
@@ -114,10 +119,15 @@ export function WorkflowExecutionBasicFromJSONTyped(json: any, ignoreDiscriminat
     };
 }
 
-export function WorkflowExecutionBasicToJSON(value?: Omit<WorkflowExecutionBasic, 'id'> | null): any {
+  export function WorkflowExecutionBasicToJSON(json: any): WorkflowExecutionBasic {
+      return WorkflowExecutionBasicToJSONTyped(json, false);
+  }
+
+  export function WorkflowExecutionBasicToJSONTyped(value?: Omit<WorkflowExecutionBasic, 'id'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'integration': IntegrationBasicToJSON(value['integration']),

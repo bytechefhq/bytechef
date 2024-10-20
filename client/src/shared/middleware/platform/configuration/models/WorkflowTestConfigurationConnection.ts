@@ -65,10 +65,15 @@ export function WorkflowTestConfigurationConnectionFromJSONTyped(json: any, igno
     };
 }
 
-export function WorkflowTestConfigurationConnectionToJSON(value?: WorkflowTestConfigurationConnection | null): any {
+  export function WorkflowTestConfigurationConnectionToJSON(json: any): WorkflowTestConfigurationConnection {
+      return WorkflowTestConfigurationConnectionToJSONTyped(json, false);
+  }
+
+  export function WorkflowTestConfigurationConnectionToJSONTyped(value?: WorkflowTestConfigurationConnection | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'connectionId': value['connectionId'],

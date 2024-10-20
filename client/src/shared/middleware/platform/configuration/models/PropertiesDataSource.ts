@@ -48,10 +48,15 @@ export function PropertiesDataSourceFromJSONTyped(json: any, ignoreDiscriminator
     };
 }
 
-export function PropertiesDataSourceToJSON(value?: PropertiesDataSource | null): any {
+  export function PropertiesDataSourceToJSON(json: any): PropertiesDataSource {
+      return PropertiesDataSourceToJSONTyped(json, false);
+  }
+
+  export function PropertiesDataSourceToJSONTyped(value?: PropertiesDataSource | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'propertiesLookupDependsOn': value['propertiesLookupDependsOn'],

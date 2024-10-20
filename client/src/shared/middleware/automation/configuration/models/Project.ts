@@ -18,18 +18,21 @@ import {
     ProjectStatusFromJSON,
     ProjectStatusFromJSONTyped,
     ProjectStatusToJSON,
+    ProjectStatusToJSONTyped,
 } from './ProjectStatus';
 import type { Category } from './Category';
 import {
     CategoryFromJSON,
     CategoryFromJSONTyped,
     CategoryToJSON,
+    CategoryToJSONTyped,
 } from './Category';
 import type { Tag } from './Tag';
 import {
     TagFromJSON,
     TagFromJSONTyped,
     TagToJSON,
+    TagToJSONTyped,
 } from './Tag';
 
 /**
@@ -169,10 +172,15 @@ export function ProjectFromJSONTyped(json: any, ignoreDiscriminator: boolean): P
     };
 }
 
-export function ProjectToJSON(value?: Omit<Project, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastProjectVersion'> | null): any {
+  export function ProjectToJSON(json: any): Project {
+      return ProjectToJSONTyped(json, false);
+  }
+
+  export function ProjectToJSONTyped(value?: Omit<Project, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastProjectVersion'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'description': value['description'],

@@ -18,6 +18,7 @@ import {
     WorkflowConnectionFromJSON,
     WorkflowConnectionFromJSONTyped,
     WorkflowConnectionToJSON,
+    WorkflowConnectionToJSONTyped,
 } from './WorkflowConnection';
 
 /**
@@ -106,10 +107,15 @@ export function WorkflowTriggerFromJSONTyped(json: any, ignoreDiscriminator: boo
     };
 }
 
-export function WorkflowTriggerToJSON(value?: Omit<WorkflowTrigger, 'connections'> | null): any {
+  export function WorkflowTriggerToJSON(json: any): WorkflowTrigger {
+      return WorkflowTriggerToJSONTyped(json, false);
+  }
+
+  export function WorkflowTriggerToJSONTyped(value?: Omit<WorkflowTrigger, 'connections'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'description': value['description'],

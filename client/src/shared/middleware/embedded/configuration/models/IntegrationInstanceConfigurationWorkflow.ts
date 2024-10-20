@@ -18,6 +18,7 @@ import {
     IntegrationInstanceConfigurationWorkflowConnectionFromJSON,
     IntegrationInstanceConfigurationWorkflowConnectionFromJSONTyped,
     IntegrationInstanceConfigurationWorkflowConnectionToJSON,
+    IntegrationInstanceConfigurationWorkflowConnectionToJSONTyped,
 } from './IntegrationInstanceConfigurationWorkflowConnection';
 
 /**
@@ -146,10 +147,15 @@ export function IntegrationInstanceConfigurationWorkflowFromJSONTyped(json: any,
     };
 }
 
-export function IntegrationInstanceConfigurationWorkflowToJSON(value?: Omit<IntegrationInstanceConfigurationWorkflow, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'workflowReferenceCode'> | null): any {
+  export function IntegrationInstanceConfigurationWorkflowToJSON(json: any): IntegrationInstanceConfigurationWorkflow {
+      return IntegrationInstanceConfigurationWorkflowToJSONTyped(json, false);
+  }
+
+  export function IntegrationInstanceConfigurationWorkflowToJSONTyped(value?: Omit<IntegrationInstanceConfigurationWorkflow, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'workflowReferenceCode'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'inputs': value['inputs'],

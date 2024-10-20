@@ -53,3 +53,7 @@ export function UnifiedApiCategoryToJSON(value?: UnifiedApiCategory | null): any
     return value as any;
 }
 
+export function UnifiedApiCategoryToJSONTyped(value: any, ignoreDiscriminator: boolean): UnifiedApiCategory {
+    return value as UnifiedApiCategory;
+}
+

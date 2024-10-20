@@ -56,10 +56,15 @@ export function HelpFromJSONTyped(json: any, ignoreDiscriminator: boolean): Help
     };
 }
 
-export function HelpToJSON(value?: Help | null): any {
+  export function HelpToJSON(json: any): Help {
+      return HelpToJSONTyped(json, false);
+  }
+
+  export function HelpToJSONTyped(value?: Help | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'body': value['body'],

@@ -47,3 +47,7 @@ export function WorkflowFormatToJSON(value?: WorkflowFormat | null): any {
     return value as any;
 }
 
+export function WorkflowFormatToJSONTyped(value: any, ignoreDiscriminator: boolean): WorkflowFormat {
+    return value as WorkflowFormat;
+}
+

@@ -18,30 +18,35 @@ import {
     OptionsDataSourceFromJSON,
     OptionsDataSourceFromJSONTyped,
     OptionsDataSourceToJSON,
+    OptionsDataSourceToJSONTyped,
 } from './OptionsDataSource';
 import type { ControlType } from './ControlType';
 import {
     ControlTypeFromJSON,
     ControlTypeFromJSONTyped,
     ControlTypeToJSON,
+    ControlTypeToJSONTyped,
 } from './ControlType';
 import type { Option } from './Option';
 import {
     OptionFromJSON,
     OptionFromJSONTyped,
     OptionToJSON,
+    OptionToJSONTyped,
 } from './Option';
 import type { PropertyType } from './PropertyType';
 import {
     PropertyTypeFromJSON,
     PropertyTypeFromJSONTyped,
     PropertyTypeToJSON,
+    PropertyTypeToJSONTyped,
 } from './PropertyType';
 import type { ValueProperty } from './ValueProperty';
 import {
     ValuePropertyFromJSON,
     ValuePropertyFromJSONTyped,
     ValuePropertyToJSON,
+    ValuePropertyToJSONTyped,
 } from './ValueProperty';
 
 /**
@@ -124,7 +129,7 @@ export function NumberPropertyFromJSONTyped(json: any, ignoreDiscriminator: bool
         return json;
     }
     return {
-        ...ValuePropertyFromJSONTyped(json, ignoreDiscriminator),
+        ...ValuePropertyFromJSONTyped(json, true),
         'defaultValue': json['defaultValue'] == null ? undefined : json['defaultValue'],
         'exampleValue': json['exampleValue'] == null ? undefined : json['exampleValue'],
         'maxNumberPrecision': json['maxNumberPrecision'] == null ? undefined : json['maxNumberPrecision'],
@@ -137,12 +142,17 @@ export function NumberPropertyFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-export function NumberPropertyToJSON(value?: NumberProperty | null): any {
+  export function NumberPropertyToJSON(json: any): NumberProperty {
+      return NumberPropertyToJSONTyped(json, false);
+  }
+
+  export function NumberPropertyToJSONTyped(value?: NumberProperty | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
-        ...ValuePropertyToJSON(value),
+        ...ValuePropertyToJSONTyped(value, true),
         'defaultValue': value['defaultValue'],
         'exampleValue': value['exampleValue'],
         'maxNumberPrecision': value['maxNumberPrecision'],

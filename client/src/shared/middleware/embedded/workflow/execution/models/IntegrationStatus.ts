@@ -47,3 +47,7 @@ export function IntegrationStatusToJSON(value?: IntegrationStatus | null): any {
     return value as any;
 }
 
+export function IntegrationStatusToJSONTyped(value: any, ignoreDiscriminator: boolean): IntegrationStatus {
+    return value as IntegrationStatus;
+}
+

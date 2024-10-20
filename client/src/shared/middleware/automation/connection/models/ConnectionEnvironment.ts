@@ -48,3 +48,7 @@ export function ConnectionEnvironmentToJSON(value?: ConnectionEnvironment | null
     return value as any;
 }
 
+export function ConnectionEnvironmentToJSONTyped(value: any, ignoreDiscriminator: boolean): ConnectionEnvironment {
+    return value as ConnectionEnvironment;
+}
+

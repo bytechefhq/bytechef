@@ -99,10 +99,15 @@ export function AppEventFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     };
 }
 
-export function AppEventToJSON(value?: Omit<AppEvent, 'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'> | null): any {
+  export function AppEventToJSON(json: any): AppEvent {
+      return AppEventToJSONTyped(json, false);
+  }
+
+  export function AppEventToJSONTyped(value?: Omit<AppEvent, 'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'id': value['id'],

@@ -18,12 +18,14 @@ import {
     JobConnectionFromJSON,
     JobConnectionFromJSONTyped,
     JobConnectionToJSON,
+    JobConnectionToJSONTyped,
 } from './JobConnection';
 import type { Webhook } from './Webhook';
 import {
     WebhookFromJSON,
     WebhookFromJSONTyped,
     WebhookToJSON,
+    WebhookToJSONTyped,
 } from './Webhook';
 
 /**
@@ -104,10 +106,15 @@ export function JobParametersFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function JobParametersToJSON(value?: JobParameters | null): any {
+  export function JobParametersToJSON(json: any): JobParameters {
+      return JobParametersToJSONTyped(json, false);
+  }
+
+  export function JobParametersToJSONTyped(value?: JobParameters | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'connections': value['connections'] == null ? undefined : ((value['connections'] as Array<any>).map(JobConnectionToJSON)),
