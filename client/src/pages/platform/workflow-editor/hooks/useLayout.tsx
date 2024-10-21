@@ -193,14 +193,14 @@ export default function useLayout({
                 id: `${taskNode.id}=>${taskNode.id}-left-placeholder-0`,
                 source: taskNode.id,
                 target: `${taskNode.id}-left-placeholder-0`,
-                type: 'smoothstep',
+                type: 'condition',
             };
 
             const rightPlaceholderEdge = {
                 id: `${taskNode.id}=>${taskNode.id}-right-placeholder-0`,
                 source: taskNode.id,
                 target: `${taskNode.id}-right-placeholder-0`,
-                type: 'smoothstep',
+                type: 'condition',
             };
 
             taskEdges.push(leftPlaceholderEdge, rightPlaceholderEdge);
@@ -309,6 +309,17 @@ export default function useLayout({
             const position = dagreGraph.node(node.id);
 
             return {...node, position};
+        });
+
+        edges = edges.map((edge) => {
+            if (edge.target.includes('0')) {
+                return {
+                    ...edge,
+                    label: edge.target.includes('left') ? 'True' : 'False',
+                };
+            }
+
+            return edge;
         });
 
         setNodes(nodes);

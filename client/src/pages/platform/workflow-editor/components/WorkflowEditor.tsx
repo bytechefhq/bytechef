@@ -9,6 +9,7 @@ import {
 import {DragEventHandler, useCallback, useEffect, useMemo, useState} from 'react';
 import ReactFlow, {Controls, MiniMap, useReactFlow, useStore} from 'reactflow';
 
+import ConditionEdge from '../edges/ConditionEdge';
 import PlaceholderEdge from '../edges/PlaceholderEdge';
 import WorkflowEdge from '../edges/WorkflowEdge';
 import useHandleDrop from '../hooks/useHandleDrop';
@@ -43,6 +44,7 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
 
     const edgeTypes = useMemo(
         () => ({
+            condition: ConditionEdge,
             placeholder: PlaceholderEdge,
             workflow: WorkflowEdge,
         }),
