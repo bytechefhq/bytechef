@@ -112,3 +112,36 @@ Type: FILE_ENTRY
 
 
 
+### Crop Image
+Crop an image to the specified input parameters.
+
+#### Properties
+
+|       Name       |    Type    |     Control Type     |                       Description                        |
+|:----------------:|:----------:|:--------------------:|:--------------------------------------------------------:|
+|      Image       | FILE_ENTRY | FILE_ENTRY  |                                                          |
+|   X coordinate   |  INTEGER   | INTEGER  | Specifies the horizontal starting point of the crop area |
+|   Y coordinate   |  INTEGER   | INTEGER  |  Specifies the vertical starting point of the crop area  |
+|      Width       |  INTEGER   | INTEGER  |           Specifies the width of the crop area           |
+|      Height      |  INTEGER   | INTEGER  |          Specifies the height of the crop area           |
+| Result File Name | STRING | TEXT  |  Specifies the output file name for the result image.  |
+
+
+### Output
+
+
+
+Type: FILE_ENTRY
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+
+
+
