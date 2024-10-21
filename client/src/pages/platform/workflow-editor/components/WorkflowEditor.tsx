@@ -6,7 +6,6 @@ import {
     WorkflowTask,
     WorkflowTrigger,
 } from '@/shared/middleware/platform/configuration';
-import {ComponentOperationType} from '@/shared/types';
 import {DragEventHandler, useCallback, useEffect, useMemo, useState} from 'react';
 import ReactFlow, {Controls, MiniMap, useReactFlow, useStore} from 'reactflow';
 
@@ -17,7 +16,6 @@ import useLayout from '../hooks/useLayout';
 import PlaceholderNode from '../nodes/PlaceholderNode';
 import WorkflowNode from '../nodes/WorkflowNode';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
-import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 
 export interface WorkflowEditorProps {
     componentDefinitions: ComponentDefinitionBasic[];
@@ -25,10 +23,8 @@ export interface WorkflowEditorProps {
 }
 
 const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: WorkflowEditorProps) => {
-    const [nodeOperations] = useState<Array<ComponentOperationType>>([]);
     const [viewportWidth, setViewportWidth] = useState(0);
 
-    const {workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
     const {setComponentActions, setWorkflow, workflow} = useWorkflowDataStore();
 
     const {componentNames} = workflow;
@@ -175,26 +171,22 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [setWorkflow, componentNames]);
 
-    // Set component actions when node actions change
-    useEffect(() => {
-        setComponentActions(nodeOperations);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [nodeOperations]);
-
     // Set viewport width and position
     useEffect(() => {
         setViewportWidth(width);
 
-        const adaptedViewportWidth = workflowNodeDetailsPanelOpen
-            ? width / 2 - window.innerWidth / 6.5
-            : width / 2 - 38;
+        let adaptedViewportWidth = width / 2.5;
+
+        if (componentNames.includes('condition')) {
+            adaptedViewportWidth -= 140;
+        }
 
         setViewport({
             x: adaptedViewportWidth,
             y: 50,
             zoom: 1,
         });
-    }, [workflowNodeDetailsPanelOpen, setViewport, width]);
+    }, [componentNames, setViewport, width]);
 
     // Update nodeNames and componentActions when workflow definition changes
     useEffect(() => {
