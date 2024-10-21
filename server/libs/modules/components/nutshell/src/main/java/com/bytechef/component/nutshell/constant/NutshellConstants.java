@@ -24,14 +24,14 @@ public class NutshellConstants {
     public static final String DESCRIPTION = "description";
     public static final String EMAIL = "email";
     public static final String EMAILS = "emails";
-    public static final String IS_PRIMARY = "isPrimary";
-    public static final String NAME = "name";
     public static final String ID = "id";
+    public static final String IS_PRIMARY = "isPrimary";
+    public static final String LINKS = "links";
+    public static final String NAME = "name";
+    public static final String OWNER = "owner";
     public static final String PHONES = "phones";
     public static final String PHONE = "phone";
     public static final String VALUE = "value";
-    public static final String OWNER = "owner";
-    public static final String LINKS = "links";
 
     private NutshellConstants() {
     }
