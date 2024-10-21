@@ -309,8 +309,8 @@ public class ComponentDefinitionRegistry {
                 componentDefinition.getActions(), List.of());
 
             for (ActionDefinition actionDefinition : actionDefinitions) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Validating %s.%s".formatted(componentDefinition.getName(), actionDefinition.getName()));
+                if (log.isTraceEnabled()) {
+                    log.trace("Validating %s.%s".formatted(componentDefinition.getName(), actionDefinition.getName()));
                 }
 
                 PropertyUtils.checkInputProperties(
@@ -324,8 +324,8 @@ public class ComponentDefinitionRegistry {
                 componentDefinition.getTriggers(), List.of());
 
             for (TriggerDefinition triggerDefinition : triggerDefinitions) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Validating %s.%s".formatted(componentDefinition.getName(), triggerDefinition.getName()));
+                if (log.isTraceEnabled()) {
+                    log.trace("Validating %s.%s".formatted(componentDefinition.getName(), triggerDefinition.getName()));
                 }
 
                 PropertyUtils.checkInputProperties(OptionalUtils.orElse(triggerDefinition.getProperties(), List.of()));
