@@ -1,12 +1,24 @@
+import EmptyList from '@/components/EmptyList';
+import {Button} from '@/components/ui/button';
 import {Skeleton} from '@/components/ui/skeleton';
 import ProjectWorkflowListItem from '@/pages/automation/projects/components/project-workflow-list/ProjectWorkflowListItem';
+import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
+import {useCreateProjectWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
 import {useGetProjectWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
+import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
+import {WorkflowIcon} from 'lucide-react';
+import {useNavigate} from 'react-router-dom';
 
 const ProjectWorkflowList = ({project}: {project: Project}) => {
+    const {captureProjectWorkflowCreated} = useAnalytics();
+
+    const navigate = useNavigate();
+
     const {data: componentDefinitions, isLoading: isComponentDefinitionsLoading} = useGetComponentDefinitionsQuery({
         actionDefinitions: true,
         triggerDefinitions: true,
@@ -27,6 +39,14 @@ const ProjectWorkflowList = ({project}: {project: Project}) => {
     const workflowTaskDispatcherDefinitions: {
         [key: string]: ComponentDefinitionBasic | undefined;
     } = {};
+
+    const createProjectWorkflowMutation = useCreateProjectWorkflowMutation({
+        onSuccess: (workflow) => {
+            captureProjectWorkflowCreated();
+
+            navigate(`/automation/projects/${project.id}/project-workflows/${workflow?.projectWorkflowId}`);
+        },
+    });
 
     return isComponentDefinitionsLoading || isTaskDispatcherDefinitionsLoading || isProjectWorkflowsLoading ? (
         <div className="space-y-3 py-2">
@@ -50,50 +70,71 @@ const ProjectWorkflowList = ({project}: {project: Project}) => {
         </div>
     ) : (
         <div className="border-b border-b-gray-100 py-3 pl-4">
-            <div className="mb-1 flex items-center justify-between">
-                <h3 className="heading-tertiary flex justify-start pl-2 text-sm">Workflows</h3>
-            </div>
+            {workflows && workflows.length > 0 ? (
+                <>
+                    <div className="mb-1 flex items-center justify-between">
+                        <h3 className="heading-tertiary flex justify-start pl-2 text-sm">Workflows</h3>
+                    </div>
 
-            <ul className="divide-y divide-gray-100">
-                {workflows &&
-                    workflows
-                        .sort((a, b) => a.label!.localeCompare(b.label!))
-                        .map((workflow) => {
-                            const componentNames = [
-                                ...(workflow.workflowTriggerComponentNames ?? []),
-                                ...(workflow.workflowTaskComponentNames ?? []),
-                            ];
+                    <ul className="divide-y divide-gray-100">
+                        {workflows
+                            .sort((a, b) => a.label!.localeCompare(b.label!))
+                            .map((workflow) => {
+                                const componentNames = [
+                                    ...(workflow.workflowTriggerComponentNames ?? []),
+                                    ...(workflow.workflowTaskComponentNames ?? []),
+                                ];
 
-                            componentNames?.map((definitionName) => {
-                                if (!workflowComponentDefinitions[definitionName]) {
-                                    workflowComponentDefinitions[definitionName] = componentDefinitions?.find(
-                                        (componentDefinition) => componentDefinition.name === definitionName
-                                    );
-                                }
+                                componentNames?.map((definitionName) => {
+                                    if (!workflowComponentDefinitions[definitionName]) {
+                                        workflowComponentDefinitions[definitionName] = componentDefinitions?.find(
+                                            (componentDefinition) => componentDefinition.name === definitionName
+                                        );
+                                    }
 
-                                if (!workflowTaskDispatcherDefinitions[definitionName]) {
-                                    workflowTaskDispatcherDefinitions[definitionName] = taskDispatcherDefinitions?.find(
-                                        (taskDispatcherDefinition) => taskDispatcherDefinition.name === definitionName
-                                    );
-                                }
-                            });
+                                    if (!workflowTaskDispatcherDefinitions[definitionName]) {
+                                        workflowTaskDispatcherDefinitions[definitionName] =
+                                            taskDispatcherDefinitions?.find(
+                                                (taskDispatcherDefinition) =>
+                                                    taskDispatcherDefinition.name === definitionName
+                                            );
+                                    }
+                                });
 
-                            const filteredComponentNames = componentNames?.filter(
-                                (item, index) => componentNames?.indexOf(item) === index
-                            );
+                                const filteredComponentNames = componentNames?.filter(
+                                    (item, index) => componentNames?.indexOf(item) === index
+                                );
 
-                            return (
-                                <ProjectWorkflowListItem
-                                    filteredComponentNames={filteredComponentNames}
-                                    key={workflow.id}
-                                    project={project}
-                                    workflow={workflow}
-                                    workflowComponentDefinitions={workflowComponentDefinitions}
-                                    workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
-                                />
-                            );
-                        })}
-            </ul>
+                                return (
+                                    <ProjectWorkflowListItem
+                                        filteredComponentNames={filteredComponentNames}
+                                        key={workflow.id}
+                                        project={project}
+                                        workflow={workflow}
+                                        workflowComponentDefinitions={workflowComponentDefinitions}
+                                        workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                                    />
+                                );
+                            })}
+                    </ul>
+                </>
+            ) : (
+                <div className="flex justify-center py-8">
+                    <EmptyList
+                        button={
+                            <WorkflowDialog
+                                createWorkflowMutation={createProjectWorkflowMutation}
+                                parentId={project.id}
+                                triggerNode={<Button>Create Workflow</Button>}
+                                useGetWorkflowQuery={useGetWorkflowQuery}
+                            />
+                        }
+                        icon={<WorkflowIcon className="size-24 text-gray-300" />}
+                        message="Get started by creating a new workflow."
+                        title="No Workflows"
+                    />
+                </div>
+            )}
         </div>
     );
 };
