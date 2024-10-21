@@ -60,19 +60,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ProjectFacadeImpl implements ProjectFacade {
 
-    private static final String WORKFLOW_DEFINITION = """
-        {
-            "label": "New Workflow",
-            "description": "",
-            "inputs": [
-            ],
-            "triggers": [
-            ],
-            "tasks": [
-            ]
-        }
-        """;
-
     private final CategoryService categoryService;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
@@ -139,14 +126,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         project = projectService.create(project);
 
-        Workflow workflow = workflowService.create(WORKFLOW_DEFINITION, Format.JSON, SourceType.JDBC);
-
-        projectWorkflowService.addWorkflow(
-            project.getId(), project.getLastProjectVersion(), Validate.notNull(workflow.getId(), "id"));
-
-        return new ProjectDTO(
-            category, project, tags,
-            projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastProjectVersion()));
+        return new ProjectDTO(category, project, List.of(), tags);
     }
 
     @Override
@@ -366,8 +346,9 @@ public class ProjectFacadeImpl implements ProjectFacade {
         project.setTags(tags);
 
         return new ProjectDTO(
-            category, projectService.update(project), tags,
-            projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastProjectVersion()));
+            category, projectService.update(project),
+            projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastProjectVersion()),
+            tags);
     }
 
     @Override
@@ -446,19 +427,20 @@ public class ProjectFacadeImpl implements ProjectFacade {
                     category -> Objects.equals(project.getCategoryId(), category.getId()),
                     null),
                 project,
+                projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastProjectVersion()),
                 CollectionUtils.filter(
                     tagService.getTags(
                         projects.stream()
                             .flatMap(curProject -> CollectionUtils.stream(curProject.getTagIds()))
                             .filter(Objects::nonNull)
                             .toList()),
-                    tag -> CollectionUtils.contains(project.getTagIds(), tag.getId())),
-                projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastProjectVersion())));
+                    tag -> CollectionUtils.contains(project.getTagIds(), tag.getId()))));
     }
 
     private ProjectDTO toProjectDTO(Project project) {
         return new ProjectDTO(
-            getCategory(project), project, tagService.getTags(project.getTagIds()),
-            projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastProjectVersion()));
+            getCategory(project), project,
+            projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastProjectVersion()),
+            tagService.getTags(project.getTagIds()));
     }
 }

@@ -32,15 +32,15 @@ import java.util.List;
 public record ProjectDTO(
     Category category, String createdBy, LocalDateTime createdDate, String description, Long id, String name,
     String lastModifiedBy, LocalDateTime lastModifiedDate, LocalDateTime lastPublishedDate, Status lastStatus,
-    int lastProjectVersion, List<ProjectVersion> projectVersions, List<Tag> tags, int version,
-    List<Long> projectWorkflowIds, Long workspaceId) {
+    int lastProjectVersion, List<ProjectVersion> projectVersions, List<Long> projectWorkflowIds,
+    List<Tag> tags, int version, Long workspaceId) {
 
-    public ProjectDTO(Category category, Project project, List<Tag> tags, List<Long> projectWorkflowIds) {
+    public ProjectDTO(Category category, Project project, List<Long> projectWorkflowIds, List<Tag> tags) {
         this(
             category, project.getCreatedBy(), project.getCreatedDate(), project.getDescription(), project.getId(),
             project.getName(), project.getLastModifiedBy(), project.getLastModifiedDate(),
             project.getLastPublishedDate(), project.getLastStatus(), project.getLastProjectVersion(),
-            project.getProjectVersions(), tags, project.getVersion(), projectWorkflowIds, project.getWorkspaceId());
+            project.getProjectVersions(), projectWorkflowIds, tags, project.getVersion(), project.getWorkspaceId());
     }
 
     public static Builder builder() {
@@ -183,7 +183,7 @@ public record ProjectDTO(
         public ProjectDTO build() {
             return new ProjectDTO(
                 category, createdBy, createdDate, description, id, name, lastModifiedBy, lastModifiedDate,
-                lastPublishedDate, lastStatus, lastProjectVersion, projectVersions, tags, version, projectWorkflowIds,
+                lastPublishedDate, lastStatus, lastProjectVersion, projectVersions, projectWorkflowIds, tags, version,
                 workspaceId);
         }
     }
