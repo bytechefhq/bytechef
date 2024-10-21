@@ -36,7 +36,6 @@ import static org.mockito.Mockito.mockStatic;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.monday.constant.MondayBoardKind;
 import com.bytechef.component.monday.constant.MondayColumnType;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
@@ -81,20 +80,6 @@ class MondayOptionUtilsTest {
         assertFalse(options.isEmpty());
 
         for (MondayColumnType type : MondayColumnType.values()) {
-            Option<String> expectedOption = option(type.getDisplayValue(), type.getName());
-
-            assertTrue(options.contains(expectedOption), "Expected option not found: " + expectedOption);
-        }
-    }
-
-    @Test
-    void testGetBoardKindOptions() {
-        List<Option<String>> options = MondayOptionUtils.getBoardKindOptions();
-
-        assertNotNull(options);
-        assertFalse(options.isEmpty());
-
-        for (MondayBoardKind type : MondayBoardKind.values()) {
             Option<String> expectedOption = option(type.getDisplayValue(), type.getName());
 
             assertTrue(options.contains(expectedOption), "Expected option not found: " + expectedOption);

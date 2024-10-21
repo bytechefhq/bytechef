@@ -18,6 +18,7 @@ package com.bytechef.component.monday.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.monday.constant.MondayConstants.BOARD_KIND;
@@ -26,7 +27,6 @@ import static com.bytechef.component.monday.constant.MondayConstants.CREATE_BOAR
 import static com.bytechef.component.monday.constant.MondayConstants.DATA;
 import static com.bytechef.component.monday.constant.MondayConstants.DESCRIPTION;
 import static com.bytechef.component.monday.constant.MondayConstants.ID;
-import static com.bytechef.component.monday.util.MondayOptionUtils.getBoardKindOptions;
 import static com.bytechef.component.monday.util.MondayUtils.executeGraphQLQuery;
 
 import com.bytechef.component.definition.ActionContext;
@@ -50,7 +50,10 @@ public class MondayCreateBoardAction {
             string(BOARD_KIND)
                 .label("Board Kind")
                 .description("The type of board to create.")
-                .options(getBoardKindOptions())
+                .options(
+                    option("Private", "private"),
+                    option("Public", "public"),
+                    option("Share", "share"))
                 .required(true),
             string(DESCRIPTION)
                 .label("Description")
