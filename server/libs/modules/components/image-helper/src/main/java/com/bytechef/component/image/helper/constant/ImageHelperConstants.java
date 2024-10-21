@@ -32,6 +32,8 @@ public class ImageHelperConstants {
     public static final String IMAGE = "image";
     public static final String RESULT_FILE_NAME = "resultFileName";
     public static final String WIDTH = "width";
+    public static final String X_COORDINATE = "x";
+    public static final String Y_COORDINATE = "y";
 
     public static final ModifiableFileEntryProperty IMAGE_PROPERTY = fileEntry(IMAGE)
         .label("Image")
