@@ -6,6 +6,9 @@ import {devtools} from 'zustand/middleware';
 export type EditionType = 'ce' | 'ee';
 
 export interface ApplicationInfoI {
+    ai: {
+        enabled: boolean;
+    };
     analytics: {
         enabled: boolean;
         postHog: {
@@ -42,6 +45,9 @@ export const useApplicationInfoStore = create<ApplicationInfoI>()(
     devtools(
         (set, get) => {
             return {
+                ai: {
+                    enabled: false,
+                },
                 analytics: {
                     enabled: false,
                     postHog: {
@@ -80,6 +86,9 @@ export const useApplicationInfoStore = create<ApplicationInfoI>()(
 
                         set((state) => ({
                             ...state,
+                            ai: {
+                                enabled: json.ai.enabled === 'true',
+                            },
                             analytics: {
                                 enabled: json.analytics.enabled === 'true',
                                 postHog: json.analytics.postHog,

@@ -7,6 +7,7 @@ import {Button} from '@/components/ui/button';
 import {useCopilotStore} from '@/pages/platform/copilot/stores/useCopilotStore';
 import DesktopSidebarMenu from '@/shared/layout/DesktopSidebarMenu';
 import DesktopSidebarNavigationMenu from '@/shared/layout/DesktopSidebarNavigationMenu';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {BotMessageSquareIcon} from 'lucide-react';
 import React from 'react';
@@ -25,6 +26,7 @@ export function DesktopSidebar({
 }) {
     const {pathname} = useLocation();
 
+    const {ai} = useApplicationInfoStore();
     const {setShowCopilot, showCopilot} = useCopilotStore();
 
     const ff_1570 = useFeatureFlagsStore()('ff-1570');
@@ -64,7 +66,7 @@ export function DesktopSidebar({
                     </div>
 
                     <div className="flex shrink-0 flex-col items-center justify-center gap-4 py-4">
-                        {ff_1570 && (
+                        {ai.enabled && ff_1570 && (
                             <Button onClick={() => setShowCopilot(!showCopilot)} size="icon" variant="ghost">
                                 <BotMessageSquareIcon className="size-7" />
                             </Button>

@@ -100,7 +100,7 @@ const platformNavigation = [
 function App() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    const {getApplicationInfo} = useApplicationInfoStore();
+    const {ai, getApplicationInfo} = useApplicationInfoStore();
     const {
         account,
         authenticated,
@@ -215,7 +215,7 @@ function App() {
                 <div className="flex size-full">
                     <Outlet />
 
-                    {showCopilot && (
+                    {ai.enabled && showCopilot && (
                         <aside className="border-l border-gray-200">
                             <CopilotPanel />
                         </aside>
