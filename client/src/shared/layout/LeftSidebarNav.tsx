@@ -43,7 +43,7 @@ const LeftSidebarNavItem = ({icon, item: {current, id, name, onItemClick}, toLin
         className={cn(
             buttonVariants({variant: 'ghost'}),
             current ? 'bg-background hover:bg-background' : 'hover:bg-background',
-            'justify-start px-2'
+            'justify-start px-2 font-normal'
         )}
         onClick={() => (onItemClick ? onItemClick(id) : null)}
         to={toLink}
