@@ -24,7 +24,7 @@ import {HelpCircleIcon, SettingsIcon, User2Icon, UserRoundCog} from 'lucide-reac
 import React, {useEffect} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 
-const DesktopSidebarMenu = () => {
+const DesktopSidebarBottomMenu = () => {
     const {application} = useApplicationInfoStore();
     const {account, logout} = useAuthenticationStore();
     const {currentWorkspaceId, setCurrentWorkspaceId} = useWorkspaceStore();
@@ -186,4 +186,4 @@ const DesktopSidebarMenu = () => {
     );
 };
 
-export default DesktopSidebarMenu;
+export default DesktopSidebarBottomMenu;
