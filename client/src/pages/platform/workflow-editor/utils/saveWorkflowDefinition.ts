@@ -10,7 +10,7 @@ import {TaskDispatcherKeys} from '@/shared/queries/platform/taskDispatcherDefini
 import {NodeDataType, WorkflowDefinitionType} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
-import getNextPlaceholderId from './getNextPlaceholderId';
+import getTasksWithConditionChildNode from './getTasksWithConditionChildNode';
 
 const SPACE = 4;
 
@@ -157,53 +157,7 @@ export default async function saveWorkflowDefinition(
         tasks = [...(workflowDefinition.tasks || [])];
 
         if (nodeData.metadata?.ui?.condition) {
-            if (nodeIndex !== undefined && nodeIndex !== -1) {
-                const tasksAfterCurrent = tasks.slice(nodeIndex);
-
-                const placeholderCorrectedTasksAfterCurrent = tasksAfterCurrent.map((task) => {
-                    let taskCondition = task.metadata?.ui?.condition;
-
-                    if (taskCondition && nodeData.metadata?.ui?.condition) {
-                        const taskConditionSide = taskCondition.includes('left')
-                            ? 'left'
-                            : taskCondition.includes('right')
-                              ? 'right'
-                              : null;
-
-                        const nodeConditionSide = nodeData.metadata.ui.condition.includes('left')
-                            ? 'left'
-                            : nodeData.metadata.ui.condition.includes('right')
-                              ? 'right'
-                              : null;
-
-                        if (taskConditionSide && nodeConditionSide && taskConditionSide === nodeConditionSide) {
-                            taskCondition = getNextPlaceholderId(taskCondition);
-                        }
-                    }
-
-                    if (task.metadata?.ui?.condition) {
-                        return {
-                            ...task,
-                            metadata: {
-                                ...task.metadata,
-                                ui: {
-                                    ...task.metadata?.ui,
-                                    // condition: getNextPlaceholderId(task.metadata?.ui?.condition),
-                                    condition: taskCondition,
-                                },
-                            },
-                        };
-                    }
-
-                    return task;
-                });
-
-                tasks = [...tasks.slice(0, nodeIndex), ...placeholderCorrectedTasksAfterCurrent];
-
-                tasks.splice(nodeIndex, 0, newTask);
-            } else {
-                tasks.push(newTask);
-            }
+            tasks = getTasksWithConditionChildNode({newTask, nodeData, nodeIndex, tasks});
         } else if (nodeIndex !== undefined && nodeIndex > -1) {
             const tasksAfterCurrent = tasks.slice(nodeIndex);
 
