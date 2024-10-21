@@ -11,7 +11,7 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {useToast} from '@/components/ui/use-toast';
+import {useToast} from '@/hooks/use-toast';
 import {ApiKey} from '@/shared/middleware/embedded/user';
 import {useCreateApiKeyMutation, useUpdateApiKeyMutation} from '@/shared/mutations/embedded/apiKeys.mutations';
 import {ApiKeyKeys} from '@/shared/queries/embedded/apiKeys.queries';

@@ -2,7 +2,7 @@ import {Button} from '@/components/ui/button';
 import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
-import {useToast} from '@/components/ui/use-toast';
+import {useToast} from '@/hooks/use-toast';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Integration} from '@/shared/middleware/embedded/configuration';
 import {usePublishIntegrationMutation} from '@/shared/mutations/embedded/integrations.mutations';

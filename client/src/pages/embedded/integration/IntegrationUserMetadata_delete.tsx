@@ -1,6 +1,6 @@
 import {Button} from '@/components/ui/button';
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {toast} from '@/components/ui/use-toast';
+import {toast} from '@/hooks/use-toast';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {zodResolver} from '@hookform/resolvers/zod';

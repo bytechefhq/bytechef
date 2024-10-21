@@ -19,7 +19,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {useToast} from '@/components/ui/use-toast';
+import {useToast} from '@/hooks/use-toast';
 import IntegrationDialog from '@/pages/embedded/integrations/components/IntegrationDialog';
 import IntegrationPublishDialog from '@/pages/embedded/integrations/components/IntegrationPublishDialog';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';

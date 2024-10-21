@@ -1,7 +1,7 @@
 import {Button} from '@/components/ui/button';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {useToast} from '@/components/ui/use-toast';
+import {useToast} from '@/hooks/use-toast';
 import ProjectInstanceEditWorkflowDialog from '@/pages/automation/project-instances/components/ProjectInstanceEditWorkflowDialog';
 import ProjectInstanceWorkflowListItemDropdownMenu from '@/pages/automation/project-instances/components/project-instance-workflow-list/ProjectInstanceWorkflowListItemDropdownMenu';
 import useProjectInstanceWorkflowSheetStore from '@/pages/automation/project-instances/stores/useProjectInstanceWorkflowSheetStore';

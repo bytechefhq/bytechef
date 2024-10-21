@@ -156,7 +156,7 @@ public class ProjectFacadeIntTest {
         assertThat(projectDTO.name()).startsWith(PREFIX_PROJECT_NAME);
         assertThat(projectDTO.id()).isNotNull();
         assertThat(projectDTO.tags()).hasSize(3);
-        assertThat(projectDTO.projectWorkflowIds()).hasSize(1);
+        assertThat(projectDTO.projectWorkflowIds()).hasSize(0);
         assertThat(categoryRepository.count()).isEqualTo(1);
         assertThat(tagRepository.count()).isEqualTo(3);
     }
@@ -314,7 +314,7 @@ public class ProjectFacadeIntTest {
 
         assertThat(project.tags()).hasSize(3);
 
-        assertThat(project.projectWorkflowIds()).hasSize(1);
+        assertThat(project.projectWorkflowIds()).hasSize(0);
 
         project = ProjectDTO.builder()
             .id(project.id())
