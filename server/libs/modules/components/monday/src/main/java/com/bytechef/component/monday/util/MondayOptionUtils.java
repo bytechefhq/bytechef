@@ -28,7 +28,6 @@ import static com.bytechef.component.monday.constant.MondayConstants.WORKSPACE_I
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.monday.constant.MondayBoardKind;
 import com.bytechef.component.monday.constant.MondayColumnType;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -69,12 +68,6 @@ public class MondayOptionUtils {
     public static List<Option<String>> getColumnTypeOptions() {
         return Arrays.stream(MondayColumnType.values())
             .map(mondayColumnType -> option(mondayColumnType.getDisplayValue(), mondayColumnType.getName()))
-            .collect(Collectors.toList());
-    }
-
-    public static List<Option<String>> getBoardKindOptions() {
-        return Arrays.stream(MondayBoardKind.values())
-            .map(mondayBoardKind -> option(mondayBoardKind.getDisplayValue(), mondayBoardKind.getName()))
             .collect(Collectors.toList());
     }
 
